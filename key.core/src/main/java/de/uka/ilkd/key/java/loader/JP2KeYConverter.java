@@ -61,6 +61,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.*;
+import com.github.javaparser.ast.jml.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
@@ -269,6 +270,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case MULTIPLY -> new Times(pi, c, lhs, rhs);
             case DIVIDE -> new Divide(pi, c, lhs, rhs);
             case REMAINDER -> new Modulo(pi, c, lhs, rhs);
+            default -> throw new IllegalStateException("Unexpected value: " + n.getOperator());
         };
     }
 
@@ -1706,12 +1708,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         StatementBlock block = accepto(n.getBlock());
         return new Ccatch(pi, c, null, param, block);
     }
-
-    @Override
-    public Object visit(KeyCatchAllStatement n, Void arg) {
-        // TODO
-        return reportUnsupportedElement(n);
-    }
     // endregion
 
     @Override
@@ -1807,7 +1803,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyExecStatement n, Void arg) {
+    public Object visit(KeyExecStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         StatementBlock body = accept(n.getExecBlock());
@@ -1831,7 +1827,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyLoopScopeBlock n, Void arg) {
+    public Object visit(KeyLoopScopeBlockStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         StatementBlock body = accept(n.getBlock());
@@ -1840,7 +1836,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMergePointStatement n, Void arg) {
+    public Object visit(KeyMergePointStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable expr = accept(n.getExpr());
@@ -1867,7 +1863,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMethodCallStatement n, Void arg) {
+    public Object visit(KeyMethodCallStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable resultVar = accepto(n.getName());
@@ -1891,7 +1887,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyTransactionStatement n, Void arg) {
+    public Object visit(KeyTransactionStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return new TransactionStatement(pi, c, n.getType());
@@ -2193,11 +2189,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(CompactConstructorDeclaration n, Void arg) {
-        return reportUnsupportedElement(n);
-    }
-
-    @Override
-    public Object visit(KeyRangeExpression n, Void arg) {
         return reportUnsupportedElement(n);
     }
     // endregion

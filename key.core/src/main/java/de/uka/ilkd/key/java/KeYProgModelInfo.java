@@ -421,7 +421,9 @@ public class KeYProgModelInfo {
             return null;
         }
         final SymbolReference<ResolvedMethodDeclaration> method = MethodResolutionLogic
-                .solveMethodInType(rct, name, jpSignature, contextTypeDeclaration.get());
+                .solveMethodInType(rct, name, jpSignature
+                //TODO super important        , contextTypeDeclaration.get()
+                );
         return method.getDeclaration()
                 .map(d -> (IProgramMethod) Objects
                         .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
@@ -688,18 +690,17 @@ public class KeYProgModelInfo {
         return result;
     }
 
-
-    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
     private boolean declaresApplicableMethods(ResolvedTypeDeclaration rt, String name,
             List<ResolvedType> signature, ResolvedReferenceTypeDeclaration context) {
         if (rt instanceof MethodResolutionCapability mrc) {
-            var method = mrc.solveMethod(name, signature, false, context);
+            var method = mrc.solveMethod(name, signature, false
+                    //TODO super important: , context
+                    );
             return method.isSolved();
         }
         return false;
     }
 
-    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
     private boolean isDeclaringInterface(
             ResolvedTypeDeclaration ct, String name,
             List<ResolvedType> signature) {
@@ -707,7 +708,6 @@ public class KeYProgModelInfo {
         var id = ct.asInterface();
         var set = id.getDeclaredMethods();
         for (var m : set) {
-            // TODO: check if m is visible for ct
             if (name.equals(m.getName())
                     && isCompatibleSignature(signature, m.formalParameterTypes()))
                 return true;
