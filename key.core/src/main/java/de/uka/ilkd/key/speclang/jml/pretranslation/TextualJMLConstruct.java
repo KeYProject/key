@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
  * form.
  */
+@Deprecated
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
