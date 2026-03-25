@@ -5,24 +5,23 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
 
+import com.github.javaparser.ast.key.KeyTransactionStmt;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import com.github.javaparser.ast.key.KeyTransactionStatement;
-
 public class TransactionStatement extends JavaStatement {
-    private final KeyTransactionStatement.TransactionType type;
+    private final KeyTransactionStmt.TransactionType type;
 
-    public TransactionStatement(KeyTransactionStatement.TransactionType type) {
+    public TransactionStatement(KeyTransactionStmt.TransactionType type) {
         super();
         this.type = type;
     }
 
     public TransactionStatement(
             PositionInfo pi, List<Comment> c,
-            KeyTransactionStatement.TransactionType type) {
+            KeyTransactionStmt.TransactionType type) {
         super(pi, c);
         this.type = type;
     }

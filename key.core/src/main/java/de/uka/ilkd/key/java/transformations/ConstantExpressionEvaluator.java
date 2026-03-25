@@ -11,7 +11,6 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyEscapeExpression;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
-import com.github.javaparser.ast.key.KeyRangeExpression;
 import com.github.javaparser.ast.key.sv.KeyExpressionSV;
 import com.github.javaparser.ast.key.sv.KeyMetaConstructExpression;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
@@ -193,6 +192,7 @@ public class ConstantExpressionEvaluator {
                         yield ((Integer) left) % (Integer) right;
                     throw new RuntimeException();
                 }
+                default -> throw new IllegalStateException("Unexpected value: " + n.getOperator());
             };
         }
 
@@ -424,12 +424,6 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(KeyEscapeExpression n, Void arg) {
-            throw new RuntimeException("unsupported expression");
-
-        }
-
-        @Override
-        public Object visit(KeyRangeExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
         }

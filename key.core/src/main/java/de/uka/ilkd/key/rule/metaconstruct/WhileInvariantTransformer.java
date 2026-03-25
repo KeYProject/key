@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import com.github.javaparser.ast.key.KeyTransactionStmt;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -37,8 +38,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import com.github.javaparser.ast.key.KeyTransactionStatement;
 
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
@@ -224,7 +223,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
-                        KeyTransactionStatement.TransactionType.FINISH))
+                        KeyTransactionStmt.TransactionType.FINISH))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModalityKind, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,

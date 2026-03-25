@@ -18,6 +18,10 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Objects;
 
+import com.github.javaparser.ast.jml.doc.JmlDoc;
+import com.github.javaparser.ast.jml.doc.JmlDocDeclaration;
+import com.github.javaparser.ast.jml.doc.JmlDocStmt;
+import com.github.javaparser.ast.jml.doc.JmlDocType;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
@@ -689,7 +693,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(KeyCatchAllStatement n, Object arg) {
+        public void visit(KeyCatchAllStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
@@ -701,7 +705,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(KeyExecStatement n, Object arg) {
+        public void visit(KeyExecStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
@@ -713,13 +717,13 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(KeyLoopScopeBlock n, Object arg) {
+        public void visit(KeyLoopScopeBlockStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
 
         @Override
-        public void visit(KeyMergePointStatement n, Object arg) {
+        public void visit(KeyMergePointStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
@@ -731,7 +735,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(KeyMethodCallStatement n, Object arg) {
+        public void visit(KeyMethodCallStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
@@ -743,13 +747,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(KeyRangeExpression n, Object arg) {
-            super.visit(n, arg);
-            defaultAction(n, arg);
-        }
-
-        @Override
-        public void visit(KeyTransactionStatement n, Object arg) {
+        public void visit(KeyTransactionStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
@@ -863,19 +861,19 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         @Override
-        public void visit(JmlDocsBodyDeclaration n, Object arg) {
+        public void visit(JmlDocDeclaration n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
 
         @Override
-        public void visit(JmlDocsTypeDeclaration n, Object arg) {
+        public void visit(JmlDocType n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }
 
         @Override
-        public void visit(JmlDocsStatements n, Object arg) {
+        public void visit(JmlDocStmt n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }

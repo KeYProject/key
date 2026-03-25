@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ast.jml.doc.*;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
@@ -275,8 +276,8 @@ public final class JMLTransformer extends JavaTransformer {
 
         for (BodyDeclaration<?> member : members) {
             // JMLDocsBodyDeclaration: JML comments inside a class/interface/... body
-            if (member instanceof JmlDocsBodyDeclaration bd) {
-                String concatenatedComment = sanitizer.asString(bd.jmlDocs());
+            if (member instanceof JmlDocDeclaration bd) {
+                String concatenatedComment = sanitizer.asString(bd.jmlComments());
 
                 // The preparser split along the grammar rules in KeYParser.g4, and gives you a list
                 // of JML entities.
@@ -431,7 +432,7 @@ public final class JMLTransformer extends JavaTransformer {
             while (stmt instanceof LabeledStmt labeledStmt) {
                 var inner = labeledStmt.getStatement();
 
-                if (inner instanceof JmlDocsStatements) {
+                if (inner instanceof JmlDocStmt) {
                     throw new SLTranslationException(
                         ("Here is something wrong. Your label '%s' is glued to a " +
                             "JML annotation instead of a Java statement. Please consider the use of braces")
@@ -458,8 +459,8 @@ public final class JMLTransformer extends JavaTransformer {
                 }
             } else if (stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
                 transformMethodLevelCommentsAt(b.getBody().asBlockStmt(), fileName);
-            } else if (stmt instanceof JmlDocsStatements doc) {
-                String concat = sanitizer.asString(doc.getJmlDocs());
+            } else if (stmt instanceof JmlDocStmt doc) {
+                String concat = sanitizer.asString(doc.jmlComments());
                 ImmutableList<TextualJMLConstruct> constructs =
                     io.parseMethodLevel(concat, fileName, pos);
                 services.addWarnings(io.getWarnings());
@@ -542,10 +543,10 @@ public final class JMLTransformer extends JavaTransformer {
             final var types = new ArrayList<>(cu.getTypes());
             ImmutableList<JMLModifier> modifiers = null;
             for (TypeDeclaration<?> td : types) {
-                if (td instanceof JmlDocsTypeDeclaration jdtd) {
+                if (td instanceof JmlDocType jdtd) {
                     // Currently, we only support modifier at type declaration level.
                     // Other things would be ghost classes or model imports.
-                    var input = sanitizer.asString(jdtd.jmlDocs());
+                    var input = sanitizer.asString(jdtd.jmlComments());
                     PreParser pp = getPreParser();
                     modifiers = pp.parseModifiers(input);
                 } else {
@@ -584,7 +585,7 @@ public final class JMLTransformer extends JavaTransformer {
         for (Modifier mod : hasMods.getModifiers()) {
             var kw = mod.getKeyword();
             if (kw instanceof JmlDocModifier jdm) {
-                var modifiers = sanitizer.asString(jdm.getJmlDocs());
+                var modifiers = sanitizer.asString(jdm.getJmlComments());
                 var jmlMods = pp.parseModifiers(modifiers);
                 for (var jmlMod : jmlMods) {
                     hasMods.addModifier(jmlMod.getParserKeyword());
@@ -636,7 +637,9 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
     }
 
     public String asString(NodeList<JmlDoc> jmlDocs, boolean emulateGlobalPosition) {
-        return asStringJT(jmlDocs.stream().map(JmlDoc::getContent).toList(), emulateGlobalPosition);
+        return asStringJT(jmlDocs.stream()
+                .map(it -> it.getTokenRange()
+                        .map(TokenRange::getBegin).orElse(null)).toList(), emulateGlobalPosition);
     }
 
     public String toSanitizedString(StringBuilder s) {
