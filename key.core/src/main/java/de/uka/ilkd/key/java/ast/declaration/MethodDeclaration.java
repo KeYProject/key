@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 
+import com.github.javaparser.ast.jml.clauses.JmlContract;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Method;
@@ -13,7 +14,6 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
@@ -94,7 +94,7 @@ public class MethodDeclaration extends JavaDeclaration
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration,
-            ImmutableList<TextualJMLConstruct> attachedJml) {
+            ImmutableList<JmlContract> attachedJml) {
         super(pi, comments, modArray, attachedJml);
         this.returnType = returnType;
         this.voidComments = voidComments;

@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;

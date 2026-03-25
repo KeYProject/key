@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 
 import org.key_project.util.ExtList;
 
@@ -27,7 +26,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * the kind of the statement, assert or assume
      */
-    private final TextualJMLAssertStatement.Kind kind;
+    private final Kind kind;
 
     /**
      * the condition in parse tree form
@@ -42,7 +41,7 @@ public class JmlAssert extends JavaStatement {
      * @param positionInfo
      *        the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+    public JmlAssert(Kind kind, KeyAst.Expression condition,
             PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
@@ -55,7 +54,7 @@ public class JmlAssert extends JavaStatement {
      */
     public JmlAssert(ExtList children) {
         super(children);
-        this.kind = Objects.requireNonNull(children.get(TextualJMLAssertStatement.Kind.class));
+        this.kind = Objects.requireNonNull(children.get(Kind.class));
         this.condition = Objects.requireNonNull(children.get(KeyAst.Expression.class));
     }
 
@@ -63,7 +62,7 @@ public class JmlAssert extends JavaStatement {
         this(other.kind, other.condition, other.getPositionInfo());
     }
 
-    public TextualJMLAssertStatement.Kind getKind() {
+    public Kind getKind() {
         return kind;
     }
 
@@ -165,5 +164,20 @@ public class JmlAssert extends JavaStatement {
     @Override
     public void visit(Visitor v) {
         v.performActionOnJmlAssert(this);
+    }
+
+    public enum Kind {
+        ASSERT("assert"), ASSUME("assume");
+
+        private final String name;
+
+        Kind(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

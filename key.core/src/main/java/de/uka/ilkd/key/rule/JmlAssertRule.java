@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
@@ -27,6 +26,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.java.ast.statement.JmlAssert.*;
 
 /**
  * A rule for JML assert/assume statements.
@@ -140,7 +141,7 @@ public final class JmlAssertRule implements BuiltInRule {
         }
 
         JTerm condition =
-            tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
+            tb.convertToFormula(spec.getTerm(services, self, INDEX_CONDITION));
 
         condition = tb.addLabel(condition, new OriginTermLabel.Origin(
             kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT

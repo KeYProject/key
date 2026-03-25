@@ -7,6 +7,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.jml.body.JmlClassAccessibleDeclaration;
+import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
+import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
+import com.github.javaparser.ast.jml.clauses.JmlContract;
+import com.github.javaparser.ast.stmt.Behavior;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -49,6 +54,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
@@ -421,8 +427,8 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private ContractClauses translateJMLClauses(TextualJMLSpecCase textualSpecCase,
-            Context outerContext, ProgramVariableCollection progVars, Behavior originalBehavior)
+    private ContractClauses translateJMLClauses(@MonotonicNonNull JmlContract textualSpecCase,
+                                                Context outerContext, ProgramVariableCollection progVars, Behavior originalBehavior)
             throws SLTranslationException {
         var context =
             outerContext
@@ -1124,7 +1130,7 @@ public class JMLSpecFactory {
         return new ClassInvariantImpl(name, name, kjt, visibility, inv, context.selfVar());
     }
 
-    public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, TextualJMLClassInv textualInv) {
+    public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, @MonotonicNonNull JmlClassExprDeclaration textualInv) {
         // check whether the invariant is static
         final ImmutableList<JMLModifier> modifiers = textualInv.getModifiers();
         final boolean isStatic = (modifiers.contains(JMLModifier.STATIC) || // modifier
@@ -1164,7 +1170,7 @@ public class JMLSpecFactory {
     }
 
     public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt,
-            TextualJMLInitially textualInv) {
+                                                    JmlClassExprDeclaration textualInv) {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
     }
 
@@ -1192,7 +1198,7 @@ public class JMLSpecFactory {
             visibility, null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
-    public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
+    public ClassAxiom createJMLRepresents(KeYJavaType kjt, @MonotonicNonNull JmlRepresentsDeclaration textualRep)
             throws SLTranslationException {
 
         boolean isStatic = textualRep.getModifiers().contains(JMLModifier.STATIC);
@@ -1230,7 +1236,7 @@ public class JMLSpecFactory {
      *        textual representation
      * @return created {@link ClassAxiom}
      */
-    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
+    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, @MonotonicNonNull JmlClassExprDeclaration textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
         if (originalRep == null) {
             throw new NullPointerException();
@@ -1267,7 +1273,7 @@ public class JMLSpecFactory {
             dep.observerFunction().isStatic() ? null : context.selfVar());
     }
 
-    public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
+    public Contract createJMLDependencyContract(KeYJavaType kjt, JmlClassAccessibleDeclaration textualDep) {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
@@ -1404,13 +1410,13 @@ public class JMLSpecFactory {
      * @throws SLTranslationException translation exception
      */
     public ImmutableSet<BlockContract> createJMLBlockContracts(IProgramMethod method,
-            List<Label> labels, StatementBlock block, TextualJMLSpecCase specificationCase)
+            List<Label> labels, StatementBlock block, JmlContract specificationCase)
             throws SLTranslationException {
         if (specificationCase.isLoopContract()) {
             return DefaultImmutableSet.nil();
         }
 
-        final Behavior behavior = specificationCase.getBehavior();
+        final var behavior = specificationCase.getBehavior();
         final AuxiliaryContract.Variables variables =
             AuxiliaryContract.Variables.create(block, labels, method, services);
         final ProgramVariableCollection programVariables =
