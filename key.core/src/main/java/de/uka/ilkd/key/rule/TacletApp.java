@@ -7,12 +7,16 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -20,12 +24,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.logic.LogicServices;
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.Term;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -33,8 +32,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.*;
-import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
-import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -57,7 +54,9 @@ public abstract class TacletApp implements RuleApp {
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
     public static final AtomicLong PERF_PRE = new AtomicLong();
 
-    /** the taclet for which the application information is collected */
+    /**
+     * the taclet for which the application information is collected
+     */
     private final /* @NonNull */ org.key_project.prover.rules.Taclet taclet;
 
     /**
@@ -77,6 +76,8 @@ public abstract class TacletApp implements RuleApp {
      * instantiated yet. This means SchemaVariables in addrule-sections have to be ignored
      */
     private volatile ImmutableSet<SchemaVariable> missingVars = null;
+
+    private volatile ImmutableSet<GenericSort> missingSorts = null;
 
     /**
      * the update context given by the current instantiations must not be changed
@@ -139,7 +140,6 @@ public abstract class TacletApp implements RuleApp {
         }
         return instanceSet;
     }
-
 
 
     /**
@@ -399,6 +399,23 @@ public abstract class TacletApp implements RuleApp {
         return missingVars;
     }
 
+    /**
+     * calculate needed GenericSorts that have not been instantiated yet. This means to ignore
+     * GenericSorts that appear only in addrule-sections of Taclets
+     *
+     * @return ImmutableSet<GenericSort> that need to be instantiated but are not
+     */
+    protected ImmutableSet<GenericSort> calculateNonInstantiatedGenericSorts() {
+        if (missingSorts == null) {
+            var coll =
+                new UninstantiatedGenericSortCollector(instantiations());
+            coll.visitWithoutAddrule(taclet());
+            missingSorts = Immutables.createSetFrom(coll.getSortList());
+        }
+
+        return missingSorts;
+    }
+
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with the given term.
@@ -445,6 +462,15 @@ public abstract class TacletApp implements RuleApp {
      */
     public @NonNull ImmutableSet<SchemaVariable> uninstantiatedVars() {
         return calculateNonInstantiatedSV();
+    }
+
+    /// returns the generic sorts that have not yet been instantiated and need to be instantiated to
+    /// apply the Taclet. (These are not all sorts like the one that appear only in the
+    /// addrule sections)
+    ///
+    /// @return ImmutableSet<GenericSort> with GenericSorts that have not been instantiated yet
+    public @NonNull ImmutableSet<GenericSort> uninstantiatedGenericSorts() {
+        return calculateNonInstantiatedGenericSorts();
     }
 
 
@@ -658,12 +684,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * @param services the Services class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(JOperatorSV p_sv, TermServices services) {
+    public Sort getRealSort(JOperatorSV p_sv, Services services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
     }
 
@@ -713,6 +738,7 @@ public abstract class TacletApp implements RuleApp {
     public final boolean complete() {
         return (posInOccurrence() != null || taclet instanceof NoFindTaclet)
                 && uninstantiatedVars().isEmpty()
+                && uninstantiatedGenericSorts().isEmpty()
                 && assumesInstantionsComplete();
     }
 
@@ -1052,9 +1078,9 @@ public abstract class TacletApp implements RuleApp {
      * create a new function namespace by adding all newly instantiated skolem symbols to a new
      * namespace.
      *
-     * @author mulbrich
      * @param func_ns the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
+     * @author mulbrich
      */
     public Namespace<@NonNull Function> extendedFunctionNameSpace(
             Namespace<@NonNull Function> func_ns) {
@@ -1181,12 +1207,11 @@ public abstract class TacletApp implements RuleApp {
     protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
             @Nullable PosInOccurrence pos) {
-
         for (var pair : instantiations.getInstantiationMap()) {
             final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV) {
+                    || sv instanceof SkolemTermSV || sv instanceof TermLabelSV) {
                 continue;
             }
 
@@ -1198,7 +1223,7 @@ public abstract class TacletApp implements RuleApp {
 
             final Set<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations, pos);
-            final Term inst = instantiations.getInstantiation(sv);
+            var inst = (Term) instantiations.getInstantiation(sv);
             if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
                 return false;
             }

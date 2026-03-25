@@ -7,16 +7,16 @@ on:
 
 jobs:
   optional-tests:
-    continue-on-error: true
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
         java: [21]
-        tests: [":key.core.proof_references:test", ":key.core.symbolic_execution:test"]
+        name: ["proof_references", "symbolic_execution"]
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up JDK ${{matrix.java}}
         uses: actions/setup-java@v5
         with:
@@ -27,13 +27,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Test with Gradle
-        run: ./gradlew --continue ${{ matrix.tests }}
+        run: ./gradlew --continue :key.core.${{ matrix.name }}:test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.tests }}
+          name: test-results-${{ matrix.os }}-${{ matrix.name }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/            

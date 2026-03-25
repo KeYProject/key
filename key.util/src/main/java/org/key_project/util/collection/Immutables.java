@@ -182,7 +182,7 @@ public final class Immutables {
      *        predicate to apply to each element to determine if it
      *        should be included
      *
-     * @returns the filtered list
+     * @return the filtered list
      */
     public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts,
             Predicate<? super T> predicate) {

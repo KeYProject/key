@@ -36,9 +36,11 @@ public final class GuiUtilities {
     /**
      * Center a component on the screen.
      *
+     * Preconditions: comp.getSize() as on screen.
+     *
      * @param comp the component to be centered relative to the screen. It must already have its
      *        final size set.
-     * @preconditions comp.getSize() as on screen.
+     *
      * @see #setCenter(Component, Component)
      */
     public static void setCenter(Component comp) {

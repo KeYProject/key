@@ -281,7 +281,7 @@ public class EngineState {
 
     public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
-                : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
+                : getFirstOpenAutomaticGoal().getLocalNamespaces()).lookupSortOrAlias(sortName);
     }
 
     public Sequent toSequent(String sequent) throws ParserException, ScriptException {

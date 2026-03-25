@@ -46,6 +46,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.Levensthein;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
@@ -281,7 +282,7 @@ public class IntermediateProofReplayer {
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<PartnerNode> partnerNodesInfo =
-                                joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
+                                joinPartnerNodes.get(joinAppInterm.getId());
 
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
@@ -366,9 +367,7 @@ public class IntermediateProofReplayer {
 
                                 addChildren(children, intermChildren);
                             } catch (SkipSMTRuleException e) {
-                                // silently continue; status will be reported
-                                // via
-                                // polling
+                                // silently continue; status will be reported via polling
                             } catch (BuiltInConstructionException | AssertionError
                                     | RuntimeException e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -465,8 +464,13 @@ public class IntermediateProofReplayer {
         }
 
         if (ourApp == null) {
+            var availableTaclets = currGoal.indexOfTaclets().getAllTacletNames().map(Name::toString)
+                    .collect(Collectors.toSet());
+            var similarNames = Levensthein.findSimilarNames(tacletName, availableTaclets);
+            var three = similarNames.stream().limit(3).collect(Collectors.joining(", "));
             throw new TacletAppConstructionException(
-                "Unknown taclet with name \"" + tacletName + "\"");
+                "Unknown taclet with name \"" + tacletName + "\". Most three similar names are: "
+                    + three);
         }
 
         Services services = proof.getServices();
@@ -487,6 +491,10 @@ public class IntermediateProofReplayer {
                 } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
                     throw new TacletAppConstructionException("The taclet " + taclet.name()
                         + " can not be applied to a formula/term in antecedent.");
+                } else if (!pos.isTopLevel()
+                        && (taclet instanceof AntecTaclet || taclet instanceof SuccTaclet)) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " must be applied at the top level; got " + pos);
                 }
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
@@ -599,7 +607,9 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
+        final SMTRule smtRule = SMTRule.INSTANCE; // proof.getServices().getProfile().findInstanceFor(SMTRule.class);
+
+        if (smtRule.name().toString().equals(ruleName)) {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
@@ -646,14 +656,14 @@ public class IntermediateProofReplayer {
                 ImmutableList<PosInOccurrence> unsatCore =
                     SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
-                    return SMTRuleApp.RULE.createApp(name, unsatCore);
+                    return smtRule.createApp(name, unsatCore);
                 } else {
-                    return SMTRuleApp.RULE.createApp(name);
+                    return smtRule.createApp(name);
                 }
             }
         }
 
-        IBuiltInRuleApp ourApp = null;
+        IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -666,19 +676,16 @@ public class IntermediateProofReplayer {
         }
 
         if (currContract != null) {
-            AbstractContractRuleApp contractApp = null;
+            AbstractContractRuleApp<?> contractApp;
 
-            BuiltInRule useContractRule;
             if (currContract instanceof OperationContract) {
-                useContractRule = UseOperationContractRule.INSTANCE;
-                contractApp = (((UseOperationContractRule) useContractRule).createApp(pos))
-                        .setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseOperationContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
             } else {
-                useContractRule = UseDependencyContractRule.INSTANCE;
-                contractApp = (((UseDependencyContractRule) useContractRule).createApp(pos))
-                        .setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseDependencyContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
                 // restore "step" if needed
-                var depContractApp = ((UseDependencyContractApp) contractApp);
+                var depContractApp = ((UseDependencyContractApp<?>) contractApp);
                 if (depContractApp.step() == null) {
                     contractApp = depContractApp.setStep(builtinIfInsts.head());
                 }
@@ -690,10 +697,8 @@ public class IntermediateProofReplayer {
                 ourApp = contractApp;
             }
 
-            currContract = null;
             if (builtinIfInsts != null) {
                 ourApp = ourApp.setAssumesInsts(builtinIfInsts);
-                builtinIfInsts = null;
             }
             return ourApp;
         }
@@ -925,6 +930,10 @@ public class IntermediateProofReplayer {
             }
 
             String value = s.substring(eq + 1);
+            int colon = value.lastIndexOf(':');
+            if (colon != -1 && value.charAt(colon - 1) != ':') {
+                value = value.substring(0, colon);
+            }
             app = parseSV2(app, sv, value, currGoal);
         }
 
@@ -961,7 +970,9 @@ public class IntermediateProofReplayer {
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(),
+                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().sortAliases(),
+                proof.getNamespaces().parametricSorts(),
+                proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(
@@ -993,7 +1004,18 @@ public class IntermediateProofReplayer {
      */
     public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
-        LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
+        var colon = value.indexOf(':');
+        Sort sort;
+        String name;
+        if (colon < 0) {
+            name = value;
+            sort = app.getRealSort(sv, services);
+        } else {
+            name = value.substring(0, colon);
+            sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
+
+        }
+        LogicVariable lv = new LogicVariable(new Name(name), sort);
         JTerm instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }

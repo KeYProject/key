@@ -146,7 +146,14 @@ public final class NotationInfo {
         this.notationTable = createDefaultNotation();
     }
 
-
+    public NotationInfo(boolean prettySyntax, boolean unicodeEnabled, boolean hidePackagePrefix) {
+        this.notationTable = createDefaultNotation();
+        this.prettySyntax = prettySyntax;
+        this.unicodeEnabled = unicodeEnabled;
+        this.hidePackagePrefix = hidePackagePrefix;
+        // TODO: Do we need this in addition?
+        // this.finalImmutable = finalImmutable;
+    }
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -405,12 +412,15 @@ public final class NotationInfo {
     // -------------------------------------------------------------------------
 
     public void refresh(Services services) {
-        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
+        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED,
+            DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
-    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         this.unicodeEnabled = useUnicodeSymbols;
         this.prettySyntax = usePrettyPrinting;
+        this.hidePackagePrefix = hidePackagePrefix;
         if (usePrettyPrinting && services != null) {
             if (useUnicodeSymbols) {
                 this.notationTable = createUnicodeNotation(services);
@@ -420,7 +430,6 @@ public final class NotationInfo {
         } else {
             this.notationTable = createDefaultNotation();
         }
-        hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
 
         if (services != null && services.getProof() != null) {
             ProofSettings settings = services.getProof().getSettings();
@@ -491,6 +500,13 @@ public final class NotationInfo {
 
         if (op instanceof SortDependingFunction) {
             result = notationTable.get(((SortDependingFunction) op).getKind());
+            if (result != null) {
+                return result;
+            }
+        }
+
+        if (op instanceof ParametricFunctionInstance pfi) {
+            result = notationTable.get(pfi.getBase());
             if (result != null) {
                 return result;
             }
