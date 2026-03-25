@@ -57,14 +57,17 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent pos) {
-            if (model.isExplorationModeSelected()) {
-                return Arrays.asList(new AddFormulaToAntecedentAction(),
-                    new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
-                    new DeleteFormulaAction(pos));
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                T object) {
+            if (!model.isExplorationModeSelected() ||
+                    kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
             }
-            return super.getContextActions(mediator, kind, pos);
+
+            var pos = (PosInSequent) object;
+            return Arrays.asList(new AddFormulaToAntecedentAction(),
+                new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
+                new DeleteFormulaAction(pos));
         }
     };
 

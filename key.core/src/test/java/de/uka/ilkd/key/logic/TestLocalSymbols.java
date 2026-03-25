@@ -91,7 +91,7 @@ public class TestLocalSymbols {
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
-        Proof proof = new Proof("TestLocalSymbols", target, "n/a", TacletForTests.initConfig());
+        Proof proof = new Proof("TestLocalSymbols", target, null, TacletForTests.initConfig());
 
         apply(proof, andRight, 0, 1);
         apply(proof, orRight, 0, 1);

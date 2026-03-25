@@ -98,7 +98,7 @@ public abstract class AbstractProblemLoader {
     /**
      * The file or folder to load.
      */
-    private final Path file;
+    private Path file;
 
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
@@ -108,17 +108,17 @@ public abstract class AbstractProblemLoader {
     /**
      * The optional class path entries to use.
      */
-    private final List<Path> classPath;
+    private List<Path> classPath;
 
     /**
      * An optional boot class path.
      */
-    private final Path bootClassPath;
+    private Path bootClassPath;
 
     /**
      * The global includes to use.
      */
-    private final List<Path> includes;
+    private List<Path> includes;
 
     /**
      * The {@link ProblemLoaderControl} to use.
@@ -128,7 +128,7 @@ public abstract class AbstractProblemLoader {
     /**
      * The {@link Profile} to use for new {@link Proof}s.
      */
-    private final Profile profileOfNewProofs;
+    private Profile profileOfNewProofs;
 
     /**
      * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
@@ -151,28 +151,28 @@ public abstract class AbstractProblemLoader {
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
-    private EnvInput envInput;
+    private @Nullable EnvInput envInput;
 
     /**
      * The instantiated {@link ProblemInitializer} used during the loading process.
      */
-    private ProblemInitializer problemInitializer;
+    private @Nullable ProblemInitializer problemInitializer;
 
     /**
      * The instantiated {@link InitConfig} which provides access to the loaded source elements and
      * specifications.
      */
-    private InitConfig initConfig;
+    private @Nullable InitConfig initConfig;
 
     /**
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
-    private Proof proof;
+    private @Nullable Proof proof;
 
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
-    private ReplayResult result;
+    private @Nullable ReplayResult result;
 
     /**
      * Whether warnings (generated when loading the proof) should be ignored
@@ -180,21 +180,19 @@ public abstract class AbstractProblemLoader {
      */
     private boolean ignoreWarnings = false;
 
+    // format: (expected, found)
     /**
      * Maps internal error codes of the parser to human readable strings. The integers refer to the
      * common MismatchedTokenExceptions, where one token is expected and another is found. Both are
      * usually only referred to by their internal code.
      */
-    private final static Map<Pair<Integer, Integer>, String> mismatchErrors;
-    private final static Map<Integer, String> missedErrors;
+    private static final Map<Pair<Integer, Integer>, String> mismatchErrors = new HashMap<>();
+    private static final Map<Integer, String> missedErrors = new HashMap<>();
 
     static {
-        // format: (expected, found)
-        mismatchErrors = new HashMap<>();
         mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors = new HashMap<>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
         missedErrors.put(KeYLexer.SEMI, "semicolon");
@@ -226,8 +224,8 @@ public abstract class AbstractProblemLoader {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
-        this.profileOfNewProofs =
-            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        setProfileOfNewProofs(
+            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -235,7 +233,79 @@ public abstract class AbstractProblemLoader {
         this.includes = includes;
     }
 
-    protected void setProof(Proof proof) {
+    public void setFile(Path file) {
+        this.file = file;
+    }
+
+    public void setClassPath(@Nullable List<Path> classPath) {
+        this.classPath = classPath;
+    }
+
+    public void setBootClassPath(@Nullable Path bootClassPath) {
+        this.bootClassPath = bootClassPath;
+    }
+
+    public void setIncludes(@Nullable List<Path> includes) {
+        this.includes = includes;
+    }
+
+    public void setProofFilename(Path proofFilename) {
+        this.proofFilename = proofFilename;
+    }
+
+    public void setEnvInput(EnvInput envInput) {
+        this.envInput = envInput;
+    }
+
+    public void setProblemInitializer(ProblemInitializer problemInitializer) {
+        this.problemInitializer = problemInitializer;
+    }
+
+    public void setInitConfig(InitConfig initConfig) {
+        this.initConfig = initConfig;
+    }
+
+    public void setResult(ReplayResult result) {
+        this.result = result;
+    }
+
+    public Path getProofFilename() {
+        return proofFilename;
+    }
+
+    public List<Path> getIncludes() {
+        return includes;
+    }
+
+    public ProblemLoaderControl getControl() {
+        return control;
+    }
+
+    public Profile getProfileOfNewProofs() {
+        return profileOfNewProofs;
+    }
+
+    public void setProfileOfNewProofs(Profile profileOfNewProofs) {
+        this.profileOfNewProofs = profileOfNewProofs;
+    }
+
+    public boolean isAskUiToSelectAProofObligationIfNotDefinedByLoadedFile() {
+        return askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+    }
+
+    public Properties getPoPropertiesToForce() {
+        return poPropertiesToForce;
+    }
+
+    public boolean isForceNewProfileOfNewProofs() {
+        return forceNewProfileOfNewProofs;
+    }
+
+    public boolean isIgnoreWarnings() {
+        return ignoreWarnings;
+    }
+
+    protected void setProof(@Nullable Proof proof) {
         this.proof = proof;
     }
 
@@ -261,8 +331,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(Consumer<Proof> callbackProofLoaded)
-            throws Exception {
+    public final void load(Consumer<Proof> callbackProofLoaded) throws Exception {
         control.loadingStarted(this);
 
         loadEnvironment();

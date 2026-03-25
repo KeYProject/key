@@ -1,5 +1,5 @@
 plugins {
-    id 'org.javacc.javacc' version '4.0.1'
+    id 'org.javacc.javacc' version '4.0.3'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -128,15 +128,6 @@ tasks.register('testRunAllFunProofs', Test) {
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
-
-tasks.register('testRunAllInfProofs', Test) {
-    description = 'Prove/reload all keyfiles tagged for regression testing'
-    group = "verification"
-    filter {
-        includeTestsMatching "RunAllProofsInfFlow"
-    }
-}
-
 
 tasks.register('testProveSMTLemmas', Test) {
     description = 'Prove (or load proofs for) lemmas used in the SMT translation'

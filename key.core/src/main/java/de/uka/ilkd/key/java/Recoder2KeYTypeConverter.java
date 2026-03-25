@@ -267,7 +267,7 @@ public class Recoder2KeYTypeConverter {
                 Debug.fail();
             }
         } else {
-            if (namespaces.sorts().lookup(s.name()) == null) {
+            if (namespaces.lookupSortOrAlias(s.name()) == null) {
                 namespaces.sorts().add(s);
             }
             result = new KeYJavaType(s);

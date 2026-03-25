@@ -36,6 +36,8 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
@@ -274,7 +276,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
+            kind = svInst.getInstantiation(op.kind());
         }
         if (jb != op.programBlock() || kind != op.kind()) {
             return JModality.getModality(kind, jb);
@@ -286,13 +288,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
             instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
+        } else if (p_operatorToBeInstantiated instanceof ParametricFunctionInstance pfi) {
+            instantiatedOp = handleParametricFunction(pfi);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
             instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
         } else if (p_operatorToBeInstantiated instanceof JModality mod) {
             instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
-                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
+                instantiatedOp = svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -310,7 +314,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final JTerm instantiationForBoundSchemaVariable =
-                        (JTerm) svInst.getInstantiation(boundSchemaVariable);
+                        svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
@@ -409,6 +413,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         assert res != null
                 : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
+    }
+
+    private Operator handleParametricFunction(ParametricFunctionInstance pfi) {
+        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+
+        for (int i = pfi.getArgs().size() - 1; i >= 0; i--) {
+            args = args.prepend(pfi.getArgs().get(i).instantiate(svInst, services));
+        }
+
+        return ParametricFunctionInstance.get(pfi.getBase(), args, services);
     }
 
     private JTerm resolveSubst(JTerm t) {

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -625,6 +626,14 @@ public final class MiscTools {
                     assert !declaredPVs.contains(pv);
                     assert !writtenPVs.contains(pv);
                     declaredPVs = declaredPVs.add(pv);
+                }
+            } else if (node instanceof SetStatement s) {
+                var spec = services.getSpecificationRepository().getStatementSpec(s);
+                if (spec != null) {
+                    var targetTerm = spec.getTerm(services, null, SetStatement.INDEX_TARGET);
+                    if (targetTerm.op() instanceof LocationVariable lv) {
+                        writtenPVs = writtenPVs.add(lv);
+                    }
                 }
             }
         }

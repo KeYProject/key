@@ -392,11 +392,7 @@ public abstract class Notation {
         }
 
         public void print(JTerm t, LogicPrinter sp) {
-            sp.printHeapConstructor(t, true);
-        }
-
-        public void printEmbeddedHeap(JTerm t, LogicPrinter sp) {
-            sp.printHeapConstructor(t, false);
+            sp.printHeapConstructor(t);
         }
     }
 
