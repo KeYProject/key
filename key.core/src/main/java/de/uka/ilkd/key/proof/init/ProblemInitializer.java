@@ -35,7 +35,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -467,7 +466,6 @@ public final class ProblemInitializer {
         // cache the last used init config
         BaseConfigCache.setBaseInputConfig(config, inputDigest);
         config = config.copy();
-        profile.prepareInitConfig(config);
         return config;
     }
 
@@ -490,7 +488,8 @@ public final class ProblemInitializer {
         }
 
         // applied after envInput/KeYUserProblemFile was read, and its setting are active.
-        var warnings = profile.prepareInitConfig(ic, additionalProfileOptions);
+        var warnings = ic.getProfile()
+                .prepareInitConfig(ic, additionalProfileOptions);
         addWarnings(warnings);
 
         return ic;

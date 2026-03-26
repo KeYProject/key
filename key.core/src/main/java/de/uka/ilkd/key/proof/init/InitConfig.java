@@ -120,7 +120,7 @@ public class InitConfig {
         }
 
         if (currentDefaultChoices.isEmpty()) { // no choices have been read.
-            currentDefaultChoices = new  TreeMap<>();
+            currentDefaultChoices = new TreeMap<>();
             for (var entry : category2DefaultChoice.entrySet()) {
                 currentDefaultChoices.put(entry.getKey(), entry.getValue().name().toString());
             }
@@ -128,11 +128,18 @@ public class InitConfig {
                     .setDefaultChoices(currentDefaultChoices);
         }
 
-        // activate by \settings {}  in file KeYUserProblemFile
-        if(settings != null) {
+        // activate by \settings {} in file KeYUserProblemFile
+        if (settings != null) {
             for (var choice : settings.getChoiceSettings().getDefaultChoicesAsSet()) {
                 activatedChoices.put(choice.category(), choice);
             }
+
+
+            Map<String, String> defaults = new TreeMap<>();
+            for (var ac : getActivatedChoices()) {
+                defaults.put(ac.category(), ac.name().toString());
+            }
+            settings.getChoiceSettings().setDefaultChoices(defaults);
         }
     }
 
@@ -399,13 +406,6 @@ public class InitConfig {
 
 
     public ProofSettings getSettings() {
-        if (settings == null)
-            return null;
-        Map<String, String> defaults = new TreeMap<>();
-        for (var ac : getActivatedChoices()) {
-            defaults.put(ac.category(), ac.name().toString());
-        }
-        settings.getChoiceSettings().setDefaultChoices(defaults);
         return settings;
     }
 

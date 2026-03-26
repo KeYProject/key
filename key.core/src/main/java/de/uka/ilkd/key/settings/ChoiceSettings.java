@@ -36,7 +36,6 @@ public class ChoiceSettings extends AbstractSettings {
 
 
     public ChoiceSettings() {
-        category2Default = new LinkedHashMap<>();
     }
 
 
