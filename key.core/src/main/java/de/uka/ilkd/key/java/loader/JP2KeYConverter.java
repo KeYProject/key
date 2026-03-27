@@ -104,8 +104,7 @@ public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schem
             var compUnit = block.findCompilationUnit();
             compUnit.ifPresent(it -> it.setData(Node.SYMBOL_RESOLVER_KEY, symbolSolver));
         }
-        return block.accept(new JP2KeYVisitor(services, services.getJavaService().getMapping(),
-            schemaVariables), null);
+        return block.accept(new JP2KeYVisitor(services, schemaVariables), null);
     }
 }
 
@@ -128,7 +127,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         new LinkedHashMap<>();
 
     JP2KeYVisitor(@NonNull Services services,
-            @NonNull KeYJPMapping mapping,
             @NonNull Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = services.getJavaService().getMapping();
