@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class WDTacletGenerator implements TacletPOGenerator {
     /**
-     * Generate well-definedness taclets to resolve formulas as WD(pv.{@literal <inv>}) or
+     * Generate well-definedness taclets to resolve formulas as WD(pv.{@literal $inv}) or
      * WD(pv.m(...)).
      *
      * @param proofConfig the proof configuration
@@ -66,7 +66,7 @@ public class WDTacletGenerator implements TacletPOGenerator {
             }
         }
 
-        // WD(a.<inv>)
+        // WD(a.$inv)
         res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
         for (RewriteTaclet t : res) {
             abstractPO.register(t, proofConfig);

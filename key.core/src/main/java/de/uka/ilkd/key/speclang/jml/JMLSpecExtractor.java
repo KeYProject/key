@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -330,8 +331,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (!isHelper && pm.getStateCount() > 0 && (!pm.isStatic() || addInvariant)) {
                     // for a static method translate \inv once again, otherwise use
                     // the internal symbol
-                    final String invString = pm.isStatic() ? "\\inv" : "<$inv>";
-                    final String invFreeString = pm.isStatic() ? "\\inv_free" : "<$inv_free>";
+                    final String invString =
+                        pm.isStatic() ? "\\inv" : PipelineConstants.IMPLICIT_OBJECT_INVARIANT;
+                    final String invFreeString = pm.isStatic() ? "\\inv_free"
+                            : PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT;
 
                     KeYJavaType classType = pm.getContainerType();
                     boolean hasFreeInvariant = services.getSpecificationRepository()

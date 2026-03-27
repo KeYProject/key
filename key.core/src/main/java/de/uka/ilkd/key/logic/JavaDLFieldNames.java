@@ -16,9 +16,6 @@ public class JavaDLFieldNames {
     public static final String IMPLICIT_FIELD_INFIX =
         SEPARATOR + FIELD_PREFIX + IMPLICIT_NAME_PREFIX;
 
-    // FIXME: There are still some names according to the old scheme around. Most notable <inv>
-    public static final String OLD_IMPLICIT_PATTERN = SEPARATOR + "<";
-
     private JavaDLFieldNames() {}
 
     public static boolean isField(Name name) {

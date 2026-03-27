@@ -204,12 +204,6 @@ public final class HeapLDT extends LDT {
             return name.substring(index + JavaDLFieldNames.FIELD_INFIX.length());
         }
 
-        index = name.indexOf(JavaDLFieldNames.OLD_IMPLICIT_PATTERN);
-        if (index >= 0 && name.endsWith(">")) {
-            return name.substring(index + JavaDLFieldNames.OLD_IMPLICIT_PATTERN.length(),
-                name.length() - 1);
-        }
-
         return name;
     }
 

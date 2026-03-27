@@ -79,12 +79,12 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         JTerm recTerm = receiver.getTerm();
 
-        // <inv> and <inv_free> are special cases
+        // $inv and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
-        if (name.equals("<$inv>") && receiver.isTerm()) {
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_INVARIANT) && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
-        if (name.equals("<$inv_free>") && receiver.isTerm()) {
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT) && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
         }
 

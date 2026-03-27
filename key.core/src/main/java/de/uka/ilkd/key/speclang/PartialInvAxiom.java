@@ -24,9 +24,9 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 /**
- * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
+ * A class axiom which is essentially of the form "o.$inv -> phi": it demands that the invariants
  * of the objects of a particular class imply a particular formula. These axioms are logically
- * weaker than the full definitions of <inv> expressed as RepresentsAxioms, but they may have higher
+ * weaker than the full definitions of $inv expressed as RepresentsAxioms, but they may have higher
  * visibility, making them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {

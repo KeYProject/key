@@ -80,7 +80,7 @@ public final class JavaInfo {
     private LocationVariable length;
 
     /**
-     * caches the observer for {@code <inv>}
+     * caches the observer for {@code $inv}
      */
     private ObserverFunction inv;
 
@@ -1197,7 +1197,7 @@ public final class JavaInfo {
     public IObserverFunction getInv() {
         // TODO: Create function when source code is parsed and register it in namespace. Return
         // only function from namespace here. No lazy creation to ensure that all proofs of the same
-        // proof environment have the same <inv> symbol.
+        // proof environment have the same $inv symbol.
         // TODO: Why is the initial check with the heaps needed?
         if (inv == null
                 || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false)
@@ -1236,7 +1236,7 @@ public final class JavaInfo {
     public IObserverFunction getStaticInv(KeYJavaType target) {
         // TODO: Create functions when source code is parsed and register them in namespace. Return
         // only functions from namespace here. No lazy creation to ensure that all proofs of the
-        // same proof environment have the same <$inv> symbols.
+        // same proof environment have the same $inv symbols.
         ObserverFunction inv = staticInvs.get(target);
         if (inv == null) {
             inv = (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(

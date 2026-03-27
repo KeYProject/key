@@ -523,7 +523,7 @@ public class JavaService {
         var obj = typeConverter.getObjectType();
         assert obj != null && obj.getJavaType() != null : "java.lang.Object has to be available";
 
-        for (CompilationUnit cu : bootClasses) {
+        for (final CompilationUnit cu : bootClasses) {
             if (cu == object) {
                 continue;
             }

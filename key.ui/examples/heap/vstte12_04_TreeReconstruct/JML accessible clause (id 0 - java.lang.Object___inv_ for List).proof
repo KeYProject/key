@@ -42,7 +42,7 @@
 
 \javaSource "src";
 
-\chooseContract "JML accessible clause [id: 0 / java.lang.Object::<inv> for List]";
+\chooseContract "JML accessible clause [id: 0 / java.lang.Object::$inv for List]";
 
 \proof {
 (keyLog "0" (keyUser "mattias" ) (keyVersion "1d23877b4d7e54300af1151f620642fdcafd3c1b"))

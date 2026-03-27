@@ -41,7 +41,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ClassAxiomAndInvariantProofReferencesAnalyst(),
             element -> IProofReference.USE_AXIOM.equals(element.getKind()),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<$inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null))<<impl>>)"));
+                "equiv(java.lang.Object::$inv(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null))<<impl>>)"));
     }
 
     /**
@@ -55,7 +55,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ClassAxiomAndInvariantProofReferencesAnalyst(),
             element -> IProofReference.USE_AXIOM.equals(element.getKind()),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<$inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null))<<impl>>)"));
+                "equiv(java.lang.Object::$inv(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null))<<impl>>)"));
     }
 
     /**
@@ -67,7 +67,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             "/proofReferences/ModelFieldTest/ModelFieldTest.java", "test.ModelFieldTest", "doubleX",
             false, new ClassAxiomAndInvariantProofReferencesAnalyst(),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<$inv>(heap,self),true)"),
+                "equiv(java.lang.Object::$inv(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
@@ -81,7 +81,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             "/proofReferences/ModelFieldTest/ModelFieldTest.java", "test.ModelFieldTest",
             "test.ModelFieldTest::$f", false, new ClassAxiomAndInvariantProofReferencesAnalyst(),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<$inv>(heap,self),true)"),
+                "equiv(java.lang.Object::$inv(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
@@ -92,8 +92,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
     public void testAccessibleTest() throws Exception {
         doReferenceFunctionTest(TESTCASE_DIRECTORY,
             "/proofReferences/AccessibleTest/AccessibleTest.java", "test.B",
-            "java.lang.Object::<$inv>", false, new ClassAxiomAndInvariantProofReferencesAnalyst(),
+            "java.lang.Object::$inv", false, new ClassAxiomAndInvariantProofReferencesAnalyst(),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<$inv>(heap,self),java.lang.Object::<$inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"));
+                "equiv(java.lang.Object::$inv(heap,self),java.lang.Object::$inv(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"));
     }
 }
