@@ -10,9 +10,9 @@ public final class IntLinkedList implements IntList {
       @ invariant footprint == \set_union(this.*,
       @      \infinite_union(int i; 0<=i && i<size; ((IntNode)nodeseq[i]).*));
       @
-      @ invariant (\forall int i; 0<=i && i<size; 
+      @ invariant (\forall int i; 0<=i && i<size;
       @         ((IntNode)nodeseq[i]) != null  // this implies \typeof(nodeseq[i]) == \type(IntNode)
-      @      && ((IntNode)nodeseq[i]).data == (int)seq[i] 
+      @      && ((IntNode)nodeseq[i]).data == (int)seq[i]
       @      && (\forall int j; 0<=j && j<size; (IntNode)nodeseq[i] == (IntNode)nodeseq[j] ==> i == j)
       @      && ((IntNode)nodeseq[i]).next == (i==size-1 ? null : (IntNode)nodeseq[i+1]));
       @
@@ -32,7 +32,7 @@ public final class IntLinkedList implements IntList {
       @*/
     public int sum_loopContract() {
         int result = 0;
-        
+
         /*@ loop_contract normal_behavior
           @ requires \invariant_for(this);
           @ ensures \invariant_for(this);
@@ -55,8 +55,10 @@ public final class IntLinkedList implements IntList {
       @*/
     public int sum_loopInvariant() {
         int result = 0;
-        
-        /*@ loop_invariant true;
+
+        /*@ loop_invariant result == (\sum int i; 0 <= i && i < \values.length; (int)seq[i]);
+          @ loop_invariant \values.length <= seq.length;
+          @ loop_invariant \values == seq[0 .. (\values.length - 1)];
           @ decreases seq.length - \values.length;
           @ assignable \nothing;
           @*/
