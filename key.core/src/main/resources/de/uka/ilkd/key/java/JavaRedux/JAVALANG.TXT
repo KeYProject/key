@@ -44,6 +44,7 @@ java.util.ListIterator
 java.lang.Long
 java.lang.Boolean
 java.util.Map
+java.util.NoSuchElementException
 java.util.Set
 java.io.FilterOutputStream
 java.io.InputStream
