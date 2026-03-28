@@ -68,9 +68,9 @@ public class PrettyPrinterRoundtripTest {
     private static final String[] HEAP_CASES = {
         "self.f",
         "sub.f",
-        "int::select(heap, sub, C::$f)",
-        "int::final(self, C::$f)",
-        "\\forall Field f; int::select(heap, self, C::$f) = 0",
+        "int::select(heap, sub, C::#f)",
+        "int::final(self, C::#f)",
+        "\\forall Field f; int::select(heap, self, C::#f) = 0",
         "\\forall Field fvar; self.fvar = 0",
         "\\forall Field fvar; any::final(self, fvar) = 0",
         "self.finf"

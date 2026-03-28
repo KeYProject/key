@@ -87,7 +87,7 @@ public class ProofSettings {
         addSettings(newSMTSettings);
     }
 
-    /*
+    /**
      * copy constructor - substitutes .clone() in classes implementing Settings
      */
     public ProofSettings(ProofSettings toCopy) {
@@ -138,7 +138,7 @@ public class ProofSettings {
      * Used by saveSettings() and settingsToString()
      */
     public void settingsToStream(Writer out) {
-        getConfiguration().save(out, "Proof-Settings-Config-File");
+        getConfiguration().save(out, null);
     }
 
     /**

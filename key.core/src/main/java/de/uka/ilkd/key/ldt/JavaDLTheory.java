@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -157,44 +157,37 @@ public class JavaDLTheory extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public JTerm translateLiteral(Literal lit, Services services) {
-        assert false;
         return null;
     }
 
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        assert false;
         return null;
     }
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-        assert false;
         return false;
     }
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        assert false;
         return null;
     }
 
     @Override
     public Type getType(JTerm t) {
-        assert false;
         return null;
     }
 }

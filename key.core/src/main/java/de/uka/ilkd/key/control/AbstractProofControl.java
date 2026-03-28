@@ -228,6 +228,7 @@ public abstract class AbstractProofControl implements ProofControl {
                     // clear up any missing
                     // generic sort instantiations.
                 }
+
             }
             if (ifSeqInteraction || !firstApp.complete()) {
                 LinkedList<TacletApp> l = new LinkedList<>();

@@ -20,3 +20,25 @@ tasks.register('generateRAPUnitTests', JavaExec) {
     mainClass.set("de.uka.ilkd.key.wd.GenerateUnitTests")
     args(rapDir)
 }
+
+tasks.register("testRAP", Test) {
+    description = "Testng the generated RAP unit tests"
+    group = "verification"
+    dependsOn('generateRAPUnitTests', 'testClasses')
+
+    forkEvery = 1
+    maxParallelForks = 2
+    useJUnitPlatform()
+    it.filter {
+        it.includeTestsMatching "de.uka.ilkd.key.proof.runallproofs.gen.*"
+    }
+    // set heap size for the test JVM(s)
+    minHeapSize = "1g"
+    maxHeapSize = "3g"
+
+    // set JVM arguments for the test JVM(s)
+    //jvmArgs('-XX:MaxPermSize=1g')
+    failFast=false
+    testLogging.showStandardStreams = false
+    testLogging.displayGranularity = 1
+}

@@ -1,7 +1,8 @@
 // verbose: true
 // broken: false
-// exceptionClass: ConvertException
-// msgContains: JML model fields cannot be declared within a method
+// exceptionClass: BuildingException
+// msgContains: Model modifier on variable declaration detected, only model fields are allowed
+// position: 11/19
 
 class ModelFieldinMethod {
 

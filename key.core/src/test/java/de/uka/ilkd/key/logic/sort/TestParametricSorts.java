@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
@@ -14,9 +13,10 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -25,7 +25,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class TestParametricSorts {
     private NamespaceSet nss;
@@ -35,21 +36,22 @@ class TestParametricSorts {
 
     @BeforeEach
     public void setUp() {
-        this.services = new Services(AbstractProfile.getDefaultProfile());
-        this.nss = services.getNamespaces();
-        this.io = new KeyIO(services, nss);
+        services = TacletForTests.services();
+        services.getJavaService().parseSpecialClasses(null);
+        nss = services.getNamespaces();
+        io = new KeyIO(services, nss);
 
+        nss.setSorts(new Namespace<>()); // fresh sorts
         nss.sorts().add(g1 = new GenericSort(new Name("G1")));
         nss.sorts().add(new GenericSort(new Name("G2")));
         nss.sorts().add(new GenericSort(new Name("G3")));
         nss.sorts().add(new GenericSort(new Name("G4")));
 
         NamespaceBuilder nb = new NamespaceBuilder(nss);
-        nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+        nb.addSort("boolean").addSort("int")
+                .addSort("Seq").addSort("LocSet").addSort("double")
                 .addSort("float");
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
     }
 
     private ParametricSortDecl addParametricSort(String name,

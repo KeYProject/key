@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -43,8 +43,6 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
-        // FIXME weigl this seems wrong. Should it not be that this
-        // containingType=manager.specInClass?
         KeYJavaType containingType = receiver.getType();
         if (containingType == null) {
             return null;
@@ -67,7 +65,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
 
             LocationVariable et = (LocationVariable) javaInfo
-                    .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
             if (et != null && pm == null) {
                 containingType = et.getKeYJavaType();
                 if (recTerm != null) {

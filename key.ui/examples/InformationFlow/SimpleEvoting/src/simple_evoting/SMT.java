@@ -30,8 +30,7 @@ public final class SMT {
       @ assignable Environment.rep;
       @ determines Environment.result \by \itself;
       @*/
-    //@ helper
-    public static void send(Message msg,
+    public static /*@ helper @*/ void send(Message msg,
                      int senderID,
                      Server server) {
         byte[] output_message =

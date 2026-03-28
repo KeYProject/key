@@ -176,7 +176,7 @@ public class MasterHandlerTest {
         }
     }
 
-    private record LoadedTestData(String name, TestData data, String translation) {
+    public record LoadedTestData(String name, TestData data, String translation) {
         @Override
         public @NonNull String toString() {
             return name();

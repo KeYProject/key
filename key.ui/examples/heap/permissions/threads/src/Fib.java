@@ -48,5 +48,5 @@ public class Fib extends ThreadSpec {
         ensures initPost();
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public Fib(int n) { this.number = n; }
+    public /*@ helper @*/ Fib(int n) { this.number = n; }
 }

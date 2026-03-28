@@ -17,7 +17,7 @@ abortJavaCardTransactionBox {
 \find(==>box_transaction|{{ ..
   #abortJavaCardTransaction;
 ... }}| (post))
-\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::<transactionConditionallyUpdated>),heap)),box(post))]) 
+\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::#$transactionConditionallyUpdated),heap)),box(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -26,7 +26,7 @@ abortJavaCardTransactionDiamond {
 \find(==>diamond_transaction|{{ ..
   #abortJavaCardTransaction;
 ... }}| (post))
-\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::<transactionConditionallyUpdated>),heap)),diamond(post))]) 
+\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::#$transactionConditionallyUpdated),heap)),diamond(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -679,7 +679,7 @@ allocateInstance {
   #lhs = #t.#allocate()@#t;
 ... }}| (post))
 \varcond(\hasSort(#t2 (program Type), alphaObj))
-\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),equals(boolean::select(heap,#lhs,java.lang.Object::<created>),FALSE))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(create(heap,#lhs)),#allmodal(post))]) 
+\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),equals(boolean::select(heap,#lhs,java.lang.Object::#$created),FALSE))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(create(heap,#lhs)),#allmodal(post))])
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
 -----------------------------------------------------
@@ -689,7 +689,7 @@ allocateInstanceWithLength {
   #lhs = #t.#allocate(#len)@#t;
 ... }}| (post))
 \varcond(\hasSort(#t2 (program Type), alphaObj))
-\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(boolean::select(heap,#lhs,java.lang.Object::<created>),FALSE),equals(length(#lhs),#len)))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::<transient>,Z(0(#))),#lhs,java.lang.Object::<transactionConditionallyUpdated>,FALSE)),#allmodal(post))]) 
+\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(boolean::select(heap,#lhs,java.lang.Object::#$created),FALSE),equals(length(#lhs),#len)))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::#$transient,Z(0(#))),#lhs,java.lang.Object::#$transactionConditionallyUpdated,FALSE)),#allmodal(post))])
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
 -----------------------------------------------------
@@ -1199,7 +1199,7 @@ assertSafe {
   method-frame (#ex) {
     #typeof(#e1) #condition = #e1;
   }
-}\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
+}\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::#$created),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
 \replacewith([]==>[\<{
   method-frame (#ex) {
     #condition = #e1;
@@ -1220,7 +1220,7 @@ assertSafeWithMessage {
     #typeof(#e1) #condition = #e1;
     #typeof(#e2) #message = #e2;
   }
-}\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
+}\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::#$created),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
 \replacewith([]==>[\<{
   method-frame (#ex) {
     #typeof(#e1) #condition = #e1;
@@ -1235,7 +1235,7 @@ Choices: (programRules:Java & assertions:safe)}
 assignableDefinition {
 \find(assignable(heapNew,heapOld,locs))
 \varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
-\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f)))))) 
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::#$created),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f))))))
 \heuristics(delayedExpansion)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1955,7 +1955,7 @@ assignment_to_primitive_array_component_transaction {
 \varcond( \not \isReferenceArray(#v (program Variable)))
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))]) 
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::#$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::#$transactionConditionallyUpdated,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::#$transactionConditionallyUpdated),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------
@@ -1981,7 +1981,7 @@ assignment_to_reference_array_component_transaction {
 \add [and(and(and(not(equals(#v,null)),lt(#se,length(#v))),geq(#se,Z(0(#)))),not(arrayStoreValid(#v,#se0)))]==>[] \replacewith([]==>[false]) ;
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))]) 
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::#$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::#$transactionConditionallyUpdated,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::#$transactionConditionallyUpdated),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------
@@ -2500,13 +2500,13 @@ blockBreakLabel {
 \find(#allmodal ((modal operator))|{{ ..
   #lb0:
   {
-    break;
+    break #lb1;
     #slist
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   do-break(#lb0:
-  break;)
+  break #lb1;)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2515,12 +2515,12 @@ Choices: programRules:Java}
 blockBreakLabeled {
 \find(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb;
     #slist
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  break;
+  break #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2529,12 +2529,12 @@ Choices: programRules:Java}
 blockBreakNoLabel {
 \find(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb1;
     #slist
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  break;
+  break #lb1;
 ... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -2557,12 +2557,12 @@ Choices: programRules:Java}
 blockContinueLabeled {
 \find(#allmodal ((modal operator))|{{ ..
   {
-    continue;
+    continue #lb;
     #slist
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  continue;
+  continue #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2949,11 +2949,11 @@ Choices: integerSimplificationRules:full}
 break {
 \find(#allmodal ((modal operator))|{{ ..
   #lb0:
-  break;
+  break #lb1;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   do-break(#lb0:
-  break;)
+  break #lb1;)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -5163,14 +5163,14 @@ Choices: true}
 createdInHeapToElementOf {
 \find(createdInHeap(s,h))
 \varcond(\notFreeIn(fv (variable), h (Heap term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),or(equals(ov,null),equals(boolean::select(h,ov,java.lang.Object::<created>),TRUE)))))) 
+\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),or(equals(ov,null),equals(boolean::select(h,ov,java.lang.Object::#$created),TRUE))))))
 \heuristics(classAxiom)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithAllFields (createdInHeapWithAllFields) =========================================
 createdInHeapWithAllFields {
 \find(createdInHeap(allFields(o),h))
-\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5178,14 +5178,14 @@ Choices: programRules:Java}
 createdInHeapWithAllFieldsEQ {
 \assumes ([equals(allFields(o),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))) 
+\sameUpdateLevel\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithArrayRange (createdInHeapWithArrayRange) =========================================
 createdInHeapWithArrayRange {
 \find(createdInHeap(arrayRange(o,lower,upper),h))
-\replacewith(or(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower))) 
+\replacewith(or(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)),lt(upper,lower)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5193,7 +5193,7 @@ Choices: programRules:Java}
 createdInHeapWithArrayRangeEQ {
 \assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower))) 
+\sameUpdateLevel\replacewith(or(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)),lt(upper,lower)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5254,7 +5254,7 @@ Choices: programRules:Java}
 == createdInHeapWithSingleton (createdInHeapWithSingleton) =========================================
 createdInHeapWithSingleton {
 \find(createdInHeap(singleton(o,f),h))
-\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5262,7 +5262,7 @@ Choices: programRules:Java}
 createdInHeapWithSingletonEQ {
 \assumes ([equals(singleton(o,f),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))) 
+\sameUpdateLevel\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5335,7 +5335,7 @@ Choices: true}
 defInDomainImpliesCreated {
 \find(inDomainImpliesCreated(m))
 \varcond(\notFreeIn(o (variable), m (Map term)))
-\replacewith(all{o (variable)}(imp(inDomain(m,o),equals(boolean::select(heap,o,java.lang.Object::<created>),TRUE)))) 
+\replacewith(all{o (variable)}(imp(inDomain(m,o),equals(boolean::select(heap,o,java.lang.Object::#$created),TRUE))))
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -5495,7 +5495,7 @@ Choices: true}
 definitionOfNewOnHeap {
 \find(==>newOnHeap(h,s))
 \varcond(\notFreeIn(i (variable), h (Heap term)), \notFreeIn(i (variable), s (Seq term)))
-\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s))),and(imp(equals(java.lang.Object::instance(any::seqGet(s,i)),TRUE),equals(boolean::select(h,java.lang.Object::seqGet(s,i),java.lang.Object::<created>),FALSE)),imp(equals(Seq::instance(any::seqGet(s,i)),TRUE),newOnHeap(h,Seq::seqGet(s,i))))))]) 
+\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s))),and(imp(equals(java.lang.Object::instance(any::seqGet(s,i)),TRUE),equals(boolean::select(h,java.lang.Object::seqGet(s,i),java.lang.Object::#$created),FALSE)),imp(equals(Seq::instance(any::seqGet(s,i)),TRUE),newOnHeap(h,Seq::seqGet(s,i))))))])
 \heuristics(comprehensions)
 Choices: true}
 -----------------------------------------------------
@@ -6244,6 +6244,14 @@ dropEffectlessStores {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== dynamic_type_for_null (dynamic_type_for_null) =========================================
+dynamic_type_for_null {
+\find(G::exactInstance(null))
+\varcond(\not\same(G, Null))
+\replacewith(FALSE)
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == elementOfAllFields (elementOfAllFields) =========================================
 elementOfAllFields {
 \find(elementOf(o,f,allFields(o2)))
@@ -6299,7 +6307,7 @@ Choices: programRules:Java}
 == elementOfFreshLocs (elementOfFreshLocs) =========================================
 elementOfFreshLocs {
 \find(elementOf(o,f,freshLocs(h)))
-\replacewith(and(not(equals(o,null)),not(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)))) 
+\replacewith(and(not(equals(o,null)),not(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE))))
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8127,7 +8135,7 @@ execBreakEliminateContinueLabelWildcard {
   exec {
     break;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
@@ -8197,7 +8205,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateBreak {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break) {
     #slist1
@@ -8205,7 +8213,7 @@ execBreakLabelEliminateBreak {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8215,7 +8223,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateBreakLabelNoMatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break #lb1) {
     #slist1
@@ -8224,7 +8232,7 @@ execBreakLabelEliminateBreakLabelNoMatch {
 \varcond(\different (#lb (program Label), #lb1 (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8234,7 +8242,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinue {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Continue) {
     #slist1
@@ -8242,7 +8250,7 @@ execBreakLabelEliminateContinue {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8252,7 +8260,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinueLabel {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Continue #lb1) {
     #slist1
@@ -8260,7 +8268,7 @@ execBreakLabelEliminateContinueLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8270,15 +8278,15 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinueLabelWildcard {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8288,7 +8296,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateExcCcatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (#t #v) {
     #slist1
@@ -8296,7 +8304,7 @@ execBreakLabelEliminateExcCcatch {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    break;
+    break #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8306,7 +8314,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateReturn {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Return) {
     #slist1
@@ -8314,7 +8322,7 @@ execBreakLabelEliminateReturn {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8324,7 +8332,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateReturnVal {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Return #t #v) {
     #slist1
@@ -8332,7 +8340,7 @@ execBreakLabelEliminateReturnVal {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8342,7 +8350,7 @@ Choices: programRules:Java}
 execBreakLabelMatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break #lb) {
     #slist1
@@ -8360,7 +8368,7 @@ Choices: programRules:Java}
 execBreakLabelWildcard {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break *) {
     #slist1
@@ -8532,7 +8540,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreak {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break) {
     #slist1
@@ -8540,7 +8548,7 @@ execContinueLabelEliminateBreak {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8550,7 +8558,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreakLabel {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break #lb1) {
     #slist1
@@ -8558,7 +8566,7 @@ execContinueLabelEliminateBreakLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8568,7 +8576,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreakLabelWildcard {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break *) {
     #slist1
@@ -8576,7 +8584,7 @@ execContinueLabelEliminateBreakLabelWildcard {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8586,7 +8594,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateContinue {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue) {
     #slist1
@@ -8594,7 +8602,7 @@ execContinueLabelEliminateContinue {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8604,7 +8612,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateContinueLabelNoMatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue #lb1) {
     #slist1
@@ -8613,7 +8621,7 @@ execContinueLabelEliminateContinueLabelNoMatch {
 \varcond(\different (#lb (program Label), #lb1 (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8623,7 +8631,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateExcCcatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (#t #v) {
     #slist1
@@ -8631,7 +8639,7 @@ execContinueLabelEliminateExcCcatch {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    continue;
+    continue #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8641,7 +8649,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateReturn {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Return) {
     #slist1
@@ -8649,7 +8657,7 @@ execContinueLabelEliminateReturn {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8659,7 +8667,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateReturnVal {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Return #t #v) {
     #slist1
@@ -8667,7 +8675,7 @@ execContinueLabelEliminateReturnVal {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -8677,7 +8685,7 @@ Choices: programRules:Java}
 execContinueLabelMatch {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue #lb) {
     #slist1
@@ -8695,9 +8703,9 @@ Choices: programRules:Java}
 execContinueLabelWildcard {
 \find(#allmodal ((modal operator))|{{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
@@ -8883,7 +8891,7 @@ execReturnEliminateContinueLabelWildcard {
   exec {
     return;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
@@ -9048,7 +9056,7 @@ execReturnValEliminateContinueLabelWildcard {
   exec {
     return #se;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
@@ -9212,7 +9220,7 @@ execThrowEliminateContinueLabelWildcard {
   exec {
     throw #se;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }}| (post))
@@ -9594,7 +9602,7 @@ getJavaCardTransient {
   #jcsystemType.#getTransient(#se)@#jcsystemType;
 ... }}| (post))
 \replacewith([]==>[not(equals(#se,null))]) ;
-\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(int::select(heap,#se,java.lang.Object::<transient>)),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(int::select(heap,#se,java.lang.Object::#$transient)),#allmodal(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -11299,7 +11307,7 @@ Choices: programRules:Java}
 insert_constant_string_value {
 \assumes ([wellFormed(heap)]==>[]) 
 \find(#csv)
-\sameUpdateLevel\replacewith(if-then-else(equals(#constantvalue(#csv),null),null,strPool(Seq::cast(#constantvalue(#csv))))) 
+\sameUpdateLevel\add [or(equals(#constantvalue(#csv),null),and(not(equals(strPool(Seq::cast(#constantvalue(#csv))),null)),equals(boolean::select(heap,strPool(Seq::cast(#constantvalue(#csv))),java.lang.Object::#$created),TRUE)))]==>[] \replacewith(if-then-else(equals(#constantvalue(#csv),null),null,strPool(Seq::cast(#constantvalue(#csv)))))
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
@@ -11573,7 +11581,7 @@ Choices: true}
 == intersectAllFieldsFreshLocs (intersectAllFieldsFreshLocs) =========================================
 intersectAllFieldsFreshLocs {
 \find(equals(intersect(allFields(o),freshLocs(h)),empty))
-\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12717,14 +12725,14 @@ Choices: programRules:Java}
 lsLblBreak {
 \find(#allmodal ((modal operator))|{{ ..
   loop-scope (#lhs) {
-    break;
+    break #lb;
     #slist
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
     #lhs = true;
-    break;
+    break #lb;
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -12735,7 +12743,7 @@ lsLblContinueMatch {
 \find(#allmodal ((modal operator))|{{ ..
   #lb:
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }}| (post))
@@ -12747,19 +12755,19 @@ Choices: programRules:Java}
 lsLblContinueNoMatch1 {
 \find(#allmodal ((modal operator))|{{ ..
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }}| (post))
 \varcond(\varcond (\storeStmtIn(#lsStmt (program Statement), #allmodal ((modal operator))|{{
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 }}| (post))), \varcond (\not\isLabeled(#lsStmt (program Statement)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
-  continue;
+  continue #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -12769,14 +12777,14 @@ lsLblContinueNoMatch2 {
 \find(#allmodal ((modal operator))|{{ ..
   #lb1:
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }}| (post))
 \varcond(\different (#lb1 (program Label), #lb (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
-  continue;
+  continue #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -13901,7 +13909,7 @@ Choices: true}
 -----------------------------------------------------
 == nullCreated (nullCreated) =========================================
 nullCreated {
-\add [or(all{h (variable)}(equals(boolean::select(h,null,java.lang.Object::<created>),TRUE)),all{h (variable)}(equals(boolean::select(h,null,java.lang.Object::<created>),FALSE)))]==>[] 
+\add [or(all{h (variable)}(equals(boolean::select(h,null,java.lang.Object::#$created),TRUE)),all{h (variable)}(equals(boolean::select(h,null,java.lang.Object::#$created),FALSE)))]==>[]
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13968,7 +13976,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSets {
 \assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,LocSet::select(h,o,f))==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13976,7 +13984,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSetsEQ {
 \assumes ([wellFormed(h),equals(LocSet::select(h,o,f),EQ)]==>[]) 
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13984,7 +13992,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSetsEQFinal {
 \assumes ([wellFormed(h),equals(LocSet::final(o,f),EQ)]==>[]) 
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13992,7 +14000,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSetsFinal {
 \assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,LocSet::final(o,f))==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14000,7 +14008,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreObserved {
 \find(obs)
 \sameUpdateLevel\varcond(\isObserver (obs (deltaObject term), h (Heap term)))
-\add [or(equals(obs,null),equals(boolean::select(h,obs,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(obs,null),equals(boolean::select(h,obs,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14008,7 +14016,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreObservedInLocSets {
 \find(elementOf(o,f,obs)==>)
 \varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14017,7 +14025,7 @@ onlyCreatedObjectsAreObservedInLocSetsEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
 \find(elementOf(o,f,EQ)==>)
 \varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14025,15 +14033,15 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreReferenced {
 \assumes ([wellFormed(h)]==>[]) 
 \find(deltaObject::select(h,o,f))
-\sameUpdateLevel\add [or(equals(deltaObject::select(h,o,f),null),equals(boolean::select(h,deltaObject::select(h,o,f),java.lang.Object::<created>),TRUE))]==>[] 
+\sameUpdateLevel\add [or(equals(deltaObject::select(h,o,f),null),equals(boolean::select(h,deltaObject::select(h,o,f),java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreReferencedFinal (onlyCreatedObjectsAreReferencedFinal) =========================================
 onlyCreatedObjectsAreReferencedFinal {
-\assumes ([wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)]==>[]) 
+\assumes ([wellFormed(h),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)]==>[])
 \find(deltaObject::final(o,f))
-\sameUpdateLevel\add [or(equals(deltaObject::final(o,f),null),equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))]==>[] 
+\sameUpdateLevel\add [or(equals(deltaObject::final(o,f),null),equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14041,7 +14049,7 @@ Choices: programRules:Java}
 only_created_objects_are_reachable {
 \assumes ([wellFormed(h)]==>[equals(o,null)]) 
 \find(reach(h,s,o,o2,n)==>)
-\add [or(not(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(not(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE)),equals(boolean::select(h,o2,java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: reach:on}
 -----------------------------------------------------
@@ -15135,7 +15143,7 @@ Choices: reach:on}
 reach_does_not_depend_on_fresh_locs {
 \assumes ([]==>[equals(o,null)]) 
 \find(reach(anon(h,empty,h2),s,o,o2,n))
-\add []==>[and(wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))] ;
+\add []==>[and(wellFormed(h),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15144,7 +15152,7 @@ Choices: reach:on}
 reach_does_not_depend_on_fresh_locs_EQ {
 \assumes ([equals(anon(h,empty,h2),EQ)]==>[equals(o,null)]) 
 \find(reach(EQ,s,o,o2,n))
-\add []==>[and(wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))] ;
+\add []==>[and(wellFormed(h),equals(boolean::select(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15177,15 +15185,15 @@ Choices: (programRules:Java & runtimeExceptions:ban)}
 == referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
 referencedObjectIsCreatedRighFinalEQ {
 \assumes ([equals(deltaObject::final(o,f),EQ)]==>[equals(EQ,null)]) 
-\find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
-\add []==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))] 
+\find(==>equals(boolean::select(h,EQ,java.lang.Object::#$created),TRUE))
+\add []==>[or(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),equals(o,null))]
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == referencedObjectIsCreatedRight (referencedObjectIsCreatedRight) =========================================
 referencedObjectIsCreatedRight {
 \assumes ([]==>[equals(deltaObject::select(h,o,f),null)]) 
-\find(==>equals(boolean::select(h,deltaObject::select(h,o,f),java.lang.Object::<created>),TRUE))
+\find(==>equals(boolean::select(h,deltaObject::select(h,o,f),java.lang.Object::#$created),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -15193,7 +15201,7 @@ Choices: programRules:Java}
 == referencedObjectIsCreatedRightEQ (referencedObjectIsCreatedRightEQ) =========================================
 referencedObjectIsCreatedRightEQ {
 \assumes ([equals(deltaObject::select(h,o,f),EQ)]==>[equals(EQ,null)]) 
-\find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
+\find(==>equals(boolean::select(h,EQ,java.lang.Object::#$created),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -15201,8 +15209,8 @@ Choices: programRules:Java}
 == referencedObjectIsCreatedRightFinal (referencedObjectIsCreatedRightFinal) =========================================
 referencedObjectIsCreatedRightFinal {
 \assumes ([]==>[equals(deltaObject::final(o,f),null)]) 
-\find(==>equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))
-\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]) 
+\find(==>equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::#$created),TRUE))
+\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),equals(o,null))])
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15689,38 +15697,38 @@ Choices: true}
 -----------------------------------------------------
 == selectCreatedOfAnon (selectCreatedOfAnon) =========================================
 selectCreatedOfAnon {
-\find(boolean::select(anon(h,s,h2),o,java.lang.Object::<created>))
-\replacewith(if-then-else(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),TRUE,boolean::select(h2,o,java.lang.Object::<created>))) 
+\find(boolean::select(anon(h,s,h2),o,java.lang.Object::#$created))
+\replacewith(if-then-else(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),TRUE,boolean::select(h2,o,java.lang.Object::#$created)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonAsFormula (selectCreatedOfAnonAsFormula) =========================================
 selectCreatedOfAnonAsFormula {
-\find(equals(boolean::select(anon(h,s,h2),o,java.lang.Object::<created>),TRUE))
-\replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
+\find(equals(boolean::select(anon(h,s,h2),o,java.lang.Object::#$created),TRUE))
+\replacewith(or(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),equals(boolean::select(h2,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonAsFormulaEQ (selectCreatedOfAnonAsFormulaEQ) =========================================
 selectCreatedOfAnonAsFormulaEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
-\find(equals(boolean::select(EQ,o,java.lang.Object::<created>),TRUE))
-\sameUpdateLevel\replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
+\find(equals(boolean::select(EQ,o,java.lang.Object::#$created),TRUE))
+\sameUpdateLevel\replacewith(or(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),equals(boolean::select(h2,o,java.lang.Object::#$created),TRUE)))
 \heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonEQ (selectCreatedOfAnonEQ) =========================================
 selectCreatedOfAnonEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
-\find(boolean::select(EQ,o,java.lang.Object::<created>))
-\sameUpdateLevel\replacewith(if-then-else(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),TRUE,boolean::select(h2,o,java.lang.Object::<created>))) 
+\find(boolean::select(EQ,o,java.lang.Object::#$created))
+\sameUpdateLevel\replacewith(if-then-else(equals(boolean::select(h,o,java.lang.Object::#$created),TRUE),TRUE,boolean::select(h2,o,java.lang.Object::#$created)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfAnon (selectOfAnon) =========================================
 selectOfAnon {
 \find(beta::select(anon(h,s,h2),o,f))
-\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f))) 
+\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15728,14 +15736,14 @@ Choices: programRules:Java}
 selectOfAnonEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(beta::select(EQ,o,f))
-\sameUpdateLevel\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f))) 
+\sameUpdateLevel\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfCreate (selectOfCreate) =========================================
 selectOfCreate {
 \find(beta::select(create(h,o),o2,f))
-\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),beta::cast(TRUE),beta::select(h,o2,f))) 
+\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),beta::cast(TRUE),beta::select(h,o2,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15743,14 +15751,14 @@ Choices: programRules:Java}
 selectOfCreateEQ {
 \assumes ([equals(create(h,o),EQ)]==>[]) 
 \find(beta::select(EQ,o2,f))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),beta::cast(TRUE),beta::select(h,o2,f))) 
+\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),beta::cast(TRUE),beta::select(h,o2,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfMemset (selectOfMemset) =========================================
 selectOfMemset {
 \find(beta::select(memset(h,s,x),o,f))
-\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o,f))) 
+\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15758,14 +15766,14 @@ Choices: programRules:Java}
 selectOfMemsetEQ {
 \assumes ([equals(memset(h,s,x),EQ)]==>[]) 
 \find(beta::select(EQ,o,f))
-\sameUpdateLevel\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o,f))) 
+\sameUpdateLevel\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfStore (selectOfStore) =========================================
 selectOfStore {
 \find(beta::select(store(h,o,f,x),o2,f2))
-\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o2,f2))) 
+\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o2,f2)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15773,19 +15781,19 @@ Choices: programRules:Java}
 selectOfStoreEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(beta::select(EQ,o2,f2))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o2,f2))) 
+\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o2,f2)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == seqConcatUnfoldLeft (seqConcatUnfold) =========================================
 seqConcatUnfoldLeft {
 \find(#allmodal ((modal operator))|{{ ..
-  #v = \singleton(#nseLeft, #eRight);
+  #v = \seq_concat(#nseLeft, #eRight);
 ... }}| (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
-  #v = \singleton(#vLeftNew, #eRight);
+  #v = \seq_concat(#vLeftNew, #eRight);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -15793,12 +15801,12 @@ Choices: programRules:Java}
 == seqConcatUnfoldRight (seqConcatUnfold) =========================================
 seqConcatUnfoldRight {
 \find(#allmodal ((modal operator))|{{ ..
-  #v = \singleton(#seLeft, #nseRight);
+  #v = \seq_concat(#seLeft, #nseRight);
 ... }}| (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
-  #v = \singleton(#seLeft, #vRightNew);
+  #v = \seq_concat(#seLeft, #vRightNew);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -16127,7 +16135,7 @@ setJavaCardTransient {
   #jcsystemType.#setTransient(#se, #se1)@#jcsystemType;
 ... }}| (post))
 \replacewith([]==>[not(equals(#se,null))]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#se,java.lang.Object::<transient>,#se1)),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#se,java.lang.Object::#$transient,#se1)),#allmodal(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -16337,7 +16345,7 @@ simplifySelectOfAnon {
 \find(beta::select(anon(h,s,h2),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16349,7 +16357,7 @@ simplifySelectOfAnonEQ {
 \find(beta::select(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),beta::select(h2,o,f),beta::select(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16360,7 +16368,7 @@ simplifySelectOfCreate {
 \find(beta::select(create(h,o),o2,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),beta::cast(TRUE),beta::select(h,o2,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),beta::cast(TRUE),beta::select(h,o2,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16372,7 +16380,7 @@ simplifySelectOfCreateEQ {
 \find(beta::select(EQ,o2,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),beta::cast(TRUE),beta::select(h,o2,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),beta::cast(TRUE),beta::select(h,o2,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16383,7 +16391,7 @@ simplifySelectOfMemset {
 \find(beta::select(memset(h,s,x),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,beta::select(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,beta::select(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16395,7 +16403,7 @@ simplifySelectOfMemsetEQ {
 \find(beta::select(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,beta::select(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,beta::select(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16406,7 +16414,7 @@ simplifySelectOfStore {
 \find(beta::select(store(h,o,f,x),o2,f2))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o2,f2)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o2,f2)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16418,7 +16426,7 @@ simplifySelectOfStoreEQ {
 \find(beta::select(EQ,o2,f2))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),beta::cast(x),beta::select(h,o2,f2)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),beta::cast(x),beta::select(h,o2,f2)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16751,7 +16759,7 @@ stringAssignment {
 \find(#normalassign ((modal operator))|{{ ..
   #v = #slit;
 ... }}| (post))
-\sameUpdateLevel\add [not(equals(strPool(#slit),null)),equals(boolean::select(heap,strPool(#slit),java.lang.Object::<created>),TRUE)]==>[] \replacewith(update-application(elem-update(#v (program Variable))(strPool(#slit)),#normalassign(post))) 
+\sameUpdateLevel\add [not(equals(strPool(#slit),null)),equals(boolean::select(heap,strPool(#slit),java.lang.Object::#$created),TRUE)]==>[] \replacewith(update-application(elem-update(#v (program Variable))(strPool(#slit)),#normalassign(post)))
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: true}
 -----------------------------------------------------
@@ -17923,12 +17931,12 @@ Choices: programRules:Java}
 tryBreakLabel {
 \find(#allmodal ((modal operator))|{{ ..
   try {
-    break;
+    break #lb;
     #slist
   }#cs
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  break;
+  break #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18033,7 +18041,7 @@ Choices: programRules:Java}
 tryFinallyBreakLabel {
 \find(#allmodal ((modal operator))|{{ ..
   try {
-    break;
+    break #lb;
     #slist
   }#cs finally {
     #slist2
@@ -18043,7 +18051,7 @@ tryFinallyBreakLabel {
   {
     #slist2
   }
-  break;
+  break #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18199,12 +18207,12 @@ Choices: programRules:Java}
 try_continue_1 {
 \find(#allmodal ((modal operator))|{{ ..
   try {
-    continue;
+    continue #lb;
     #slist
   }#cs
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  continue;
+  continue #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18227,7 +18235,7 @@ Choices: programRules:Java}
 try_finally_continue_1 {
 \find(#allmodal ((modal operator))|{{ ..
   try {
-    continue;
+    continue #lb;
     #slist
   }#cs finally {
     #slist2
@@ -18237,7 +18245,7 @@ try_finally_continue_1 {
   {
     #slist2
   }
-  continue;
+  continue #lb;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18591,7 +18599,7 @@ Choices: programRules:Java}
 wellFormedMemsetArrayObject {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(ar,x))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::#$created),TRUE),arrayStoreValid(ar,x)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18607,7 +18615,7 @@ Choices: programRules:Java}
 wellFormedStoreArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(o,x))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::#$created),TRUE),arrayStoreValid(o,x)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18631,7 +18639,7 @@ Choices: programRules:Java}
 wellFormedStoreObject {
 \find(wellFormed(store(h,o,f,x)))
 \succedentPolarity\varcond(\fieldType(f (Field term), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::#$created),TRUE),equals(alpha::instance(x),TRUE)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18640,7 +18648,7 @@ wellFormedStoreObjectEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
 \sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::#$created),TRUE),equals(alpha::instance(x),TRUE)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -60,7 +59,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     }
 
     @Override
-    public @Nullable Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() {
         return new Location(null, position);
     }
 }

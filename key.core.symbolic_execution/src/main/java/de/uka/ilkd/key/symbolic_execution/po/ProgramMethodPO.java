@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -356,7 +356,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         }
         IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
         if (pm == null) {
-            pm = javaInfo.getConstructor(type, parameterTypes);
+            pm = javaInfo.getConstructor(type, parameterTypes, type);
             if (pm == null) {
                 throw new IOException("Can't find program method \"" + value + "\".");
             }

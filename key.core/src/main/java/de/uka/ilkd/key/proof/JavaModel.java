@@ -8,8 +8,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.Includes;
 
 import org.key_project.util.java.IOUtil;
@@ -147,8 +149,10 @@ public final class JavaModel {
     /// if necessary.
     public String asKeyString() {
         return (bootClassPath != null
-                ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
-                : "") +
+                && !Objects.equals(bootClassPath.toAbsolutePath(), Services.getReduxPath())
+                        ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
+                        : "")
+                +
                 (classPath != null && !classPath.isEmpty() ? "\n\\classpath %s;".formatted(
                     classPath.stream().map(IOUtil::safePath)
                             .map("\"%s\""::formatted)

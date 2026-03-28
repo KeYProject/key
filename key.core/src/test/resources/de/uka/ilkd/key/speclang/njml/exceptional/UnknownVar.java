@@ -1,11 +1,11 @@
-// exceptionClass: PosConvertException
-// msgContains: Could not resolve FieldReference "unknownVar"
+// exceptionClass: ParserException
+// msgContains: Name could not be resolved 'unknownVar'
 // position: 12/9
 
 
 class UnknownVar {
 
-    /*@ public normal_bevhaviour
+    /*@ public normal_behaviour
       @  ensures true;
       @*/
     public void m() {

@@ -95,7 +95,7 @@ public final class BFilter extends ThreadSpec2 {
         ensures stateInv();
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public BFilter(Sampler s, Buffer b) {
+    public /*@ helper @*/ BFilter(Sampler s, Buffer b) {
         this.sampler = s;
         this.buffer = b;
     }

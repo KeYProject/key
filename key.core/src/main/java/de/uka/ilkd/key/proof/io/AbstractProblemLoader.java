@@ -362,13 +362,13 @@ public abstract class AbstractProblemLoader {
     protected void loadEnvironment() throws ProofInputException, IOException {
         FileRepo fileRepo = createFileRepo();
 
-        var timeBeforeEnv = System.nanoTime();
+        long timeBeforeEnv = System.nanoTime();
         LOGGER.info("Loading environment from {}", file);
         envInput = createEnvInput(fileRepo);
         LOGGER.debug("Environment load took {}",
             PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
-        var beforeInitConfig = System.nanoTime();
+        long beforeInitConfig = System.nanoTime();
         LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);

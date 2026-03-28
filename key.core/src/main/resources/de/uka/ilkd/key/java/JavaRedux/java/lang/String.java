@@ -4,12 +4,6 @@ public final class String extends java.lang.Object implements java.io.Serializab
 {
    // public final static java.util.Comparator CASE_INSENSITIVE_ORDER;
 
-   /*@ normal_behavior
-       ensures \result == \dl_seqLen(\dl_strContent(this));
-    */
-   public /*@pure*/ int length();
-
-
    /*@
    public normal_behavior
       requires true;
@@ -192,7 +186,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \nothing;
    */
-   public boolean /*@ helper */ startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
+   public /*@ helper */ boolean startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
 
    /*@
    public normal_behavior
@@ -205,7 +199,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \nothing;
     */
-   public boolean /*@ helper */ startsWith(java.lang.String other);
+   public /*@ helper */ boolean startsWith(java.lang.String other);
 
    /*@
    public normal_behavior
@@ -305,7 +299,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@
    public normal_behavior
       requires startIdx >= 0 && startIdx < \dl_seqLen(\dl_strContent(this));
-      //boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
+      //boolean::select(heapAtPre, \result, java.lang.Object::#$created)==FALSE
       ensures \result != null;
       ensures \dl_strContent(\result)==\dl_seqSub(\dl_strContent(this), startIdx, \dl_seqLen(\dl_strContent(this)));
       assignable \nothing;
@@ -322,7 +316,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires endIdx >= startIdx && startIdx >= 0
            && endIdx <= \dl_seqLen(\dl_strContent(this));
-      //boolean::select(heapAtPre, result, java.lang.Object::<created>)==FALSE
+      //boolean::select(heapAtPre, result, java.lang.Object::#$created)==FALSE
       ensures \result != null;
       ensures \dl_strContent(\result)==\dl_seqSub(\dl_strContent(this), startIdx, endIdx);
       assignable \nothing;
@@ -339,7 +333,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public normal_behavior
       requires    other != null;
       requires \dl_seqLen(\dl_strContent(other)) > 0;
-      //ensures boolean::select(heapAtPre, result, java.lang.Object::<created>)==FALSE
+      //ensures boolean::select(heapAtPre, result, java.lang.Object::#$created)==FALSE
       ensures \result != null;
       ensures \dl_strContent(\result)==\dl_seqConcat(\dl_strContent(this), \dl_strContent(other));
       assignable \nothing;
@@ -439,7 +433,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       requires obj == null;
       ensures \dl_strContent(\result) == "null";
       ensures \result != null;
-      //       && boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
+      //       && boolean::select(heapAtPre, \result, java.lang.Object::#$created)==FALSE
       assignable \nothing;
    also
    public normal_behavior
@@ -520,7 +514,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures \dl_seqLen(\dl_strContent(\result)) == count;
       ensures (\forall int i; 0 <= i < count;
                          (int) \dl_strContent(\result)[i] == data[i+offset]);
-      //    && boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
+      //    && boolean::select(heapAtPre, \result, java.lang.Object::#$created)==FALSE
       ensures \result != null;
       assignable \nothing;
    also
@@ -544,7 +538,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       ensures (\forall int i; 0 <= i < data.length;
                   (int) \dl_strContent(\result)[i] == data[i]);
       ensures \result != null;
-      //    && boolean::select(heapAtPre, \result, java.lang.Object::<created>)==FALSE
+      //    && boolean::select(heapAtPre, \result, java.lang.Object::#$created)==FALSE
       assignable \nothing;
    also exceptional_behavior
       requires data == null;

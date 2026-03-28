@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -14,7 +13,7 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -48,7 +47,7 @@ class FinalFieldCodeValidatorTest {
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(dir, null, null, null);
 
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         Set<Contract> contracts = new HashSet<>();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
@@ -76,7 +75,7 @@ class FinalFieldCodeValidatorTest {
     }
 
     private void testConstructor(Contract c, KeYEnvironment<?> env)
-            throws ProofInputException, MalformedURLException {
+            throws ProofInputException {
         try {
             // System.out.println("Contract id: " + c.getName());
             ContractPO po = c.createProofObl(env.getInitConfig());

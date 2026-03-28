@@ -643,8 +643,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             /**
              * creates the NIL list iterator
              */
-            public SLNilListIterator() {
-            }
+            public SLNilListIterator() {}
 
             /** @return next element in list */
             @Override

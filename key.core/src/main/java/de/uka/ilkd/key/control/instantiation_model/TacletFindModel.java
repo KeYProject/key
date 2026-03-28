@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
@@ -340,6 +340,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @throws SVInstantiationException if the instantiation is incorrect
      */
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
+
         final TermBuilder tb = services.getTermBuilder();
         TacletApp result = originalApp;
         SchemaVariable sv = null;
@@ -392,6 +393,7 @@ public class TacletFindModel extends AbstractTableModel {
             }
 
             for (irow = noEditRow + 1; irow < entries.size(); irow++) {
+
                 if (!isInputAvailable(irow)) {
                     continue;
                 }

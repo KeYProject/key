@@ -96,5 +96,5 @@ public class ThreadSpec2 {
         ensures stateInv();
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public ThreadSpec2() {}
+    public /*@ helper @*/ ThreadSpec2() {}
 }

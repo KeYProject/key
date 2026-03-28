@@ -9,11 +9,6 @@ public final class ProblemLoaderException extends Exception {
     private static final long serialVersionUID = 5683051720482052601L;
     private final AbstractProblemLoader origin;
 
-    public ProblemLoaderException(AbstractProblemLoader origin, Throwable cause) {
-        super(cause.getMessage(), cause);
-        this.origin = origin;
-    }
-
     public ProblemLoaderException(AbstractProblemLoader origin, String msg, Throwable cause) {
         super(msg, cause);
         this.origin = origin;
