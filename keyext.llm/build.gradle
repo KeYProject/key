@@ -1,0 +1,10 @@
+description = "LLM UI"
+
+dependencies {
+    implementation project(":key.core")
+    implementation project(":key.ui")
+
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5.1")
+    implementation("com.google.code.gson:gson:2.13.2")
+    implementation("org.slf4j:jcl-over-slf4j:1.7.5")
+}
