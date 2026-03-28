@@ -157,11 +157,11 @@ public class JavacExtension
 
             JavacSettings settings = JavacSettingsProvider.getJavacSettings();
             CompletableFuture<List<PositionedIssueString>> task = settings.getUseProcessors()
-                    ? JavaCompilerCheckFacade.checkExternally(mediator.getUI(), bootClassPath,
+                    ? JavaCompilerCheckFacade.checkExternally(bootClassPath,
                         classpath,
                         javaPath,
                         settings)
-                    : JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath,
+                    : JavaCompilerCheckFacade.check(bootClassPath, classpath,
                         javaPath, settings);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {

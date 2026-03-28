@@ -18,7 +18,6 @@ import javax.tools.*;
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.settings.Configuration;
 
 import org.key_project.util.Streams;
@@ -35,8 +34,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * For setting up <code>javac</code> it uses the KeY project information about the bootpath and
  * classpath.
- * Any issues found in the compilation are reported to a provided listener of type
- * {@link ProblemInitializer.ProblemInitializerListener}.
  * <p>
  * Checking the target Java code can be enabled / disabled by providing the property
  * <code>-PKEY_JAVAC_DISABLE=true</code> / <code>-PKEY_JAVAC_DISABLE=false</code> on startup of KeY.
@@ -61,7 +58,7 @@ public class JavaCompilerCheckFacade {
             var settings = new JavacSettings();
             settings.readSettings(params);
 
-            List<PositionedIssueString> result = check(null,
+            List<PositionedIssueString> result = check(
                 Paths.get(params.getString("bootClassPath")),
                 params.getStringList("classPath").stream().map(Paths::get).toList(),
                 Paths.get(params.getString("javaPath")), settings).get();
@@ -93,11 +90,8 @@ public class JavaCompilerCheckFacade {
 
     /**
      * initiates the compilation check on the target Java source (the Java program to be verified)
-     * in a separate process (with another java runtime) and
-     * reports any issues to the provided <code>listener</code>
+     * in a separate process (with another java runtime)
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *        about any issues found in the target Java program
      * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
      * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
@@ -107,7 +101,6 @@ public class JavaCompilerCheckFacade {
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> checkExternally(
-            ProblemInitializer.ProblemInitializerListener listener,
             Path bootClassPath, List<Path> classPath, Path javaPath,
             JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
@@ -177,11 +170,7 @@ public class JavaCompilerCheckFacade {
 
     /**
      * initiates the compilation check on the target Java source (the Java program to be verified)
-     * and
-     * reports any issues to the provided <code>listener</code>
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *        about any issues found in the target Java program
      * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
      * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
@@ -191,7 +180,6 @@ public class JavaCompilerCheckFacade {
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
-            ProblemInitializer.ProblemInitializerListener listener,
             Path bootClassPath, List<Path> classPath, Path javaPath,
             JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
@@ -205,9 +193,6 @@ public class JavaCompilerCheckFacade {
 
         if (compiler == null) {
             LOGGER.info("Javac is not available in current java runtime. Javac check skipped");
-            if (listener != null) {
-                listener.reportStatus(null, "No javac compiler found. Java check disabled.");
-            }
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
@@ -249,8 +234,9 @@ public class JavaCompilerCheckFacade {
         }
 
         if (bootClassPath != null) {
-            options.add("-bootclasspath");
-            options.add(bootClassPath.toAbsolutePath().toString());
+            // options.add("-bootclasspath");
+            // options.add(bootClassPath.toAbsolutePath().toString());
+            LOGGER.info("The \"bootclasspath\" Option is set but not supported.");
         }
 
         if (classPath != null && !classPath.isEmpty()) {
@@ -276,6 +262,10 @@ public class JavaCompilerCheckFacade {
 
         Iterable<? extends JavaFileObject> compilationUnits =
             fileManager.getJavaFileObjects(files.toArray(new Path[0]));
+
+        LOGGER.info(
+            "running Javac check with following\n\toptions: {},\n\tclasses: {},\n\tcompilation units: {},",
+            options, classes, compilationUnits);
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
             options, classes, compilationUnits);
