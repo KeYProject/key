@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -81,10 +80,6 @@ class TermImpl implements JTerm {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
-
     /**
      * Constructs a term for the given operator, with the given sub terms, bounded variables and (if
      * applicable) the code block on this term.
@@ -95,36 +90,13 @@ class TermImpl implements JTerm {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            String origin) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.origin = origin;
     }
-
-    TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
-        this(op, subs, boundVars, "");
-    }
-
-    /**
-     * For which feature is this information needed?
-     * What is the difference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
-     */
-    private final String origin;
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =

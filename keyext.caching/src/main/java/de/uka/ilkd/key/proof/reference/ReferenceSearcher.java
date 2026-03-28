@@ -54,10 +54,13 @@ public final class ReferenceSearcher {
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
             Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
             var tacletsOk = true;
-            for (var taclet : tacletIndex.allNoPosTacletApps().stream()
-                    .filter(x -> x.taclet().getOrigin() != null
-                            && x.taclet().getOrigin().contains(proofFile))
-                    .toList()) {
+            final var list = tacletIndex.allNoPosTacletApps().stream()
+                    .filter(x -> {
+                        var origin = p.getServices().getNamespaces().docs().findOrigin(x.taclet());
+                        return origin != null && origin.contains(proofFile);
+                    })
+                    .toList();
+            for (NoPosTacletApp taclet : list) {
                 if (newTaclets.stream().noneMatch(newTaclet -> Objects
                         .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
                     tacletsOk = false;

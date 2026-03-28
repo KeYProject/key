@@ -65,36 +65,6 @@ public abstract class AbstractProblemLoader {
      */
     private boolean loadSingleJavaFile = false;
 
-    public static class ReplayResult {
-
-        private final Node node;
-        private final List<Throwable> errors;
-        private final String status;
-
-        public ReplayResult(String status, List<Throwable> errors, Node node) {
-            this.status = status;
-            this.errors = errors;
-            this.node = node;
-        }
-
-        public Node getNode() {
-            return node;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public List<Throwable> getErrorList() {
-            return errors;
-        }
-
-        public boolean hasErrors() {
-            return errors != null && !errors.isEmpty();
-        }
-
-    }
-
     /**
      * The file or folder to load.
      */
@@ -858,5 +828,35 @@ public abstract class AbstractProblemLoader {
 
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
+    }
+
+    public static class ReplayResult {
+
+        private final Node node;
+        private final List<Throwable> errors;
+        private final String status;
+
+        public ReplayResult(String status, List<Throwable> errors, Node node) {
+            this.status = status;
+            this.errors = errors;
+            this.node = node;
+        }
+
+        public Node getNode() {
+            return node;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<Throwable> getErrorList() {
+            return errors;
+        }
+
+        public boolean hasErrors() {
+            return errors != null && !errors.isEmpty();
+        }
+
     }
 }

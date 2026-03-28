@@ -16,7 +16,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -118,9 +117,4 @@ public interface JTerm
      *         non-empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     boolean containsJavaBlockRecursive();
-
-    /**
-     * Returns a human-readable source of this term. For example the filename with line and offset.
-     */
-    default @Nullable String getOrigin() { return null; }
 }
