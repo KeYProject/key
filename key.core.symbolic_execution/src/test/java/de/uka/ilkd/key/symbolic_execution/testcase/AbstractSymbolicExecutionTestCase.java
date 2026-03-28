@@ -1461,6 +1461,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean usePrettyPrinting, boolean variablesAreOnlyComputedFromUpdates,
             boolean simplifyConditions) throws ProblemLoaderException, ProofInputException {
         // Make sure that required files exists
+        if (javaPathInBaseDir.startsWith("/")) {
+            javaPathInBaseDir = javaPathInBaseDir.substring(1);
+        }
         Path javaFile = baseDir.resolve(javaPathInBaseDir);
         assertTrue(Files.exists(javaFile));
         // Load java file
@@ -2052,6 +2055,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(containerTypeName);
             assertNotNull(methodFullName);
             assertNotNull(oraclePathInBaseDirFile);
+            if (oraclePathInBaseDirFile.startsWith("/")) {
+                oraclePathInBaseDirFile = oraclePathInBaseDirFile.substring(1);
+            }
             var oracleFile = baseDir.resolve(oraclePathInBaseDirFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 assertTrue(Files.exists(oracleFile),

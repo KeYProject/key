@@ -4,8 +4,12 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
@@ -46,16 +50,24 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     private static final Object DEFAULT_SV_KEY = new Object();
     private static final Object DEFAULT_PROGSV_KEY = new Object();
 
-    /** contains rewrite Taclets */
+    /**
+     * contains rewrite Taclets
+     */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> rwList = new LinkedHashMap<>();
 
-    /** contains antecedent Taclets */
+    /**
+     * contains antecedent Taclets
+     */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> antecList = new LinkedHashMap<>();
 
-    /** contains succedent Taclets */
+    /**
+     * contains succedent Taclets
+     */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> succList = new LinkedHashMap<>();
 
-    /** contains NoFind-Taclets */
+    /**
+     * contains NoFind-Taclets
+     */
     protected ImmutableList<NoPosTacletApp> noFindList = ImmutableSLList.nil();
 
     /**
@@ -64,7 +76,9 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     protected HashSet<NoPosTacletApp> partialInstantiatedRuleApps = new LinkedHashSet<>();
 
 
-    /** constructs empty rule index */
+    /**
+     * constructs empty rule index
+     */
     TacletIndex() {
     }
 
@@ -102,10 +116,8 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
                     // indexed independently of sort
                     indexObj = sortDependingFunction.getKind();
                 case ParametricFunctionInstance pfi -> indexObj = pfi.getBase();
-                case ElementaryUpdate ignored ->
-                    indexObj = ElementaryUpdate.class;
-                case JModality ignored ->
-                    indexObj = JModality.class;
+                case ElementaryUpdate ignored -> indexObj = ElementaryUpdate.class;
+                case JModality ignored -> indexObj = JModality.class;
                 default -> {
                 }
             }
@@ -247,7 +259,9 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
         tacletAppList.forEach(this::remove);
     }
 
-    /** clones the index */
+    /**
+     * clones the index
+     */
     @Override
     public Object clone() {
         return this.copy();
@@ -549,6 +563,18 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
 
     @Override
     public abstract TacletIndex copy();
+
+    /// Returns a stream of names of known rules of the underlying [TacletIndex].
+    public Stream<Name> getAllTacletNames() {
+        Function<ImmutableList<NoPosTacletApp>, Stream<Name>> function =
+            it -> it.stream().map(app -> app.taclet().name());
+        return Stream.concat(
+            antecList.values().stream().flatMap(function),
+            Stream.concat(
+                succList.values().stream().flatMap(function), Stream.concat(
+                    rwList.values().stream().flatMap(function),
+                    noFindList.stream().map(it -> it.taclet().name()))));
+    }
 
     /**
      * Inner class to track the occurrences of prefix elements in java blocks

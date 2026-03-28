@@ -76,15 +76,16 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param b second list
      * @return whether they are equal (same length, equal elements)
      */
-    public static <T> boolean compareImmutableLists(
-            ImmutableList<T> a, ImmutableList<T> b, BiPredicate<T, T> cmp) {
+    public static <T> boolean compareImmutableLists(ImmutableList<? extends T> a,
+            ImmutableList<? extends T> b,
+            BiPredicate<? super T, ? super T> cmp) {
         if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
             return true;
         }
         if (a == null || b == null || (a.size() != b.size())) {
             return false;
         }
-        ImmutableList<T> remainderToCompare = a;
+        ImmutableList<? extends T> remainderToCompare = a;
         while (!remainderToCompare.isEmpty()) {
             final T obj1 = remainderToCompare.head();
             if (!cmp.test(obj1, b.head())) {

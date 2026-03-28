@@ -349,7 +349,7 @@ class TermImpl implements JTerm {
     }
 
     @Override
-    public <V> boolean equalsModProperty(Object o, Property<JTerm> property, V... v) {
+    public <V> boolean equalsModProperty(Object o, Property<? super JTerm> property, V... v) {
         if (!(o instanceof JTerm other)) {
             return false;
         }

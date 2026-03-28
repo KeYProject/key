@@ -312,6 +312,9 @@ public abstract class AbstractProofReferenceTestCase {
             // representations
             ProofIndependentSettings.setUsePrettyPrinting(false);
             // Make sure that required files exists
+            if (javaPathInBaseDir.startsWith("/")) {
+                javaPathInBaseDir = javaPathInBaseDir.substring(1);
+            }
             Path javaFile = baseDir.resolve(javaPathInBaseDir);
             assertTrue(Files.exists(javaFile));
             // Make sure that the correct taclet options are defined.
@@ -385,6 +388,9 @@ public abstract class AbstractProofReferenceTestCase {
             // representations
             ProofIndependentSettings.setUsePrettyPrinting(false);
             // Make sure that required files exists
+            if (javaPathInBaseDir.startsWith("/")) {
+                javaPathInBaseDir = javaPathInBaseDir.substring(1);
+            }
             Path javaFile = baseDir.resolve(javaPathInBaseDir);
             assertTrue(Files.exists(javaFile));
             // Make sure that the correct taclet options are defined.

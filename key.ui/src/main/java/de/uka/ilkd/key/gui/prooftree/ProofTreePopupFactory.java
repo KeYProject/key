@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
@@ -148,7 +148,7 @@ public final class ProofTreePopupFactory {
         initMenu(menu, context);
 
         menu.addSeparator();
-        KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
+        KeYGuiExtensionFacade.addContextMenuItems(ContextMenuKind.PROOF_TREE, menu,
             context.invokedNode, context.mediator);
 
         if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
@@ -182,8 +182,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class SubtreeStatistics extends ProofTreeAction {
-        private static final long serialVersionUID = -8452239418108180349L;
-
         protected SubtreeStatistics(ProofTreeContext context) {
             super(context);
             setName("Show Subtree Statistics");
@@ -205,8 +203,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class CollapseOtherBranches extends ProofTreeAction {
-        private static final long serialVersionUID = -6461403850298323327L;
-
         protected CollapseOtherBranches(ProofTreeContext context) {
             super(context);
             setName("Collapse Other Branches");
@@ -219,8 +215,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class ExpandGoalsBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -500754845710844009L;
-
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
@@ -252,8 +246,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class ExpandAllBelow extends ProofTreeAction {
-        private static final long serialVersionUID = 850060084128297700L;
-
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
             setName("Expand All Below");
@@ -269,8 +261,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class CollapseBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -7283113335781286556L;
-
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
@@ -284,8 +274,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class PrevSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 8705344500396898345L;
-
         public PrevSibling(ProofTreeContext context) {
             super(context);
             setName("Previous Sibling");
@@ -321,8 +309,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class NextSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 2337297147243419973L;
-
         public NextSibling(ProofTreeContext context) {
             super(context);
             setName("Next Sibling");
@@ -358,8 +344,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class Notes extends ProofTreeAction {
-        private static final long serialVersionUID = -6871120844080468856L;
-
         public Notes(ProofTreeContext context) {
             super(context);
             setName("Edit Notes...");
@@ -385,8 +369,6 @@ public final class ProofTreePopupFactory {
     }
 
     static class Prune extends ProofTreeAction {
-        private static final long serialVersionUID = -1744963704210861370L;
-
         public Prune(ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
@@ -605,7 +587,6 @@ public final class ProofTreePopupFactory {
     }
 
     public static abstract class ProofTreeAction extends KeyAction {
-        private static final long serialVersionUID = 2686349019163064481L;
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {
