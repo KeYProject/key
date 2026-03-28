@@ -64,6 +64,7 @@ public abstract class AbstractProblemLoader {
      * @see EnvInput#isIgnoreOtherJavaFiles()
      */
     private boolean loadSingleJavaFile = false;
+    private @Nullable Configuration additionalProfileOptions;
 
     public static class ReplayResult {
 
@@ -552,6 +553,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
         return pi;
     }
@@ -859,4 +861,15 @@ public abstract class AbstractProblemLoader {
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
     }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object representing additional options for the given profile.
+    /// @see ProblemInitializer
+    public Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
 }

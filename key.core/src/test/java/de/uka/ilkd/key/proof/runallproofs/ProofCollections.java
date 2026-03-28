@@ -366,7 +366,6 @@ public class ProofCollections {
             "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
 
         g = c.group("quicksort");
-        g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
