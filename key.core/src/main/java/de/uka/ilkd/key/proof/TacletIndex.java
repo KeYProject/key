@@ -7,9 +7,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
