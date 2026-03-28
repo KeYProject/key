@@ -14,7 +14,7 @@ For more information, refer to
   * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
   * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
-The current version of KeY is 2.12.2, licensed under GPL v2.
+The current version of KeY is 2.12.4, licensed under GPL v2.
 
 
 Feel free to use the project templates to get started using KeY:
