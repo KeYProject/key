@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import recoder.java.declaration.EnumConstantDeclaration;
 
 /**
@@ -23,16 +24,21 @@ import recoder.java.declaration.EnumConstantDeclaration;
  * In addition the programvariables that represent enum constants are memorized. Thus this class is
  * able to have queries on the enum constants.
  *
+ * mulbrich: Update 2025 (a mere 19 years later):
+ * Updated from the old heap model to the new one.
+ *
  * @author mulbrich
- * @since 2006-12-10
+ * @since 2006-12-10, updated 2025-10-24 by MU
  */
 
 public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * store the program variables which represent the enum constants
+     * in a lookup map from name to (ordinal index, program variable)
      */
-    private final List<IProgramVariable> constants = new ArrayList<>();
+    private final Map<String, Pair<@NonNull Integer, @NonNull IProgramVariable>> constants =
+        new HashMap<>();
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
@@ -48,9 +54,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
         super(children, fullName, isLibrary);
 
+        int ordinal = 0;
         for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
             String constName = ecd.getEnumConstantSpecification().getName();
-            constants.add(findAttr(constName));
+            constants.put(constName, new Pair<>(ordinal, findAttr(constName)));
+            ordinal++;
         }
     }
 
@@ -75,33 +83,6 @@ public class EnumClassDeclaration extends ClassDeclaration {
             fieldName + " is not an attribute of " + this.getFullName());
     }
 
-    /*
-     * is pv a enum constant of THIS enum?
-     */
-    private boolean isLocalEnumConstant(IProgramVariable pv) {
-        for (IProgramVariable cnst : constants) {
-            if (cnst.equals(pv)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * get the index of the program variable amongst the enumconstants of THIS enum.
-     *
-     * @param pv PV to look up
-     * @return -1 if not found, otherwise the 0-based index.
-     */
-    private int localIndexOf(ProgramVariable pv) {
-        for (int i = 0; i < constants.size(); i++) {
-            if (constants.get(i).equals(pv)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     /**
      * get the number of defined enum constants in this type.
      *
@@ -112,30 +93,14 @@ public class EnumClassDeclaration extends ClassDeclaration {
     }
 
     /**
-     * check whether a PV is an enum constant of any enum type.
+     * get the constant with the given name, including its ordinal index.
      *
-     * @param attribute ProgramVariable to check.
-     * @return true iff attribute is an enum constant.
+     * @param fieldName the name of the enum constant
+     * @return a pair of (index, program variable) of the enum constant with the given name or null
+     *         if there is no such constant
      */
-    public static boolean isEnumConstant(IProgramVariable attribute) {
-        KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration) {
-            return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
-        } else {
-            return false;
-        }
+    public @Nullable Pair<@NonNull Integer, @NonNull IProgramVariable> getConstant(
+            String fieldName) {
+        return constants.get(fieldName);
     }
-
-    // TODO DOC
-    public static int indexOf(ProgramVariable attribute) {
-        KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration) {
-            return ((EnumClassDeclaration) type).localIndexOf(attribute);
-        } else {
-            return -1;
-        }
-    }
-
 }
