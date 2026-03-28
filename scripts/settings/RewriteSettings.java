@@ -1,0 +1,154 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
+import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.settings.ProofSettings;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+/// This is a java program for rewriting the settings of KeY files from the old format to the new format.
+/// The old format was a string contain a properties file (`key=value`). The new format is JSON-like tree structure
+/// with the advantage of type safety and structureness.
+///
+/// ## How to run the program
+/// 1. Compile key to receive a fatjar
+/// ```sh
+/// key> gradle assemble
+///```
+///
+/// 2. Run this program using the shadow jar. Requires a rather new JDK/JRE:
+/// ```sh
+/// java -cp ../../key.ui/build/libs/key-2.12.4-dev-exe.jar RewriteSettings.java <files>
+///```
+/// (no compilation needed)
+///
+/// @author Alexander Weigl
+/// @version 1 (4/6/25)
+public class RewriteSettings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RewriteSettings.class);
+    private static boolean ERROR = false;
+    private static boolean ALWAYS_WRITE = false;
+
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            args = new String[]{
+                    "/home/weigl/work/key/key.ui/examples/standard_key/strings/proofs/substringSubstring.proof"};
+        }
+
+        for (String arg : args) {
+            if ("-f".equals(arg)) {
+                ALWAYS_WRITE = true;
+            }
+
+            var path = Paths.get(arg);
+            var files = Files.isDirectory(
+                    path) ? Files.walk(path).filter(it -> Files.isRegularFile(it)
+                            && (it.getFileName().toString().endsWith(".key") ||
+                            it.getFileName().toString().endsWith(".proof")))
+                    .toList()
+                    : Collections.singletonList(path);
+            for (var file : files) {
+                rewrite(file);
+            }
+        }
+        System.exit(ERROR ? 1 : 0);
+    }
+
+    private static void rewrite(Path file) throws IOException {
+        boolean isGzip = file.getFileName().toString().endsWith(".gz");
+        LOGGER.info("Rewriting: {} (isGzip:{})", file.getFileName(), isGzip);
+        KeYLexer lex;
+        if (isGzip) {
+            var input = CharStreams.fromStream(new GZIPInputStream(Files.newInputStream(file)));
+            lex = ParsingFacade.createLexer(input);
+        } else {
+            lex = ParsingFacade.createLexer(file);
+        }
+        lex.setProofIsEOF(false);
+        var ctx = lex.getAllTokens();
+        var output = new StringBuilder();
+
+        boolean hit = false;
+        for (Iterator<? extends Token> iterator = ctx.iterator(); iterator.hasNext(); ) {
+            var token = iterator.next();
+            if (token.getType() == KeYLexer.KEYSETTINGS) {
+                output.append(token.getText());
+                output.append(" ");
+
+                while (iterator.hasNext() && token.getType() != KeYLexer.STRING_LITERAL) {
+                    token = iterator.next();
+                }
+
+                if (token.getType() != KeYLexer.STRING_LITERAL) {
+                    return;
+                }
+
+                hit = true;
+
+                final var text = token.getText();
+                var settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+                settings.loadSettingsFromPropertyString(text.substring(1, text.length() - 1));
+                output.append(settings.settingsToString());
+
+                while (iterator.hasNext() && token.getType() != KeYLexer.RBRACE) {
+                    token = iterator.next();
+                }
+            } else {
+                output.append(token.getText());
+            }
+        }
+
+        if (!hit) {
+            LOGGER.warn("No settings in file {} found", file);
+            return;
+        }
+
+        boolean write = true;
+        try {
+            // Try to parse the new content.
+            ParsingFacade.parseFile(CharStreams.fromString(output.toString()));
+        } catch (ParseCancellationException e) {
+            try {
+                // if failed, check if the old content is also not parseable.
+                ParsingFacade.parseFile(CharStreams.fromString(output.toString()));
+
+                // on success: do not write this file.
+                write = false;
+                LOGGER.error("Error parsing after rewrite file {}: {}", file, e.getMessage(), e);
+                Files.writeString(file.resolveSibling(file.getFileName() + "-rewritten.error"), output.toString());
+            } catch (ParseCancellationException e2) {
+                //on error write file.
+            }
+        }
+
+        if (write || ALWAYS_WRITE) {
+
+            if (!isGzip) {
+                Files.writeString(file, output.toString());
+            } else {
+                try (var out = new GZIPOutputStream(Files.newOutputStream(file))) {
+                    out.write(output.toString().getBytes(Charset.defaultCharset()));
+                }
+            }
+            LOGGER.info("File translated, tested and written: {}", file);
+        } else {
+            ERROR = true;
+        }
+    }
+}
+
