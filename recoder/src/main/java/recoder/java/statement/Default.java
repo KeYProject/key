@@ -16,7 +16,7 @@ import recoder.list.generic.ASTList;
  * @author <TT>AutoDoc</TT>
  */
 
-public class Default extends Branch {
+public class Default extends SwitchBranch {
 
     /**
      * serialization id
@@ -69,16 +69,6 @@ public class Default extends Branch {
 
     public Default deepClone() {
         return new Default(this);
-    }
-
-    /**
-     * Set parent.
-     *
-     * @param parent a switch.
-     */
-
-    public void setParent(Switch parent) {
-        this.parent = parent;
     }
 
     /**

@@ -13,6 +13,10 @@ import recoder.java.SourceVisitor;
  */
 public class SourceVisitorExtended extends SourceVisitor {
 
+    public void visitActiveCase(ActiveCase x) {
+        // default do nothing
+    }
+
     public void visitCatchAll(CatchAllStatement x) {
         // default do nothing
     }

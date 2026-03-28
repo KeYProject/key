@@ -217,6 +217,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         return new MethodBodyStatement(tr, resVar, convert(l.getMethodReference()));
     }
 
+    public ActiveCase convert(de.uka.ilkd.key.java.recoderext.ActiveCase ac) {
+        ExtList children = collectChildren(ac);
+        return new ActiveCase(children, positionInfo(ac));
+    }
+
     /**
      * translate Context statement blocks
      */
@@ -279,13 +284,17 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(ProgramVariableSVWrapper svw) {
+    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper svw) {
+        return svw.getSV();
+    }
 
+    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.SwitchBranchSVWrapper svw) {
         return svw.getSV();
     }
 
     /**
-     * for some reason the this and super references have to be treated differently here.
+     * for some reason the {@code this} and {@code super} references have to be treated differently
+     * here.
      */
 
     @Override

@@ -17,7 +17,13 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -308,9 +314,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix curPrefix) {
+        if (pe instanceof PossibleProgramPrefix curPrefix) {
 
-            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
+            final ImmutableArray<PossibleProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
 
             // fail fast check

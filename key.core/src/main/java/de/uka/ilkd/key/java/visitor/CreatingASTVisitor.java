@@ -357,6 +357,22 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
+    public void performActionOnActiveCase(ActiveCase x) {
+        ExtList changeList = stack.peek();
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
+            if (!preservesPositionInfo) {
+                pi = PositionInfo.UNDEFINED;
+            }
+            addChild(new ActiveCase(changeList, pi));
+            changed();
+        } else {
+            doDefaultAction(x);
+        }
+    }
+
     // eee
     @Override
     public void performActionOnCase(Case x) {
@@ -1221,13 +1237,22 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public void performActionOnSwitch(Switch x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Switch(changeList);
+        var changeList = stack.peek();
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            var pos = changeList.removeFirstOccurrence(PositionInfo.class);
+            if (!preservesPositionInfo) {
+                pos = PositionInfo.UNDEFINED;
             }
-        };
-        def.doAction(x);
+            Expression expr = changeList.removeFirstOccurrence(Expression.class);
+            var branches = changeList.collect(SwitchBranch.class);
+            changeList.clear();
+            var sw = new Switch(pos, expr, branches);
+            addChild(sw);
+            changed();
+        } else {
+            doDefaultAction(x);
+        }
     }
 
     @Override

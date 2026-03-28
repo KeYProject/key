@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.PositionInfo;
 
 import org.key_project.util.ExtList;
 
@@ -18,6 +19,11 @@ public abstract class BranchStatement extends JavaStatement {
     protected BranchStatement() {
 
     }
+
+    public BranchStatement(PositionInfo pos) {
+        super(pos);
+    }
+
 
 
     /**

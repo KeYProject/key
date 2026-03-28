@@ -31,14 +31,7 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Ccatch;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.ForUpdates;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
@@ -249,7 +242,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
     public static final ProgramSVSort ARRAYPOSTDECL = new ArrayPostDeclarationSort();
 
-    public static final ProgramSVSort SWITCH = new SwitchSVSort();
+    public static final ProgramSVSort SWITCH_BRANCH = new SwitchBranchSVSort();
 
     public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE =
         new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
@@ -1219,15 +1212,12 @@ public abstract class ProgramSVSort extends SortImpl {
         }
     }
 
-    private static final class SwitchSVSort extends ProgramSVSort {
-
-        public SwitchSVSort() {
-            super(new Name("Switch"));
-        }
+    private static final class SwitchBranchSVSort extends ProgramSVSort {
+        public SwitchBranchSVSort() { super(new Name("SwitchBranch")); }
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            return (pe instanceof Switch);
+            return (pe instanceof Case) || (pe instanceof Default);
         }
     }
 

@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Case.
  *
  */
-public class Case extends BranchImp implements ExpressionContainer {
+public class Case extends SwitchBranch implements ExpressionContainer {
 
     /**
      * Expression.

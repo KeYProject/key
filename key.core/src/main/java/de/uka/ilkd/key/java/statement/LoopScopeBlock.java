@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Dominic Scheurer
  */
 public class LoopScopeBlock extends JavaStatement
-        implements StatementContainer, ExpressionContainer, ProgramPrefix {
+        implements StatementContainer, ExpressionContainer, PossibleProgramPrefix {
 
     protected final IProgramVariable indexPV;
     protected final StatementBlock body;
@@ -72,20 +72,20 @@ public class LoopScopeBlock extends JavaStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
+        return !body.isEmpty() && body.getStatementAt(0) instanceof PossibleProgramPrefix;
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.getStatementAt(0);
+            return (PossibleProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
@@ -100,8 +100,8 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(body.getBody(), this);
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
+        return StatementBlock.computePrefixElements(this);
     }
 
     @Override

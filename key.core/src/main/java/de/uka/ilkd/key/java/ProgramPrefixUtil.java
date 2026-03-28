@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 
 public class ProgramPrefixUtil {
 
@@ -26,7 +26,7 @@ public class ProgramPrefixUtil {
         }
     }
 
-    public static ProgramPrefixInfo computeEssentials(ProgramPrefix prefix) {
+    public static ProgramPrefixInfo computeEssentials(PossibleProgramPrefix prefix) {
         int length = 1;
         MethodFrame mf = (MethodFrame) (prefix instanceof MethodFrame ? prefix : null);
         while (prefix.hasNextPrefixElement()) {

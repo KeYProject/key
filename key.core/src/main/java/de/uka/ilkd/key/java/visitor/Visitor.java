@@ -304,6 +304,8 @@ public interface Visitor {
 
     void performActionOnCase(Case x);
 
+    void performActionOnActiveCase(ActiveCase x);
+
     void performActionOnCatch(Catch x);
 
     void performActionOnDefault(Default x);

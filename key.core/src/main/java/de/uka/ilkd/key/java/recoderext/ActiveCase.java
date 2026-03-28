@@ -1,66 +1,36 @@
-/* This file was part of the RECODER library and protected by the LGPL.
- * This file is part of KeY since 2021 - https://key-project.org
+/* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package recoder.java.statement;
+package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.*;
+import recoder.java.statement.EmptyStatement;
+import recoder.java.statement.SwitchBranch;
 import recoder.list.generic.ASTList;
 
-/**
- * Case.
- *
- * @author <TT>AutoDoc</TT>
- */
-
-public class Case extends SwitchBranch implements ExpressionContainer {
-
+public class ActiveCase extends SwitchBranch {
     /**
      * serialization id
      */
-    private static final long serialVersionUID = 4344680443480425524L;
-
-    /**
-     * Expression.
-     */
-
-    protected Expression expression;
+    private static final long serialVersionID = /* TODO */ 0;
 
     /**
      * Body.
      */
-
     protected ASTList<Statement> body;
 
     /**
-     * Case.
+     * ActiveCase.
      */
-
-    public Case() {
+    public ActiveCase() {
         super();
     }
 
     /**
-     * Case.
-     *
-     * @param e an expression.
+     * ActiveCase.
      */
-
-    public Case(Expression e) {
-        setExpression(e);
-        makeParentRoleValid();
-    }
-
-    /**
-     * Case.
-     *
-     * @param e an expression.
-     * @param body a statement mutable list.
-     */
-
-    public Case(Expression e, ASTList<Statement> body) {
+    public ActiveCase(ASTList<Statement> body) {
         setBody(body);
-        setExpression(e);
         makeParentRoleValid();
     }
 
@@ -70,11 +40,8 @@ public class Case extends SwitchBranch implements ExpressionContainer {
      * @param proto a case.
      */
 
-    protected Case(Case proto) {
+    protected ActiveCase(ActiveCase proto) {
         super(proto);
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
         if (proto.body != null) {
             body = proto.body.deepClone();
         }
@@ -87,8 +54,8 @@ public class Case extends SwitchBranch implements ExpressionContainer {
      * @return the object.
      */
 
-    public Case deepClone() {
-        return new Case(this);
+    public ActiveCase deepClone() {
+        return new ActiveCase(this);
     }
 
     /**
@@ -97,9 +64,6 @@ public class Case extends SwitchBranch implements ExpressionContainer {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
         if (body != null) {
             for (Statement statement : body) {
                 statement.setStatementContainer(this);
@@ -115,15 +79,11 @@ public class Case extends SwitchBranch implements ExpressionContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
         if (body != null) {
             result += body.size();
         }
         return result;
     }
-
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
@@ -135,12 +95,6 @@ public class Case extends SwitchBranch implements ExpressionContainer {
 
     public ProgramElement getChildAt(int index) {
         int len;
-        if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
-            index--;
-        }
         if (body != null) {
             len = body.size();
             if (len > index) {
@@ -152,15 +106,11 @@ public class Case extends SwitchBranch implements ExpressionContainer {
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0: expression
-        // role 1 (IDX): body
-        if (expression == child) {
-            return 0;
-        }
+        // role 0 (IDX): body
         if (body != null) {
             int index = body.indexOf(child);
             if (index >= 0) {
-                return (index << 4) | 1;
+                return (index << 4);
             }
         }
         return -1;
@@ -183,14 +133,6 @@ public class Case extends SwitchBranch implements ExpressionContainer {
         if (p == null) {
             throw new NullPointerException();
         }
-        if (expression == p) {
-            Expression r = (Expression) q;
-            expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
-            return true;
-        }
         count = (body == null) ? 0 : body.size();
         for (int i = 0; i < count; i++) {
             if (body.get(i) == p) {
@@ -205,29 +147,6 @@ public class Case extends SwitchBranch implements ExpressionContainer {
             }
         }
         return false;
-    }
-
-    /**
-     * Get the number of expressions in this container.
-     *
-     * @return the number of expressions.
-     */
-
-    public int getExpressionCount() {
-        return (expression != null) ? 1 : 0;
-    }
-
-    /*
-     * Return the expression at the specified index in this node's "virtual" expression
-     * array. @param index an index for an expression. @return the expression with the given
-     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
-     */
-
-    public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
-        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -254,29 +173,6 @@ public class Case extends SwitchBranch implements ExpressionContainer {
     }
 
     /**
-     * Get expression.
-     *
-     * @return the expression.
-     */
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    /**
-     * Set expression.
-     *
-     * @param e an expression.
-     */
-
-    public void setExpression(Expression e) {
-        if (e == null) {
-            throw new NullPointerException("Cases must have an expression");
-        }
-        expression = e;
-    }
-
-    /**
      * The body may be empty (null), to define a fall-through. Attaching an
      * {@link EmptyStatement}would create a single ";".
      */
@@ -296,7 +192,12 @@ public class Case extends SwitchBranch implements ExpressionContainer {
     }
 
     public void accept(SourceVisitor v) {
-        v.visitCase(this);
+        if (v instanceof SourceVisitorExtended e) {
+            e.visitActiveCase(this);
+        } else {
+            throw new IllegalStateException(
+                "Method 'accept' not implemented in " + "ActiveCase");
+        }
     }
 
     public SourceElement getLastElement() {

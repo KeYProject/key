@@ -182,11 +182,7 @@ public class Switch extends BranchStatement
         if (branches != null) {
             for (int i = branches.size() - 1; i >= 0; i -= 1) {
                 Branch b = branches.get(i);
-                if (b instanceof Case) {
-                    ((Case) b).setParent(this);
-                } else {
-                    ((Default) b).setParent(this);
-                }
+                ((SwitchBranch) b).setParent(this);
             }
         }
     }

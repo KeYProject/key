@@ -98,7 +98,7 @@ public class HTMLSyntaxHighlighter {
             "char", "long", "short", "byte", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E",
             "boolean",
             "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E", "final",
-            "volatile", "assert", "default" };
+            "volatile", "assert", "default", "\\Qactive&#045;case\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|", Arrays.asList(JAVA_KEYWORDS));
 

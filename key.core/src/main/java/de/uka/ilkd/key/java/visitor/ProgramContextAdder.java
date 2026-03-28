@@ -5,17 +5,9 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.statement.Exec;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
@@ -59,30 +51,36 @@ public class ProgramContextAdder {
 
         if (!prefixPos.hasNext()) {
             body = createWrapperBody(context, putIn, suffix);
-            // special case labeled statement as a label must not be
+            // special case labeled statement as a label need not be
             // succeeded by a statement block
             if (context instanceof LabeledStatement) {
                 body = createLabeledStatementWrapper((LabeledStatement) context, body);
+            } else if (context instanceof ActiveCase ac) {
+                body = createActiveCaseWrapper(ac, (StatementBlock) body);
             }
             return body;
         } else {
             body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos, prefixDepth, prefix,
                 suffix);
-            if (context instanceof StatementBlock) {
-                return createStatementBlockWrapper((StatementBlock) context, body);
-            } else if (context instanceof Try) {
-                return createTryStatementWrapper((StatementBlock) body, (Try) context);
-            } else if (context instanceof MethodFrame) {
-                return createMethodFrameWrapper((MethodFrame) context, (StatementBlock) body);
-            } else if (context instanceof LabeledStatement) {
-                return createLabeledStatementWrapper((LabeledStatement) context, body);
-            } else if (context instanceof LoopScopeBlock) {
-                return createLoopScopeBlockWrapper((LoopScopeBlock) context, (StatementBlock) body);
-            } else if (context instanceof SynchronizedBlock) {
-                return createSynchronizedBlockWrapper((SynchronizedBlock) context,
+            if (context instanceof StatementBlock block) {
+                return createStatementBlockWrapper(block, body);
+            } else if (context instanceof Try t) {
+                return createTryStatementWrapper(t, (StatementBlock) body);
+            } else if (context instanceof MethodFrame mf) {
+                return createMethodFrameWrapper(mf, (StatementBlock) body);
+            } else if (context instanceof LabeledStatement ls) {
+                return createLabeledStatementWrapper(ls, body);
+            } else if (context instanceof LoopScopeBlock lsb) {
+                return createLoopScopeBlockWrapper(lsb, (StatementBlock) body);
+            } else if (context instanceof SynchronizedBlock sb) {
+                return createSynchronizedBlockWrapper(sb,
                     (StatementBlock) body);
-            } else if (context instanceof Exec) {
-                return createExecStatementWrapper((StatementBlock) body, (Exec) context);
+            } else if (context instanceof Exec e) {
+                return createExecStatementWrapper(e, (StatementBlock) body);
+            } else if (context instanceof Switch sw) {
+                return createSwitchWrapper(sw, (ActiveCase) body);
+            } else if (context instanceof ActiveCase ac) {
+                return createActiveCaseWrapper(ac, (Statement) body);
             } else {
                 throw new RuntimeException(
                     new UnexpectedException("Unexpected block type: " + context.getClass()));
@@ -92,7 +90,7 @@ public class ProgramContextAdder {
 
     /**
      * inserts the content of the statement block <code>putIn</code> and adds succeeding children of
-     * the innermost non terminal element (usually statement block) in the context.
+     * the innermost non-terminal element (usually statement block) in the context.
      *
      * @param wrapper the JavaNonTerminalProgramElement with the context that has to be wrapped
      *        around the content of <code>putIn</code>
@@ -144,7 +142,7 @@ public class ProgramContextAdder {
     /**
      * Replaces the first statement in the wrapper block. The replacement is optimized as it just
      * returns the replacement block if it is the only child of the statement block to be
-     * constructed and the chld is a statementblock too.
+     * constructed and the child is a statementblock too.
      *
      * @param wrapper the StatementBlock where to replace the first statement
      * @param replacement the StatementBlock that replaces the first statement of the block
@@ -166,11 +164,31 @@ public class ProgramContextAdder {
         }
     }
 
-    protected Try createTryStatementWrapper(StatementBlock body, Try old) {
+    protected Try createTryStatementWrapper(Try old, StatementBlock body) {
         return new Try(body, old.getBranchList());
     }
 
-    protected Exec createExecStatementWrapper(StatementBlock body, Exec old) {
+    protected ActiveCase createActiveCaseWrapper(ActiveCase old, Statement body) {
+        var stmts = old.getBody().toArray(new Statement[0]);
+        if (body instanceof StatementBlock bodyBlock) {
+            if (stmts[0] instanceof StatementBlock sb && !sb.isEmpty()) {
+                stmts[0] = bodyBlock;
+            } else {
+                stmts = bodyBlock.getBody().toArray(new Statement[0]);
+            }
+        } else {
+            stmts[0] = body;
+        }
+        return new ActiveCase(stmts);
+    }
+
+    protected Switch createSwitchWrapper(Switch old, ActiveCase body) {
+        var branches = old.getBranchList().toArray(new Branch[0]);
+        branches[0] = body;
+        return new Switch(old.getExpression(), branches);
+    }
+
+    protected Exec createExecStatementWrapper(Exec old, StatementBlock body) {
         return new Exec(body, old.getBranchList());
     }
 

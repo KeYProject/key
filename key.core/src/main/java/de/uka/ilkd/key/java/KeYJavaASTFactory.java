@@ -2313,7 +2313,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Switch} block that executes <code>branches</code> depending on the value
      *         of <code>expression</code>
      */
-    public static Switch switchBlock(final Expression expression, final Branch[] branches) {
+    public static Switch switchBlock(final Expression expression, final SwitchBranch[] branches) {
         final Switch block = new Switch(expression, branches);
 
         return block;

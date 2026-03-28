@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 
 import org.key_project.util.ExtList;
 
@@ -32,12 +32,15 @@ public final class JavaTools {
         assert jb.program() != null;
 
         SourceElement result = jb.program().getFirstElement();
-        while ((result instanceof ProgramPrefix || result instanceof CatchAllStatement)
-                && !(result instanceof StatementBlock && ((StatementBlock) result).isEmpty())) {
+        while ((result instanceof PossibleProgramPrefix pre && pre.isPrefix())
+                || result instanceof CatchAllStatement) {
             if (result instanceof LabeledStatement) {
                 result = ((LabeledStatement) result).getChildAt(1);
             } else if (result instanceof CatchAllStatement) {
                 result = ((CatchAllStatement) result).getBody();
+            } else if (result == result.getFirstElement()
+                    && ((PossibleProgramPrefix) result).isPrefix()) {
+                System.out.println(result);
             } else {
                 result = result.getFirstElement();
             }

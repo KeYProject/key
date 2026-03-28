@@ -1689,7 +1689,8 @@ public final class SymbolicExecutionUtil {
                             JavaProgramElement element = block.program();
                             if (element instanceof StatementBlock) {
                                 StatementBlock b = (StatementBlock) block.program();
-                                ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
+                                ImmutableArray<PossibleProgramPrefix> prefix =
+                                    b.getPrefixElements();
                                 result = CollectionUtil.count(prefix,
                                     element1 -> element1 instanceof MethodFrame);
                             }
@@ -4006,7 +4007,8 @@ public final class SymbolicExecutionUtil {
                     blocks.addFirst((StatementBlock) firstStatement);
                 }
                 SourceElement lastStatement = null;
-                while (firstStatement instanceof ProgramPrefix && lastStatement != firstStatement) {
+                while (firstStatement instanceof PossibleProgramPrefix
+                        && lastStatement != firstStatement) {
                     lastStatement = firstStatement;
                     firstStatement = firstStatement.getFirstElementIncludingBlocks();
                     if (lastStatement instanceof MethodFrame) {

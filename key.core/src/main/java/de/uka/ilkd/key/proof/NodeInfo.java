@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -192,7 +192,7 @@ public class NodeInfo {
         // TODO: unify with MiscTools getActiveStatement
         if (firstStatement != null) {
             activeStatement = firstStatement;
-            while ((activeStatement instanceof ProgramPrefix)
+            while ((activeStatement instanceof PossibleProgramPrefix pre && pre.isPrefix())
                     && !(activeStatement instanceof StatementBlock)) {
                 activeStatement = activeStatement.getFirstElement();
             }

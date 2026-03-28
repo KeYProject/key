@@ -6,8 +6,8 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Labeled statement.
  */
 public class LabeledStatement extends JavaStatement
-        implements StatementContainer, NamedProgramElement, ProgramPrefix {
+        implements StatementContainer, NamedProgramElement, PossibleProgramPrefix {
 
     /**
      * Name.
@@ -94,10 +94,11 @@ public class LabeledStatement extends JavaStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        if (body instanceof ProgramPrefix) {
+        if (body instanceof PossibleProgramPrefix) {
             if (body instanceof StatementBlock) {
                 return !((StatementBlock) body).isEmpty()
-                        && ((StatementBlock) body).getStatementAt(0) instanceof ProgramPrefix;
+                        && ((StatementBlock) body)
+                                .getStatementAt(0) instanceof PossibleProgramPrefix;
             }
             return true;
         }
@@ -105,9 +106,9 @@ public class LabeledStatement extends JavaStatement
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) (body instanceof StatementBlock
+            return (PossibleProgramPrefix) (body instanceof StatementBlock
                     ? ((StatementBlock) body).getStatementAt(0)
                     : body);
         } else {
@@ -116,16 +117,16 @@ public class LabeledStatement extends JavaStatement
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
         if (body instanceof StatementBlock) {
-            return StatementBlock.computePrefixElements(((StatementBlock) body).getBody(), this);
-        } else if (body instanceof ProgramPrefix) {
-            return StatementBlock.computePrefixElements(new ImmutableArray<>(body), this);
+            return StatementBlock.computePrefixElements(this);
+        } else if (body instanceof PossibleProgramPrefix) {
+            return StatementBlock.computePrefixElements(this);
         }
         return new ImmutableArray<>(this);
     }

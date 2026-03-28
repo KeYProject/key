@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
@@ -14,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Default.
  *
  */
-public class Default extends BranchImp {
+public class Default extends SwitchBranch {
 
     /**
      * Body.
@@ -60,6 +61,11 @@ public class Default extends BranchImp {
             result += body.size();
         }
         return result;
+    }
+
+    @Override
+    public SourceElement getFirstElement() {
+        return body.get(0);
     }
 
     /**

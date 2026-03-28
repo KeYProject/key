@@ -122,6 +122,10 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new MergePointStatement(e);
     }
 
+    public ActiveCase createActiveCase() {
+        return new ActiveCase();
+    }
+
     /**
      * Create a {@link PassiveExpression}.
      */
@@ -239,6 +243,14 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             throwSortInvalid(sv, "Ccatch");
         }
         return new CcatchSVWrapper(sv);
+    }
+
+    public SwitchBranchSVWrapper getSwitchBranchSV(String s) throws ParseException {
+        JOperatorSV sv = lookupSchemaVariable(s);
+        if (!(sv instanceof ProgramSV)) {
+            throwSortInvalid(sv, "SwitchCase");
+        }
+        return new SwitchBranchSVWrapper((ProgramSV) sv);
     }
 
     /**

@@ -29,9 +29,9 @@ public class MethodStackInfo implements NameCreationInfo {
      */
     public ImmutableList<IProgramMethod> getMethodStack() {
         ImmutableList<IProgramMethod> list = ImmutableSLList.nil();
-        if (element instanceof ProgramPrefix) {
-            final ImmutableArray<ProgramPrefix> prefix =
-                ((ProgramPrefix) element).getPrefixElements();
+        if (element instanceof PossibleProgramPrefix) {
+            final ImmutableArray<PossibleProgramPrefix> prefix =
+                ((PossibleProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
                 if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
