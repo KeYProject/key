@@ -6,12 +6,12 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +39,6 @@ public final class ExampleChooser extends JDialog {
      * This path is also accessed by the Eclipse integration of KeY to find the right examples.
      */
     public static final String EXAMPLES_PATH = "examples";
-
-    private static final long serialVersionUID = -4405666868752394532L;
-
-    /**
-     * This constant is accessed by the eclipse based projects.
-     */
-    public static final String KEY_FILE_NAME = "project.key";
-
-    private static final String PROOF_FILE_NAME = "project.proof";
 
     /**
      * Java property name to specify a custom key example folder.
@@ -70,165 +62,21 @@ public final class ExampleChooser extends JDialog {
     /**
      * The result value of the dialog. <code>null</code> if nothing to be loaded
      */
-    private File fileToLoad = null;
+    private Path fileToLoad = null;
 
     /**
      * The currently selected example. <code>null</code> if none selected
      */
     private Example selectedExample;
 
-    /**
-     * This class wraps a {@link File} and has a special {@link #toString()} method only using the
-     * short file name w/o path.
-     * <p>
-     * Used for displaying files in the examples list w/o prefix
-     */
-    public static class Example {
-        /**
-         * The default category under which examples range if they do not have {@link #KEY_PATH}
-         * set.
-         */
-        private static final String DEFAULT_CATEGORY_PATH = "Unsorted";
-
-        /**
-         * The {@link Properties} key to specify the path in the tree.
-         */
-        private static final String KEY_PATH = "example.path";
-
-        /**
-         * The {@link Properties} key to specify the name of the example. Directory name if left
-         * open.
-         */
-        private static final String KEY_NAME = "example.name";
-
-        /**
-         * The {@link Properties} key to specify the file for the example. KEY_FILE_NAME by default
-         */
-        private static final String KEY_FILE = "example.file";
-
-        /**
-         * The {@link Properties} key to specify the proof file in the tree. May be left open
-         */
-        private static final String KEY_PROOF_FILE = "example.proofFile";
-
-        /**
-         * The {@link Properties} key to specify the path in the tree. Prefix to specify additional
-         * files to load. Append 1, 2, 3, ...
-         */
-        private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
-
-        /**
-         * The {@link Properties} key to specify the path in the tree. Prefix to specify export
-         * files which are not shown as tabs in the example wizard but are extracted to Java
-         * projects in the Eclipse integration. Append 1, 2, 3, ...
-         */
-        private static final String EXPORT_FILE_PREFIX = "example.exportFile.";
-
-        private final File exampleFile;
-        private final File directory;
-        private final String description;
-        private final Properties properties;
-
-        public Example(File file) throws IOException {
-            this.exampleFile = file;
-            this.directory = file.getParentFile();
-            this.properties = new Properties();
-            StringBuilder sb = new StringBuilder();
-            extractDescription(file, sb, properties);
-            this.description = sb.toString();
-        }
-
-        public File getDirectory() {
-            return directory;
-        }
-
-        public File getProofFile() {
-            return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
-        }
-
-        public File getObligationFile() {
-            return new File(directory, properties.getProperty(KEY_FILE, KEY_FILE_NAME));
-        }
-
-        public String getName() {
-            return properties.getProperty(KEY_NAME, directory.getName());
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public File getExampleFile() {
-            return exampleFile;
-        }
-
-        public List<File> getAdditionalFiles() {
-            ArrayList<File> result = new ArrayList<>();
-            int i = 1;
-            while (properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
-                result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
-                i++;
-            }
-            return result;
-        }
-
-        public List<File> getExportFiles() {
-            ArrayList<File> result = new ArrayList<>();
-            int i = 1;
-            while (properties.containsKey(EXPORT_FILE_PREFIX + i)) {
-                result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
-                i++;
-            }
-            return result;
-        }
-
-        public String[] getPath() {
-            return properties.getProperty(KEY_PATH, DEFAULT_CATEGORY_PATH).split("/");
-        }
-
-        @Override
-        public String toString() {
-            return getName();
-        }
-
-        public void addToTreeModel(DefaultTreeModel model) {
-            DefaultMutableTreeNode node =
-                findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
-            node.add(new DefaultMutableTreeNode(this));
-        }
-
-        private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path,
-                int from) {
-            if (from == path.length) {
-                return root;
-            }
-            Enumeration<?> en = root.children();
-            while (en.hasMoreElements()) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-                if (node.getUserObject().equals(path[from])) {
-                    return findChild(node, path, from + 1);
-                }
-            }
-            // not found ==> add new
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(path[from]);
-            root.add(node);
-            return findChild(node, path, from + 1);
-        }
-
-        public boolean hasProof() {
-            return properties.containsKey(KEY_PROOF_FILE);
-        }
-
-    }
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    private ExampleChooser(File examplesDir) {
+    private ExampleChooser(Path examplesDir) {
         super(MainWindow.getInstance(), "Load Example", true);
         assert examplesDir != null;
-        assert examplesDir.isDirectory();
 
         // create list panel
         final JPanel listPanel = new JPanel();
@@ -341,10 +189,10 @@ public final class ExampleChooser extends JDialog {
     // internal methods
     // -------------------------------------------------------------------------
 
-    public static File lookForExamples() {
+    public static Path lookForExamples() {
         // weigl: using java properties: -Dkey.examples.dir="..."
         if (System.getProperty(KEY_EXAMPLE_DIR) != null) {
-            return new File(System.getProperty(KEY_EXAMPLE_DIR));
+            return Paths.get(System.getProperty(KEY_EXAMPLE_DIR));
         }
 
         // greatly simplified version without parent path lookup.
@@ -352,45 +200,16 @@ public final class ExampleChooser extends JDialog {
         if (!folder.exists()) {
             folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
         }
-        return folder;
+        return folder.toPath();
     }
 
-    private static String fileAsString(File f) {
+    private static String fileAsString(Path f) {
         try {
-            return IOUtil.readFrom(f);
+            return Files.readString(f);
         } catch (IOException e) {
             LOGGER.error("Could not read file '{}'", f, e);
             return "<Error reading file: " + f + ">";
         }
-    }
-
-    private static StringBuilder extractDescription(File file, StringBuilder sb,
-            Properties properties) {
-        try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String line;
-            boolean emptyLineSeen = false;
-            while ((line = r.readLine()) != null) {
-                if (emptyLineSeen) {
-                    sb.append(line).append("\n");
-                } else {
-                    String trimmed = line.trim();
-                    if (trimmed.length() == 0) {
-                        emptyLineSeen = true;
-                    } else if (trimmed.startsWith("#")) {
-                        // ignore
-                    } else {
-                        String[] entry = trimmed.split(" *[:=] *", 2);
-                        if (entry.length > 1) {
-                            properties.put(entry[0], entry[1]);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("", e);
-            return sb;
-        }
-        return sb;
     }
 
 
@@ -414,8 +233,8 @@ public final class ExampleChooser extends JDialog {
                 if (p >= 0) {
                     addTab(fileAsString.substring(p), "Proof Obligation", false);
                 }
-                for (File file : example.getAdditionalFiles()) {
-                    addTab(fileAsString(file), file.getName(), false);
+                for (Path file : example.getAdditionalFiles()) {
+                    addTab(fileAsString(file), file.getFileName().toString(), false);
                 }
                 loadButton.setEnabled(true);
                 loadProofButton.setEnabled(example.hasProof());
@@ -447,16 +266,16 @@ public final class ExampleChooser extends JDialog {
      * Shows the dialog, using the passed examples directory. If null is passed, tries to find
      * examples directory on its own.
      */
-    public static File showInstance(String examplesDirString) {
+    public static @Nullable Path showInstance(Path examplesDirString) {
         // get examples directory
-        File examplesDir;
+        Path examplesDir;
         if (examplesDirString == null) {
             examplesDir = lookForExamples();
         } else {
-            examplesDir = new File(examplesDirString);
+            examplesDir = examplesDirString;
         }
 
-        if (!examplesDir.isDirectory()) {
+        if (!Files.isDirectory(examplesDir)) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
                 "The examples directory cannot be found.\n" + "Please install them at "
                     + (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
@@ -483,19 +302,17 @@ public final class ExampleChooser extends JDialog {
      * @param examplesDir The examples directory to list examples in.
      * @return The found examples.
      */
-    public static List<Example> listExamples(File examplesDir) {
-        List<Example> result = new LinkedList<>();
+    public static List<Example> listExamples(Path examplesDir) {
+        List<Example> result = new ArrayList<>(64);
 
-        String line;
-        final File index = new File(new File(examplesDir, "index"), "samplesIndex.txt");
-        try (BufferedReader br =
-            new BufferedReader(new FileReader(index, StandardCharsets.UTF_8))) {
-            while ((line = br.readLine()) != null) {
+        final Path index = examplesDir.resolve("index").resolve("samplesIndex.txt");
+        try {
+            for (var line : Files.readAllLines(index)) {
                 line = line.trim();
-                if (line.startsWith("#") || line.length() == 0) {
+                if (line.startsWith("#") || line.isEmpty()) {
                     continue;
                 }
-                File f = new File(examplesDir, line);
+                Path f = examplesDir.resolve(line);
                 try {
                     result.add(new Example(f));
                 } catch (IOException e) {
