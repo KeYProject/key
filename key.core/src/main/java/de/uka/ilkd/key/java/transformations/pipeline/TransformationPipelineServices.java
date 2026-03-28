@@ -6,12 +6,10 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.Position;
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
-import de.uka.ilkd.key.speclang.PositionedString;
-
-import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -28,8 +26,11 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import de.uka.ilkd.key.speclang.PositionedString;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -445,6 +446,35 @@ public class TransformationPipelineServices {
             return declaration.getRange().isPresent() &&
                     container.getRange().isPresent() &&
                     container.containsWithinRange(declaration);
+        }
+    }
+
+
+    /**
+     * Generates unique names for generated inner classes.
+     */
+    class NameGenerator {
+
+        private final Set<String> generatedNames = new HashSet<>();
+
+        public String generate(String prefix, Position pos) {
+            return generate(prefix, pos, null);
+        }
+
+        private String generate(String prefix, Position pos, Integer counter) {
+            Integer line = pos != null ? pos.line : null;
+
+            String newName = prefix + "L" + line;
+            if (counter != null) {
+                newName += "_" + counter;
+            }
+
+            if (generatedNames.contains(newName)) {
+                return generate(prefix, pos, counter == null ? 0 : counter + 1);
+            }
+
+            generatedNames.add(newName);
+            return newName;
         }
     }
 }
