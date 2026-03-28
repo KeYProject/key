@@ -1,4 +1,5 @@
 plugins {
+    id 'java-test-fixtures'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -9,15 +10,10 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
-    testImplementation 'junit:junit:4.13.1'
-    //api group: group, name: 'recoderkey', version: '1.0'
-
-    // JavaCC
-    //implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    //javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
+
 
     api project(':key.util')
 
@@ -31,6 +27,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
     testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+
+    // test fixtures
+    testFixturesApi(testFixtures(project(":key.util")))
 }
 
 // The target directory for JavaCC (parser generation)
