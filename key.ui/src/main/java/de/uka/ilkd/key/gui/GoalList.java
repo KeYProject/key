@@ -228,11 +228,15 @@ public class GoalList extends JList<Goal> implements TabPanel {
                             return false;
                         }
                     }); // do not print term labels
-            sp.printSequent(seq);
-            res = sp.result().replace('\n', ' ');
-            res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
-
-            seqToString.put(seq, res);
+            try {
+                sp.printSequent(seq);
+            } catch (Exception ex) {
+                LOGGER.warn("GoalList: Problem printing sequent.", ex);
+            } finally {
+                res = sp.result().replace('\n', ' ');
+                res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
+                seqToString.put(seq, res);
+            }
         }
         return res;
     }
@@ -810,7 +814,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // (DS) Also add the serial of the corresponding node to the
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
+
+                // FIXME weigl: disable for UnbalancedParenIssue
                 valueStr = "(#" + ((Goal) value).node().serialNr() + ") " + seqToString(seq);
+                // valueStr = "";
 
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;

@@ -1,7 +1,7 @@
 <entry key="store.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Object o2; \forall Field f2; \forall any v;
       select<[any]>(store(h,o,f,v), o2, f2)<<Trigger>> =
-         \if(o = o2 & f = f2 & f != java.lang.Object::<created>)
+         \if(o = o2 & f = f2 & f != java.lang.Object::#$created)
          \then(v)
          \else(select<[any]>(h, o2, f2))
 ]]></entry>
@@ -13,7 +13,7 @@
 <entry key="anon.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Heap h2; \forall LocSet ls;
       select<[any]>(anon(h, ls, h2), o, f)<<Trigger>> =
-         \if(elementOf(o, f, ls) & f != java.lang.Object::<created>
+         \if(elementOf(o, f, ls) & f != java.lang.Object::#$created
            | elementOf(o, f, freshLocs(h)))
          \then(select<[any]>(h2, o, f))
          \else(select<[any]>(h, o, f))
@@ -22,7 +22,7 @@
 <entry key="memset.dl"><![CDATA[
     \forall Heap h; \forall LocSet s; \forall any x; \forall Object o; \forall Field f;
       select<[any]>(memset(h, s, x), o, f)<<Trigger>> =
-         \if(elementOf(o, f, s) & f != java.lang.Object::<created>)
+         \if(elementOf(o, f, s) & f != java.lang.Object::#$created)
          \then(x)
          \else(select<[any]>(h, o, f))
 ]]></entry>
@@ -30,14 +30,14 @@
 <entry key="create.dl"><![CDATA[
   \forall Heap h; \forall Object o; \forall Object o2; \forall Field f;
       select<[any]>(create(h, o), o2, f)<<Trigger>> =
-         \if(o = o2 & o != null & f = java.lang.Object::<created>)
+         \if(o = o2 & o != null & f = java.lang.Object::#$created)
          \then(TRUE)
          \else(select<[any]>(h, o2, f))
 ]]></entry>
 
 <entry key="wellFormed.dl"><![CDATA[
   \forall Heap h; \forall Object o; \forall Field f; (wellFormed(h) ->
-      select<[boolean]>(h, (select<[java.lang.Object]>(h, o, f))<<Trigger>>, java.lang.Object::<created>) = TRUE
+      select<[boolean]>(h, (select<[java.lang.Object]>(h, o, f))<<Trigger>>, java.lang.Object::#$created) = TRUE
     | (select<[java.lang.Object]>(h, o, f)) = null)
 ]]></entry>
 

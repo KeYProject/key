@@ -7,11 +7,13 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericArgument;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
@@ -48,7 +50,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private static final String EMPTY_CONSTANT = "empty";
     public static final String ELEMENTOF = "elementOf";
     private static final String SELECT = "select";
-    private static final String CREATED_FIELD_NAME = "java.lang.Object::<created>";
+    private static final String CREATED_FIELD_NAME = "java.lang.Object::#$created";
     private static final String ARR_FUNCTION_NAME = "arr";
     private static final String SEQ_EMPTY = "seqEmpty";
     private static final String SEQ_OUTSIDE = "seqGetOutside";
@@ -1414,7 +1416,7 @@ public class SMTObjTranslator implements SMTTranslator {
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
-            name = name.replace("$", "");
+            name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
             Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
             fieldSorts.put(name, sort);
@@ -1479,7 +1481,11 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
                 function = getCastFunction(source, target);
             }
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) { // is the
+                                                                                        // static
+            // invariant
+            // supposed to
+            // be here?
             if (functions.containsKey(CLASS_INVARIANT)) {
                 function = functions.get(CLASS_INVARIANT);
             } else {

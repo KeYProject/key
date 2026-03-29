@@ -32,7 +32,7 @@ final class For implements Iterable {
 
   java.util.Iterator iterator () { return it; } 
 
-  final class Trivial extends java.util.Iterator {
+  final class Trivial implements java.util.Iterator {
     boolean hasNext() { return true; }
     Object next() { return null; }
   }

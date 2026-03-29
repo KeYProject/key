@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJMLPreTranslator {
     private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
-        return new PreParser(true).parseClassLevel(ms);
+        return new PreParser().parseClassLevel(ms);
     }
 
     // region lexing

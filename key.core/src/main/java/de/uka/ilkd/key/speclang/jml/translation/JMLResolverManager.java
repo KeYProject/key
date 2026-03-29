@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
@@ -20,7 +21,8 @@ import de.uka.ilkd.key.speclang.translation.*;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, LocationVariable selfVar,
+    public JMLResolverManager(
+            JavaInfo javaInfo, KeYJavaType specInClass, LocationVariable selfVar,
             SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
@@ -32,9 +34,11 @@ public final class JMLResolverManager extends SLResolverManager {
 
     @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_public")) {
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+            Modifiers.JML_SPEC_PUBLIC.class)) {
             return new Public();
-        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_protected")) {
+        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+            Modifiers.JML_SPEC_PROTECTED.class)) {
             return new Protected();
         } else {
             return null;

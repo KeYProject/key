@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -349,7 +349,7 @@ class TermImpl implements JTerm {
     }
 
     @Override
-    public <V> boolean equalsModProperty(Object o, Property<JTerm> property, V... v) {
+    public <V> boolean equalsModProperty(Object o, Property<? super JTerm> property, V... v) {
         if (!(o instanceof JTerm other)) {
             return false;
         }

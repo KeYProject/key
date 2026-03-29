@@ -3,7 +3,7 @@ name: Weekly Builds of KeY
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '0 5 * * 1' # every monday morning
+    - cron: '0 5 * * 1' # every monday morning
 
 permissions:
   contents: write
@@ -24,49 +24,31 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'gradle'
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build with Gradle
-        run: ./gradlew --parallel assemble
-
-  doc:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v5
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-
-      - name: Build Documentation with Gradle
-        run: ./gradlew alldoc
-
-      - name: Package
-        run: tar cvf key-javadoc.tar.xz build/docs/javadoc
-
-  deploy:
-    needs: [build, doc]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload Javadoc
-        uses: actions/upload-artifact@v7
-        with:
-          name: javadoc
-          path: "javadoc.tar.xz"
+        run: ./gradlew --parallel assemble javadoc alldoc
 
       - name: Upload ShadowJar
         uses: actions/upload-artifact@v7
         with:
           name: shadowjars
           path: "*/build/libs/*-exe.jar"
+          retention-days: 1
+
+      - name: Package
+        run: tar cvf key-javadoc.tar.xz build/docs/javadoc
+
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v7
+        with:
+          name: javadoc
+          path: "key-javadoc.tar.xz"
+          retention-days: 1
 
       - name: Delete previous nightly release
         continue-on-error: true
@@ -79,29 +61,18 @@ jobs:
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |          
+        run: |
           gh release create --generate-notes --title "Nightly Release" \
              --prerelease --notes-start-tag KEY-2.12.3 \
-             nightly key.ui/build/libs/key-*-exe.jar
+             nightly key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
 
-  deploy-maven:
-    needs: [ build, doc ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v5
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-
+      - run: export GPG_TTY=$(tty)
       - name: Upload to SNAPSHOT repository
-        run: ./gradlew publishMavenJavaPublicationToKEYLABRepository
+        run: ./gradlew --parallel publishMavenJavaPublicationToKEYLABRepository
         env:
           BUILD_NUMBER: "SNAPSHOT"
           GITLAB_DEPLOY_TOKEN: ${{ secrets.GITLAB_DEPLOY_TOKEN }}
+#          SIGNING_KEY_ID: ${{secrents.SIGNING_KEY_ID}}
+#          GPG_PRIVATE_KEY: ${{secrents.GPG_PRIVATE_KEY}}
+#          GPG_PASSPHRASE: ${{secrents.GPG_PASSPHRASE}}
 

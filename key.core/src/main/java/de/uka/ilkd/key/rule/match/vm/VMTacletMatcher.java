@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -247,7 +247,6 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull LogicServices services) {
         var result = (MatchConditions) cond;
         if (result != null) {
-
             final var svIterator = result.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {

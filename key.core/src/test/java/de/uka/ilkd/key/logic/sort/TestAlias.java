@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
@@ -33,8 +33,9 @@ public class TestAlias {
         nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
                 .addSort("float");
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
+        services.activateJava(null);
+        JavaService js = services.getJavaService();
+        js.parseSpecialClasses();
     }
 
     private SortAlias addAlias(String name, String aliased) {

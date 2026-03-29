@@ -134,7 +134,7 @@ public final class Plotter extends ThreadSpec2 {
         ensures stateInv();
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public Plotter(AFilter a, BFilter b, Buffer buf) {
+    public /*@ helper @*/ Plotter(AFilter a, BFilter b, Buffer buf) {
         this.ta = a;
         this.tb = b;
         this.buffer = buf;

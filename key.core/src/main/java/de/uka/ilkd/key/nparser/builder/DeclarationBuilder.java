@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -214,8 +214,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                     createdSorts.add(s);
                 } else {
                     // weigl: agreement on KaKeY meeting: this should be ignored until we finally
-                    // have
-                    // local namespaces for generic sorts
+                    // have local namespaces for generic sorts
                     // addWarning(ctx, "Sort declaration is ignored, due to collision.");
                     LOGGER.debug(
                         "Sort declaration of {} in {} is ignored due to collision (already "

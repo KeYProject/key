@@ -193,7 +193,8 @@ public class NamespaceSet {
     /**
      * looks up for the symbol in the namespaces sort, functions and programVariables
      *
-     * @param name the Name to look up
+     * @param name
+     *        the Name to look up
      * @return the element of the given name or null
      */
     public Named lookupLogicSymbol(Name name) {

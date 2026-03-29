@@ -5,21 +5,25 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.SuperArrayDeclaration;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
@@ -286,9 +290,7 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second SequentFormula
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(
-            SequentFormula _this,
-            SequentFormula that) {
+    public static boolean equalsModProofIrrelevancy(SequentFormula _this, SequentFormula that) {
         if (_this == that) {
             return true;
         }
@@ -306,9 +308,68 @@ public class EqualityModuloProofIrrelevancy {
      * @param sf the {@link SequentFormula} for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(
-            SequentFormula sf) {
+    public static int hashCodeModProofIrrelevancy(SequentFormula sf) {
         return PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty((JTerm) sf.formula());
+    }
+
+    // Sequent
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first Sequent
+     * @param that the second Sequent
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(Sequent _this, Sequent that) {
+        if (_this == that) {
+            return true;
+        } else if (_this == null || that == null) {
+            return false;
+        }
+        return equalsModProofIrrelevancy(_this.antecedent(), that.antecedent())
+                && equalsModProofIrrelevancy(_this.succedent(), that.succedent());
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param sequent the {@link Sequent} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(Sequent sequent) {
+        return Objects.hash(hashCodeModProofIrrelevancy(sequent.antecedent()),
+            hashCodeModProofIrrelevancy(sequent.succedent()));
+    }
+
+    // Semisequent
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first Semisequent
+     * @param that the second Semisequent
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(Semisequent _this, Semisequent that) {
+        if (_this == that) {
+            return true;
+        } else if (_this == null || that == null) {
+            return false;
+        }
+        return EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.asList(), that.asList(),
+            EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy);
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param semi the {@link Semisequent} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(Semisequent semi) {
+        return EqualsModProofIrrelevancyUtil.hashCodeIterable(semi.asList(),
+            EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy);
     }
 
     // RuleApp
@@ -412,7 +473,8 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second Taclet
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(Taclet _this, Taclet that) {
+    public static boolean equalsModProofIrrelevancy(org.key_project.prover.rules.Taclet _this,
+            org.key_project.prover.rules.Taclet that) {
         if (that == _this)
             return true;
 
@@ -442,16 +504,17 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        return _this.goalTemplates().equals(that.goalTemplates());
+        return EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.goalTemplates(),
+            that.goalTemplates(), EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy);
     }
 
     /**
      * computes the hash code modulo proof irrelevancy for the given argument
      *
-     * @param taclet the {@link Taclet} for which to compute the hash
+     * @param taclet the Taclet for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(Taclet taclet) {
+    public static int hashCodeModProofIrrelevancy(org.key_project.prover.rules.Taclet taclet) {
         Sequent sequentFormulas = taclet.assumesSequent();
         return hashCodeModProofIrrelevancy(sequentFormulas.getFormulaByNr(1));
     }
@@ -506,6 +569,102 @@ public class EqualityModuloProofIrrelevancy {
             app.uninstantiatedVars(),
             app.isUpdateContextFixed(),
             app.rule());
+    }
+
+    // TacletGoalTemplate
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first TacletGoalTemplate
+     * @param that the second TacletGoalTemplate
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(TacletGoalTemplate _this,
+            TacletGoalTemplate that) {
+        if (_this == that) {
+            return true;
+        } else if (_this == null || that == null) {
+            return false;
+        }
+        return equalsModProofIrrelevancy(_this.sequent(), that.sequent())
+                && EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.rules(), that.rules(),
+                    EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy);
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param t the {@link TacletGoalTemplate} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(TacletGoalTemplate t) {
+        return Objects.hash(hashCodeModProofIrrelevancy(t.sequent()),
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(t.rules(),
+                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy));
+    }
+
+    // AntecSuccTacletGoalTemplate
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first AntecSuccTacletGoalTemplate
+     * @param that the second AntecSuccTacletGoalTemplate
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(AntecSuccTacletGoalTemplate _this,
+            AntecSuccTacletGoalTemplate that) {
+        if (_this == that) {
+            return true;
+        } else if (_this == null || that == null) {
+            return false;
+        }
+        return equalsModProofIrrelevancy((TacletGoalTemplate) _this, (TacletGoalTemplate) that)
+                && equalsModProofIrrelevancy(_this.replaceWith(), that.replaceWith());
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param t the {@link AntecSuccTacletGoalTemplate} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(AntecSuccTacletGoalTemplate t) {
+        return Objects.hash(hashCodeModProofIrrelevancy((TacletGoalTemplate) t),
+            hashCodeModProofIrrelevancy(t.replaceWith()));
+    }
+
+    // RewriteTacletGoalTemplate
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first RewriteTacletGoalTemplate
+     * @param that the second RewriteTacletGoalTemplate
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(RewriteTacletGoalTemplate _this,
+            RewriteTacletGoalTemplate that) {
+        if (_this == that) {
+            return true;
+        } else if (_this == null || that == null) {
+            return false;
+        }
+        return equalsModProofIrrelevancy((TacletGoalTemplate) _this, (TacletGoalTemplate) that)
+                && _this.replaceWith().equalsModProperty(that.replaceWith(),
+                    PROOF_IRRELEVANCY_PROPERTY);
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param t the {@link RewriteTacletGoalTemplate} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(RewriteTacletGoalTemplate t) {
+        return Objects.hash(hashCodeModProofIrrelevancy((TacletGoalTemplate) t),
+            t.replaceWith().hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
     }
 
     // MatchConditions

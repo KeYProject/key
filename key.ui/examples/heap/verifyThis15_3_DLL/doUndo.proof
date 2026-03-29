@@ -744,16 +744,16 @@
             (branch "Case 2"
                (rule "eqTermCut" (formula "44") (term "2,0,0,0,1,0") (inst "s=seqLen(seqSub(seqConcat(seqSub(select<[Seq]>(heap,
                                            self,
-                                           DoubleLinkedList::$s),
+                                           DoubleLinkedList::#s),
                                Z(0(#)),
                                k),
                         seqSub(select<[Seq]>(heap,
                                            self,
-                                           DoubleLinkedList::$s),
+                                           DoubleLinkedList::#s),
                                add(k, Z(1(#))),
                                select<[int]>(heap,
                                            self,
-                                           DoubleLinkedList::$len))),
+                                           DoubleLinkedList::#len))),
               Z(0(#)),
               k))") (userinteraction))
                (branch "Assume k = seqSub(seqConcat(seqSub(self.s, 0, k), seqSub(self.s, k + 1, self.len)), 0, k).length"

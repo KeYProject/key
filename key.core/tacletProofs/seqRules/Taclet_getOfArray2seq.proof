@@ -90,7 +90,7 @@
    (rule "pullOutSelect" (formula "2") (term "1") (inst "selectSK=fv_0_0") (userinteraction))
    (rule "selectOfStore" (formula "1") (term "0") (userinteraction))
    (rule "cut_direct" (formula "1") (term "0,0") (userinteraction))
-   (branch "CUT: f_a = ov_0 & arr(f_idx) = fv_0 & !arr(f_idx) = java.lang.Object::<created> TRUE"
+   (branch "CUT: f_a = ov_0 & arr(f_idx) = fv_0 & !arr(f_idx) = java.lang.Object::#$created TRUE"
        (builtin "One Step Simplification" (formula "2"))
        (builtin "One Step Simplification" (formula "1"))
       (rule "castDel" (formula "2") (term "0"))
@@ -101,7 +101,7 @@
       (rule "applyEqRigid" (formula "5") (term "1,0") (ifseqformula "1"))
       (rule "close" (formula "5") (ifseqformula "3"))
    )
-   (branch "CUT: f_a = ov_0 & arr(f_idx) = fv_0 & !arr(f_idx) = java.lang.Object::<created> FALSE"
+   (branch "CUT: f_a = ov_0 & arr(f_idx) = fv_0 & !arr(f_idx) = java.lang.Object::#$created FALSE"
        (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "4")))
       (rule "closeFalse" (formula "1"))
    )

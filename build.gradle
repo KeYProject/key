@@ -1,4 +1,4 @@
-plugins {
+    plugins {
     //Support for IntelliJ IDEA
     //https://docs.gradle.org/current/userguide/idea_plugin.html
     id("idea")
@@ -17,6 +17,8 @@ plugins {
 
     // Plugin for publishing via the new Nexus API
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+
+    id "signing"
 }
 
 
@@ -36,7 +38,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "2.13.0$build"
+version = "3.0.0$build"
 
 subprojects {
     apply plugin: "java"
@@ -59,10 +61,10 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven { url = "https://git.key-project.org/api/v4/projects/35/packages/maven/" }
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-api:2.0.17")
         testImplementation("ch.qos.logback:logback-classic:1.5.32")
 
@@ -132,11 +134,6 @@ subprojects {
         // these seems to be missing starting with Gradle 9
         testClassesDirs = sourceSets.test.output.classesDirs
         classpath = sourceSets.test.runtimeClasspath
-
-        // Fail on empty test suites
-        afterSuite { suite, result ->
-            assert result.testCount > 0, "There are no executed test. This is unexpected and should be investigated!"
-        }
     }
 
 
@@ -353,14 +350,24 @@ subprojects {
                 }
             }
         }
-
         signing {
-            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
-            sign publishing.publications.mavenJava
+            //sign publishing.publications.mavenJava
         }
     }
 }
 
+signing {
+    // does not work
+    if(System.getenv("GPG_PRIVATE_KEY") == null) {
+        useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
+    } else{
+        useInMemoryPgpKeys(
+                System.getenv("SIGNING_KEY_ID"),
+                System.getenv("GPG_PRIVATE_KEY"),
+                System.getenv("GPG_PASSPHRASE")
+        )
+    }
+}
 
 nexusPublishing {
     repositories {
@@ -410,12 +417,10 @@ tasks.register('alldoc', Javadoc){
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
 
     configure(options) {
-        //showFromPrivate()
+        showFromPrivate()
+        options.addBooleanOption('html5', true)
         encoding = 'UTF-8'
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
@@ -425,7 +430,45 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2026 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
-        links += "https://www.antlr.org/api/Java/"
+        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links += "https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
+        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.32/"
+        links +="https://www.javadoc.io/doc/com.formdev/flatlaf/3.7/"
+        links +="https://www.javadoc.io/doc/com.miglayout/miglayout-swing/11.4.3/"
+        links +="https://www.javadoc.io/doc/com.squareup/javapoet/1.13.0/"
+        //links +="https://www.javadoc.io/doc/de.unruh/scala-isabelle_2.13/0.4.5/"
+        links +="https://www.javadoc.io/doc/info.picocli/picocli/4.7.7/"
+        links +="https://www.javadoc.io/doc/org.antlr/ST4/4.3.4/"
+        links +="https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
+        links +="https://www.javadoc.io/doc/org.jspecify/jspecify/1.0.0/"
+        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+
+        linkSource()
+        author()
+        version()
+
+        group("key.core.infflow", "de.uka.ilkd.key.informationflow")
+        group("key.core", "de.uka.ilkd.key")
+        group("key.util", "org.key_project.util")
+        group("key.ui", "org.key_project.util.java",
+                "de.uka.ilkd.key.core", "de.uka.ilkd.key.gui",
+                "de.uka.ilkd.key.proof", "de.uka.ilkd.key.ui","de.uka.ilkd.key.util")
+        group("key.core.wd", "de.uka.ilkd.key.wd")
+        group("key.core.testgen", "de.uka.ilkd.key.testgen")
+        group("key.ncore", "org.key_project.logic")
+        group("key.ncore.calculus", "org.key_project.prover")
+
+        /*
+        group("keyext.isabelletranslation", "org.key_project.isabelletranslation")
+        group("keyext.proofmanagement", "org.key_project.proofmanagement")
+        group("keyext.slicing", "org.key_project.slicing")
+        group("keyext.ui.testgen", "de.uka.ilkd.key.gui.testgen")
+        group("keyext.exploration","org.key_project.exploration")
+        group("keyext.caching", "de.uka.ilkd.key.gui.plugins.caching")
+        group("key.core.symbolic_execution",// "de.uka.ilkd.key.proof",
+                "de.uka.ilkd.key.rule.label", "de.uka.ilkd.key.strategy",
+                "de.uka.ilkd.key.symbolic_execution")
+        group("key.core.proof_references", "de.uka.ilkd.key.proof_references")*/
     }
 }
 

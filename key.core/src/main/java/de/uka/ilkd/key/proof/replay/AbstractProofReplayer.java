@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -227,7 +227,9 @@ public abstract class AbstractProofReplayer {
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             // find the correct taclet
-            for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
+            for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
+                    .getPartialInstantiatedApps()) {
+                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
@@ -239,7 +241,8 @@ public abstract class AbstractProofReplayer {
             }
             if (ourApp == null) {
                 throw new IllegalStateException(
-                    "proof replayer failed to find dynamically added taclet");
+                    "proof replayer failed to find dynamically added taclet at original node "
+                        + originalStep.serialNr());
             }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);

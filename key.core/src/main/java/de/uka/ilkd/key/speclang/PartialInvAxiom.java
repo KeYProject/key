@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
@@ -24,9 +24,9 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 /**
- * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
+ * A class axiom which is essentially of the form "o.$inv -> phi": it demands that the invariants
  * of the objects of a particular class imply a particular formula. These axioms are logically
- * weaker than the full definitions of <inv> expressed as RepresentsAxioms, but they may have higher
+ * weaker than the full definitions of $inv expressed as RepresentsAxioms, but they may have higher
  * visibility, making them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {

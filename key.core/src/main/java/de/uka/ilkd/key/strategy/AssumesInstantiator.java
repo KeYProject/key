@@ -89,7 +89,8 @@ public class AssumesInstantiator {
     }
 
     /**
-     * @param p_all if true then return all formulas of the particular semisequent, otherwise only
+     * @param p_all
+     *        if true then return all formulas of the particular semisequent, otherwise only
      *        the formulas returned by <code>selectNewFormulas</code>
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)

@@ -59,8 +59,8 @@ public class RewriteTest {
     @Test
     public void testLessTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        Path script = HelperClassForTests.TESTCASE_DIRECTORY
-                .resolve("scriptCommands/lesstrans.script");
+        Path script =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/lesstrans.script");
         Path keyFile =
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/less_trans.key");
 

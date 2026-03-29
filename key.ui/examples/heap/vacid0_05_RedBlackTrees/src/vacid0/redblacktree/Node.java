@@ -162,9 +162,7 @@ public class Node {
           @ invariant parent == Node.NIL && left == Node.NIL && right == Node.NIL;
           @ invariant !isRed;
           @*/
-
-        //@ helper
-        private Nil(){
+        private /*@ helper @*/ Nil(){
             //@ set height = 0;
             parent = this;
             left = this;

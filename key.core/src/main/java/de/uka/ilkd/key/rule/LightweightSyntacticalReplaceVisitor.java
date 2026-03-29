@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;

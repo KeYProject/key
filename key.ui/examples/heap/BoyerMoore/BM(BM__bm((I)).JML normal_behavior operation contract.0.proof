@@ -1938,8 +1938,8 @@
                    (builtin "One Step Simplification" (formula "19"))
                   (rule "true_left" (formula "19"))
                   (rule "allLeft" (formula "22") (inst "t=select<[int]>(heap,
-            final<[IntOpt]>(null, IntOpt::$NONE),
-            IntOpt::$value)"))
+            IntOpt::final(null, IntOpt::#NONE),
+            IntOpt::#value)"))
                   (rule "cut_direct" (formula "22") (term "1"))
                   (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 TRUE"
                       (builtin "One Step Simplification" (formula "23"))
@@ -2624,7 +2624,7 @@
                                                 (rule "dismissNonSelectedField" (formula "37") (term "4,0") (userinteraction))
                                                 (rule "selectOfStore" (formula "37") (term "4,0") (userinteraction))
                                                 (rule "ifthenelse_split" (formula "37") (term "4,0") (userinteraction))
-                                                (branch " i_14 = i_14 & IntOpt::$value = IntOpt::$value & !IntOpt::$value = java.lang.Object::<created> TRUE"
+                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::<created> TRUE"
                                                    (rule "castDel2" (formula "38") (term "4,0") (ifseqformula "5") (userinteraction))
                                                    (rule "applyEqReverse" (formula "31") (term "4,0") (ifseqformula "5") (userinteraction))
                                                     (builtin "Use Dependency Contract" (formula "38") (term "0") (ifInst ""  (formula "31") (term "0")) (contract "BoyerMoore[BoyerMoore::count([I,\bigint,\bigint)].JML accessible clause.0") (userinteraction))
@@ -2865,7 +2865,7 @@
                                                       )
                                                    )
                                                 )
-                                                (branch " i_14 = i_14 & IntOpt::$value = IntOpt::$value & !IntOpt::$value = java.lang.Object::<created> FALSE"
+                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::<created> FALSE"
                                                     (builtin "One Step Simplification" (formula "37"))
                                                    (rule "closeTrue" (formula "37"))
                                                 )
@@ -3183,7 +3183,7 @@
                                                    (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                                    (rule "hideAuxiliaryEq" (formula "2"))
                                                    (rule "ifthenelse_split" (formula "2") (term "0"))
-                                                   (branch "f_0 = IntOpt::$present & o_0 = i_14 TRUE"
+                                                   (branch "f_0 = IntOpt::#present & o_0 = i_14 TRUE"
                                                       (rule "andLeft" (formula "2"))
                                                       (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
                                                       (rule "hideAuxiliaryEq" (formula "4"))
@@ -3210,11 +3210,11 @@
                                                       (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                                       (rule "close" (formula "35") (ifseqformula "1"))
                                                    )
-                                                   (branch "f_0 = IntOpt::$present & o_0 = i_14 FALSE"
+                                                   (branch "f_0 = IntOpt::#present & o_0 = i_14 FALSE"
                                                       (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                                       (rule "hideAuxiliaryEq" (formula "2"))
                                                       (rule "ifthenelse_split" (formula "2") (term "0"))
-                                                      (branch "f_0 = IntOpt::$value & o_0 = i_14 TRUE"
+                                                      (branch "f_0 = IntOpt::#value & o_0 = i_14 TRUE"
                                                          (rule "andLeft" (formula "2"))
                                                          (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
                                                          (rule "hideAuxiliaryEq" (formula "4"))
@@ -3235,7 +3235,7 @@
                                                          (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                                          (rule "close" (formula "37") (ifseqformula "1"))
                                                       )
-                                                      (branch "f_0 = IntOpt::$value & o_0 = i_14 FALSE"
+                                                      (branch "f_0 = IntOpt::#value & o_0 = i_14 FALSE"
                                                          (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                                          (rule "hideAuxiliaryEq" (formula "2"))
                                                          (rule "ifthenelse_split" (formula "2") (term "0"))
@@ -4212,8 +4212,8 @@
                          (builtin "One Step Simplification" (formula "15"))
                         (rule "true_left" (formula "15"))
                         (rule "allLeft" (formula "19") (inst "t=select<[int]>(heap,
-            final<[IntOpt]>(null, IntOpt::$NONE),
-            IntOpt::$value)"))
+            IntOpt::final(null, IntOpt::#NONE),
+            IntOpt::#value)"))
                         (rule "cut_direct" (formula "19") (term "1"))
                         (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 + mc_0 * -1 TRUE"
                             (builtin "One Step Simplification" (formula "20"))

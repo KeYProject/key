@@ -8,6 +8,7 @@ on:
     branches:
       - "main"
       - "KeY-*"
+      - "releases/*"
   merge_group:
 
 permissions:
@@ -25,10 +26,9 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         java: [ 21 ]
         modules: [
-          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core, key.core.rifl,
+          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
-          key.util, key.core.example, keyext.caching,
-          keyext.proofmanagement, key.removegenerics ]
+          key.util, key.core.example, keyext.caching, keyext.proofmanagement]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
@@ -107,6 +107,7 @@ jobs:
         with:
           name: test-results-${{ matrix.test }}
           path: |
+            key.core/proofs/**        
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/

@@ -14,7 +14,7 @@
 <entry key="freshLocs.dl"><![CDATA[
   \forall Heap h; \forall Object o; \forall Field f;
      ( elementOf(o,f,freshLocs(h))<<Trigger>> <->
-        o != null & !select<[boolean]>(h,o,java.lang.Object::<created>)=TRUE )
+        o != null & !select<[boolean]>(h,o,java.lang.Object::#$created)=TRUE )
 ]]></entry>
 
 <entry key="singleton.dl">

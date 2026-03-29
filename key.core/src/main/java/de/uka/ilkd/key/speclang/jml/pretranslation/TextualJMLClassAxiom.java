@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
@@ -60,7 +62,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
 
     @Override
     public int hashCode() {
-        return modifiers.hashCode() + inv.hashCode();
+        return Objects.hash(modifiers, inv);
     }
 
     public String getName() {
