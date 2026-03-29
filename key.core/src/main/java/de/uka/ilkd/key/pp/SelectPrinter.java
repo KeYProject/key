@@ -238,7 +238,7 @@ class SelectPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
-     * For example: boolean::select(heap, object, java.lang.Object::#$created)
+     * For example: select<[boolean]>(heap, object, java.lang.Object::#$created)
      */
     private void printBuiltinObjectProperty(LogicPrinter lp, JTerm t, JTerm heapTerm,
             JTerm objectTerm,

@@ -7,7 +7,7 @@
    <variable name="instance" isArrayIndex="false">
       <value name="instance {true}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          <variable name="value" isArrayIndex="false">
-            <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <value name="value {true}" typeString="int" valueString="select<[int]>(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
       </value>

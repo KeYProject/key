@@ -514,7 +514,7 @@
                                     (rule "ifthenelse_split" (formula "51") (term "0"))
                                     (branch "   if (self_1.$created = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_Account,
+      else (select<[boolean]>(anonHeap_Account,
                              self_1,
                              $created))
 = TRUE TRUE"
@@ -523,7 +523,7 @@
                                     )
                                     (branch "   if (self_1.$created = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_Account,
+      else (select<[boolean]>(anonHeap_Account,
                              self_1,
                              $created))
 = TRUE FALSE"
@@ -531,32 +531,32 @@
                                        (branch "   if (  if (  if (  if (  if (  if (  e_3.$created
                                           = TRUE)
                                          then (TRUE)
-                                         else (boolean::select(anonHeap_Account,
+                                         else (select<[boolean]>(anonHeap_Account,
                                                                 e_3,
                                                                 $created))
                                    = TRUE)
                                   then (TRUE)
-                                  else (boolean::select(anonHeap_deposit,
+                                  else (select<[boolean]>(anonHeap_deposit,
                                                          e_3,
                                                          $created))
                             = TRUE)
                            then (TRUE)
-                           else (boolean::select(anonHeap_Account_0,
+                           else (select<[boolean]>(anonHeap_Account_0,
                                                   e_3,
                                                   $created))
                      = TRUE)
                     then (TRUE)
-                    else (boolean::select(anonHeap_deposit_0,
+                    else (select<[boolean]>(anonHeap_deposit_0,
                                            e_3,
                                            $created))
               = TRUE)
              then (TRUE)
-             else (boolean::select(anonHeap_transfer,
+             else (select<[boolean]>(anonHeap_transfer,
                                     e_3,
                                     $created))
        = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_getTotal,
+      else (select<[boolean]>(anonHeap_getTotal,
                              e_3,
                              $created))
 = TRUE TRUE"
@@ -588,32 +588,32 @@
                                        (branch "   if (  if (  if (  if (  if (  if (  e_3.$created
                                           = TRUE)
                                          then (TRUE)
-                                         else (boolean::select(anonHeap_Account,
+                                         else (select<[boolean]>(anonHeap_Account,
                                                                 e_3,
                                                                 $created))
                                    = TRUE)
                                   then (TRUE)
-                                  else (boolean::select(anonHeap_deposit,
+                                  else (select<[boolean]>(anonHeap_deposit,
                                                          e_3,
                                                          $created))
                             = TRUE)
                            then (TRUE)
-                           else (boolean::select(anonHeap_Account_0,
+                           else (select<[boolean]>(anonHeap_Account_0,
                                                   e_3,
                                                   $created))
                      = TRUE)
                     then (TRUE)
-                    else (boolean::select(anonHeap_deposit_0,
+                    else (select<[boolean]>(anonHeap_deposit_0,
                                            e_3,
                                            $created))
               = TRUE)
              then (TRUE)
-             else (boolean::select(anonHeap_transfer,
+             else (select<[boolean]>(anonHeap_transfer,
                                     e_3,
                                     $created))
        = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_getTotal,
+      else (select<[boolean]>(anonHeap_getTotal,
                              e_3,
                              $created))
 = TRUE FALSE"
@@ -719,12 +719,12 @@
                               (rule "polySimp_sepPosMonomial" (formula "33"))
                               (rule "mul_literals" (formula "33") (term "1"))
                               (rule "ifthenelse_split" (formula "45") (term "0"))
-                              (branch "   boolean::select(anonHeap_Account, self_1, $created)
+                              (branch "   select<[boolean]>(anonHeap_Account, self_1, $created)
 = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "46"))
                                  (rule "closeTrue" (formula "46"))
                               )
-                              (branch "   boolean::select(anonHeap_Account, self_1, $created)
+                              (branch "   select<[boolean]>(anonHeap_Account, self_1, $created)
 = TRUE FALSE"
                                  (rule "cut_direct" (formula "50") (term "1"))
                                  (branch " CUT: wellFormed(heapAfter_getTotal) TRUE"
@@ -3647,7 +3647,7 @@
                   (rule "ifthenelse_split" (formula "31") (term "0"))
                   (branch "   if (self_1.$created = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_Account,
+      else (select<[boolean]>(anonHeap_Account,
                              self_1,
                              $created))
 = TRUE TRUE"
@@ -3656,7 +3656,7 @@
                   )
                   (branch "   if (self_1.$created = TRUE)
       then (TRUE)
-      else (boolean::select(anonHeap_Account,
+      else (select<[boolean]>(anonHeap_Account,
                              self_1,
                              $created))
 = TRUE FALSE"

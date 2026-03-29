@@ -133,7 +133,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="l2" isArrayIndex="false">
-                        <value name="l2 {true}" typeString="int" valueString="int::select(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="l2 {true}" typeString="int" valueString="select<[int]>(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -150,7 +150,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="l2" isArrayIndex="false">
-                           <value name="l2 {true}" typeString="int" valueString="int::select(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="l2 {true}" typeString="int" valueString="select<[int]>(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -167,7 +167,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="l2" isArrayIndex="false">
-                              <value name="l2 {true}" typeString="int" valueString="int::select(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="l2 {true}" typeString="int" valueString="select<[int]>(anon_heap_max&lt;&lt;anonHeapFunction&gt;&gt;,self,VariableMethodContractTest::$l2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>

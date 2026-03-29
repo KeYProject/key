@@ -21,7 +21,7 @@ Java has the peculiarity of covariant array types. They allow an array assignmen
 
 Integers are used to access the entries of entries within arrays stored on the heap. This function provides the injection of the integer domain into that of the type Field. It is ensured that this image of arr is disjoint from any defined field constant.
 
-The array access a[i], for instance for an int-array a, becomes int::select(heap, a, arr(i)).</entry>
+The array access a[i], for instance for an int-array a, becomes select<[int]>(heap, a, arr(i)).</entry>
 
 <entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
 <entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>

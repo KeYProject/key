@@ -399,7 +399,7 @@
             (builtin "One Step Simplification" (formula "27"))
             (rule "ifthenelse_negated_for" (formula "27"))
             (rule "ifthenelse_split_for" (formula "27"))
-            (branch "int::select(anonHeap_build, self_4, p) = array_0.length TRUE"
+            (branch "select<[int]>(anonHeap_build, self_4, p) = array_0.length TRUE"
                (rule "applyEq" (formula "22") (term "1,1,0,0") (ifseqformula "1"))
                (rule "applyEq" (formula "20") (term "0") (ifseqformula "1"))
                (rule "applyEq" (formula "21") (term "1") (ifseqformula "1"))
@@ -503,7 +503,7 @@
                   (rule "closeFalse" (formula "1"))
                )
             )
-            (branch "int::select(anonHeap_build, self_4, p) = array_0.length FALSE"
+            (branch "select<[int]>(anonHeap_build, self_4, p) = array_0.length FALSE"
                (rule "methodCallReturn" (formula "28") (term "1"))
                (rule "assignment" (formula "28") (term "1"))
                (builtin "One Step Simplification" (formula "28"))

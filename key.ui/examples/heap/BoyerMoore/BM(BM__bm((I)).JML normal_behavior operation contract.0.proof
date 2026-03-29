@@ -2624,7 +2624,7 @@
                                                 (rule "dismissNonSelectedField" (formula "37") (term "4,0") (userinteraction))
                                                 (rule "selectOfStore" (formula "37") (term "4,0") (userinteraction))
                                                 (rule "ifthenelse_split" (formula "37") (term "4,0") (userinteraction))
-                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::<created> TRUE"
+                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::#$created TRUE"
                                                    (rule "castDel2" (formula "38") (term "4,0") (ifseqformula "5") (userinteraction))
                                                    (rule "applyEqReverse" (formula "31") (term "4,0") (ifseqformula "5") (userinteraction))
                                                     (builtin "Use Dependency Contract" (formula "38") (term "0") (ifInst ""  (formula "31") (term "0")) (contract "BoyerMoore[BoyerMoore::count([I,\bigint,\bigint)].JML accessible clause.0") (userinteraction))
@@ -2865,7 +2865,7 @@
                                                       )
                                                    )
                                                 )
-                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::<created> FALSE"
+                                                (branch " i_14 = i_14 & IntOpt::#value = IntOpt::#value & !IntOpt::#value = java.lang.Object::#$created FALSE"
                                                     (builtin "One Step Simplification" (formula "37"))
                                                    (rule "closeTrue" (formula "37"))
                                                 )
@@ -3158,7 +3158,7 @@
                                                 (rule "leq_literals" (formula "22") (term "0"))
                                                  (builtin "One Step Simplification" (formula "22"))
                                                 (rule "ifthenelse_split" (formula "2") (term "0"))
-                                                (branch "f_0 = java.lang.Object::<created> & o_0 = i_14 TRUE"
+                                                (branch "f_0 = java.lang.Object::#$created & o_0 = i_14 TRUE"
                                                    (rule "andLeft" (formula "2"))
                                                    (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
                                                     (builtin "One Step Simplification" (formula "5") (ifInst ""  (formula "3")))
@@ -3179,7 +3179,7 @@
                                                    (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                                    (rule "close" (formula "35") (ifseqformula "1"))
                                                 )
-                                                (branch "f_0 = java.lang.Object::<created> & o_0 = i_14 FALSE"
+                                                (branch "f_0 = java.lang.Object::#$created & o_0 = i_14 FALSE"
                                                    (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                                    (rule "hideAuxiliaryEq" (formula "2"))
                                                    (rule "ifthenelse_split" (formula "2") (term "0"))
