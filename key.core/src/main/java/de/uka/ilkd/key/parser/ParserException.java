@@ -22,7 +22,7 @@ public final class ParserException extends RuntimeException implements HasLocati
      *        location is unknown or the error is independent of a location.
      */
     public ParserException(String message, Location location) {
-        super(message);
+        super(message + " at " + location);
         this.location = location;
     }
 
