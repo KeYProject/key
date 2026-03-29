@@ -180,9 +180,9 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         if (symbol instanceof ParametricFunctionInstance pfi) {
-            // e.g., <classErroneous><[A]>
+            // e.g., #$classErroneous<[A]>
             return new SplitFieldName(pfi.getArgs().head().sort().toString(),
-                pfi.getBase().name().toString());
+                pfi.getBase().name().toString().substring(1));
         }
         var name = symbol.name().toString();
 
