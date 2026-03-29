@@ -15,7 +15,7 @@ Name extends Record {
             return true;
         if (!(o instanceof Name that))
             return false;
-        return java.lang.Objects.equals(name, o.name);
+        return java.lang.Objects.equals(name, that.name);
         return true;
     }
 
@@ -51,10 +51,10 @@ Name extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 
     public static // package-private
     Name $allocate();
@@ -139,7 +139,7 @@ final class Point extends Record {
             return true;
         if (!(o instanceof Point that))
             return false;
-        return java.lang.Objects.equals(x, o.x) && java.lang.Objects.equals(y, o.y);
+        return java.lang.Objects.equals(x, that.x) && java.lang.Objects.equals(y, that.y);
         return true;
     }
 
@@ -183,10 +183,10 @@ final class Point extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 
     public static Point $allocate();
 

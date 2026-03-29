@@ -15,7 +15,7 @@ Name extends Record {
             return true;
         if (!(o instanceof Name that))
             return false;
-        return java.lang.Objects.equals(name, o.name);
+        return java.lang.Objects.equals(name, that.name);
         return true;
     }
 
@@ -60,7 +60,7 @@ final class Point extends Record {
             return true;
         if (!(o instanceof Point that))
             return false;
-        return java.lang.Objects.equals(x, o.x) && java.lang.Objects.equals(y, o.y);
+        return java.lang.Objects.equals(x, that.x) && java.lang.Objects.equals(y, that.y);
         return true;
     }
 

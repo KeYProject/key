@@ -13,7 +13,7 @@ final class MyRecord extends Record {
             return true;
         if (!(o instanceof MyRecord that))
             return false;
-        return java.lang.Objects.equals(test, o.test);
+        return java.lang.Objects.equals(test, that.test);
         return true;
     }
 
@@ -47,8 +47,8 @@ final class MyRecord extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 }

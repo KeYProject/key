@@ -19,7 +19,7 @@ final class Mapping extends Record {
             return true;
         if (!(o instanceof Mapping that))
             return false;
-        return java.lang.Objects.equals(from, o.from) && java.lang.Objects.equals(to, o.to);
+        return java.lang.Objects.equals(from, that.from) && java.lang.Objects.equals(to, that.to);
         return true;
     }
 
@@ -52,8 +52,8 @@ final class Mapping extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 }

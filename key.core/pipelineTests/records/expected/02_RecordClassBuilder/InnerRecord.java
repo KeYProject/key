@@ -15,7 +15,7 @@ class OuterClass {
                 return true;
             if (!(o instanceof MyRecord that))
                 return false;
-            return java.lang.Objects.equals(test, o.test);
+            return java.lang.Objects.equals(test, that.test);
             return true;
         }
 

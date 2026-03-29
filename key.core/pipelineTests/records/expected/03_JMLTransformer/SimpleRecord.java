@@ -13,7 +13,7 @@ public final class SimpleRecord extends Record {
             return true;
         if (!(o instanceof SimpleRecord that))
             return false;
-        return java.lang.Objects.equals(name, o.name);
+        return java.lang.Objects.equals(name, that.name);
         return true;
     }
 

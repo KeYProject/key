@@ -19,7 +19,7 @@ final class Mapping extends Record {
             return true;
         if (!(o instanceof Mapping that))
             return false;
-        return java.lang.Objects.equals(from, o.from) && java.lang.Objects.equals(to, o.to);
+        return java.lang.Objects.equals(from, that.from) && java.lang.Objects.equals(to, that.to);
         return true;
     }
 

@@ -15,7 +15,7 @@ class OuterClass {
                 return true;
             if (!(o instanceof MyRecord that))
                 return false;
-            return java.lang.Objects.equals(test, o.test);
+            return java.lang.Objects.equals(test, that.test);
             return true;
         }
 
@@ -44,10 +44,10 @@ class OuterClass {
         private OuterClass $enclosingThis;
 
         @javax.annotation.processing.Generated()
-        static public model boolean <$staticInv>;
+        static public model boolean $staticInv;
 
         @javax.annotation.processing.Generated()
-        static public model boolean <$staticInv_free>;
+        static public model boolean $staticInv_free;
 
         public static MyRecord $allocate();
 
@@ -115,10 +115,10 @@ class OuterClass {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 
     public static OuterClass $allocate();
 

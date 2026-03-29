@@ -13,7 +13,7 @@ public final class SimpleRecord extends Record {
             return true;
         if (!(o instanceof SimpleRecord that))
             return false;
-        return java.lang.Objects.equals(name, o.name);
+        return java.lang.Objects.equals(name, that.name);
         return true;
     }
 
@@ -44,10 +44,10 @@ public final class SimpleRecord extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv>;
+    static public model boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean <$staticInv_free>;
+    static public model boolean $staticInv_free;
 
     public static SimpleRecord $allocate();
 }
