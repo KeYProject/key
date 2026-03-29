@@ -136,7 +136,7 @@ public class ProveRulesTest {
         }
 
         /*
-         * Create list of constructor parameters containig one entry for each taclet name. (that
+         * Create list of constructor parameters containing one entry for each taclet name. (that
          * means there will be one test case for each taclet)
          */
         return tacletNames.stream()

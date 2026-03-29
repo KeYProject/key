@@ -143,8 +143,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * @param varfuncName
      *        the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-            Sort sort, KeYParser.Formal_sort_argsContext genericArgsCtxt) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName,
+            KeYParser.Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
         Operator[] operators =
             { schemaVariables().lookup(name), variables().lookup(name),
@@ -160,36 +160,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        if (sort != null || sortName != null) {
-            Name fqName =
-                new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
-            operators =
-                new Operator[] { schemaVariables().lookup(fqName),
-                    variables().lookup(fqName),
-                    programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    functions().lookup(fqName),
-                    AbstractTermTransformer.name2metaop(fqName.toString()) };
-
-            for (Operator op : operators) {
-                if (op != null) {
-                    return op;
-                }
-            }
-
-            SortDependingFunction firstInstance =
-                SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
-            if (sort == null)
-                semanticError(ctx, "Could not find sort: %s", sortName);
-            if (firstInstance != null) {
-                SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
-                if (v != null) {
-                    return v;
-                }
-            }
-            semanticError(ctx, "Could not find (program) variable or constant %s",
-                fqName.toString());
-            return null;
-        }
         if (genericArgsCtxt != null) {
             var d = nss.parametricFunctions().lookup(name);
             if (d == null) {

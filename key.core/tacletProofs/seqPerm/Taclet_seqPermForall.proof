@@ -331,7 +331,7 @@
    (rule "inEqSimp_contradInEq1" (formula "8") (term "0") (ifseqformula "1"))
    (rule "qeq_literals" (formula "8") (term "0,0"))
     (builtin "One Step Simplification" (formula "8"))
-   (rule "allLeft" (formula "3") (inst "t=int::seqGet(s_0, v_iv_0)"))
+   (rule "allLeft" (formula "3") (inst "t=seqGet<[int]>(s_0, v_iv_0)"))
    (rule "applyEqRigid" (formula "3") (term "0,0,0") (ifseqformula "13"))
    (rule "replace_known_right" (formula "3") (term "0,0") (ifseqformula "15"))
     (builtin "One Step Simplification" (formula "3"))

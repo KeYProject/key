@@ -89,11 +89,6 @@ public final class JavaDLMatchVMInstructionSet {
         return instruction;
     }
 
-    public static SimilarSortDependingFunctionInstruction getSimilarSortDependingFunctionInstruction(
-            SortDependingFunction sortDependingFunction) {
-        return new SimilarSortDependingFunctionInstruction(sortDependingFunction);
-    }
-
     public static SimilarParametricFunctionInstruction getSimilarParametricFunctionInstruction(
             ParametricFunctionInstance psi) {
         return new SimilarParametricFunctionInstruction(psi);

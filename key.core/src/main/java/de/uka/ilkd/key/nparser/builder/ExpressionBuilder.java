@@ -176,7 +176,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private static boolean isSelectTerm(JTerm term) {
-        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+        return term.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().toString().equals("select") && term.arity() == 3;
     }
 
     @Override
@@ -783,7 +784,7 @@ public class ExpressionBuilder extends DefaultBuilder {
            * }
            */
         assert s != null;
-        SortDependingFunction castSymbol =
+        ParametricFunctionInstance castSymbol =
             getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);
     }
@@ -1164,7 +1165,6 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
-        Sort sortId = accept(ctx.sortId());
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
@@ -1189,7 +1189,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1201,7 +1201,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+                null);
             if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
@@ -1463,8 +1463,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1472,8 +1472,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
+            if (ctx.sortId() != null) {
+                firstName = ctx.sortId().getText() + "::" + firstName;
+            }
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, genericArgsCtxt);
+                genericArgsCtxt);
         }
 
         JTerm current;

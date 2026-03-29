@@ -10,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -81,7 +82,7 @@ class GenericTranslator {
      * @param instantiation the instantiation sort.
      * @return returns the new term with instantiated variables. If <code>term</code> can not be
      *         instantiated the method returns <code>null</code>, e.g. this can occur, when
-     *         <code>term</code> is of type {@link SortDependingFunction} and
+     *         <code>term</code> is of type {@link ParametricFunctionInstance} and
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
 
@@ -116,24 +117,26 @@ class GenericTranslator {
 
         }
 
-        if (term.op() instanceof SortDependingFunction func) {
-
+        if (term.op() instanceof ParametricFunctionInstance func) {
             try { // Try block is necessary because there are some
                   // taclets
                   // that should have isReference-Condition, but
                   // they don't
                   // have the condition.
 
-                if (func.getSortDependingOn().equals(generic)) {
+                // TODO(DD): Extend to more complex parametric functions; ask RB what is expected
+                // here
+                if (func.getArgs().size() == 1 && func.getArgs().head().sort().equals(generic)) {
                     if (instantiation.extendsTrans(services.getJavaInfo().nullSort())) {
                         return null;
                     }
-                    func = func.getInstanceFor(instantiation, services);
+                    func = ParametricFunctionInstance.get(func.getBase(),
+                        ImmutableList.of(new GenericArgument(instantiation)), services);
 
-                    if (func.getKind().equals(JavaDLTheory.CAST_NAME)) {
+                    if (func.getBase() == services.getJavaDLTheory().getCastSymbol(services)) {
                         for (int i = 0; i < term.arity(); i++) {
 
-                            if (!sameHierachyBranch(func.getSortDependingOn(),
+                            if (!sameHierachyBranch(func.getArgs().head().sort(),
                                 subTerms[i].sort())) {
                                 // don't
                                 // instantiate
@@ -146,7 +149,6 @@ class GenericTranslator {
                     }
 
                     term = services.getTermFactory().createTerm(func, subTerms);
-
                 }
             } catch (IllegalArgumentException e) {
                 for (TranslationListener l : listener) {

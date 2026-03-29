@@ -43,12 +43,12 @@ public class FinalPrinterTest {
 
     @ParameterizedTest(name = "{0} => {1}")
     @CsvSource(delimiter = ';', textBlock = """
-            int::select(heap, self, C::#f); self.f
-            int::select(heap, self, C::#finf); int::select(heap, self, C::#finf)
-            int::final(sub, Csub::#finf); sub.finf
-            int::final(sub, C::#finf); sub.(C::finf)
-            int::final(self, C::#finf); self.finf
-            int::final(sub, C::#finf); sub.(C::finf)
+            select<[int]>(heap, self, C::#f); self.f
+            select<[int]>(heap, self, C::#finf); select<[int]>(heap, self, C::#finf)
+            final<[int]>(sub, Csub::#finf); sub.finf
+            final<[int]>(sub, C::#finf); sub.(C::finf)
+            final<[int]>(self, C::#finf); self.finf
+            final<[int]>(sub, C::#finf); sub.(C::finf)
             """)
     public void testPPWithFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
@@ -63,11 +63,11 @@ public class FinalPrinterTest {
 
     @ParameterizedTest(name = "{0} => {1}")
     @CsvSource(delimiter = ';', textBlock = """
-            int::final(sub, Csub::#finf); sub.finf
-            int::final(sub, C::#finf); sub.(C::finf)
-            int::final(self, C::#finf); self.finf
-            int::select(heap, self, C::#f); self.f
-            int::select(heap, self, C::#finf); self.finf
+            final<[int]>(sub, Csub::#finf); sub.finf
+            final<[int]>(sub, C::#finf); sub.(C::finf)
+            final<[int]>(self, C::#finf); self.finf
+            select<[int]>(heap, self, C::#f); self.f
+            select<[int]>(heap, self, C::#finf); self.finf
             """)
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()

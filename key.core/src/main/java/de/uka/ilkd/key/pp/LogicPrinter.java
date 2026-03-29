@@ -941,25 +941,12 @@ public class LogicPrinter {
         } else {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
-
-            if (t.op() instanceof SortDependingFunction op) {
-
-                // remove package prefix from SortDependingFunction
-                if (notationInfo.isHidePackagePrefix()) {
-                    String sort = op.getSortDependingOn().declarationString();
-                    int index = sort.lastIndexOf('.');
-                    sort = sort.substring(index + 1);
-                    layouter.print(sort);
-                    layouter.print("::");
-
-                    name = op.getKind().toString();
-                }
-
-                // mark instance and exactInstance as keywords
-                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
-                        || op.getKind().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
+            if (t.op() instanceof ParametricFunctionInstance op) {
+                if (op.getBase().name().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
+                        || op.getBase().name().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
                     isKeyword = true;
                 }
+                name = op.getBase().name().toString();
             }
             if (isKeyword) {
                 layouter.markStartKeyword();
@@ -971,6 +958,16 @@ public class LogicPrinter {
             }
             if (isKeyword) {
                 layouter.markEndKeyword();
+            }
+            if (t.op() instanceof ParametricFunctionInstance pfi) {
+                layouter.print("<[");
+                for (int i = 0; i < pfi.getArgs().size(); ++i) {
+                    var arg = pfi.getArgs().get(i);
+                    if (i > 0)
+                        layouter.print(", ");
+                    printSort(arg.sort());
+                }
+                layouter.print("]>");
             }
             if (!t.boundVars().isEmpty()) {
                 layouter.print("{").beginC(0);
@@ -993,12 +990,21 @@ public class LogicPrinter {
         }
     }
 
+    private void printSort(Sort s) {
+        String sort = s.declarationString();
+        if (notationInfo.isHidePackagePrefix()) {
+            int index = sort.lastIndexOf('.');
+            sort = sort.substring(index + 1);
+        }
+        layouter.print(sort);
+    }
+
     public void printCast(String pre, String post, JTerm t, int ass) {
-        final SortDependingFunction cast = (SortDependingFunction) t.op();
+        final var cast = (ParametricFunctionInstance) t.op();
 
         layouter.startTerm(t.arity());
         layouter.print(pre);
-        String sort = cast.getSortDependingOn().toString();
+        String sort = cast.getArgs().head().sort().toString();
         // remove package prefix from sort name
         if (notationInfo.isHidePackagePrefix()) {
             int index = sort.lastIndexOf('.');
@@ -1116,7 +1122,7 @@ public class LogicPrinter {
     }
 
     /*
-     * Print a term of the form: T::seqGet(Seq, int).
+     * Print a term of the form: seqGet<[T]>(Seq, int).
      */
     public void printSeqGet(JTerm t) {
         if (notationInfo.isPrettySyntax()) {

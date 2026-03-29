@@ -9,7 +9,7 @@ import java.util.Set;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -116,7 +116,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
         bindRuleSet(d, "stringsSimplify", longConst(-5000));
 
         final TermFeature charOrIntLiteral = or(tf.charLiteral, tf.literal,
-            or(add(OperatorClassTF.create(SortDependingFunction.class), // XXX:
+            or(add(OperatorClassTF.create(ParametricFunctionInstance.class), // XXX:
                 // was CastFunctionSymbol.class
                 sub(tf.literal)), inftyTermConst()));
 

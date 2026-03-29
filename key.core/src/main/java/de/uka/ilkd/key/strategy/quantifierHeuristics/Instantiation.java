@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -178,8 +178,8 @@ class Instantiation {
 
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
-        if (cost == null && (inst.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) inst.op()).getKind().equals(JavaDLTheory.CAST_NAME))) {
+        if (cost == null && (inst.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
             cost = instancesWithCosts.get(inst.sub(0));
         }
 

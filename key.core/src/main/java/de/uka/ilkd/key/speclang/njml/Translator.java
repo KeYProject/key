@@ -229,7 +229,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 + " context and permissions not enabled.",
                 ctx);
         }
-        if (!term.op().name().toString().endsWith("::select")) {
+        if (!(term.op() instanceof ParametricFunctionInstance pfi)
+                || pfi.getBase() != services.getTypeConverter().getHeapLDT().getSelect()) {
             raiseError("\\permission expression used with non store-ref" + " expression.", ctx);
         }
         return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(),
@@ -631,7 +632,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        final SortDependingFunction f =
+        final ParametricFunctionInstance f =
             services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;

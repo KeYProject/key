@@ -63,7 +63,7 @@ public class TestParser {
         String content = """
                 \\sorts { \\generic gen; }\s
 
-                \\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }
+                \\rules { SomeRule { \\find(instance<[gen]>(0)) \\replacewith(false) }; }
                 \\problem { true }""";
 
         Services services = TacletForTests.services();

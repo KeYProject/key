@@ -10,5 +10,5 @@ contains:
 expected: VALID
 keySrc: |-
   \problem {
-    \forall Object o; (String::instance(o) = TRUE -> (String)o = o)
+    \forall Object o; (instance<[String]>(o) = TRUE -> (String)o = o)
   }

@@ -164,7 +164,7 @@
       (rule "close" (formula "16") (ifseqformula "1"))
    )
    (branch "k = 0 FALSE"
-      (rule "eqTermCut" (formula "16") (term "0,0,0") (inst "s=int::select(heap, a, arr(sub(k, Z(1(#)))))") (userinteraction))
+      (rule "eqTermCut" (formula "16") (term "0,0,0") (inst "s=select<[int]>(heap, a, arr(sub(k, Z(1(#)))))") (userinteraction))
       (branch "Assume a[k - 1]@heap[anon(allLocs setMinus a.*, anon_heap<<anonHeapFunction>>)] = a[k - 1]"
          (rule "polySimp_elimSub" (formula "17") (term "3,1,1,1"))
          (rule "mul_literals" (formula "17") (term "1,3,1,1,1"))

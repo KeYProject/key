@@ -4,10 +4,9 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -36,9 +35,9 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
         final JTerm element = term.sub(1);
 
         final Sort arraySort;
-        if (array.op() instanceof SortDependingFunction && ((SortDependingFunction) array.op())
-                .getKind().equals(JavaDLTheory.EXACT_INSTANCE_NAME)) {
-            arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
+        if (array.op() instanceof ParametricFunctionInstance pfi && pfi.getBase()
+                .equals(services.getJavaDLTheory().getExactInstanceofSymbol(services))) {
+            arraySort = pfi.getArgs().head().sort();
         } else {
             arraySort = array.sort();
         }
