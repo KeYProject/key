@@ -248,7 +248,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         // test pretty syntax
         comparePrettySyntaxAgainstVerboseSyntax("a.$created",
             "select<[boolean]>(heap,a,java.lang.Object::#$created)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.#$initialized",
+        comparePrettySyntaxAgainstVerboseSyntax("a.$initialized",
             "select<[boolean]>(heap,a,java.lang.Object::#$initialized)");
         comparePrettySyntaxAgainstVerboseSyntax("a.$transient",
             "select<[int]>(heap,a,java.lang.Object::#$transient)");
