@@ -8,9 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -29,9 +29,13 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -39,8 +43,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TacletForTests {
 
-    private TacletForTests() {
-    }
+    private TacletForTests() {}
 
     public static final String testRules =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
@@ -62,7 +65,8 @@ public class TacletForTests {
         // library (HACK)
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
+            return new RuleCollection(
+                ImmutableList.of(RuleSourceFactory.fromDefaultLocation(ldtFile)),
                 ImmutableSLList.nil());
         }
     };
@@ -106,7 +110,7 @@ public class TacletForTests {
         if (services == null) {
             parse();
         }
-        return services;
+        return services.copy(false);
     }
 
 
@@ -150,6 +154,12 @@ public class TacletForTests {
         return rules;
     }
 
+    @NonNull
+    public static NoPosTacletApp lookupTaclet(String name) {
+        var result = getRules().lookup(name);
+        assertNotNull(result, "Failed to find taclet " + name);
+        return result;
+    }
 
     public static Namespace<RuleSet> getHeuristics() {
         return nss.ruleSets();
@@ -188,6 +198,22 @@ public class TacletForTests {
         return getSorts().lookup(new Name(name));
     }
 
+    public static JTerm parseTerm(String termstr, Services services, NamespaceSet nss) {
+        if (termstr.isEmpty()) {
+            return null;
+        }
+
+        try {
+            KeyIO io = new KeyIO(services, nss);
+            // TacletForTests.getAbbrevs()
+            return io.parseExpression(termstr);
+        } catch (Exception e) {
+            fail("Exception occurred while parsing of " + termstr, e);
+            return null;
+        }
+
+    }
+
     public static JTerm parseTerm(String termstr, Services services) {
         if (termstr.isEmpty()) {
             return null;
@@ -216,8 +242,8 @@ public class TacletForTests {
     }
 
     public static ProgramElement parsePrg(String prgString) {
-        Recoder2KeY r2k = new Recoder2KeY(services(), new NamespaceSet());
-        return r2k.readBlockWithEmptyContext(prgString).program();
+        JavaService r2k = services().getJavaService();
+        return r2k.readBlockWithEmptyContext(prgString, null).program();
     }
 
     public static Goal createGoal() {

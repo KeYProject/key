@@ -88,8 +88,7 @@ public class Substitution {
 
     private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
         final ClashFreeSubst subst =
-            new ClashFreeSubst(var,
-                (JTerm) instance, tb);
+            new ClashFreeSubst(var, (JTerm) instance, tb);
         return subst.apply((JTerm) t);
     }
 

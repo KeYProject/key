@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.operator.TypeOperator;
+//import de.uka.ilkd.key.java.declaration.*;
+//import de.uka.ilkd.key.java.expression.operator.TypeOperator;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
@@ -33,9 +33,10 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SyntaxElement subst,
             SVInstantiations svInst, Services services) {
 
+
         if (var != variable)
             return true;
-
+/*
         var inst = svInst.getInstantiation(variable);
 
         if (inst instanceof TypeOperator) {
@@ -55,10 +56,12 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return matchesField(services, (Function) op);
         }
 
+*/
         return false;
     }
 
     public boolean matchesField(Services services, Function op) {
+        /*
         var kpmi = services.getJavaInfo().getKeYProgModelInfo();
 
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
@@ -103,6 +106,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 .anyMatch(a -> a.getTypeReference().getName().equals(annot));
 
         return value;
+        */ 
+        return false;
     }
 
     @Override

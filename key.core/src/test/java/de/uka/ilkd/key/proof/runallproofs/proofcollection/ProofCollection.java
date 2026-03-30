@@ -80,6 +80,10 @@ public final class ProofCollection {
 
     public GroupedProofCollectionUnit group(String name) {
         var settings = new ProofCollectionSettings(this.settings);
+        return group(name, settings);
+    }
+
+    public GroupedProofCollectionUnit group(String name, ProofCollectionSettings settings) {
         var unit = new GroupedProofCollectionUnit(name, settings);
         units.add(unit);
         return unit;
@@ -88,7 +92,8 @@ public final class ProofCollection {
     /**
      * Removes all groups from this collection except the given names
      *
-     * @param groupNames a list of groups to be kept
+     * @param groupNames
+     *        a list of groups to be kept
      */
     public void keep(String... groupNames) {
         Arrays.sort(groupNames);

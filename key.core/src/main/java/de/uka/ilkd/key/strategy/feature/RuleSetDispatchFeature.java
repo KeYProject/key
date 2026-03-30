@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -32,6 +33,10 @@ import org.jspecify.annotations.NonNull;
 public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
+
+    public Set<RuleSet> ruleSets() {
+        return rulesetToFeature.keySet();
+    }
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
@@ -94,5 +99,16 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public Feature get(RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
+    }
+
+    /**
+     * Returns the used {@link Feature} for the given {@link RuleSet} and removes it.
+     *
+     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
+     *         available.
+     */
+    public Feature remove(RuleSet ruleSet) {
+        return rulesetToFeature.remove(ruleSet);
     }
 }

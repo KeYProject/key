@@ -6,10 +6,10 @@ package de.uka.ilkd.key.gui.colors;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
  * @version 1 (10.05.19)
  */
 public class ColorSettings {
-    public static final File SETTINGS_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "colors.json");
+    public static final Path SETTINGS_FILE_NEW =
+        PathConfig.getKeyConfigDir().resolve("colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
 
     private static ColorSettings INSTANCE;
@@ -47,7 +47,7 @@ public class ColorSettings {
 
     public static ColorSettings getInstance() {
         if (INSTANCE == null) {
-            if (SETTINGS_FILE_NEW.exists()) {
+            if (Files.exists(SETTINGS_FILE_NEW)) {
                 try {
                     LOGGER.info("Load color settings from file {}", SETTINGS_FILE_NEW);
                     INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
@@ -94,8 +94,8 @@ public class ColorSettings {
      * @see #SETTINGS_FILE_NEW
      */
     public void save() {
-        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.toAbsolutePath());
+        try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's Colors");
             writer.flush();

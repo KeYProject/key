@@ -149,7 +149,7 @@ public class MasterHandlerTest {
                 Path srcDir = Files.createTempDirectory("SMT_key_" + name);
                 Path tmpSrc = srcDir.resolve("src.java");
                 Files.writeString(tmpSrc, javaSrc);
-                keySrc += "\\javaSource \"" + srcDir + "\";\n";
+                keySrc = "\\javaSource \"" + srcDir + "\";\n" + keySrc;
             }
 
             Path tmpKey = Files.createTempFile("SMT_key_%s".formatted(name), ".key");
@@ -176,7 +176,7 @@ public class MasterHandlerTest {
         }
     }
 
-    private record LoadedTestData(String name, TestData data, String translation) {
+    public record LoadedTestData(String name, TestData data, String translation) {
         @Override
         public @NonNull String toString() {
             return name();

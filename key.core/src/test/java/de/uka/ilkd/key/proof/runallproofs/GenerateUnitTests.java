@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,36 +32,31 @@ import org.slf4j.LoggerFactory;
  */
 public class GenerateUnitTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
-    /**
-     * Output folder. Set on command line.
-     */
-    private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
-        var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
-            ProofCollections.automaticInfFlow() };
+        var collections = List.of(ProofCollections.automaticJavaDL());
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
+        var outputFolder = Paths.get(args[0]);
+        run(outputFolder, collections);
+    }
 
-        outputFolder = Paths.get(args[0]);
+    public static void run(Path outputFolder, List<ProofCollection> collections)
+            throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
+        outputFolder = outputFolder.toAbsolutePath();
         Files.createDirectories(outputFolder);
 
         for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(unit);
+                createUnitClass(outputFolder, unit);
             }
         }
     }
 
-    // "import de.uka.ilkd.key.util.NamedRunner;\n" +
-    // "import de.uka.ilkd.key.util.TestName;\n" +
-    // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
-    // +
-    // "@RunWith(NamedRunner.class)\n" +
     private static final String TEMPLATE_CONTENT =
         """
                 /* This file is part of KeY - https://key-project.org
@@ -76,6 +68,8 @@ public class GenerateUnitTests {
                 import org.junit.jupiter.api.*;
                 import static org.junit.jupiter.api.Assertions.*;
 
+                //@org.junit.jupiter.api.Timeout(180)
+                @org.junit.jupiter.api.Tag("RAP")
                 public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
                   public static final String STATISTIC_FILE = "$statisticsFile";
 
@@ -90,6 +84,8 @@ public class GenerateUnitTests {
                     this.localSettings =  "$localSettings";
                   }
 
+                  $killSwitch
+
                   $timeout
                   $methods
                 }
@@ -102,7 +98,7 @@ public class GenerateUnitTests {
      * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(RunAllProofsTestUnit unit)
+    private static void createUnitClass(Path outputFolder, RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
@@ -125,19 +121,13 @@ public class GenerateUnitTests {
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
-        vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
+        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\n"));
-
-        vars.put("timeout", "");
-
-        if (false) {// disabled
-            int globalTimeout = 0;
-            if (globalTimeout > 0) {
-                vars.put("timeout",
-                    "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
-            }
+                    .replace("\n", "\\\\n"));
+        if (unit.isResetEachTest()) {
+            vars.put("killSwitch",
+                "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");
         }
 
         StringBuilder methods = new StringBuilder();

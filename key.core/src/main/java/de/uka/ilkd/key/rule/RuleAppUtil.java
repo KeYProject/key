@@ -54,7 +54,7 @@ public final class RuleAppUtil {
         }
         // built-ins need special treatment:
         // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
+        if (ruleApp instanceof AbstractBuiltInRuleApp<?> builtIn) {
             builtIn.assumesInsts().forEach(inputs::add);
         }
 

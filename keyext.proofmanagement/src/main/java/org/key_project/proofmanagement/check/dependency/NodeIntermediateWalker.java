@@ -27,6 +27,7 @@ public abstract class NodeIntermediateWalker {
         this.root = root;
     }
 
+
     /** starts the walker */
     public void start() {
         walkIteratively();

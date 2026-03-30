@@ -10,7 +10,7 @@ dependencies {
     implementation 'org.jspecify:jspecify:1.0.0'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     enableAssertions = true
 }
 

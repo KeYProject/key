@@ -7,18 +7,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.IGuard;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -35,30 +33,34 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The built in rule app for the loop invariant rule.
  */
-public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
+        extends AbstractBuiltInRuleApp<T> {
 
-    private final While loop;
+    protected final While loop;
 
-    private LoopSpecification spec;
-    private final List<LocationVariable> heapContext;
-    private IFProofObligationVars infFlowVars;
-    private ExecutionContext executionContext;
-    private JTerm guard;
+    protected @Nullable LoopSpecification spec;
+    @Nullable
+    protected final List<LocationVariable> heapContext;
+    private @Nullable ExecutionContext executionContext;
+    private @Nullable JTerm guard;
 
-    private final TermServices services;
+    protected final TermServices services;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos,
-            TermServices services) {
+    public LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pos, TermServices services) {
         this(rule, pos, null, null, null, services);
     }
 
-    protected LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts,
-            LoopSpecification inv,
-            List<LocationVariable> heapContext, TermServices services) {
+    protected LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> ifInsts,
+            @Nullable LoopSpecification inv,
+            @Nullable List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm().javaBlock());
@@ -80,7 +82,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      *
      * @param services TODO
      */
-    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
+    private @Nullable LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             TermServices services) {
         if (rawInv == null) {
             return null;
@@ -132,7 +134,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 return result;
             }
 
-            private JTerm replace(JTerm visited) {
+            private @Nullable JTerm replace(JTerm visited) {
                 ImmutableArray<JTerm> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("index")) {
@@ -163,7 +165,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 return result;
             }
 
-            private JTerm replace(JTerm visited) {
+            private @Nullable JTerm replace(JTerm visited) {
                 ImmutableArray<JTerm> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("values")) {
@@ -237,7 +239,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return rawInv.instantiate(newInvs, newFreeInvs, var);
     }
 
-    protected LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    protected LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pio,
             LoopSpecification inv, TermServices services) {
         this(rule, pio, null, inv, null, services);
     }
@@ -283,8 +285,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, spec, heapContext,
+    public LoopInvariantBuiltInRuleApp<T> replacePos(PosInOccurrence newPos) {
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, newPos, ifInsts, spec, heapContext,
             services);
     }
 
@@ -293,25 +295,22 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp setAssumesInsts(
+    public LoopInvariantBuiltInRuleApp<T> setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
 
     }
 
-    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
+    public LoopInvariantBuiltInRuleApp<T> setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
         if (this.loop == inv.getLoop()) {
             this.spec = inv;
         }
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv, heapContext,
             services);
     }
 
-    public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
-        this.infFlowVars = vars;
-    }
 
     public void setGuard(JTerm guard) {
         this.guard = guard;
@@ -322,14 +321,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public LoopInvariantBuiltInRuleApp<T> tryToInstantiate(Goal goal) {
         if (spec != null) {
             return this;
         }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv,
             HeapContext.getModifiableHeaps(services, m.transaction()), services);
     }
 
@@ -347,9 +346,6 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return heapContext;
     }
 
-    public IFProofObligationVars getInformationFlowProofObligationVars() {
-        return infFlowVars;
-    }
 
     public JTerm getGuard() {
         return guard;

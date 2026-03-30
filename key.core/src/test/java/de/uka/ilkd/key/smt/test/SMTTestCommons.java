@@ -61,7 +61,8 @@ public abstract class SMTTestCommons {
      * check a problem file
      *
      * @param expected the expected result. Needed for setting a shorter timeout for unknown cases
-     * @param filepath the path to the file
+     * @param filepath
+     *        the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
@@ -115,10 +116,11 @@ public abstract class SMTTestCommons {
     /**
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
-     * @param file problem file.
-     * @param pro determines the profile that should be used.
+     * @param file
+     *        problem file.
+     * @param pro
+     *        determines the profile that should be used.
      * @return ProofAggregate of the problem file.
-     * @profile determines the profile that should be used.
      */
     protected ProofAggregate parse(Path file, Profile pro) {
         assertTrue(Files.exists(file));

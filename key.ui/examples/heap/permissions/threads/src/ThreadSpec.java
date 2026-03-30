@@ -80,5 +80,5 @@ public class ThreadSpec {
         ensures initPost();
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public ThreadSpec() {}
+    public /*@ helper @*/ ThreadSpec() {}
 }

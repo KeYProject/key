@@ -10,9 +10,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
@@ -116,7 +116,7 @@ public class ProblemTypeInformation {
      */
     public Set<String> getFieldsForSort(Sort s) {
         Set<String> result = new HashSet<>();
-        result.add(Util.processName("java.lang.Object::<created>"));
+        result.add(Util.processName("java.lang.Object::#$created"));
 
         JavaInfo info = services.getJavaInfo();
 
@@ -133,7 +133,6 @@ public class ProblemTypeInformation {
             for (Field f : info.getAllFields(c)) {
 
                 String name = f.getFullName();
-                // name = name.replace("::", "::$");
                 name = Util.processName(name);
                 result.add(name);
 

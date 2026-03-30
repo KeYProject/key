@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Provides the facility to open the documentation at press of F1. The opened page is determined
  * context-sensitive by the current focused component and parent components. Specify the URL via
- * {@HelpInfo}.
+ * {@link HelpInfo}.
  *
  * @author Alexander Weigl
  * @version 1 (10.04.19)

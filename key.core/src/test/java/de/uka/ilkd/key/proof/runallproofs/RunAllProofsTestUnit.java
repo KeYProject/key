@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
 
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +94,9 @@ public final class RunAllProofsTestUnit implements Serializable {
                 for (TestFile testFile : testFiles) {
                     TestResult testResult = testFile.runKey();
                     testResults.add(testResult);
+
+                    // weigl: avoid data memory leak
+                    JavaParserFacade.clearInstances();
                 }
             }
             case PERFILE -> {
@@ -174,5 +178,9 @@ public final class RunAllProofsTestUnit implements Serializable {
 
     public int getTotalNumTests() {
         return this.testFiles.size();
+    }
+
+    public boolean isResetEachTest() {
+        return settings.isResetEachTest();
     }
 }

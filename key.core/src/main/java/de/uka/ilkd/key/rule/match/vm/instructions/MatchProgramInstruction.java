@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.JavaDeclaration;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -32,20 +30,5 @@ public class MatchProgramInstruction implements MatchInstruction {
                 (Services) services),
             (MatchConditions) matchConditions);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        var add = "";
-
-        if (pe instanceof StatementBlock) {
-            var body = ((StatementBlock) pe).getBody();
-            var first = body.get(0);
-
-            add += " " + first.toString() + " " + first.getClass() + " "
-                + ((JavaDeclaration) first).getModifiers();
-        }
-
-        return "MatchProgramInstruction(pe: " + pe.toString() + ", " + pe.getClass() + ")" + add;
     }
 }

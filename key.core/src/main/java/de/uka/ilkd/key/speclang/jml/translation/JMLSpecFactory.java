@@ -9,15 +9,16 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -178,7 +180,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -186,7 +190,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else {
                 InformationFlowContract symbData1 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -195,13 +201,19 @@ public class JMLSpecFactory {
                     clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
+                if (symbData1 != null) {
+                    symbDatas = symbDatas.add(symbData1);
+                }
+
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
                     JModality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData1).add(symbData2);
+                if (symbData2 != null) {
+                    symbDatas = symbDatas.add(symbData2);
+                }
             }
         }
         return symbDatas;
@@ -1211,8 +1223,10 @@ public class JMLSpecFactory {
      * Creates a class axiom from a textual JML representation. As JML axioms are always without
      * modifiers, they are implicitly non-static and public.
      *
-     * @param kjt the type where the axiom is declared
-     * @param textual textual representation
+     * @param kjt
+     *        the type where the axiom is declared
+     * @param textual
+     *        textual representation
      * @return created {@link ClassAxiom}
      */
     public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {

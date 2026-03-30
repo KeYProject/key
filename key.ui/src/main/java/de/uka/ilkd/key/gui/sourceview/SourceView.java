@@ -34,11 +34,11 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.statement.Else;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -799,7 +799,8 @@ public final class SourceView extends JComponent {
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      *
-     * @param se the given SourceElement
+     * @param se
+     *        the given SourceElement
      * @return a new PositionInfo starting at the minimum of all the contained positions and ending
      *         at the maximum position
      */

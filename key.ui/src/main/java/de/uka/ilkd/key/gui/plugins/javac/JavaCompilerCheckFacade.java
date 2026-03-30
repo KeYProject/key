@@ -88,7 +88,7 @@ public class JavaCompilerCheckFacade {
         List<String> options = new ArrayList<>();
 
         if (bootClassPath != null) {
-            options.add("-Xbootclasspath");
+            options.add("-bootclasspath");
             options.add(bootClassPath.toAbsolutePath().toString());
         }
         if (classPath != null && !classPath.isEmpty()) {

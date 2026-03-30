@@ -47,11 +47,11 @@ class GUIBranchNode extends GUIAbstractTreeNode {
      * @return number of children
      */
     private int fillChildrenCache(boolean dryRun) {
-        if (childrenCache == null) {
+        if (childrenCache == null && !dryRun) {
             createChildrenCache();
         }
 
-        if (!childrenCache.isEmpty()) {
+        if (childrenCache != null && !childrenCache.isEmpty()) {
             return childrenCache.size();
         }
 

@@ -28354,7 +28354,7 @@
                               (rule "replace_known_left" (formula "4") (term "0,0,0,1,1,0,0") (ifseqformula "1"))
                               (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "49")))
                               (rule "ifthenelse_split" (formula "2") (term "0"))
-                              (branch " ¬f_0 = java.lang.Object::<created> ∧ o_0 = a ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2)) ∧ (f_0 = arr(e1) ∨ o_0 = a) ∧ (f_0 = arr(e2) ∨ o_0 = a) TRUE"
+                              (branch " ¬f_0 = java.lang.Object::#$created ∧ o_0 = a ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2)) ∧ (f_0 = arr(e1) ∨ o_0 = a) ∧ (f_0 = arr(e2) ∨ o_0 = a) TRUE"
                                  (rule "andLeft" (formula "2"))
                                  (rule "andLeft" (formula "2"))
                                  (rule "andLeft" (formula "2"))
@@ -29597,7 +29597,7 @@
                                     (rule "closeFalse" (formula "12"))
                                  )
                               )
-                              (branch " ¬f_0 = java.lang.Object::<created> ∧ o_0 = a ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2)) ∧ (f_0 = arr(e1) ∨ o_0 = a) ∧ (f_0 = arr(e2) ∨ o_0 = a) FALSE"
+                              (branch " ¬f_0 = java.lang.Object::#$created ∧ o_0 = a ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2)) ∧ (f_0 = arr(e1) ∨ o_0 = a) ∧ (f_0 = arr(e2) ∨ o_0 = a) FALSE"
                                  (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                  (rule "hideAuxiliaryEq" (formula "2"))
                                  (rule "cut_direct" (formula "46") (term "1,0,0,0"))
@@ -29641,7 +29641,7 @@
                                     (rule "commute_and" (formula "4") (term "0,0"))
                                     (rule "commute_and" (formula "5") (term "0,0"))
                                     (rule "ifthenelse_split" (formula "3") (term "0"))
-                                    (branch " ¬f_0 = java.lang.Object::<created> ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3)) TRUE"
+                                    (branch " ¬f_0 = java.lang.Object::#$created ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3)) TRUE"
                                        (rule "andLeft" (formula "3"))
                                        (rule "notLeft" (formula "3"))
                                        (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
@@ -30840,11 +30840,11 @@
                                           )
                                        )
                                     )
-                                    (branch " ¬f_0 = java.lang.Object::<created> ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3)) FALSE"
+                                    (branch " ¬f_0 = java.lang.Object::#$created ∧ (f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3)) FALSE"
                                        (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "3"))
                                        (rule "hideAuxiliaryEq" (formula "3"))
                                        (rule "ifthenelse_split" (formula "3") (term "0"))
-                                       (branch " ¬f_0 = java.lang.Object::<created> ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4)) TRUE"
+                                       (branch " ¬f_0 = java.lang.Object::#$created ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4)) TRUE"
                                           (rule "andLeft" (formula "3"))
                                           (rule "notLeft" (formula "3"))
                                           (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
@@ -31977,11 +31977,11 @@
                                              )
                                           )
                                        )
-                                       (branch " ¬f_0 = java.lang.Object::<created> ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4)) FALSE"
+                                       (branch " ¬f_0 = java.lang.Object::#$created ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4)) FALSE"
                                           (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "3"))
                                           (rule "hideAuxiliaryEq" (formula "3"))
                                           (rule "ifthenelse_split" (formula "3") (term "0"))
-                                          (branch " ¬f_0 = java.lang.Object::<created> ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4) ∨ f_0 = arr(e5)) TRUE"
+                                          (branch " ¬f_0 = java.lang.Object::#$created ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4) ∨ f_0 = arr(e5)) TRUE"
                                              (rule "andLeft" (formula "3"))
                                              (rule "notLeft" (formula "3"))
                                              (rule "applyEqReverse" (formula "51") (term "1") (ifseqformula "4"))
@@ -32118,7 +32118,7 @@
                                              (rule "leq_literals" (formula "13"))
                                              (rule "closeFalse" (formula "13"))
                                           )
-                                          (branch " ¬f_0 = java.lang.Object::<created> ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4) ∨ f_0 = arr(e5)) FALSE"
+                                          (branch " ¬f_0 = java.lang.Object::#$created ∧ ( f_0 = arr(e1) ∨ f_0 = arr(e2) ∨ f_0 = arr(e3) ∨ f_0 = arr(e4) ∨ f_0 = arr(e5)) FALSE"
                                              (rule "close" (formula "50") (ifseqformula "3"))
                                           )
                                        )

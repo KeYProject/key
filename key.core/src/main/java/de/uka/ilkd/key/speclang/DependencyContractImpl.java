@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -48,7 +48,8 @@ public final class DependencyContractImpl implements DependencyContract {
     // constructors
     // -------------------------------------------------------------------------
 
-    DependencyContractImpl(String baseName, String name, KeYJavaType kjt, IObserverFunction target,
+    public DependencyContractImpl(String baseName, String name, KeYJavaType kjt,
+            IObserverFunction target,
             KeYJavaType specifiedIn, Map<LocationVariable, JTerm> pres, JTerm mby,
             Map<LocationVariable, JTerm> deps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,

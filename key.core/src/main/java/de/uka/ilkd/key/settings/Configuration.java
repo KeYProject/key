@@ -3,19 +3,27 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
+
+import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * A container to hold parsed configurations. Configurations are a mapping between property names
@@ -43,11 +51,11 @@ public class Configuration {
     /**
      * Loads a configuration using the given file.
      *
-     * @param file existsing file path
+     * @param file existing file path
      * @return a configuration based on the file contents
-     * @throws IOException if file does not exists or i/o error
+     * @throws IOException if file does not exist or i/o error
      */
-    public static Configuration load(File file) throws IOException {
+    public static Configuration load(Path file) throws IOException {
         return ParsingFacade.readConfigurationFile(file);
     }
 
@@ -411,12 +419,43 @@ public class Configuration {
      * @param writer a writer
      * @param comment a comment
      */
-    public void save(Writer writer, String comment) {
+    public void save(Writer writer, @Nullable String comment) {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
+    }
+
+    @Override
+    public String toString() {
+        try (StringWriter sw = new StringWriter()) {
+            save(sw, "");
+            return sw.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void overwriteWith(Configuration other) {
         data.putAll(other.data);
+    }
+
+    /// Returns all section in the current configuration.
+    public List<Configuration> getSections() {
+        return this.data.values().stream()
+                .filter(it -> it instanceof Configuration)
+                .map(it -> (Configuration) it)
+                .toList();
+    }
+
+    /// Returns all section in the current configuration with their name.
+    public List<Pair<String, Configuration>> getSectionsWithNames() {
+        return this.data.entrySet().stream()
+                .filter(it -> it.getValue() instanceof Configuration)
+                .map(it -> new Pair<>(it.getKey(), (Configuration) it.getValue()))
+                .toList();
+    }
+
+    /// Returns the set of known keys
+    public Set<String> keys() {
+        return this.data.keySet();
     }
 
     // TODO Add documentation for this.
@@ -465,7 +504,11 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationWriter printComment(String comment) {
+        public ConfigurationWriter printComment(@Nullable String comment) {
+            if (comment == null) {
+                return this;
+            }
+
             if (comment.contains("\n")) {
                 out.format("/* %s */\n", comment);
             } else {
@@ -525,7 +568,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format(" }");
+            out.format("}");
             return this;
         }
 
@@ -555,7 +598,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format(" ]");
+            out.format("]");
             return this;
         }
 

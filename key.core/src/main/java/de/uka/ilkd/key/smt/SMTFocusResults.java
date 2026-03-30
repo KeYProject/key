@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -25,6 +26,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +123,7 @@ public final class SMTFocusResults {
      * @param problem SMT solver results
      * @return formula collection or null if the solver did not produce an unsat core
      */
-    public static ImmutableList<PosInOccurrence> getUnsatCore(
+    public static @Nullable ImmutableList<PosInOccurrence> getUnsatCore(
             SMTProblem problem) {
 
         SMTSolver solver = problem.getSuccessfulSolver();
@@ -135,7 +137,7 @@ public final class SMTFocusResults {
 
         LOGGER.info("Analyzing unsat core: {}", lastLine);
 
-        Integer[] numbers;
+        int[] numbers;
         if (lastLine.matches("\\(.*\\)")) {
             // Z3 unsat core format: all labels on one line
             numbers = parseZ3Format(lastLine);
@@ -149,7 +151,9 @@ public final class SMTFocusResults {
 
         Node goalNode = problem.getNode();
 
-        HashSet<Integer> unsatCore = new HashSet<>(Arrays.asList(numbers));
+        Set<Integer> unsatCore = new TreeSet<>();
+        Arrays.stream(numbers).forEach(unsatCore::add);
+
         ImmutableList<PosInOccurrence> unsatCoreFormulas =
             ImmutableSLList.nil();
 
@@ -183,11 +187,14 @@ public final class SMTFocusResults {
      * @param lastLine unsat core line
      * @return list of labels referenced in the unsat core
      */
-    static Integer[] parseZ3Format(String lastLine) {
+    static int[] parseZ3Format(String lastLine) {
         lastLine = lastLine.substring(1, lastLine.length() - 1);
+        if (lastLine.isBlank()) {
+            return new int[0];
+        }
 
         String[] labels = lastLine.trim().split(" +");
-        Integer[] numbers = new Integer[labels.length];
+        int[] numbers = new int[labels.length];
         for (int i = 0; i < numbers.length; i++) {
             numbers[i] = Integer.parseInt(labels[i].substring(2));
         }
@@ -207,16 +214,16 @@ public final class SMTFocusResults {
      * @param lines cvc5 output
      * @return list of labels referenced in unsat core
      */
-    static Integer[] parseCVC5Format(String[] lines) {
+    static int[] parseCVC5Format(String[] lines) {
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].equals("(")) {
-                Integer[] numbers = new Integer[lines.length - 2 - i];
+                var numbers = new int[lines.length - 2 - i];
                 for (int j = i + 1; j < lines.length - 1; j++) {
                     numbers[j - i - 1] = Integer.parseInt(lines[j].substring(2));
                 }
                 return numbers;
             }
         }
-        return null;
+        return new int[0];
     }
 }

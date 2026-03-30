@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -57,7 +57,8 @@ public class Main {
      *
      * @param location the Path with the path to the source directory of the Java project
      *        to be verified
-     * @return the {@KeYEnvironment} that provides the context for all following verification tasks
+     * @return the {@link KeYEnvironment} that provides the context for all following verification
+     *         tasks
      * @throws ProblemLoaderException if the setup fails
      */
     private static KeYEnvironment<?> setupEnvironment(Path location) throws ProblemLoaderException {
@@ -111,7 +112,7 @@ public class Main {
         // List all specifications of all types in the source location (not classPaths and
         // bootClassPath)
         final List<Contract> proofContracts = new LinkedList<>();
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =

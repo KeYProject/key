@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
@@ -163,7 +164,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
                 return new SingleRuleApplicationInfo(message, g, null);
             }
 
-            app = g.getRuleAppManager().next();
+            app = Objects.requireNonNull(g.getRuleAppManager()).next();
 
             app = updateBuiltInRuleIndex(g, app);
 

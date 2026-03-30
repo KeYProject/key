@@ -28,6 +28,18 @@ public class ImmutableArray<S extends @Nullable Object>
         content = (S[]) new Object[0];
     }
 
+    public ImmutableArray(S s1) {
+        content = (S[]) new Object[] { s1 };
+    }
+
+    public ImmutableArray(S s1, S s2) {
+        content = (S[]) new Object[] { s1, s2 };
+    }
+
+    public ImmutableArray(S s1, S s2, S s3) {
+        content = (S[]) new Object[] { s1, s2, s3 };
+    }
+
     /**
      * creates a new <S>Array
      *

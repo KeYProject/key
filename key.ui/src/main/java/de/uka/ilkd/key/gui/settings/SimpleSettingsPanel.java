@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.fonticons.IconProvider;
 
 import org.key_project.util.java.StringUtil;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,12 +146,17 @@ public class SimpleSettingsPanel extends JPanel {
      * {@link javax.swing.text.NumberFormatter#stringToValue(String)}). Entered values have to be
      * Numbers, otherwise the Number-Validator will fail.
      *
-     * @param min the minimum value of the JSpinner
-     * @param max the maximum value of the JSpinner
-     * @param step the step size of the JSpinner
-     * @param validator a validator used to check the entered values for additional restrictions
+     * @param min
+     *        the minimum value of the JSpinner
+     * @param max
+     *        the maximum value of the JSpinner
+     * @param step
+     *        the step size of the JSpinner
+     * @param validator
+     *        a validator used to check the entered values for additional restrictions
      * @return the created JSpinner
-     * @param <T> the class of the minimum value
+     * @param <T>
+     *        the class of the minimum value
      */
     protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(T min,
             Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
@@ -183,14 +189,19 @@ public class SimpleSettingsPanel extends JPanel {
         if (s == null || s.isEmpty()) {
             s = "";
         } else {
-            String brokenLines = StringUtil.wrapLines(s);
-            s = "<html>"
-                + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+            s = createHtmlText(s);
         }
 
         JLabel infoButton = new JLabel(HELP_ICON.get(16f));
         infoButton.setToolTipText(s);
         return infoButton;
+    }
+
+    public static @NonNull String createHtmlText(String s) {
+        String brokenLines = StringUtil.wrapLines(s);
+        s = "<html>"
+            + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+        return s;
     }
 
     public static JLabel createHelpTextLabel(String s) {

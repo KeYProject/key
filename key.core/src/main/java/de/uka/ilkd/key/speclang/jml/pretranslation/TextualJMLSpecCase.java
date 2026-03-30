@@ -26,6 +26,21 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
+    private final Behavior behavior;
+    private ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    public TextualJMLSpecCase(TextualJMLSpecCase specCase) {
+        this(specCase.modifiers, specCase.behavior);
+        clauses.addAll(specCase.clauses);
+    }
+
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+        super(modifiers);
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
+        this.behavior = behavior;
+    }
 
     public ImmutableList<LabeledParserRuleContext> getRequiresFree(Name toString) {
         return getList(REQUIRES_FREE, toString);
@@ -98,8 +113,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         AXIOMS,
     }
 
-    private final Behavior behavior;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
 
     static class Entry {
         final Object clauseType;
@@ -115,14 +128,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Entry(Object clauseType, LabeledParserRuleContext ctx) {
             this(clauseType, ctx, null);
         }
-    }
-
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
-        super(modifiers);
-        if (behavior == null) {
-            throw new IllegalArgumentException();
-        }
-        this.behavior = behavior;
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
@@ -160,19 +165,28 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
+    public boolean contains(ClauseHd clause, @Nullable Name heapName) {
+        return clauses.stream()
+                .anyMatch(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
+    public boolean removeClauses(ClauseHd clause, @Nullable Name heapName) {
+        return clauses
+                .removeIf(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
     /**
      * Merge clauses of two spec cases. Keep behavior of this one.
      *
      * @param other
      */
     public @NonNull TextualJMLSpecCase merge(@NonNull TextualJMLSpecCase other) {
-        TextualJMLSpecCase res = clone();
+        TextualJMLSpecCase res = copy();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
-    @Override
-    public @NonNull TextualJMLSpecCase clone() {
+    public @NonNull TextualJMLSpecCase copy() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getModifiers(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);

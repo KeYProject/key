@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -135,11 +135,13 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
-            return SMTRuleApp.RULE.createApp(null, proof.getServices());
+        final SMTRule smtRule = SMTRule.INSTANCE;
+
+        if (smtRule.displayName().equals(ruleName)) {
+            return smtRule.createApp(null, proof.getServices());
         }
 
-        IBuiltInRuleApp ourApp = null;
+        IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
         if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
@@ -153,21 +155,18 @@ public abstract class AbstractProofReplayer {
         }
 
         if (currContract != null) {
-            AbstractContractRuleApp contractApp = null;
+            AbstractContractRuleApp<?> contractApp = null;
 
-            BuiltInRule useContractRule;
             if (currContract instanceof OperationContract) {
-                useContractRule = UseOperationContractRule.INSTANCE;
-                contractApp = (((UseOperationContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseOperationContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
             } else {
-                useContractRule = UseDependencyContractRule.INSTANCE;
+                var rule = proof.getServices().getProfile().getUseDependencyContractRule();
                 // copy over the mysterious "step"
                 PosInOccurrence step =
-                    findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                    findInNewSequent(((UseDependencyContractApp<?>) ruleApp).step(),
                         currGoal.sequent());
-                contractApp = (((UseDependencyContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract).setStep(step);
+                contractApp = rule.createApp(pos).setContract(currContract).setStep(step);
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
@@ -228,7 +227,9 @@ public abstract class AbstractProofReplayer {
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             // find the correct taclet
-            for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
+            for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
+                    .getPartialInstantiatedApps()) {
+                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
@@ -240,7 +241,8 @@ public abstract class AbstractProofReplayer {
             }
             if (ourApp == null) {
                 throw new IllegalStateException(
-                    "proof replayer failed to find dynamically added taclet");
+                    "proof replayer failed to find dynamically added taclet at original node "
+                        + originalStep.serialNr());
             }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);

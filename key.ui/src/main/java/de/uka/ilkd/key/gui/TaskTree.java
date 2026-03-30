@@ -22,7 +22,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
@@ -303,7 +303,7 @@ public class TaskTree extends JPanel {
                     Proof p = task.proof();
                     delegateView.setSelectionPath(selPath);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        DefaultContextMenuKind.PROOF_LIST, p, mediator);
+                        ContextMenuKind.PROOF_LIST, p, mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

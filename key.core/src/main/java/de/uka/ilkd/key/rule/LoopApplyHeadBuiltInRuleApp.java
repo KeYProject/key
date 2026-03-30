@@ -12,22 +12,20 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Rule application for {@link LoopApplyHeadRule}.
  *
  * @author lanzinger
  */
-public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
-
-    /**
-     * The rule being applied.
-     */
-    private LoopApplyHeadRule rule;
-
+@NullMarked
+public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp<LoopApplyHeadRule> {
     /**
      * The loop contracts on which the rule is applied.
      */
-    protected ImmutableSet<LoopContract> contracts;
+    protected @Nullable ImmutableSet<LoopContract> contracts;
 
     /**
      * The instantiation.
@@ -35,24 +33,21 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     protected AbstractLoopContractRule.Instantiation instantiation;
 
     /**
-     *
      * @param rule the rule being applied.
      * @param pio the position at which the rule is applied.
      */
-    public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    public LoopApplyHeadBuiltInRuleApp(LoopApplyHeadRule rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
     /**
-     *
      * @param rule the rule being applied.
      * @param pio the position at which the rule is applied.
      * @param contracts the contracts on which the rule is applied.
      */
-    public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableSet<LoopContract> contracts) {
+    public LoopApplyHeadBuiltInRuleApp(LoopApplyHeadRule rule, @Nullable PosInOccurrence pio,
+            @Nullable ImmutableSet<LoopContract> contracts) {
         super(rule, pio);
-        this.rule = (LoopApplyHeadRule) rule;
         this.contracts = contracts;
     }
 
@@ -66,7 +61,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * @return {@code true} iff the rule application cannot be completed for the current goal.
      */
     public boolean cannotComplete(final Goal goal) {
-        return !rule.isApplicable(goal, pio);
+        return !rule().isApplicable(goal, pio);
     }
 
     @Override
@@ -75,26 +70,29 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopApplyHeadBuiltInRuleApp(rule, newPos, contracts);
+    public LoopApplyHeadBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+        return new LoopApplyHeadBuiltInRuleApp(rule(), newPos, contracts);
     }
 
     @Override
-    public IBuiltInRuleApp setAssumesInsts(
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
-    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        instantiation =
-            new AbstractLoopContractRule.Instantiator((JTerm) pio.subTerm(), goal).instantiate();
-
+    public LoopApplyHeadBuiltInRuleApp tryToInstantiate(Goal goal) {
+        assert pio != null;
         Services services = goal.proof().getServices();
 
-        contracts = AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
-        rule = LoopApplyHeadRule.INSTANCE;
+        // TODO: FOR REVIEW (weigl):
+        // Here we plugin the static reference directly. LCIR comes now w/o InfFlow support.
+        final var instance = LoopContractInternalRule.INSTANCE;
+        instantiation =
+            instance.new Instantiator((JTerm) pio.subTerm(), goal)
+                    .instantiate();
+
+        contracts = instance.getApplicableContracts(instantiation, goal, services);
         return this;
     }
 }

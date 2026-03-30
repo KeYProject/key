@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -69,7 +70,7 @@ public class ProgramElementName extends Name
     }
 
     public ProgramElementName(String n, String q) {
-        super(q + "::" + n);
+        super(q + JavaDLFieldNames.SEPARATOR + n);
         assert !q.isEmpty() : "Tried to create qualified name with missing qualifier";
 
         this.qualifierString = q.intern();
@@ -129,17 +130,6 @@ public class ProgramElementName extends Name
      */
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     public PositionInfo getPositionInfo() {

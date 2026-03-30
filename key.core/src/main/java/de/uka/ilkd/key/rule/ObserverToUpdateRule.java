@@ -3,25 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -139,11 +136,11 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         if (inst.isFirst()) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) {
+            if (!inst.getFirst().pm().isModel() || inst.getFirst().pm().getStateCount() > 1) {
                 return false;
             }
 
-            return inst.getFirst().actualResult instanceof ProgramVariable;
+            return inst.getFirst().actualResult() instanceof ProgramVariable;
         }
 
         return true;
@@ -234,20 +231,20 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst,
             RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
-        final JavaBlock jb = inst.progPost.javaBlock();
+        final JavaBlock jb = inst.progPost().javaBlock();
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
 
         // split goal into branches
         final ImmutableList<Goal> result;
         final Goal contGoal, nullGoal;
-        final ReferencePrefix rp = inst.mr.getReferencePrefix();
+        final ReferencePrefix rp = inst.mr().getReferencePrefix();
         if (rp != null && !(rp instanceof ThisReference) && !(rp instanceof SuperReference)
-                && !(rp instanceof TypeReference) && !(inst.pm.isStatic())) {
+                && !(rp instanceof TypeReference) && !(inst.pm().isStatic())) {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" + inst.actualSelf + " = null)");
+            nullGoal.setBranchLabel("Null reference (" + inst.actualSelf() + " = null)");
         } else {
             result = goal.split(1);
             contGoal = result.head();
@@ -257,26 +254,27 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
-            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
+            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.actualSelf(), tb.NULL()));
+            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u(), actualSelfNotNull, null)),
                 ruleApp.posInOccurrence());
         }
 
         // ---- create "Assignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        JModality modality = JModality.getModality(inst.modality.kind(), postJavaBlock);
+        JModality modality = JModality.getModality(inst.modality().kind(), postJavaBlock);
         JTerm modalityTerm =
-            tb.prog(inst.modality.kind(), postJavaBlock, inst.progPost.sub(0),
+            tb.prog(inst.modality().kind(), postJavaBlock, inst.progPost().sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost.sub(0)), null,
-                        inst.progPost.getLabels())));
-        JTerm lhs = tb.var((ProgramVariable) inst.actualResult);
+                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost().sub(0)), null,
+                        inst.progPost().getLabels())));
+        JTerm lhs = tb.var((ProgramVariable) inst.actualResult());
         JTerm update =
-            tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
+            tb.elementary(lhs,
+                makeCall(services, inst.pm(), inst.actualSelf(), inst.actualParams()));
         JTerm normalPost = tb.apply(update, modalityTerm);
-        contGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
+        contGoal.changeFormula(new SequentFormula(tb.apply(inst.u(), normalPost, null)),
             ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,

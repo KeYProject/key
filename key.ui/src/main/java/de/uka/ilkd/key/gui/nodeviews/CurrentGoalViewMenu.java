@@ -16,7 +16,7 @@ import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -258,39 +258,45 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds an item for built-in rules (e.g., Run Simplify or Update Simplifier)
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule) {
-        if (builtInRule == WhileInvariantRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                "Applies a known and complete loop specification immediately.",
-                ENTER_LOOP_SPECIFICATION,
-                "Allows to modify an existing or to enter a new loop specification.");
-        } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                "Applies a known and complete block specification immediately.",
-                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
-        } else if (builtInRule == BlockContractExternalRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                "All available contracts of the block are combined and applied.",
-                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
-        } else if (builtInRule == LoopContractInternalRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                "Applies a known and complete loop block specification immediately.",
-                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
-        } else if (builtInRule == LoopContractExternalRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                "All available contracts of the loop block are combined and applied.",
-                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
-        } else if (builtInRule == UseOperationContractRule.INSTANCE) {
-            addBuiltInRuleItem(builtInRule, APPLY_CONTRACT,
+        switch (builtInRule) {
+            case WhileInvariantRule rule ->
+                // we add two items in this case: one for auto one for interactive
+                addBuiltInRuleItem(builtInRule, APPLY_RULE,
+                    "Applies a known and complete loop specification immediately.",
+                    ENTER_LOOP_SPECIFICATION,
+                    "Allows to modify an existing or to enter a new loop specification.");
+            case BlockContractInternalRule rule ->
+                // we add two items in this case: one for auto one for interactive
+                addBuiltInRuleItem(builtInRule, APPLY_RULE,
+                    "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+            case BlockContractExternalRule rule ->
+                // we add two items in this case: one for auto one for interactive
+                addBuiltInRuleItem(builtInRule, APPLY_RULE,
+                    "All available contracts of the block are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+            case LoopContractInternalRule rule ->
+                // we add two items in this case: one for auto one for interactive
+                addBuiltInRuleItem(builtInRule, APPLY_RULE,
+                    "Applies a known and complete loop block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+            case LoopContractExternalRule rule ->
+                // we add two items in this case: one for auto one for interactive
+                addBuiltInRuleItem(builtInRule, APPLY_RULE,
+                    "All available contracts of the loop block are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+            case UseOperationContractRule rule -> addBuiltInRuleItem(builtInRule, APPLY_CONTRACT,
                 "All available contracts of the method are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
-        }
-        if (builtInRule != MergeRule.INSTANCE && builtInRule != LoopScopeInvariantRule.INSTANCE) {
-            add(new ApplyBuiltInAction(builtInRule, builtInRule.toString(), ""));
+            case MergeRule r -> {
+            }
+            case LoopScopeInvariantRule r -> {
+            }
+            case null -> {
+            }
+            default -> {
+                add(new ApplyBuiltInAction(builtInRule, builtInRule.toString(), ""));
+            }
         }
     }
 

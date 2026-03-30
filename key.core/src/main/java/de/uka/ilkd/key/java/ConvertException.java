@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+
 /**
  * This exception class is mainly thrown by Recoder2KeY and its companions.
  *
@@ -12,38 +16,26 @@ package de.uka.ilkd.key.java;
  * This information is then read by the KeYParser to produce helpful error messages.
  *
  */
-public class ConvertException extends RuntimeException {
+public class ConvertException extends RuntimeException implements HasLocation {
+    private final Location location;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7112945712992241455L;
-
-    public ConvertException(String errmsg) {
-        super(errmsg);
+    public ConvertException(String message) {
+        super(message);
+        location = Location.UNDEFINED;
     }
 
-    public ConvertException(Throwable pe) {
-        super(pe);
+    public ConvertException(String message, Location location) {
+        super(message);
+        this.location = location;
     }
 
-    public ConvertException(String errmsg, Throwable cause) {
-        super(errmsg, cause);
+    @Override
+    public Location getLocation() {
+        return location;
     }
 
-    public recoder.parser.ParseException parseException() {
-        if (getCause() instanceof recoder.parser.ParseException) {
-            return (recoder.parser.ParseException) getCause();
-        } else {
-            return null;
-        }
-    }
-
-    public de.uka.ilkd.key.parser.proofjava.ParseException proofJavaException() {
-        if (getCause() instanceof de.uka.ilkd.key.parser.proofjava.ParseException) {
-            return (de.uka.ilkd.key.parser.proofjava.ParseException) getCause();
-        } else {
-            return null;
-        }
+    @Override
+    public String getMessage() {
+        return super.getMessage() + "\n" + location.toString();
     }
 }

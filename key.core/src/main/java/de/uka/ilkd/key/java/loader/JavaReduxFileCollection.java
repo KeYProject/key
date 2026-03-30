@@ -1,0 +1,224 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.java.loader;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
+
+import de.uka.ilkd.key.java.JavaService;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.jspecify.annotations.Nullable;
+
+/**
+ * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot
+ * sources and to iterate over them.
+ *
+ * <p>
+ * The resources are stored in the binaries. We use the {@link KeYResourceManager} to find the
+ * resources.
+ *
+ * <p>
+ * There is a text file whose name is given by
+ * {@link Profile#getInternalClasslistFilename()} which enumerates all
+ * java files that have to be read.
+ *
+ * @author mulbrich
+ */
+public class JavaReduxFileCollection implements FileCollection {
+
+    /**
+     * The location where the libraries to be parsed can be found. It will be used as a resource
+     * path relative to the path of the package.
+     */
+    public static final Path JAVA_SRC_DIR = Paths.get("JavaRedux");
+
+    /**
+     * The resource location
+     */
+    private Path resourceLocation;
+
+    /**
+     * This list stores all resources to be retrieved. It is fed by the constructor.
+     */
+    private final List<String> resources = new ArrayList<>();
+
+    /**
+     * Instantiates a new file collection.
+     * <p>
+     * The list of resources is retreived and interpreted. The resources themselves are not yet
+     * read.
+     *
+     * @param profile
+     *        the {@link Profile} to use
+     * @throws IOException
+     *         if access to the resources fails
+     */
+    public JavaReduxFileCollection(Profile profile) throws IOException {
+        resourceLocation = JAVA_SRC_DIR;
+
+        if (!profile.getInternalClassDirectory().isEmpty()) {
+            resourceLocation = resourceLocation.resolve(profile.getInternalClassDirectory());
+        }
+        String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
+
+        URL jlURL =
+            KeYResourceManager.getManager().getResourceFile(JavaService.class, resourceString);
+
+        if (jlURL == null) {
+            throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
+        }
+
+        try (final BufferedReader r =
+            new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
+            for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
+                // ignore comments and empty lines
+                if ((jl.isEmpty()) || (jl.charAt(0) == '#')) {
+                    continue;
+                }
+                resources.add(jl);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This class only supports walker for a single file type: .java
+     */
+    public Walker createWalker(String extension) throws IOException {
+        if (!".java".equals(extension)) {
+            throw new IllegalStateException("This collection can only list .java files");
+        }
+
+        return new Walker(resources.iterator());
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This class only supports walker for a single file type: .java
+     */
+    public Walker createWalker(String[] extensions) throws IOException {
+        if (extensions == null || extensions.length < 1 || !".java".equals(extensions[0])) {
+            throw new IllegalStateException("This collection can only list .java files");
+        }
+
+        return new Walker(resources.iterator());
+
+    }
+
+    public Stream<URI> getResources() {
+        return resources.stream()
+                .map(it -> {
+                    try {
+                        return KeYResourceManager.getManager().getResourceFile(
+                            JavaService.class,
+                            resourceLocation + "/" + it.replace('.', '/') + ".java").toURI();
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    /**
+     * The Class Walker wraps a string iterator and creates URL, streams and DataLocation elements
+     * on demand.
+     */
+    public class Walker implements FileCollection.Walker {
+
+        /**
+         * The iterator to wrap, it iterates the resources to open.
+         */
+        private final Iterator<String> iterator;
+
+        /**
+         * The currently open resource. null before the first step and after the last step.
+         */
+        private String current = null;
+
+        /**
+         * The URL of the current resource.
+         */
+        private URL currentURL = null;
+
+
+        private Walker(Iterator<String> iterator) {
+            this.iterator = iterator;
+        }
+
+        public String getType() {
+            return "internal";
+        }
+
+        public InputStream openCurrent() throws IOException, NoSuchElementException {
+            if (current == null) {
+                throw new NoSuchElementException();
+            }
+
+            if (currentURL == null) {
+                throw new FileNotFoundException("cannot find " + resourceLocation + "/" + current);
+            }
+
+            return currentURL.openStream();
+        }
+
+        @Override
+        public InputStream openCurrent(@Nullable FileRepo fileRepo)
+                throws IOException, NoSuchElementException {
+            if (fileRepo != null) {
+                return fileRepo.getInputStream(currentURL);
+            } else {
+                return openCurrent(); // fallback without FileRepo
+            }
+        }
+
+        @Override
+        public Path getCurrentLocation() {
+            try {
+                return Path.of(currentURL.toURI());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public boolean step() {
+            if (!iterator.hasNext()) {
+                current = null;
+                currentURL = null;
+                return false;
+            }
+
+            current = iterator.next();
+
+            final String currentFileName = current.replace('.', '/').concat(".java");
+
+            // may be null!
+            currentURL = KeYResourceManager.getManager().getResourceFile(JavaService.class,
+                resourceLocation + "/" + currentFileName);
+
+            return true;
+        }
+
+        @Override
+        public String getRelativeLocation() {
+            return null;
+        }
+    }
+
+}
