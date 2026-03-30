@@ -115,11 +115,11 @@ public final class HeapLDT extends LDT {
         arr = addFunction(services, "arr");
         created = addFunction(services, "java.lang.Object::#$created");
         initialized = addFunction(services, "java.lang.Object::#$initialized");
-        classPrepared = addParametricFunction(services, "#$classPrepared");
-        classInitialized = addParametricFunction(services, "#$classInitialized");
+        classPrepared = addParametricFunction(services, "$classPrepared");
+        classInitialized = addParametricFunction(services, "$classInitialized");
         classInitializationInProgress =
-            addParametricFunction(services, "#$classInitializationInProgress");
-        classErroneous = addParametricFunction(services, "#$classErroneous");
+            addParametricFunction(services, "$classInitializationInProgress");
+        classErroneous = addParametricFunction(services, "$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -180,9 +180,9 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         if (symbol instanceof ParametricFunctionInstance pfi) {
-            // e.g., #$classErroneous<[A]>
+            // e.g., $classErroneous<[A]>
             return new SplitFieldName(pfi.getArgs().head().sort().toString(),
-                pfi.getBase().name().toString().substring(1));
+                pfi.getBase().name().toString());
         }
         var name = symbol.name().toString();
 
