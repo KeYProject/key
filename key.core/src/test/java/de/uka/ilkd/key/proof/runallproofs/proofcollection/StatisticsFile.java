@@ -192,12 +192,12 @@ public class StatisticsFile implements Serializable {
      *        mentioned explicitly.
      * @throws IOException Thrown in case statistics file is not accessible.
      */
-    public void appendStatistics(Proof proof, File keyFile) throws IOException {
+    public void appendStatistics(Proof proof, Path keyFile) throws IOException {
         Statistics statistics = proof.getStatistics();
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
         for (Column<?> column : columns) {
-            entries.add(column.addEntry(statistics, keyFile, proofClosed).toString());
+            entries.add(column.addEntry(statistics, keyFile.toFile(), proofClosed).toString());
         }
         writeLine(entries);
     }

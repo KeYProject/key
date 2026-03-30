@@ -5,9 +5,9 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;

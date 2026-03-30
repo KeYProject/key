@@ -80,6 +80,9 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         mergeNamespace(initiatingProofNS.functions(), sideProofNS.functions());
         mergeNamespace(initiatingProofNS.ruleSets(), sideProofNS.ruleSets());
         mergeNamespace(initiatingProofNS.sorts(), sideProofNS.sorts());
+        mergeNamespace(initiatingProofNS.sortAliases(), sideProofNS.sortAliases());
+        mergeNamespace(initiatingProofNS.parametricSorts(), sideProofNS.parametricSorts());
+        mergeNamespace(initiatingProofNS.parametricFunctions(), sideProofNS.parametricFunctions());
         mergeNamespace(initiatingProofNS.choices(), sideProofNS.choices());
     }
 

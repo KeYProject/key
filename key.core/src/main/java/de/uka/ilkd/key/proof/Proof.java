@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
@@ -13,8 +12,8 @@ import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -43,7 +42,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -96,7 +94,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * declarations &c, read from a problem file or otherwise
      */
-    private String problemHeader = "";
+    private KeyAst.@Nullable Declarations problemHeader = null;
 
     /**
      * the proof environment (optional)
@@ -136,7 +134,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
     private long autoModeTime = 0;
 
-    private @Nullable Strategy<@NonNull Goal> activeStrategy;
+    private @Nullable Strategy<Goal> activeStrategy;
 
     private PropertyChangeListener settingsListener;
 
@@ -157,7 +155,7 @@ public class Proof implements ProofObject<Goal>, Named {
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<>();
 
     /**
-     * The {@link File} under which this {@link Proof} was saved the last time if available or
+     * The {@link Path} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
     private @Nullable Path proofFile;
@@ -238,15 +236,18 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public Proof(String name, Sequent problem, String header, InitConfig initConfig,
-            Path proofFile) {
+    @Deprecated
+    public Proof(String name, Sequent problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig,
+            @Nullable Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
         this.proofFile = proofFile;
     }
 
-    public Proof(String name, JTerm problem, String header, InitConfig initConfig) {
+    public Proof(String name, JTerm problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
@@ -255,7 +256,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Proof(String name, Sequent sequent, String header, TacletIndex rules,
+    public Proof(String name, Sequent sequent, KeyAst.@Nullable Declarations header,
+            TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
         this(name, sequent, rules, builtInRules, initConfig);
         problemHeader = header;
@@ -325,7 +327,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public String header() {
+    public KeyAst.@Nullable Declarations header() {
         return problemHeader;
     }
 
@@ -389,7 +391,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy<@NonNull Goal> getActiveStrategy() {
+    public Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -397,7 +399,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public void setActiveStrategy(Strategy<@NonNull Goal> activeStrategy) {
+    public void setActiveStrategy(Strategy<Goal> activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
@@ -409,7 +411,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
 
     private void updateStrategyOnGoals() {
-        Strategy<@NonNull Goal> ourStrategy = getActiveStrategy();
+        Strategy<Goal> ourStrategy = getActiveStrategy();
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);
@@ -611,7 +613,6 @@ public class Proof implements ProofObject<Goal>, Named {
      * adds a new goal to the list of goals
      *
      * @param goal the Goal to be added
-     *
      * @deprecated use {@link #reOpenGoal(Goal)} when re-opening a goal
      */
     @Deprecated // eventually, this method should be made private
@@ -776,7 +777,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@NonNull Predicate<Node> pred) {
+    public @Nullable Node findAny(Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -974,7 +975,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(@NonNull Node node) {
+    public Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1237,9 +1238,9 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
-     * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
+     * Returns the {@link Path} under which the {@link Proof} was saved the last time if available.
      *
-     * @return The {@link File} under which the {@link Proof} was saved the last time or
+     * @return The {@link Path} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
     public @Nullable Path getProofFile() {
@@ -1247,9 +1248,9 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
-     * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     * Sets the {@link Path} under which the {@link Proof} was saved the last time.
      *
-     * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
+     * @param proofFile The {@link Path} under which the {@link Proof} was saved the last time.
      */
     public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;
@@ -1317,7 +1318,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the associated lookup
      */
-    public @NonNull Lookup getUserData() {
+    public Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

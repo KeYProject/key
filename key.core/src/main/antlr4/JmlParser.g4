@@ -11,17 +11,18 @@ options { tokenVocab=JmlLexer; }
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
+modifiersEOF: modifiers EOF;
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: classlevel_element | modifiers | set_statement;
+classlevel_comment: classlevel_element | modifiers;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
+  : class_invariant     | accessible_clause  | method_specification
   | method_declaration  | field_declaration  | represents_clause
   | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+  | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;

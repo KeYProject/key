@@ -37,7 +37,7 @@ public class GZipProofSaver extends ProofSaver {
     @Override
     protected void save(Path file) throws IOException {
         try (var out = new GZIPOutputStream(Files.newOutputStream(file))) {
-            save(out);
+            save(file.getParent(), out);
         }
     }
 }

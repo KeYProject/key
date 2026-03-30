@@ -112,6 +112,11 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
+    public Path getTopLevelProjectFile() {
+        return dbh.getTopLevelProjectFile();
+    }
+
+    @Override
     public PathNode getFileTree() throws IOException {
         // Path rootPath = fs.getPath("/");
         // PathNode root = new PathNode(null, rootPath);

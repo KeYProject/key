@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.operator.Subtype;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -43,19 +43,22 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
+    public boolean isResponsible(Operator op, JTerm[] subs,
+            Services services,
             ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
+            Services services,
             ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+    public boolean isResponsible(Operator op, JTerm sub,
+            TermServices services,
             ExecutionContext ec) {
         return op instanceof Subtype;
     }
@@ -67,7 +70,8 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services,
+            ExecutionContext ec) {
         if (op instanceof Subtype) {
             return ssubsort;
         }

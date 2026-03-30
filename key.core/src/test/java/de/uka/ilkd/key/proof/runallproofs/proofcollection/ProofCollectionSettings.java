@@ -42,12 +42,10 @@ public class ProofCollectionSettings implements Serializable {
     private static final String TEMP_DIR = "tempDir";
     private static final String RUN_ONLY_ON = "runOnlyOn";
     private static final String DIRECTORY = "directory";
-
     public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
     public static final String IGNORE_KEY = "ignore";
-
     public static final String FORK_TIMEOUT_KEY = "forkTimeout";
-
+    public static final String FORK_MEMORY = "forkMemory";
     public static final String FORK_DEBUG_PORT = "forkDebugPort";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofCollectionSettings.class);
@@ -98,6 +96,8 @@ public class ProofCollectionSettings implements Serializable {
         }
         SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableMap(tmp);
     }
+
+    private boolean resetEachTest;
 
     /**
      * Creates a {@link ProofCollectionSettings} object from the specified
@@ -392,7 +392,11 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     public String getForkMemory() {
-        return get("forkMemory");
+        return get(FORK_MEMORY);
+    }
+
+    public ProofCollectionSettings setForkMemory(String s) {
+        return set(FORK_MEMORY, s);
     }
 
     public String getForkTimeout() {
@@ -402,4 +406,13 @@ public class ProofCollectionSettings implements Serializable {
     public ProofCollectionSettings setDirectory(String s) {
         return set(DIRECTORY, s);
     }
+
+    public boolean isResetEachTest() {
+        return resetEachTest;
+    }
+
+    public void setResetEachTest(boolean resetEachTest) {
+        this.resetEachTest = resetEachTest;
+    }
+
 }

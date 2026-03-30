@@ -8,14 +8,14 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://github.com/GradleUp/shadow
-    id 'com.gradleup.shadow' version "9.3.1"
+    id 'com.gradleup.shadow' version "9.3.2"
 }
 
 description = "User interface for the deductive verification of Java programs"
 
 dependencies {
     implementation project(":key.core")
-    implementation project(":key.core.rifl")
+    //implementation project(":key.core.rifl")
 
     implementation("com.formdev:flatlaf:3.7")
 
@@ -24,14 +24,14 @@ dependencies {
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
-    implementation project(":key.removegenerics")
+    //implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.4.2'
+    api 'com.miglayout:miglayout-swing:11.4.3'
 
     implementation("info.picocli:picocli:4.7.7")
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.5.27'
+    implementation 'ch.qos.logback:logback-classic:1.5.32'
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
@@ -75,7 +75,7 @@ application {
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
-    //systemProperties["KeyDebugFlag"] = "on"
+    systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
     // enable assertion
@@ -84,6 +84,17 @@ run {
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
     jvmArgs += "-Dsun.awt.disablegrab=true "
+}
+
+
+tasks.register('runDebug', JavaExec) {
+    systemProperties["key.examples.dir"] = "$projectDir/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+}
+
+tasks.register('runExperimental', JavaExec) {
+    systemProperties["key.examples.dir"] = "$projectDir/examples"
+    args "--experimental"
 }
 
 tasks.register('runWithProfiler', JavaExec) {

@@ -8,9 +8,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -224,7 +224,8 @@ public final class KeYFacade {
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
      *
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
             InitConfig initConfig, Configuration properties) throws Exception {
@@ -433,7 +434,18 @@ public final class KeYFacade {
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
+            /*
+             * We need to respect included .key files from project.key (for dl_ escapes). The
+             * easiest way to do this is to add the top-level project.key as include and let
+             * SLEnvInput take care about the includes from there.
+             */
+            List<Path> includePaths = List.of();
+            Path projectFile = pbh.getTopLevelProjectFile();
+            if (projectFile != null) {
+                includePaths = List.of(projectFile);
+            }
+
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, includePaths);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");

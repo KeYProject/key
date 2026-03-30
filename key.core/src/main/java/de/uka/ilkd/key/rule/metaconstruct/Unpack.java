@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -16,7 +16,8 @@ public class Unpack extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param loop the instance of expression contained by the meta construct
+     * @param loop
+     *        the instance of expression contained by the meta construct
      */
     public Unpack(For loop) {
         super("unpack", loop);

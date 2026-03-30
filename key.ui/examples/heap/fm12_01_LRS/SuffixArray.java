@@ -66,7 +66,7 @@ public final class SuffixArray {
 
 
 
-    private void /*@ helper @*/ sort(final int[] data) {
+    private /*@ helper @*/ void sort(final int[] data) {
         /*@ maintaining data.length == a.length;
           @ maintaining 0 <= k && k <= data.length;
           @ maintaining (\forall int i; 0 <= i && i < a.length;
@@ -77,7 +77,7 @@ public final class SuffixArray {
           @ decreasing data.length - k;
           @ assignable data[*];
           @*/
-        for(int k = 0; k < data.length; k++)
+        for(int k = 0; k < data.length; k++) {
             /*@ maintaining 0 <= l && l <= k;
               @ maintaining (\forall int i; l < i && i <= k;
               @                 compare(data[i],data[i-1]) > 0);
@@ -87,8 +87,9 @@ public final class SuffixArray {
               @ decreasing l;
               @ assignable data[*];
               @*/
-            for(int l = k; l > 0 && compare(data[l - 1], data[l]) > 0; l--)
+            for (int l = k; l > 0 && compare(data[l - 1], data[l]) > 0; l--)
                 swap(data, l);
+        }
     }
 
     /*@ normal_behavior
@@ -97,7 +98,7 @@ public final class SuffixArray {
       @ ensures data[x-1] == \old(data[x]);
       @ assignable data[x], data[x-1];
       @*/
-    private static void /*@ helper @*/ swap(int[] data, int x) {
+    private static /*@ helper @*/ void swap(int[] data, int x) {
         final int y = x-1;
         final int t = data[x];
         data[x] = data[y];

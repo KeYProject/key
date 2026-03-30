@@ -57,14 +57,14 @@ public interface EnvInput {
      *
      * @see #isIgnoreOtherJavaFiles()
      */
-    default @Nullable Path getJavaFile() throws ProofInputException {
+    default @Nullable Path getJavaFile() {
         return null;
     }
 
     /**
      * gets the classpath elements to be considered here.
      */
-    List<Path> readClassPath() throws ProofInputException;
+    List<Path> readClassPath();
 
     /**
      * gets the boot classpath element, null if none set.

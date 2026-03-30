@@ -1,0 +1,172 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.java.ast.expression.literal;
+
+import java.util.List;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Char literal.
+ *
+ * @author <TT>Wolfram Pfeifer</TT>
+ */
+public class CharLiteral extends AbstractIntegerLiteral {
+
+    /**
+     * The actual char this CharLiteral represents.
+     */
+    private final char charVal;
+
+    public CharLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments, char charVal) {
+        super(pi, comments);
+        this.charVal = charVal;
+    }
+
+    /**
+     * Creates a new CharLiteral from the given char.
+     *
+     * @param charVal
+     *        a char value.
+     */
+    public CharLiteral(char charVal) {
+        this(null, null, charVal);
+    }
+
+    /**
+     * Creates a new CharLiteral from the given String.
+     * Char literals can be given as described in the Java 8 Language Specification:
+     * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
+     * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
+     * processed earlier and don't have to be handled here.
+     * <p>
+     * Note that the char must be enclosed in single-quotes.
+     *
+     * @param children
+     *        an ExtList with all children(comments). May contain: Comments
+     * @param valueStr
+     *        a string.
+     */
+    public CharLiteral(ExtList children, String valueStr) {
+        super(children);
+        this.charVal = parseFromString(valueStr);
+    }
+
+    /**
+     * Creates a new CharLiteral from the given String. The String must be of the form
+     * <code>'c'</code> (with c being an arbitrary char).
+     *
+     * @param valueStr
+     *        a string.
+     */
+    public CharLiteral(String valueStr) {
+        this(null, null, parseFromString(valueStr));
+    }
+
+    /**
+     * Returns the decimal value of the char.
+     *
+     * @return the decimal value of the char as a BigInteger
+     */
+    public long getValue() {
+        return charVal;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnCharLiteral(this);
+    }
+
+    @Override
+    public KeYJavaType getKeYJavaType(Services javaServ) {
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
+    }
+
+    @Override
+    public String toString() {
+        // the actual char surrounded by single-quotes
+        return "'" + charVal + "'";
+    }
+
+    @Override
+    public String getValueString() {
+        // the char value as a decimal number (without single-quotes)
+        return "" + (int) charVal;
+    }
+
+    /**
+     * Parses the String and extracts the actual value of the literal.
+     * This method is able to parse char literals as described in the Java 8 Language Specification:
+     * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
+     * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
+     * processed earlier and don't have to be handled by this method.
+     * <p>
+     * This method does not check the length of the literal for validity.
+     *
+     * @param sourceStr
+     *        the String containing the literal surrounded by single-quotes
+     * @return the parsed value as a char
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
+     *         character literal or the literal is not surrounded by single-quotes
+     * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4">
+     *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
+     */
+    protected static char parseFromString(final String sourceStr) {
+        String valStr = sourceStr;
+        if (sourceStr.charAt(0) == '\'' && sourceStr.charAt(sourceStr.length() - 1) == '\'') {
+            valStr = sourceStr.length() == 1 ? sourceStr
+                    : sourceStr.substring(1, sourceStr.length() - 1);
+        } else if (sourceStr.isEmpty()) {
+            throw new NumberFormatException("Empty character does not exist");
+        }
+
+        /*
+         * There are three possible cases:
+         * 1. the char is written directly
+         * 2. Java escape like '\n'
+         * 3. octal Unicode escape like '\040'
+         */
+        if (valStr.charAt(0) == '\\') {
+            return switch (valStr.charAt(1)) {
+                case 'b' -> '\b';
+                case 't' -> '\t';
+                case 'n' -> '\n';
+                case 'f' -> '\f';
+                case 'r' -> '\r';
+                case '\"' -> '\"';
+                case '\'' -> '\'';
+                case '\\' -> '\\';
+                case '0', '1', '2', '3', '4', '5', '6', '7' -> (char) Integer
+                        .parseInt(valStr.substring(1), 8);
+                case 'u' -> (char) Integer.parseInt(valStr.substring(2), 16);
+                default -> throw new NumberFormatException("Invalid char: " + sourceStr);
+            };
+        } else {
+            return valStr.charAt(0);
+        }
+    }
+}

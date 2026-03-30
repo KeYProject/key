@@ -12,10 +12,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.nparser.*;
@@ -65,7 +62,7 @@ public class KeYFile implements EnvInput {
     private final String name;
     private final Profile profile;
     protected InitConfig initConfig;
-    private KeyAst.File fileCtx = null;
+    private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
@@ -219,9 +216,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                // weigl: fix #3721, absolute path is required to solve relative filenames.
-                Path absPath = file.file().toAbsolutePath().getParent();
-                includes = ctx.getIncludes(absPath.toUri().toURL());
+                includes = ctx.getIncludes(file.file().getParent());
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {
@@ -376,7 +371,7 @@ public class KeYFile implements EnvInput {
      */
     public List<PositionedString> readFuncAndPred() {
         if (file == null) {
-            return null;
+            return Collections.emptyList();
         }
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());

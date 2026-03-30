@@ -5,9 +5,11 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
 
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
@@ -66,40 +68,62 @@ public class SyntaxElementMatchProgramGenerator {
         } else {
             program.add(getCheckNodeKindInstruction(JTerm.class));
             program.add(gotoNextInstruction());
-            if (op instanceof final SortDependingFunction sortDependingFunction) {
-                program.add(getCheckNodeKindInstruction(SortDependingFunction.class));
-                program.add(getSimilarSortDependingFunctionInstruction(sortDependingFunction));
-                program.add(gotoNextInstruction());
-                if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
-                    program.add(getMatchGenericSortInstruction(gs));
-                } else {
-                    program.add(getMatchIdentityInstruction(sortDependingFunction.getChild(0)));
+            switch (op) {
+                case ParametricFunctionInstance pfi -> {
+                    program.add(getCheckNodeKindInstruction(ParametricFunctionInstance.class));
+                    program.add(getSimilarParametricFunctionInstruction(pfi));
+                    program.add(gotoNextInstruction());
+                    for (int i = 0; i < pfi.getChildCount(); i++) {
+                        var arg = (GenericArgument) pfi.getChild(i);
+                        if (arg.sort() instanceof GenericSort gs) {
+                            program.add(getMatchGenericSortInstruction(gs));
+                        } else if (arg.sort() instanceof ParametricSortInstance) {
+                            throw new UnsupportedOperationException(
+                                "TODO @ DD: Parametric sort in generic args!");
+                        } else {
+                            program.add(getMatchIdentityInstruction(arg));
+                        }
+                        program.add(gotoNextInstruction());
+                    }
                 }
-                program.add(gotoNextInstruction());
-            } else if (op instanceof ElementaryUpdate elUp) {
-                program.add(getCheckNodeKindInstruction(ElementaryUpdate.class));
-                program.add(gotoNextInstruction());
-                if (elUp.lhs() instanceof SchemaVariable sv) {
-                    program.add(getMatchInstructionForSV(sv));
-                    program.add(gotoNextSiblingInstruction());
-                } else if (elUp.lhs() instanceof LocationVariable locVar) {
-                    program.add(getMatchIdentityInstruction(locVar));
+                case final SortDependingFunction sortDependingFunction -> {
+                    program.add(getCheckNodeKindInstruction(SortDependingFunction.class));
+                    program.add(getSimilarSortDependingFunctionInstruction(sortDependingFunction));
+                    program.add(gotoNextInstruction());
+                    if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
+                        program.add(getMatchGenericSortInstruction(gs));
+                    } else {
+                        program.add(getMatchIdentityInstruction(sortDependingFunction.getChild(0)));
+                    }
                     program.add(gotoNextInstruction());
                 }
-            } else if (op instanceof Modality mod) {
-                program.add(getCheckNodeKindInstruction(Modality.class));
-                program.add(gotoNextInstruction());
-                if (mod.kind() instanceof ModalOperatorSV modKindSV) {
-                    program.add(matchModalOperatorSV(modKindSV));
-                } else {
-                    program.add(getMatchIdentityInstruction(mod.kind()));
+                case ElementaryUpdate elUp -> {
+                    program.add(getCheckNodeKindInstruction(ElementaryUpdate.class));
+                    program.add(gotoNextInstruction());
+                    if (elUp.lhs() instanceof SchemaVariable sv) {
+                        program.add(getMatchInstructionForSV(sv));
+                        program.add(gotoNextSiblingInstruction());
+                    } else if (elUp.lhs() instanceof LocationVariable locVar) {
+                        program.add(getMatchIdentityInstruction(locVar));
+                        program.add(gotoNextInstruction());
+                    }
                 }
-                program.add(gotoNextInstruction());
-                program.add(matchProgram(pattern.javaBlock().program()));
-                program.add(gotoNextSiblingInstruction());
-            } else {
-                program.add(getMatchIdentityInstruction(op));
-                program.add(gotoNextInstruction());
+                case Modality mod -> {
+                    program.add(getCheckNodeKindInstruction(Modality.class));
+                    program.add(gotoNextInstruction());
+                    if (mod.kind() instanceof ModalOperatorSV modKindSV) {
+                        program.add(matchModalOperatorSV(modKindSV));
+                    } else {
+                        program.add(getMatchIdentityInstruction(mod.kind()));
+                    }
+                    program.add(gotoNextInstruction());
+                    program.add(matchProgram(pattern.javaBlock().program()));
+                    program.add(gotoNextSiblingInstruction());
+                }
+                default -> {
+                    program.add(getMatchIdentityInstruction(op));
+                    program.add(gotoNextInstruction());
+                }
             }
         }
 

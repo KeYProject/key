@@ -6,11 +6,12 @@ package de.uka.ilkd.key.ldt;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -19,10 +20,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,12 +32,13 @@ import org.jspecify.annotations.Nullable;
  * provides a programming interface to access these entities, and it assists the type converter in
  * handling them.
  */
+@NullMarked
 public abstract class LDT implements Named {
 
     private final Name name;
 
     /** the main sort associated with the LDT */
-    private final Sort sort;
+    private final @Nullable Sort sort;
 
     /** the namespace of functions this LDT feels responsible for */
     private final Namespace<Function> functions = new Namespace<>();
@@ -163,8 +165,8 @@ public abstract class LDT implements Named {
     }
 
     public boolean containsFunction(Function op) {
-        final Operator n = functions.lookup(op.name());
-        return (n == op);
+        final var n = functions.lookup(op.name());
+        return n == op;
     }
 
     // -------------------------------------------------------------------------
@@ -181,7 +183,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
+    public abstract boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -196,7 +198,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+    public abstract boolean isResponsible(Operator op, JTerm left,
             JTerm right, Services services, ExecutionContext ec);
 
 
@@ -210,7 +212,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
+    public abstract boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -228,7 +230,7 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(Operator op,
             Services services, ExecutionContext ec);
 
     /**

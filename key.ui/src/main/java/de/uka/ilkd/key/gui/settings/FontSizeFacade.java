@@ -30,8 +30,7 @@ public final class FontSizeFacade {
     private static final Map<String, Float> ORIGINAL_FONT_SIZES = new HashMap<>();
     private static double currentFactor = 1;
 
-    private FontSizeFacade() {
-    }
+    private FontSizeFacade() {}
 
     private static void saveCurrentFontSizes() {
         for (String k : KEYS) {
@@ -45,7 +44,8 @@ public final class FontSizeFacade {
     /**
      * Scale all managed fonts by the provided factor. Then attempts to redraw all components.
      *
-     * @param factor the factor
+     * @param factor
+     *        the factor
      * @see SwingUtilities#updateComponentTreeUI(Component)
      */
     public static void resizeFonts(double factor) {

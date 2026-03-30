@@ -1046,6 +1046,7 @@ public final class MainWindow extends JFrame {
         help.add(new KeYProjectHomepageAction(this));
         // help.add(new SystemInfoAction(this));
         help.add(new MenuSendFeedackAction(this));
+        help.add(new CreateGithubIssueAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
