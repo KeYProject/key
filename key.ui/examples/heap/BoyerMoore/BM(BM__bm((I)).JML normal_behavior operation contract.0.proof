@@ -1938,7 +1938,7 @@
                    (builtin "One Step Simplification" (formula "19"))
                   (rule "true_left" (formula "19"))
                   (rule "allLeft" (formula "22") (inst "t=select<[int]>(heap,
-            IntOpt::final(null, IntOpt::#NONE),
+            final<[IntOpt]>(null, IntOpt::#NONE),
             IntOpt::#value)"))
                   (rule "cut_direct" (formula "22") (term "1"))
                   (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 TRUE"
@@ -3239,7 +3239,7 @@
                                                          (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                                          (rule "hideAuxiliaryEq" (formula "2"))
                                                          (rule "ifthenelse_split" (formula "2") (term "0"))
-                                                         (branch "f_0 = java.lang.Object::<initialized> & o_0 = i_14 TRUE"
+                                                         (branch "f_0 = java.lang.Object::#$initialized & o_0 = i_14 TRUE"
                                                             (rule "andLeft" (formula "2"))
                                                             (rule "applyEqReverse" (formula "43") (term "1") (ifseqformula "4"))
                                                             (rule "hideAuxiliaryEq" (formula "4"))
@@ -3264,7 +3264,7 @@
                                                             (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                                             (rule "close" (formula "35") (ifseqformula "1"))
                                                          )
-                                                         (branch "f_0 = java.lang.Object::<initialized> & o_0 = i_14 FALSE"
+                                                         (branch "f_0 = java.lang.Object::#$initialized & o_0 = i_14 FALSE"
                                                             (rule "close" (formula "42") (ifseqformula "2"))
                                                          )
                                                       )
@@ -4212,7 +4212,7 @@
                          (builtin "One Step Simplification" (formula "15"))
                         (rule "true_left" (formula "15"))
                         (rule "allLeft" (formula "19") (inst "t=select<[int]>(heap,
-            IntOpt::final(null, IntOpt::#NONE),
+            final<[IntOpt]>(null, IntOpt::#NONE),
             IntOpt::#value)"))
                         (rule "cut_direct" (formula "19") (term "1"))
                         (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 + mc_0 * -1 TRUE"
