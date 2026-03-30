@@ -7,7 +7,7 @@
  * to the {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository} This process happens in the
  * legacy package {@link de.uka.ilkd.key.speclang.jml}.
  * <p>
- * The translation happens in {@link de.uka.ilkd.key.speclang.njml.TextualTranslator} and
+ * The translation happens in {@link de.uka.ilkd.key.speclang.njml.KeyJml2JmlParserTranslator} and
  * {@link de.uka.ilkd.key.speclang.njml.Translator}.
  * <p>
  * Gradle has a task for debugging the lexer {@code gradle debugJmlLexer}.

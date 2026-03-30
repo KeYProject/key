@@ -28,23 +28,16 @@ public class PreParser {
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
+    public KeyJml2JmlParserTranslator parseClassLevel(JmlLexer lexer) {
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         p.getErrorReporter().throwException();
-        jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator(
+        KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
 
-        // Add a construct for dangling modifiers. The JMLTransformer should attach this to the
-        // appropriate element
-        if (!translator.mods.isEmpty()) {
-            translator.constructs =
-                translator.constructs.append(new TextualJMLModifierList(translator.mods));
-        }
-
-        return translator.constructs;
+        jmlCheck(ctx);
+        return translator;
     }
 
     private void jmlCheck(ParserRuleContext ctx) {
@@ -80,7 +73,7 @@ public class PreParser {
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         p.getErrorReporter().throwException();
         jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator(
+        KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
         return translator.constructs;
@@ -131,7 +124,7 @@ public class PreParser {
         JmlParser p = JmlFacade.createParser(JmlFacade.createLexer(modifiers));
         var ctx = p.modifiersEOF();
         p.getErrorReporter().throwException();
-        TextualTranslator translator = new TextualTranslator(
+        KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
         return translator.mods;

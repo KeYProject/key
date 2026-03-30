@@ -77,7 +77,7 @@ public class MethodlevelTranslatorTest {
             modelMethodParameters.param_decl().stream().anyMatch(it -> it.NULLABLE() != null));
 
         // Test translation
-        final TextualTranslator translator = new TextualTranslator(false);
+        final KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(false);
         ctx.accept(translator);
         final var translationOpt =
             translator.constructs.stream().filter(c -> c instanceof TextualJMLMethodDecl)
@@ -126,7 +126,7 @@ public class MethodlevelTranslatorTest {
 
         // Test translation
 
-        final TextualTranslator translator = new TextualTranslator(false);
+        final KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(false);
         ctx.accept(translator);
         final var translationOpt =
             translator.constructs.stream().filter(c -> c instanceof TextualJMLMethodDecl)

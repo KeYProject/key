@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import com.github.javaparser.ast.jml.clauses.JmlContract;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -15,10 +16,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
 
 /**
@@ -32,14 +29,10 @@ import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
  * into a {@link TextualJMLModifierList} construct,
  * which is then attached to the appropriate element by the {@link JMLTransformer}.
  */
-class TextualTranslator extends JmlParserBaseVisitor<Object> {
-
+class KeyJml2JmlParserTranslator extends JmlParserBaseVisitor<Object> {
     private final boolean attachOriginLabel;
-
-    public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
     public ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
-    private @Nullable TextualJMLSpecCase methodContract;
-    private @Nullable TextualJMLLoopSpec loopContract;
+    private @Nullable JmlContract clauseContainer;
 
     /**
      * Translates a token to a JMLModifier
@@ -83,7 +76,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         };
     }
 
-    public TextualTranslator(boolean attachOriginLabel) {
+    public KeyJml2JmlParserTranslator(boolean attachOriginLabel) {
         this.attachOriginLabel = attachOriginLabel;
     }
 
@@ -98,7 +91,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
      *
      * @param construct
      */
-    protected void finishConstruct(TextualJMLConstruct construct) {
+    protected void finishConstruct(JmlContract construct) {
         constructs = constructs.append(construct);
         mods = ImmutableSLList.nil();
         methodContract = null;

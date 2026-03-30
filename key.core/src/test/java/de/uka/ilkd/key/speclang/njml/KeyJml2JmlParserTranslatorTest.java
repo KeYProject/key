@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TextualTranslatorTest {
+public class KeyJml2JmlParserTranslatorTest {
 
     /**
      * Testcases for issue 1667 asserts and assumes were inserted into constructs in the wrong order
@@ -24,7 +24,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator(true);
+        KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());
@@ -42,7 +42,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator(true);
+        KeyJml2JmlParserTranslator translator = new KeyJml2JmlParserTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());

@@ -26,12 +26,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
      */
     Comment[] getComments();
 
-    ///
-    default ImmutableList<JmlContract> getAttachedJml() {
-        return ImmutableSLList.nil();
-    }
-
-
     /**
      * matches the source "text" (@link SourceData#getSource()) against the pattern represented by
      * this object. In case of a successful match the resulting {@link MatchConditions} with the
