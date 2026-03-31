@@ -59,8 +59,9 @@ public class FieldHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         if (trans.isNewSymbol(term)) {
             Operator op = term.op();
-            Matcher m = Pattern.compile("\\" + JavaDLFieldNames.IMPLICIT_NAME_PREFIX + "(.*?)")
-                    .matcher(op.name().toString());
+            Matcher m =
+                Pattern.compile(Pattern.quote("" + JavaDLFieldNames.IMPLICIT_NAME_PREFIX) + "(.*?)")
+                        .matcher(op.name().toString());
             String fieldName = op.name().toString()
                     .replace(JavaDLFieldNames.IMPLICIT_FIELD_INFIX, "_").replace(".", "_");
             if (m.find()) {

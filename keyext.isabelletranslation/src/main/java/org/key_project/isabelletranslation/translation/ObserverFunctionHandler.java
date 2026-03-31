@@ -35,7 +35,8 @@ public class ObserverFunctionHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         if (trans.isNewSymbol(term)) {
             String opName = term.op().name().toString();
-            Matcher m = Pattern.compile("\\" + JavaDLFieldNames.IMPLICIT_NAME_PREFIX + "(.*?)")
+            Matcher m = Pattern
+                    .compile(Pattern.quote("" + JavaDLFieldNames.IMPLICIT_NAME_PREFIX) + "(.*?)")
                     .matcher(opName);
             String functionName;
             if (m.find()) {
