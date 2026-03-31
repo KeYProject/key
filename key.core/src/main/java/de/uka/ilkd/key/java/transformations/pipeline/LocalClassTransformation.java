@@ -32,7 +32,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
  *
  * @author engelc
  */
-public class LocalClassTransformation extends JavaTransformer {
+public class LocalClassTransformation extends JavaTransformerAbstract {
 
     public LocalClassTransformation(TransformationPipelineServices services) {
         super(services);

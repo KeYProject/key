@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformerAbstract;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -105,10 +106,15 @@ class KeyJavaPipelineTest {
         var expected = testFolder.resolve("expected");
         var actual = testFolder.resolve("actual");
 
-        return Files.walk(expected)
-                .filter(Files::isRegularFile)
-                .map(it -> DynamicTest.dynamicTest(it.toString(),
-                    () -> checkEqualFile(it, expected, actual)));
+        if (Files.exists(expected)) {
+            return Files.walk(expected)
+                    .filter(Files::isRegularFile)
+                    .map(it -> DynamicTest.dynamicTest(it.toString(),
+                        () -> checkEqualFile(it, expected, actual)));
+        } else {
+            Files.createDirectories(expected);
+            return Stream.empty();
+        }
     }
 
     private void checkEqualFile(Path expectedFile, Path expectedFolder, Path actualFolder)
@@ -123,7 +129,7 @@ class KeyJavaPipelineTest {
         Truth.assertThat(actual).isEqualTo(expected);
     }
 
-    private static class DebugOutputTransformer extends JavaTransformer {
+    private static class DebugOutputTransformer extends JavaTransformerAbstract {
         final Path outputFolder;
         final Set<Path> alreadyWritten = new HashSet<>();
         private static final Logger LOGGER = LoggerFactory.getLogger(DebugOutputTransformer.class);

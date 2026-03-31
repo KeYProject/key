@@ -38,7 +38,7 @@ import com.github.javaparser.ast.type.Type;
  * them will access these fields, this transformer has to be executed
  * before the other transformers are called.
  */
-public class ImplicitFieldAdder extends JavaTransformer {
+public class ImplicitFieldAdder extends JavaTransformerAbstract {
 
     /**
      * flag set if java.lang.Object has been already transformed

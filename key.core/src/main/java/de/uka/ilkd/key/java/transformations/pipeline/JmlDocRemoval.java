@@ -16,7 +16,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (3/3/26)
  */
-public class JmlDocRemoval extends JavaTransformer {
+public class JmlDocRemoval extends JavaTransformerAbstract {
     public JmlDocRemoval(@NonNull TransformationPipelineServices services) {
         super(services);
     }
