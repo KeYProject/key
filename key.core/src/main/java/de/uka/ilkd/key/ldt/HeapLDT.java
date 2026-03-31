@@ -448,7 +448,9 @@ public final class HeapLDT extends LDT {
             }
             final Name kind = new Name(name.toString().substring(index + 2));
 
-            var firstInstance = services.getNamespaces().parametricFunctions().lookup(kind);
+            final String nameWithoutFieldPrefix = kind.toString().substring(1);
+            var firstInstance =
+                services.getNamespaces().parametricFunctions().lookup(nameWithoutFieldPrefix);
             if (firstInstance != null) {
                 Sort sortDependingOn = fieldPV.getContainerType().getSort();
                 result = ParametricFunctionInstance.get(firstInstance,
