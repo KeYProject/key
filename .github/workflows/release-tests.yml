@@ -44,7 +44,7 @@ jobs:
 
       - name: Setup Gradle
         uses:
-          gradle/actions/setup-gradle@v5
+          gradle/actions/setup-gradle@v6
 
       - name: Assemble
         run: ./gradlew --parallel assemble
@@ -56,7 +56,7 @@ jobs:
         run: ./gradlew :key.core.symbolic_execution:test -x :key.core.proof_references:test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
           name: unit-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}
@@ -96,13 +96,13 @@ jobs:
           z3Version: ${{ env.z3 }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()        # run this step even if a previous step failed
         with:
           name: integration-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}
@@ -142,13 +142,13 @@ jobs:
           z3Version: ${{ matrix.z3 }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: "Running tests"
         run: ./gradlew :key.core:test --continue --tests 'de.uka.ilkd.key.smt.*'
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()        # run this step even if a previous step failed
         with:
           name: smt-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}-${{matrix.z3}}-${{matrix.cvc5}}

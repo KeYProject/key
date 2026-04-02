@@ -55,7 +55,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
         run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
@@ -71,7 +71,7 @@ jobs:
             !**/jacocoTestReport.xml
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
 
   integration-tests:
     env:
@@ -97,7 +97,7 @@ jobs:
         uses: keyproject/setup-smt@v0
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 
