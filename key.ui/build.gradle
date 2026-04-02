@@ -8,7 +8,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://github.com/GradleUp/shadow
-    id 'com.gradleup.shadow' version "9.3.2"
+    id 'com.gradleup.shadow' version "9.4.1"
 }
 
 description = "User interface for the deductive verification of Java programs"
@@ -17,7 +17,7 @@ dependencies {
     implementation project(":key.core")
     //implementation project(":key.core.rifl")
 
-    implementation("com.formdev:flatlaf:3.7")
+    implementation("com.formdev:flatlaf:3.7.1")
 
     implementation project(":key.core.infflow")
     implementation project(":key.core.wd")
