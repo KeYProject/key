@@ -1,4 +1,8 @@
+import groovy.yaml.YamlSlurper
+import groovy.json.JsonSlurper
+
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 
@@ -35,6 +39,9 @@ dependencies {
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
+
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     runtimeOnly project(":keyext.ui.testgen")
     runtimeOnly project(":keyext.caching")
@@ -130,35 +137,41 @@ tasks.register('runInExperimentalMode', JavaExec) {
  * @return a list of filenames to be added to examples.zip. Each line
  * is relative to the examples directory.
  */
-List<String> scanReadmeFiles() {
+List<Path> scanReadmeFiles() {
     def examplesIndex = Paths.get(projectDir.toString(),
-            "examples", "index", "samplesIndex.txt")
-    List<String> result = new ArrayList<>()
-    result.add("index/samplesIndex.txt")
-    for (String line : Files.readAllLines(examplesIndex)) {
-        line = line.trim()
-        if (line.isEmpty() || line.startsWith("#")) {
-            continue
-        }
+            "examples", "index", "exampleIndex.jsonc")
 
-        def readme = Paths.get(projectDir.toString(), "examples",
-                line.replace("/", File.separator))
-        def dir = line.substring(0, line.lastIndexOf('/') + 1)
-        result.add(line)
-        // The project file is not always project.key, but better include the
-        // default file.
-        result.add(dir + "project.key")
-        for (String rmLine : Files.readAllLines(readme)) {
-            if(rmLine.startsWith("#")) continue
-            def parts = rmLine.split("=", 2)
-            if (parts.length < 2) break
-            def key = parts[0].trim()
-            if(key.containsIgnoreCase("file")) {
-                def filename = parts[1].trim()
-                result.add(dir + filename)
+    List<Path> result = new ArrayList<>()
+    result.add("index/exampleIndex.jsonc")
+
+    def jsonSlurper = new JsonSlurper(type: groovy.json.JsonParserType.LAX)
+    def cfg = new org.yaml.snakeyaml.Yaml()
+    def files = jsonSlurper.parse(examplesIndex)
+
+    def exampleDir = Paths.get(projectDir.toString(), "examples")
+    for (String line : files) {
+        def readme = exampleDir.resolve(line).toAbsolutePath()
+        def dir = readme.getParent()
+        result.add(readme)
+        // The project file is not always project.key, but better include the default file.
+        result.add(dir.resolve("project.key"))
+
+        if (readme.toString().endsWith(".json5")) {
+            def info = jsonSlurper.parse(readme)
+        } else if (readme.toString().endsWith(".txt")) {
+            def info = yamlSlurper.parse(readme)
+        } else if (readme.toString().endsWith(".txt")) {
+            for (String rmLine : Files.readAllLines(readme)) {
+                if (rmLine.startsWith("#")) continue
+                def parts = rmLine.split("=", 2)
+                if (parts.length < 2) break
+                def key = parts[0].trim()
+                if (key.containsIgnoreCase("file")) {
+                    def filename = parts[1].trim()
+                    result.add(dir + filename)
+                }
             }
         }
     }
-    // println(result)
     return result
 }

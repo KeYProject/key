@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://key-project.org/example.schema.json",
+  "title": "Example",
+  "description": "The format of a KeY example in key.ui",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "dfasdfsadfs"
+    },
+    "name": {
+      "type": "string",
+      "description": "The person's last name."
+    },
+    "path": {
+      "description": "Age in years which must be equal to or greater than zero.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "files": {
+      "description": "Additional files",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://key-project.org/exampleIndex.schema.json",
+  "title": "Example Index",
+  "description": "Defines the the format for index of examples in key.ui",
+  "type": "array",
+  "items": {
+    "type": "string",
+    "pattern": "^\\S+(/\\S+)*\\.(txt|jsonc?)$"
+  }
+}
+

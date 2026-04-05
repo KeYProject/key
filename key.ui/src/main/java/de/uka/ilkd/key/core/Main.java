@@ -3,21 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.Callable;
-import javax.xml.parsers.ParserConfigurationException;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.gui.examples.ExamplesFacade;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -34,17 +23,26 @@ import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
-
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Callable;
 
 /**
  * The main entry point for KeY
@@ -448,7 +446,7 @@ public final class Main implements Callable<Integer> {
     }
 
     public static void ensureExamplesAvailable() {
-        File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
+        File examplesDir = getExamplesDir() == null ? ExamplesFacade.lookForExamples()
                 : new File(getExamplesDir());
         if (!examplesDir.exists()) {
             examplesDir = setupExamples();
