@@ -29,7 +29,7 @@ import org.jspecify.annotations.NonNull;
  * JavaParser. It should not be used anymore.
  */
 @Deprecated(forRemoval = true)
-public class JMLCommentTransformer extends JavaTransformer {
+public class JMLCommentTransformer extends JavaTransformerAbstract {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
     };
     public static final DataKey<List<Comment>> AFTER_COMMENTS = new DataKey<>() {

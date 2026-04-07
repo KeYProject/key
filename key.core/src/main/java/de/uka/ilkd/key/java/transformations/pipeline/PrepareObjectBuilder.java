@@ -42,7 +42,7 @@ import static de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants.IM
  * Creates the preparation method for pre-initilizing the object fields
  * with their default settings.
  */
-public class PrepareObjectBuilder extends JavaTransformer {
+public class PrepareObjectBuilder extends JavaTransformerAbstract {
     public PrepareObjectBuilder(TransformationPipelineServices services) {
         super(services);
     }

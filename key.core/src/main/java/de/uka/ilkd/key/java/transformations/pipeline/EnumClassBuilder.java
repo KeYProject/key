@@ -19,7 +19,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParse
 /// @author mulbrich, drodt
 /// @since 2006-11-20
 /// @version 2026-03-03
-public class EnumClassBuilder extends JavaTransformer {
+public class EnumClassBuilder extends JavaTransformerAbstract {
     /// a mapping of enums to the newly created class declarations.
     final Map<EnumDeclaration, EnumClassDeclaration> substitutes = new LinkedHashMap<>();
 

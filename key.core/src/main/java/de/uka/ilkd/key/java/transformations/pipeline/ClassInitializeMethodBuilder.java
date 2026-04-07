@@ -41,7 +41,7 @@ import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMeth
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
-public class ClassInitializeMethodBuilder extends JavaTransformer {
+public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
     public static final String CLASS_INITIALIZE_IDENTIFIER = "$clinit";
 
     /**

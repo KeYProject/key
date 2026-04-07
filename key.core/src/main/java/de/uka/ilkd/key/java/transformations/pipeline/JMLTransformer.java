@@ -55,7 +55,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 ///
 /// Support for ghost statements.
 ///
-/// After execution this {@link JavaTransformer}, contracts are attached to
+/// After execution this {@link JavaTransformerAbstract}, contracts are attached to
 /// {@link MethodDeclaration}, or {@link BlockStmt}, {@link FieldDeclaration} and
 /// {@link MethodDeclaration} were introduced for ghost and model declarations,
 /// JML statements (assume, assert, ...) are inserted into the bodies using
@@ -75,7 +75,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// @author pfeifer
 /// @author ulbrich
 @SuppressWarnings("OptionalGetWithoutIsPresent")
-public final class JMLTransformer extends JavaTransformer {
+public final class JMLTransformer extends JavaTransformerAbstract {
     public static final EnumSet<JMLModifier> JAVA_MODS =
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
             JMLModifier.PROTECTED, JMLModifier.PUBLIC, JMLModifier.STATIC);

@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
  * methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of
  * the normalform is the same as for the original constructor.
  */
-public class ConstructorNormalformBuilder extends JavaTransformer {
+public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
     /**
      * creates the constructor normalform builder
      */

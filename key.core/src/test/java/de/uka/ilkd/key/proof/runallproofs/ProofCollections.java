@@ -1018,6 +1018,9 @@ public class ProofCollections {
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
 
+        g = c.group("JavaFeatures");
+        g.loadable("Java/TextBlockLiterals/project.key");
+
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
