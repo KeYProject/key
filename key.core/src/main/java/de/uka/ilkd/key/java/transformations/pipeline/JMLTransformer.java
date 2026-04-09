@@ -222,7 +222,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         for (var modifier : modifiers) {
             methodDecl.addModifier(modifier.getParserKeyword());
         }
-        addSpec(methodDecl, decl);
+        TransformationPipelineServices.addSpec(methodDecl, decl);
         return methodDecl;
     }
 
@@ -280,7 +280,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
 
                 // The preparser split along the grammar rules in KeYParser.g4, and gives you a list
                 // of JML entities.
-                PreParser pp = getPreParser();
+                PreParser pp = TransformationPipelineServices.getPreParser();
                 // We might have multiple textual constructs now, because the single comment could
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
 
@@ -301,7 +301,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                         jmlModifiers = null; // these are used now
                         // attach all specification cases accumulated so far
                         for (TextualJMLSpecCase specCase : specCases) {
-                            addSpec(decl, specCase);
+                            TransformationPipelineServices.addSpec(decl, specCase);
                         }
                         td.addMember(decl);
                         specCases.clear();
@@ -310,7 +310,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                             || c instanceof TextualJMLClassInv
                             || c instanceof TextualJMLInitially
                             || c instanceof TextualJMLDepends) {
-                        addClassSpec(td, c);
+                        TransformationPipelineServices.addClassSpec(td, c);
                     } else if (c instanceof TextualJMLSpecCase specCase) {
                         // accumulate spec cases (these are model method contracts) to attach them
                         // in a later loop iteration to the model method declaration
@@ -354,7 +354,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             // add specifications to (Java) method and constructor declarations
             if (member instanceof CallableDeclaration<?> c) {
                 for (var specCase : specCases) {
-                    addSpec(c, specCase);
+                    TransformationPipelineServices.addSpec(c, specCase);
                 }
                 specCases.clear();
             }
@@ -387,37 +387,9 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         }
     }
 
-    private static @NonNull PreParser getPreParser() {
-        return new PreParser();
-    }
-
-    private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
-        if (!td.containsData(KEY_CLASS_SPEC)) {
-            td.setData(KEY_CLASS_SPEC, new ArrayList<>(4));
-        }
-        List<TextualJMLConstruct> specList = td.getData(KEY_CLASS_SPEC);
-        specList.add(c);
-    }
-
-    private void addSpec(Node nextMember, TextualJMLConstruct specCase) {
-        if (!nextMember.containsData(KEY_SPEC_CASE)) {
-            nextMember.setData(KEY_SPEC_CASE, new ArrayList<>(4));
-        }
-        List<TextualJMLConstruct> specList = nextMember.getData(KEY_SPEC_CASE);
-        specList.add(specCase);
-    }
-
-    private void addLoopSpec(Node nextMember, TextualJMLLoopSpec spec) {
-        if (!nextMember.containsData(KEY_LOOP_SPEC)) {
-            nextMember.setData(KEY_LOOP_SPEC, new ArrayList<>(4));
-        }
-        List<TextualJMLLoopSpec> specList = nextMember.getData(KEY_LOOP_SPEC);
-        specList.add(spec);
-    }
-
     private void transformMethodLevelCommentsAt(BlockStmt blockStmt, URI fileName)
             throws SLTranslationException {
-        PreParser io = getPreParser();
+        PreParser io = TransformationPipelineServices.getPreParser();
         var stmts = new ArrayList<>(blockStmt.getStatements());
         var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size() * 2);
 
@@ -480,7 +452,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                             if (specifiedStmt instanceof BlockStmt
                                     || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
                                     || specifiedStmt instanceof LabeledStmt) {
-                                addSpec(specifiedStmt, spec);
+                                TransformationPipelineServices.addSpec(specifiedStmt, spec);
                                 continue;
                             } else {
                                 throw new IllegalStateException(
@@ -498,7 +470,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                             if (specifiedStmt instanceof BlockStmt
                                     || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
                                     || specifiedStmt instanceof LabeledStmt) {
-                                addLoopSpec(specifiedStmt, spec);
+                                TransformationPipelineServices.addLoopSpec(specifiedStmt, spec);
                                 continue;
                             } else {
                                 throw new IllegalStateException(
@@ -546,7 +518,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                     // Currently, we only support modifier at type declaration level.
                     // Other things would be ghost classes or model imports.
                     var input = sanitizer.asString(jdtd.jmlDocs());
-                    PreParser pp = getPreParser();
+                    PreParser pp = TransformationPipelineServices.getPreParser();
                     modifiers = pp.parseModifiers(input);
                 } else {
                     if (modifiers != null && !modifiers.isEmpty()) {
@@ -578,7 +550,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * @param hasMods the node the modifiers should be attached to
      */
     private void transformModifiers(NodeWithModifiers<?> hasMods) {
-        PreParser pp = getPreParser();
+        PreParser pp = TransformationPipelineServices.getPreParser();
         services.addWarnings(pp.getWarnings());
 
         for (Modifier mod : hasMods.getModifiers()) {

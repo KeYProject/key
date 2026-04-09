@@ -410,16 +410,18 @@ public final class ExampleChooser extends JDialog {
             if (example != selectedExample) {
                 addTab(example.getDescription(), "Description", true);
                 final String fileAsString = fileAsString(example.getObligationFile());
-                final int p = fileAsString.lastIndexOf("\\problem");
-                if (p >= 0) {
-                    addTab(fileAsString.substring(p), "Proof Obligation", false);
+                if (fileAsString != null) {
+                    final int p = fileAsString.lastIndexOf("\\problem");
+                    if (p >= 0) {
+                        addTab(fileAsString.substring(p), "Proof Obligation", false);
+                    }
+                    for (File file : example.getAdditionalFiles()) {
+                        addTab(fileAsString(file), file.getName(), false);
+                    }
+                    loadButton.setEnabled(true);
+                    loadProofButton.setEnabled(example.hasProof());
+                    selectedExample = example;
                 }
-                for (File file : example.getAdditionalFiles()) {
-                    addTab(fileAsString(file), file.getName(), false);
-                }
-                loadButton.setEnabled(true);
-                loadProofButton.setEnabled(example.hasProof());
-                selectedExample = example;
             }
         } else {
             selectedExample = null;

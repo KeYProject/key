@@ -6,10 +6,15 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.njml.PreParser;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -28,10 +33,13 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_EXPR;
 
 /**
  * @author Alexander Weigl
@@ -52,6 +60,57 @@ public class TransformationPipelineServices {
             TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
+    }
+
+    static void addSpec(Node nextMember, TextualJMLConstruct specCase) {
+        if (!nextMember.containsData(JMLTransformer.KEY_SPEC_CASE)) {
+            nextMember.setData(JMLTransformer.KEY_SPEC_CASE, new ArrayList<>(4));
+        }
+        List<TextualJMLConstruct> specList = nextMember.getData(JMLTransformer.KEY_SPEC_CASE);
+        specList.add(specCase);
+    }
+
+    static @NonNull PreParser getPreParser() {
+        return new PreParser();
+    }
+
+    static void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
+        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
+            td.setData(JMLTransformer.KEY_CLASS_SPEC, new ArrayList<>(4));
+        }
+        List<TextualJMLConstruct> specList = td.getData(JMLTransformer.KEY_CLASS_SPEC);
+        specList.add(c);
+    }
+
+    static void addLoopSpec(Node nextMember, TextualJMLLoopSpec spec) {
+        if (!nextMember.containsData(JMLTransformer.KEY_LOOP_SPEC)) {
+            nextMember.setData(JMLTransformer.KEY_LOOP_SPEC, new ArrayList<>(4));
+        }
+        List<TextualJMLLoopSpec> specList = nextMember.getData(JMLTransformer.KEY_LOOP_SPEC);
+        specList.add(spec);
+    }
+
+
+    public static List<TextualJMLLoopSpec> getLoopSpec(Node n) {
+        if (!n.containsData(JMLTransformer.KEY_LOOP_SPEC)) {
+            return Collections.emptyList();
+        }
+        return n.getData(JMLTransformer.KEY_LOOP_SPEC);
+    }
+
+    public static List<TextualJMLConstruct> getClassSpec(Node td) {
+        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
+            return Collections.emptyList();
+
+        }
+        return td.getData(JMLTransformer.KEY_CLASS_SPEC);
+    }
+
+    public static List<TextualJMLConstruct> getSpec(Node n) {
+        if (!n.containsData(JMLTransformer.KEY_SPEC_CASE)) {
+            return Collections.emptyList();
+        }
+        return n.getData(JMLTransformer.KEY_SPEC_CASE);
     }
 
     public void addWarning(PositionedString warning) {
@@ -205,6 +264,7 @@ public class TransformationPipelineServices {
     /// i = j + 5;
     /// }
     /// ```
+    ///
     /// @param cd the TypeDeclaration of which the initializers have to be collected
     /// @return the list of copy assignments and method references realizing the initializers.`
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
@@ -281,6 +341,38 @@ public class TransformationPipelineServices {
 
     public JavaParser getParser() {
         return javaParserFactory.createJavaParser();
+    }
+
+    public Statement parseStatement(String code) {
+        return getParser().parseStatement(code).getResult().orElseThrow();
+    }
+
+    public void attachTypeSpec(TypeDeclaration<?> clazz, @Nullable String spec) {
+        if (spec == null)
+            return;
+        PreParser pp = getPreParser();
+        ImmutableList<TextualJMLConstruct> specification = pp.parseClassLevel(spec);
+        specification.forEach(it -> addClassSpec(clazz, it));
+    }
+
+    public void attachSpec(Node node, @Nullable String spec) {
+        if (spec == null)
+            return;
+        PreParser pp = getPreParser();
+        ImmutableList<TextualJMLConstruct> specification = pp.parseClassLevel(spec);
+        specification.forEach(it -> addSpec(node, it));
+        LOGGER.info("Generated specification {} for {}", spec, node);
+    }
+
+    public void attachExpr(Node node, @Nullable String spec) {
+        if (spec == null)
+            return;
+        PreParser pp = getPreParser();
+        ImmutableList<TextualJMLConstruct> specification =
+            pp.parseMethodLevel(spec, null, Position.UNDEFINED);
+        TextualJMLAssertStatement expr = (TextualJMLAssertStatement) specification.get(0);
+        node.setData(KEY_EXPR, expr.getContext());
+        LOGGER.info("Generated specification {} for {}", spec, node);
     }
 
 
@@ -363,23 +455,6 @@ public class TransformationPipelineServices {
 
         public List<ResolvedReferenceType> getAllSupertypes(TypeDeclaration<?> td) {
             return td.resolve().getAncestors();
-            /*
-             * if (td.isEnumDeclaration()) {
-             * return Collections.singletonList(getType("java", "lang", "Enum"));
-             * }
-             *
-             * if (td.isRecordDeclaration()) {
-             * return Collections.singletonList(getType("java", "lang", "Record"));
-             * }
-             *
-             * if (td.isAnnotationDeclaration()) {
-             * return Collections.emptyList();
-             * }
-             *
-             * ClassOrInterfaceDeclaration cd = (ClassOrInterfaceDeclaration) td;
-             * var a = cd.resolve();
-             * return typeDeclaration2allSupertypes.get(td);
-             */
         }
 
         public List<CompilationUnit> getUnits() {

@@ -141,4 +141,8 @@ public class AstFactory {
             String.format("Created by %s:%d", next.getFileName(), next.getLineNumber()));
         return node;
     }
+
+    public static Expression attributeThis(String field) {
+        return attribute(new ThisExpr(), field);
+    }
 }
