@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.HashMap;
@@ -5,11 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -59,7 +62,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The variable value pairs of the current state under given conditions.
      */
-    private final Map<Term, IExecutionVariable[]> conditionalVariables =
+    private final Map<JTerm, IExecutionVariable[]> conditionalVariables =
         new HashMap<>();
 
     /**
@@ -80,13 +83,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The already computed block completion conditions.
      */
-    private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions =
+    private final Map<IExecutionBlockStartNode<?>, JTerm> blockCompletionConditions =
         new HashMap<>();
 
     /**
-     * The already computed human readable block completion conditions.
+     * The already computed human-readable block completion conditions.
      */
-    private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions =
+    private final Map<IExecutionBlockStartNode<?>, String> formattedBlockCompletionConditions =
         new HashMap<>();
 
     /**
@@ -106,7 +109,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -158,9 +161,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getPathCondition() throws ProofInputException {
+    public JTerm getPathCondition() throws ProofInputException {
         // Search path condition of the parent which is used by default.
-        Term result = null;
+        JTerm result = null;
         AbstractExecutionNode<?> parent = getParent();
         while (result == null && parent != null) {
             if (parent.isPathConditionChanged()) {
@@ -277,7 +280,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public IExecutionVariable[] getVariables(Term condition) throws ProofInputException {
+    public IExecutionVariable[] getVariables(JTerm condition) throws ProofInputException {
         synchronized (this) {
             IExecutionVariable[] result = conditionalVariables.get(condition);
             if (result == null) {
@@ -289,13 +292,14 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     }
 
     /**
-     * Computes the variables lazily when {@link #getVariables(Term)} is called the first time.
+     * Computes the variables lazily when {@link #getVariables(JTerm)} is called the first time.
      *
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param condition A {@link JTerm} specifying some additional constraints to consider.
      * @return The {@link IExecutionVariable}s of the current state under the given condition.
      * @throws ProofInputException
      */
-    protected IExecutionVariable[] lazyComputeVariables(Term condition) throws ProofInputException {
+    protected IExecutionVariable[] lazyComputeVariables(JTerm condition)
+            throws ProofInputException {
         return SymbolicExecutionUtil.createExecutionVariables(this, condition);
     }
 
@@ -380,10 +384,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @return The {@link PosInOccurrence}s of the modality or its updates.
      */
     protected PosInOccurrence lazyComputeModalityPIO() {
-        PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence originalPio =
+            getProofNode().getAppliedRuleApp().posInOccurrence();
         // Try to go back to the parent which provides the updates
         PosInOccurrence pio = originalPio;
-        Term term = pio.subTerm();
+        var term = pio.subTerm();
         if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
             pio = pio.up();
             term = pio.subTerm();
@@ -421,7 +426,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
         if (completedBlock != null && completedBlocks.contains(completedBlock)) {
             completedBlocks = completedBlocks.removeAll(completedBlock);
             blockCompletionConditions.remove(completedBlock);
-            formatedBlockCompletionConditions.remove(completedBlock);
+            formattedBlockCompletionConditions.remove(completedBlock);
         }
     }
 
@@ -429,11 +434,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    public JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
-        Term result = blockCompletionConditions.get(completedNode);
+        JTerm result = blockCompletionConditions.get(completedNode);
         if (result == null) {
-            result = (Term) lazyComputeBlockCompletionCondition(completedNode, false);
+            result = (JTerm) lazyComputeBlockCompletionCondition(completedNode, false);
         }
         return result;
     }
@@ -444,7 +449,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     @Override
     public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
-        String result = formatedBlockCompletionConditions.get(completedNode);
+        String result = formattedBlockCompletionConditions.get(completedNode);
         if (result == null) {
             result = (String) lazyComputeBlockCompletionCondition(completedNode, true);
         }
@@ -452,27 +457,27 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     }
 
     /**
-     * Computes the condition lazily when {@link #getBlockCompletionCondition(IExecutionNode)} or
-     * {@link #getFormatedBlockCompletionCondition(IExecutionNode)} is called the first time.
+     * Computes the condition lazily when {@link #getBlockCompletionCondition} or
+     * {@link #getFormatedBlockCompletionCondition} is called the first time.
      *
      * @param completedNode The completed {@link IExecutionNode} for which the condition is
      *        requested.
-     * @param returnFormatedCondition {@code true} formated condition is returned, {@code false}
-     *        {@link Term} is returned.
+     * @param returnFormattedCondition {@code true} formatted condition is returned, {@code false}
+     *        {@link JTerm} is returned.
      * @throws ProofInputException Occurred Exception
      */
     protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
-            boolean returnFormatedCondition) throws ProofInputException {
+            boolean returnFormattedCondition) throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
         if (initConfig != null && // Otherwise Proof is disposed.
                 completedBlocks.contains(completedNode)) {
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<>();
+            List<JTerm> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != completedNode) {
                 if (parent instanceof IExecutionBranchCondition) {
-                    Term bc = ((IExecutionBranchCondition) parent).getBranchCondition();
+                    JTerm bc = ((IExecutionBranchCondition) parent).getBranchCondition();
                     if (bc == null) {
                         return null; // Proof disposed in between, computation not possible
                     }
@@ -481,18 +486,18 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
                 parent = parent.getParent();
             }
             // Add current branch condition to path
-            Term condition = services.getTermBuilder().and(bcs);
+            JTerm condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
             }
             condition = SymbolicExecutionUtil.improveReadability(condition, services);
             // Format path condition
-            String formatedCondition = formatTerm(condition, services);
+            String formattedCondition = formatTerm(condition, services);
             // Update maps
             blockCompletionConditions.put(completedNode, condition);
-            formatedBlockCompletionConditions.put(completedNode, formatedCondition);
-            return returnFormatedCondition ? formatedCondition : condition;
+            formattedBlockCompletionConditions.put(completedNode, formattedCondition);
+            return returnFormattedCondition ? formattedCondition : condition;
         } else {
             return null;
         }

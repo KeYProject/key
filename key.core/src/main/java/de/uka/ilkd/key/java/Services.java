@@ -1,27 +1,43 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofServices;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.lookup.Lookup;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * this is a collection of common services to the KeY prover. Services include information on the
+ * This is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, LogicServices, ProofServices {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
     /**
      * the proof
      */
@@ -47,7 +63,8 @@ public class Services implements TermServices {
     /**
      * the information object on the Java model
      */
-    private final JavaInfo javainfo;
+    @Nullable
+    private JavaInfo javaInfo;
 
     /**
      * variable namer for inner renaming
@@ -74,6 +91,8 @@ public class Services implements TermServices {
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
+    private OriginTermLabelFactory originFactory;
+
     private final Profile profile;
 
     private final ServiceCaches caches;
@@ -82,27 +101,20 @@ public class Services implements TermServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
+    @Nullable
+    private JavaService javaService;
+
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
      */
     public Services(Profile profile) {
-        assert profile != null;
-        this.profile = profile;
-        this.counters = new LinkedHashMap<>();
-        this.caches = new ServiceCaches();
-        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-        this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
-        typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(
-            new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
-        nameRecorder = new NameRecorder();
+        this(profile, null, new LinkedHashMap<>(), new ServiceCaches());
     }
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
-            KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, @Nullable JavaService javaService,
+            HashMap<String, Counter> counters,
+            ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -112,10 +124,16 @@ public class Services implements TermServices {
         this.caches = caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-        this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
+        this.specRepos = profile.createSpecificationRepository(this);
+        this.cee = new ConstantExpressionEvaluator();
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+        if (javaService == null) {
+            this.javaService = null;
+            this.javaInfo = null;
+        } else {
+            this.javaService = javaService.copy(this);
+            this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
+        }
         nameRecorder = new NameRecorder();
     }
 
@@ -125,15 +143,17 @@ public class Services implements TermServices {
         this.namespaces = s.namespaces;
         this.cee = s.cee;
         this.typeconverter = s.typeconverter;
-        this.javainfo = s.javainfo;
+        this.javaInfo = s.javaInfo;
         this.counters = s.counters;
         this.specRepos = s.specRepos;
         this.javaModel = s.javaModel;
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
+        this.javaService = s.javaService;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.originFactory = s.originFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -141,7 +161,6 @@ public class Services implements TermServices {
         result.setNamespaces(namespaces);
         return result;
     }
-
 
     /**
      * Returns the TypeConverter associated with this Services object.
@@ -155,6 +174,9 @@ public class Services implements TermServices {
         typeconverter = tc;
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return typeconverter.getJavaDLTheory();
+    }
 
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
@@ -167,8 +189,9 @@ public class Services implements TermServices {
     /**
      * Returns the JavaInfo associated with this Services object.
      */
+    @NonNull
     public JavaInfo getJavaInfo() {
-        return javainfo;
+        return Objects.requireNonNull(javaInfo);
     }
 
 
@@ -225,28 +248,15 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-        Debug.assertTrue(
-            !(getJavaInfo().getKeYProgModelInfo()
-                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+        Services s = new Services(profile, javaService, copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
-    }
-
-    /**
-     * Generate a copy of this object. All references are copied w/o duplicating their content.
-     *
-     * @return a freshly created Services object
-     */
-    public Services shallowCopy() {
-        return new Services(this);
     }
 
     /**
@@ -267,50 +277,31 @@ public class Services implements TermServices {
      * creates a new service object with the same ldt information as the actual one
      */
     public Services copyPreservesLDTInformation() {
-        Debug.assertTrue(
-            !(javainfo.getKeYProgModelInfo()
-                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
-        Services s = new Services(getProfile());
+        Services s =
+            new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
+        s.nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-
+        s.originFactory = originFactory;
         return s;
     }
 
 
     /**
-     * Marks this services as proof specific Please make sure that the {@link Services} does not not
+     * Marks this services as proof specific Please make sure that the {@link Services} does not
      * yet belong to an existing proof or that it is owned by a proof environment. In both cases
      * copy the {@link InitConfig} via {@link InitConfig#deepCopy()} or one of the other copy
      * methods first.
      *
-     * @param p_proof the Proof to which this {@link Services} instance belongs
+     * @param proof the Proof to which this {@link Services} instance belongs
      */
-    public void setProof(Proof p_proof) {
+    public void setProof(Proof proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                "Services are already owned by another proof:" + proof.name());
+                "Services are already owned by another proof:" + this.proof.name());
         }
-        proof = p_proof;
-    }
-
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
+        this.proof = proof;
     }
 
 
@@ -337,7 +328,6 @@ public class Services implements TermServices {
         return namespaces;
     }
 
-
     /**
      * sets the namespaces of known predicates, functions, variables
      *
@@ -346,7 +336,6 @@ public class Services implements TermServices {
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
-
 
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
@@ -369,60 +358,6 @@ public class Services implements TermServices {
     }
 
     /**
-     * Returns the used {@link ServiceCaches}.
-     *
-     * @return The used {@link ServiceCaches}.
-     */
-    public ServiceCaches getCaches() {
-        return caches;
-    }
-
-    /**
-     *
-     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.
-     * Usually the cache backed version is the intended one. The non-cached version is for use cases
-     * where a lot of intermediate terms are created of which most exist only for a very short time.
-     * To avoid polluting the cache it is then recommended to use the non-cache version
-     *
-     * @return The {@link TermBuilder} used to create {@link Term}s.
-     */
-    @Override
-    public TermBuilder getTermBuilder(boolean withCache) {
-        return withCache ? termBuilder : termBuilderWithoutCache;
-    }
-
-    /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
-     * {@link #getTermBuilder(true).
-     *
-     * @return The {@link TermBuilder} used to create {@link Term}s.
-     */
-    @Override
-    public TermBuilder getTermBuilder() {
-        return termBuilder;
-    }
-
-    /**
-     * Returns the {@link TermFactory} used to create {@link Term}s.
-     *
-     * @return The {@link TermFactory} used to create {@link Term}s.
-     */
-    @Override
-    public TermFactory getTermFactory() {
-        return termBuilder.tf();
-    }
-
-    public ITermProgramVariableCollectorFactory getFactory() {
-        return factory;
-    }
-
-
-    public void setFactory(ITermProgramVariableCollectorFactory factory) {
-        this.factory = factory;
-    }
-
-
-    /**
      * returns the {@link JavaModel} with all path information
      *
      * @return the {@link JavaModel} on which this services is based on
@@ -437,6 +372,88 @@ public class Services implements TermServices {
         this.javaModel = javaModel;
     }
 
+    /**
+     * Returns the used {@link ServiceCaches}.
+     *
+     * @return The used {@link ServiceCaches}.
+     */
+    public ServiceCaches getCaches() {
+        return caches;
+    }
+
+    /**
+     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link JTerm}s.
+     * Usually the cache backed version is the intended one. The non-cached version is for use cases
+     * where a lot of intermediate terms are created of which most exist only for a very short time.
+     * To avoid polluting the cache it is then recommended to use the non-cache version
+     *
+     * @return The {@link TermBuilder} used to create {@link JTerm}s.
+     */
+    @Override
+    public TermBuilder getTermBuilder(boolean withCache) {
+        return withCache ? termBuilder : termBuilderWithoutCache;
+    }
+
+    /**
+     * Returns the {@link TermBuilder} used to create {@link JTerm}s. Same as
+     * <code>getTermBuilder(true)</code>>.
+     *
+     * @return The {@link TermBuilder} used to create {@link JTerm}s.
+     */
+    @Override
+    public TermBuilder getTermBuilder() {
+        return termBuilder;
+    }
+
+    /**
+     * Returns the {@link TermFactory} used to create {@link JTerm}s.
+     *
+     * @return The {@link TermFactory} used to create {@link JTerm}s.
+     */
+    @Override
+    public TermFactory getTermFactory() {
+        return termBuilder.tf();
+    }
+
+    public ITermProgramVariableCollectorFactory getFactory() {
+        return factory;
+    }
+
+    public void setFactory(ITermProgramVariableCollectorFactory factory) {
+        this.factory = factory;
+    }
+
+
+    // =================================================================================================================
+    // =================================================================================================================
+
+    // Origin label specific methods; these should eventually be moved out of the services class
+    // when doing that we must take care not to introduce dependencies to ProofSettings or similar
+    // in places
+    // where that should not occur
+
+    /**
+     * sets the factory for origin term labels
+     *
+     * @param originFactory the {@link OriginTermLabelFactory} to use, if null is passed, origin
+     *        labels should not be created
+     */
+    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+        this.originFactory = originFactory;
+    }
+
+    /**
+     * return the factory for origin term labels
+     *
+     * @return the OriginTermLabelFactory to use or null if origin labels should not be created
+     */
+    public OriginTermLabelFactory getOriginFactory() {
+        return originFactory;
+    }
+    // =================================================================================================================
+    // =================================================================================================================
+
+    // TODO: Ask weigl whether this is still needed
     public Lookup createLookup() {
         Lookup lookup = new Lookup();
         lookup.register(getJavaInfo());
@@ -448,5 +465,55 @@ public class Services implements TermServices {
         lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
         return lookup;
+    }
+
+    @NonNull
+    public JavaService getJavaService() {
+        assert javaService != null : "Java Services needs to initialized in advanced.";
+        return javaService;
+    }
+
+    private JavaService activateJavaPath(@NonNull Path bootClassPath,
+            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
+        if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
+                && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
+            return javaService;
+        }
+        LOGGER.info("activate java with {} and {}", bootClassPath, libraryPaths);
+        javaService = new JavaService(this, bootClassPath, libraryPaths, fileRepo);
+        javaInfo = new JavaInfo(new KeYProgModelInfo(javaService), this);
+        return javaService;
+    }
+
+    public JavaService activateJava(@Nullable Path bootClassPath,
+            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
+        Path path;
+        if (bootClassPath != null) {
+            path = bootClassPath;
+        } else {
+            path = getReduxPath();
+        }
+
+        if (libraryPaths == null) {
+            libraryPaths = Collections.emptyList();
+        }
+
+        return activateJavaPath(path, libraryPaths, fileRepo);
+    }
+
+    public void activateJava(@Nullable Path bootClassPath) {
+        activateJava(bootClassPath, Collections.emptyList(), null);
+    }
+
+    public static Path getReduxPath() {
+        // TODO weigl: where to put this code. The implementation of services.getProfile() is
+        // stupid.
+        var resourcePath = "JavaRedux/JAVALANG.TXT";
+        var url = KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+        try {
+            return Paths.get(url.toURI()).getParent();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

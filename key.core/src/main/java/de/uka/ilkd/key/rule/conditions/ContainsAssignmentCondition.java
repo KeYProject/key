@@ -1,15 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
@@ -19,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author Dominic Scheurer
  *
  */
-public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableConditionAdapter {
+public class ContainsAssignmentCondition extends VariableConditionAdapter {
 
     /* the schemavariable matched agains an expression */
     private final SchemaVariable expression;
@@ -53,7 +58,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
      * {@inheritDoc}
      */
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         if (var != expression) {
             return true;
@@ -62,7 +67,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
 
 
         final ProgramElement pe;
-        if (instCandidate instanceof Term) {
+        if (instCandidate instanceof JTerm) {
             return true;
         } else {
             pe = (ProgramElement) instCandidate;

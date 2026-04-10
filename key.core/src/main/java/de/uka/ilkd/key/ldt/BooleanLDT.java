@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 
@@ -26,9 +30,9 @@ public final class BooleanLDT extends LDT {
 
     /** the boolean literals as function symbols and terms */
     private final Function bool_true;
-    private final Term term_bool_true;
+    private final JTerm term_bool_true;
     private final Function bool_false;
-    private final Term term_bool_false;
+    private final JTerm term_bool_false;
 
 
     // -------------------------------------------------------------------------
@@ -49,12 +53,12 @@ public final class BooleanLDT extends LDT {
     // public interface
     // -------------------------------------------------------------------------
 
-    public Term getFalseTerm() {
+    public JTerm getFalseTerm() {
         return term_bool_false;
     }
 
 
-    public Term getTrueTerm() {
+    public JTerm getTrueTerm() {
         return term_bool_true;
     }
 
@@ -76,7 +80,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -88,7 +92,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
 
@@ -96,14 +100,14 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         if (lit instanceof BooleanLiteral) {
             return (((BooleanLiteral) lit).getValue() ? term_bool_true : term_bool_false);
         }
@@ -113,7 +117,8 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+    public Function getFunctionFor(Operator op,
+            Services services,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -127,7 +132,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() == bool_true) {
             return BooleanLiteral.TRUE;
         } else if (t.op() == bool_false) {
@@ -140,7 +145,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_BOOLEAN;
         } else {

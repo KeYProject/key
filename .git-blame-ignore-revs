@@ -4,3 +4,5 @@
 b1ed8d6bc836ea40f357a839707d41fbb04ed6e2
 # commit with manual formatting corrections
 a9fcedc6c8d96f2480549254a307b3fbe31f04bd
+# switch from Java 1.7 to Java 21 compat mode in the Eclipse Formatter/Spotless
+b98fa5e41695ecb55b65f6acfc860c8b27e5422b

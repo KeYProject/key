@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.Collections;
@@ -10,9 +13,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.swing.JComponent;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.logic.Name;
 
 /**
  * <p>
@@ -51,7 +55,7 @@ public abstract class NodeInfoVisualizer extends JComponent
      * @param longName the visualizer's long name.
      * @param shortName the visualizer's short name.
      */
-    public NodeInfoVisualizer(Node node, String longName, String shortName) {
+    protected NodeInfoVisualizer(Node node, String longName, String shortName) {
         this.node = node;
         this.longName = longName;
         this.shortName = shortName;

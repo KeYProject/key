@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.profile;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -12,13 +14,14 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SimplifyTermStrategy;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
- * An extended {@link JavaProfile} used in side proofs to simplify a {@link Term}.
+ * An extended {@link JavaProfile} used in side proofs to simplify a {@link JTerm}.
  *
  * @author Martin Hentschel
  */
@@ -60,8 +63,8 @@ public class SimplifyTermProfile extends JavaProfile {
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil()
                     .prepend((state, services, applicationPosInOccurrence, applicationTerm, rule,
-                            goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars,
-                            newTermJavaBlock, newTermOriginalLabels, label) -> label);
+                            goal, hint, tacletTerm,
+                            newTerm, label) -> label);
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
             new SingletonLabelFactory<>(SymbolicExecutionUtil.RESULT_LABEL), null,
             symExcPolicies, null, null, null, null, null));
@@ -88,7 +91,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public String ident() {
         return NAME;
     }
 

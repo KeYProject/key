@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -19,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which returns as result
  * ({@link #result()}) used {@link LocationVariable} which are undeclared, but used in the given
- * {@link ProgramElement.
+ * {@link ProgramElement}.
  * </p>
  * <p>
  * Declared {@link LocationVariable}s are:
@@ -52,8 +55,10 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     /**
      * Constructor.
      *
-     * @param root The {@link ProgramElement} to collect undeclared variables in.
-     * @param services The {@link Services} to use.
+     * @param root
+     *        The {@link ProgramElement} to collect undeclared variables in.
+     * @param services
+     *        The {@link Services} to use.
      */
     public UndeclaredProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);

@@ -2,14 +2,15 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Nov 02 16:05:54 CET 2018
+#Wed Apr 12 13:22:03 CEST 2023
+[Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
+[Choice]DefaultChoices=JavaCard-JavaCard\\:off, Strings-Strings\\:on, assertions-assertions\\:safe, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:treatAsAxiom, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -41,26 +42,24 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Fri Nov 02 16:05:54 CET 2018
-name=jdiv_one
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "jdiv_one",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "pschmitt" ) (keyVersion "1321e9557786d570114c4bc549c3b8abcb65e022"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "127")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "jdiv_axiom" (formula "1") (term "0") (newnames "f_divNum") (userinteraction))
-(builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "polySimp_mulLiterals" (formula "1") (term "2,1"))
 (rule "eqSymm" (formula "1"))
 (rule "polySimp_elimOne" (formula "1") (term "2,0"))
-(builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "eqSymm" (formula "1"))
 (rule "close" (formula "2") (ifseqformula "1"))
 )
-
 }

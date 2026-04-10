@@ -1,11 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.Collections;
 import java.util.List;
 
-import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.util.collection.Pair;
 
 /**
  * Stores the dependency graph nodes touched by a proof step.

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.awt.*;
@@ -7,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -26,13 +31,16 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -536,9 +544,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToString(AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
-        final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
+        final Pair<LocationVariable, JTerm> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
-        return "(" + predFormWithPh.first.toString() + ","
+        return "(" + predFormWithPh.first + ","
             + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
     }
 
@@ -729,7 +737,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         public Object getValueAt(int rowIndex, int columnIndex) {
             final AbstractDomainElemChoice row = abstrPredicateChoices.get(rowIndex);
             return columnIndex == 0
-                    ? row.getProgVar().sort() + " " + row.getProgVar().name().toString()
+                    ? row.getProgVar().sort() + " " + row.getProgVar().name()
                     : row.getAbstrDomElem();
         }
 
@@ -777,7 +785,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The loaded proof.
      */
     static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
-        java.io.File proofFile = new java.io.File("examples/" + proofFileName);
+        Path proofFile = Paths.get("examples/", proofFileName);
 
         try {
             de.uka.ilkd.key.control.KeYEnvironment<?> environment =

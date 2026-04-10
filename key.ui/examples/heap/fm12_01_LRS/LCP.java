@@ -18,9 +18,9 @@ final class LCP {
       @ ensures \result <= a.length - y;
       @ ensures (\forall int i; 0 <= i && i < \result;
       @                         a[x+i] == a[y+i] );
-      @ ensures a[x+\result] != a[y+\result]
-      @             || \result == a.length-x
-      @             || \result == a.length-y;
+      @ ensures \result == a.length-x
+      @      || \result == a.length-y
+      @      || a[x+\result] != a[y+\result];
       @ strictly_pure @*/
     static int lcp(int[] a, int x, int y) {
         int l = 0;

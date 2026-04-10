@@ -1,14 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.*;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -64,12 +64,8 @@ public class BuiltInRuleAppIndex {
         return index;
     }
 
-    private NewRuleListener getNewRulePropagator() {
-        return newRuleListener;
-    }
-
-    public void scanApplicableRules(Goal goal) {
-        scanSimplificationRule(goal, getNewRulePropagator());
+    public void scanApplicableRules(Goal goal, NewRuleListener newRuleListener) {
+        scanSimplificationRule(goal, newRuleListener);
     }
 
     private void scanSimplificationRule(Goal goal, NewRuleListener listener) {
@@ -88,14 +84,13 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-
-
     private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
             NewRuleListener listener) {
         final Node node = goal.node();
         final Sequent seq = node.sequent();
 
-        for (final SequentFormula sf : (antec ? seq.antecedent() : seq.succedent())) {
+        for (final SequentFormula sf : (antec ? seq.antecedent()
+                : seq.succedent())) {
             scanSimplificationRule(rules, goal, antec, sf, listener);
         }
     }
@@ -143,17 +138,21 @@ public class BuiltInRuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal goal, SequentChangeInfo sci) {
-        scanAddedFormulas(goal, true, sci);
-        scanAddedFormulas(goal, false, sci);
+    public void sequentChanged(Goal goal,
+            SequentChangeInfo sci,
+            NewRuleListener listener) {
+        scanAddedFormulas(goal, true, sci, listener);
+        scanAddedFormulas(goal, false, sci, listener);
 
-        scanModifiedFormulas(goal, true, sci);
-        scanModifiedFormulas(goal, false, sci);
+        scanModifiedFormulas(goal, true, sci, listener);
+        scanModifiedFormulas(goal, false, sci, listener);
     }
 
-    private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo sci) {
-        ImmutableList<SequentFormula> cfmas = sci.addedFormulas(antec);
-        final NewRuleListener listener = getNewRulePropagator();
+    private void scanAddedFormulas(Goal goal, boolean antec,
+            SequentChangeInfo sci,
+            NewRuleListener listener) {
+        ImmutableList<SequentFormula> cfmas =
+            sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
             final SequentFormula cfma = cfmas.head();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
@@ -162,14 +161,16 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanModifiedFormulas(Goal goal, boolean antec, SequentChangeInfo sci) {
-
-        final NewRuleListener listener = getNewRulePropagator();
-        ImmutableList<FormulaChangeInfo> fcis = sci.modifiedFormulas(antec);
+    private void scanModifiedFormulas(Goal goal, boolean antec,
+            SequentChangeInfo sci,
+            NewRuleListener listener) {
+        ImmutableList<FormulaChangeInfo> fcis =
+            sci.modifiedFormulas(antec);
 
         while (!fcis.isEmpty()) {
-            final FormulaChangeInfo fci = fcis.head();
-            final SequentFormula cfma = fci.getNewFormula();
+            final FormulaChangeInfo fci =
+                fcis.head();
+            final SequentFormula cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }

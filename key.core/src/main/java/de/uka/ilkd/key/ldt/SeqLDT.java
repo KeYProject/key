@@ -1,28 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import javax.annotation.Nullable;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class SeqLDT extends LDT {
@@ -41,6 +39,7 @@ public final class SeqLDT extends LDT {
     private final Function seqConcat;
     private final Function seqSub;
     private final Function seqReverse;
+    private final Function seqUpd;
     private final Function seqDef;
     private final Function values;
 
@@ -53,6 +52,7 @@ public final class SeqLDT extends LDT {
         seqConcat = addFunction(services, "seqConcat");
         seqSub = addFunction(services, "seqSub");
         seqReverse = addFunction(services, "seqReverse");
+        seqUpd = addFunction(services, "seqUpd");
         seqIndexOf = addFunction(services, "seqIndexOf");
         seqDef = addFunction(services, "seqDef");
         values = addFunction(services, "values");
@@ -88,6 +88,9 @@ public final class SeqLDT extends LDT {
         return seqSub;
     }
 
+    public Function getSeqUpd() {
+        return seqUpd;
+    }
 
     public Function getSeqReverse() {
         return seqReverse;
@@ -101,8 +104,6 @@ public final class SeqLDT extends LDT {
     /**
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
-     *
-     * @return
      */
     public Function getValues() {
         return values;
@@ -110,66 +111,56 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
-        return isResponsible(op, (Term) null, services, ec);
+        return isResponsible(op, (JTerm) null, services, ec);
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
-                || op instanceof SeqLength;
+                || op instanceof SeqLength || op instanceof SeqPut;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof EmptySeqLiteral;
         return services.getTermBuilder().func(seqEmpty);
     }
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-            ExecutionContext ec) {
-        if (op instanceof SeqSingleton) {
-            return seqSingleton;
-        } else if (op instanceof SeqConcat) {
-            return seqConcat;
-        } else if (op instanceof SeqSub) {
-            return seqSub;
-        } else if (op instanceof SeqReverse) {
-            return seqReverse;
-        } else if (op instanceof SeqIndexOf) {
-            return seqIndexOf;
-        } else if (op instanceof SeqGet) {
-            return seqGet;
-        } else if (op instanceof SeqLength) {
-            return seqLen;
-        }
-        assert false;
-        return null;
+    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+        return switch (op) {
+            case SeqSingleton ignored -> seqSingleton;
+            case SeqConcat ignored -> seqConcat;
+            case SeqSub ignored -> seqSub;
+            case SeqReverse ignored -> seqReverse;
+            case SeqPut ignored -> seqUpd;
+            case SeqIndexOf ignored -> seqIndexOf;
+            case SeqGet ignored -> seqGet;
+            case SeqLength ignored -> seqLen;
+            default -> throw new AssertionError();
+        };
     }
 
-    @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
-        case "add":
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
+        if (operationName.equals("add")) {
             return getSeqConcat();
-        default:
-            return null;
         }
+        return null;
     }
 
 
@@ -180,7 +171,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(seqEmpty)) {
             return EmptySeqLiteral.INSTANCE;
         }
@@ -190,7 +181,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

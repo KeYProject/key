@@ -1,4 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
+
 
 import java.util.Random;
 
@@ -9,7 +13,7 @@ import java.util.Random;
 public class RandomName {
     private static final Random random = new Random();
 
-    private static final String[] ADJECTIVES = new String[] { "French", "Spanish", "abandoned",
+    private static final String[] ADJECTIVES = { "French", "Spanish", "abandoned",
         "able",
         "absolute", "academic", "acceptable", "acclaimed", "accomplished", "accurate", "aching",
         "acidic", "acrobatic", "active", "actual", "adept", "admirable", "admired", "adolescent",
@@ -182,7 +186,7 @@ public class RandomName {
         "yearly", "yellow", "yellowish", "young", "youthful", "yummy", "zany", "zealous", "zesty",
         "zigzag" };
 
-    private static final String[] ANIMALS = new String[] { "cat", "caterpillar", "cattle",
+    private static final String[] ANIMALS = { "cat", "caterpillar", "cattle",
         "chamois",
         "cheetah", "chicken", "chimpanzee", "chinchilla", "chough", "coati", "cobra", "cockroach",
         "cod", "cormorant", "coyote", "crab", "crane", "crocodile", "crow", "curlew", "deer",

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -13,9 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -501,7 +504,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child {@link ISymbolicEquivalenceClass}.
          *
-         * @param object The {@link ISymbolicEquivalenceClass} to add.
+         * @param ec The {@link ISymbolicEquivalenceClass} to add.
          */
         public void addEquivalenceClass(ISymbolicEquivalenceClass ec) {
             equivalenceClasses = equivalenceClasses.append(ec);
@@ -597,7 +600,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -606,7 +609,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }
@@ -653,7 +656,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getName() {
+        public JTerm getName() {
             return null;
         }
 
@@ -686,7 +689,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -695,7 +698,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }
@@ -794,7 +797,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() {
+        public JTerm getValue() {
             return null;
         }
 
@@ -842,7 +845,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -858,7 +861,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public JTerm getCondition() {
             return null;
         }
 
@@ -1006,7 +1009,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -1022,7 +1025,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public JTerm getCondition() {
             return null;
         }
 
@@ -1078,7 +1081,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getTerms() {
+        public ImmutableList<JTerm> getTerms() {
             return null;
         }
 
@@ -1093,7 +1096,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child term string.
          *
-         * @param object The term string to add.
+         * @param termString The term string to add.
          */
         public void addTermString(String termString) {
             this.termStrings = termStrings.append(termString);
@@ -1103,7 +1106,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getRepresentative() {
+        public JTerm getRepresentative() {
             return null;
         }
 
@@ -1119,7 +1122,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public boolean containsTerm(Term term) {
+        public boolean containsTerm(JTerm term) {
             return false;
         }
     }

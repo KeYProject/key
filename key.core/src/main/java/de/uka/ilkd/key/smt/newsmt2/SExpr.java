@@ -1,19 +1,9 @@
-/*
- * KEY
- */
-
-/*
- * This file is part of AlgoVer.
- *
- * Copyright (C) 2015-2016 Karlsruhe Institute of Technology
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,27 +22,25 @@ public class SExpr implements Writable {
     /**
      * An enumeration of the types that an {@link SExpr} can assume.
      */
-    public static class Type {
+    public record Type(String name, String injection, String projection) {
 
-        /** to indicate that this expression holds a value of type U */
+        /**
+         * to indicate that this expression holds a value of type U
+         */
         public static final Type UNIVERSE = new Type("Universe", null, null);
-        /** to indicate that this expression has other or unknown type */
+        /**
+         * to indicate that this expression has other or unknown type
+         */
         public static final Type NONE = new Type("None", null, null);
-        /** to indicate that this element needs no escaping despite its name */
+        /**
+         * to indicate that this element needs no escaping despite its name
+         */
         public static final Type VERBATIM = new Type("Verbatim", null, null);
 
-        /** to indicate that an expression holds a value of type Bool */
+        /**
+         * to indicate that an expression holds a value of type Bool
+         */
         public static final Type BOOL = new Type("Bool", "b2u", "u2b");
-
-        public final String name;
-        public final String injection;
-        public final String projection;
-
-        public Type(String name, String injection, String projection) {
-            this.name = name;
-            this.injection = injection;
-            this.projection = projection;
-        }
 
         @Override
         public String toString() {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -24,7 +27,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());
@@ -42,7 +45,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());

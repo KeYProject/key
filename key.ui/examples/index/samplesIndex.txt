@@ -20,6 +20,11 @@ firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
+# Java Features
+Java/Records/README.txt
+Java/TextBlockLiterals/README.txt
+
+
 # The KeY Book (note: the comments here are only for maintainability, if you want to move an entry to a different section, look into the individual txt file!)
 ## Chapter 15 - Using the KeY Prover
 newBook/Using_KeY/Building_Propositional_Proofs/README.txt
@@ -46,9 +51,9 @@ firstTouch/05-ReverseArray/README.txt
 heap/saddleback_search/README.txt
 heap/permutedSum/README.txt
 heap/quicksort/README.txt
+heap/BoyerMoore/README.txt
 
 # Dynamic Frames
-firstTouch/07-Cell/README.txt
 ## Block & Loop Contracts
 heap/block_loop_contracts/Simple/README.txt
 heap/block_loop_contracts/Divide/README.txt

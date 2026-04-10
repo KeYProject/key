@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
@@ -6,6 +9,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
@@ -36,19 +40,17 @@ public class ToggleExplorationAction extends KeyAction {
                 .addKeYSelectionListener(new KeYSelectionListener() {
 
                     @Override
-                    public void selectedProofChanged(KeYSelectionEvent e) {
+                    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                         updateEnable(mainWindow);
                     }
 
-                    @Override
-                    public void selectedNodeChanged(KeYSelectionEvent e) {}
                 });
 
         updateEnable(mainWindow);
     }
 
     private void updateEnable(MainWindow mainWindow) {
-        // Only enable if a proof is loaded. Otherwise the buttons may become out of sync
+        // Only enable if a proof is loaded. Otherwise, the buttons may become out of sync
         // with the actual settings which are loaded along with the proof.
         setEnabled(mainWindow.getProofTreeView().getDelegateModel() != null);
     }

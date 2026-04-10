@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
@@ -12,6 +14,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -33,7 +36,6 @@ import org.key_project.util.collection.ImmutableSet;
  * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
- * @see MergeWithSignLattice
  */
 public abstract class MergeProcedure {
 
@@ -62,9 +64,9 @@ public abstract class MergeProcedure {
      * @param services The services object.
      * @return The merge result.
      */
-    public abstract ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services);
+    public abstract ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services);
 
     /**
      * Similar to {@link AbstractBuiltInRuleApp#complete()}. Method was introduced for predicate
@@ -111,35 +113,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public static class ValuesMergeResult {
-        private final ImmutableSet<Term> newConstraints;
-        private final Term mergeVal;
-        private final LinkedHashSet<Name> newNames;
-        private final LinkedHashSet<Term> sideConditions;
-
-        public ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
-                LinkedHashSet<Name> newNames, LinkedHashSet<Term> sideConditions) {
-            this.newConstraints = newConstraints;
-            this.mergeVal = mergeVal;
-            this.newNames = newNames;
-            this.sideConditions = sideConditions;
-        }
-
-        public ImmutableSet<Term> getNewConstraints() {
-            return newConstraints;
-        }
-
-        public Term getMergeVal() {
-            return mergeVal;
-        }
-
-        public LinkedHashSet<Name> getNewNames() {
-            return newNames;
-        }
-
-        public LinkedHashSet<Term> getSideConditions() {
-            return sideConditions;
-        }
+    public record ValuesMergeResult(ImmutableSet<JTerm> newConstraints, JTerm mergeVal,
+            LinkedHashSet<Name> newNames,
+            LinkedHashSet<JTerm> sideConditions) {
     }
 
 }

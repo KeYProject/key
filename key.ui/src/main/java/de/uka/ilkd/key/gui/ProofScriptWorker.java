@@ -1,62 +1,66 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
+import java.net.URI;
 import java.util.List;
-import java.util.Observer;
-import java.util.concurrent.*;
+import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+/**
+ * Executes s given script.
+ */
+@NullMarked
+public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScriptEngine.Message>
+        implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
-    private final String script;
-    private final Location initialLocation;
-
-    /** The initially selected goal. */
-    private final Goal initiallySelectedGoal;
-
-    /** The proof script engine. */
-    private ProofScriptEngine engine;
-    private JDialog monitor;
-    private JTextArea logArea;
-
-    private final Observer observer = (o, arg) -> publish(arg);
-
-    public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
-        this.script = Files.readString(file.toPath());
-        this.mediator = mediator;
-        this.initiallySelectedGoal = null;
-    }
+    private final KeyAst.ProofScript script;
 
     /**
-     * Instantiates a new proof script worker.
-     *
-     * @param mediator the mediator
-     * @param script the script
-     * @param location the location
+     * The initially selected goal.
      */
-    public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
-        this(mediator, script, location, null);
+    private final @Nullable Goal initiallySelectedGoal;
+
+    /**
+     * The proof script engine.
+     */
+    private final ProofScriptEngine engine;
+    private final JDialog monitor = new JDialog(MainWindow.getInstance(),
+        "Running Script ...", ModalityType.MODELESS);
+    private final JTextArea logArea = new JTextArea();
+
+    private final Consumer<ProofScriptEngine.Message> observer = this::publish;
+
+    /**
+     * Instantiates a new proof script worker.
+     *
+     * @param mediator the mediator
+     * @param script the script
+     */
+    public ProofScriptWorker(KeYMediator mediator, KeyAst.ProofScript script) {
+        this(mediator, script, null);
     }
 
     /**
@@ -64,21 +68,19 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      *
      * @param mediator the mediator
      * @param script the script
-     * @param location the location
      * @param initiallySelectedGoal the initially selected goal
      */
-    public ProofScriptWorker(KeYMediator mediator, String script, Location location,
-            Goal initiallySelectedGoal) {
+    public ProofScriptWorker(KeYMediator mediator, KeyAst.ProofScript script,
+            @Nullable Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
-        this.initialLocation = location;
         this.initiallySelectedGoal = initiallySelectedGoal;
+        engine = new ProofScriptEngine(script, initiallySelectedGoal);
     }
 
     @Override
-    protected Object doInBackground() throws Exception {
+    protected @Nullable Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(script, initialLocation, initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -88,20 +90,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     private void makeDialog() {
-        URL url = initialLocation.getFileURL();
-
-        if (monitor != null) {
-            logArea.setText("Running script from URL '" + url + "':\n");
-            return;
-        }
-
-        JDialog dlg =
-            new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
-        Container cp = dlg.getContentPane();
-        logArea = new JTextArea();
+        URI uri = script.getStartLocation().getFileURI().orElse(null);
+        Container cp = monitor.getContentPane();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from URL '" + url + "':\n");
+        logArea.setText("Running script from URL '" + uri + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancelButton = new JButton("Cancel");
@@ -110,24 +103,31 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
 
-        dlg.setSize(750, 400);
-        dlg.setLocationRelativeTo(MainWindow.getInstance());
-
-        this.monitor = dlg;
+        monitor.setSize(750, 400);
+        monitor.setLocationRelativeTo(MainWindow.getInstance());
     }
 
     @Override
-    protected void process(List<Object> chunks) {
+    protected void process(List<ProofScriptEngine.Message> chunks) {
         Document doc = logArea.getDocument();
-        for (Object chunk : chunks) {
-            assert chunk instanceof String;
-
-            try {
-                if (!((String) chunk).startsWith("'")) {
-                    doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
-                } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
+        for (ProofScriptEngine.Message info : chunks) {
+            var message = new StringBuilder("\n---\n");
+            if (info instanceof ProofScriptEngine.EchoMessage(String msg)) {
+                message.append(msg);
+            } else {
+                var exec = (ProofScriptEngine.ExecuteInfo) info;
+                if (exec.command().startsWith("'echo ")) {
+                    continue;
                 }
+                if (exec.location().getFileURI().isPresent()) {
+                    message.append(exec.location().getFileURI().get()).append(":");
+                }
+                message.append(exec.location().getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
+                        .append(exec.command());
+            }
+            try {
+                doc.insertString(doc.getLength(), message.toString(), null);
             } catch (BadLocationException e) {
                 LOGGER.warn("Failed to insert string", e);
             }
@@ -138,8 +138,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      * initiate the GUI stuff and relay to superclass
      */
     public void init() {
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
+        mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof(),
+            true, false);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -150,47 +151,38 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      */
     @Override
     public void done() {
-        if (monitor != null) {
-            monitor.setVisible(false);
-        }
+        monitor.setVisible(false);
 
         try {
             get();
         } catch (CancellationException ex) {
-            LOGGER.info("Scripting was cancelled.", ex);
+            LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> mediator.startInterface(true), 1000);
-        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
 
-        try {
-            if (!mediator.getSelectedProof().closed()) {
-                mediator.getSelectionModel()
-                        .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
-            }
-        } catch (ScriptException e) {
-            LOGGER.warn("", e);
-        }
-
-        mediator.setInteractive(true);
+        final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof();
+        mediator.finishAutoMode(proof, true, true, this::selectGoalOrNode);
     }
 
-    private static void runWithDeadline(Runnable runnable, int milliseconds) {
-        final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final Future<?> future = executor.submit(runnable);
-        executor.shutdown();
-        try {
-            future.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            /*
-             * NOTE (DS, 2019-02-08): There are some problems in starting the automode... We will
-             * just don't do anything here and hope that everything works fine (which it did for my
-             * tests). Any Java-multithreading experts around? ;)
-             */
+    private void selectGoalOrNode() {
+        final KeYSelectionModel selectionModel = mediator.getSelectionModel();
+        if (!mediator.getSelectedProof().closed()) {
+            try {
+                selectionModel
+                        .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
+                return;
+            } catch (ScriptException e) {
+                LOGGER.warn("Script threw exception", e);
+            } catch (Exception e) {
+                LOGGER.warn("Unexpected exception", e);
+            }
         }
+        selectionModel.defaultSelection();
     }
 
     @Override

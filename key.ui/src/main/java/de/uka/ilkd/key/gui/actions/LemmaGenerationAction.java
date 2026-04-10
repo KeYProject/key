@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import javax.swing.*;
 
@@ -24,7 +27,13 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class LemmaGenerationAction extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LemmaGenerationAction.class);
+
     public enum Mode {
         ProveUserDefinedTaclets, ProveKeYTaclets, ProveAndAddUserDefinedTaclets
     }
@@ -33,7 +42,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
 
 
-    public LemmaGenerationAction(MainWindow mainWindow) {
+    protected LemmaGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
 
         putValue(NAME, getTitle());
@@ -52,6 +61,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     abstract protected boolean proofIsRequired();
 
     protected final void handleException(Throwable exception) {
+        LOGGER.error("", exception);
         IssueDialog.showExceptionDialog(mainWindow, exception);
     }
 
@@ -95,7 +105,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         }
 
         @Override
-        public final void stopped(final ProofAggregate p, final ImmutableSet<Taclet> taclets,
+        public final void stopped(final @Nullable ProofAggregate p,
+                final ImmutableSet<Taclet> taclets,
                 final boolean addAsAxioms) {
             SwingUtilities.invokeLater(() -> doStopped(p, taclets, addAsAxioms));
         }
@@ -132,6 +143,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveKeYTaclets.this.mainWindow, exception);
                 }
 
@@ -140,7 +152,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
                     }
 
@@ -194,9 +205,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 return;
             }
 
-            final File fileForLemmata = chooser.getFileForTaclets();
+            final Path fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
-            List<File> filesForAxioms = chooser.getFilesForAxioms();
+            List<Path> filesForAxioms = chooser.getFilesForAxioms();
             Profile profile = mainWindow.getMediator().getProfile();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(), new Services(profile),
@@ -211,6 +222,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveUserDefinedTaclets.this.mainWindow,
                         exception);
                 }
@@ -220,8 +232,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
+                        mainWindow.getMediator().getSelectionModel()
+                                .setSelectedProof(p.getFirstProof());
                     }
                 }
 
@@ -269,9 +282,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 return;
             }
             final Proof proof = getMediator().getSelectedProof();
-            final File fileForLemmata = chooser.getFileForTaclets();
+            final Path fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
-            List<File> filesForAxioms = chooser.getFilesForAxioms();
+            List<Path> filesForAxioms = chooser.getFilesForAxioms();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(),
                     new Services(proof.getServices().getProfile()), mainWindow.getUserInterface());
@@ -285,6 +298,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveAndAddTaclets.this.mainWindow, exception);
                 }
 

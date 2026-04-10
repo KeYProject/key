@@ -1,10 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
+import java.util.Objects;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -17,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Observer symbols serve as the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
-public class ObserverFunction extends Function implements IObserverFunction {
+public class ObserverFunction extends JFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;
@@ -34,7 +39,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
-        super(createName(baseName, container), sort,
+        super(createName(baseName, Objects.requireNonNull(container)), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
         assert container != null;
@@ -49,7 +54,6 @@ public class ObserverFunction extends Function implements IObserverFunction {
     public static ProgramElementName createName(String baseName, KeYJavaType container) {
         return new ProgramElementName(baseName, container.getSort().toString());
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -79,7 +83,6 @@ public class ObserverFunction extends Function implements IObserverFunction {
 
         return result;
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -165,5 +168,4 @@ public class ObserverFunction extends Function implements IObserverFunction {
     public final ImmutableArray<KeYJavaType> getParamTypes() {
         return paramTypes;
     }
-
 }

@@ -1,26 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import javax.annotation.Nullable;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,9 @@ public final class IntegerLDT extends LDT {
 
     // public name constants
     public static final String NEGATIVE_LITERAL_STRING = "neglit";
+    public static final String ADD_STRING = "add";
+    public static final String SUB_STRING = "sub";
+    public static final String MUL_STRING = "mul";
     public static final Name NUMBERS_NAME = new Name("Z");
     public static final Name CHAR_ID_NAME = new Name("C");
 
@@ -57,8 +62,8 @@ public final class IntegerLDT extends LDT {
     private final Function pow;
     private final Function bsum;
     private final Function bprod;
-    // private final Function min; // handled by the \ifEx operator
-    // private final Function max;
+    // private final JavaDLFunction min; // handled by the \ifEx operator
+    // private final JavaDLFunction max;
     private final Function jdiv;
     private final Function jmod;
     private final Function unaryMinusJint;
@@ -147,8 +152,8 @@ public final class IntegerLDT extends LDT {
     private final Function inRangeLong;
     private final Function inRangeChar;
     private final Function index;
-    private final Term one;
-    private final Term zero;
+    private final JTerm one;
+    private final JTerm zero;
 
 
 
@@ -278,7 +283,7 @@ public final class IntegerLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private boolean isNumberLiteral(Operator f) {
+    private boolean isNumberLiteral(org.key_project.logic.op.Operator f) {
         String n = f.name().toString();
         if (n.length() == 1) {
             char c = n.charAt(0);
@@ -287,7 +292,7 @@ public final class IntegerLDT extends LDT {
         return false;
     }
 
-    private Term makeDigit(int digit, TermBuilder tb) {
+    private JTerm makeDigit(int digit, TermBuilder tb) {
         return tb.func(getNumberSymbol(),
             tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
     }
@@ -706,42 +711,31 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol for the given operation
      */
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
     }
 
-    @Nullable
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "mod":
-            return getMod();
-        case "neg":
-            return getNeg();
-        }
-        return null;
+    public @Nullable Function getFunctionFor(String op, Services services) {
+        return switch (op) {
+            case "gt" -> getGreaterThan();
+            case "geq" -> getGreaterOrEquals();
+            case "lt" -> getLessThan();
+            case "leq" -> getLessOrEquals();
+            case "div" -> getDiv();
+            case "mul" -> getMul();
+            case "add" -> getAdd();
+            case "sub" -> getSub();
+            case "mod" -> getMod();
+            case "neg" -> getNeg();
+            default -> null;
+        };
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
@@ -749,24 +743,25 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left,
+            JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
             "Literal '" + lit + "' is not an integer literal.");
 
-        Term result;
+        JTerm result;
         if (lit instanceof CharLiteral) {
             result = services.getTermBuilder().cTerm(((CharLiteral) lit).getValueString());
         } else {
@@ -781,9 +776,9 @@ public final class IntegerLDT extends LDT {
         return containsFunction(f) && (f.arity() == 0 || isNumberLiteral(f));
     }
 
-    public String toNumberString(Term t) {
+    public String toNumberString(JTerm t) {
         StringBuilder sb = new StringBuilder();
-        Operator f = t.op();
+        var f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
             t = t.sub(0);
@@ -798,14 +793,14 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
         Function f = (Function) t.op();
         if (isNumberLiteral(f) || f == numbers || f == charID) {
 
-            Term it = t;
+            JTerm it = t;
             if (f == charID || f == numbers) {
                 it = it.sub(0);
             }
@@ -817,7 +812,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }
@@ -906,7 +901,7 @@ public final class IntegerLDT extends LDT {
     /**
      * the function representing the Java operator <code>(byte)</code>
      *
-     * @return function representing the generic Java operator function
+     * @return function representing the generic Java operator JavaDLFunction
      */
     public Function getJavaCastByte() {
         return javaCastByte;
@@ -1001,11 +996,11 @@ public final class IntegerLDT extends LDT {
         return javaSubInt;
     }
 
-    public Term zero() {
+    public JTerm zero() {
         return zero;
     }
 
-    public Term one() {
+    public JTerm one() {
         return one;
     }
 }

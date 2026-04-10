@@ -1,25 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
-public final class LogicVariable extends AbstractSortedOperator
-        implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
+public final class LogicVariable extends JAbstractSortedOperator
+        implements QuantifiableVariable {
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
-        assert sort != Sort.FORMULA;
-        assert sort != Sort.UPDATE;
+        if (sort instanceof GenericSort) {
+            throw new IllegalArgumentException("Cannot have logic variable of generic sort!");
+        }
+        assert sort != JavaDLTheory.FORMULA;
+        assert sort != JavaDLTheory.UPDATE;
     }
-
 
     @Override
     public String toString() {
@@ -27,16 +34,12 @@ public final class LogicVariable extends AbstractSortedOperator
     }
 
     @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof LogicVariable)) {
-            return false;
-        }
-        LogicVariable that = (LogicVariable) obj;
-        return name().equals(that.name()) && sort().equals(that.sort());
+    public int getChildCount() {
+        return 0;
     }
 
     @Override
-    public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(name(), sort());
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Logic variable " + name() + " does not have children");
     }
 }

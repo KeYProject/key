@@ -1,14 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,100 +24,110 @@ import org.slf4j.LoggerFactory;
  * This class is intended to be called from gradle. See the gradle task
  * {@code generateRunAllProofs}.
  * <p>
- * The considered proof collections files are configured statically in {@link #collections}.
+ * The considered proof collections files are configured statically in
+ * {@link ProofCollections}.
  *
  * @author Alexander Weigl
  * @version 1 (6/14/20)
  */
 public class GenerateUnitTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
-    /**
-     * Output folder. Set on command line.
-     */
-    private static String outputFolder;
-
-    /**
-     * List of considered proofs collections.
-     */
-    private final static String[] collections =
-        new String[] { RunAllProofsFunctional.INDEX_FILE, RunAllProofsInfFlow.INDEX_FILE };
 
     public static void main(String[] args) throws IOException {
+        var collections = List.of(ProofCollections.automaticJavaDL());
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
+        var outputFolder = Paths.get(args[0]);
+        run(outputFolder, collections);
+    }
 
-        outputFolder = args[0];
+    public static void run(Path outputFolder, List<ProofCollection> collections)
+            throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
-        File out = new File(outputFolder);
-        out.mkdirs();
+        outputFolder = outputFolder.toAbsolutePath();
+        Files.createDirectories(outputFolder);
 
-        for (String index : collections) {
-            LOGGER.info("Index file: {}", index);
-            ProofCollection col = RunAllProofsTest.parseIndexFile(index);
+        for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(col, unit);
+                createUnitClass(outputFolder, unit);
             }
         }
     }
 
     private static final String TEMPLATE_CONTENT =
-        "package $packageName;\n" + "\n" + "import org.junit.*;\n" +
-        // "import de.uka.ilkd.key.util.NamedRunner;\n" +
-        // "import de.uka.ilkd.key.util.TestName;\n" +
-            "import org.junit.rules.Timeout;\n" + "import org.junit.runner.RunWith;\n" + "\n" +
-            // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
-            // +
-            // "@RunWith(NamedRunner.class)\n" +
-            "public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {\n"
-            + "\n" + "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"
-            + "  @Before public void setUp() {\n" + "    this.baseDirectory = \"$baseDirectory\";\n"
-            + "    this.statisticsFile = STATISTIC_FILE;\n" + "    this.name = \"$name\";\n"
-            + "    this.reloadEnabled = $reloadEnabled;\n" + "    this.tempDir = \"$tempDir\";\n"
-            + "\n" + "    this.globalSettings = \"$keySettings\";\n"
-            + "    this.localSettings =  \"$localSettings\";\n" + "  }\n" + "\n" + "  $timeout\n"
-            + "\n" + "  $methods\n" + "\n" + "}\n";
+        """
+                /* This file is part of KeY - https://key-project.org
+                 * KeY is licensed under the GNU General Public License Version 2
+                 * SPDX-License-Identifier: GPL-2.0-only */
+
+                package $packageName;
+
+                import org.junit.jupiter.api.*;
+                import static org.junit.jupiter.api.Assertions.*;
+
+                //@org.junit.jupiter.api.Timeout(180)
+                @org.junit.jupiter.api.Tag("RAP")
+                public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
+                  public static final String STATISTIC_FILE = "$statisticsFile";
+
+                  { // initialize during construction
+                    this.baseDirectory = "$baseDirectory";
+                    this.statisticsFile = STATISTIC_FILE;
+                    this.name = "$name";
+                    this.reloadEnabled = $reloadEnabled;
+                    this.tempDir = "$tempDir";
+
+                    this.globalSettings = "$keySettings";
+                    this.localSettings =  "$localSettings";
+                  }
+
+                  $killSwitch
+
+                  $timeout
+                  $methods
+                }
+                """;
 
     /**
-     * Generates the test classes for the given proof collection, and writes the java files.
+     * Generates the test classes for the given proof collection, and writes the
+     * java files.
      *
-     * @param col
-     * @param unit
+     * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit)
+    private static void createUnitClass(Path outputFolder, RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
-        String className = name.replaceAll("\\.java", "").replaceAll("\\.key", "")
+        String className = '_' + name // avoids name clashes, i.e., group "switch"
+                .replaceAll("\\.java", "")
+                .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_");
 
         ProofCollectionSettings settings = unit.getSettings();
         Map<String, String> vars = new TreeMap<>();
         vars.put("className", className);
         vars.put("packageName", packageName);
-        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath());
+        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
         vars.put("statisticsFile",
-            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath());
+            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath()
+                    .replaceAll("\\\\", "/"));
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
-        vars.put("tempDir", settings.getTempDir().getAbsolutePath());
+        vars.put("tempDir", settings.getTempDir().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
 
-        vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
+        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\n"));
-
-        vars.put("timeout", "");
-
-        if (false) {// disabled
-            int globalTimeout = 0;
-            if (globalTimeout > 0) {
-                vars.put("timeout",
-                    "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
-            }
+                    .replace("\n", "\\\\n"));
+        if (unit.isResetEachTest()) {
+            vars.put("killSwitch",
+                "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");
         }
 
         StringBuilder methods = new StringBuilder();
@@ -126,8 +135,10 @@ public class GenerateUnitTests {
         int clashCounter = 0;
 
         for (TestFile file : unit.getTestFiles()) {
-            File keyFile = file.getKeYFile();
-            String testName = keyFile.getName().replaceAll("\\.java", "").replaceAll("\\.key", "")
+            Path keyFile = file.getKeYFile();
+            String testName = keyFile.getFileName().toString()
+                    .replaceAll("\\.java", "")
+                    .replaceAll("\\.key", "")
                     .replaceAll("[^a-zA-Z0-9]+", "_");
 
             if (usedMethodNames.contains(testName)) {
@@ -140,26 +151,22 @@ public class GenerateUnitTests {
             methods.append("\n");
             methods.append("@Test(").append(to).append(")")
                     // .append("@TestName(\"").append(keyFile.getName()).append("\")")
-                    .append("public void test").append(testName).append("() throws Exception {\n");
-            // "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
+                    .append("void test").append(testName).append("() throws Exception {\n");
+            // "// This tests is based on").append(keyFile.toAbsolutePath()).append("\n");
 
             switch (file.getTestProperty()) {
-            case PROVABLE:
-                methods.append("assertProvability(\"").append(keyFile.getAbsolutePath())
+                case PROVABLE -> methods.append("assertProvability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
                         .append("\");");
-                break;
-            case NOTPROVABLE:
-                methods.append("assertUnProvability(\"").append(keyFile.getAbsolutePath())
+                case NOTPROVABLE -> methods.append("assertUnProvability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
                         .append("\");");
-                break;
-            case LOADABLE:
-                methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath())
+                case LOADABLE -> methods.append("assertLoadability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
                         .append("\");");
-                break;
-            case NOTLOADABLE:
-                methods.append("assertUnLoadability(\"").append(keyFile.getAbsolutePath())
+                case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
                         .append("\");");
-                break;
             }
             methods.append("}");
         }
@@ -173,9 +180,8 @@ public class GenerateUnitTests {
             m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/"));
         }
         m.appendTail(sb);
-        File folder = new File(outputFolder, packageName.replace('.', '/'));
-        folder.mkdirs();
-        Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"),
-            sb.toString().getBytes(StandardCharsets.UTF_8));
+        var folder = outputFolder.resolve(packageName.replace('.', '/'));
+        Files.createDirectories(folder);
+        Files.writeString(folder.resolve(className + ".java"), sb.toString());
     }
 }

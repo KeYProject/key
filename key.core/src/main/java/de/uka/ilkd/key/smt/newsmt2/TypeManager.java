@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.HashSet;
@@ -6,9 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms for the modular
@@ -41,15 +46,20 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
+                // axiom: child <: s
                 master.addAxiom(new SExpr("assert",
                     new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild))
                             && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
-                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
-                            SExprs.sortExpr(otherChild));
-                        master.addAxiom(new SExpr("assert", new SExpr("not", st)));
+                        // check: if otherChild is an interface, child might still be subtype of it
+                        if (!child.extendsTrans(otherChild)) {
+                            // axiom: !(child <: otherChild) (if child != otherChild)
+                            SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
+                                SExprs.sortExpr(otherChild));
+                            master.addAxiom(new SExpr("assert", new SExpr("not", st)));
+                        }
                     }
                 }
             }
@@ -57,10 +67,11 @@ class TypeManager {
 
         // if sort has no direct parents, make it a child of any
         for (Sort s : master.getSorts()) {
-            if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
+            if (!(s instanceof NullSort) && !(s.equals(JavaDLTheory.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
                     master.addAxiom(new SExpr("assert",
-                        new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                        new SExpr("subtype", SExprs.sortExpr(s),
+                            SExprs.sortExpr(JavaDLTheory.ANY))));
                 }
             }
         }

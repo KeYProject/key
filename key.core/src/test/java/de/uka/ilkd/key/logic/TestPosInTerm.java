@@ -1,6 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import org.junit.jupiter.api.Assertions;
+import org.key_project.logic.PosInTerm;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +56,7 @@ public class TestPosInTerm {
 
     @Test
     public void testUpDownWithCopy() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -88,10 +92,10 @@ public class TestPosInTerm {
 
     @Test
     public void testEquals() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] pos2 = new int[] { 10, 2, 5, 20, 4, 100, 75, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] pos3 = new int[] { 10, 2, 5, 20, 4, 100, 25, 2, 0, 1, 0, 1 };
-        int[] pos4 = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos2 = { 10, 2, 5, 20, 4, 100, 75, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos3 = { 10, 2, 5, 20, 4, 100, 25, 2, 0, 1, 0, 1 };
+        int[] pos4 = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69 };
 
 
         PosInTerm pit1 = toPosInTerm(pos);
@@ -99,16 +103,16 @@ public class TestPosInTerm {
         assertEquals(pit1, pit2);
         assertEquals(pit1.hashCode(), pit2.hashCode());
 
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos2));
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos3));
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos4));
+        assertNotEquals(pit1, toPosInTerm(pos2));
+        assertNotEquals(pit1, toPosInTerm(pos3));
+        assertNotEquals(pit1, toPosInTerm(pos4));
     }
 
     @Test
     public void testFirstN() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] posN4 = new int[] { 10, 2, 5, 20 };
-        int[] posN7 = new int[] { 10, 2, 5, 20, 4, 100, 25 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] posN4 = { 10, 2, 5, 20 };
+        int[] posN7 = { 10, 2, 5, 20, 4, 100, 25 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -125,7 +129,7 @@ public class TestPosInTerm {
 
     @Test
     public void testIntegerList() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -136,7 +140,7 @@ public class TestPosInTerm {
 
     @Test
     public void testParseReverseString() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 

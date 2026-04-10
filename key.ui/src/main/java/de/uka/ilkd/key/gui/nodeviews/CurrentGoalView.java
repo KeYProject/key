@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -13,11 +16,11 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -30,26 +33,7 @@ import org.slf4j.LoggerFactory;
  * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 8494000234215913553L;
-
-    public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
-
-    public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
-
-    private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
-
-    public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
-
 
     // the mediator
     private final KeYMediator mediator;
@@ -72,7 +56,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
-        setBackground(Color.white);
+
         // disables selection
         setSelectionColor(getBackground());
         listener = new CurrentGoalViewListener(this, getMediator());
@@ -165,26 +149,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
 
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
+                Object tag = createColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
         }
     }
-
-
-    /**
-     * given a node and a sequent formula, returns the first node among the node's parents that
-     * contains the sequent formula @form.
-     */
-    public Node jumpToIntroduction(Node node, SequentFormula form) {
-        while (node.parent() != null && node.sequent().contains(form)) {
-            node = node.parent();
-        }
-        return node;
-    }
-
-
 
     DragSource getDragSource() {
         return dragSource;
@@ -280,30 +250,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
-    }
-
-    /**
-     * Enables drag'n'drop of highlighted subterms in the sequent window.
-     *
-     * @param allowDragNDrop enables drag'n'drop iff set to true.
-     */
-    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
-        listener.setModalDragNDropEnabled(allowDragNDrop);
-    }
-
-    /**
-     * Checks whether drag'n'drop of highlighted subterms in the sequent window currently is
-     * enabled..
-     *
-     * @return true iff drag'n'drop is enabled.
-     */
-    public synchronized boolean modalDragNDropEnabled() {
-        return listener.modalDragNDropEnabled();
-    }
-
-    @Override
-    public String getHighlightedText() {
-        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     public PosInSequent getMousePosInSequent() {

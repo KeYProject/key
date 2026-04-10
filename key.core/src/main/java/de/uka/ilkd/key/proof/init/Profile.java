@@ -1,16 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
+import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooserFactory;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -22,7 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
  * <li>the goal selection strategy</li>
  * <li>the way how term labels are maintained</li>
  * </ul>
- *
+ * <p>
  * Currently this is only rudimentary: possible extensions are
  * <ul>
  * <li>program model to use (java, misrac, csharp)</li>
@@ -31,14 +42,13 @@ import org.key_project.util.collection.ImmutableSet;
  * etc.
  * </p>
  * <p>
- * Each {@link Profile} has a unique name {@link #name()}.
+ * Each {@link Profile} has a unique name {@link #ident()}.
  * </p>
  * <p>
  * It is recommended to have only one instance of each {@link Profile}. The default instances for
  * usage in the {@link Thread} of the user interface are available via
  * {@link JavaProfile#getDefaultInstance()} and
- * {@code SymbolicExecutionJavaProfile#getDefaultInstance()}. It is possible to get the default
- * instance for a given name via {@link AbstractProfile#getDefaultInstanceForName(String)}. Multiple
+ * {@code SymbolicExecutionJavaProfile#getDefaultInstance()}. Multiple
  * instances are only required if {@link Proof}s are done in parallel (in different
  * {@link Thread}s), because some rules might have a state (at the moment this is only the
  * {@link OneStepSimplifier}).
@@ -51,13 +61,31 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public interface Profile {
 
-    /** returns the rule source containg all taclets for this profile */
+    /**
+     * returns the rule source containg all taclets for this profile
+     */
     RuleCollection getStandardRules();
 
-    /** the name of this profile */
-    String name();
+    /**
+     * the name of this profile used to for storing into key files, and for loading
+     */
+    String ident();
 
-    /** returns the strategy factories for the supported strategies */
+    /**
+     * the name of this profile presentable for humans
+     */
+    default String displayName() {
+        return ident();
+    }
+
+    /// A description of this profile for the user
+    default String description() {
+        return "";
+    }
+
+    /**
+     * returns the strategy factories for the supported strategies
+     */
     ImmutableSet<StrategyFactory> supportedStrategies();
 
     /**
@@ -88,7 +116,7 @@ public interface Profile {
     /**
      * returns the default builder for a goal chooser
      */
-    GoalChooserBuilder getDefaultGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getDefaultGoalChooserBuilder();
 
     /**
      * sets the user selected goal chooser builder to be used as prototype
@@ -101,9 +129,11 @@ public interface Profile {
     /**
      * returns a new builder instance for the selected goal choooser
      */
-    GoalChooserBuilder getSelectedGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getSelectedGoalChooserBuilder();
 
-    /** returns the (default) justification for the given rule */
+    /**
+     * returns the (default) justification for the given rule
+     */
     RuleJustification getJustification(Rule r);
 
 
@@ -124,4 +154,34 @@ public interface Profile {
     TermLabelManager getTermLabelManager();
 
     boolean isSpecificationInvolvedInRuleApp(RuleApp app);
+
+    /// Create an instance of a specification repository suitable for the given profile.
+    /// For example WD requires a special instance.
+    default SpecificationRepository createSpecificationRepository(Services services) {
+        return new SpecificationRepository(services);
+    }
+
+    /// Returns the implementation of a [UseDependencyContractRule] for this profile.
+    ///
+    /// @see de.uka.ilkd.key.proof.io.IntermediateProofReplayer
+    default UseDependencyContractRule getUseDependencyContractRule() {
+        return UseDependencyContractRule.INSTANCE;
+    }
+
+    /// Returns the implementation of a [UseOperationContractRule] for this profile
+    ///
+    /// @see de.uka.ilkd.key.proof.io.IntermediateProofReplayer
+    default UseOperationContractRule getUseOperationContractRule() {
+        return UseOperationContractRule.INSTANCE;
+    }
+
+    /// Let a profile visit a freshly created init profile. Allows the setting of properties after
+    /// the
+    /// Taclet base has been loaded, but before Java sources are loaded or the environment is
+    /// established.
+    ///
+    /// @see ProblemInitializer
+    default void prepareInitConfig(InitConfig baseConfig) {
+
+    }
 }

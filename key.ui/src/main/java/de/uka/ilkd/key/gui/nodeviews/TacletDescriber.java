@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.*;
@@ -7,10 +10,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -20,23 +27,25 @@ import org.key_project.util.collection.ImmutableSet;
  */
 class TacletDescriber {
 
-    private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
+    private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
         boolean started = false;
-        if (sv.isRigid() && !(sv instanceof VariableSV)) {
-            if (!started) {
-                out.append("[");
+        if (psv instanceof JOperatorSV sv) {
+            if (sv.isRigid() && !(sv instanceof VariableSV)) {
+                if (!started) {
+                    out.append("[");
+                }
+                out.append("rigid");
+                started = true;
             }
-            out.append("rigid");
-            started = true;
-        }
-        if (sv instanceof ProgramSV && ((ProgramSV) sv).isListSV()) {
-            if (!started) {
-                out.append("[");
-            } else {
-                out.append(", ");
+            if (sv instanceof ProgramSV && ((ProgramSV) sv).isListSV()) {
+                if (!started) {
+                    out.append("[");
+                } else {
+                    out.append(", ");
+                }
+                out.append("list");
+                started = true;
             }
-            out.append("list");
-            started = true;
         }
 
         if (started) {
@@ -45,10 +54,9 @@ class TacletDescriber {
     }
 
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
-        if (schemaVar instanceof ModalOperatorSV) {
-            final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
+        if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
-            for (final Operator op : modalOpSV.getModalities()) {
+            for (final var op : modalOpSV.getModalities()) {
                 out.append(sep);
                 out.append(op.name());
                 sep = ", ";
@@ -76,15 +84,15 @@ class TacletDescriber {
         /*
          * TODO: Add an explanation for the following if-statement. (Kai Wallisch 01/2015)
          */
-        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV
-                || schemaVar instanceof TermLabelSV)) {
-            out.append(" ").append(schemaVar.sort().declarationString());
+        if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV
+                || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
+            out.append(" ").append(((JOperatorSV) schemaVar).sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }
 
     private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
-        ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
+        ImmutableSet<SchemaVariable> schemaVars = t.getAssumesAndFindVariables();
 
         for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
@@ -119,27 +127,25 @@ class TacletDescriber {
      * </p>
      *
      * @param mediator The {@link KeYMediator} to use.
-     * @param node The {@link Node} to use.
+     * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, Node node, int width) {
-        RuleApp app = node.getAppliedRuleApp();
+    public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {
             s.append("The following rule was applied on this node: \n\n");
-            if (app.rule() instanceof Taclet) {
+            if (app.rule() instanceof de.uka.ilkd.key.rule.Taclet taclet) {
                 SequentViewLogicPrinter logicPrinter =
                     SequentViewLogicPrinter.purePrinter(width, mediator.getNotationInfo(),
                         mediator.getServices(), getVisibleTermLabels());
-                logicPrinter.printTaclet((Taclet) (app.rule()));
+                logicPrinter.printTaclet(taclet);
                 s.append(logicPrinter.result());
             } else {
                 s.append(app.rule());
             }
 
-            if (app instanceof TacletApp) {
-                TacletApp tapp = (TacletApp) app;
+            if (app instanceof TacletApp tapp) {
                 if (tapp.instantiations()
                         .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s.append("\n\nWith sorts:\n");

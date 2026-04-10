@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.BufferedReader;
@@ -7,17 +10,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +44,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     /**
      * Handler option. If provided, the translator will label translations of sequent formulas such
-     * that {@link de.uka.ilkd.key.gui.smt.SMTFocusResults} can interpret the unsat core.
+     * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
-     * This option is currently only enabled for Z3.
-     * Currently, this option only works with a CVC5 dev build.
-     * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
-     * add this handler option to the .props file.
+     * This option is currently only enabled for Z3 and cvc5 (needs 1.0.4+).
      * </p>
+     * Make sure to also send (get-unsat-core) in the respective socket class when adding this
+     * option.
      */
     private static final String GET_UNSAT_CORE = "getUnsatCore";
 
@@ -122,7 +126,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append(System.lineSeparator());
 
         sb.append("; --- Declarations\n");
-        extractSortDeclarations(sequent, services, master, sequentAsserts);
+        extractSortDeclarations(services, master);
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -136,7 +140,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
-        int i = 0;
+        int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
                 String label = "L_" + i;
@@ -149,9 +153,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n(check-sat)");
-        if (getUnsatCore) {
-            sb.append("\n(get-unsat-core)");
-        }
 
         if (!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
@@ -177,16 +178,15 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return sb;
     }
 
-    /*
+    /**
      * precompute the information on the required sources from the translation.
      */
-    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master,
-            List<Term> sequentAsserts) {
+    private void extractSortDeclarations(Services services, MasterHandler master) {
         TypeManager tm = new TypeManager(services);
         tm.handle(master);
     }
 
-    /*
+    /**
      * extract a sequent into an SMT collection.
      *
      * The translation adds elements to the lists in the master handler on the way.
@@ -219,7 +219,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
-    /*
+    /**
      * Turn a sequent to a collection of formulas. Antecedent positive, succedent negated.
      */
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
@@ -229,7 +229,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             res.add(sf.formula());
         }
         for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
+            res.add(tb.not((JTerm) sf.formula()));
         }
         return res;
     }

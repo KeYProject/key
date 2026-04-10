@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -25,7 +28,7 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
      * @param proof The {@link Proof} in which this {@link IBreakpoint} is used.
      * @param enabled The enabled state.
      */
-    public AbstractBreakpoint(Proof proof, boolean enabled) {
+    protected AbstractBreakpoint(Proof proof, boolean enabled) {
         this.proof = proof;
         this.enabled = enabled;
     }
@@ -34,8 +37,8 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
     }
 
     /**

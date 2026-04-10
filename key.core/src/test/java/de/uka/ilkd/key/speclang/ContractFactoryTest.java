@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -31,9 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Wolfram Pfeifer
  */
 public class ContractFactoryTest {
-    /** the filename of the key file which is needed to create Services and JavaInfo */
-    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+    /**
+     * the filename of the key file which is needed to create Services and JavaInfo
+     */
+    private static final Path TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("speclang").resolve("testFile.key");
 
     /** JavaInfo containing information about the available datatypes and methods */
     private JavaInfo javaInfo;
@@ -53,27 +59,38 @@ public class ContractFactoryTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo =
-                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+            javaInfo = HelperClassForTests.parse(TEST_FILE).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
+            services.setOriginFactory(new OriginTermLabelFactory());
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
         preParser = new PreParser();
     }
 
     /**
-     * Checks that two equal assignable clauses are combined correctly, i.e. without if-expressions.
+     * Checks that two equal assignable clauses are combined correctly, i.e., without
+     * if-expressions.
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if the test succeeds
      */
     @Test
-    public void testCombineEqualAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable \\nothing;\n" + "@\n" + "@ also\n"
-            + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-            + "@  signals_only RuntimeException;\n" + "@*/";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+    public void testCombineEqualModifiable() throws SLTranslationException {
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable \\nothing;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
 
@@ -81,16 +98,26 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly: \nothing and
      * \strictly_nothing should be combined to empty (w/o if-then-else).
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
-    public void testCombineEmptyAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable \\strictly_nothing;\n" + "@\n"
-            + "@ also\n" + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-            + "@  signals_only RuntimeException;\n" + "@*/";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+    public void testCombineEmptyModifiable() throws SLTranslationException {
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable \\strictly_nothing;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
 
@@ -98,31 +125,45 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly, i.e. using intersection
      * and if-expressions with preconditions of the original contracts in their conditions.
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
-    public void testCombineDifferentAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable l;\n" + "@\n" + "@ also\n" + "@\n"
-            + "@ exceptional_behavior\n" + "@  requires a == 5;\n" + "@  assignable \\nothing;\n"
-            + "@  signals (RuntimeException e) true;\n" + "@  signals_only RuntimeException;\n"
-            + "@*/";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+    public void testCombineDifferentModifiable() throws SLTranslationException {
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable l;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
-            + "allLocs))", woLabels.toString());
+            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::#l),"
+            + "allLocs))",
+            woLabels.toString());
     }
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
-     * returns the modifies term of the resulting combined contract (with origin labels removed).
+     * returns the modifiable term of the resulting combined contract (with origin labels removed).
      *
-     * @param contractStr the string containing the contracts for method m
-     * @return the combined modifies term of the contracts in the input string, without origin
+     * @param contractStr
+     *        the string containing the contracts for method m
+     * @return the combined modifiable term of the contracts in the input string, without origin
      *         labels
-     * @throws SLTranslationException should not be thrown
+     * @throws SLTranslationException
+     *         should not be thrown
      */
-    private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
+    private JTerm calculateCombinedModifiableWOLabels(String contractStr)
+            throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
@@ -132,8 +173,7 @@ public class ContractFactoryTest {
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {
-            if (c instanceof TextualJMLSpecCase) {
-                TextualJMLSpecCase c1 = (TextualJMLSpecCase) c;
+            if (c instanceof TextualJMLSpecCase c1) {
                 contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, c1));
             }
         }
@@ -151,7 +191,7 @@ public class ContractFactoryTest {
         FunctionalOperationContract singleContract = cf.union(cs);
 
         // remove origin labels
-        Term combinedMod = singleContract.getMod();
-        return TermLabel.removeIrrelevantLabels(combinedMod, services);
+        JTerm combinedModifiable = singleContract.getModifiable();
+        return TermLabelManager.removeIrrelevantLabels(combinedModifiable, services);
     }
 }

@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.exploration.ProofExplorationService;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Action for the user to visually delete formulas from the sequent (using hide)
@@ -45,7 +48,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         if (pio == null) {
             return;
         }
-        Term term = pio.subTerm();
+        JTerm term = (JTerm) pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         service.soundHide(g, pio, term);

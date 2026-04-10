@@ -1,0 +1,12 @@
+contains:
+  - |-
+    ; --- Sequent
+    (assert (not (exists ((var_x Int))
+           (= (i2u var_x) (i2u 42)))))
+expected: VALID
+keySrc: |-
+  \programVariables { int p; }
+
+  \problem {
+     \exists int x; (x = 42)
+  }

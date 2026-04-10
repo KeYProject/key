@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         this.cache = cache;
     }
 
+    @Override
     public TermTacletAppIndex getIndexForTerm(Term t) {
         return cache.get(getQueryKey(t));
     }
@@ -51,6 +54,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
     }
 
+    @Override
     public void putIndexForTerm(Term t, TermTacletAppIndex index) {
         cache.put(getNewKey(t), index);
     }
@@ -90,11 +94,10 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey)) {
+            if (!(obj instanceof CacheKey objKey)) {
                 return false;
             }
 
-            final CacheKey objKey = (CacheKey) obj;
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 

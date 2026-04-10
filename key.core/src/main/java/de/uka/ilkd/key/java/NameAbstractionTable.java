@@ -1,8 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.java.ast.SourceElement;
 
 /**
  * This class is used for the equals modulo renaming method in SourceElement. The purpose of this
@@ -40,7 +45,7 @@ public class NameAbstractionTable {
      *
      * @param pe0 SourceElement
      * @param pe1 SourceElement
-     * @returns true if the pe1 and pe2 have been assigned to the same name
+     * @return true if the pe1 and pe2 have been assigned to the same name
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
         if (declarations0 != null) {

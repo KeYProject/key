@@ -1,10 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
@@ -16,7 +21,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
      */
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         Goal result;
 
         if (allGoalsSatisfiable) {
@@ -27,12 +32,19 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             if (nextGoals.isEmpty()) {
                 result = null;
             } else {
-                result = nextGoals.head();
-                nextGoals = nextGoals.tail();
+                do {
+                    result = nextGoals.head();
+                    nextGoals = nextGoals.tail();
+                } while (result != null && !result.isAutomatic());
             }
         } else {
             ++nextGoalCounter;
-            result = selectedList.isEmpty() ? null : selectedList.head();
+            do {
+                result = selectedList.isEmpty() ? null : selectedList.head();
+                if (result != null && !result.isAutomatic()) {
+                    selectedList = selectedList.tail();
+                }
+            } while (result != null && !result.isAutomatic());
         }
         return result;
     }
@@ -44,9 +56,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
-        for (Goal newGoal : newGoals) {
-            final Goal g = newGoal;
-
+        for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {
                 // if (!allGoalsSatisfiable)
                 // goalList = goalList.prepend(g);
@@ -57,7 +67,8 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         return prevGoalList;
     }
 
-    protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
+    @Override
+    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
@@ -65,7 +76,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
-            final Goal goal = selectedList.head();
+            final @NonNull Goal goal = selectedList.head();
             selectedList = selectedList.tail();
 
             if (node == goal.node() || newGoals.contains(goal)) {

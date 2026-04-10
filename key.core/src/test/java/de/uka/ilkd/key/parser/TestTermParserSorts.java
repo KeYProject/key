@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +35,8 @@ public class TestTermParserSorts extends AbstractTestTermParser {
          * Test any::seqGet(s,i)
          */
         String pp = "s[i]";
-        Term expected = parseTerm("any::seqGet(s,i)");
-        Term actual = parseTerm(pp);
+        JTerm expected = parseTerm("any::seqGet(s,i)");
+        JTerm actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
 
@@ -56,10 +59,10 @@ public class TestTermParserSorts extends AbstractTestTermParser {
      * The KeY type int has several possible corresponding KeYJavaTypes. Those types are: char,
      * byte, short, int, long
      *
-     * This test checks if the parser finds a suitable function, if a query with integer arguments
+     * This test checks if the parser finds a suitable function if a query with integer arguments
      * is provided.
      *
-     * Sometimes several functions are available that the parser may select. For example a query of
+     * Sometimes several functions are available that the parser may select. For example, a query of
      * the form "a.query(0)" with Java functions available that have the following signatures:
      *
      * public int query(int i); public int query(byte b);
@@ -69,7 +72,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseIntegerArgs() throws Exception {
         String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
-        Term t = parseTerm("a.queryByte(0)");
+        JTerm t = parseTerm("a.queryByte(0)");
         assertEquals(s, t.toString());
 
         s = "testTermParserSorts.IntegerMethods::queryByteArray(heap,a,ba)";

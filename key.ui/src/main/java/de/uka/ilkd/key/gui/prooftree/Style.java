@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.Icon;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -18,7 +23,7 @@ public class Style {
     public String text;
 
     /** the tooltip */
-    public Tooltip tooltip;
+    public @Nullable Tooltip tooltip;
 
     /** foreground color of the node */
     public Color foreground;
@@ -27,10 +32,10 @@ public class Style {
     public Color background;
 
     /** border color of the node */
-    public Color border;
+    public @Nullable Color border;
 
     /** icon of the node */
-    public Icon icon;
+    public @Nullable Icon icon;
 
     /** Wrapper class for the tooltip */
     public static class Tooltip {
@@ -63,7 +68,7 @@ public class Style {
          * @param value the value
          * @param block whether this should be rendered as a block
          */
-        public void addAdditionalInfo(@Nonnull String key, @Nonnull String value, boolean block) {
+        public void addAdditionalInfo(@NonNull String key, @NonNull String value, boolean block) {
             additionalInfo.add(new Fragment(key, value, block));
         }
 
@@ -72,7 +77,7 @@ public class Style {
          *
          * @param notes the notes
          */
-        public void addNotes(@Nonnull String notes) {
+        public void addNotes(@NonNull String notes) {
             addAdditionalInfo("Notes", notes, false);
         }
 
@@ -81,7 +86,7 @@ public class Style {
          *
          * @param rule the rule
          */
-        public void addRule(@Nonnull String rule) {
+        public void addRule(@NonNull String rule) {
             addAdditionalInfo("Rule", rule, false);
         }
 
@@ -90,7 +95,7 @@ public class Style {
          *
          * @param on the info
          */
-        public void addAppliedOn(@Nonnull String on) {
+        public void addAppliedOn(@NonNull String on) {
             addAdditionalInfo("Applied on", LogicPrinter.escapeHTML(on, true), true);
         }
 

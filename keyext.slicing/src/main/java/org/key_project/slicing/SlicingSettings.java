@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.Map;
@@ -12,14 +15,27 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
  * @author Arne Keller
  */
 public class SlicingSettings extends AbstractPropertiesSettings {
+
+    public static final String CATEGORY = "ProofSlicing";
+
+    /**
+     * Config key for {@link #alwaysTrack}.
+     */
+    private static final String KEY_ALWAYS_TRACK = "alwaysTrack";
     /**
      * Config key for {@link #aggressiveDeduplicate}.
      */
-    private static final String KEY_AGGRESSIVE_DEDUPLICATE = "[ProofSlicing]aggressiveDeduplicate";
+    private static final String KEY_AGGRESSIVE_DEDUPLICATE = "aggressiveDeduplicate";
     /**
      * Config key for {@link #dotExecutable}.
      */
-    private static final String KEY_DOT_EXECUTABLE = "[ProofSlicing]dotExecutable";
+    private static final String KEY_DOT_EXECUTABLE = "dotExecutable";
+
+    /**
+     * Always track dependencies config key.
+     */
+    private final PropertyEntry<Boolean> alwaysTrack =
+        createBooleanProperty(KEY_ALWAYS_TRACK, true);
 
     /**
      * Aggressive rule deduplication config key.
@@ -30,7 +46,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * Path to dot executable config key.
      */
     private final PropertyEntry<String> dotExecutable =
-        createStringProperty(KEY_DOT_EXECUTABLE, null);
+        createStringProperty(KEY_DOT_EXECUTABLE, "");
 
     /**
      * Override map for aggressive deduplication config.
@@ -38,6 +54,18 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * over {@link #aggressiveDeduplicate}.
      */
     private final Map<Proof, Boolean> aggressiveDeduplicateOverride = new WeakHashMap<>();
+
+    public SlicingSettings() {
+        super(CATEGORY);
+    }
+
+    public boolean getAlwaysTrack() {
+        return alwaysTrack.get();
+    }
+
+    public void setAlwaysTrack(boolean value) {
+        alwaysTrack.set(value);
+    }
 
     /**
      * @param proof proof
@@ -54,7 +82,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     /**
      * Disable aggressive de-duplication for a particular proof.
      *
-     * @param proof proof to disable aggresive de-duplication for
+     * @param proof proof to disable aggressive de-duplication for
      */
     public void deactivateAggressiveDeduplicate(Proof proof) {
         aggressiveDeduplicateOverride.put(proof, false);
@@ -72,7 +100,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     public String getDotExecutable() {
         String path = dotExecutable.get();
-        if (path != null) {
+        if (path != null && !path.isBlank()) {
             return path;
         }
         if (System.getProperty("os.name").startsWith("Windows")) {

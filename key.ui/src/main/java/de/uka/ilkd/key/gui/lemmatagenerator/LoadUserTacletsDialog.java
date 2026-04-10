@@ -1,18 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.io.File;
-import java.util.LinkedList;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.IntStream;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -23,46 +28,53 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 public class LoadUserTacletsDialog extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    /** the text to be displayed when the "Help" button is pressed */
+    /**
+     * the text to be displayed when the "Help" button is pressed
+     */
     private static final String HELP_TEXT =
-        "In this dialog you can choose the files that are used for loading user-defined taclets:"
-            + "\n\n"
-            + "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that "
-            + "they can be used for the current proof. For each taclet an extra proof obligation is "
-            + "built that must be provable, in order to sustain the correctness of the calculus.\n\n"
-            + "Definitions:\n"
-            + "This file contains the signature (function symbols, predicate symbols, sorts)"
-            + " that are used for creating the proof obligations mentioned above. In most cases it "
-            + "should be the same file as indicated in 'User-Defined Taclets'.\n\n"
-            + "Axioms:\nIn order to prove the correctness of the created lemmata,"
-            + " for some user-defined taclets the introduction "
-            + "of additional axioms is necessary. At this point you can add them.\n"
-            + "Beware of the fact that it is crucial for the correctness of the calculus that the used "
-            + "axioms are consistent."
-            + "It is the responsibility of the user to guarantee this consistency.\n\n"
-            + "Technical Remarks:\nThe axioms must be stored in another file than the user-defined "
-            + "taclets. Furthermore the axioms are only loaded for the lemmata, but not for the "
-            + "current proof.";
+        """
+                In this dialog you can choose the files that are used for loading user-defined taclets:
 
-    /** warning text that will be shown when loading taclets without proving them */
+                User-Defined Taclets:
+                This file contains the taclets that should be loaded, so that they can be used for the current proof. For each taclet an extra proof obligation is built that must be provable, in order to sustain the correctness of the calculus.
+
+                Definitions:
+                This file contains the signature (function symbols, predicate symbols, sorts) that are used for creating the proof obligations mentioned above. In most cases it should be the same file as indicated in 'User-Defined Taclets'.
+
+                Axioms:
+                In order to prove the correctness of the created lemmata, for some user-defined taclets the introduction of additional axioms is necessary. At this point you can add them.
+                Beware of the fact that it is crucial for the correctness of the calculus that the used axioms are consistent.It is the responsibility of the user to guarantee this consistency.
+
+                Technical Remarks:
+                The axioms must be stored in another file than the user-defined taclets. Furthermore the axioms are only loaded for the lemmata, but not for the current proof.""";
+
+    /**
+     * warning text that will be shown when loading taclets without proving them
+     */
     private static final String INFO_TEXT =
-        "Be aware of the fact that you are going to load taclets\n"
-            + "without creating corresponding proof obligations!\n"
-            + "In case that the taclets that you want to load are unsound,\n"
-            + "the calculus will become unsound!";
+        """
+                Be aware of the fact that you are going to load taclets
+                without creating corresponding proof obligations!
+                In case that the taclets that you want to load are unsound,
+                the calculus will become unsound!""";
 
-    /** this dialog can be in one of two modes (started from different actions) */
+    /**
+     * this dialog can be in one of two modes (started from different actions)
+     */
     public enum Mode {
-        /** only prove taclets but do not add them to current proof */
+        /**
+         * only prove taclets but do not add them to current proof
+         */
         PROVE,
 
-        /** load taclets into current proof environment but allow also their proof */
+        /**
+         * load taclets into current proof environment but allow also their proof
+         */
         LOAD
     }
 
     private class UserTacletFileBox extends Box {
-        private static final long serialVersionUID = 1L;
-        private File chosenFile;
+        private Path chosenFile;
         private JButton chooseFileButton;
         private JTextField fileField;
         private final String title;
@@ -71,14 +83,14 @@ public class LoadUserTacletsDialog extends JPanel {
 
             super(BoxLayout.Y_AXIS);
             this.title = title;
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
 
             if (title != null) {
                 this.setBorder(BorderFactory.createTitledBorder(title));
             }
 
             box.add(getFileField());
-            box.add(Box.createHorizontalStrut(5));
+            box.add(createHorizontalStrut(5));
             box.add(getChooseFileButton());
             this.add(box);
         }
@@ -99,7 +111,7 @@ public class LoadUserTacletsDialog extends JPanel {
                 setMaximumWidth(chooseFileButton,
                     getRemoveAxiomFileButton().getPreferredSize().width);
                 chooseFileButton.addActionListener(e -> {
-                    File file = chooseFiles(title);
+                    Path file = chooseFiles(title);
                     if (file != null) {
                         fileHasBeenChosen();
                         setChosenFile(file);
@@ -115,19 +127,19 @@ public class LoadUserTacletsDialog extends JPanel {
             }
         }
 
-        public void setChosenFile(File file) {
+        public void setChosenFile(Path file) {
             chosenFile = file;
             getFileField().setText(chosenFile.toString());
         }
 
-        public File getChosenFile() {
+        public Path getChosenFile() {
             return chosenFile;
         }
     }
 
     private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    private JList<File> axiomsList;
+    private JList<Path> axiomsList;
     private JButton addAxiomFileButton;
     private JButton removeAxiomFileButton;
     private JButton helpButton;
@@ -143,7 +155,7 @@ public class LoadUserTacletsDialog extends JPanel {
     private JCheckBox lemmaCheckbox;
 
     private boolean closedByOkButton = false;
-    private final DefaultListModel<File> listModel = new DefaultListModel<>();
+    private final DefaultListModel<Path> listModel = new DefaultListModel<>();
     private boolean firstTimeAddingAxioms = true;
     private final Mode mode;
     private JDialog dialog;
@@ -176,18 +188,11 @@ public class LoadUserTacletsDialog extends JPanel {
         this.add(Box.createVerticalStrut(5));
     }
 
-    public List<File> getFilesForAxioms() {
-        List<File> files = new LinkedList<>();
-        Object[] objects = listModel.toArray();
-        if (objects != null) {
-            for (Object file : objects) {
-                files.add((File) file);
-            }
-        }
-        return files;
+    public List<Path> getFilesForAxioms() {
+        return IntStream.range(0, listModel.size()).mapToObj(listModel::get).toList();
     }
 
-    public File getFileForTaclets() {
+    public Path getFileForTaclets() {
         return userTacletFileBox.getChosenFile();
     }
 
@@ -207,7 +212,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         changedToNotSelected();
                         lemmaCheckbox.setSelected(false);
                         ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
-                                .showDialogUsingAxioms(
+                                .setShowDialogUsingAxioms(
                                     showDialogUsingAxioms && infoDialog.showThisDialogNextTime());
                     }
                 } else {
@@ -235,7 +240,7 @@ public class LoadUserTacletsDialog extends JPanel {
         enableAxiomFilePanel(false);
     }
 
-    private JList<File> getAxiomsList() {
+    private JList<Path> getAxiomsList() {
         if (axiomsList == null) {
             axiomsList = new JList<>();
             axiomsList.setModel(listModel);
@@ -263,9 +268,9 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationByPlatform(true);
             helpWindow.setTitle("Help");
             helpWindow.pack();
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
 
         }
         return helpWindow;
@@ -282,12 +287,12 @@ public class LoadUserTacletsDialog extends JPanel {
         return scrollPane;
     }
 
-    private File chooseFiles(String title) {
+    private @Nullable Path chooseFiles(String title) {
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(title);
         fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // user pressed OK button
-            return fileChooser.getSelectedFile();
+            return fileChooser.getSelectedFile().toPath();
         } else {
             // user pressed Cancel button
             return null;
@@ -316,12 +321,12 @@ public class LoadUserTacletsDialog extends JPanel {
                     firstTimeAddingAxioms =
                         !infoDialog.showDialog(INFO_TEXT, LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
-                            .showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                            .setShowDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                     if (firstTimeAddingAxioms) {
                         return;
                     }
                 }
-                File file = chooseFiles("File containing the axioms.");
+                Path file = chooseFiles("File containing the axioms.");
                 if (file != null) {
                     listModel.addElement(file);
 
@@ -335,8 +340,8 @@ public class LoadUserTacletsDialog extends JPanel {
         if (removeAxiomFileButton == null) {
             removeAxiomFileButton = new JButton("Remove");
             removeAxiomFileButton.addActionListener(e -> {
-                List<File> values = getAxiomsList().getSelectedValuesList();
-                for (File o : values) {
+                List<Path> values = getAxiomsList().getSelectedValuesList();
+                for (Path o : values) {
                     listModel.removeElement(o);
                 }
             });
@@ -448,8 +453,8 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationByPlatform(true);
             dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
         }
         return dialog;
     }

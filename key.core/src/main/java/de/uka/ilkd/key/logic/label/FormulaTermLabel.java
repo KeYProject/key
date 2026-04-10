@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.Collection;
@@ -5,8 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * Label attached to a predicates for instance in postconditions, loop invariants or precondition
@@ -130,22 +134,19 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
-        switch (i) {
-        case 0:
-            return getId();
-        case 1:
-            return beforeIds;
-        default:
-            return null;
-        }
+    public Object getTLChild(int i) {
+        return switch (i) {
+            case 0 -> getId();
+            case 1 -> beforeIds;
+            default -> null;
+        };
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         if (beforeIds != null) {
             return 2;
         } else {
@@ -291,7 +292,7 @@ public class FormulaTermLabel implements TermLabel {
      * @return The new label sub ID.
      */
     public static int newLabelSubID(Services services, int labelId) {
-        return services.getCounter(FormulaTermLabel.PROOF_COUNTER_SUB_PREFIX + labelId)
+        return services.getCounter(PROOF_COUNTER_SUB_PREFIX + labelId)
                 .getCountPlusPlus();
     }
 }

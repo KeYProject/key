@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +81,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param path the bootclasspath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setBootClassPath(File path) throws IllegalStateException;
+    void setBootClassPath(Path path) throws IllegalStateException;
 
     /**
      * Sets the classpath.
@@ -87,7 +89,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param classPath the classpath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setClassPath(List<File> classPath) throws IllegalStateException;
+    void setClassPath(List<Path> classPath) throws IllegalStateException;
 
     /**
      * Sets the java path (where the source files are located).
@@ -95,7 +97,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param javaPath the java path to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setJavaPath(String javaPath) throws IllegalStateException;
+    void setJavaPath(Path javaPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.

@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.transformations.pipeline.ClassInitializeMethodBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -32,15 +35,13 @@ public class StaticInitialisation extends ProgramTransformer {
             } else {
                 return null; // no static initialisation necessary
             }
-        } else if (pe instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) pe;
+        } else if (pe instanceof ProgramVariable pv) {
             if (pv.isStatic()) {
                 typeToBeInitialised = pv.getContainerType();
             } else {
                 return null; // no static initialisation necessary
             }
-        } else if (pe instanceof MethodReference) {
-            final MethodReference mr = (MethodReference) pe;
+        } else if (pe instanceof MethodReference mr) {
             final ExecutionContext ec = insts.getContextInstantiation().activeStatementContext();
             final IProgramMethod m;
             final KeYJavaType mrPrefixType = mr.determineStaticPrefixType(services, ec);
@@ -62,7 +63,7 @@ public class StaticInitialisation extends ProgramTransformer {
 
         } else {
             // at the moment the 'new' case is catched via static method
-            // call of <createObject>
+            // call of $createObject
             Debug.fail("static initialisation: Unexpected case in static initialisation.");
         }
 

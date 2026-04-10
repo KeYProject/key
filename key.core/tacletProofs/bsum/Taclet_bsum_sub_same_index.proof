@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Mar 21 18:04:40 CET 2022
+#Wed Apr 12 13:17:54 CEST 2023
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
@@ -12,7 +12,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , finalFields-finalFields\\:immutable , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on, Strings-Strings\\:on, assertions-assertions\\:safe, bigint-bigint\\:on, finalFields-finalFields\\:immutable, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:treatAsAxiom, moreSeqRules-moreSeqRules\\:on, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -47,25 +47,24 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Mon Mar 21 18:04:40 CET 2022
-name=bsum_sub_same_index
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "bsum_sub_same_index",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "Julian" ) (keyVersion "802059dea3"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "11200")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "notRight" (formula "1") (newnames "v_uSub1,f_i0,f_i1,f_t1,v_uSub2,f_t2"))
 (rule "impLeft" (formula "1") (userinteraction))
-(branch "Case 1"
+(branch
     (builtin "One Step Simplification" (formula "1"))
    (rule "closeTrue" (formula "1"))
 )
-(branch "Case 2"
+(branch
    (rule "notLeft" (formula "1") (userinteraction))
    (rule "apply_subst" (formula "1") (term "1,2,0") (userinteraction))
    (rule "int_induction" (inst "b=(  bsum{int v_uSub1;}(f_i0,
@@ -92,7 +91,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
       (rule "allRight" (formula "1") (inst "sk=nv_0") (userinteraction))
       (rule "impRight" (formula "1") (userinteraction))
       (rule "andLeft" (formula "1"))
-      (rule "hide_right" (formula "4") (userinteraction))
       (rule "bsum_induction_upper" (formula "3") (term "0") (userinteraction))
       (rule "bsum_induction_upper" (formula "3") (term "0,1") (userinteraction))
       (rule "bsum_induction_upper" (formula "3") (term "1,1") (userinteraction))
@@ -300,7 +298,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
       (rule "add_zero_left" (formula "3") (term "1"))
        (builtin "One Step Simplification" (formula "3"))
       (rule "orRight" (formula "3"))
-      (rule "eqSymm" (formula "4"))
       (rule "inEqSimp_leqRight" (formula "3"))
       (rule "times_zero_1" (formula "1") (term "1,0,0"))
       (rule "add_zero_right" (formula "1") (term "0,0"))
@@ -315,35 +312,17 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    (branch "Use Case"
       (rule "allLeftHide" (formula "1") (inst "t=sub(f_i1, f_i0)") (userinteraction))
       (rule "impLeft" (formula "1") (userinteraction))
-      (branch "Case 1"
+      (branch
          (rule "bsum_empty" (formula "2") (term "0") (userinteraction))
          (branch "Precondition"
-            (rule "eqSymm" (formula "3"))
             (rule "polySimp_elimSub" (formula "1") (term "0"))
-            (rule "polySimp_elimSub" (formula "3") (term "2,1"))
-            (rule "polySimp_elimSub" (formula "3") (term "0"))
-            (rule "polySimp_homoEq" (formula "3"))
-            (rule "polySimp_mulComm0" (formula "3") (term "1,0"))
             (rule "polySimp_addComm0" (formula "1") (term "0"))
-            (rule "polySimp_rightDist" (formula "3") (term "1,0"))
-            (rule "polySimp_mulLiterals" (formula "3") (term "1,1,0"))
-            (rule "polySimp_elimOne" (formula "3") (term "1,1,0"))
-            (rule "polySimp_mulComm0" (formula "3") (term "0,1,0"))
-            (rule "polySimp_addAssoc" (formula "3") (term "0"))
-            (rule "polySimp_addComm0" (formula "3") (term "0,0"))
             (rule "inEqSimp_leqRight" (formula "2"))
             (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
             (rule "inEqSimp_geqRight" (formula "2"))
             (rule "times_zero_1" (formula "1") (term "1,0,0"))
             (rule "add_zero_right" (formula "1") (term "0,0"))
             (rule "polySimp_addAssoc" (formula "1") (term "0"))
-            (rule "polySimp_sepPosMonomial" (formula "3"))
-            (rule "polySimp_mulComm0" (formula "3") (term "1"))
-            (rule "polySimp_rightDist" (formula "3") (term "1"))
-            (rule "polySimp_mulAssoc" (formula "3") (term "0,1"))
-            (rule "polySimp_mulComm0" (formula "3") (term "0,0,1"))
-            (rule "polySimp_mulLiterals" (formula "3") (term "0,1"))
-            (rule "polySimp_elimOne" (formula "3") (term "0,1"))
             (rule "inEqSimp_sepPosMonomial1" (formula "2"))
             (rule "polySimp_mulComm0" (formula "2") (term "1"))
             (rule "polySimp_rightDist" (formula "2") (term "1"))
@@ -375,9 +354,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
          (branch "Empty Sum"
             (rule "bsum_empty" (formula "2") (term "0,1") (userinteraction))
             (branch "Precondition"
-               (rule "eqSymm" (formula "3"))
                (rule "polySimp_elimSub" (formula "1") (term "0"))
-               (rule "polySimp_elimSub" (formula "3") (term "0"))
                (rule "polySimp_addComm0" (formula "1") (term "0"))
                (rule "inEqSimp_leqRight" (formula "2"))
                (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
@@ -385,9 +362,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                (rule "times_zero_1" (formula "1") (term "1,0,0"))
                (rule "add_zero_right" (formula "1") (term "0,0"))
                (rule "polySimp_addAssoc" (formula "1") (term "0"))
-               (rule "polySimp_sepNegMonomial" (formula "3"))
-               (rule "polySimp_mulLiterals" (formula "3") (term "0"))
-               (rule "polySimp_elimOne" (formula "3") (term "0"))
                (rule "inEqSimp_sepPosMonomial1" (formula "2"))
                (rule "polySimp_mulComm0" (formula "2") (term "1"))
                (rule "polySimp_rightDist" (formula "2") (term "1"))
@@ -419,10 +393,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             (branch "Empty Sum"
                (rule "bsum_empty" (formula "2") (term "1,1") (userinteraction))
                (branch "Precondition"
-                  (rule "eqSymm" (formula "3"))
                   (rule "polySimp_elimSub" (formula "1") (term "0"))
-                  (rule "polySimp_elimSub" (formula "3") (term "0"))
-                  (rule "add_zero_left" (formula "3") (term "0"))
                   (rule "polySimp_addComm0" (formula "1") (term "0"))
                   (rule "inEqSimp_leqRight" (formula "2"))
                   (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
@@ -430,10 +401,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                   (rule "times_zero_1" (formula "1") (term "1,0,0"))
                   (rule "add_zero_right" (formula "1") (term "0,0"))
                   (rule "polySimp_addAssoc" (formula "1") (term "0"))
-                  (rule "polySimp_invertEq" (formula "3"))
-                  (rule "times_zero_2" (formula "3") (term "1"))
-                  (rule "polySimp_mulLiterals" (formula "3") (term "0"))
-                  (rule "polySimp_elimOne" (formula "3") (term "0"))
                   (rule "inEqSimp_sepPosMonomial1" (formula "2"))
                   (rule "polySimp_mulComm0" (formula "2") (term "1"))
                   (rule "polySimp_rightDist" (formula "2") (term "1"))
@@ -470,7 +437,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             )
          )
       )
-      (branch "Case 2"
+      (branch
          (rule "eqSymm" (formula "1"))
          (rule "eqSymm" (formula "2"))
          (rule "polySimp_elimSub" (formula "1") (term "1,1,1"))

@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.beans.PropertyChangeListener;
+import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +26,18 @@ import org.slf4j.LoggerFactory;
 public class ProofIndependentSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
 
-    public static final ProofIndependentSettings DEFAULT_INSTANCE =
-        new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
+    public static final ProofIndependentSettings DEFAULT_INSTANCE;
+
+    static {
+        var file = new File(PathConfig.getProofIndependentSettings().toString()
+                .replace(".props", ".json"));
+        if (file.exists()) {
+            DEFAULT_INSTANCE = new ProofIndependentSettings(file);
+        } else {
+            var old = PathConfig.getProofIndependentSettings();
+            DEFAULT_INSTANCE = new ProofIndependentSettings(old.toFile());
+        }
+    }
 
     private final ProofIndependentSMTSettings smtSettings =
         ProofIndependentSMTSettings.getDefaultSettingsData();
@@ -35,19 +46,27 @@ public class ProofIndependentSettings {
     private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
-    private final String filename;
+    private final FeatureSettings featureSettings = new FeatureSettings();
+
+    private File filename;
 
 
     private final List<Settings> settings = new LinkedList<>();
 
-    private final SettingsListener settingsListener = e -> saveSettings();
-    private Properties lastReadedProperties;
+    private final PropertyChangeListener settingsListener = e -> saveSettings();
+    private Properties lastReadProperties;
+    private Configuration lastReadConfiguration;
 
-    private ProofIndependentSettings(String filename) {
+    private ProofIndependentSettings() {
         addSettings(smtSettings);
         addSettings(lemmaGeneratorSettings);
         addSettings(generalSettings);
         addSettings(viewSettings);
+        addSettings(featureSettings);
+    }
+
+    private ProofIndependentSettings(File filename) {
+        this();
         this.filename = filename;
         loadSettings();
     }
@@ -55,55 +74,86 @@ public class ProofIndependentSettings {
     public void addSettings(Settings settings) {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
-            settings.addSettingsListener(settingsListener);
-            if (lastReadedProperties != null) {
-                settings.readSettings(lastReadedProperties);
+            settings.addPropertyChangeListener(settingsListener);
+            if (lastReadProperties != null) {
+                settings.readSettings(lastReadProperties);
+            }
+            if (lastReadConfiguration != null) {
+                settings.readSettings(lastReadConfiguration);
             }
         }
     }
 
     private void loadSettings() {
         try {
-            File testFile = new File(filename);
-            if (testFile.exists()) {
+            if (filename.exists()) {
                 if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
                         PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
-                    load(testFile);
+                    load(filename);
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not load settings from {}", filename, e);
         }
     }
 
     private void load(File file) throws IOException {
-        try (FileInputStream in = new FileInputStream(file)) {
-            Properties properties = new Properties();
-            properties.load(in);
-            for (Settings settings : settings) {
-                settings.readSettings(properties);
+        if (!file.getName().endsWith(".json")) {
+            try (FileInputStream in = new FileInputStream(file)) {
+                Properties properties = new Properties();
+                properties.load(in);
+                for (Settings settings : settings) {
+                    settings.readSettings(properties);
+                }
+                lastReadProperties = properties;
             }
-            lastReadedProperties = properties;
+        } else {
+            this.lastReadConfiguration = Configuration.load(file.toPath());
+            for (Settings settings : settings) {
+                settings.readSettings(lastReadConfiguration);
+            }
         }
     }
 
     public void saveSettings() {
-        Properties result = new Properties();
-        for (Settings settings : settings) {
-            settings.writeSettings(result);
+        if (!filename.getName().endsWith(".json")) {
+            Properties result = lastReadProperties == null
+                    ? new Properties()
+                    : new Properties(lastReadProperties);
+
+            for (Settings settings : settings) {
+                settings.writeSettings(result);
+            }
+
+            if (!filename.exists()) {
+                filename.getParentFile().mkdirs();
+            }
+
+            try (var out = new FileOutputStream(filename)) {
+                result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
+            } catch (IOException e) {
+                LOGGER.error("Could not store settings to {}", filename, e);
+            }
         }
 
-        File file = new File(filename);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
+        Configuration config = new Configuration();
+        if (lastReadConfiguration != null) {
+            config.overwriteWith(lastReadConfiguration);
         }
 
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
+        for (var settings : settings)
+            settings.writeSettings(config);
+        if (!filename.exists()) {
+            filename.getParentFile().mkdirs();
+        }
+
+        try (var out =
+            new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
+            config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not store settings to {}", filename, e);
         }
     }
 
@@ -127,13 +177,17 @@ public class ProofIndependentSettings {
         return smtSettings;
     }
 
+    public FeatureSettings getFeatureSettings() {
+        return featureSettings;
+    }
+
     /**
      * Checks if pretty printing is enabled or not.
      *
      * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
      */
     public static boolean isUsePrettyPrinting() {
-        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        return DEFAULT_INSTANCE.getViewSettings().isUsePretty();
     }
 
     /**
@@ -143,7 +197,7 @@ public class ProofIndependentSettings {
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+        DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
     }
 }

@@ -1,18 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -42,7 +47,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the Name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(Name name, ProgramElement body) {
+    protected ProgramTransformer(Name name, ProgramElement body) {
         this.name = name;
         this.body = body;
     }
@@ -53,7 +58,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the String with the name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(String name, ProgramElement body) {
+    protected ProgramTransformer(String name, ProgramElement body) {
         this(new Name(name), body);
     }
 
@@ -224,7 +229,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * get a list of schema variables that are needed by this entity when working given a SV
      * instantiation set.
      *
-     * @param svInst the instantiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {

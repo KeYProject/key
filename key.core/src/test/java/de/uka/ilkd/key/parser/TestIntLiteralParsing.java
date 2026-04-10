@@ -1,17 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+import de.uka.ilkd.key.util.RecognitionException;
 
-import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -145,18 +148,19 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
     private final JmlIO jio;
     private static KeYJavaType containerType;
-    private static ProgramVariable self;
+    private static LocationVariable self;
 
     public TestIntLiteralParsing() {
         containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        jio = new JmlIO().services(getServices()).classType(containerType)
+        self = (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable("next",
+            containerType);
+        jio = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
     }
 
 
     @Override
-    public Term parseTerm(String s) throws RecognitionException {
+    public JTerm parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
         /*
          * containerType and self variable are not relevant for the tests currently and can be
@@ -195,10 +199,9 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * This method tests if meaningful ("out of bounds") error messages get printed for int literals
      * which are just outside the range of int.
      *
-     * @throws RecognitionException if a parsing error occurs
      */
     @TestFactory
-    public Stream<DynamicTest> testIntRange() throws RecognitionException {
+    public Stream<DynamicTest> testIntRange() {
         return Arrays.stream(INTRANGESTRINGS).map(it -> DynamicTest.dynamicTest(it, () -> {
             RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
             assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
@@ -208,8 +211,6 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     /**
      * This method tests if meaningful ("out of bounds") error messages get printed for long
      * literals which are just outside the range of long.
-     *
-     * @return
      */
     @TestFactory
     public Stream<DynamicTest> testLongRange() {

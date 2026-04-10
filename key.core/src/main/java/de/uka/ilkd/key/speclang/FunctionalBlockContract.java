@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
@@ -39,19 +42,13 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
     }
 
     @Override
-    public FunctionalBlockContract map(UnaryOperator<Term> op, Services services) {
+    public FunctionalBlockContract map(UnaryOperator<JTerm> op, Services services) {
         return new FunctionalBlockContract(getAuxiliaryContract().map(op, services), id());
     }
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
         return new FunctionalBlockContractPO(initConfig, this);
-    }
-
-    @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof FunctionalBlockContract;
-        return new FunctionalBlockContractPO(initConfig, (FunctionalBlockContract) contract);
     }
 
     @Override

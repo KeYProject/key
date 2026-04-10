@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.io.File;
@@ -44,7 +47,8 @@ class JavaCompilerCheckFacadeTest {
                 public void reportException(Object sender, ProofOblInput input, Exception e) {}
             };
         var promise =
-            JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(), src);
+            JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(),
+                src.toPath());
         promise.get();
     }
 

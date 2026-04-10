@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Adds the hit count functionality to an {@link AbstractBreakpoint}.
@@ -37,16 +41,16 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * @param proof the {@link Proof} that will be executed and should stop
      * @param enabled flag if the Breakpoint is enabled
      */
-    public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
+    protected AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
         super(proof, enabled);
         this.hitCount = hitCount;
     }
 
     /**
-     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}. If the Hitcount
+     * Checks if the hitcount is exceeded for the given {@link LineBreakpoint}. If the Hitcount
      * is not exceeded the hitted counter is incremented, otherwise its set to 0.
      *
-     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
+     * @return true if the Hitcount is exceeded or the {@link LineBreakpoint} has no Hitcount.
      */
     protected boolean hitcountExceeded(Node node) {
         if (!(hitCount == -1)) {
@@ -72,8 +76,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         return hitcountExceeded(node);
     }
 

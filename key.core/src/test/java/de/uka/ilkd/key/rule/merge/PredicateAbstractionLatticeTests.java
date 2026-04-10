@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -9,14 +12,14 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import org.junit.jupiter.api.Assertions;
@@ -31,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class PredicateAbstractionLatticeTests {
 
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
 
     @Test
     public void testCreateSignLatticeWithPredicates() {
@@ -44,11 +47,11 @@ public class PredicateAbstractionLatticeTests {
         final TermBuilder tb = p.getServices().getTermBuilder();
 
         final AbstractionPredicate gtZero = AbstractionPredicate.create(intSort,
-            (Term input) -> (tb.gt(input, tb.zero())), services);
+            (JTerm input) -> (tb.gt(input, tb.zero())), services);
         final AbstractionPredicate eqZero = AbstractionPredicate.create(intSort,
-            (Term input) -> (tb.equals(input, tb.zero())), services);
+            (JTerm input) -> (tb.equals(input, tb.zero())), services);
         final AbstractionPredicate ltZero = AbstractionPredicate.create(intSort,
-            (Term input) -> (tb.lt(input, tb.zero())), services);
+            (JTerm input) -> (tb.lt(input, tb.zero())), services);
 
         ArrayList<AbstractionPredicate> predicates = new ArrayList<>();
 

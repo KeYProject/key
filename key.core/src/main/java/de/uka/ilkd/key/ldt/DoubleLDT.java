@@ -1,18 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.Negative;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
@@ -112,7 +118,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -123,7 +129,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         if (left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())) {
@@ -133,7 +139,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (sub != null && sub.sort().extendsTrans(targetSort())) {
             return op instanceof Negative;
@@ -143,7 +149,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof DoubleLiteral : "Literal '" + lit + "' is not a double literal.";
         String s = ((DoubleLiteral) lit).getValue();
         double doubleVal = Double.parseDouble(s);
@@ -151,52 +157,35 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "neg":
-            return getNeg();
+    public @Nullable Function getFunctionFor(String op, Services services) {
+        return switch (op) {
+            case "gt" -> getGreaterThan();
+            case "geq" -> getGreaterOrEquals();
+            case "lt" -> getLessThan();
+            case "leq" -> getLessOrEquals();
+            case "div" -> getDiv();
+            case "mul" -> getMul();
+            case "add" -> getAdd();
+            case "sub" -> getSub();
+            case "neg" -> getNeg();
 
-        // Floating point extensions with "\fp_"
-        case "nan":
-            return getIsNaN();
-        case "zero":
-            return getIsZero();
-        case "infinite":
-            return getIsInfinite();
-        case "nice":
-            return getIsNice();
-        case "abs":
-            return getAbs();
-        case "negative":
-            return getIsNegative();
-        case "positive":
-            return getIsPositive();
-        case "subnormal":
-            return getIsSubnormal();
-        case "normal":
-            return getIsNormal();
-        }
-        return null;
+            // Floating point extensions with "\fp_"
+            case "nan" -> getIsNaN();
+            case "zero" -> getIsZero();
+            case "infinite" -> getIsInfinite();
+            case "nice" -> getIsNice();
+            case "abs" -> getAbs();
+            case "negative" -> getIsNegative();
+            case "positive" -> getIsPositive();
+            case "subnormal" -> getIsSubnormal();
+            case "normal" -> getIsNormal();
+            default -> null;
+        };
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+    public Function getFunctionFor(Operator op,
+            Services services,
             ExecutionContext ec) {
         if (op instanceof Negative) {
             return getJavaUnaryMinus();
@@ -211,7 +200,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
+    public DoubleLiteral translateTerm(JTerm t, ExtList children, Services services) {
         Function f = (Function) t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -229,7 +218,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {

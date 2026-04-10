@@ -1,26 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,7 +43,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <h2>How to update {@code taclet.old.txt} efficiently.</h2>
  * <p>
  * You can generate a new oracle easily by invoking the disabled test-method
- * {@link #createNewOracle()}. This method generates the {@code taclet.new.txt} file. Then, you
+ * {@link #createNewOracle()}. This method generates the {@code taclets.new.txt} file. Then, you
  * should use a diff-tool to compare the changes or directly overwrite {@code taclets.old.txt} with
  * the new representations.
  *
@@ -89,12 +91,13 @@ public class TestTacletEquality {
     private static InitConfig initConfig;
 
     @BeforeAll
-    static void setUp() throws ProofInputException, IOException, ProblemLoaderException {
-        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
+    static void setUp() throws Exception {
+        Path file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-            SingleThreadProblemLoader loader = new SingleThreadProblemLoader(file, null, null, null,
-                JavaProfile.getDefaultInstance(), true, control, false, null);
+            SingleThreadProblemLoader loader =
+                new SingleThreadProblemLoader(file, null, null, null,
+                    JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
             // uncomment the line, if you want to generate a new oracle file
@@ -124,6 +127,11 @@ public class TestTacletEquality {
         }
     }
 
+    // @Test
+    public void createOracle() {
+        createNewOracle();
+    }
+
     @ParameterizedTest
     @MethodSource("createCases")
     public void testEquality(String name, String expected) {
@@ -137,8 +145,7 @@ public class TestTacletEquality {
         Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
     }
 
-    @Nonnull
-    private String normalise(String expected) {
+    private @NonNull String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
     }
 

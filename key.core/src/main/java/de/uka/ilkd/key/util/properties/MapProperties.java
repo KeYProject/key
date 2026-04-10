@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.properties;
 
 import java.util.IdentityHashMap;
+
+import org.jspecify.annotations.Nullable;
 
 public class MapProperties extends AbstractProperties {
 
@@ -39,7 +44,7 @@ public class MapProperties extends AbstractProperties {
      * @see jatc.util.Properties#get(jatc.util.MapProperties.Property)
      */
     @Override
-    public <T> T get(Property<T> property) {
+    public <T> @Nullable T get(Property<T> property) {
         return property.getType().cast(map.get(property));
     }
 

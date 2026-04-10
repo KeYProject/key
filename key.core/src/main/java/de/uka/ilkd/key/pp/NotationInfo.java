@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
@@ -5,78 +8,76 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
+
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
  * <p>
  * Stores the mapping from operators to {@link Notation}s. Each {@link Notation} represents the
- * concrete syntax for some {@link de.uka.ilkd.key.logic.op.Operator}. The {@link LogicPrinter} asks
+ * concrete syntax for some {@link Operator}. The {@link LogicPrinter} asks
  * the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change. New Notations can be added.
  *
  * <p>
- * The next lines describe a general rule how to determine priorities and associativities:
+ * The next lines describe a general rule how to determine priorities and associativity:
  *
  * One thing we need to know from the pretty printer: Given a term <tt>t</tt> containg <tt>s</tt> as
  * proper subterm. Then <tt>s</tt> is printed in parentheses when the priority of the top level
  * symbol of <tt>s</tt> is strict less than the associativity of the position where <tt>s</tt>
  * occurs. For example:
  * <p>
- * Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativities for each of its subterms
- * be 40; <tt>OR</tt>s priority is <tt>20</tt> and the associativites are both <tt>30</tt> then
+ * Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativity for each of its subterms
+ * be 40; <tt>OR</tt>s priority is <tt>20</tt> and the associativity are both <tt>30</tt> then
  * <ul>
- * <li>formula <tt>(p & q) | r</tt> is pretty printed as <tt>p & q | r</tt> as the priority of & is
+ * <li>formula {@code (p & q) | r} is pretty printed as {@code p & q | r} as the priority of
+ * {@code &} is
  * 30 which is (greater or) equal than the associativity of <tt>OR</tt>s left subterm which is
  * 30.</li>
- * <li>In contrast the formula <tt>p & (q | r)</tt> is pretty printed as <tt>p & (q | r)</tt> as the
+ * <li>In contrast the formula {@code p & (q | r)} is pretty printed as {@code p & (q | r)} as the
  * priority of <tt>OR</tt> is 20 which is less than the associativity of <tt>AND</tt>s left subterm,
  * which is 40.</li>
  * </ul>
  *
  * A general rule to determine the correct priority and associativity is to use:
- *
+ * <p>
  * Grammar rules whose derivation delivers a syntactical correct logic term should follow a standard
  * numbering scheme, which is used as indicator for priorities and associativites, e.g. by simply
- * reading the grammar rule <blockquote><tt>term60 ::= term70 (IMP term70)?</tt></blockquote> we get
+ * reading the grammar rule <blockquote>{@code term60 ::= term70 (IMP term70)?}</blockquote> we get
  * the priority of <tt>IMP</tt>, which is <tt>60</tt>. The associativities of <tt>IMP</tt>s subterms
  * are not much more difficult to determine, namely the left subterm has associativity <tt>70</tt>
  * and in this case its the same for the right subterm (<tt>70</tt>).
+ * </p>
  * <p>
  * There are exceptional cases for
  * <ul>
  * <li><em>infix function</em> symbols that are left associative e.g. <code>-, +</code> <blockquote>
- * <tt> term90 ::= term100 (PLUS term100)* </tt> </blockquote> then the associative for the right
+ * {@code term90 ::= term100 (PLUS term100)* } </blockquote> then the associative for the right
  * subterm is increased by <tt>1</tt>, i.e. here we have a priority of <tt>90</tt> for <tt>PLUS</tt>
  * as infix operator, a left associativity of <tt>100</tt> <em>and</em> a right associativity of
  * <tt>101</tt></li>
- * <li>update and substituition terms: for them their associativity is determined dynamically by the
+ * <li>update and substitution terms: for them their associativity is determined dynamically by the
  * pretty printer depending if it is applied on a formula or term. In principal there should be two
  * different rules in the parser as then we could reuse the general rule from above, but there are
  * technical reasons which causes this exception.</li>
  * <li>some very few rules do not follow the usual parser design e.g. like
- * <blockquote><tt>R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 </tt></blockquote> where
- * <blockquote><tt>SubRule_ASS2 ::= OP SubRule_ASS1</tt></blockquote> Most of these few rules could
+ * <blockquote>{@code R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 }</blockquote> where
+ * <blockquote>{@code SubRule_ASS2 ::= OP SubRule_ASS1}</blockquote> Most of these few rules could
  * in general be rewritten to fit the usual scheme e.g. as
- * <blockquote><tt> R_PRIO ::= (OP)? SubRule_ASS1</tt></blockquote> using the priorities and
- * associativities of the so rewritten rules (instead of rewriting them actually) is a way to cope
+ * <blockquote>{@code R_PRIO ::= (OP)? SubRule_ASS1}</blockquote> using the priorities and
+ * associativity of the so rewritten rules (instead of rewriting them actually) is a way to cope
  * with them.</li>
  * </ul>
  */
 public final class NotationInfo {
-
-
-
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
     static final int PRIORITY_TOP = 0;
     static final int PRIORITY_EQUIVALENCE = 20;
@@ -109,6 +110,14 @@ public final class NotationInfo {
     public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
 
     /**
+     * Whether the final field special treatment is on. If on, then select(heap, o, f) is not
+     * pretty-printed as o.f.
+     * To be on the safe side, it is on by default.
+     */
+    public static boolean DEFAULT_FINAL_IMMUTABLE = true;
+
+
+    /**
      * This maps operators and classes of operators to {@link Notation}s. The idea is that we first
      * look whether the operator has a Notation registered. Otherwise, we see if there is one for
      * the <em>class</em> of the operator.
@@ -127,6 +136,8 @@ public final class NotationInfo {
 
     private boolean hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
 
+    private boolean finalImmutable = DEFAULT_FINAL_IMMUTABLE;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -135,7 +146,14 @@ public final class NotationInfo {
         this.notationTable = createDefaultNotation();
     }
 
-
+    public NotationInfo(boolean prettySyntax, boolean unicodeEnabled, boolean hidePackagePrefix) {
+        this.notationTable = createDefaultNotation();
+        this.prettySyntax = prettySyntax;
+        this.unicodeEnabled = unicodeEnabled;
+        this.hidePackagePrefix = hidePackagePrefix;
+        // TODO: Do we need this in addition?
+        // this.finalImmutable = finalImmutable;
+    }
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -162,36 +180,40 @@ public final class NotationInfo {
             new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
             new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.DIA,
+        tbl.put(JModality.JavaModalityKind.DIA,
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX,
+        tbl.put(JModality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
-            PRIORITY_POST_MODALITY));
-        tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(ModalOperatorSV.class,
+            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(JModality.JavaModalityKind.TOUT,
+            new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(JModality.JavaModalityKind.DIA_TRANSACTION,
+            new Notation.ModalityNotation("\\diamond_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(JModality.JavaModalityKind.BOX_TRANSACTION,
+            new Notation.ModalityNotation("\\box_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(JModality.JavaModalityKind.TOUT_TRANSACTION,
+            new Notation.ModalityNotation("\\throughout_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
         tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
         tbl.put(WarySubstOp.SUBST, new Notation.Subst());
         tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
         tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());
 
-        tbl.put(Function.class, new Notation.FunctionNotation());
+        tbl.put(JFunction.class, new Notation.FunctionNotation());
         tbl.put(LogicVariable.class, new Notation.VariableNotation());
         tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
         tbl.put(Equality.class,
             new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON));
         tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-        tbl.put(ModalOperatorSV.class,
-            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
         tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 
-        tbl.put(Sort.CAST_NAME,
+        tbl.put(JavaDLTheory.CAST_NAME,
             new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
         return tbl;
@@ -279,6 +301,7 @@ public final class NotationInfo {
         // heap operators
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+        tbl.put(HeapLDT.FINAL_NAME, new Notation.FinalNotation());
         tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
         tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
         tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
@@ -389,12 +412,15 @@ public final class NotationInfo {
     // -------------------------------------------------------------------------
 
     public void refresh(Services services) {
-        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
+        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED,
+            DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
-    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         this.unicodeEnabled = useUnicodeSymbols;
         this.prettySyntax = usePrettyPrinting;
+        this.hidePackagePrefix = hidePackagePrefix;
         if (usePrettyPrinting && services != null) {
             if (useUnicodeSymbols) {
                 this.notationTable = createUnicodeNotation(services);
@@ -404,7 +430,11 @@ public final class NotationInfo {
         } else {
             this.notationTable = createDefaultNotation();
         }
-        hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+
+        if (services != null && services.getProof() != null) {
+            ProofSettings settings = services.getProof().getSettings();
+            finalImmutable = FinalHeapResolution.isFinalEnabled(settings);
+        }
     }
 
     public AbbrevMap getAbbrevMap() {
@@ -435,6 +465,18 @@ public final class NotationInfo {
             return result;
         }
 
+        if (op instanceof Modality mod) {
+            result = notationTable.get(mod.kind());
+            if (result != null) {
+                return result;
+            } else {
+                result = notationTable.get(ModalOperatorSV.class);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
         if (op instanceof SchemaVariable) {
             result = notationTable.get(SchemaVariable.class);
             if (result != null) {
@@ -463,6 +505,13 @@ public final class NotationInfo {
             }
         }
 
+        if (op instanceof ParametricFunctionInstance pfi) {
+            result = notationTable.get(pfi.getBase());
+            if (result != null) {
+                return result;
+            }
+        }
+
         return new Notation.FunctionNotation();
     }
 
@@ -480,6 +529,10 @@ public final class NotationInfo {
 
     public void setHidePackagePrefix(boolean b) {
         hidePackagePrefix = b;
+    }
+
+    public boolean isFinalImmutable() {
+        return finalImmutable;
     }
 
     public Map<Object, Notation> getNotationTable() {

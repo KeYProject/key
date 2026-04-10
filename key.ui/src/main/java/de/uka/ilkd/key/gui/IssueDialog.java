@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -22,21 +25,32 @@ import javax.swing.text.html.HTMLDocument;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
+import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +103,7 @@ public final class IssueDialog extends JDialog {
     /** the warnings that are shown in this dialog */
     private final List<PositionedIssueString> warnings;
 
-    private final Map<String, String> fileContentsCache = new HashMap<>();
+    private final Map<URI, String> fileContentsCache = new HashMap<>();
 
     private final JTextField fTextField = new JTextField();
     private final JTextField lTextField = new JTextField();
@@ -191,7 +205,7 @@ public final class IssueDialog extends JDialog {
             String escapedTail = LogicPrinter.escapeHTML(tail, true);
             sb.append(escapedTail);
 
-            return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
+            return new PositionedIssueString(sb.toString(), pis.getLocation(),
                 pis.getAdditionalInfo());
         }).collect(Collectors.toList());
     }
@@ -229,9 +243,9 @@ public final class IssueDialog extends JDialog {
         this.throwable = throwable;
         this.critical = critical;
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.warnings = decorateHTML(warnings);
-        this.warnings.sort(Comparator.comparing(o -> o.fileName));
+        this.warnings.sort(Comparator.comparing(o -> o.location));
 
         setLayout(new BorderLayout());
 
@@ -366,8 +380,7 @@ public final class IssueDialog extends JDialog {
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
                     Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                    if (attribute instanceof AttributeSet) {
-                        AttributeSet set = (AttributeSet) attribute;
+                    if (attribute instanceof AttributeSet set) {
                         String href = (String) set.getAttribute(HTML.Attribute.HREF);
                         if (href != null) {
                             try {
@@ -407,8 +420,7 @@ public final class IssueDialog extends JDialog {
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
                     Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                    if (attribute instanceof AttributeSet) {
-                        AttributeSet set = (AttributeSet) attribute;
+                    if (attribute instanceof AttributeSet set) {
                         String href = (String) set.getAttribute(HTML.Attribute.HREF);
                         if (href != null && !entered) {
                             entered = true;
@@ -442,7 +454,7 @@ public final class IssueDialog extends JDialog {
             issueTextPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Desktop.getDesktop().browse(hle.getURL().toURI());
+                        SwingUtil.browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         LOGGER.warn("Failed to browse", ex);
                     }
@@ -469,8 +481,7 @@ public final class IssueDialog extends JDialog {
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
-        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument) {
-            HTMLDocument hdoc = (HTMLDocument) editor.getDocument();
+        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
             if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
                 return elem;
@@ -546,12 +557,20 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
      * shown in the dialog.
+     * Important: make sure to also log the exception before showing the dialog!
      *
      * @param parent the parent of the dialog (will be blocked)
      * @param exception the exception to display
      */
     public static void showExceptionDialog(Window parent, Throwable exception) {
-        Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
+        // make sure UI is usable after any exception
+        MainWindow.getInstance().getMediator().startInterface(true);
+
+        Set<PositionedIssueString> msg = extractMessage(exception);
+        if (exception instanceof BuildingExceptions) {
+            ((BuildingExceptions) exception).getErrors().forEach(
+                it -> LOGGER.info("Error", it));
+        }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
@@ -589,11 +608,39 @@ public final class IssueDialog extends JDialog {
      * @param exception the exception to extract the data from
      * @return a new PositionedIssueString created from the data
      */
-    private static PositionedIssueString extractMessage(Throwable exception) {
+    private static Set<PositionedIssueString> extractMessage(Throwable exception) {
+        { // Search for a BuildingException(s) first.
+            var e = exception;
+            while (e != null) {
+                switch (e) {
+                    case BuildingExceptions be -> {
+                        return extractMessages(be);
+                    }
+                    case BuildingException b -> {
+                        return extractMessage(b);
+                    }
+                    case JavaBuildingExceptions b -> {
+                        return extractMessages(b);
+                    }
+                    default -> {
+                    }
+                }
+                e = e.getCause();
+            }
+        }
+
         try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
+
+            switch (exception) {
+                case ParseCancellationException e -> exception = exception.getCause();
+                case InputMismatchException ime -> message = ExceptionTools.getNiceMessage(ime);
+                case NoViableAltException nvae -> message = ExceptionTools.getNiceMessage(nvae);
+                default -> {
+                }
+            }
 
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
@@ -603,21 +650,52 @@ public final class IssueDialog extends JDialog {
                             exception.getCause().toString());
             }
 
-            String resourceLocation = "";
+            URI resourceLocation = null;
             Position pos = Position.UNDEFINED;
             Location location = ExceptionTools.getLocation(exception);
-            if (Location.isValidLocation(location)) {
-                resourceLocation = location.getFileURL().toString();
-                pos = location.getPosition();
+            if (location != null) {
+                if (!location.getPosition().isNegative()) {
+                    pos = location.getPosition();
+                }
+                if (location.getFileURI().isPresent()) {
+                    resourceLocation = location.getFileURI().get();
+                }
             }
-            return new PositionedIssueString(message == null ? exception.toString() : message,
-                resourceLocation, pos, info);
+            return Collections.singleton(
+                new PositionedIssueString(message == null ? exception.toString() : message,
+                    new Location(resourceLocation, pos), info));
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             LOGGER.debug("Creating a Location failed for {}", exception, e);
         }
-        return new PositionedIssueString("Constructing the error message failed!");
+        return Collections.singleton(
+            new PositionedIssueString("Constructing the error message failed!"));
     }
+
+    private static Set<PositionedIssueString> extractMessages(JavaBuildingExceptions e) {
+        return e.getIssues().stream().map(IssueDialog::extractMessage).collect(Collectors.toSet());
+    }
+
+    private static Set<PositionedIssueString> extractMessages(BuildingExceptions e) {
+        return e.getErrors().stream().map(IssueDialog::extractMessage).collect(Collectors.toSet());
+    }
+
+    private static PositionedIssueString extractMessage(BuildingIssue e) {
+        var ps = e.asPositionedString();
+        return new PositionedIssueString(ps.text, ps.location, "",
+            e.isWarning() ? PositionedIssueString.Kind.WARNING : PositionedIssueString.Kind.ERROR);
+    }
+
+    private static PositionedIssueString extractMessage(JavaBuildingIssue e) {
+        return new PositionedIssueString(e.getMessage(), new Location(e.getPath(), e.getPosition()),
+            "", PositionedIssueString.Kind.ERROR);
+    }
+
+    private static Set<PositionedIssueString> extractMessage(BuildingException e) {
+        return Collections.singleton(new PositionedIssueString(e.getMessage(), e.getLocation(), "",
+            PositionedIssueString.Kind.ERROR));
+    }
+
 
     private void accept() {
         if (!critical && chkIgnoreWarnings.isSelected()) {
@@ -628,41 +706,57 @@ public final class IssueDialog extends JDialog {
 
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
-        if (!issue.fileName.isEmpty()) {
-            fTextField.setText("URL: " + issue.fileName);
+        Location location = issue.getLocation();
+        Position pos = location.getPosition();
+        cTextField.setText("Column: " + pos.column());
+        lTextField.setText("Line: " + pos.line());
+
+        btnEditFile.setEnabled(pos != Position.UNDEFINED);
+
+        if (location.getFileURI().isEmpty()) {
+            fTextField.setVisible(false);
+            txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
-            fTextField.setText("");
-        }
-        cTextField.setText("Column: " + issue.pos.column());
-        lTextField.setText("Line: " + issue.pos.line());
-
-        btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
-
-        try {
-            String source =
-                StringUtil.replaceNewlines(fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                        return IOUtil.readFrom(stream);
-                    } catch (IOException e) {
-                        LOGGER.debug("Unknown IOException!", e);
-                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                    }
-                }), "\n");
-
-            if (isJava(issue.fileName)) {
-                showJavaSourceCode(source);
-            } else {
-                txtSource.setText(source);
+            URI uri = location.getFileURI().get();
+            if (uri.getScheme() == null) {
+                uri = URI.create("file:" + uri.getPath());
             }
-            DefaultHighlighter dh = new DefaultHighlighter();
-            txtSource.setHighlighter(dh);
-            addHighlights(dh, issue.fileName);
+            fTextField.setText("URL: " + uri);
+            fTextField.setVisible(true);
 
-            // ensure that the currently selected problem is shown in view
-            int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
-            txtSource.setCaretPosition(offset);
-        } catch (Exception e) {
-            LOGGER.warn("Failed to update preview", e);
+            try {
+                URI finalUri = uri;
+                String source = StringUtil.replaceNewlines(
+                    fileContentsCache.computeIfAbsent(uri, fn -> {
+                        try {
+                            String result = IOUtil.readFrom(finalUri);
+                            if (result == null) {
+                                throw new NullPointerException();
+                            }
+                            return result;
+                        } catch (IOException e) {
+                            LOGGER.debug("Unknown IOException!", e);
+                            return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                        }
+                    }), "\n");
+
+                if (isJava(uri.getPath())) {
+                    showSourceCode(source, new JavaJMLEditorLexer());
+                } else if (isKeY(uri.getPath())) {
+                    showSourceCode(source, new KeYEditorLexer());
+                } else {
+                    txtSource.setText(source);
+                }
+                DefaultHighlighter dh = new DefaultHighlighter();
+                txtSource.setHighlighter(dh);
+                addHighlights(dh, uri);
+
+                // ensure that the currently selected problem is shown in view
+                int offset = pos.isNegative() ? 0 : getOffsetFromLineColumn(source, pos);
+                txtSource.setCaretPosition(offset);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to update preview", e);
+            }
         }
         validate();
     }
@@ -671,9 +765,9 @@ public final class IssueDialog extends JDialog {
         txtStacktrace.setText(issue.getAdditionalInfo());
     }
 
-    private void showJavaSourceCode(String source) {
+    private void showSourceCode(String source, SourceHighlightDocument.EditorLexer lexer) {
         try {
-            JavaDocument doc = new JavaDocument();
+            SourceHighlightDocument doc = new SourceHighlightDocument(lexer);
             txtSource.setDocument(doc);
             doc.insertString(0, source, new SimpleAttributeSet());
         } catch (BadLocationException e) {
@@ -681,18 +775,19 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-    private void addHighlights(DefaultHighlighter dh, String fileName) {
-        warnings.stream().filter(ps -> fileName.equals(ps.fileName))
+    private void addHighlights(DefaultHighlighter dh, URI url) {
+        warnings.stream().filter(ps -> ps.getLocation().getFileURI().equals(Optional.of(url)))
                 .forEach(ps -> addHighlights(dh, ps));
     }
 
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
         // if we have no position there is no highlight
-        if (ps.pos.isNegative()) {
+        Position pos = ps.getLocation().getPosition();
+        if (pos.isNegative()) {
             return;
         }
         String source = txtSource.getText();
-        int offset = getOffsetFromLineColumn(source, ps.pos);
+        int offset = getOffsetFromLineColumn(source, pos);
         int end = offset;
         while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
             end++;
@@ -709,7 +804,12 @@ public final class IssueDialog extends JDialog {
     }
 
     private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
+        // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
+        return fileName != null && fileName.endsWith(".java");
+    }
+
+    private boolean isKeY(String fileName) {
+        return fileName != null && (fileName.endsWith(".key") || fileName.endsWith(".proof"));
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {
@@ -748,9 +848,9 @@ public final class IssueDialog extends JDialog {
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Desktop.getDesktop().browse(hle.getURL().toURI());
+                        SwingUtil.browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        LOGGER.warn("Failed to browse", ex);
+                        LOGGER.warn("Failed to browse ", ex);
                     }
                 }
             });

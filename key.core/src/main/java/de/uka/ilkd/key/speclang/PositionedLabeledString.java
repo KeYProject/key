@@ -1,49 +1,39 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
- * moment, this is used to distinguish implicit specifications from explicit ones and '&' from '&&'
- * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or'). Cf.
- * {@link de.uka.ilkd.key.logic.TermImpl} and {@link de.uka.ilkd.key.logic.LabeledTermImpl}.
+ * moment, this is used to distinguish implicit specifications from explicit ones and {@code &} from
+ * {@code &&}
+ * (logical and shortcut 'and') as well as {@code |} from {@code ||} (logical and shortcut 'or').
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class PositionedLabeledString extends PositionedString {
 
     public final ImmutableArray<TermLabel> labels;
 
-    public PositionedLabeledString(String text, String fileName, Position pos,
+    public PositionedLabeledString(String text, Location location,
             ImmutableArray<TermLabel> labels) {
-        super(text, fileName, pos);
+        super(text, location);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
 
     }
 
-    public PositionedLabeledString(String text, String fileName, Position pos, TermLabel label) {
-        this(text, fileName, pos, new ImmutableArray<>(label));
-    }
-
-    public PositionedLabeledString(String text, String fileName, ImmutableArray<TermLabel> labels) {
-        this(text, fileName, null, labels);
-    }
-
-    public PositionedLabeledString(String text, String fileName, TermLabel label) {
-        this(text, fileName, new ImmutableArray<>(label));
-    }
-
-    public PositionedLabeledString(String text, ImmutableArray<TermLabel> labels) {
-        this(text, null, labels);
-    }
-
-    public PositionedLabeledString(String text, TermLabel label) {
-        this(text, new ImmutableArray<>(label));
+    public PositionedLabeledString(String text, Location location, TermLabel label) {
+        this(text, location, new ImmutableArray<>(label));
     }
 
     /**
@@ -84,10 +74,9 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString)) {
+        if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }
-        final PositionedLabeledString cmp = (PositionedLabeledString) o;
         if (labels.size() == cmp.labels.size()) {
             if (!super.equals(o)) {
                 return false;

@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
+
+import org.key_project.logic.op.ParsableVariable;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Argument types for {@link TacletBuilderCommand}s.
@@ -14,7 +18,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
  * @see TacletBuilderCommand
  */
 public enum ArgumentType {
-    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(Term.class),
+    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(JTerm.class),
     JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
 
     public final Class<?> clazz;

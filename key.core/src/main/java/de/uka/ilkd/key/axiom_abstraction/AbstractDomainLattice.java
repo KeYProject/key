@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction;
 
 import java.util.Iterator;
 
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
@@ -16,8 +19,6 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitt
  * through the domain elements, thereby respecting the partial order.
  *
  * @author Dominic Scheurer
- *
- * @param <AbstrDomElem>
  */
 public abstract class AbstractDomainLattice
         implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {
@@ -37,11 +38,11 @@ public abstract class AbstractDomainLattice
      * @param services The services object.
      * @return A suitable abstract domain element.
      */
-    public AbstractDomainElement abstractFrom(SymbolicExecutionState state, Term term,
+    public AbstractDomainElement abstractFrom(SymbolicExecutionState state, JTerm term,
             Services services) {
 
         for (AbstractDomainElement elem : this) {
-            Term toProve = getSideConditionForAxiom(state, term, elem, services);
+            JTerm toProve = getSideConditionForAxiom(state, term, elem, services);
 
             if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
                 return elem;
@@ -60,13 +61,13 @@ public abstract class AbstractDomainLattice
      * @param services The services object.
      * @return Side condition to prove in order to show that elem abstracts from term.
      */
-    public static Term getSideConditionForAxiom(SymbolicExecutionState state, Term term,
+    public static JTerm getSideConditionForAxiom(SymbolicExecutionState state, JTerm term,
             AbstractDomainElement elem, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        Term axiom = elem.getDefiningAxiom(term, services);
-        Term appl = tb.apply(state.first, axiom);
-        Term toProve = tb.imp(state.second, appl);
+        JTerm axiom = elem.getDefiningAxiom(term, services);
+        JTerm appl = tb.apply(state.first, axiom);
+        JTerm toProve = tb.imp(state.second, appl);
 
         return toProve;
     }

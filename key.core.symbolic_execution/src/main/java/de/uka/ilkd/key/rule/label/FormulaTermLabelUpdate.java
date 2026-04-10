@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
@@ -12,17 +15,17 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
@@ -46,46 +49,44 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
-            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
-        if (hint instanceof TacletLabelHint) {
-            TacletLabelHint tacletHint = (TacletLabelHint) hint;
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+            Set<TermLabel> labels) {
+        if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
-                    && (TruthValueTracingUtil.isPredicate(newTermOp)
-                            || TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs))) {
+                    && (TruthValueTracingUtil.isPredicate(newTerm)
+                            || TruthValueTracingUtil.isLogicOperator(newTerm.op(),
+                                newTerm.subs()))) {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
                         applicationPosInOccurrence, FormulaTermLabel.NAME);
-                    if (label instanceof FormulaTermLabel) {
-                        FormulaTermLabel oldLabel = (FormulaTermLabel) label;
+                    if (label instanceof FormulaTermLabel oldLabel) {
                         int labelSubID = FormulaTermLabel.newLabelSubID(services, oldLabel);
                         FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(),
                             labelSubID, Collections.singletonList(oldLabel.getId()));
                         labels.add(newLabel);
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
+                        FormulaTermLabelRefactoring.setParentRefactoringRequired(state, true);
                     }
                 }
             }
         }
-        if (ruleApp instanceof TacletApp) {
-            TacletApp ta = (TacletApp) ruleApp;
-            if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
+        if (ruleApp instanceof TacletApp ta) {
+            if (ta.assumesInstantionsComplete() && ta.assumesFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
-                for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                        ifInst.getConstrainedFormula().formula().getLabels());
+                        ((JTerm) ifInst.getSequentFormula().formula()).getLabels());
                     if (ifLabel != null) {
-                        ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
+                        ifLabels.put(ifInst.getSequentFormula(), ifLabel);
                     }
                 }
                 if (!ifLabels.isEmpty()) {
-                    if (TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)
+                    if (TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())
                     // || TruthValueEvaluationUtil.isPredicate(newTermOp)
                     ) {
                         for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels

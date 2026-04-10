@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
@@ -14,12 +16,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -39,18 +36,21 @@ public final class AutoModeAction extends MainWindowAction {
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofGoalsAdded(ProofTreeEvent e) {
             Proof p = e.getSource();
             ImmutableList<Goal> newGoals = e.getGoals();
@@ -69,7 +69,6 @@ public final class AutoModeAction extends MainWindowAction {
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
         setIcon(startLogo);
-        setAcceleratorKey(START_KEY);
 
         enable();
 
@@ -79,14 +78,15 @@ public final class AutoModeAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             }
 
             /**
-             * the selected proof has changed. Enable or disable action depending whether a proof is
+             * the selected proof has changed. Enable or disable action depending on whether a proof
+             * is
              * available or not
              */
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 if (associatedProof != null) {
                     associatedProof.removeProofTreeListener(ptl);
                 }
@@ -112,9 +112,10 @@ public final class AutoModeAction extends MainWindowAction {
                 if (associatedProof != null) {
                     associatedProof.removeProofTreeListener(ptl);
                 }
-                putValue(Action.NAME, "Stop");
-                putValue(Action.SMALL_ICON, stopLogo);
-                putValue(Action.ACCELERATOR_KEY, STOP_KEY);
+                putValue(NAME, "Stop");
+                putValue(SMALL_ICON, stopLogo);
+                putValue(ACCELERATOR_KEY, STOP_KEY);
+                enable();
             }
 
             /**
@@ -125,9 +126,10 @@ public final class AutoModeAction extends MainWindowAction {
                         && !associatedProof.containsProofTreeListener(ptl)) {
                     associatedProof.addProofTreeListener(ptl);
                 }
-                putValue(Action.NAME, getStartCommand());
-                putValue(Action.SMALL_ICON, startLogo);
-                putValue(Action.ACCELERATOR_KEY, START_KEY);
+                putValue(NAME, getStartCommand());
+                putValue(SMALL_ICON, startLogo);
+                putValue(ACCELERATOR_KEY, START_KEY);
+                enable();
             }
 
         });
@@ -166,7 +168,8 @@ public final class AutoModeAction extends MainWindowAction {
             // This method delegates the request only to the UserInterfaceControl which implements
             // the functionality.
             // No functionality is allowed in this method body!
-            getMediator().getUI().getProofControl().stopAndWaitAutoMode();
+            setEnabled(false);
+            getMediator().getUI().getProofControl().stopAutoMode();
         }
     }
 

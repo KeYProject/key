@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.util.event;
 
 import java.util.EventObject;
@@ -25,7 +28,7 @@ public class SideProofStoreEvent extends EventObject {
      * Constructor.
      *
      * @param source The source.
-     * @param proof The added or removed {@link Entry}s.
+     * @param entries The added or removed {@link Entry}s.
      */
     public SideProofStoreEvent(SideProofStore source, Entry[] entries) {
         super(source);

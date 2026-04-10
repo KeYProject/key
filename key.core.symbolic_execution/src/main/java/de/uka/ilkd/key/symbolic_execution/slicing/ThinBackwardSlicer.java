@@ -1,23 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -35,8 +38,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             throws ProofInputException {
         try {
             boolean accept = false;
-            if (activeStatement instanceof CopyAssignment) {
-                CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
+            if (activeStatement instanceof CopyAssignment copyAssignment) {
                 ImmutableArray<Expression> arguments = copyAssignment.getArguments();
                 if (arguments.size() >= 1) {
                     SourceElement originalTarget = arguments.get(0);
@@ -50,8 +52,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                         }
                     }
                 }
-            } else if (activeStatement instanceof MethodBodyStatement) {
-                MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+            } else if (activeStatement instanceof MethodBodyStatement mbs) {
                 IProgramVariable resultVariable = mbs.getResultVariable();
                 ReferencePrefix relevantTarget = toReferencePrefix(resultVariable);
                 if (relevantTarget != null
@@ -66,14 +67,14 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
                 // Compute modified locations
                 List<Location> modifiedLocations = new LinkedList<>();
-                Term loopConditionModalityTerm =
+                JTerm loopConditionModalityTerm =
                     SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                     throw new IllegalStateException(
                         "Use Loop Invariant/Operation Contract rule implementation has changed at node "
                             + node.serialNr() + ".");
                 }
-                Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
+                JTerm updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
                 while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
                     listModifiedLocations(UpdateApplication.getUpdate(updateTerm), services,
                         services.getTypeConverter().getHeapLDT(), modifiedLocations,

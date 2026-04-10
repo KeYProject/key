@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -15,6 +17,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.*;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +65,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-            tok.getTokenSource().getSourceName(), stack);
+            MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
@@ -133,11 +137,11 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final String source;
+        final URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, String source, String stack) {
+                int charPositionInLine, String msg, URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -153,7 +157,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         public String showInInput(String[] lines) {
-            String line = lines[this.line];
+            String line;
+            try {
+                line = lines[this.line];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                line = "";
+            }
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
                 + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
@@ -165,10 +174,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
     public static class ParserException extends RuntimeException implements HasLocation {
         private final List<SyntaxError> errors;
+        private final Location location;
 
         public ParserException(String msg, List<SyntaxError> errors) {
             super(msg);
             this.errors = errors;
+            if (errors.isEmpty()) {
+                location = Location.UNDEFINED;
+            } else {
+                SyntaxError e = errors.get(0);
+                // e.charPositionInLine is 0 based!
+                location =
+                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+            }
         }
 
         public String print(String[] lines, CharSequence delimter) {
@@ -188,14 +206,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public Location getLocation() throws MalformedURLException {
-            if (!errors.isEmpty()) {
-                SyntaxError e = errors.get(0);
-                // e.charPositionInLine is 0 based!
-                return new Location(MiscTools.parseURL(e.source),
-                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
-            }
-            return null;
+        public @NonNull Location getLocation() {
+            return location;
         }
     }
 }

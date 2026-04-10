@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.ArrayList;
@@ -6,7 +9,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -17,22 +19,25 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Proof slicing extension.
- * For more details see <a href="https://key-project.org/docs/user/ProofSlicing/">the user
+ * For more details see <a href="https://keyproject.github.io/key-docs/user/ProofSlicing/">the user
  * guide</a>.
  *
  * @author Arne Keller
@@ -42,6 +47,7 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
     experimental = false,
     optional = true,
     priority = 9001)
+@HelpInfo(path = "/user/ProofSlicing/")
 public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
@@ -68,8 +74,12 @@ public class SlicingExtension implements KeYGuiExtension,
      */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(
-                KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                T object) {
+            if (kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
+            }
+            PosInSequent pos = (PosInSequent) object;
 
             DependencyTracker tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
@@ -100,16 +110,15 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    @Nonnull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind,
-            @Nonnull Object underlyingObject) {
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind,
+            @NonNull T underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 
@@ -139,10 +148,9 @@ public class SlicingExtension implements KeYGuiExtension,
         });
     }
 
-    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(
-            @Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public @NonNull Collection<TabPanel> getPanels(
+            @NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             leftPanel = new SlicingLeftPanel(mediator, this);
             mediator.addKeYSelectionListener(leftPanel);

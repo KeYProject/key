@@ -1,11 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.configuration;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -23,8 +37,8 @@ public class ChoiceSelector extends JDialog {
     private static final String EXPLANATIONS_RESOURCE =
         "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
-    private final HashMap<String, String> category2DefaultChoice;
-    private HashMap<String, Set<String>> category2Choices;
+    private final Map<String, String> category2DefaultChoice;
+    private Map<String, Set<String>> category2Choices;
     private boolean changed = false;
 
 
@@ -44,7 +58,7 @@ public class ChoiceSelector extends JDialog {
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;
-        category2DefaultChoice = settings.getDefaultChoices();
+        category2DefaultChoice = new HashMap<>(settings.getDefaultChoices());
         if (category2DefaultChoice.isEmpty()) {
             JOptionPane.showConfirmDialog(ChoiceSelector.this,
                 "There are no Taclet Options available as the rule-files have not been parsed yet!",
@@ -89,7 +103,7 @@ public class ChoiceSelector extends JDialog {
             choiceList.addListSelectionListener(e -> {
                 ChoiceEntry selectedValue = choiceList.getSelectedValue();
                 if (selectedValue != null) {
-                    setDefaultChoice(selectedValue.getChoice());
+                    setDefaultChoice(selectedValue.choice());
 
                 } else {
                     setDefaultChoice(null);
@@ -271,7 +285,7 @@ public class ChoiceSelector extends JDialog {
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-        return ArrayUtil.search(choices, element -> element.getChoice().equals(choice));
+        return ArrayUtil.search(choices, element -> element.choice().equals(choice));
     }
 
     /**
@@ -308,9 +322,15 @@ public class ChoiceSelector extends JDialog {
     /**
      * Represents a choice with all its meta information.
      *
+     * @param choice The choice.
+     * @param unsound Is unsound?
+     * @param incomplete Is incomplete?
+     * @param information An optionally information.
      * @author Martin Hentschel
      */
-    public static class ChoiceEntry {
+    public record ChoiceEntry(String choice, boolean unsound, boolean incomplete,
+            String information) {
+
         /**
          * Text shown to the user in case of incompletness.
          */
@@ -322,26 +342,6 @@ public class ChoiceSelector extends JDialog {
         public static final String UNSOUND_TEXT = "Java modeling unsound";
 
         /**
-         * The choice.
-         */
-        private final String choice;
-
-        /**
-         * Is unsound?
-         */
-        private final boolean unsound;
-
-        /**
-         * Is incomplete?
-         */
-        private final boolean incomplete;
-
-        /**
-         * An optionally information.
-         */
-        private final String information;
-
-        /**
          * Constructor.
          *
          * @param choice The choice.
@@ -349,12 +349,8 @@ public class ChoiceSelector extends JDialog {
          * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
-        public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+        public ChoiceEntry {
             assert choice != null;
-            this.choice = choice;
-            this.unsound = unsound;
-            this.incomplete = incomplete;
-            this.information = information;
         }
 
         /**
@@ -362,7 +358,8 @@ public class ChoiceSelector extends JDialog {
          *
          * @return The choice.
          */
-        public String getChoice() {
+        @Override
+        public String choice() {
             return choice;
         }
 
@@ -371,7 +368,8 @@ public class ChoiceSelector extends JDialog {
          *
          * @return {@code true} unsound, {@code false} sound.
          */
-        public boolean isUnsound() {
+        @Override
+        public boolean unsound() {
             return unsound;
         }
 
@@ -380,7 +378,8 @@ public class ChoiceSelector extends JDialog {
          *
          * @return {@code true} incomplete, {@code false} complete.
          */
-        public boolean isIncomplete() {
+        @Override
+        public boolean incomplete() {
             return incomplete;
         }
 
@@ -389,7 +388,8 @@ public class ChoiceSelector extends JDialog {
          *
          * @return The optionally information.
          */
-        public String getInformation() {
+        @Override
+        public String information() {
             return information;
         }
 
@@ -397,27 +397,11 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public int hashCode() {
-            int hashcode = 5;
-            hashcode = hashcode * 17 + choice.hashCode();
-            hashcode = hashcode * 17 + (incomplete ? 5 : 3);
-            hashcode = hashcode * 17 + (unsound ? 5 : 3);
-            if (information != null) {
-                hashcode = hashcode * 17 + information.hashCode();
-            }
-            return hashcode;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ChoiceEntry) {
-                ChoiceEntry other = (ChoiceEntry) obj;
-                return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
-                        && unsound == other.isUnsound()
-                        && Objects.equals(information, other.getInformation());
+            if (obj instanceof ChoiceEntry(String choice1, boolean unsound1, boolean incomplete1, String information1)) {
+                return choice.equals(choice1) && incomplete == incomplete1
+                        && unsound == unsound1
+                        && Objects.equals(information, information1);
             } else {
                 return false;
             }

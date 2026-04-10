@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.*;
@@ -12,7 +15,6 @@ import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
@@ -24,6 +26,8 @@ import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
+import org.key_project.prover.sequent.Sequent;
 
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);
@@ -40,9 +44,12 @@ public class JoinDialog extends StdDialog {
 
     }
 
-    private static final String INFO = "It is not possible to join both goals, "
-        + "because new symbols have been introduced\n on the branches which belong to the goals: "
-        + "Up to now the treatment of new symbols\nis not supported by the joining mechanism.\n\n";
+    private static final String INFO = """
+            It is not possible to join both goals, because new symbols have been introduced
+             on the branches which belong to the goals: Up to now the treatment of new symbols
+            is not supported by the joining mechanism.
+
+            """;
 
 
     private static class ContentPanel extends Box {
@@ -190,57 +197,57 @@ public class JoinDialog extends StdDialog {
 
         private Box createLeftAlignedComponent(JComponent comp) {
 
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
             box.add(comp);
-            box.add(Box.createHorizontalGlue());
+            box.add(createHorizontalGlue());
             return box;
         }
 
         private void create() {
 
 
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
 
 
             box.add(getHeadline());
-            box.add(Box.createHorizontalGlue());
+            box.add(createHorizontalGlue());
 
 
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
             this.add(box);
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
 
-            box = Box.createHorizontalBox();
-            Box vertBox = Box.createVerticalBox();
+            box = createHorizontalBox();
+            Box vertBox = createVerticalBox();
             vertBox.add(createLeftAlignedComponent(getHeadline()));
             vertBox.add(new JScrollPane(getSequentViewer1()));
             box.add(vertBox);
 
 
-            vertBox = Box.createVerticalBox();
+            vertBox = createVerticalBox();
             JLabel label = new JLabel("<html><b>with</b></html>");
 
 
             label.setFont(this.getFont());
             vertBox.add(createLeftAlignedComponent(label));
 
-            Box horzBox = Box.createHorizontalBox();
+            Box horzBox = createHorizontalBox();
             horzBox.add(new JScrollPane(getChoiceList()));
-            horzBox.add(Box.createHorizontalStrut(5));
+            horzBox.add(createHorizontalStrut(5));
             horzBox.add(new JScrollPane(getSequentViewer2()));
             vertBox.add(horzBox);
             box.add(vertBox);
 
             this.add(box);
 
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
             this.add(createLeftAlignedComponent(getInfoPredicate()));
             this.add(getPredicateInput());
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
             this.add(getInfoBoxPane());
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
 
 

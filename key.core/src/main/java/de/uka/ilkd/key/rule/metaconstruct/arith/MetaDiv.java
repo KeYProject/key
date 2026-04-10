@@ -1,17 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 public final class MetaDiv extends AbstractTermTransformer {
 
@@ -42,9 +45,9 @@ public final class MetaDiv extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        Term arg1 = term.sub(0);
-        Term arg2 = term.sub(1);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        JTerm arg1 = term.sub(0);
+        JTerm arg2 = term.sub(1);
         BigInteger bigIntArg1;
         BigInteger bigIntArg2;
 
@@ -54,11 +57,11 @@ public final class MetaDiv extends AbstractTermTransformer {
             Name undefName = new Name("undef(" + term + ")");
             Function undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
-                undef = new Function(undefName,
+                undef = new JFunction(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }
-            return services.getTermFactory().createTerm(undef);
+            return services.getTermBuilder().func(undef);
         }
         BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
         BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);

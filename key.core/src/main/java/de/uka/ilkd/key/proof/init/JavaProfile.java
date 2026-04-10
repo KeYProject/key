@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -8,34 +11,19 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.JmlAssertRule;
-import de.uka.ilkd.key.rule.LoopApplyHeadRule;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
+import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserFactory;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.label.OriginTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
+import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -45,8 +33,30 @@ import org.key_project.util.collection.ImmutableSet;
  *
  */
 public class JavaProfile extends AbstractProfile {
-    public static final String NAME = "Java Profile";
+    public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
+
+    /**
+     * the name of the profile
+     *
+     * @return the name
+     */
+    @Override
+    public String ident() {
+        return permissions ? NAME_WITH_PERMISSIONS : PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return permissions ? NAME_WITH_PERMISSIONS : (PROFILE_ID + " (Default)");
+    }
+
+    @Override
+    public String description() {
+        return permissions
+                ? "Java programs with support for permissions"
+                : "The default for Java programs";
+    }
 
     /**
      * <p>
@@ -61,7 +71,7 @@ public class JavaProfile extends AbstractProfile {
     public static JavaProfile defaultInstance;
     public static JavaProfile defaultInstancePermissions;
 
-    public static final StrategyFactory DEFAULT = new JavaCardDLStrategyFactory();
+    public static final StrategyFactory DEFAULT = new ModularJavaDLStrategyFactory();
 
     private boolean permissions = false;
 
@@ -69,7 +79,7 @@ public class JavaProfile extends AbstractProfile {
 
     protected JavaProfile(String standardRules) {
         super(standardRules);
-        setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+        setSelectedGoalChooserBuilder(DepthFirstGoalChooserFactory.NAME);
     }
 
     public JavaProfile() {
@@ -119,7 +129,9 @@ public class JavaProfile extends AbstractProfile {
             new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                 new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
-            new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
+            new OriginTermLabelFactory(), originTermLabelPolicyList,
+            null, null,
+            null, null,
             originTermLabelRefactorings, null));
 
         result =
@@ -150,7 +162,9 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(UseDependencyContractRule.INSTANCE).prepend(getOneStepSimpilifier())
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
-                .prepend(JmlAssertRule.ASSUME_INSTANCE);
+                .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(SetStatementRule.INSTANCE)
+                .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
@@ -190,22 +204,13 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     public RuleJustification getJustification(Rule r) {
-        return r == UseOperationContractRule.INSTANCE || r == UseDependencyContractRule.INSTANCE
-                || r == BlockContractExternalRule.INSTANCE || r == LoopContractExternalRule.INSTANCE
-                        ? new ComplexRuleJustificationBySpec()
-                        : super.getJustification(r);
+        if (r instanceof ComplexJustificationable) {
+            return new ComplexRuleJustificationBySpec();
+        } else {
+            return super.getJustification(r);
+        }
     }
 
-
-    /**
-     * the name of the profile
-     *
-     * @return the name
-     */
-    @Override
-    public String name() {
-        return permissions ? NAME_WITH_PERMISSIONS : NAME;
-    }
 
     /**
      * the default strategy factory to be used

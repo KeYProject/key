@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
 
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -15,8 +17,10 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -35,7 +39,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     private enum TacletSections {
         REPLACE, ADD, ASSUM, FIND;
 
-        public Term getDefaultValue(TermServices services) {
+        public JTerm getDefaultValue(TermServices services) {
             return services.getTermBuilder().ff();
         }
     }
@@ -50,14 +54,14 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @param services TODO
      * @return translation
      */
-    private Term translateReplaceAndAddTerm(TacletGoalTemplate template, Term find,
+    private JTerm translateReplaceAndAddTerm(TacletGoalTemplate template, JTerm find,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
-        Term replace = find;
+        JTerm replace = find;
         if (template instanceof RewriteTacletGoalTemplate) {
             replace = ((RewriteTacletGoalTemplate) template).replaceWith();
         }
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -66,8 +70,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             replace = TacletSections.REPLACE.getDefaultValue(services);
         }
 
-        Term term = tb.imp(tb.equals(find, replace), add);
-        return term;
+        return tb.imp(tb.equals(find, replace), add);
     }
 
     /**
@@ -81,16 +84,17 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @param services TODO
      * @return translation
      */
-    private Term translateReplaceAndAddFormula(TacletGoalTemplate template, Term find, int polarity,
+    private JTerm translateReplaceAndAddFormula(TacletGoalTemplate template, JTerm find,
+            int polarity,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term replace = find;
+        JTerm replace = find;
         if (template instanceof RewriteTacletGoalTemplate) {
             replace = ((RewriteTacletGoalTemplate) template).replaceWith();
         }
 
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -102,38 +106,32 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         assert polarity == 0 || add == TacletSections.ADD.getDefaultValue(services)
                 : "add() commands not allowed in polarity rules (syntactically forbidden)";
 
-        Term term = tb.imp(translateEquivalence(find, replace, polarity, services), add);
-        return term;
+        return tb.imp(translateEquivalence(find, replace, polarity, services), add);
 
     }
 
-    private Term translateEquivalence(Term find, Term replace, int polarity,
+    private JTerm translateEquivalence(JTerm find, JTerm replace, int polarity,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
-        switch (polarity) {
-        case 0:
-            return tb.equals(find, replace);
-        case 1:
-            return tb.imp(replace, find);
-        case -1:
-            return tb.imp(find, replace);
-        default:
-            throw new IllegalArgumentException();
-        }
+        return switch (polarity) {
+            case 0 -> tb.equals(find, replace);
+            case 1 -> tb.imp(replace, find);
+            case -1 -> tb.imp(find, replace);
+            default -> throw new IllegalArgumentException();
+        };
     }
 
-    private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
+    private JTerm translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
             TermServices services) {
-
         TermBuilder tb = services.getTermBuilder();
         Sequent replace = null;
         if (template instanceof AntecSuccTacletGoalTemplate) {
             replace = ((AntecSuccTacletGoalTemplate) template).replaceWith();
         }
 
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        Term rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
+        JTerm rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
                 : translate(replace, services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -141,34 +139,32 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         if (rep == null) {
             rep = TacletSections.REPLACE.getDefaultValue(services);
         }
-        Term term = tb.or(rep, add);
-        return term;
+        return tb.or(rep, add);
     }
 
     /**
      * Translates a RewriteTaclet to a formula.
      */
     @Override
-    public Term translate(Taclet taclet, TermServices services) throws IllegalTacletException {
+    public JTerm translate(Taclet taclet, TermServices services) throws IllegalTacletException {
 
 
         TermBuilder tb = services.getTermBuilder();
 
         // the standard translation of the patterns.
 
-        Term find = TacletSections.FIND.getDefaultValue(services),
+        JTerm find = TacletSections.FIND.getDefaultValue(services),
                 assum = TacletSections.ASSUM.getDefaultValue(services);
 
         // translate the find pattern.
-        if (taclet instanceof FindTaclet) {
-            FindTaclet findTaclet = (FindTaclet) taclet;
+        if (taclet instanceof FindTaclet findTaclet) {
             if (getFindFromTaclet(findTaclet) != null) {
                 find = getFindFromTaclet(findTaclet);
             }
         }
 
         // translate the replace and add patterns of the taclet.
-        ImmutableList<Term> list = ImmutableSLList.nil();
+        ImmutableList<JTerm> list = ImmutableSLList.nil();
 
         for (TacletGoalTemplate template : taclet.goalTemplates()) {
 
@@ -178,9 +174,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             } else if (taclet instanceof SuccTaclet) {
                 list = list.append(translateReplaceAndAddSequent(template, SUCC, services));
 
-            } else if (taclet instanceof RewriteTaclet) {
-                RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
-                if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
+            } else if (taclet instanceof RewriteTaclet rwTaclet) {
+                if (rwTaclet.find().sort().equals(JavaDLTheory.FORMULA)) {
                     int polarity = getPolarity(rwTaclet);
                     list = list.append(
                         translateReplaceAndAddFormula(template, find, polarity, services));
@@ -196,8 +191,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                     "Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
             }
         }
-        if (taclet.ifSequent() != null) {
-            if ((assum = translate(taclet.ifSequent(), services)) == null) {
+        if (taclet.assumesSequent() != null) {
+            if ((assum = translate(taclet.assumesSequent(), services)) == null) {
                 assum = TacletSections.ASSUM.getDefaultValue(services);
             }
         }
@@ -214,22 +209,22 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     /**
      * Retrieve the "find" Term from a FindTaclet.
-     *
+     * <p>
      * Originally, this simply calls {@link FindTaclet#find()}. Overriding classes may choose to
      * garnish the result with additional information.
      *
      * @param findTaclet a non-null taclet instance
      * @return the find clause of the argument
      */
-    protected Term getFindFromTaclet(FindTaclet findTaclet) {
+    protected JTerm getFindFromTaclet(FindTaclet findTaclet) {
         return findTaclet.find();
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        int restr = rwTaclet.getApplicationRestriction();
-        if ((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+        var restr = rwTaclet.applicationRestriction();
+        if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
-        } else if ((restr & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+        } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {
             return +1;
         } else {
             return 0;

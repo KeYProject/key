@@ -1,7 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Timer;
@@ -9,19 +17,21 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
+import de.uka.ilkd.key.gui.actions.useractions.SMTProofApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
@@ -32,6 +42,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import org.key_project.logic.Term;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -85,6 +97,10 @@ public class SolverListener implements SolverLauncherListener {
 
         public SMTProblem getProblem() {
             return problem;
+        }
+
+        public SMTSolver getSolver() {
+            return solver;
         }
 
         private void addInformation(String title, String content) {
@@ -192,22 +208,51 @@ public class SolverListener implements SolverLauncherListener {
 
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
+        // ensure that the goal closing does not lag the UI
         mediator.stopInterface(true);
         try {
-            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
+            new SMTProofApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
+            // switch to new open goal
+            mediator.getSelectionModel().defaultSelection();
         }
 
     }
 
+    /**
+     * Reduce the sequent on each open goal to the formulas present
+     * in the unsat core computed by one of the SMT solvers.
+     */
     private void focusResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+            // focus each goal
+            Set<Goal> focusedGoals = new HashSet<>();
+            Set<Goal> failedToFocus = new HashSet<>();
+            for (InternSMTProblem problem : problems) {
+                Goal goal = problem.problem.getGoal();
+                Node goalNode = goal.node();
+                if (focusedGoals.contains(goal)
+                        || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+                    continue; // already done
+                }
+                if (SMTFocusResults.focus(problem.problem, mediator.getServices())) {
+                    focusedGoals.add(goal);
+                    failedToFocus.remove(goal);
+
+                    // focus SMT application
+                    if (goalNode == mediator.getSelectedNode()) {
+                        mediator.getSelectionModel().setSelectedNode(goal.node());
+                    }
+                } else {
+                    failedToFocus.add(goal);
+                }
+            }
+            if (!failedToFocus.isEmpty()) {
                 JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "None of the SMT solvers provided an unsat core.",
+                    "None of the SMT solvers provided an unsat core for one of the goals.",
                     "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
             }
         } finally {
@@ -255,9 +300,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
 
-
         boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
-
 
 
         progressDialog =
@@ -267,7 +310,6 @@ public class SolverListener implements SolverLauncherListener {
         SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));
 
     }
-
 
 
     private InternSMTProblem getProblem(int col, int row) {
@@ -286,13 +328,19 @@ public class SolverListener implements SolverLauncherListener {
 
     private void discardEvent(final SolverLauncher launcher) {
         launcher.stop();
-        progressDialog.setVisible(false);
+        progressDialog.dispose();
     }
 
     private void applyEvent(final SolverLauncher launcher) {
         launcher.stop();
         applyResults();
-        progressDialog.setVisible(false);
+        /*
+         * Previously, the progressDialog was only made invisible which enabled users to
+         * click the apply button more than once, each time creating a new SMT goal.
+         * Disposing of the dialog is fine as it is created anew each time a SolverLauncher
+         * is started anyway (see #launcherStarted(), #prepareDialog()).
+         */
+        progressDialog.dispose();
     }
 
     @Override
@@ -331,22 +379,22 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
-        switch (state) {
-        case Running:
-            running(problem);
-            return true;
-        case Stopped:
-            stopped(problem);
-            return false;
-        case Waiting:
-            waiting(problem);
-            return true;
-
-        }
-        return true;
+        return switch (state) {
+            case Running -> {
+                running(problem);
+                yield true;
+            }
+            case Stopped -> {
+                stopped(problem);
+                yield false;
+            }
+            case Waiting -> {
+                waiting(problem);
+                yield true;
+            }
+        };
 
     }
 
@@ -411,25 +459,18 @@ public class SolverListener implements SolverLauncherListener {
         int x = problem.getSolverIndex();
         int y = problem.getProblemIndex();
         switch (reason) {
-        case Exception:
-            progressModel.setProgress(0, x, y);
-            progressModel.setTextColor(RED.get(), x, y);
-            progressModel.setText("Exception!", x, y);
-
-
-
-            break;
-        case NoInterruption:
-            throw new RuntimeException("This position should not be reachable!");
-
-        case Timeout:
-            progressModel.setProgress(0, x, y);
-            progressModel.setText("Timeout.", x, y);
-
-            break;
-        case User:
-            progressModel.setText("Interrupted by user.", x, y);
-            break;
+            case Exception -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setTextColor(RED.get(), x, y);
+                progressModel.setText("Exception!", x, y);
+            }
+            case NoInterruption ->
+                throw new RuntimeException("This position should not be reachable!");
+            case Timeout -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setText("Timeout.", x, y);
+            }
+            case User -> progressModel.setText("Interrupted by user.", x, y);
         }
     }
 
@@ -536,20 +577,19 @@ public class SolverListener implements SolverLauncherListener {
 
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
-        String message = "You are using a version of " + type.getName()
-            + " which has not been tested for this version of KeY.\nIt can therefore be that"
-            + " errors occur that would not occur\nusing the following version or higher:\n" +
-            type.getMinimumSupportedVersion();
-        return message;
+        return ("""
+                You are using a version of %s which has not been tested for this version of KeY.
+                It can therefore be that errors occur that would not occur
+                using the following version or higher:
+                %s""")
+                .formatted(type.getName(), type.getMinimumSupportedVersion());
     }
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
 
-
         private final SolverLauncher launcher;
         private final boolean counterexample;
-
 
 
         public ProgressDialogListenerImpl(SolverLauncher launcher, boolean counterexample) {
@@ -605,13 +645,13 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     /**
-     * Checks if the given {@link Term} contains a modality, query, or update.
+     * Checks if the given {@link JTerm} contains a modality, query, or update.
      *
-     * @param term The {@link Term} to check.
+     * @param term The {@link JTerm} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
-    public static boolean containsModalityOrQuery(Term term) {
+    public static boolean containsModalityOrQuery(JTerm term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
         return visitor.containsModOrQuery();
@@ -624,7 +664,7 @@ public class SolverListener implements SolverLauncherListener {
      *
      * @author jschiffl
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor implements DefaultVisitor {
         /**
          * The result.
          */
@@ -635,7 +675,7 @@ public class SolverListener implements SolverLauncherListener {
          */
         @Override
         public void visit(Term visited) {
-            if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
+            if (visited.op() instanceof JModality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }
         }

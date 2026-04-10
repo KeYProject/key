@@ -1,20 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -24,6 +26,21 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
+    private final Behavior behavior;
+    private ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    public TextualJMLSpecCase(TextualJMLSpecCase specCase) {
+        this(specCase.modifiers, specCase.behavior);
+        clauses.addAll(specCase.clauses);
+    }
+
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+        super(modifiers);
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
+        this.behavior = behavior;
+    }
 
     public ImmutableList<LabeledParserRuleContext> getRequiresFree(Name toString) {
         return getList(REQUIRES_FREE, toString);
@@ -33,8 +50,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
-            @Nonnull Name heap) {
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
+        return getList(ASSIGNABLE_FREE, toString);
+    }
+
+    private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
+            @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
                     .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
@@ -58,12 +83,20 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(REQUIRES, heap);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
         return getList(ASSIGNABLE, heap);
     }
 
     public ImmutableList<LabeledParserRuleContext> getDecreases() {
         return getList(DECREASES);
+    }
+
+    public Iterable<ParserRuleContext> getClauses() {
+        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toList());
     }
 
     /**
@@ -76,13 +109,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     /**
      * Heap-dependent clauses
+     * Note that the name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
     public enum ClauseHd {
-        ACCESSIBLE, ASSIGNABLE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE, AXIOMS,
+        ACCESSIBLE, ASSIGNABLE, ASSIGNABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
+        AXIOMS,
     }
 
-    private final Behavior behavior;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
 
     static class Entry {
         final Object clauseType;
@@ -98,14 +132,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Entry(Object clauseType, LabeledParserRuleContext ctx) {
             this(clauseType, ctx, null);
         }
-    }
-
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @Nonnull Behavior behavior) {
-        super(mods);
-        if (behavior == null) {
-            throw new IllegalArgumentException();
-        }
-        this.behavior = behavior;
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
@@ -143,20 +169,29 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
+    public boolean contains(ClauseHd clause, @Nullable Name heapName) {
+        return clauses.stream()
+                .anyMatch(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
+    public boolean removeClauses(ClauseHd clause, @Nullable Name heapName) {
+        return clauses
+                .removeIf(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
     /**
      * Merge clauses of two spec cases. Keep behavior of this one.
      *
      * @param other
      */
-    public @Nonnull TextualJMLSpecCase merge(@Nonnull TextualJMLSpecCase other) {
-        TextualJMLSpecCase res = clone();
+    public @NonNull TextualJMLSpecCase merge(@NonNull TextualJMLSpecCase other) {
+        TextualJMLSpecCase res = copy();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
-    @Override
-    public @Nonnull TextualJMLSpecCase clone() {
-        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+    public @NonNull TextualJMLSpecCase copy() {
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getModifiers(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);
         return res;
@@ -177,8 +212,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
-            + mods + ", name='" + name + '\'' + '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
+            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 
@@ -187,9 +222,22 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
-    public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
+    /**
+     * An abbreviation is a short-name for a term. Currently unused during the JML translation.
+     * A relict from older days ({@link #getAbbreviations()}.
+     *
+     * @param typeName name of the type
+     * @param abbrevName the short-representation of the term
+     * @param abbreviatedTerm the term to be abbreviated.
+     */
+    public record Abbreviation(LabeledParserRuleContext typeName,
+            LabeledParserRuleContext abbrevName,
+            LabeledParserRuleContext abbreviatedTerm) {
+    }
+
+    public Abbreviation[] getAbbreviations() {
         /* weigl: prepare for future use of generated abbreviations from JML specifications */
-        return new Triple[0];
+        return new Abbreviation[0];
     }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
@@ -231,6 +279,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
@@ -249,10 +301,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TextualJMLSpecCase)) {
+        if (!(o instanceof TextualJMLSpecCase that)) {
             return false;
         }
-        TextualJMLSpecCase that = (TextualJMLSpecCase) o;
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

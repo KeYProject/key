@@ -1,0 +1,7 @@
+contains:
+  - (assert (not (forall ((var_i Int)) (=> (>= var_i 0) (>= (* 2 var_i) var_i)))))
+expected: VALID
+keySrc: |-
+  \problem {
+    \forall int i; (i >= 0 -> 2*i >= i)
+  }

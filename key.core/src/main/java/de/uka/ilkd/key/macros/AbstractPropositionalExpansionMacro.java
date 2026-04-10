@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
@@ -5,13 +8,21 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
+
+import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -50,7 +61,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
             allowOSS());
     }
@@ -63,7 +75,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * @param goal context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+            PosInOccurrence pio,
             Goal goal) {
         return true;
     }
@@ -72,15 +85,15 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * This strategy accepts all rule apps for which the rule name is in the admitted set and
      * rejects everything else.
      */
-    private static class PropExpansionStrategy implements Strategy {
-
+    private static class PropExpansionStrategy implements Strategy<Goal> {
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
-        private final Strategy delegate;
+        private final Strategy<@NonNull Goal> delegate;
         private final boolean allowOSS;
 
-        public PropExpansionStrategy(Strategy delegate, Set<String> admittedRuleNames,
+        public PropExpansionStrategy(Strategy<@NonNull Goal> delegate,
+                Set<String> admittedRuleNames,
                 boolean allowOSS) {
             this.delegate = delegate;
             this.admittedRuleNames = admittedRuleNames;
@@ -93,12 +106,14 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
-                return delegate.computeCost(ruleApp, pio, goal);
+                return delegate.computeCost(ruleApp, pio, goal, mState);
             } else if (admittedRuleNames.contains(name)) {
-                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
+                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal, mState);
                 // pass through negative costs
                 if (origCost instanceof NumberRuleAppCost
                         && ((NumberRuleAppCost) origCost).getValue() < 0) {
@@ -112,7 +127,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             return delegate.isApprovedApp(app, pio, goal);
         }
 
@@ -125,6 +141,5 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
-
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase.analyst;
 
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
@@ -21,6 +24,6 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
             "/proofReferences/UseOperationContractTest/UseOperationContractTest.java",
             "UseOperationContractTest", "main", true, new ContractProofReferencesAnalyst(),
             new ExpectedProofReferences(IProofReference.USE_CONTRACT,
-                "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                "pre: {heap=java.lang.Object::$inv(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::$inv(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}free post: {heap=true, savedHeap=null}; modifiable: {heap=allLocs, savedHeap=null}; hasModifiable: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
     }
 }

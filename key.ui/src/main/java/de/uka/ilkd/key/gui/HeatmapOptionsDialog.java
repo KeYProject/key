@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -163,6 +166,7 @@ public class HeatmapOptionsDialog extends JDialog {
         pack();
         setAlwaysOnTop(true);
         setResizable(false);
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     /**
@@ -371,7 +375,7 @@ public class HeatmapOptionsDialog extends JDialog {
             p.add(l, BorderLayout.NORTH);
             this.setContentPane(p);
             this.pack();
-            this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             this.setLocationRelativeTo(owner);
             this.setAlwaysOnTop(true);
             this.setVisible(true);

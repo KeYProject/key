@@ -1,22 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * variable condition used if a new variable is introduced
  */
-public class NewVarcond {
+public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
 
     private final SchemaVariable sv;
     private final SchemaVariable peerSV;
     private final KeYJavaType type;
 
-
     /*
-     * @param sv the Schemavariable representing a new variable.
+     * @param sv the SchemaVariable representing a new variable.
      *
-     * @param peerSV a Schemavariable defining the type of the new variable.
+     * @param peerSV a SchemaVariable defining the type of the new variable.
      */
     public NewVarcond(SchemaVariable sv, SchemaVariable peerSV) {
         assert sv != null;
@@ -26,7 +30,6 @@ public class NewVarcond {
         this.type = null;
     }
 
-
     public NewVarcond(SchemaVariable sv, KeYJavaType type) {
         assert sv != null;
         assert type != null;
@@ -34,7 +37,6 @@ public class NewVarcond {
         this.peerSV = null;
         this.type = type;
     }
-
 
     public boolean isDefinedByType() {
         return peerSV == null;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.Hashtable;
@@ -18,7 +21,7 @@ public class MaxRuleAppSlider extends JSlider {
     private KeYMediator mediator;
 
     public MaxRuleAppSlider(KeYMediator mediator, String text) {
-        super(SwingConstants.HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);
+        super(HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);
         this.text = text;
 
         this.mediator = mediator;

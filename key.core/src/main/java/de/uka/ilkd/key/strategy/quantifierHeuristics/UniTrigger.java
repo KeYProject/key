@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -37,6 +40,7 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
 
+    @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
@@ -66,15 +70,15 @@ class UniTrigger implements Trigger {
     }
 
 
+    @Override
     public Term getTriggerTerm() {
         return trigger;
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof UniTrigger)) {
+        if (!(arg0 instanceof UniTrigger a)) {
             return false;
         }
-        final UniTrigger a = (UniTrigger) arg0;
         return a.trigger.equals(trigger);
     }
 
@@ -119,7 +123,7 @@ class UniTrigger implements Trigger {
      * Test whether this substitution constains loop. It is mainly used for unitrigger's loop test.
      */
     private static boolean containsLoop(Substitution subst) {
-        final Iterator<QuantifiableVariable> it = subst.getVarMap().keyIterator();
+        final var it = subst.getVarMap().keyIterator();
         while (it.hasNext()) {
             if (containsLoop(subst.getVarMap(), it.next())) {
                 return true;
@@ -131,7 +135,8 @@ class UniTrigger implements Trigger {
     /**
      * Code copied from logic.EqualityConstraint
      */
-    private static boolean containsLoop(ImmutableMap<QuantifiableVariable, Term> varMap,
+    private static boolean containsLoop(
+            ImmutableMap<QuantifiableVariable, Term> varMap,
             QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
         ImmutableList<Term> fringe = ImmutableSLList.nil();
@@ -142,10 +147,10 @@ class UniTrigger implements Trigger {
         }
 
         while (true) {
-            for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
+            for (var quantifiableVariable : checkForCycle.freeVars()) {
                 final QuantifiableVariable termVar = quantifiableVariable;
                 if (!body.contains(termVar)) {
-                    final Term termVarterm = varMap.get(termVar);
+                    final var termVarterm = (JTerm) varMap.get(termVar);
                     if (termVarterm != null) {
                         if (termVarterm.freeVars().contains(var)) {
                             return true;

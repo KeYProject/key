@@ -1,18 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 
@@ -91,7 +97,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -102,7 +108,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())
@@ -110,13 +116,13 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return sub != null && sub.sort().extendsTrans(targetSort()) && op instanceof Negative;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof FloatLiteral : "Literal '" + lit + "' is not a float literal.";
         String s = ((FloatLiteral) lit).getValue();
         float flValue = Float.parseFloat(s);
@@ -124,75 +130,48 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+    public Function getFunctionFor(Operator op,
+            Services services,
             ExecutionContext ec) {
-        if (op instanceof GreaterThan) {
-            return getGreaterThan();
-        } else if (op instanceof LessThan) {
-            return getLessThan();
-        } else if (op instanceof GreaterOrEquals) {
-            return getGreaterOrEquals();
-        } else if (op instanceof LessOrEquals) {
-            return getLessOrEquals();
-        } else if (op instanceof Negative) {
-            return getJavaUnaryMinus();
-        } else if (op instanceof Plus) {
-            return getJavaAdd();
-        } else if (op instanceof Minus) {
-            return getJavaSub();
-        } else if (op instanceof Times) {
-            return getJavaMul();
-        } else if (op instanceof Divide) {
-            return getJavaDiv();
-        } else if (op instanceof Modulo) {
-            return getJavaMod();
-        } else {
-            return null;
-        }
+        return switch (op) {
+            case GreaterThan ignored -> getGreaterThan();
+            case LessThan ignored -> getLessThan();
+            case GreaterOrEquals ignored -> getGreaterOrEquals();
+            case LessOrEquals ignored -> getLessOrEquals();
+            case Negative ignored -> getJavaUnaryMinus();
+            case Plus ignored -> getJavaAdd();
+            case Minus ignored -> getJavaSub();
+            case Times ignored -> getJavaMul();
+            case Divide ignored -> getJavaDiv();
+            case Modulo ignored -> getJavaMod();
+            default -> null;
+        };
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "neg":
-            return getNeg();
-        // Floating point extensions with "\fp_"
-        case "nan":
-            return getIsNaN();
-        case "zero":
-            return getIsZero();
-        case "infinite":
-            return getIsInfinite();
-        case "nice":
-            return getIsNice();
-        case "abs":
-            return getAbs();
-        case "negative":
-            return getIsNegative();
-        case "positive":
-            return getIsPositive();
-        case "subnormal":
-            return getIsSubnormal();
-        case "normal":
-            return getIsNormal();
-        }
-        return null;
+    public @Nullable Function getFunctionFor(String op, Services services) {
+        return switch (op) {
+            case "gt" -> getGreaterThan();
+            case "geq" -> getGreaterOrEquals();
+            case "lt" -> getLessThan();
+            case "leq" -> getLessOrEquals();
+            case "div" -> getDiv();
+            case "mul" -> getMul();
+            case "add" -> getAdd();
+            case "sub" -> getSub();
+            case "neg" -> getNeg();
+            // Floating point extensions with "\fp_"
+            case "nan" -> getIsNaN();
+            case "zero" -> getIsZero();
+            case "infinite" -> getIsInfinite();
+            case "nice" -> getIsNice();
+            case "abs" -> getAbs();
+            case "negative" -> getIsNegative();
+            case "positive" -> getIsPositive();
+            case "subnormal" -> getIsSubnormal();
+            case "normal" -> getIsNormal();
+            default -> null;
+        };
     }
 
     @Override
@@ -202,7 +181,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
+    public FloatLiteral translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -222,7 +201,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_FLOAT;
         } else {

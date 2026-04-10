@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.lang.reflect.Constructor;
@@ -11,8 +14,9 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
+
+import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +101,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * been specified for that sort.
      *
      * @param s {@link Sort} of for elements in the lattice.
-     * @param predicates {@link AbstractionPredicate}s for all sorts.
+     * @param applicablePredicates {@link AbstractionPredicate}s for all sorts.
      * @param latticeType Type of {@link AbstractPredicateAbstractionLattice}.
      * @param services The {@link Services} object.
      * @return The corresponding {@link AbstractDomainLattice}.

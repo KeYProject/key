@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
+
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
@@ -15,7 +18,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> type of object to store
  */
-public class DefaultImmutableSet<T> implements ImmutableSet<T> {
+public class DefaultImmutableSet<T extends @Nullable Object> implements ImmutableSet<T> {
 
     /**
      *
@@ -32,7 +35,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** the empty set */
     @SuppressWarnings("unchecked")
-    public static final <T> DefaultImmutableSet<T> nil() {
+    public static <T extends @Nullable Object> DefaultImmutableSet<T> nil() {
         return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 
@@ -45,7 +48,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      *
      * @param element of type <T> the new Set contains
      */
-    protected DefaultImmutableSet(T element) {
+    private DefaultImmutableSet(T element) {
         elementList = (ImmutableSLList.<T>nil()).prepend(element);
     }
 
@@ -57,6 +60,10 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      */
     private DefaultImmutableSet(ImmutableList<T> elementList) {
         this.elementList = elementList;
+    }
+
+    public static <T> ImmutableSet<T> fromCollection(Collection<T> seq) {
+        return new DefaultImmutableSet<>(ImmutableList.fromList(seq));
     }
 
     // private static HashSet<String> previousComplains = new HashSet<>();
@@ -156,7 +163,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.nil();
+            return nil();
         } else {
             return new DefaultImmutableSet<>(intersectElements);
         }
@@ -175,14 +182,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return true iff obj in set */
     @Override
-    public boolean contains(T obj) {
+    public boolean contains(@Nullable Object obj) {
         complainAboutSize();
         return elementList.contains(obj);
     }
 
     /** @return true iff this set is subset of set s */
     @Override
-    public boolean subset(ImmutableSet<T> s) {
+    public boolean subset(ImmutableSet<? extends @Nullable Object> s) {
         if (size() > s.size()) {
             return false;
         } else {
@@ -221,14 +228,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<>(list);
+        return list.isEmpty() ? nil() : new DefaultImmutableSet<>(list);
     }
 
     /**
      * @return true iff the this set is subset of o and vice versa.
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == this) {
             return true;
         }
@@ -283,7 +290,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param list a non-null immutable list
      * @return a fresh immutable set with the same iteration order.
      */
-    public static <T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
+    public static <T extends @Nullable Object> ImmutableSet<T> fromImmutableList(
+            ImmutableList<T> list) {
         if (list.isEmpty()) {
             return nil();
         } else {
@@ -291,48 +299,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
     }
 
-    /**
-     * Create an immutable set from a mutable set
-     *
-     * @param set a non-null mutable set
-     * @return a fresh immutable set with all the elements in set
-     */
-    public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
-        if (set == null) {
-            return null;
-        }
-        if (set.isEmpty()) {
-            return nil();
-        } else {
-            ImmutableList<T> backerList = ImmutableSLList.nil();
-            for (T element : set) {
-                backerList = backerList.prepend(element);
-            }
-            return new DefaultImmutableSet<>(backerList);
-        }
-    }
-
-
-    public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
-        if (seq == null) {
-            return null;
-        }
-        return fromSet(new HashSet<>(seq));
-    }
-
-
     @Override
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("{");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("}");
-        return str.toString();
+        return Strings.formatAsList(this, "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */
@@ -377,7 +346,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
         /** @return true iff obj in set */
         @Override
-        public boolean contains(T obj) {
+        public boolean contains(@Nullable Object obj) {
             return false;
         }
 
@@ -389,7 +358,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
         /** @return true iff this set is subset of set s */
         @Override
-        public boolean subset(ImmutableSet<T> s) {
+        public boolean subset(ImmutableSet<? extends @Nullable Object> s) {
             return true;
         }
 
@@ -406,10 +375,10 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
 
         /**
-         * @return true iff the this set is subset of o and vice versa.
+         * @return true iff this set is subset of o and vice versa.
          */
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof NILSet<?>;
         }
 

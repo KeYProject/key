@@ -1,22 +1,43 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
- * loop. It unwinds the loop: e.g. <code>
+ * loop. It unwinds the loop: e.g.
+ *
+ * <pre>
+ * {@code
  * while ( i<10 ) {
  *   i++
  * }
- * </code> becomes if (i<10) l1:{ l2:{ i++; } while (i<10) { i++; } }
+ * }
+ * </pre>
+ *
+ * becomes
+ *
+ * <pre>
+ * {@code
+ * if (i < 10)
+ *     l1: {
+ *         l2: {
+ *             i++;
+ *         }
+ *         while (i < 10) { i++; }
+ *     }
+ * }
+ * </pre>
  *
  */
 public class UnwindLoop extends ProgramTransformer {
@@ -42,10 +63,9 @@ public class UnwindLoop extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        if (!(pe instanceof LoopStatement)) {
+        if (!(pe instanceof LoopStatement originalLoop)) {
             return new ProgramElement[] { pe };
         }
-        final LoopStatement originalLoop = (LoopStatement) pe;
 
         final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
             (ProgramElementName) svInst.getInstantiation(outerLabel),

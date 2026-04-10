@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -34,15 +37,13 @@ public final class SaveBundleAction extends MainWindowAction {
 
         // react to setting changes
         GeneralSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        settings.addSettingsListener(e -> updateStatus());
+        settings.addPropertyChangeListener(e -> updateStatus());
 
         // react to changes of proof selection
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 updateStatus();
             }
         });

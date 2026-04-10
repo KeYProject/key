@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -5,7 +8,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -16,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice
@@ -32,13 +35,28 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
     protected SettingsPanel() {
-        pCenter.setLayout(new MigLayout(new LC().fillX().wrapAfter(3), new AC().count(3).fill(1)
-                .grow(1000f, 1).size("16px", 2).grow(0f, 0).align("right", 0)));
+        pCenter.setLayout(new MigLayout(
+            // set up rows:
+            new LC().fillX()
+                    // remove the padding after the help icon
+                    .insets(null, null, null, "0").wrapAfter(3),
+            // set up columns:
+            new AC().count(3).fill(1)
+                    // label column does not grow
+                    .grow(0f, 0)
+                    // input area does grow
+                    .grow(1000f, 1)
+                    // help icon always has the same size
+                    .size("16px", 2)
+                    .align("right", 0)));
     }
 
     /**
-     * @param info
-     * @return
+     * Factory method for the construction of informational displays using
+     * text areas.
+     *
+     * @param info information to be shown
+     * @return a new {@link JTextArea} showing the given information
      */
     protected static JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
@@ -164,12 +182,21 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
+     * Adds a new combobox to the panel.
+     *
+     * @param title
+     *        label of the combo box
      * @param info
+     *        help text
      * @param selectionIndex
+     *        which item to initially select
      * @param validator
+     *        validator
      * @param items
+     *        the items
      * @param <T>
-     * @return
+     *        the type of the items
+     * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
             @Nullable Validator<T> validator, T... items) {
@@ -190,7 +217,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
+        } else if (title != null) {
+            pCenter.add(new JLabel(title));
+            pCenter.add(comboBox, new CC().wrap());
         } else {
+            // TODO: this branch seems to always throw an exception
             add(comboBox, new CC().span(2).wrap());
         }
         return comboBox;
@@ -213,6 +244,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JScrollPane field = createTextArea(text, validator);
         addTitledComponent(title, field, info);
         return (JTextArea) field.getViewport().getView();
+    }
+
+    protected JTextArea addTextAreaWithoutScroll(String title, String text, String info,
+            final Validator<String> validator) {
+        JTextArea field = createTextAreaWithoutScroll(text, validator);
+        addTitledComponent(title, field, info);
+        return field;
     }
 
 
@@ -242,24 +280,35 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
     /**
      * Create a titled JSpinner (with additional information) for entering numbers in [min, max].
-     * The min and max values have to be comparable (to check min <= value <= max) and min must be a
-     * Number to be handled by the JSpinner's SpinnerNumberModel correctly. The Number class of min
-     * also determines how the default NumberFormatter used by the JSpinner formats entered Strings
+     * The min and max values have to be comparable (to check {@code min <= value <= max} and
+     * {@code min} must be a
+     * {@link Number} to be handled by the {@link JSpinner}'s {@link SpinnerNumberModel} correctly.
+     * The Number class of min
+     * also determines how the default {@link javax.swing.text.NumberFormatter} used by the
+     * {@link JSpinner} formats entered Strings
      * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
      *
      * If there are additional restrictions for the entered values, the passed validator can check
-     * those. The entered values have to be of a subclass of Number (as this is a number text
-     * field), otherwise the Number-Validator will fail.
+     * those. The entered values have to be of a subclass of {@link Number} (as this is a number
+     * text
+     * field), otherwise the {@link Validator} will fail.
      *
-     * @param title the title of the text field
-     * @param min the minimum value that can be entered
-     * @param max the maximum value that can be entered
-     * @param step the step size used when changing the entered value using the JSpinner's arrow
+     * @param title
+     *        the title of the text field
+     * @param min
+     *        the minimum value that can be entered
+     * @param max
+     *        the maximum value that can be entered
+     * @param step
+     *        the step size used when changing the entered value using the JSpinner's arrow
      *        buttons
-     * @param info arbitrary information about the text field
-     * @param validator a validator for checking the entered values
+     * @param info
+     *        arbitrary information about the text field
+     * @param validator
+     *        a validator for checking the entered values
      * @return the created JSpinner
-     * @param <T> the class of the minimum value
+     * @param <T>
+     *        the class of the minimum value
      */
     protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
             Comparable<T> max, Number step, String info, final Validator<Number> validator) {
@@ -307,7 +356,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Creates an empty validator instance.
      *
-     * @param <T> arbitrary
+     * @param <T>
+     *        arbitrary
      * @return non-null
      */
     protected <T> Validator<T> emptyValidator() {

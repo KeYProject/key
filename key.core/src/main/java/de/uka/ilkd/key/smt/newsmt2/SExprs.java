@@ -1,14 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.
@@ -51,14 +51,11 @@ public class SExprs {
      * @return an SExpr equivalent to the conjunction of the clauses.
      */
     public static SExpr and(List<SExpr> clauses) {
-        switch (clauses.size()) {
-        case 0:
-            return TRUE;
-        case 1:
-            return clauses.get(0);
-        default:
-            return new SExpr("and", Type.BOOL, clauses);
-        }
+        return switch (clauses.size()) {
+            case 0 -> TRUE;
+            case 1 -> clauses.get(0);
+            default -> new SExpr("and", Type.BOOL, clauses);
+        };
     }
 
     /**
@@ -139,19 +136,19 @@ public class SExprs {
 
         if (type == Type.UNIVERSE) {
             // Use the injection to go to universe
-            if (orgType.injection == null) {
+            if (orgType.injection() == null) {
                 throw new SMTTranslationException(
                     "Cannot inject from " + orgType + " into U: " + exp);
             }
-            return new SExpr(orgType.injection, type, exp);
+            return new SExpr(orgType.injection(), type, exp);
         }
 
         if (orgType == Type.UNIVERSE) {
             // Use the projection to go to other type
-            if (type.projection == null) {
+            if (type.projection() == null) {
                 throw new SMTTranslationException("Cannot project from U to " + type + ": " + exp);
             }
-            return new SExpr(type.projection, type, exp);
+            return new SExpr(type.projection(), type, exp);
         }
 
         throw new SMTTranslationException(
@@ -316,18 +313,18 @@ public class SExprs {
     }
 
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr(">=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr(">=", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<=", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
@@ -335,18 +332,18 @@ public class SExprs {
     }
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("-", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("-", IntegerOpHandler.INT, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("+", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("+", IntegerOpHandler.INT, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
-        return new SExpr("ite", Type.UNIVERSE, SExprs.coerce(cond, Type.BOOL),
-            SExprs.coerce(_then, Type.UNIVERSE), SExprs.coerce(_else, Type.UNIVERSE));
+        return new SExpr("ite", Type.UNIVERSE, coerce(cond, Type.BOOL),
+            coerce(_then, Type.UNIVERSE), coerce(_else, Type.UNIVERSE));
     }
 
     public static SExpr let(String var, SExpr val, SExpr in) {

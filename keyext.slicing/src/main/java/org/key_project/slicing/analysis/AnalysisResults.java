@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.analysis;
 
 import java.util.Collections;
@@ -8,13 +11,21 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
+import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Results of the dependency analysis algorithm.
@@ -27,6 +38,7 @@ public final class AnalysisResults {
      * The analyzed proof.
      */
     public final Proof proof;
+    public final DependencyGraph dependencyGraph;
     /**
      * Total amount of rule applications.
      */
@@ -81,6 +93,7 @@ public final class AnalysisResults {
      * Specify the results of analyzing a proof.
      *
      * @param proof the analyzed proof
+     * @param dependencyGraph the dependency graph of the proof
      * @param totalSteps the number of steps in the proof
      * @param ruleStatistics statistics on analyzed rules
      * @param usefulSteps set of useful steps to include in the slice
@@ -93,6 +106,7 @@ public final class AnalysisResults {
      */
     public AnalysisResults(
             Proof proof,
+            DependencyGraph dependencyGraph,
             int totalSteps,
             RuleStatistics ruleStatistics,
             Set<Node> usefulSteps,
@@ -103,6 +117,7 @@ public final class AnalysisResults {
             boolean didDeduplicateRuleApps,
             ExecutionTime executionTime) {
         this.proof = proof;
+        this.dependencyGraph = dependencyGraph;
         this.totalSteps = totalSteps;
         this.usefulStepsNr = usefulSteps.size();
         this.ruleStatistics = ruleStatistics;
@@ -134,6 +149,32 @@ public final class AnalysisResults {
      */
     public boolean indicateSlicingPotential() {
         return totalSteps > usefulStepsNr;
+    }
+
+    /**
+     * Reduce the sequent of the provided node to formulas deemed useful.
+     * (Formulas are useful if they are used to close the branch.)
+     *
+     * @param node proof node
+     * @return sequent with only useful formulas
+     */
+    public Sequent reduceSequent(Node node) {
+        final Sequent seq = node.sequent();
+        return JavaDLSequentKit.createSequent(reduce(seq.antecedent().asList(), node, true),
+            reduce(seq.succedent().asList(), node, false));
+    }
+
+    private ImmutableList<SequentFormula> reduce(ImmutableList<SequentFormula> semi, Node node,
+            boolean antec) {
+        ImmutableList<SequentFormula> semiList = ImmutableSLList.nil();
+        for (SequentFormula sf : semi) {
+            var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
+            if (usefulNodes.contains(graphNode)) {
+                semiList = semiList.prepend(sf);
+            }
+        }
+        return semiList.size() == semi.size() ? semi : semiList.reverse();
     }
 
     @Override

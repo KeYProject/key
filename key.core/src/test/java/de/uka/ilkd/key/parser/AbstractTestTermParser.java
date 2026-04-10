@@ -1,19 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class AbstractTestTermParser {
+
+    private static Services SERVICES = null;
 
     protected final TermFactory tf;
     protected final TermBuilder tb;
@@ -35,6 +44,7 @@ public class AbstractTestTermParser {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        // services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
@@ -56,9 +66,10 @@ public class AbstractTestTermParser {
         io.load(content).parseFile().loadDeclarations().loadSndDegreeDeclarations();
     }
 
-    public Term parseProblem(String s) {
+    public JTerm parseProblem(String s) {
         try {
-            new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+            TacletForTests.services().getJavaService()
+                    .parseSpecialClasses();
             KeyIO io = new KeyIO(TacletForTests.services(), nss);
             KeyIO.Loader loader = io.load(s);
             return loader.getProblem();
@@ -67,20 +78,21 @@ public class AbstractTestTermParser {
         }
     }
 
-    public Term parseTerm(String s) throws Exception {
+    public JTerm parseTerm(String s) throws Exception {
         return io.parseExpression(s);
     }
 
-    public Term parseFormula(String s) throws Exception {
+    public JTerm parseFormula(String s) throws Exception {
         return parseTerm(s);
     }
 
     /**
-     * Convert a {@link Term} into a {@link String}.
+     * Convert a {@link JTerm} into a {@link String}.
      *
-     * @param t The {@link Term} that will be converted.
+     * @param t
+     *        The {@link JTerm} that will be converted.
      */
-    protected String printTerm(Term t) {
+    protected String printTerm(JTerm t) {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.getNotationInfo().setHidePackagePrefix(false);
         lp.printTerm(t);
@@ -89,7 +101,7 @@ public class AbstractTestTermParser {
 
     /**
      * Remove whitespaces before executing
-     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
+     * {@link org.junit.jupiter.api.Assertions#assertEquals(Object, Object)}.
      */
     protected static void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
@@ -100,21 +112,24 @@ public class AbstractTestTermParser {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""), message);
     }
 
-    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult)
-            throws IOException {
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, JTerm expectedParseResult) {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
-        String message = "\nAssertion failed while pretty-printing a term:\n" + expectedParseResult
-            + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
-            + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
-            + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        String message = ("""
+
+                Assertion failed while pretty-printing a term:
+                %s
+                Expected pretty-syntax is: "%s"
+                But pretty-printing resulted in: "%s"
+                (whitespaces are ignored during comparison of the above strings)
+                """).formatted(expectedParseResult, expectedPrettySyntax, printedSyntax);
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
-    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax)
+    protected void verifyParsing(JTerm expectedParseResult, String expectedPrettySyntax)
             throws Exception {
         // check whether parsing pretty-syntax produces the correct term
-        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
+        JTerm parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. " + "Parsed string \""
             + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
             + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
@@ -123,35 +138,39 @@ public class AbstractTestTermParser {
 
     /**
      * Takes two different String representations for the same term and checks whether they result
-     * in the same {@link Term} after parsing. Subsequently, the {@link Term} is printed back to a
+     * in the same {@link JTerm} after parsing. Subsequently, the {@link JTerm} is printed back to a
      * {@link String} and compared with the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax {@link Term} in verbose syntax.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        {@link JTerm} representation in pretty-syntax.
+     * @param verboseSyntax
+     *        {@link JTerm} in verbose syntax.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
             String verboseSyntax, String... optionalStringRepresentations) throws Exception {
-        Term expectedParseResult = parseTerm(verboseSyntax);
+        JTerm expectedParseResult = parseTerm(verboseSyntax);
         compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult,
             optionalStringRepresentations);
     }
 
     /**
-     * Takes a {@link String} and a {@link Term} and checks whether they can be transformed into
+     * Takes a {@link String} and a {@link JTerm} and checks whether they can be transformed into
      * each other by the operations parsing and printing.
      *
-     * @param prettySyntax Expected result after pretty-printing {@code expectedParseResult}.
-     * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        Expected result after pretty-printing {@code expectedParseResult}.
+     * @param expectedParseResult
+     *        Expected result after parsing {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
-            Term expectedParseResult, String... optionalStringRepresentations) throws Exception {
+            JTerm expectedParseResult, String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);
         verifyPrettyPrinting(prettySyntax, expectedParseResult);
@@ -165,8 +184,9 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "termParser" + File.separator + "parserTest.key");
+        Path keyFile = HelperClassForTests.TESTCASE_DIRECTORY
+                .resolve("termParser")
+                .resolve("parserTest.key");
         return HelperClassForTests.createServices(keyFile);
     }
 

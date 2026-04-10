@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 
@@ -53,7 +56,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
         charLiteral = op(C);
 
-        constant = ConstantTermFeature.INSTANCE;
+        constant = constantTermFeature();
 
         atom = add(not(addF), not(mulF));
         linearMonomial = or(atom, opSub(mul, atom, literal));

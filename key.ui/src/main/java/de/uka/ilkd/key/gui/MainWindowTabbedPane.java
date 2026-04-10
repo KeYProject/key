@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -43,10 +46,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
 
 
         // change some key mappings which collide with font settings.
-        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent()
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP,
                     Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(
+        getInputMap(WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(
             KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         setName("leftTabbed");
     }

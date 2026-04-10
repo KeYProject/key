@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -6,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
@@ -17,7 +20,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class HeapContext {
 
-    public static List<LocationVariable> getModHeaps(Services services, boolean transaction) {
+    public static List<LocationVariable> getModifiableHeaps(Services services,
+            boolean transaction) {
         List<LocationVariable> result = new ArrayList<>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -41,12 +45,12 @@ public class HeapContext {
         return result;
     }
 
-    public static Map<LocationVariable, Term> getAtPres(
+    public static Map<LocationVariable, JTerm> getAtPres(
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        final Map<LocationVariable, Term> result = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> result = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final LocationVariable lv = atPreVars.get(heap);
-            final Term t = lv == null ? null : services.getTermBuilder().var(lv);
+            final JTerm t = lv == null ? null : services.getTermBuilder().var(lv);
             result.put(heap, t);
         }
         return result;

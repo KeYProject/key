@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -9,6 +11,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Shows the proof management dialog
@@ -25,20 +29,20 @@ public final class ProofManagementAction extends MainWindowAction {
         setName("Proof Management");
         setTooltip("Browse contracts and possible proof targets");
         setIcon(IconFactory.proofMgt(16));
-        setAcceleratorLetter(KeyEvent.VK_M);
 
         setEnabled(enabled());
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             }
 
             /**
-             * the selected proof has changed. Enable or disable action depending whether a proof is
+             * the selected proof has changed. Enable or disable action depending on whether a proof
+             * is
              * available or not
              */
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 setEnabled(enabled());
             }
         });

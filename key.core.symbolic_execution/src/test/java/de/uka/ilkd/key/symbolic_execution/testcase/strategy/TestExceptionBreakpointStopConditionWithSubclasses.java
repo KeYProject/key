@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -23,7 +26,7 @@ public class TestExceptionBreakpointStopConditionWithSubclasses
     @Test // weigl not prev. activated
     public void testBreakpointStopCondition() throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         try {

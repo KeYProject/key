@@ -1,0 +1,15 @@
+\problem {
+add(Z(2(#)), Z(2(#))) = Z(4(#))
+}
+
+\proof {
+(keyLog "0" (keyUser "arne" ) (keyVersion "3b3afbd3c459d500948aebed1347d8d52aa969d6"))
+
+(autoModeTime "17")
+
+(branch "dummy ID"
+(rule "add_literals" (formula "1") (term "0"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "closeTrue" (formula "1"))
+)
+}

@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A {@code Styler} is a part of a strategy to implement a flexible mechanism for the representation
@@ -16,5 +19,5 @@ public interface Styler<T> {
      * Set the required style information in {@code current} accordingly to the object given in
      * {@code obj}.
      */
-    void style(@Nonnull Style current, @Nonnull T obj);
+    void style(@NonNull Style current, @NonNull T obj);
 }

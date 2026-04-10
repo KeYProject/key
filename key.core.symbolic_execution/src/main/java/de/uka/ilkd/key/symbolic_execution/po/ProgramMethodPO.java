@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -6,27 +9,28 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,17 +43,22 @@ import org.key_project.util.collection.ImmutableSLList;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodBodyStatement&gt}catch(java.lang.Exception e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <methodBodyStatement>
+ * } catch(java.lang.Exception e) {
+ *    exc = e
+ * }
+ * <modalityEnd>
+ *  (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  *
@@ -148,8 +157,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -157,8 +166,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
@@ -175,9 +184,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected JTerm getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         return tb.tt();
     }
@@ -186,8 +195,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected JTerm buildFrameClause(List<LocationVariable> modHeaps, Map<JTerm, JTerm> heapToAtPre,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         return tb.tt();
     }
 
@@ -195,8 +205,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return Modality.DIA;
+    protected JModality.JavaModalityKind getTerminationMarker() {
+        return JModality.JavaModalityKind.DIA;
     }
 
     /**
@@ -236,8 +246,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodPO) {
-            ProgramMethodPO other = (ProgramMethodPO) obj;
+        if (obj instanceof ProgramMethodPO other) {
             return Objects.equals(pm, other.getProgramMethod())
                     && Objects.equals(precondition, other.getPrecondition());
         } else {
@@ -256,14 +265,17 @@ public class ProgramMethodPO extends AbstractOperationPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
-        properties.setProperty("method", getProgramMethodSignature(getProgramMethod(), true));
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("method", getProgramMethodSignature(getProgramMethod(), true));
         if (getPrecondition() != null && !getPrecondition().isEmpty()) {
-            properties.setProperty("precondition", getPrecondition());
+            c.set("precondition", getPrecondition());
         }
+        return c;
     }
 
     /**
@@ -288,37 +300,22 @@ public class ProgramMethodPO extends AbstractOperationPO {
     }
 
     /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        return new LoadedPOContainer(new ProgramMethodPO(initConfig, getName(properties),
-            getProgramMethod(initConfig, properties), getPrecondition(properties),
-            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
-    }
-
-    /**
      * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
      *
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already loaded {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The found {@link IProgramMethod}.
      * @throws IOException Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
-    public static IProgramMethod getProgramMethod(InitConfig initConfig, Properties properties)
+    public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
             throws IOException {
         // Get container class and method signature
-        String value = properties.getProperty("method");
+        String value = properties.getString("method");
         if (value == null) {
             throw new IOException("Property \"method\" is not defined.");
         }
-        int classMethodSeparator = value.indexOf("#");
+        int classMethodSeparator = value.indexOf('#');
         if (classMethodSeparator < 0) {
             throw new IOException(
                 "Property \"method\" does not contain the class method separator \"#\".");
@@ -327,12 +324,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
         String signature = value.substring(classMethodSeparator + 1);
         JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         // Split signature in name and parameter type names
-        int breaketsStart = signature.indexOf("(");
+        int breaketsStart = signature.indexOf('(');
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \"(\".");
         }
-        int breaketsEnd = signature.lastIndexOf(")");
+        int breaketsEnd = signature.lastIndexOf(')');
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \")\".");
@@ -359,7 +356,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         }
         IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
         if (pm == null) {
-            pm = javaInfo.getConstructor(type, parameterTypes);
+            pm = javaInfo.getConstructor(type, parameterTypes, type);
             if (pm == null) {
                 throw new IOException("Can't find program method \"" + value + "\".");
             }
@@ -373,13 +370,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param properties The proof obligation settings to read from.
      * @return The precondition or {@code null} if not available.
      */
-    public static String getPrecondition(Properties properties) {
-        return properties.getProperty("precondition");
+    public static String getPrecondition(Configuration properties) {
+        return properties.getString("precondition");
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         // TODO Auto-generated method stub
         return null;
     }

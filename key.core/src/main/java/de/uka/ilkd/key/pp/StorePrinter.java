@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.JTerm;
+
+import org.key_project.logic.op.Function;
 
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following
@@ -21,7 +25,7 @@ class StorePrinter extends FieldPrinter {
      * Common code for all pretty-printed store variants. This section is executed at the beginning
      * of pretty-printing.
      */
-    private void initPrettyPrint(LogicPrinter lp, final Term heapTerm) {
+    private boolean initPrettyPrint(LogicPrinter lp, final JTerm heapTerm) {
         lp.layouter.startTerm(4);
 
         lp.layouter.markStartSub();
@@ -35,13 +39,15 @@ class StorePrinter extends FieldPrinter {
         }
 
         lp.layouter.print("[");
+
+        return hasEmbedded;
     }
 
     /*
      * Common code for all pretty-printed store variants. This section is executed at the end of
      * pretty-printing.
      */
-    private void finishPrettyPrint(LogicPrinter lp, final Term valueTerm, boolean closingBrace) {
+    private void finishPrettyPrint(LogicPrinter lp, final JTerm valueTerm, boolean closingBrace) {
         lp.layouter.print(" := ");
         lp.layouter.markStartSub();
         lp.printTerm(valueTerm);
@@ -54,7 +60,7 @@ class StorePrinter extends FieldPrinter {
         }
     }
 
-    void printStore(LogicPrinter lp, Term t, boolean closingBrace) {
+    void printStore(LogicPrinter lp, JTerm t, boolean closingBrace) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 4;
 
@@ -62,12 +68,12 @@ class StorePrinter extends FieldPrinter {
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
-            final Term heapTerm = t.sub(0);
-            final Term objectTerm = t.sub(1);
-            final Term fieldTerm = t.sub(2);
-            final Term valueTerm = t.sub(3);
+            final JTerm heapTerm = t.sub(0);
+            final JTerm objectTerm = t.sub(1);
+            final JTerm fieldTerm = t.sub(2);
+            final JTerm valueTerm = t.sub(3);
 
-            if (isStaticFieldConstant(objectTerm, fieldTerm)) {
+            if (isStaticFieldConstant(fieldTerm)) {
                 printStoreOnStaticField(lp, heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 printStoreOnGenericFieldConstant(lp, heapTerm, objectTerm, fieldTerm, valueTerm,
@@ -89,10 +95,10 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents an array element.
      */
-    private void printStoreOnArrayElement(LogicPrinter lp, final Term heapTerm,
-            final Term objectTerm,
-            final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(lp, heapTerm);
+    private void printStoreOnArrayElement(LogicPrinter lp, final JTerm heapTerm,
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+        boolean embedded = initPrettyPrint(lp, heapTerm);
 
         PosTableLayouter layouter = lp.layouter();
         layouter.markStartSub();
@@ -110,16 +116,16 @@ class StorePrinter extends FieldPrinter {
 
         layouter.print("]");
 
-        finishPrettyPrint(lp, valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, !embedded);
     }
 
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnJavaFieldConstant(LogicPrinter lp, final Term heapTerm,
-            final Term objectTerm,
-            final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(lp, heapTerm);
+    private void printStoreOnJavaFieldConstant(LogicPrinter lp, final JTerm heapTerm,
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+        boolean embedded = initPrettyPrint(lp, heapTerm);
 
         lp.layouter.markStartSub();
         lp.printTerm(objectTerm);
@@ -133,13 +139,13 @@ class StorePrinter extends FieldPrinter {
         lp.printLabels(fieldTerm);
         lp.layouter.markEndSub();
 
-        finishPrettyPrint(lp, valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, !embedded);
     }
 
-    private void printStoreOnGenericFieldConstant(LogicPrinter lp, final Term heapTerm,
-            final Term objectTerm,
-            final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(lp, heapTerm);
+    private void printStoreOnGenericFieldConstant(LogicPrinter lp, final JTerm heapTerm,
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+        boolean embedded = initPrettyPrint(lp, heapTerm);
 
         lp.layouter.markStartSub();
         lp.printTerm(objectTerm);
@@ -152,15 +158,16 @@ class StorePrinter extends FieldPrinter {
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.layouter.markEndSub();
 
-        finishPrettyPrint(lp, valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, !embedded);
     }
 
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(LogicPrinter lp, final Term heapTerm, final Term fieldTerm,
-            final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(lp, heapTerm);
+    private void printStoreOnStaticField(LogicPrinter lp, final JTerm heapTerm,
+            final JTerm fieldTerm,
+            final JTerm valueTerm, boolean closingBrace) {
+        boolean embedded = initPrettyPrint(lp, heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
@@ -182,7 +189,7 @@ class StorePrinter extends FieldPrinter {
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.layouter.markEndSub();
 
-        finishPrettyPrint(lp, valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, !embedded);
     }
 
 }

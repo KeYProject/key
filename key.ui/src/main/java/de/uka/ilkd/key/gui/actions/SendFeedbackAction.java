@@ -1,16 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -23,6 +24,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +70,19 @@ public class SendFeedbackAction extends AbstractAction {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    /**
+     * Extracts java source directory from {@link Proof#header()}, if it exists.
+     *
+     * @param proof the Proof
+     * @return the location of the java source code or null if no such exists
+     */
+    public static @Nullable File getJavaSourceLocation(Proof proof) {
+        KeyAst.@Nullable Declarations header = proof.header();
+        if (header == null)
+            return null;
+        return header.getJavaSourceLocation();
     }
 
     private static abstract class SendFeedbackItem implements ActionListener {
@@ -118,7 +134,7 @@ public class SendFeedbackAction extends AbstractAction {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
                     + e.getMessage() + "\n" + serializeStackTrace(e))
-                            .getBytes(StandardCharsets.UTF_8);
+                        .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
@@ -213,7 +229,7 @@ public class SendFeedbackAction extends AbstractAction {
             Proof proof = mediator.getSelectedProof();
             OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            saver.save(stream);
+            saver.save(Paths.get(".").toAbsolutePath(), stream);
             return stream.toByteArray();
         }
 
@@ -264,29 +280,31 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         boolean isEnabled() {
             if (throwable != null) {
-                Location location = null;
                 try {
-                    location = ExceptionTools.getLocation(throwable);
+                    var location = ExceptionTools.getLocation(throwable);
+                    return location != null && location.getFileURI().isPresent();
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
                     LOGGER.warn("Failed to extract location", e);
                     return false;
                 }
-                return Location.isValidLocation(location);
             }
             return false;
         }
 
         @Override
         byte[] retrieveFileData() throws IOException {
-            Location location = ExceptionTools.getLocation(throwable);
             /*
              * Certainly there are more efficient methods than reading to string with IOUtil (using
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            String source = IOUtil.readFrom(location.getFileURL());
-            return source.getBytes(Charset.defaultCharset());
+            Location url = ExceptionTools.getLocation(throwable);
+            if (url != null) {
+                String content = IOUtil.readFrom(url.fileUri());
+                return content.getBytes(Charset.defaultCharset());
+            }
+            return new byte[0];
         }
     }
 
@@ -300,7 +318,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+                File javaSourceLocation = getJavaSourceLocation(proof);
                 return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
@@ -320,7 +338,7 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-            File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+            File javaSourceLocation = getJavaSourceLocation(proof);
             List<File> javaFiles = new LinkedList<>();
             getJavaFilesRecursively(javaSourceLocation, javaFiles);
             for (File f : javaFiles) {
@@ -356,6 +374,7 @@ public class SendFeedbackAction extends AbstractAction {
                         + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -399,6 +418,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
 
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }

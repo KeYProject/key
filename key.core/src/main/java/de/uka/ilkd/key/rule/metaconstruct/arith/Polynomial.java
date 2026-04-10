@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -6,11 +9,12 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -46,7 +50,8 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-        polyTerm = TermLabel.removeIrrelevantLabels(polyTerm, services);
+        polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
+            services);
 
         Polynomial res;
         synchronized (cache) {
@@ -232,7 +237,8 @@ public class Polynomial {
         if (it.hasNext()) {
             res = it.next().toTerm(services);
             while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(add, res, it.next().toTerm(services));
+                res = services.getTermFactory().createTerm(add, (JTerm) res,
+                    (JTerm) it.next().toTerm(services));
             }
         }
 
@@ -241,7 +247,8 @@ public class Polynomial {
         if (res == null) {
             res = cTerm;
         } else if (!BigInteger.ZERO.equals(constantPart)) {
-            res = services.getTermFactory().createTerm(add, cTerm, res);
+            res = services.getTermFactory().createTerm(add, (JTerm) cTerm,
+                (JTerm) res);
         }
 
         return res;
@@ -275,7 +282,7 @@ public class Polynomial {
         }
 
         public void analyse(Term polynomial) {
-            final Operator op = polynomial.op();
+            final var op = polynomial.op();
             if (op == add) {
                 analyse(polynomial.sub(0));
                 analyse(polynomial.sub(1));

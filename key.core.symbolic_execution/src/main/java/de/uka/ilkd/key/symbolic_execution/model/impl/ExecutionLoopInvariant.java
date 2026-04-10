@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -43,7 +46,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     @Override
     protected String lazyComputeName() {
         return getLoopInvariant().getPlainText(getServices(), getAppliedRuleApp().getHeapContext(),
-            getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
+            getSettings().usePrettyPrinting(), getSettings().useUnicode(), false).trim();
     }
 
     /**

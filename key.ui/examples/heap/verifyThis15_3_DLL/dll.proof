@@ -39,12 +39,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Wed Jun 03 19:20:23 CEST 2015
-name=DoubleLinkedList[DoubleLinkedList\\:\\:DoubleLinkedList([LDoubleLinkedList.Node)].JML normal_behavior operation contract.0
-contract=DoubleLinkedList[DoubleLinkedList\\:\\:DoubleLinkedList([LDoubleLinkedList.Node)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "DoubleLinkedList[DoubleLinkedList::DoubleLinkedList([LDoubleLinkedList.Node)].JML normal_behavior operation contract.0",
+	"contract": "DoubleLinkedList[DoubleLinkedList::DoubleLinkedList([LDoubleLinkedList.Node)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "kirsten" ) (keyVersion "c2a4d52c2ad58a473b8d4f6ce4c8d074ffe247f6"))
@@ -77,7 +76,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (rule "narrowSelectArrayType" (formula "7") (term "2,0,0,0,0,1") (ifseqformula "1") (ifseqformula "6"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "7") (term "1") (inst "#v0=d"))
 (rule "variableDeclaration" (formula "7") (term "1") (newnames "d"))
-(rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<createObject>,savedHeapBefore_<createObject>"))
+(rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$createObject,savedHeapBefore_$createObject"))
 (builtin "One Step Simplification" (formula "7"))
 (rule "variableDeclaration" (formula "7") (term "1") (newnames "__NEW__"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "7") (term "1") (inst "#v0=d_1"))
@@ -97,10 +96,10 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (rule "assignment_write_attribute_this" (formula "10"))
 (builtin "One Step Simplification" (formula "10"))
 (rule "methodCallWithinClass" (formula "10") (term "1"))
-(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_<prepareEnter>,savedHeapBefore_<prepareEnter>"))
+(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_$prepareEnter,savedHeapBefore_$prepareEnter"))
 (builtin "One Step Simplification" (formula "10"))
 (rule "methodCallSuper" (formula "10") (term "1"))
-(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_<prepare>,savedHeapBefore_<prepare>"))
+(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_$prepare,savedHeapBefore_$prepare"))
 (builtin "One Step Simplification" (formula "10"))
 (rule "methodCallEmpty" (formula "10") (term "1"))
 (rule "blockEmpty" (formula "10") (term "1"))

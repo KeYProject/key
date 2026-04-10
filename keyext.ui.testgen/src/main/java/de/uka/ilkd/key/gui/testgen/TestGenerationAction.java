@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -9,8 +14,11 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 
 /**
@@ -19,16 +27,18 @@ import de.uka.ilkd.key.proof.ProofEvent;
  *
  * @author mihai
  */
-public class TestGenerationAction extends MainWindowAction {
+public class TestGenerationAction extends MainWindowAction implements PropertyChangeListener {
     private static final long serialVersionUID = -4911859008849602897L;
 
     private static final String NAME = "Generate Testcases...";
     private static final String TOOLTIP = "Generate test cases for open goals";
+    private static final String TOOLTIP_EXTRA = ". Install Z3 to enable this functionality!";
+    private boolean haveZ3CE = false;
 
     public TestGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName(TestGenerationAction.NAME);
-        setTooltip(TestGenerationAction.TOOLTIP);
+        setName(NAME);
+        setTooltip(TOOLTIP);
         Icon icon = IconFactory.testGeneration(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
         setMenuPath("Proof");
@@ -39,6 +49,7 @@ public class TestGenerationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         TGInfoDialog dlg = new TGInfoDialog(mainWindow);
         dlg.setVisible(true);
+        dlg.setLocationRelativeTo(mainWindow);
     }
 
 
@@ -47,16 +58,21 @@ public class TestGenerationAction extends MainWindowAction {
      * has to be invoked after the Main class has been initialised with the KeYMediator.
      */
     public void init() {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+                .addPropertyChangeListener(this);
+        checkZ3CE();
+
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
-                setEnabled(proof != null);
+                setEnabled(haveZ3CE && proof != null);
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                final Proof proof = getMediator().getSelectedProof();
+                setEnabled(haveZ3CE && proof != null);
             }
         };
         getMediator().addKeYSelectionListener(selListener);
@@ -75,6 +91,26 @@ public class TestGenerationAction extends MainWindowAction {
                 getMediator().addKeYSelectionListener(selListener);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+    }
+
+    /**
+     * @return whether Z3 is installed
+     */
+    private boolean checkZ3CE() {
+        haveZ3CE = SolverTypes.Z3_CE_SOLVER.isInstalled(false);
+        if (!haveZ3CE) {
+            setEnabled(false);
+            setTooltip(TOOLTIP + TOOLTIP_EXTRA);
+        } else if (!isEnabled()) {
+            setEnabled(getMediator().getSelectedProof() != null);
+            setTooltip(TOOLTIP);
+        }
+        return haveZ3CE;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        checkZ3CE();
     }
 }

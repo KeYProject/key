@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
@@ -43,7 +45,8 @@ public class RenameTable {
     }
 
     /**
-     * does nearly the same as {@link #contains(QuantifiableVariable)} but performs the test only on
+     * does nearly the same as {@link #contains(QuantifiableVariable)} but performs the test only
+     * on
      * the local table
      *
      * @param n the QuantifiableVariable object the existence of an abstract name is checked.

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.testcase.collection;
 
 import java.util.Iterator;
@@ -15,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSetAsListOfString {
 
-    final String[] str = new String[] { "Dies", "ist", "ein", "Test" };
+    final String[] str = { "Dies", "ist", "ein", "Test" };
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {

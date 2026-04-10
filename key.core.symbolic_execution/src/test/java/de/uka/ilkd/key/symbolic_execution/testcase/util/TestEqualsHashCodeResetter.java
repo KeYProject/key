@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import java.util.HashMap;
@@ -7,7 +10,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestEqualsHashCodeResetter {
     /**
-     * Tests {@link EqualsHashCodeResetter#getWrappedElement()}.
+     * Tests {@link EqualsHashCodeResetter#wrappedElement()}.
      */
     @Test
     public void testGetWrappedElement() {
@@ -36,11 +38,11 @@ public class TestEqualsHashCodeResetter {
         EqualsHashCodeResetter<MyBean> br = new EqualsHashCodeResetter<>(bb);
         EqualsHashCodeResetter<MyBean> nullr = new EqualsHashCodeResetter<>(null);
         // Test wrapped elements
-        assertSame(a1b, a1r.getWrappedElement());
-        assertSame(a2b, a2r.getWrappedElement());
-        assertSame(a1b, a1ar.getWrappedElement());
-        assertSame(bb, br.getWrappedElement());
-        Assertions.assertNull(nullr.getWrappedElement());
+        assertSame(a1b, a1r.wrappedElement());
+        assertSame(a2b, a2r.wrappedElement());
+        assertSame(a1b, a1ar.wrappedElement());
+        assertSame(bb, br.wrappedElement());
+        assertNull(nullr.wrappedElement());
     }
 
     /**
@@ -122,19 +124,19 @@ public class TestEqualsHashCodeResetter {
         beanSet.add(a2b); // Replaces existing element a1b
         beanSet.add(bb);
         assertEquals(2, beanSet.size());
-        Assertions.assertTrue(beanSet.contains(a1b));
-        Assertions.assertTrue(beanSet.contains(a2b));
-        Assertions.assertTrue(beanSet.contains(bb));
+        assertTrue(beanSet.contains(a1b));
+        assertTrue(beanSet.contains(a2b));
+        assertTrue(beanSet.contains(bb));
         // Test resetter in LinkedHashSet
         Set<EqualsHashCodeResetter<MyBean>> set = new LinkedHashSet<>();
         set.add(a1r);
         set.add(a2r);
         set.add(br);
         assertEquals(3, set.size());
-        Assertions.assertTrue(set.contains(a1r));
-        Assertions.assertTrue(set.contains(a2r));
-        Assertions.assertTrue(set.contains(a1ar));
-        Assertions.assertTrue(set.contains(br));
+        assertTrue(set.contains(a1r));
+        assertTrue(set.contains(a2r));
+        assertTrue(set.contains(a1ar));
+        assertTrue(set.contains(br));
     }
 
     /**
@@ -232,22 +234,17 @@ public class TestEqualsHashCodeResetter {
     /**
      * Utility class used in tests.
      *
+     * @param value A value.
      * @author Martin Hentschel
      */
-    private static class MyBean {
-        /**
-         * A value.
-         */
-        private final String value;
-
+    private record MyBean(String value) {
         /**
          * Constructor.
          *
          * @param value A value.
          */
-        public MyBean(String value) {
+        private MyBean {
             assertNotNull(value);
-            this.value = value;
         }
 
         /**
@@ -262,12 +259,5 @@ public class TestEqualsHashCodeResetter {
             }
         }
 
-        /**
-         * Overwritten to make {@link MyBean}s equal if they have the same value.
-         */
-        @Override
-        public int hashCode() {
-            return value.hashCode();
-        }
     }
 }

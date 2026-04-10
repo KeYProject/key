@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.event.ActionEvent;
@@ -6,13 +9,14 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The menu item for the state merging rule.
@@ -81,8 +85,9 @@ public class MergeRuleMenuItem extends JMenuItem {
                             @Override
                             protected void done() {
                                 completedApp.clearProgressListeners();
-                                mediator.getUI().taskFinished(new DefaultTaskFinishedInfo(this,
-                                    goal, goal.proof(), duration, 1, 0));
+                                mediator.getUI().taskFinished(
+                                    new DefaultTaskFinishedInfo(MergeRuleMenuItem.this,
+                                        goal, goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }

@@ -1,9 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.properties;
 
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+
+/// WEIGL: These classes are redundant with {@link PropertyEntry}
+/// {@link PropertyEntry} is also prepared for {@link Configuration} which provides
+/// a type safe access.
 public interface Properties {
 
     final class Property<T> {

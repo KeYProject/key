@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -18,15 +21,17 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceView.Highlight;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +174,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         FileOrigin origin;
         Set<FileOrigin> subtermOrigins;
 
-        Term term = pos.getPosInOccurrence().subTerm();
+        JTerm term = (JTerm) pos.getPosInOccurrence().subTerm();
         OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
         if (label == null) {
@@ -187,15 +192,17 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         try {
             if (origin != null) {
-                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(origin.fileName,
-                    origin.line, ORIGIN_HIGHLIGHT_COLOR.get(), 20));
+                originHighlights.addAll(
+                    sourceView.addHighlightsForJMLStatement(origin.getFileName().orElse(null),
+                        origin.getLine(), ORIGIN_HIGHLIGHT_COLOR.get(), 20));
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
                     originHighlights
-                            .addAll(sourceView.addHighlightsForJMLStatement(subtermOrigin.fileName,
-                                subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
+                            .addAll(sourceView.addHighlightsForJMLStatement(
+                                subtermOrigin.getFileName().orElse(null),
+                                subtermOrigin.getLine(), SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
                 }
             }
         } catch (BadLocationException | IOException e) {

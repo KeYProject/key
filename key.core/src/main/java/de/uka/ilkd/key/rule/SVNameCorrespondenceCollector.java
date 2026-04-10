@@ -1,20 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
@@ -24,7 +25,7 @@ import org.key_project.util.collection.ImmutableMap;
  * or skolem functions.
  */
 
-public class SVNameCorrespondenceCollector extends DefaultVisitor {
+public class SVNameCorrespondenceCollector implements DefaultVisitor {
 
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
@@ -48,13 +49,14 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      */
     public void visit(Term t) {
 
-        final Operator top = t.op();
+        final var top = t.op();
 
         if (top instanceof SubstOp) {
-            final Operator substTermOp = t.sub(0).op();
-            final QuantifiableVariable substVar = t.varsBoundHere(1).get(0);
-            if (substTermOp instanceof SchemaVariable && substVar instanceof SchemaVariable) {
-                addNameCorrespondence((SchemaVariable) substTermOp, (SchemaVariable) substVar);
+            final var substTermOp = t.sub(0).op();
+            final var substVar = t.varsBoundHere(1).get(0);
+            if (substTermOp instanceof SchemaVariable substTermSV
+                    && substVar instanceof SchemaVariable substVarSV) {
+                addNameCorrespondence(substTermSV, substVarSV);
             }
         }
 
@@ -105,7 +107,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
         SchemaVariable findSV = null;
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
@@ -116,11 +118,10 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
                 findSV = (SchemaVariable) findTerm.sub(2).op();
             }
         }
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
+        for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
-                final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
+                final JTerm replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
                 replaceWithTerm.execPostOrder(this);
                 if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable) {
                     addNameCorrespondence((SchemaVariable) replaceWithTerm.op(), findSV);
@@ -131,8 +132,8 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : gt.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

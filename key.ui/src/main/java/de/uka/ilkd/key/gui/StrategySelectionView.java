@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -13,6 +16,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -22,8 +26,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
-import de.uka.ilkd.key.util.Triple;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>There is no need to change this class to change the available settings!</b> The only thing to
  * be done is to modify the available {@link StrategySettingsDefinition} in
- * {@link JavaCardDLStrategy.Factory#getSettingsDefinition()}.
+ * {@link StrategyFactory#getSettingsDefinition()}.
  * </p>
  * <p>
  * As future work this class should not show a fixed content defined by {@link #DEFINITION}. Instead
@@ -92,10 +96,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * Observe changes on {@link #mediator}.
      */
     private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-        }
 
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             refresh(e.getSource().getSelectedProof());
         }
     };
@@ -152,7 +154,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         JPanel goPanel = new JPanel();
         GridBagLayout goLayout = new GridBagLayout();
         goPanel.setLayout(goLayout);
-        goPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        goPanel.setAlignmentX(LEFT_ALIGNMENT);
 
         gbcpanel5.gridx = 1;
         gbcpanel5.gridy = 0;
@@ -203,12 +205,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 predefChanged = true;
                 refreshDefaultButton();
             });
-            maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+            maxSlider.setAlignmentX(LEFT_ALIGNMENT);
             box.add(maxSlider);
             box.add(Box.createVerticalStrut(8));
         }
 
-        javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);
 
         // //////////////////////////////////////////////////////////////////////
@@ -219,7 +221,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             javaDLOptionsPanel.setLayout(javaDLOptionsLayout);
 
             javaDLOptionsScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-            javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
             box.add(javaDLOptionsScrollPane);
 
             int yCoord = 0;
@@ -242,9 +244,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             boolean topLevel, AbstractStrategyPropertyDefinition definition) {
 
         // Individual options
-        if (definition instanceof OneOfStrategyPropertyDefinition) {
-            OneOfStrategyPropertyDefinition oneOfDefinition =
-                (OneOfStrategyPropertyDefinition) definition;
+        if (definition instanceof OneOfStrategyPropertyDefinition oneOfDefinition) {
             ButtonGroup buttonGroup = new ButtonGroup();
             if (!oneOfDefinition.getValues().isEmpty()) {
                 data.addPropertyGroup(oneOfDefinition.getApiKey(), buttonGroup);
@@ -406,9 +406,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         existingPredefs[0] = "Defaults";
 
         int i = 1;
-        for (Triple<String, Integer, IDefaultStrategyPropertiesFactory> furtherDefault : DEFINITION
+        for (StrategySettingsDefinition.StrategySettingEntry furtherDefault : DEFINITION
                 .getFurtherDefaults()) {
-            existingPredefs[i] = furtherDefault.first;
+            existingPredefs[i] = furtherDefault.name();
             i++;
         }
 
@@ -426,10 +426,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 newProps =
                     DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
             } else {
-                Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
-                    DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                newMaxSteps = chosenDefault.second;
-                newProps = chosenDefault.third.createDefaultStrategyProperties();
+                var chosenDefault = DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                newMaxSteps = chosenDefault.order();
+                newProps = chosenDefault.factory().createDefaultStrategyProperties();
             }
 
             mediator.getSelectedProof().getSettings().getStrategySettings()
@@ -515,7 +514,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         }
     }
 
-    public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
+    public Strategy<@NonNull Goal> getStrategy(String strategyName, Proof proof,
+            StrategyProperties properties) {
         if (mediator != null) {
             for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
@@ -552,7 +552,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     private void updateStrategySettings(String strategyName, StrategyProperties p) {
         final Proof proof = mediator.getSelectedProof();
-        final Strategy strategy = getStrategy(strategyName, proof, p);
+        final Strategy<@NonNull Goal> strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -582,7 +582,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     /**
-     * Provided via {@link StrategySelectionView#getStrategySelectionComponents()} for direct access
+     * Provided via {@link StrategySelectionView} for direct access
      * to created user interface components.
      *
      * @author Martin Hentschel

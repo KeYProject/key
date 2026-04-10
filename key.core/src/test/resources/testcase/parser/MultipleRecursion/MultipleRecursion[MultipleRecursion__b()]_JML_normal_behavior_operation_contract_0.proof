@@ -40,12 +40,11 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Tue Jan 28 15:42:38 CET 2014
-name=MultipleRecursion[MultipleRecursion\\:\\:b()].JML normal_behavior operation contract.0
-contract=MultipleRecursion[MultipleRecursion\\:\\:b()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "MultipleRecursion[MultipleRecursion::b()].JML normal_behavior operation contract.0",
+	"contract": "MultipleRecursion[MultipleRecursion::b()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

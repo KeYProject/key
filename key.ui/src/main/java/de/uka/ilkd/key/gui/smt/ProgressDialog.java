@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.*;
@@ -13,6 +16,12 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import de.uka.ilkd.key.smt.SMTFocusResults;
+
+import org.key_project.util.java.SwingUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog showing launched SMT processes and results.
@@ -20,6 +29,8 @@ import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
+
     private final ProgressTable table;
     /**
      * Button to apply the results of running the SMT solver.
@@ -86,7 +97,6 @@ public class ProgressDialog extends JDialog {
         table.getTableHeader().setReorderingAllowed(false);
         table.setModel(model, titles);
         this.listener = listener;
-        this.setLocationByPlatform(true);
         if (counterexample) {
             this.setTitle("SMT Counterexample Search");
         } else {
@@ -104,8 +114,9 @@ public class ProgressDialog extends JDialog {
         buttonBox.add(getStopButton());
         buttonBox.add(Box.createHorizontalStrut(5));
         if (!counterexample) {
-            buttonBox.add(getApplyButton());
             buttonBox.add(getFocusButton());
+            buttonBox.add(Box.createHorizontalStrut(5));
+            buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
 
@@ -117,11 +128,13 @@ public class ProgressDialog extends JDialog {
         constraints.gridy++;
         constraints.weighty = 2.0;
         contentPane.add(getScrollPane(), constraints);
-        constraints.gridy++;
-        constraints.weighty = 1.0;
+        constraints.gridy += 2;
+        constraints.weighty = 0.0;
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
+        // always set the location last, otherwise it is not centered!
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public void setProgress(int value) {
@@ -147,6 +160,7 @@ public class ProgressDialog extends JDialog {
                 try {
                     listener.focusButtonClicked();
                 } catch (Exception exception) {
+                    LOGGER.error("", exception);
                     // There may be exceptions during rule application that should not be lost.
                     IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
@@ -166,6 +180,7 @@ public class ProgressDialog extends JDialog {
                     listener.applyButtonClicked();
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
             });
@@ -175,14 +190,7 @@ public class ProgressDialog extends JDialog {
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
-            scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-            Dimension dim = new Dimension(table.getPreferredSize());
-            dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
-            dim.height = scrollPane.getPreferredSize().height;
-            scrollPane.setPreferredSize(dim);
-
+            scrollPane = SwingUtil.createScrollPane(table);
         }
         return scrollPane;
     }
@@ -197,7 +205,6 @@ public class ProgressDialog extends JDialog {
                 if (modus.equals(Modus.SOLVERS_RUNNING)) {
                     listener.stopButtonClicked();
                 }
-
             });
         }
         return stopButton;
@@ -206,22 +213,21 @@ public class ProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case SOLVERS_DONE:
-            stopButton.setText("Discard");
-            if (applyButton != null) {
-                applyButton.setEnabled(true);
+            case SOLVERS_DONE -> {
+                stopButton.setText("Discard");
+                if (applyButton != null) {
+                    applyButton.setEnabled(true);
+                }
+                if (focusButton != null) {
+                    focusButton.setEnabled(true);
+                }
             }
-            if (focusButton != null) {
-                focusButton.setEnabled(true);
+            case SOLVERS_RUNNING -> {
+                stopButton.setText("Stop");
+                if (applyButton != null) {
+                    applyButton.setEnabled(false);
+                }
             }
-            break;
-        case SOLVERS_RUNNING:
-            stopButton.setText("Stop");
-            if (applyButton != null) {
-                applyButton.setEnabled(false);
-            }
-            break;
-
         }
     }
 

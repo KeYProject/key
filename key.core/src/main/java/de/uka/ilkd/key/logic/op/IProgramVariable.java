@@ -1,12 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TerminalProgramElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.java.ast.TerminalProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 
-public interface IProgramVariable extends TerminalProgramElement, Named, SortedOperator {
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
+
+
+public interface IProgramVariable
+        extends TerminalProgramElement, SortedOperator, Operator {
     KeYJavaType getKeYJavaType();
 
     KeYJavaType getKeYJavaType(Services javaServ);

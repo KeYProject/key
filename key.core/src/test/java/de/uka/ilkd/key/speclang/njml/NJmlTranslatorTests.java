@@ -1,11 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -23,14 +30,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1 (6/1/21)
  */
 public class NJmlTranslatorTests {
-    public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+    public static final Path testFile = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("speclang")
+            .resolve("testFile.key");
+
     private final PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            HelperClassForTests.parse(testFile).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
+        services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         preParser = new PreParser();
     }
@@ -40,51 +50,24 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(1, 1));
+            preParser.parseClassLevel(contract, null, Position.newOneBased(1, 1));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
 
-    // weigl: ignored since fix #1640, due to interface change
-    // @Test
-    // public void testModelMethodWithAtSignInBody() {
-    // ImmutableList<TextualJMLConstruct> result =
-    // jmlIO.parseClassLevel("/*@ model int f(int x) { \n" +
-    // "@ return x+1; " +
-    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
-    // assertNotNull(result);
-    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-    // assertEquals("int f (int x);", decl.getParsableDeclaration().trim());
-    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-    // assertEquals("f(x) == (x+1)", eqString);
-    // }
-    //
-    // @Test
-    // public void testModelMethodWithAtSignInBody2() {
-    // ImmutableList<TextualJMLConstruct> result =
-    // jmlIO.parseClassLevel("/*@ model int f(int[] arr) { \n" +
-    // "@ //this is a comment \n" +
-    // "@ return arr[1]; //comment\n" +
-    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
-    // assertNotNull(result);
-    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-    // assertEquals("int f (int[] arr);", decl.getParsableDeclaration().trim());
-    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-    // assertEquals("f(arr) == (arr[1])", eqString);
-    // }
-
     @Test
-    public void testWarnRequires() {
+    void testWarnRequires() throws URISyntaxException {
         preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contract, new URI("Test.java"), Position.newOneBased(5, 5));
         assertNotNull(result);
-        ImmutableList<PositionedString> warnings = preParser.getWarnings();
-        PositionedString message = warnings.head();
+        List<PositionedString> warnings = preParser.getWarnings();
+        PositionedString message = warnings.getFirst();
         assertEquals(
-            "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
+            "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
+                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
+                + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 
@@ -93,52 +76,54 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*@ public abstract final normal_behaviour\nrequires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contract, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(1, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
     }
 
     @Test
     void testContractModifiersMultiple() {
         preParser.clearWarnings();
-        String contracts = "/*@ public abstract final normal_behaviour\n" +
-            "  @ requires true;\n" +
-            "  @ private static exceptional_behaviour\n" +
-            "  @ requires false;\n" +
-            "  @*/";
+        String contracts = """
+                /*@ public abstract final normal_behaviour
+                  @ requires true;
+                  @ private static exceptional_behaviour
+                  @ requires false;
+                  @*/""";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
         jml = result.tail().head();
         assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
-            jml.getMods());
+            jml.getModifiers());
     }
 
     @Test
     void testContractModifiersMultipleAlso() {
         preParser.clearWarnings();
-        String contracts = "/*@ public abstract final normal_behaviour\n" +
-            "  @ requires true;\n" +
-            "  @ also \n" +
-            "  @ private static exceptional_behaviour\n" +
-            "  @ requires false;\n" +
-            "  @*/";
+        String contracts = """
+                /*@ public abstract final normal_behaviour
+                  @ requires true;
+                  @ also\s
+                  @ private static exceptional_behaviour
+                  @ requires false;
+                  @*/""";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
         jml = result.tail().head();
         assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
-            jml.getMods());
+            jml.getModifiers());
     }
 }

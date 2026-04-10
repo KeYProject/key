@@ -1,33 +1,45 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
+import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+
+import org.jspecify.annotations.NonNull;
 
 public class OneOfCP implements Feature {
 
-    private final BackTrackingManager manager;
     private final Feature[] features;
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP();
 
-    private OneOfCP(BackTrackingManager manager, Feature[] features) {
-        this.manager = manager;
+    private OneOfCP(Feature[] features) {
         this.features = features;
     }
 
-    public static Feature create(Feature[] features, BackTrackingManager manager) {
-        return new OneOfCP(manager, features);
+    public static Feature create(Feature[] features) {
+        return new OneOfCP(features);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
+            Goal goal,
+            MutableState mState) {
+        final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(cp, this);
-        return features[theChosenOne].computeCost(app, pos, goal);
+        return features[theChosenOne].computeCost(app, pos, goal, mState);
     }
 
     private final class CP implements ChoicePoint {
@@ -39,17 +51,21 @@ public class OneOfCP implements Feature {
                 this.oldApp = oldApp;
             }
 
+            @Override
             public boolean hasNext() {
                 return num < features.length;
             }
 
+            @Override
             public CPBranch next() {
                 final int chosen = num++;
                 return new CPBranch() {
+                    @Override
                     public void choose() {
                         theChosenOne = chosen;
                     }
 
+                    @Override
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
@@ -59,11 +75,13 @@ public class OneOfCP implements Feature {
             /**
              * throws an unsupported operation exception
              */
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
         }
 
+        @Override
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(oldApp);
         }

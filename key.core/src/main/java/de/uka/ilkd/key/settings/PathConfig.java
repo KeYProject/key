@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.key_project.util.java.IOUtil;
 
@@ -13,13 +18,14 @@ import org.key_project.util.java.IOUtil;
  * directory. In Microsoft windows operating systems this is directly the hard disc that contains
  * the KeY code. But the eclipse integration requires to change the default location. This is
  * possible via {@link #setKeyConfigDir(String)} which should be called once before something is
- * done with KeY (e.g. before the {@link MainWindow} is opened).
+ * done with KeY (e.g. before the {@code MainWindow} is opened).
  * </p>
  */
 public final class PathConfig {
 
     /**
-     * The Java system property used to indicate that the settings in the KeY directory should not
+     * The name of the Java system property used to indicate that the settings in the KeY directory
+     * should not
      * be consulted at startup.
      */
     public static final String DISREGARD_SETTINGS_PROPERTY = "key.disregardSettings";
@@ -32,22 +38,22 @@ public final class PathConfig {
     /**
      * In which file to store the recent files.
      */
-    private static String recentFileStorage;
+    private static Path recentFileStorage;
 
     /**
      * In which file to store the proof-independent settings.
      */
-    private static String proofIndependentSettings;
+    private static Path proofIndependentSettings;
 
     /**
      * directory where to find the KeY configuration files
      */
-    private static String keyConfigDir;
+    private static Path keyConfigDir;
 
     /**
      * Directory in which the log files are stored.
      */
-    private static File logDirectory;
+    private static Path logDirectory;
 
     private PathConfig() {
     }
@@ -64,7 +70,7 @@ public final class PathConfig {
      *
      * @return The directory.
      */
-    public static String getKeyConfigDir() {
+    public static Path getKeyConfigDir() {
         return keyConfigDir;
     }
 
@@ -74,11 +80,11 @@ public final class PathConfig {
      * @param keyConfigDir The new directory to use.
      */
     public static void setKeyConfigDir(String keyConfigDir) {
-        PathConfig.keyConfigDir = keyConfigDir;
-        PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
-        PathConfig.proofIndependentSettings =
-            getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.logDirectory = new File(keyConfigDir, "logs");
+        PathConfig.keyConfigDir = Paths.get(keyConfigDir);
+
+        recentFileStorage = getKeyConfigDir().resolve("recentFiles.json");
+        proofIndependentSettings = getKeyConfigDir().resolve("proofIndependentSettings.props");
+        logDirectory = getKeyConfigDir().resolve("logs");
     }
 
     /**
@@ -86,15 +92,15 @@ public final class PathConfig {
      *
      * @return The path to the file.
      */
-    public static String getRecentFileStorage() {
+    public static Path getRecentFileStorage() {
         return recentFileStorage;
     }
 
     /**
      *
      */
-    public static File getLogDirectory() {
-        return PathConfig.logDirectory;
+    public static Path getLogDirectory() {
+        return logDirectory;
     }
 
     /**
@@ -102,7 +108,7 @@ public final class PathConfig {
      *
      * @return The path to the file.
      */
-    public static String getProofIndependentSettings() {
+    public static Path getProofIndependentSettings() {
         return proofIndependentSettings;
     }
 

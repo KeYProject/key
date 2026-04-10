@@ -1,29 +1,34 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
@@ -76,6 +81,8 @@ public interface Visitor {
     void performActionOnSeqSub(SeqSub x);
 
     void performActionOnSeqReverse(SeqReverse x);
+
+    void performActionOnSeqPut(SeqPut seqPut);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
@@ -169,8 +176,6 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
-
     void performActionOnBinaryAnd(BinaryAnd x);
 
     void performActionOnBinaryAndAssignment(BinaryAndAssignment x);
@@ -180,6 +185,8 @@ public interface Visitor {
     void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
 
     void performActionOnCopyAssignment(CopyAssignment x);
+
+    void performActionOnSetStatement(SetStatement x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 
@@ -334,24 +341,30 @@ public interface Visitor {
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnLoopContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds loop contract for new loop statement to loop contract of old loop statement.
      *
-     * @param oldLoop the old loop statement
-     * @param newLoop the new loop statement
+     * @param oldLoop
+     *        the old loop statement
+     * @param newLoop
+     *        the new loop statement
      */
     void performActionOnLoopContract(final LoopStatement oldLoop, final LoopStatement newLoop);
 
@@ -396,18 +409,10 @@ public interface Visitor {
     /**
      * Performs action on JML assert statement.
      *
-     * @param jmlAssert the statement to perform the action on.
+     * @param jmlAssert
+     *        the statement to perform the action on.
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
-    /**
-     * Performs action on the condition of a JML assert statement.
-     *
-     * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
-     * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
-     *
-     * @param cond the condition to perform an action on (may be {@code null} if the JML assert
-     *        wasn't finished)
-     */
-    void performActionOnJmlAssertCondition(final Term cond);
+    void performActionOnSubtype(Subtype subtype);
 }

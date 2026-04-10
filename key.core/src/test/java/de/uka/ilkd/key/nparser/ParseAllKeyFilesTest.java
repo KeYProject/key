@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
@@ -23,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @Disabled
 public class ParseAllKeyFilesTest {
     public static Collection<Path> getFiles() throws IOException {
-        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())) {
+        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY)) {
             return s.filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
                     .collect(Collectors.toList());
         }

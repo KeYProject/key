@@ -1,6 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -10,6 +14,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+
 
 /**
  * The default implementation of {@link SMTSettings}.
@@ -62,7 +67,7 @@ public class DefaultSMTSettings implements SMTSettings {
     @Override
     public int getMaxNumberOfGenerics() {
 
-        return pdSettings.maxGenericSorts;
+        return pdSettings.getMaxGenericSorts();
     }
 
     @Override
@@ -79,7 +84,7 @@ public class DefaultSMTSettings implements SMTSettings {
             }
 
             for (Taclet taclet : proof.getInitConfig().activatedTaclets()) {
-                if (pdSettings.supportedTaclets.contains(taclet.name().toString(), true)) {
+                if (pdSettings.getSupportedTaclets().contains(taclet.name().toString(), true)) {
                     taclets.add(taclet);
                 }
             }
@@ -104,7 +109,7 @@ public class DefaultSMTSettings implements SMTSettings {
     @Override
     public boolean instantiateNullAssumption() {
 
-        return pdSettings.useNullInstantiation;
+        return pdSettings.isUseNullInstantiation();
     }
 
     @Override
@@ -118,29 +123,29 @@ public class DefaultSMTSettings implements SMTSettings {
     @Override
     public boolean useAssumptionsForBigSmallIntegers() {
 
-        return pdSettings.useConstantsForIntegers;
+        return pdSettings.isUseConstantsForIntegers();
     }
 
     @Override
     public boolean useBuiltInUniqueness() {
 
-        return pdSettings.useBuiltInUniqueness;
+        return pdSettings.isUseBuiltInUniqueness();
     }
 
     @Override
     public boolean useExplicitTypeHierarchy() {
 
-        return pdSettings.useExplicitTypeHierarchy;
+        return pdSettings.isUseExplicitTypeHierarchy();
     }
 
     @Override
     public boolean useUninterpretedMultiplicationIfNecessary() {
 
-        return pdSettings.useUIMultiplication;
+        return pdSettings.isUseUIMultiplication();
     }
 
     public SupportedTaclets getSupportedTaclets() {
-        return pdSettings.supportedTaclets;
+        return pdSettings.getSupportedTaclets();
     }
 
     public ProofIndependentSMTSettings.ProgressMode getModeOfProgressDialog() {
@@ -163,24 +168,19 @@ public class DefaultSMTSettings implements SMTSettings {
         return piSettings.getPathForSMTTranslation();
     }
 
-    public void fireSettingsChanged() {
-        piSettings.fireSettingsChanged();
-        pdSettings.fireSettingsChanged();
-    }
-
-    public void addListener(SettingsListener listener) {
-        piSettings.addSettingsListener(listener);
-        pdSettings.addSettingsListener(listener);
+    public void addListener(PropertyChangeListener listener) {
+        piSettings.addPropertyChangeListener(listener);
+        pdSettings.addPropertyChangeListener(listener);
     }
 
     @Override
     public long getMaximumInteger() {
-        return pdSettings.maxInteger;
+        return pdSettings.getMaxInteger();
     }
 
     @Override
     public long getMinimumInteger() {
-        return pdSettings.minInteger;
+        return pdSettings.getMinInteger();
     }
 
     @Override
@@ -221,7 +221,7 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public boolean invarianForall() {
-        return pdSettings.invariantForall;
+        return pdSettings.isInvariantForall();
     }
 
     @Override

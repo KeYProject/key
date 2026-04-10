@@ -1,17 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -24,10 +21,21 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Choice;
+import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -50,7 +58,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<>();
+    private Map<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -73,10 +81,12 @@ public class InitConfig {
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
+    // weigl this field is never set
     private String originalKeYFileName;
 
     private ProofSettings settings;
 
+    private KeyAst.@Nullable Declarations header;
 
 
     // -------------------------------------------------------------------------
@@ -86,8 +96,8 @@ public class InitConfig {
     public InitConfig(Services services) {
         this.services = services;
 
-        category2DefaultChoice =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+        category2DefaultChoice = new HashMap<>(
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices());
     }
 
 
@@ -121,7 +131,7 @@ public class InitConfig {
      *
      * @return true if the default was successfully set
      */
-    public boolean addCategoryDefaultChoice(@Nonnull String category, @Nonnull String choice) {
+    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
         if (!category2DefaultChoice.containsKey(category)) {
             category2DefaultChoice.put(category, choice);
             return true;
@@ -132,7 +142,7 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@Nonnull Map<String, String> init) {
+    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
@@ -140,9 +150,8 @@ public class InitConfig {
         if (changed) {
             // FIXME weigl: I do not understand why the default choices are back progragated!
             // For me this is a design flaw.
-            @SuppressWarnings("unchecked")
-            HashMap<String, String> clone =
-                (HashMap<String, String>) category2DefaultChoice.clone();
+            Map<String, String> clone =
+                new HashMap<>(category2DefaultChoice);
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -175,8 +184,7 @@ public class InitConfig {
         category2DefaultChoice =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> c2DC = (HashMap<String, String>) category2DefaultChoice.clone();
+        HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
         }
@@ -189,7 +197,8 @@ public class InitConfig {
             }
         }
         this.activatedChoices = activatedChoices
-                .union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
+                .union(
+                    DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
@@ -213,13 +222,6 @@ public class InitConfig {
 
     public void setTaclets(ImmutableList<Taclet> tacs) {
         taclets = tacs;
-        // invalidate active taclet cache
-        this.activatedTacletCache = null;
-    }
-
-    public void setTaclets(Collection<Taclet> tacs) {
-        taclets = ImmutableSLList.nil();
-        addTaclets(tacs);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
@@ -278,7 +280,7 @@ public class InitConfig {
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
         return (profile == null ? ImmutableSLList.nil()
-                : profile.getStandardRules().getStandardBuiltInRules());
+                : profile.getStandardRules().standardBuiltInRules());
     }
 
 
@@ -290,7 +292,8 @@ public class InitConfig {
         justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, Node node, boolean isAxiom) {
+    public void registerRuleIntroducedAtNode(RuleApp r, Node node,
+            boolean isAxiom) {
         justifInfo.addJustification(r.rule(), new RuleJustificationByAddRules(node, isAxiom));
     }
 
@@ -343,7 +346,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<Function> funcNS() {
+    public Namespace<@NonNull Function> funcNS() {
         return namespaces().functions();
     }
 
@@ -351,7 +354,7 @@ public class InitConfig {
     /**
      * returns the sort namespace of this initial configuration
      */
-    public Namespace<Sort> sortNS() {
+    public Namespace<@NonNull Sort> sortNS() {
         return namespaces().sorts();
     }
 
@@ -359,7 +362,7 @@ public class InitConfig {
     /**
      * returns the heuristics namespace of this initial configuration
      */
-    public Namespace<RuleSet> ruleSetNS() {
+    public Namespace<@NonNull RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
@@ -367,7 +370,7 @@ public class InitConfig {
     /**
      * returns the variable namespace of this initial configuration
      */
-    public Namespace<QuantifiableVariable> varNS() {
+    public Namespace<@NonNull QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 
@@ -375,7 +378,7 @@ public class InitConfig {
     /**
      * returns the program variable namespace of this initial configuration
      */
-    public Namespace<IProgramVariable> progVarNS() {
+    public Namespace<@NonNull IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
@@ -383,7 +386,7 @@ public class InitConfig {
     /**
      * returns the choice namespace of this initial configuration
      */
-    public Namespace<Choice> choiceNS() {
+    public Namespace<@NonNull Choice> choiceNS() {
         return namespaces().choices();
     }
 
@@ -426,11 +429,12 @@ public class InitConfig {
             ic.setSettings(new ProofSettings(settings));
         }
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = new HashMap<>(category2DefaultChoice);
         ic.setTaclet2Builder(
             (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
+        ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
@@ -450,5 +454,24 @@ public class InitConfig {
 
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
+    }
+
+    /// Enforce the given choice. Remove choices of the same category from the current set.
+    public void activateChoice(Choice choice) {
+        setActivatedChoices(
+            getActivatedChoices()
+                    .stream().filter(it -> choice.category().equals(it.category()))
+                    .collect(ImmutableSet.collector())
+                    .add(choice));
+    }
+
+    /// returns the user-given declarations used during loading
+    public KeyAst.@Nullable Declarations getProblemHeader() {
+        return header;
+    }
+
+    /// sets the user-given declarations that are used during saving proofs
+    public void setHeader(KeyAst.@Nullable Declarations header) {
+        this.header = header;
     }
 }

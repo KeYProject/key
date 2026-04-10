@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 

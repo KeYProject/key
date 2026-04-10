@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: FAQ
-    url: https://key-project.org/docs/faq
+    url: https://keyproject.github.io/key-docs/faq
     about: Documentation 
   - name: KeY Discussions
     url: https://github.com/keyproject/key/discussions

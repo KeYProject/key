@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Map;
@@ -34,7 +37,7 @@ public abstract class SMTHandlerProperty<T> {
      */
     private final String description;
 
-    public SMTHandlerProperty(String identifier, String label, String description) {
+    protected SMTHandlerProperty(String identifier, String label, String description) {
         this.identifier = identifier;
         this.label = label;
         this.description = description;

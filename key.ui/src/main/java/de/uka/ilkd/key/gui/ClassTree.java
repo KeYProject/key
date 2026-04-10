@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -6,19 +9,19 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 public class ClassTree extends JTree {
@@ -244,19 +247,18 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
             boolean skipLibraryClasses, Services services) {
         // get all classes
-        final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-        kjts.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
+        var types = new ArrayList<>(services.getJavaInfo().getAllKeYJavaTypes());
+        types.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration)
                 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()
                         && skipLibraryClasses));
 
         // sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[0]);
-        Arrays.sort(kjtsarr, Comparator.comparing(KeYJavaType::getFullName));
+        types.sort(Comparator.comparing(KeYJavaType::getFullName));
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (KeYJavaType keYJavaType : kjtsarr) {
+        for (KeYJavaType keYJavaType : types) {
             insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
         }
 

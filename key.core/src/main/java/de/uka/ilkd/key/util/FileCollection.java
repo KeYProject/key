@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-
-import recoder.io.DataLocation;
 
 /**
  * This class encapsulates a collection of files which is arbitrarily organised. It is iterable and
@@ -55,11 +57,11 @@ public interface FileCollection {
      */
     Walker createWalker(String[] extensions) throws IOException;
 
+
     /**
      * A Walker allows to iterate (once and one way) through a FileCollection.
      */
     interface Walker {
-
         /**
          * step to next element in the collection if there is another one. The getCurrent...()
          * functions will behave differently after a call to step().
@@ -67,24 +69,6 @@ public interface FileCollection {
          * @return true iff there is another element in the collection
          */
         boolean step();
-
-        /**
-         * get the name of the current file in the iteration. This is only the short name not
-         * including any location data.
-         *
-         * @return a short file name, not null
-         * @throws NoSuchElementException if the previous call to step returned false.
-         */
-        String getCurrentName() throws NoSuchElementException;
-
-        /**
-         * get a {@link DataLocation} object describing the current file. The dynamic type of the
-         * result depends on the implementation in use.
-         *
-         * @return a {@link DataLocation}, not null
-         * @throws NoSuchElementException if the previous call to step returned false.
-         */
-        DataLocation getCurrentDataLocation() throws NoSuchElementException;
 
         /**
          * return the type of the structure that is iterated. Must return the same value for any
@@ -117,5 +101,9 @@ public interface FileCollection {
          * @throws NoSuchElementException if the previous call to step returned false.
          */
         InputStream openCurrent(FileRepo repo) throws IOException, NoSuchElementException;
+
+        Path getCurrentLocation();
+
+        String getRelativeLocation();
     }
 }

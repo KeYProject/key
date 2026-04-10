@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.HashMap;
@@ -7,14 +10,15 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.Util;
+
+import org.key_project.logic.sort.Sort;
 
 public class ProblemTypeInformation {
 
@@ -51,7 +55,7 @@ public class ProblemTypeInformation {
     /**
      * @param key
      * @return
-     * @see java.util.Map#get(java.lang.Object)
+     * @see Map#get(Object)
      */
     public SMTSort getTypeForConstant(Object key) {
         return constantsTypes.get(key);
@@ -61,7 +65,7 @@ public class ProblemTypeInformation {
      * @param key
      * @param value
      * @return
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     * @see Map#put(Object, Object)
      */
     public SMTSort putConstantType(String key, SMTSort value) {
         return constantsTypes.put(key, value);
@@ -81,7 +85,7 @@ public class ProblemTypeInformation {
     /**
      * @param key
      * @return
-     * @see java.util.Map#get(java.lang.Object)
+     * @see Map#get(Object)
      */
     public SMTSort getTypeForField(Object key) {
         return fieldTypes.get(key);
@@ -91,7 +95,7 @@ public class ProblemTypeInformation {
      * @param key
      * @param value
      * @return
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     * @see Map#put(Object, Object)
      */
     public SMTSort putFieldType(String key, SMTSort value) {
 
@@ -112,14 +116,13 @@ public class ProblemTypeInformation {
      */
     public Set<String> getFieldsForSort(Sort s) {
         Set<String> result = new HashSet<>();
-        result.add(Util.processName("java.lang.Object::<created>"));
+        result.add(Util.processName("java.lang.Object::#$created"));
 
         JavaInfo info = services.getJavaInfo();
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
-        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration) {
-            ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
+        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
                 if (!sp.equals(kjt)) {
@@ -130,7 +133,6 @@ public class ProblemTypeInformation {
             for (Field f : info.getAllFields(c)) {
 
                 String name = f.getFullName();
-                // name = name.replace("::", "::$");
                 name = Util.processName(name);
                 result.add(name);
 

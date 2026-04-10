@@ -1,15 +1,8 @@
 lexer grammar KeYLexer;
 
 @header {
-    import java.io.InputStream;
-    import de.uka.ilkd.key.util.*;
     import java.util.HashMap;
     import java.util.LinkedHashMap;
-    import antlr.CharStreamException;
-    import antlr.TokenStreamException;
-    import org.antlr.runtime.*;
-    import java.util.NoSuchElementException;
-    import java.io.*;
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
@@ -85,6 +78,7 @@ PROXY : '\\proxy';
 EXTENDS : '\\extends';
 ONEOF : '\\oneof';
 ABSTRACT : '\\abstract';
+ALIAS: '\\alias';
 
 // Keywords used in schema variable declarations
 SCHEMAVARIABLES : '\\schemaVariables';
@@ -101,7 +95,7 @@ SKOLEMFORMULA : '\\skolemFormula';
 TERMLABEL : '\\termlabel';
 
 // used in contracts
-MODIFIES : '\\modifies';
+MODIFIABLE : '\\modifiable';
 
 // Keywords used in program variable declarations
 PROGRAMVARIABLES : '\\programVariables';
@@ -146,12 +140,14 @@ DIFFERENTFIELDS:'\\differentFields';
 ISREFERENCE:'\\isReference';
 ISREFERENCEARRAY:'\\isReferenceArray';
 ISSTATICFIELD : '\\isStaticField';
+ISMODELFIELD : '\\isModelField';
 ISINSTRICTFP : '\\isInStrictFp';
 ISSUBTYPE : '\\sub';
 EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
 NEW_TYPE_OF: '\\newTypeOf';
 NEW_DEPENDING_ON: '\\newDependingOn';
+NEW_LOCAL_VARS: '\\newLocalVars';
 HAS_ELEMENTARY_SORT:'\\hasElementarySort';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
@@ -192,6 +188,7 @@ PROFILE : '\\profile';
 TRUE : 'true';
 FALSE : 'false';
 
+
 // Keywords related to taclets
 SAMEUPDATELEVEL : '\\sameUpdateLevel';
 INSEQUENTSTATE : '\\inSequentState';
@@ -214,8 +211,10 @@ AVOID : '\\avoid';
 
 PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
+DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+FREE : '\\free';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -230,9 +229,10 @@ INVARIANTS : '\\invariants';
 // Taclet annotations (see TacletAnnotations.java for more details)
 LEMMA : '\\lemma';
 
-// The first two guys are not really meta operators, treated separately
+// The first three guys are not really meta operators, treated separately
 IN_TYPE : '\\inType';
 IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
+IS_FINAL : '\\isFinal';
 CONTAINERTYPE : '\\containerType';
 
 // types that need to be declared as keywords
@@ -241,13 +241,14 @@ CONTAINERTYPE : '\\containerType';
 //BIGINT : '\\bigint';
 
 // Unicode symbols for special functions/predicates
-UTF_PRECEDES : '\u227A';
-UTF_IN : '\u220A';
-UTF_EMPTY : '\u2205';
-UTF_UNION : '\u222A';
-UTF_INTERSECT : '\u2229';
-UTF_SUBSET : '\u2286';
-UTF_SETMINUS : '\u2216';
+UTF_PRECEDES  : '\u227A' /*≺*/ | '\\precedes';
+UTF_IN        : '\u220A' /*∊*/ | '\\in';
+UTF_EMPTY     : '\u2205' /*∅*/ | '\\emptyset';
+UTF_UNION     : '\u222A' /*∪*/ | '\\cup';
+UTF_INTERSECT : '\u2229' /*∩*/ | '\\cap';
+UTF_SUBSET_EQ : '\u2286' /*⊆*/ | '\\subseteq';
+UTF_SUBSEQ    : '\u2282' /*⊂*/ | '\\subset';
+UTF_SETMINUS  : '\u2216' /*∖*/ | '\\setminus';
 
 fragment
 VOCAB
@@ -382,19 +383,18 @@ GREATEREQUAL
 :   '>' '=' | '\u2265'
       ;
 
-RGUILLEMETS
-      :   '>' '>'
-      ;
-      
+OPENTYPEPARAMS : '<[';
+CLOSETYPEPARAMS : ']>';
+
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
-LGUILLEMETS: '<' '<';
-IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
+LGUILLEMETS: '<' '<' | '«' | '‹';
+RGUILLEMETS: '>''>' | '»' | '›';
+IMPLICIT_IDENT: '<' '$'? (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
-PRIMES:	('\'')+;
 CHAR_LITERAL
 : '\''
                 ((' '..'&') |
@@ -416,8 +416,6 @@ SL_COMMENT
 
 DOC_COMMENT: '/*!' -> more, pushMode(docComment);
 ML_COMMENT: '/*' -> more, pushMode(COMMENT);
-
-
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
 
 HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F' | '_')+ ('l'|'L')?;
@@ -458,7 +456,7 @@ DOUBLE_LITERAL:
     ;
 
 REAL_LITERAL:
-    RATIONAL_LITERAL ('r' | 'R')
+    RATIONAL_LITERAL ('r' | 'R')?
     ;
 
 
@@ -486,6 +484,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 ERROR_CHAR: .;
 
 mode modDiamond;

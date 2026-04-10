@@ -1,9 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 
 /**
@@ -15,8 +21,9 @@ public class RecAndExistentiallyConnectedClausesFeature extends BinaryTermFeatur
 
     private RecAndExistentiallyConnectedClausesFeature() {}
 
-    protected boolean filter(Term term, Services services) {
-        final ClausesGraph graph = ClausesGraph.create(term, services.getCaches());
+    @Override
+    protected boolean filter(Term term, MutableState mState, LogicServices services) {
+        final ClausesGraph graph = ClausesGraph.create(term, ((Services) services).getCaches());
         return graph.isFullGraph();
     }
 }

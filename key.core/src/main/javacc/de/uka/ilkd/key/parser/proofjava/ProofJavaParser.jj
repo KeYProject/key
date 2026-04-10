@@ -503,6 +503,7 @@ TOKEN :
 | < TRANSIENT: "transient" >
 | < TRUE: "true" >
 | < TRY: "try" >
+| < TYPE: "\\TYPE" >
 | < VOID: "void" >
 | < VOLATILE: "volatile" >
 | < WHILE: "while" >
@@ -1597,8 +1598,8 @@ ArrayInitializer ArrayInitializer() :
  * This production is needed to have a semantic lookahead to decide whether
  * <x> is a type parameter or an implicit identifier
  * consider:
- *    public <E> <ImplicitClass> <init>( ...
- *    public <ImplicitClass> <init>(
+ *    public <E> <ImplicitClass> $init( ...
+ *    public <ImplicitClass> $init(
  * The first < ist the decision point!
  * If 2 identifiers follow the <...>, it is a type parameter
  * otherwise a lookahead of >= 7 would have to be specified.
@@ -2028,6 +2029,7 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
+  | "\\TYPE"
   | <DL_EMBEDDED_FUNCTION>
   )
   {
@@ -3289,14 +3291,9 @@ Expression ADTConstructor() :
         setPrefixInfo(result);
     }
     |
-    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    "\\seq_upd" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
     {
-        // desugaring
-        final Expression one = factory.createIntLiteral(1);
-        final Expression first = new SeqSub(expr, factory.createIntLiteral(0), factory.createMinus(expr2, one));
-        final Expression second = new SeqSingleton(result);
-        final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
-        result = new SeqConcat(first, new SeqConcat(second, third));
+        result = new SeqPut(expr, expr2, result);
         setPrefixInfo(result);
     }
     )

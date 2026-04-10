@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -28,6 +30,9 @@ import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
+import bibliothek.gui.dock.control.focus.FocusRequest;
+import org.jspecify.annotations.NonNull;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
@@ -115,6 +120,23 @@ public class DockingHelper {
     }
 
     /**
+     * Focus the specified panel.
+     *
+     * @param mainWindow main window
+     * @param panel class name of the panel to show
+     */
+    public static void focus(MainWindow mainWindow, Class<?> panel) {
+        SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
+        if (dockable == null) {
+            return;
+        }
+        dockable.setVisible(true);
+        FocusRequest request =
+            new DefaultFocusRequest(dockable.intern(), null, false, true, false, true);
+        dockable.getControl().getController().setFocusedDockable(request);
+    }
+
+    /**
      * Iterates through all dockables and restores the visibility of all hidden dockables.
      * Dockables may be hidden if they are part of an extension that was disabled previously.
      * They are inserted in the left panels (more precisely, next to the goal list).
@@ -162,7 +184,7 @@ public class DockingHelper {
             p.getComponent(), p.getPermissions(), a);
     }
 
-    public static @Nonnull CAction translateAction(@Nonnull Action action) {
+    public static @NonNull CAction translateAction(@NonNull Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -172,7 +194,7 @@ public class DockingHelper {
     }
 
     public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
-            CDecorateableAction<A> derive, @Nonnull Action action) {
+            CDecorateableAction<A> derive, @NonNull Action action) {
         derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         derive.setEnabled(action.isEnabled());
 
@@ -184,7 +206,7 @@ public class DockingHelper {
         });
     }
 
-    private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
+    private static @NonNull CAction createCheckBox(@NonNull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override

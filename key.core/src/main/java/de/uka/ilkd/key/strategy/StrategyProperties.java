@@ -1,17 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import de.uka.ilkd.key.settings.Configuration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class StrategyProperties extends Properties {
-
-    public static final String INF_FLOW_CHECK_PROPERTY = "INF_FLOW_CHECK_PROPERTY";
-    public static final String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";
-    public static final String INF_FLOW_CHECK_FALSE = "INF_FLOW_CHECK_FALSE";
 
     public static final String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public static final String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
@@ -26,7 +27,7 @@ public final class StrategyProperties extends Properties {
     public static final String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public static final String LOOP_EXPAND = "LOOP_EXPAND";
     public static final String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; // Used for test
-                                                                            // generation chrisg
+    // generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
     public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public static final String LOOP_SCOPE_INV_TACLET = "LOOP_SCOPE_INV_TACLET";
@@ -146,19 +147,19 @@ public final class StrategyProperties extends Properties {
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF =
         "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
 
-    private static final long serialVersionUID = -4647245742912258421L;
+    private static final String CATEGORY = "StrategyProperty";
 
     /**
      * Section key for storage file to identify strategy settings
      */
-    private static final String STRATEGY_PROPERTY = "[StrategyProperty]";
+    private static final String STRATEGY_PROPERTY = "[" + CATEGORY + "]";
 
     private static final String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
 
 
     // String identities.
-    private static final String[] STRING_POOL = { INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE,
-        INF_FLOW_CHECK_FALSE, STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
+    private static final String[] STRING_POOL = { STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT,
+        STOPMODE_NONCLOSE,
         SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED, LOOP_OPTIONS_KEY,
         LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_SCOPE_INVARIANT,
         LOOP_SCOPE_INV_TACLET, LOOP_SCOPE_EXPAND, LOOP_NONE, BLOCK_OPTIONS_KEY,
@@ -180,7 +181,6 @@ public final class StrategyProperties extends Properties {
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
 
-
     private static final Properties DEFAULT_MAP = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategyProperties.class);
 
@@ -199,7 +199,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             DEFAULT_MAP.setProperty(userTacletsOptionsKey(i), USER_TACLETS_OFF);
         }
-        DEFAULT_MAP.setProperty(INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_FALSE);
+        // DEFAULT_MAP.setProperty(INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_FALSE);
         DEFAULT_MAP.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
         DEFAULT_MAP.setProperty(VBT_PHASE, VBT_SYM_EX);
         DEFAULT_MAP.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
@@ -225,7 +225,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             put(userTacletsOptionsKey(i), DEFAULT_MAP.get(userTacletsOptionsKey(i)));
         }
-        put(INF_FLOW_CHECK_PROPERTY, DEFAULT_MAP.get(INF_FLOW_CHECK_PROPERTY));
+        // put(INF_FLOW_CHECK_PROPERTY, DEFAULT_MAP.get(INF_FLOW_CHECK_PROPERTY));
         put(STOPMODE_OPTIONS_KEY, DEFAULT_MAP.get(STOPMODE_OPTIONS_KEY));
         put(VBT_PHASE, DEFAULT_MAP.getProperty(VBT_PHASE));
         put(CLASS_AXIOM_OPTIONS_KEY, DEFAULT_MAP.getProperty(CLASS_AXIOM_OPTIONS_KEY));
@@ -257,7 +257,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
         }
-        sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p, INF_FLOW_CHECK_PROPERTY));
+        // sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p, INF_FLOW_CHECK_PROPERTY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p, STOPMODE_OPTIONS_KEY));
         sp.put(VBT_PHASE, readSingleOption(p, VBT_PHASE));
         sp.put(CLASS_AXIOM_OPTIONS_KEY, readSingleOption(p, CLASS_AXIOM_OPTIONS_KEY));
@@ -290,41 +290,41 @@ public final class StrategyProperties extends Properties {
         // invariant for the SED. For this, one would
         // however have to change the SED's
         // implementation and to update the tests.
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-            loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT
-                    : StrategyProperties.LOOP_EXPAND);
-        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-            blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT_INTERNAL
-                    : StrategyProperties.BLOCK_EXPAND);
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-            methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT
-                    : StrategyProperties.METHOD_EXPAND);
-        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
-        sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-            StrategyProperties.AUTO_INDUCTION_OFF);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-        sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-            StrategyProperties.SPLITTING_DELAYED);
-        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-            StrategyProperties.STOPMODE_DEFAULT);
-        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-            StrategyProperties.CLASS_AXIOM_FREE);
-        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-            quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE
-                    : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-            aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
-                    : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+        sp.setProperty(LOOP_OPTIONS_KEY,
+            loopTreatmentInvariant ? LOOP_INVARIANT
+                    : LOOP_EXPAND);
+        sp.setProperty(BLOCK_OPTIONS_KEY,
+            blockTreatmentContract ? BLOCK_CONTRACT_INTERNAL
+                    : BLOCK_EXPAND);
+        sp.setProperty(METHOD_OPTIONS_KEY,
+            methodTreatmentContract ? METHOD_CONTRACT
+                    : METHOD_EXPAND);
+        sp.setProperty(OSS_OPTIONS_KEY, OSS_ON);
+        sp.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
+        sp.setProperty(QUERY_OPTIONS_KEY, QUERY_RESTRICTED);
+        sp.setProperty(NON_LIN_ARITH_OPTIONS_KEY,
+            NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(AUTO_INDUCTION_OPTIONS_KEY,
+            AUTO_INDUCTION_OFF);
+        sp.setProperty(DEP_OPTIONS_KEY, DEP_OFF);
+        sp.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
+        sp.setProperty(SPLITTING_OPTIONS_KEY,
+            SPLITTING_DELAYED);
+        sp.setProperty(STOPMODE_OPTIONS_KEY,
+            STOPMODE_DEFAULT);
+        sp.setProperty(CLASS_AXIOM_OPTIONS_KEY,
+            CLASS_AXIOM_FREE);
+        sp.setProperty(QUANTIFIERS_OPTIONS_KEY,
+            quantifierInstantiationWithSplitting ? QUANTIFIERS_INSTANTIATE
+                    : QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
+            aliasChecks ? SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
+                    : SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         sp.setProperty(
-            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
             nonExecutionBranchHidingSideProofs
-                    ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                    : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+                    ? SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
+                    : SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
 
@@ -367,7 +367,31 @@ public final class StrategyProperties extends Properties {
         return null;
     }
 
+    public static StrategyProperties read(Configuration category) {
+        category = category.getOrCreateSection("options");
+        StrategyProperties sp = new StrategyProperties();
+        for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
+            final var def = entry.getValue();
+            final var obj = category.get(entry.getKey().toString());
+            if (obj != null && def.getClass() == obj.getClass()) {
+                sp.put(entry.getKey(), obj);
+            }
+        }
+        return sp;
+    }
 
+    public void write(Configuration category) {
+        category = category.getOrCreateSection("options");
+        for (Map.Entry<Object, Object> entry : entrySet()) {
+            final var value = entry.getValue();
+            if (value != null) {
+                category.set(entry.getKey().toString(), value);
+            }
+        }
+    }
+
+
+    @Override
     public String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
@@ -391,7 +415,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             p.put(STRATEGY_PROPERTY + userTacletsOptionsKey(i), get(userTacletsOptionsKey(i)));
         }
-        p.put(STRATEGY_PROPERTY + INF_FLOW_CHECK_PROPERTY, get(INF_FLOW_CHECK_PROPERTY));
+        // p.put(STRATEGY_PROPERTY + INF_FLOW_CHECK_PROPERTY, get(INF_FLOW_CHECK_PROPERTY));
         p.put(STRATEGY_PROPERTY + STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + VBT_PHASE, get(VBT_PHASE));
         p.put(STRATEGY_PROPERTY + AUTO_INDUCTION_OPTIONS_KEY, get(AUTO_INDUCTION_OPTIONS_KEY));
@@ -409,6 +433,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
@@ -428,4 +453,6 @@ public final class StrategyProperties extends Properties {
         }
         return result;
     }
+
+
 }

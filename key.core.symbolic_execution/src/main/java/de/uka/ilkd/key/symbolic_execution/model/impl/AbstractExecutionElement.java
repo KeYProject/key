@@ -1,17 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Provides a basic implementation of {@link IExecutionElement}.
@@ -30,7 +34,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     private final Node proofNode;
 
     /**
-     * The human readable name of this node.
+     * The human-readable name of this node.
      */
     private String name;
 
@@ -41,7 +45,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
         assert settings != null;
         assert proofNode != null;
         this.settings = settings;
@@ -132,20 +136,21 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     /**
      * Computes the name of this node lazily when {@link #getName()} is called the first time.
      *
-     * @return The human readable name of this {@link IExecutionNode}.
+     * @return The human-readable name of this {@link IExecutionNode}.
      */
     protected abstract String lazyComputeName() throws ProofInputException;
 
     /**
-     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+     * Converts the given {@link JTerm} into a {@link String} respecting
+     * {@link ITreeSettings#usePrettyPrinting()}.
      *
-     * @param term The {@link Term} to convert.
+     * @param term The {@link JTerm} to convert.
      * @param services The {@link Services} to use.
-     * @return The {@link String} representation of the given {@link Term}.
+     * @return The {@link String} representation of the given {@link JTerm}.
      */
-    protected String formatTerm(Term term, Services services) {
-        return SymbolicExecutionUtil.formatTerm(term, services, settings.isUseUnicode(),
-            settings.isUsePrettyPrinting());
+    protected String formatTerm(JTerm term, Services services) {
+        return SymbolicExecutionUtil.formatTerm(term, services, settings.useUnicode(),
+            settings.usePrettyPrinting());
     }
 
     /**

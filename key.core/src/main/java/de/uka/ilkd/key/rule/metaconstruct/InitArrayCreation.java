@@ -1,32 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -39,7 +44,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;
-    private final static String createArrayName = "<createArray>";
+    private final static String createArrayName = "$createArray";
 
     public InitArrayCreation(SchemaVariable newObjectSV, ProgramElement newExpr) {
         super("init-array-creation", newExpr);
@@ -48,7 +53,7 @@ public class InitArrayCreation extends InitArray {
 
     /**
      * trying to create an array of negative length causes a
-     * {@link java.lang.NegativeArraySizeException} to be thrown. The if statement implementing this
+     * {@link NegativeArraySizeException} to be thrown. The if statement implementing this
      * behaviour is created by this method.
      *
      * @param cond the Expression representing the guard checking if the given length is negative or
@@ -82,11 +87,27 @@ public class InitArrayCreation extends InitArray {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
+        final NameRecorder nameRecorder = services.getNameRecorder();
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 
         for (int i = 0; i < pvars.length; i++) {
-            final ProgramElementName name = varNamer.getTemporaryNameProposal("dim" + i);
+            // first check for previously saved name
+            Name proposedName = null;
+            for (var name : nameRecorder.getSetProposals()) {
+                if (name.toString().startsWith("dim" + i + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                    proposedName = name;
+                    break;
+                }
+            }
+            final ProgramElementName name;
+            if (proposedName != null) {
+                name = new ProgramElementName(proposedName.toString());
+            } else {
+                // if there is no previous name, create a new one
+                name = varNamer.getTemporaryNameProposal("dim" + i);
+                nameRecorder.addProposal(new Name(name.getProgramName()));
+            }
 
             final LocalVariableDeclaration argDecl =
                 KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
@@ -181,9 +202,8 @@ public class InitArrayCreation extends InitArray {
                 return new ProgramElement[] {
                     arrayCreationWithoutInitializers(array, na, services) };
             }
-        } else if (pe instanceof ArrayInitializer) {
+        } else if (pe instanceof ArrayInitializer init) {
             final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
-            final ArrayInitializer init = (ArrayInitializer) pe;
             ArrayType arrayType = null;
             try {
                 arrayType = (ArrayType) kjt.getJavaType();

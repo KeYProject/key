@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -12,6 +14,7 @@ import de.uka.ilkd.key.util.parsing.LocatableException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -21,7 +24,7 @@ import org.antlr.v4.runtime.Token;
  *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
- * @see #run(Token, CharStream, IProofFileParser, URL)
+ * @see #run(Token, CharStream, IProofFileParser, URI)
  */
 public class ProofReplayer {
     /**
@@ -47,10 +50,10 @@ public class ProofReplayer {
      * @param input a valid input stream
      * @param prl the proof replayer instance
      * @param source the source of the stream, used for producing exceptions with locations
-     * @see #run(CharStream, IProofFileParser, int, URL)
+     * @see #run(CharStream, IProofFileParser, int, URI)
      */
-    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
-            URL source) {
+    public static void run(@NonNull Token token, CharStream input, IProofFileParser prl,
+            URI source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine(), source);
     }
@@ -59,7 +62,7 @@ public class ProofReplayer {
      * Replays the proof behind the given {@code input}. This method uses the {@link KeYLexer} to
      * lex input stream, and parse them manually by consuming the tokens. It singals to the given
      * {@link IProofFileParser} at start or end of an expr.
-     *
+     * <p>
      * Avoid the usage of a parser, avoids also the construction of an ASTs.
      *
      * @param input a valid input stream
@@ -68,7 +71,7 @@ public class ProofReplayer {
      * @param source the source of the stream, used for producing exceptions with locations
      */
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
-            URL source) {
+            URI source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         ArrayDeque<IProofFileParser.ProofElementID> stack = new ArrayDeque<>(); // currently open
@@ -78,41 +81,40 @@ public class ProofReplayer {
         while (true) {
             int type = stream.LA(1); // current token type
             switch (type) {
-            case KeYLexer.LPAREN:
-                // expected "(" <id> ["string"]
-                stream.consume(); // consume the "("
-                Token idToken = stream.LT(1); // element id
-                IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
-
-                if (cur == null) {
-                    Location loc =
-                        new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
-                    throw new LocatableException("Unknown proof element: " + idToken.getText(),
-                        loc);
+                case KeYLexer.LPAREN -> {
+                    // expected "(" <id> ["string"]
+                    stream.consume(); // consume the "("
+                    Token idToken = stream.LT(1); // element id
+                    IProofFileParser.ProofElementID cur =
+                        proofSymbolElementId.get(idToken.getText());
+                    if (cur == null) {
+                        Location loc =
+                            new Location(source,
+                                Position.fromToken(idToken).offsetLine(startLine - 1));
+                        throw new LocatableException("Unknown proof element: " + idToken.getText(),
+                            loc);
+                    }
+                    stream.consume();
+                    String arg = null;
+                    int pos = idToken.getLine() + startLine;
+                    if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
+                        // argument was given
+                        arg = stream.LT(1).getText();
+                        arg = unescape(arg.substring(1, arg.length() - 1));
+                        stream.consume();// throw string away
+                    }
+                    prl.beginExpr(cur, arg);
+                    stack.push(cur);
+                    posStack.push(pos);
                 }
-                stream.consume();
-
-                String arg = null;
-                int pos = idToken.getLine() + startLine;
-                if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
-                    // argument was given
-                    arg = stream.LT(1).getText();
-                    arg = unescape(arg.substring(1, arg.length() - 1));
-                    stream.consume();// throw string away
+                case KeYLexer.RPAREN -> {
+                    prl.endExpr(stack.pop(), posStack.pop());
+                    stream.consume();
                 }
-
-                prl.beginExpr(cur, arg);
-                stack.push(cur);
-                posStack.push(pos);
-                break;
-            case KeYLexer.RPAREN:
-                prl.endExpr(stack.pop(), posStack.pop());
-                stream.consume();
-                break;
-            case KeYLexer.EOF:
-                return;
-            default:
-                stream.consume();
+                case KeYLexer.EOF -> {
+                    return;
+                }
+                default -> stream.consume();
             }
         }
     }

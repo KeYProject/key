@@ -1,17 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
@@ -55,17 +58,17 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
-        String name = PREFIX + op.name().toString();
+        String name = PREFIX + op.name();
         if (!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
-            if (op.sort() != Sort.FORMULA && (enableQuantifiers || op.arity() == 0)) {
+            if (op.sort() != JavaDLTheory.FORMULA && (enableQuantifiers || op.arity() == 0)) {
                 trans.addAxiom(HandlerUtil.funTypeAxiom(op, name, trans));
             }
             trans.addKnownSymbol(name);
         }
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
+        List<SExpr> children = trans.translate(term.subs(), UNIVERSE);
+        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         return new SExpr(name, exprType, children);
     }
 

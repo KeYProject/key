@@ -1,31 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.rules.RuleApp;
 
-public class RuleJustificationByAddRules implements RuleJustification {
 
-    private final Node node;
-    private final boolean isAxiom;
+public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {
 
-    public RuleJustificationByAddRules(Node node, boolean isAxiom) {
+    public RuleJustificationByAddRules {
         assert node != null;
-        this.node = node;
-        this.isAxiom = isAxiom;
     }
 
-    public boolean isAxiomJustification() {
-        return isAxiom;
-    }
+    @Override
+    public boolean isAxiomJustification() { return isAxiom; }
 
-    public RuleApp motherTaclet() {
-        return node.getAppliedRuleApp();
-    }
+    public RuleApp motherTaclet() { return node.getAppliedRuleApp(); }
 
     public String toString() {
         String mother;

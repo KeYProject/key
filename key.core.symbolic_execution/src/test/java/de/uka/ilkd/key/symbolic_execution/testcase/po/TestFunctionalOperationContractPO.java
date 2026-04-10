@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -40,11 +43,11 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
     protected void doTest(String javaPathInkeyRepDirectory, String baseContractName,
             String oraclePathInBaseDirFile, String expectedTryContent) throws ProofInputException,
             IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         try {
             // Make sure that the correct taclet options are defined.
-            originalTacletOptions = setDefaultTacletOptions(testCaseDirectory,
+            originalTacletOptions = setDefaultTacletOptions(
                 javaPathInkeyRepDirectory, baseContractName);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,

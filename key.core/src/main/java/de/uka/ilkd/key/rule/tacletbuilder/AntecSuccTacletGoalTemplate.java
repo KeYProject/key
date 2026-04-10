@@ -1,23 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.rule.tacletbuilder;
+
+import de.uka.ilkd.key.logic.BoundVarsVisitor;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
  * ruleGoals that replaces a sequent with a sequent. The replacewith for terms/formulae is realized
  * in another class calles RewriteTacletGoalTemplate.
  */
-package de.uka.ilkd.key.rule.tacletbuilder;
-
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.Taclet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
-    private Sequent replacewith = Sequent.EMPTY_SEQUENT;
+    private Sequent replacewith = JavaDLSequentKit.getInstance().getEmptySequent();
 
     /**
      * creates new Goaldescription

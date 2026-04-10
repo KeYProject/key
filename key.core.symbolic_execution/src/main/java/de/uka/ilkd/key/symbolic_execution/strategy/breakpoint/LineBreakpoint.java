@@ -1,20 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.ExtList;
 
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
@@ -105,7 +108,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *
      * @param line The current line of code, that the auto mode is evaluating
      * @param path The path of the Class, that contains the currently evaluated code
-     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates
+     * @return true if a {@link LineBreakpoint} is in the given line and the condition evaluates
      *         to true and the Hitcount is exceeded, false otherwise
      */
     protected boolean shouldStopInLine(int line, String path) {
@@ -113,13 +116,12 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             activeStatement = ((LoopInvariantBuiltInRuleApp) ruleApp).getLoopStatement();
         }
         return isInLine(activeStatement)
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     private boolean isInLine(SourceElement activeStatement) {

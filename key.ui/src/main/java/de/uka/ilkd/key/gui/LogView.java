@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -116,6 +119,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             });
             dialog.setContentPane(ui);
             dialog.setSize(800, 600);
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.setVisible(true);
         }
     }
@@ -234,7 +238,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     if (line.isEmpty() || line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] fields = line.split("[|]");
+                    String[] fields = line.split("[|]", STYLES.length);
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);
                     boolean skipErrorLevel = !levelError && "ERROR".equals(fields[1]);

@@ -1,42 +1,45 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -190,7 +193,7 @@ public class MethodCall extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        LOGGER.debug("method-call: called for {}", pe);
+        LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
@@ -220,8 +223,9 @@ public class MethodCall extends ProgramTransformer {
 
         newContext = methRef.getReferencePrefix();
         if (newContext == null) {
-            Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(),
-                execContext);
+            JTerm self =
+                services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(),
+                    execContext);
             if (self != null) {
                 newContext =
                     (ReferencePrefix) services.getTypeConverter().convertToProgramElement(self);
@@ -229,8 +233,7 @@ public class MethodCall extends ProgramTransformer {
         } else if (newContext instanceof ThisReference) {
             newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
                 services.getTypeConverter().convertToLogicElement(newContext, execContext));
-        } else if (newContext instanceof FieldReference) {
-            final FieldReference fieldContext = (FieldReference) newContext;
+        } else if (newContext instanceof FieldReference fieldContext) {
             if (fieldContext.referencesOwnInstanceField()) {
                 newContext = fieldContext.setReferencePrefix(execContext.getRuntimeInstance());
             }
@@ -254,7 +257,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleStatic(Services services) {
         Statement result;
-        LOGGER.debug("method-call: invocation of static method detected");
+        LOGGER.trace("method-call: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod, arguments);
@@ -263,7 +266,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleSuperReference(Services services) {
         Statement result;
-        LOGGER.debug(
+        LOGGER.trace(
             "method-call: super invocation of method detected." + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, execContext.getRuntimeInstance(), superMethod,
@@ -273,14 +276,14 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleInstanceInvocation(Services services, Statement result) {
         if (pm.isPrivate() || (methRef.implicit() && methRef.getName()
-                .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+                .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
-            LOGGER.debug("method-call: invocation of private method detected."
+            LOGGER.trace("method-call: invocation of private method detected."
                 + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
-            LOGGER.debug("method-call: invocation of non-private" + " instance method detected."
+            LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
                 + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,

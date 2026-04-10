@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
@@ -6,6 +9,8 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Listener for a {@link SequentView}.
@@ -48,8 +53,10 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
      *
      * @param menu the menu to hide.
      */
-    void hideMenu(JMenu menu) {
-        menu.setPopupMenuVisible(false);
+    void hideMenu(@Nullable JMenu menu) {
+        if (menu != null) {
+            menu.setPopupMenuVisible(false);
+        }
     }
 
     /**

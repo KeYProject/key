@@ -2,14 +2,15 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Oct 31 23:23:05 CET 2018
+#Wed Apr 12 13:20:34 CEST 2023
+[Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
+[Choice]DefaultChoices=JavaCard-JavaCard\\:off, Strings-Strings\\:on, assertions-assertions\\:safe, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:treatAsAxiom, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -41,23 +42,22 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Oct 31 23:23:05 CET 2018
-name=div_one
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "div_one",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "pschmitt" ) (keyVersion "c16317441e6109be5cfa8ef1a8e95e731d8d6cae"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "207")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "div_axiom" (formula "1") (term "0") (newnames "f_divNum") (inst "quotient=quotient_0") (userinteraction))
 (rule "qeq_literals" (formula "1") (term "0,1,1"))
-(builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "equal_literals" (formula "1") (term "0"))
-(builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "mul_literals" (formula "1") (term "1,1,1"))
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "1"))
@@ -71,15 +71,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "applyEq" (formula "4") (term "0") (ifseqformula "1"))
 (rule "eqSymm" (formula "4"))
 (rule "inEqSimp_strengthen0" (formula "3") (ifseqformula "4"))
-(rule "inEqSimp_contradEq3" (formula "4") (ifseqformula "3"))
-(rule "polySimp_mulComm0" (formula "4") (term "1,0,0"))
-(rule "polySimp_pullOutFactor1b" (formula "4") (term "0,0"))
-(rule "add_literals" (formula "4") (term "1,1,0,0"))
-(rule "times_zero_1" (formula "4") (term "1,0,0"))
-(rule "add_zero_right" (formula "4") (term "0,0"))
-(rule "qeq_literals" (formula "4") (term "0"))
-(builtin "One Step Simplification" (formula "4"))
-(rule "false_right" (formula "4"))
 (rule "inEqSimp_contradInEq1" (formula "3") (ifseqformula "2"))
 (rule "andLeft" (formula "3"))
 (rule "inEqSimp_homoInEq1" (formula "3"))
@@ -95,5 +86,4 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "leq_literals" (formula "3"))
 (rule "closeFalse" (formula "3"))
 )
-
 }

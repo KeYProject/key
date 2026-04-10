@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -16,13 +22,13 @@ public abstract class AbstractRunnableWithException implements IRunnableWithExce
     /**
      * An occurred exception.
      */
-    private Exception exception;
+    private @MonotonicNonNull Exception exception;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Exception getException() {
+    public @Nullable Exception getException() {
         return exception;
     }
 

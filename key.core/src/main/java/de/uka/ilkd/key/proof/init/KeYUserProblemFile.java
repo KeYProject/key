@@ -1,31 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
 import java.io.IOException;
-import javax.annotation.Nonnull;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.nparser.ChoiceInformation;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.ProblemInformation;
-import de.uka.ilkd.key.nparser.ProofReplayer;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -33,7 +34,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Term problemTerm = null;
+    private Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -49,7 +50,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -62,7 +63,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile,
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
@@ -77,7 +78,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
+    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
@@ -101,7 +102,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
         // read key file itself (except contracts)
-        super.readExtendedSignature();
+        warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
@@ -124,13 +125,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
 
-        readSorts();
-        readFuncAndPred();
-        readRules();
-
         try {
-            problemTerm = getProblemFinder().getProblemTerm();
-            if (problemTerm == null) {
+            problem = getProblemFinder().getProblem();
+            if (problem == null) {
                 boolean chooseDLContract = chooseContract() != null;
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
@@ -143,25 +140,25 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
     }
 
-
     @Override
     public String chooseContract() {
         return getProblemFinder().getChooseContract();
     }
 
     @Override
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return getProblemFinder().getProofObligation();
     }
 
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
+    public ProofAggregate getPO() {
+        assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig),
+            new Proof(name, problem, getParseContext().getProblemHeader(), initConfig,
+                file.file()),
             name);
     }
 
@@ -172,11 +169,21 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
 
+    /**
+     * True iff a {@link ProofScriptEntry} is present
+     *
+     * @see #readProofScript()
+     */
     public boolean hasProofScript() {
-        return getParseContext().findProofScript() != null;
+        return readProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+    /**
+     * Returns the {@link ProofScriptEntry} in this resource
+     *
+     * @return {@link ProofScriptEntry} if present otherwise null
+     */
+    public KeyAst.@Nullable ProofScript readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -189,7 +196,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         if (token != null) {
             CharStream stream = file.getCharStream();
             // also pass the file to be able to produce exceptions with locations
-            ProofReplayer.run(token, stream, prl, file.url());
+            try {
+                ProofReplayer.run(token, stream, prl, file.url().toURI());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -200,13 +211,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             return false;
         }
         final KeYUserProblemFile kf = (KeYUserProblemFile) o;
-        return kf.file.file().getAbsolutePath().equals(file.file().getAbsolutePath());
+        return kf.file.file().toAbsolutePath().equals(file.file().toAbsolutePath());
     }
 
 
     @Override
     public int hashCode() {
-        return file.file().getAbsolutePath().hashCode();
+        return file.file().toAbsolutePath().hashCode();
     }
 
     /**
@@ -231,10 +242,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
-     * @throws Exception Occurred Exception.
      */
-    private Profile readProfileFromFile() throws Exception {
-        @Nonnull
+    private Profile readProfileFromFile() {
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
@@ -242,6 +251,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         } else {
             return null;
         }
+    }
+
+
+    /// returns the user-local definition given in the file.
+    public KeyAst.@Nullable Declarations getProblemHeader() {
+        return getParseContext().getProblemHeader();
     }
 
     /**

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -12,17 +15,17 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     private final LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext represents) {
-        super(mods);
+        super(modifiers);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext represents, String name) {
-        this(mods, represents);
+        this(modifiers, represents);
         this.name = name;
     }
 
@@ -38,17 +41,16 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLRepresents)) {
+        if (!(o instanceof TextualJMLRepresents r)) {
             return false;
         }
-        TextualJMLRepresents r = (TextualJMLRepresents) o;
-        return mods.equals(r.mods) && represents.equals(r.represents);
+        return modifiers.equals(r.modifiers) && represents.equals(r.represents);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + represents.hashCode();
+        return modifiers.hashCode() + represents.hashCode();
     }
 
     public String getName() {

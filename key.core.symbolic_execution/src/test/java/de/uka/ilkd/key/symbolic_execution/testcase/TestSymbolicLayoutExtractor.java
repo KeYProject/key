@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
@@ -23,6 +26,7 @@ import org.key_project.util.java.StringUtil;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -529,7 +533,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             String precondition, int numberOfReturnNodeInMostLeftBranch,
             int expectedNumberOfLayouts, boolean useOperationContracts,
             boolean onReturnStatementNode) throws Exception {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
@@ -647,7 +651,8 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 SymbolicLayoutReader reader = new SymbolicLayoutReader();
-                ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+                ISymbolicLayout expected =
+                    reader.read(testCaseDirectory.resolve(oracleFile).toFile());
                 assertNotNull(expected);
                 assertModel(expected, current);
             }
@@ -668,7 +673,8 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 SymbolicLayoutReader reader = new SymbolicLayoutReader();
-                ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+                ISymbolicLayout expected =
+                    reader.read(testCaseDirectory.resolve(oracleFile).toFile());
                 assertNotNull(expected);
                 assertModel(expected, current);
             }

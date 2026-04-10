@@ -1,24 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -26,12 +31,19 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
- * This class wraps a ImmMap<SchemaVariable,InstantiationEntry<?>> and is used to store
- * instantiations of schemavariables. The class is immutable, this means changing its content will
- * result in creating a new object.
+ * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
+ * {@link InstantiationEntry}
+ * and is used to store instantiations of schemavariables. The class is immutable,
+ * this means changing its content results in creating a new object.
  */
-public class SVInstantiations {
+public class SVInstantiations
+        implements org.key_project.prover.rules.instantiation.SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
@@ -41,6 +53,7 @@ public class SVInstantiations {
      */
     private static final SchemaVariable CONTEXTSV = SchemaVariableFactory.createProgramSV(
         new ProgramElementName("Context"), new ProgramSVSort(new Name("ContextStatementBlock")) {
+            @Override
             public boolean canStandFor(ProgramElement pe, Services services) {
                 return true;
             }
@@ -48,13 +61,13 @@ public class SVInstantiations {
 
 
     /** the map with the instantiations to logic terms */
-    private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
+    private final ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> map;
 
     /**
      * just a list of "interesting" instantiations: these instantiations are not 100% predetermined
      * and worth saving in a proof
      */
-    private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting;
+    private final ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> interesting;
 
     /**
      * updates may be ignored when matching, therefore they need to be added after the application
@@ -69,7 +82,7 @@ public class SVInstantiations {
     /** additional conditions for the generic sorts */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
-    /** creates a new SVInstantions object with an empty map */
+    /** creates a new SVInstantiations object with an empty map */
     private SVInstantiations() {
         genericSortConditions = ImmutableSLList.nil();
         updateContext = ImmutableSLList.nil();
@@ -82,19 +95,21 @@ public class SVInstantiations {
      *
      * @param map the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
      */
-    private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
-            ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
-            ImmutableList<UpdateLabelPair> updateContext,
-            ImmutableList<GenericSortCondition> genericSortConditions) {
+    private SVInstantiations(
+            ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> map,
+            ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> interesting,
+            ImmutableList<@NonNull UpdateLabelPair> updateContext,
+            ImmutableList<@NonNull GenericSortCondition> genericSortConditions) {
         this(map, interesting, updateContext, GenericSortInstantiations.EMPTY_INSTANTIATIONS,
             genericSortConditions);
     }
 
-    private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
-            ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
-            ImmutableList<UpdateLabelPair> updateContext,
+    private SVInstantiations(
+            ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> map,
+            ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> interesting,
+            ImmutableList<@NonNull UpdateLabelPair> updateContext,
             GenericSortInstantiations genericSortInstantiations,
-            ImmutableList<GenericSortCondition> genericSortConditions) {
+            ImmutableList<@NonNull GenericSortCondition> genericSortConditions) {
         this.map = map;
         this.interesting = interesting;
         this.updateContext = updateContext;
@@ -117,66 +132,23 @@ public class SVInstantiations {
      * already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param subst the Term the SchemaVariable is instantiated with
+     * @param matchedElement the SyntaxElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, Term subst, Services services) {
-        return add(sv, new TermInstantiation(sv, subst), services);
+    public SVInstantiations add(SchemaVariable sv, SyntaxElement matchedElement,
+            LogicServices services) {
+        return add(sv, new InstantiationEntry<>(matchedElement), services);
     }
 
-
-    public SVInstantiations add(ModalOperatorSV sv, Operator op, Services services) {
-        return add(sv, new OperatorInstantiation(op), services);
+    public SVInstantiations addInteresting(SchemaVariable sv, SyntaxElement subst,
+            LogicServices services) {
+        return addInteresting(sv, new InstantiationEntry<>(subst), services);
     }
 
-
-    public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
-        return addInteresting(sv, new TermInstantiation(sv, subst), services);
+    public <T> SVInstantiations add(SchemaVariable sv, ImmutableArray<T> pes, Class<T> type,
+            LogicServices services) {
+        return add(sv, new ListInstantiation<>(pes, type), services);
     }
-
-
-    public SVInstantiations add(SchemaVariable sv, ProgramList pes, Services services) {
-        return add(sv, new ProgramListInstantiation(pes.getList()), services);
-    }
-
-    public SVInstantiations add(SchemaVariable sv, ImmutableArray<TermLabel> labels,
-            Services services) {
-        return add(sv, new TermLabelInstantiationEntry(labels), services);
-    }
-
-
-    public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
-        return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
-            services);
-    }
-
-
-
-    /**
-     * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
-     * already, the new pair is taken without a warning.
-     *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
-     * @return SVInstantiations the new SVInstantiations containing the given pair
-     */
-    public SVInstantiations add(SchemaVariable sv, ProgramElement pe, Services services) {
-        return add(sv, new ProgramInstantiation(pe), services);
-    }
-
-
-    public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
-            Services services) {
-        return addInteresting(sv, new ProgramInstantiation(pe), services);
-    }
-
-    public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
-            Services services) {
-        return addInteresting(sv,
-            new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
-    }
-
-
 
     /**
      * adds the given pair to the instantiations for the context.If the context has been
@@ -189,9 +161,11 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
-            ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
+            ExecutionContext activeStatementContext, ProgramElement pe, LogicServices services) {
         return add(CONTEXTSV,
-            new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
+            new InstantiationEntry<>(new ContextStatementBlockInstantiation(prefix, postfix,
+                activeStatementContext, pe)),
+            services);
     }
 
 
@@ -208,23 +182,25 @@ public class SVInstantiations {
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
-            boolean p_forceRebuild, Services services) {
-        Boolean b = getGenericSortInstantiations().checkSorts(p_sv, p_entry);
+            boolean p_forceRebuild, LogicServices services) {
+        if (p_sv instanceof JOperatorSV asv) {
+            Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
-        if (b == null) {
-            return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
+            if (b == null) {
+                return rebuildSorts(services);
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }
 
     private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
-            Services services) {
-        Boolean b = getGenericSortInstantiations().checkCondition(p_c);
+            LogicServices services) {
+        final Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
         if (b == null) {
             return rebuildSorts(services);
@@ -237,7 +213,7 @@ public class SVInstantiations {
         return this;
     }
 
-    private SVInstantiations rebuildSorts(Services services) {
+    private SVInstantiations rebuildSorts(LogicServices services) {
         genericSortInstantiations =
             GenericSortInstantiations.create(map.iterator(), getGenericSortConditions(), services);
         return this;
@@ -248,44 +224,43 @@ public class SVInstantiations {
      * already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?>
+     * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
+    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry,
+            LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv, InstantiationEntry<?> entry,
-            Services services) {
+            LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                    .checkSorts(sv, entry, false, services);
+                .checkSorts(sv, entry, false, services);
     }
 
-
-    public SVInstantiations addInteresting(SchemaVariable sv, Name name, Services services) {
-        SchemaVariable existingSV = lookupVar(sv.name());
-        Name oldValue = (Name) getInstantiation(existingSV);
-        if (name.equals(oldValue)) {
+    public SVInstantiations addInteresting(SchemaVariable sv, Name name, LogicServices services) {
+        final SchemaVariable existingSV = lookupVar(sv.name());
+        final Name oldValue = existingSV == null ? null : getInstantiation(existingSV);
+        if (oldValue == null) {
+            // otherwise (nothing here yet) add it
+            return addInteresting(sv, new InstantiationEntry<>(name), services);
+        } else if (name.equals(oldValue)) {
             return this; // already have it
-        } else if (oldValue != null) {
+        } else {
             throw new IllegalStateException(
                 "Trying to add a second name proposal for " + sv + ": " + oldValue + "->" + name);
-        } else {
-            // otherwise (nothing here yet) add it
-            return addInteresting(sv, new NameInstantiationEntry(name), services);
         }
     }
-
 
     /**
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?> the SchemaVariable is instantiated with
+     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -298,7 +273,7 @@ public class SVInstantiations {
      *
      * @throws IllegalInstantiationException, if sv has not yet been instantiated
      */
-    public SVInstantiations makeInteresting(SchemaVariable sv, Services services) {
+    public SVInstantiations makeInteresting(SchemaVariable sv, LogicServices services) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
 
         if (entry == null) {
@@ -320,7 +295,7 @@ public class SVInstantiations {
      * @param term the Term the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
-        return replace(sv, new TermInstantiation(sv, term), services);
+        return replace(sv, new InstantiationEntry<>(term), services);
     }
 
     /**
@@ -331,7 +306,7 @@ public class SVInstantiations {
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
-        return replace(sv, new ProgramInstantiation(pe), services);
+        return replace(sv, new InstantiationEntry<>(pe), services);
     }
 
     /**
@@ -343,7 +318,7 @@ public class SVInstantiations {
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
-        return replace(sv, new ProgramListInstantiation(pes), services);
+        return replace(sv, new ListInstantiation<>(pes, ProgramElement.class), services);
     }
 
     /**
@@ -360,7 +335,9 @@ public class SVInstantiations {
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return replace(CONTEXTSV,
-            new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
+            new InstantiationEntry<>(new ContextStatementBlockInstantiation(prefix, postfix,
+                activeStatementContext, pe)),
+            services);
     }
 
 
@@ -369,18 +346,20 @@ public class SVInstantiations {
      *
      * @return true iff the sv has been instantiated already
      */
-    public boolean isInstantiated(SchemaVariable sv) {
+    @Override
+    public boolean isInstantiated(@NonNull SchemaVariable sv) {
         return map.containsKey(sv);
     }
 
     /**
      * returns the instantiation of the given SchemaVariable
      *
-     * @return the InstantiationEntry<?> the SchemaVariable will be instantiated with, null if no
+     * @return the InstantiationEntry the SchemaVariable will be instantiated with, {@code null} if
+     *         no
      *         instantiation is stored
      */
-    public InstantiationEntry<?> getInstantiationEntry(SchemaVariable sv) {
-        return map.get(sv);
+    public <T> InstantiationEntry<T> getInstantiationEntry(SchemaVariable sv) {
+        return (InstantiationEntry<T>) map.get(sv);
     }
 
     /**
@@ -389,8 +368,9 @@ public class SVInstantiations {
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Object getInstantiation(SchemaVariable sv) {
-        final InstantiationEntry<?> entry = getInstantiationEntry(sv);
+    @Override
+    public <T> @Nullable T getInstantiation(@NonNull SchemaVariable sv) {
+        final InstantiationEntry<T> entry = getInstantiationEntry(sv);
         return entry == null ? null : entry.getInstantiation();
     }
 
@@ -401,14 +381,16 @@ public class SVInstantiations {
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Term getTermInstantiation(SchemaVariable sv, ExecutionContext ec, Services services) {
+    public JTerm getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
+            LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
-        } else if (inst instanceof Term) {
-            return (Term) inst;
+        } else if (inst instanceof JTerm term) {
+            return term;
         } else if (inst instanceof ProgramElement) {
-            return services.getTypeConverter().convertToLogicElement((ProgramElement) inst, ec);
+            return ((Services) services).getTypeConverter()
+                    .convertToLogicElement((ProgramElement) inst, ec);
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;
         }
@@ -419,46 +401,12 @@ public class SVInstantiations {
      *
      * @param updateApplicationlabels the TermLabels attached to the application operator term
      */
-    public SVInstantiations addUpdate(Term update,
+    public SVInstantiations addUpdate(@NonNull JTerm update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
-        assert update.sort() == Sort.UPDATE;
+        assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
             updateContext.append(new UpdateLabelPair(update, updateApplicationlabels)),
             getGenericSortInstantiations(), getGenericSortConditions());
-    }
-
-    public static class UpdateLabelPair {
-        private final Term update;
-
-        private final ImmutableArray<TermLabel> updateApplicationlabels;
-
-        public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
-            this.update = update;
-            this.updateApplicationlabels = updateApplicationlabels;
-        }
-
-        public Term getUpdate() {
-            return update;
-        }
-
-        public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
-            return updateApplicationlabels;
-        }
-
-        @Override
-        public int hashCode() {
-            return update.hashCode() + updateApplicationlabels.hashCode() * 7;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof UpdateLabelPair) {
-                return update.equals(((UpdateLabelPair) obj).getUpdate()) && updateApplicationlabels
-                        .equals(((UpdateLabelPair) obj).getUpdateApplicationlabels());
-            } else {
-                return false;
-            }
-        }
     }
 
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
@@ -483,9 +431,9 @@ public class SVInstantiations {
     /**
      * returns the instantiation entry for the context "schema variable" or null if non such exists
      */
-    public ContextInstantiationEntry getContextInstantiation() {
+    public ContextStatementBlockInstantiation getContextInstantiation() {
         final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
-        return (ContextInstantiationEntry) entry;
+        return entry == null ? null : (ContextStatementBlockInstantiation) entry.getInstantiation();
     }
 
     /**
@@ -498,12 +446,21 @@ public class SVInstantiations {
     }
 
     /**
-     * returns iterator of the mapped pair (SchemaVariables, InstantiationEntry<?>)
+     * returns iterator of the mapped pair {@code (SchemaVariables, InstantiationEntry)}
      *
-     * @return the Iterator<IEntry><SchemaVariable,InstantiationEntry<?>>
+     * @return the Iterator
      */
     public Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
         return map.iterator();
+    }
+
+    /**
+     * returns iterator of the mapped pair {@code (SchemaVariables, InstantiationEntry)}
+     *
+     * @return the Iterator
+     */
+    public @NonNull ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> getInstantiationMap() {
+        return map;
     }
 
     /**
@@ -538,6 +495,7 @@ public class SVInstantiations {
      *
      * @return true if the given object and this one have the same mappings
      */
+    @Override
     public boolean equals(Object obj) {
         final SVInstantiations cmp;
         if (!(obj instanceof SVInstantiations)) {
@@ -549,15 +507,12 @@ public class SVInstantiations {
             return false;
         }
 
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            pairIterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+        for (final var e : map) {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (inst instanceof TermImpl) {
-                if (!((TermImpl) inst)
-                        .equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof JTerm instAsTerm) {
+                if (!instAsTerm.equalsModProperty(cmp.getInstantiation(e.key()),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -568,47 +523,45 @@ public class SVInstantiations {
 
     }
 
+    @Override
     public int hashCode() {
         int result = 37 * getUpdateContext().hashCode() + size();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            pairIterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.value().getInstantiation() instanceof TermLabel) {
-                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+        for (final var e : map) {
+            final Object instantiation = e.value().getInstantiation();
+            if (instantiation instanceof TermLabel termLabel) {
                 if (!termLabel.isProofRelevant()) {
                     continue;
                 }
             }
-            result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
+            result = 37 * result + instantiation.hashCode() + e.key().hashCode();
         }
         return result;
     }
 
-    public SVInstantiations union(SVInstantiations other, Services services) {
-        ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
+    @Override
+    public @NonNull SVInstantiations union(
+            org.key_project.prover.rules.instantiation.@NonNull SVInstantiations p_other,
+            @NonNull LogicServices services) {
+        final var other = (SVInstantiations) p_other;
+        ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> result = map;
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {
             result = result.put(entry.key(), entry.value());
         }
 
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.nil();
+        ImmutableList<UpdateLabelPair> updates = updateContext;
 
-        if (other.getUpdateContext().isEmpty()) {
-            updates = getUpdateContext();
-        } else if (getUpdateContext().isEmpty()) {
-            updates = other.getUpdateContext();
-        } else if (!getUpdateContext().equals(other.getUpdateContext())) {
-            Debug.fail(
-                "The update context of one of" + " the instantiations has to be empty or equal.");
-        } else {
-            updates = other.getUpdateContext();
+        if (updates.isEmpty()) {
+            updates = other.updateContext;
+        } else if (!updateContext.equals(other.updateContext)) {
+            throw new IllegalArgumentException(
+                "The update context of one of the instantiations has to be empty or equal.");
         }
         return new SVInstantiations(result, interesting(), updates, getGenericSortConditions())
                 .rebuildSorts(services);
     }
 
-    public ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting() {
+    public ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> interesting() {
         return interesting;
     }
 
@@ -622,14 +575,15 @@ public class SVInstantiations {
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
+    public @NonNull SVInstantiations add(GenericSortCondition p_c, LogicServices services)
+            throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
-    public ExecutionContext getExecutionContext() {
-        final ContextInstantiationEntry cte = getContextInstantiation();
+    public @Nullable ExecutionContext getExecutionContext() {
+        final ContextStatementBlockInstantiation cte = getContextInstantiation();
         if (cte != null) {
             return cte.activeStatementContext();
         } else {
@@ -637,7 +591,8 @@ public class SVInstantiations {
         }
     }
 
-    public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
+    public @Nullable ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(
+            Name name) {
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
             if (e.key().name().equals(name)) {
                 return e;
@@ -646,13 +601,20 @@ public class SVInstantiations {
         return null; // handle this better!
     }
 
-    public SchemaVariable lookupVar(Name name) {
-        final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = lookupEntryForSV(name);
+    @Override
+    public @Nullable SchemaVariable lookupVar(@NonNull Name name) {
+        final var e = lookupEntryForSV(name);
         return e == null ? null : e.key(); // handle this better!
     }
 
-    public Object lookupValue(Name name) {
-        final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = lookupEntryForSV(name);
-        return e == null ? null : e.value().getInstantiation();
+    @Override
+    public <T> @Nullable T lookupValue(@NonNull Name name) {
+        final var e = lookupEntryForSV(name);
+        // e.value() cannot be null here as null instantiations are not allowed
+        return e == null ? null : (T) e.value().getInstantiation();
+    }
+
+    public record UpdateLabelPair(@NonNull JTerm update,
+            ImmutableArray<TermLabel> updateApplicationlabels) {
     }
 }

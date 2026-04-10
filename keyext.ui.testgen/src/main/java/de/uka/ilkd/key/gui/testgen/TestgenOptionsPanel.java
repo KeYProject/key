@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import javax.swing.*;
@@ -5,10 +8,9 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = -2170118134719823425L;
     private static final String INFO_APPLY_SYMBOLIC_EX =
         "Performs bounded symbolic execution on the current proof tree."
             + " More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking "
@@ -17,9 +19,6 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         "Choose the folder where the test case files will be written.";
     private static final String INFO_MAX_PROCESSES =
         "Maximal number of SMT processes that are allowed to " + "run concurrently.";
-    private static final String INFO_USE_JUNIT = "Generate a JUnit 4 test suite and a test oracle "
-        + "from the postcondition. Disable this option when using a JML runtime checker since the "
-        + "generated code may be too complicated for the runtime checker or may not comply with JML requirements.";
     private static final String INFO_INVARIANT_FOR_ALL =
         "Includes class invariants in the test data constraints. "
             + "I.e., require the class invariant of all created objects to be true in the initial state.";
@@ -56,7 +55,6 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner maxUnwinds;
     private final JCheckBox symbolicEx;
-    private final JCheckBox useJUnit;
     private final JCheckBox invariantForAll;
     private final JCheckBox includePostCondition;
     private final JCheckBox removeDuplicates;
@@ -73,7 +71,6 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         includePostCondition = getIncludePostCondition();
         maxProcesses = getMaxProcesses();
         objenesisPanel = getObjenesisPanel();
-        useJUnit = getJUnitPanel();
         openJMLPanel = getOpenJMLPanel();
         saveToFilePanel = getSaveToFilePanel();
         removeDuplicates = getRemoveDuplicatesPanel();
@@ -82,82 +79,55 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
 
     private JSpinner getMaxProcesses() {
         return addNumberField("Concurrent processes:", 0, Integer.MAX_VALUE, 1, INFO_MAX_PROCESSES,
-            obj -> {
-                settings.setConcurrentProcesses(obj.intValue());
-                settings.fireSettingsChanged();
-            });
+            obj -> settings.setConcurrentProcesses(obj.intValue()));
     }
 
     private JSpinner getMaxUnwinds() {
-        return addNumberField("Maximal unwinds:", 0, Integer.MAX_VALUE, 1, INFO_MAX_UNWINDS, e -> {
-            settings.setMaxUnwinds(e.intValue());
-            settings.fireSettingsChanged();
-        });
+        return addNumberField("Maximal unwinds:", 0, Integer.MAX_VALUE, 1, INFO_MAX_UNWINDS,
+            e -> settings.setMaxUnwinds(e.intValue()));
     }
 
 
     private JTextField getSaveToFilePanel() {
-        return addFileChooserPanel("Store test cases to folder:", "", INFO_SAVE_TO, true, e -> {
-            settings.setOutputPath(saveToFilePanel.getText());
-            settings.fireSettingsChanged();
-        });
+        return addFileChooserPanel("Store test cases to folder:", "", INFO_SAVE_TO, true,
+            e -> settings.setOutputPath(saveToFilePanel.getText()));
     }
 
     private JTextField getOpenJMLPanel() {
         return addFileChooserPanel("Location of openjml:", "", INFO_OPEN_JML_PATH, false, e -> {
-            settings.setOpenjmlPath(openJMLPanel.getText());
-            settings.fireSettingsChanged();
+            // settings.setOpenjmlPath(openJMLPanel.getText());
         });
     }
 
     private JTextField getObjenesisPanel() {
         return addFileChooserPanel("Location of objenesis:", "", INFO_OBJENESIS_PATH, false, e -> {
-            settings.setObjenesisPath(objenesisPanel.getText());
-            settings.fireSettingsChanged();
-        });
-    }
-
-    private JCheckBox getJUnitPanel() {
-        return addCheckBox("Generate JUnit and test oracle", INFO_USE_JUNIT, false, val -> {
-            settings.setUseJunit(val);
-            settings.fireSettingsChanged();
+            // settings.setObjenesisPath(objenesisPanel.getText());
         });
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {
-        return addCheckBox("Remove duplicates", INFO_REMOVE_DUPLICATES, false, val -> {
-            settings.setRemoveDuplicates(val);
-            settings.fireSettingsChanged();
-        });
+        return addCheckBox("Remove duplicates", INFO_REMOVE_DUPLICATES, false,
+            val -> settings.setRemoveDuplicates(val));
     }
 
     private JCheckBox getRFLSelectionPanel() {
-        return addCheckBox("Use reflection framework", INFO_RFL_SELECTION, false, val -> {
-            settings.setRFL(val);
-            settings.fireSettingsChanged();
-        });
+        return addCheckBox("Use reflection framework", INFO_RFL_SELECTION, false,
+            val -> settings.setUseRFL(val));
     }
 
     private JCheckBox getSymbolicEx() {
-        return addCheckBox("Apply symbolic execution", INFO_APPLY_SYMBOLIC_EX, false, val -> {
-            settings.setApplySymbolicExecution(val);
-            settings.fireSettingsChanged();
-        });
+        return addCheckBox("Apply symbolic execution", INFO_APPLY_SYMBOLIC_EX, false,
+            val -> settings.setApplySymbolicExecution(val));
     }
 
     private JCheckBox getInvariantForall() {
         return addCheckBox("Require invariant for all objects", INFO_INVARIANT_FOR_ALL, false,
-            val -> {
-                settings.setInvariantForAll(val);
-                settings.fireSettingsChanged();
-            });
+            val -> settings.setInvariantForAll(val));
     }
 
     private JCheckBox getIncludePostCondition() {
-        return addCheckBox("Include post condition", INFO_INCLUDE_POSTCONDITION, false, val -> {
-            settings.setIncludePostCondition(val);
-            settings.fireSettingsChanged();
-        });
+        return addCheckBox("Include post condition", INFO_INCLUDE_POSTCONDITION, false,
+            val -> settings.setIncludePostCondition(val));
     }
 
     @Override
@@ -166,16 +136,15 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());
-        useJUnit.setSelected(settings.useJunit());
         symbolicEx.setSelected(settings.getApplySymbolicExecution());
         removeDuplicates.setSelected(settings.removeDuplicates());
-        checkboxRFL.setSelected(settings.useRFL());
-        objenesisPanel.setText(settings.getObjenesisPath());
-        openJMLPanel.setText(settings.getOpenjmlPath());
+        checkboxRFL.setSelected(settings.isUseRFL());
+        // objenesisPanel.setText(settings.getObjenesisPath());
+        // openJMLPanel.setText(settings.getOpenjmlPath());
         saveToFilePanel.setText(settings.getOutputFolderPath());
         return this;
     }
@@ -184,6 +153,5 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     public void applySettings(MainWindow window) {
         TestGenerationSettings globalSettings = TestGenerationSettings.getInstance();
         globalSettings.set(settings);
-        globalSettings.fireSettingsChanged();
     }
 }

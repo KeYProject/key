@@ -1,21 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termfeature.BinarySumTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.ConstTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.OperatorTF;
+import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -27,11 +32,11 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
     private final TermFeature hasCoeff;
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final Function Z, mul, add;
 
 
-    private MonomialsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         super(numbers);
         this.left = left;
@@ -50,16 +55,18 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
-        m1.collect(left.toTerm(app, pos, goal), goal.proof().getServices());
+        m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
-        m2.collect(right.toTerm(app, pos, goal), goal.proof().getServices());
+        m2.collect(right.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
 
@@ -155,19 +162,17 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, Services services) {
+        protected void collect(Term te, MutableState mState, Services services) {
             if (te.op() == add) {
-                collect(te.sub(0), services);
-                collect(te.sub(1), services);
-            } else if (te.op() == Z) {
-                // nothing
-            } else {
-                addTerm(stripOffLiteral(te, services));
+                collect(te.sub(0), mState, services);
+                collect(te.sub(1), mState, services);
+            } else if (te.op() != Z) {
+                addTerm(stripOffLiteral(te, mState, services));
             }
         }
 
-        private Term stripOffLiteral(Term te, Services services) {
-            if (!(hasCoeff.compute(te, services) instanceof TopRuleAppCost))
+        private Term stripOffLiteral(Term te, MutableState mState, Services services) {
+            if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals
             {

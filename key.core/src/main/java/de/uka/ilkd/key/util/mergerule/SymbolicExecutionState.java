@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
@@ -12,7 +16,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionState extends Pair<Term, Term> {
+public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
 
     private Node correspondingNode = null;
 
@@ -20,7 +24,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
      * @param symbolicState The symbolic state (parallel update).
      * @param pathCondition The path condition (formula).
      */
-    public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
+    public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition) {
         super(symbolicState, pathCondition);
     }
 
@@ -29,7 +33,8 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
      * @param pathCondition The path condition (formula).
      * @param correspondingNode The node corresponding to this SE state.
      */
-    public SymbolicExecutionState(Term symbolicState, Term pathCondition, Node correspondingNode) {
+    public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition,
+            Node correspondingNode) {
         this(symbolicState, pathCondition);
         this.correspondingNode = correspondingNode;
     }
@@ -37,14 +42,14 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     /**
      * @return The symbolic state.
      */
-    public Term getSymbolicState() {
+    public JTerm getSymbolicState() {
         return first;
     }
 
     /**
      * @return The path condition.
      */
-    public Term getPathCondition() {
+    public JTerm getPathCondition() {
         return second;
     }
 
@@ -56,7 +61,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     }
 
     /**
-     * @param The node corresponding to this SE state.
+     * @param correspondingNode The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;

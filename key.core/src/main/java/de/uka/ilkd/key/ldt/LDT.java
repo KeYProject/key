@@ -1,25 +1,30 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
 import java.util.TreeMap;
-import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file shipped with KeY.
@@ -27,15 +32,16 @@ import org.key_project.util.ExtList;
  * provides a programming interface to access these entities, and it assists the type converter in
  * handling them.
  */
+@NullMarked
 public abstract class LDT implements Named {
 
     private final Name name;
 
     /** the main sort associated with the LDT */
-    private final Sort sort;
+    private final @Nullable Sort sort;
 
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace<Operator> functions = new Namespace<>();
+    private final Namespace<Function> functions = new Namespace<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -80,14 +86,14 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(TermServices services, String funcName) {
+    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
-        return addFunction(f);
+        return (F) addFunction(f);
     }
 
     protected final SortDependingFunction addSortDependingFunction(TermServices services,
@@ -104,7 +110,7 @@ public abstract class LDT implements Named {
      *
      * @return the basic functions of the model
      */
-    protected final Namespace<Operator> functions() {
+    protected final Namespace<Function> functions() {
         return functions;
     }
 
@@ -123,12 +129,14 @@ public abstract class LDT implements Named {
         // TreeMap ensures the map is sorted according to the natural order of its keys.
         Map<Name, LDT> ret = new TreeMap<>();
 
+        ret.put(JavaDLTheory.NAME, new JavaDLTheory(s));
         ret.put(IntegerLDT.NAME, new IntegerLDT(s));
         ret.put(BooleanLDT.NAME, new BooleanLDT(s));
         ret.put(LocSetLDT.NAME, new LocSetLDT(s));
         ret.put(HeapLDT.NAME, new HeapLDT(s));
         ret.put(PermissionLDT.NAME, new PermissionLDT(s));
         ret.put(SeqLDT.NAME, new SeqLDT(s));
+        ret.put(SortLDT.NAME, new SortLDT(s));
         ret.put(FreeLDT.NAME, new FreeLDT(s));
         ret.put(MapLDT.NAME, new MapLDT(s));
         ret.put(FloatLDT.NAME, new FloatLDT(s));
@@ -157,8 +165,8 @@ public abstract class LDT implements Named {
     }
 
     public boolean containsFunction(Function op) {
-        Named n = functions.lookup(op.name());
-        return (n == op);
+        final var n = functions.lookup(op.name());
+        return n == op;
     }
 
     // -------------------------------------------------------------------------
@@ -175,7 +183,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -190,8 +198,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left,
-            Term right, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(Operator op, JTerm left,
+            JTerm right, Services services, ExecutionContext ec);
 
 
     /**
@@ -204,7 +212,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public abstract boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -214,7 +222,7 @@ public abstract class LDT implements Named {
      * @param lit the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
-    public abstract Term translateLiteral(Literal lit, Services services);
+    public abstract JTerm translateLiteral(Literal lit, Services services);
 
     /**
      * returns the function symbol for the given <em>Java</em> operator.
@@ -222,15 +230,15 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(Operator op,
             Services services, ExecutionContext ec);
 
     /**
      * get the function in this LDT for an operation identified by generic operationName. If the LDT
      * does not support this named function, it should return null.
-     *
+     * <p>
      * This is used to resolve overloaded symbols.
-     *
+     * <p>
      * For example: "+" may map to "add" for integers, and to "addFloat" for floats.
      *
      * @param operationName non-null operationName for a generic function
@@ -246,7 +254,7 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(Function f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
 
-    public abstract Type getType(Term t);
+    public abstract Type getType(JTerm t);
 }

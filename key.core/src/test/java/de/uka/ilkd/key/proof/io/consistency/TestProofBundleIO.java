@@ -1,17 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
+import de.uka.ilkd.key.proof.runallproofs.ProveTest;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -20,6 +24,8 @@ import org.key_project.util.java.IOUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Wolfram Pfeifer
  */
 public class TestProofBundleIO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
     /** the resources path for this test */
     private static Path testDir;
 
@@ -40,8 +47,7 @@ public class TestProofBundleIO {
      */
     @BeforeAll
     public static void prepare() {
-        testDir =
-            Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
+        testDir = HelperClassForTests.TESTCASE_DIRECTORY.resolve("proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
@@ -129,7 +135,7 @@ public class TestProofBundleIO {
         Path base = testDir.resolve("simpleBundleGeneration");
 
         simple.setBaseDir(base);
-        simple.setJavaPath(base.resolve("src").toString());
+        simple.setJavaPath(base.resolve("src"));
 
         Path src = base.resolve("src");
         InputStream is1 = simple.getInputStream(base.resolve("test.key"));
@@ -159,7 +165,14 @@ public class TestProofBundleIO {
      * @throws ProblemLoaderException if loading fails
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
+        AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
+        if (replayResult.hasErrors()) {
+            LOGGER.debug("Error(s) while loading");
+            for (Throwable error : replayResult.getErrorList()) {
+                LOGGER.debug("Error ", error);
+            }
+        }
         assertNotNull(env);
 
         Proof proof = env.getLoadedProof();
@@ -188,7 +201,7 @@ public class TestProofBundleIO {
         Path path = testDir.resolve(dirName).resolve("test.key");
 
         // load *.key file
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path);
         assertNotNull(env);
 
         Proof proof = env.getLoadedProof();
@@ -201,7 +214,7 @@ public class TestProofBundleIO {
 
         // save (closed) proof as a bundle
         Path target = testDir.resolve(dirName).resolve("test.zproof");
-        ProofBundleSaver saver = new ProofBundleSaver(proof, target.toFile());
+        ProofBundleSaver saver = new ProofBundleSaver(proof, target);
         saver.save();
 
         // check if target file exists and has minimum size

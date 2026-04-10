@@ -1,20 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
 
-public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
+import org.key_project.util.Strings;
 
-    /**
-     *
-     */
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+public class ImmutableArray<S extends @Nullable Object>
+        implements java.lang.Iterable<S>, java.io.Serializable {
+
     private static final long serialVersionUID = -9041545065066866250L;
 
     private final S[] content;
@@ -27,6 +28,18 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         content = (S[]) new Object[0];
     }
 
+    public ImmutableArray(S s1) {
+        content = (S[]) new Object[] { s1 };
+    }
+
+    public ImmutableArray(S s1, S s2) {
+        content = (S[]) new Object[] { s1, s2 };
+    }
+
+    public ImmutableArray(S s1, S s2, S s3) {
+        content = (S[]) new Object[] { s1, s2, s3 };
+    }
+
     /**
      * creates a new <S>Array
      *
@@ -34,20 +47,29 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(S... arr) {
-        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
-        System.arraycopy(arr, 0, content, 0, arr.length);
+        this(arr, 0, arr.length);
     }
 
+    @SuppressWarnings("unchecked")
+    public ImmutableArray(S[] arr, int lower, int upper) {
+        Class<? extends Object[]> arrayClass = arr.getClass();
+        assert arrayClass.isArray() : "@AssumeAssertion(nullness): arrayClass is an array";
+        content = (S[]) Array.newInstance(arrayClass.getComponentType(), upper - lower);
+        System.arraycopy(arr, lower, content, 0, upper - lower);
+    }
 
     /**
+     * <p>
      * creates a new immutable array with the contents of the given collection.
-     *
+     * </p>
+     * <p>
      * The order of elements is defined by the collection.
+     * </p>
      *
      * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
-    public ImmutableArray(@Nonnull Collection<? extends S> list) {
+    public ImmutableArray(@NonNull Collection<? extends S> list) {
         content = (S[]) list.toArray();
     }
 
@@ -86,7 +108,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     public boolean contains(S op) {
         for (S el : content) {
-            if (el.equals(op)) {
+            if (Objects.equals(el, op)) {
                 return true;
             }
         }
@@ -102,7 +124,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public <T> T[] toArray(T[] array) {
         T[] result;
         if (array.length < size()) {
-            result = (T[]) Array.newInstance(array.getClass().getComponentType(), content.length);
+            Class<? extends Object[]> arrayClass = array.getClass();
+            assert arrayClass.isArray() : "@AssumeAssertion(nullness): arrayClass is an array";
+            result = (T[]) Array.newInstance(arrayClass.getComponentType(), content.length);
         } else {
             result = array;
         }
@@ -116,14 +140,14 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
-        S[] cmp = null;
+
+        final @Nullable Object @Nullable [] cmp;
         if (o instanceof ImmutableArray) {
-            cmp = ((ImmutableArray<S>) o).content;
+            cmp = ((ImmutableArray<?>) o).content;
         } else {
             return false;
         }
@@ -133,7 +157,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         }
 
         for (int i = 0; i < content.length; i++) {
-            if (!content[i].equals(cmp[i])) {
+            if (!Objects.equals(content[i], cmp[i])) {
                 return false;
             }
         }
@@ -142,24 +166,15 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0, sz = size(); i < sz; i++) {
-            sb.append(content[i]);
-            if (i < sz - 1) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @Override
     public Iterator<S> iterator() {
-        return new ArrayIterator<>(this);
+        return new ArrayIterator<S>(this);
     }
 
-    private static class ArrayIterator<T> implements Iterator<T> {
+    private static class ArrayIterator<T extends @Nullable Object> implements Iterator<T> {
 
         private int i = 0;
         private final ImmutableArray<T> coll;

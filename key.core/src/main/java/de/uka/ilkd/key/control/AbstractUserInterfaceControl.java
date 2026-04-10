@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
-import java.util.LinkedList;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,11 +22,13 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -32,20 +38,19 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
-    private static final org.slf4j.Logger LOGGER =
+    private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
-    private int numOfInvokedMacros = 0;
+    protected AtomicInteger numOfInvokedMacros = new AtomicInteger(0);
 
     /**
      * The registered {@link ProverTaskListener}.
      */
-    private final List<ProverTaskListener> proverTaskListener =
-        new LinkedList<>();
+    private final List<ProverTaskListener> proverTaskListener = new CopyOnWriteArrayList<>();
 
     /**
      * Constructor.
      */
-    public AbstractUserInterfaceControl() {
+    protected AbstractUserInterfaceControl() {
         addProverTaskListener(new ProofMacroListenerAdapter());
     }
 
@@ -76,10 +81,10 @@ public abstract class AbstractUserInterfaceControl
      *        just about to start
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskStarted(info);
+        synchronized (proverTaskListener) {
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskStarted(info);
+            }
         }
     }
 
@@ -89,10 +94,10 @@ public abstract class AbstractUserInterfaceControl
      * @param position The current position.
      */
     protected void fireTaskProgress(int position) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskProgress(position);
+        synchronized (proverTaskListener) {
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskProgress(position);
+            }
         }
     }
 
@@ -102,10 +107,14 @@ public abstract class AbstractUserInterfaceControl
      * @param info The {@link TaskFinishedInfo}.
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskFinished(info);
+        try {
+            synchronized (proverTaskListener) {
+                for (ProverTaskListener l : proverTaskListener) {
+                    l.taskFinished(info);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("failed to fire task finished event ", e);
         }
     }
 
@@ -156,16 +165,16 @@ public abstract class AbstractUserInterfaceControl
     }
 
     public boolean isAtLeastOneMacroRunning() {
-        return numOfInvokedMacros != 0;
+        return numOfInvokedMacros.getAcquire() != 0;
     }
 
     protected void macroStarted(TaskStartedInfo info) {
-        numOfInvokedMacros++;
+        numOfInvokedMacros.incrementAndGet();
     }
 
-    protected synchronized void macroFinished(final ProofMacroFinishedInfo info) {
-        if (numOfInvokedMacros > 0) {
-            numOfInvokedMacros--;
+    protected void macroFinished(final ProofMacroFinishedInfo info) {
+        if (numOfInvokedMacros.getAcquire() > 0) {
+            numOfInvokedMacros.decrementAndGet();
         } else {
             LOGGER.warn("Number of running macros became negative.");
         }
@@ -175,8 +184,8 @@ public abstract class AbstractUserInterfaceControl
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            if (TaskStartedInfo.TaskKind.Macro == info.getKind()
-                    && !info.getMessage().contains(ProverCore.PROCESSING_STRATEGY)) {
+            if (TaskStartedInfo.TaskKind.Macro == info.kind()
+                    && !info.message().contains(ProverCore.PROCESSING_STRATEGY)) {
                 macroStarted(info);
             }
         }
@@ -198,8 +207,8 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
@@ -222,7 +231,7 @@ public abstract class AbstractUserInterfaceControl
             if (loader != null && loader.getProof() != null) {
                 loader.getProof().dispose();
             }
-            throw new ProblemLoaderException(loader, e);
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 
@@ -239,13 +248,11 @@ public abstract class AbstractUserInterfaceControl
      * @return The instantiated {@link ProblemInitializer}.
      */
     protected ProblemInitializer createProblemInitializer(Profile profile) {
-        ProblemInitializer pi = new ProblemInitializer(this, new Services(profile), this);
-        return pi;
+        return new ProblemInitializer(this, new Services(profile), this);
     }
 
     @Override
-    public void loadingStarted(AbstractProblemLoader loader) {
-    }
+    public void loadingStarted(AbstractProblemLoader loader) {}
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,

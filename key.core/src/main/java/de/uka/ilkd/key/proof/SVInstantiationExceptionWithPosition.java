@@ -1,13 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an exception with position information. The row position is absolut this means, if in
@@ -20,7 +21,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     private final Position position;
     private final boolean inIfSequent;
 
-    public SVInstantiationExceptionWithPosition(String description, Position position,
+    protected SVInstantiationExceptionWithPosition(String description, Position position,
             boolean inIfSequent) {
         super(description);
         this.position = position;
@@ -57,9 +58,8 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
         return getMessage();
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
-        return new Location((URL) null, position);
+    public @Nullable Location getLocation() {
+        return new Location(null, position);
     }
 }

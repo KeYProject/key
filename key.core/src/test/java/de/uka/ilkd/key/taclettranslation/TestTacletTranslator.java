@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Assertions;
@@ -29,22 +33,31 @@ public class TestTacletTranslator {
 
     // some methods essentially "stolen" from TestTacletParser
 
-    private final static String DECLS = "\\sorts { S; }\n" + "\\functions {\n" + "  S const1;\n"
-        + "  S const2;\n" + "}\n" + "\\schemaVariables {\n"
-        + "  \\formula phi, psi, tau, assume_left, assume_right, add_left, add_right;\n"
-        + "  \\term S x;\n" + "  \\variables S z;\n}\n";
+    private final static String DECLS = """
+            \\sorts { S; }
+            \\functions {
+              S const1;
+              S const2;
+            }
+            \\schemaVariables {
+              \\formula phi, psi, tau, assume_left, assume_right, add_left, add_right;
+              \\term S x;
+              \\variables S z;
+            }
+            """;
 
 
     @BeforeEach
     public void setUp() throws Exception {
         nss = new NamespaceSet();
         services = new Services(AbstractProfile.getDefaultProfile());
+        services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
-    private Term parseTerm(String s) {
+    private JTerm parseTerm(String s) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
-        return (Term) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
+        return (JTerm) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
     }
 
     private Taclet parseTaclet(String s) {
@@ -63,8 +76,8 @@ public class TestTacletTranslator {
         tacletString = DECLS + "\n\\rules { " + tacletString + "; }";
 
         Taclet taclet = parseTaclet(tacletString);
-        Term expected = parseTerm(termString);
-        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
+        JTerm expected = parseTerm(termString);
+        JTerm translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
         Assertions.assertEquals(expected, translation,
             "Taclet " + taclet.name() + " not translated as expected");
@@ -77,9 +90,14 @@ public class TestTacletTranslator {
     @Test
     public void testPropositional1() {
         testTaclet(
-            "propositional1 { \n" + "\\assumes( assume_left ==> assume_right ) \n"
-                + "\\find( const1 ) \n" + "\\replacewith( const2 ) \n"
-                + "\\add( add_left ==> add_right ) \n" + "; \n" + "\\add( psi ==> ) }",
+            """
+                    propositional1 {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( const1 )\s
+                    \\replacewith( const2 )\s
+                    \\add( add_left ==> add_right )\s
+                    ;\s
+                    \\add( psi ==> ) }""",
 
             // second case first. no replace means const1=const1
 
@@ -90,10 +108,16 @@ public class TestTacletTranslator {
     @Test
     public void testPropositional2() {
         testTaclet(
-            "propositionalLeft { \n" + "\\assumes( assume_left ==> assume_right ) \n"
-                + "\\find( phi ==> ) \n" + "\\replacewith( psi ==> ) \n"
-                + "\\add( add_left ==> add_right ) \n" + "; \n" + "\\add( tau ==> ) \n" + "; \n"
-                + "\\replacewith( ==> psi )}",
+            """
+                    propositionalLeft {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi ==> )\s
+                    \\replacewith( psi ==> )\s
+                    \\add( add_left ==> add_right )\s
+                    ;\s
+                    \\add( tau ==> )\s
+                    ;\s
+                    \\replacewith( ==> psi )}""",
 
             // last case first.
 
@@ -104,8 +128,12 @@ public class TestTacletTranslator {
     @Test
     public void testNoPolarity() {
         testTaclet(
-            "noPolarity { \n" + "\\assumes( assume_left ==> assume_right ) \n" + "\\find( phi  ) \n"
-                + "\\replacewith( psi ); \n" + "\\replacewith( tau )}",
+            """
+                    noPolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
 
@@ -115,9 +143,13 @@ public class TestTacletTranslator {
     @Test
     public void testPositivePolarity() {
         testTaclet(
-            "positivePolarity { \n" + "\\assumes( assume_left ==> assume_right ) \n"
-                + "\\find( phi  ) \n" + "\\succedentPolarity \n" + "\\replacewith( psi ); \n"
-                + "\\replacewith( tau )}",
+            """
+                    positivePolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\succedentPolarity\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
             // for positive polarity w/o assumption,
@@ -129,9 +161,13 @@ public class TestTacletTranslator {
     @Test
     public void testNegativePolarity() {
         testTaclet(
-            "negativePolarity { \n" + "\\assumes( assume_left ==> assume_right ) \n"
-                + "\\find( phi  ) \n" + "\\antecedentPolarity \n" + "\\replacewith( psi ); \n"
-                + "\\replacewith( tau )}",
+            """
+                    negativePolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\antecedentPolarity\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
             // for negative polarity w/o assumption,

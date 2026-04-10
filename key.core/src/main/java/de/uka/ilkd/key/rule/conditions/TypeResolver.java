@@ -1,22 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -46,11 +51,14 @@ public abstract class TypeResolver {
         return new NonGenericSortResolver(s);
     }
 
+    public static TypeResolver createParametricSortResolver(ParametricSortInstance psi) {
+        return new ParametricSortResolver(psi);
+    }
 
-    public abstract boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+    public abstract boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, TermServices services);
 
-    public abstract Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+    public abstract Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, Services services);
 
 
@@ -71,13 +79,13 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
@@ -97,13 +105,13 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return true;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return s;
         }
@@ -127,26 +135,26 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
 
             final Sort s;
 
-            final SVSubstitute inst = (SVSubstitute) (resolveSV == sv ? instCandidate
+            final SyntaxElement inst = (SyntaxElement) (resolveSV == sv ? instCandidate
                     : instMap.getInstantiation(resolveSV));
 
             if (inst instanceof ProgramVariable) {
                 s = ((ProgramVariable) inst).sort();
             } else {
-                Term gsTerm = null;
-                if (inst instanceof Term) {
-                    gsTerm = (Term) inst;
+                JTerm gsTerm = null;
+                if (inst instanceof JTerm) {
+                    gsTerm = (JTerm) inst;
                     s = gsTerm.sort();
                 } else if (inst instanceof BinaryOperator) {
                     s = services.getTypeConverter().getKeYJavaType((BinaryOperator) inst).getSort();
@@ -178,18 +186,18 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
 
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             final Sort result;
 
-            final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate
+            final SyntaxElement inst = (SyntaxElement) (memberSV == sv ? instCandidate
                     : instMap.getInstantiation(memberSV));
 
             if (inst instanceof Operator) {
@@ -200,8 +208,8 @@ public abstract class TypeResolver {
                             .convertToLogicElement((Expression) inst, instMap.getExecutionContext())
                             .op(),
                         services);
-                } else if (inst instanceof Term) {
-                    result = getContainerSort(((Term) inst).op(), services);
+                } else if (inst instanceof JTerm) {
+                    result = getContainerSort(((JTerm) inst).op(), services);
                 } else {
                     Debug.fail("Unexpected instantiation for SV " + memberSV + ":" + inst);
                     result = null;
@@ -216,10 +224,9 @@ public abstract class TypeResolver {
                 result = ((ProgramVariable) op).getContainerType().getSort();
             } else if (op instanceof IObserverFunction) {
                 result = ((IObserverFunction) op).getContainerType().getSort();
-            } else if (op instanceof Function && ((Function) op).isUnique()
+            } else if (op instanceof Function func && func.isUnique()
                     && op.name().toString().contains("::")) {
                 // Heap
-                Function func = (Function) op;
                 String funcName = func.name().toString();
                 String sortName = funcName.substring(0, funcName.indexOf("::"));
                 return services.getNamespaces().sorts().lookup(new Name(sortName));
@@ -232,6 +239,31 @@ public abstract class TypeResolver {
         @Override
         public String toString() {
             return "\\containerType(" + memberSV + ")";
+        }
+    }
+
+    private static class ParametricSortResolver extends TypeResolver {
+        private final ParametricSortInstance psi;
+
+        public ParametricSortResolver(ParametricSortInstance psi) {
+            this.psi = psi;
+        }
+
+        @Override
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+                SVInstantiations instMap, TermServices services) {
+            return psi.isComplete(instMap);
+        }
+
+        @Override
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+                SVInstantiations instMap, Services services) {
+            return psi.resolveSort(instMap, services);
+        }
+
+        @Override
+        public String toString() {
+            return psi.toString();
         }
     }
 }

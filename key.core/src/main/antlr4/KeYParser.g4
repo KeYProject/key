@@ -27,6 +27,7 @@ decls
     | pred_decls
     | func_decls
     | transform_decls
+    | datatype_decls
     | ruleset_decls
     | contracts             // for problems
     | invariants            // for problems
@@ -36,11 +37,11 @@ decls
 
 problem
 :
-  ( PROBLEM LBRACE a=term RBRACE
+  ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-  | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+  | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
-  proofScript?
+  proofScriptEntry?
 ;
 
 
@@ -93,13 +94,20 @@ one_sort_decl
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
     | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ALIAS simple_ident_dots EQUALS sortId SEMI
   )
+;
+
+parametric_sort_decl
+:
+    simple_ident_dots
+    formal_sort_param_decls
 ;
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | INT_LITERAL
+  simple_ident (DOT simple_ident)*
 ;
 
 simple_ident_dots_comma_list
@@ -208,6 +216,7 @@ pred_decl
 :
   doc=DOC_COMMENT?
   pred_name = funcpred_name
+  formal_sort_param_decls?
   (whereToBind=where_to_bind)?
   argSorts=arg_sorts
   SEMI
@@ -224,9 +233,51 @@ func_decl
   (UNIQUE)?
   retSort = sortId
   func_name = funcpred_name
-	whereToBind=where_to_bind?
+  formal_sort_param_decls?
+  whereToBind=where_to_bind?
   argSorts = arg_sorts
   SEMI
+;
+
+/**
+\datatypes {
+ \free List = Nil | Cons(any head, List tail);
+}
+*/
+datatype_decls:
+  DATATYPES LBRACE datatype_decl* RBRACE
+;
+
+datatype_decl:
+  doc=DOC_COMMENT?
+  // weigl: all datatypes are free!
+  // FREE?
+  name=simple_ident formal_sort_param_decls?
+  EQUALS
+  datatype_constructor (OR datatype_constructor)*
+  SEMI
+;
+
+datatype_constructor:
+  name=simple_ident
+  (
+    LPAREN
+    (argSort+=sortId argName+=simple_ident
+     (COMMA argSort+=sortId argName+=simple_ident)*
+    )?
+    RPAREN
+  )?
+;
+
+formal_sort_param_decls
+: OPENTYPEPARAMS
+      formal_sort_param_decl (COMMA formal_sort_param_decl)*
+      CLOSETYPEPARAMS
+;
+
+formal_sort_param_decl
+:
+    (PLUS | MINUS)? simple_ident
 ;
 
 func_decls
@@ -267,6 +318,7 @@ transform_decl
     SEMI
 ;
 
+
 transform_decls:
     TRANSFORMERS LBRACE (transform_decl)* RBRACE
 ;
@@ -294,7 +346,14 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (EMPTYBRACKETS)*
+    id=simple_ident_dots formal_sort_args? (EMPTYBRACKETS)*
+;
+
+formal_sort_args
+:
+    OPENTYPEPARAMS
+    sortId (COMMA sortId)*
+    CLOSETYPEPARAMS
 ;
 
 id_declaration
@@ -304,7 +363,7 @@ id_declaration
 
 funcpred_name
 :
-  (sortId DOUBLECOLON)? name=simple_ident_dots
+  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
 ;
 
 
@@ -327,9 +386,11 @@ literals:
   | integer
   | floatnum
   | string_literal
+  | emptyset
 ;
 
-term: parallel_term;
+emptyset: UTF_EMPTY;
+term: parallel_term; // weigl: should normally be equivalence_term
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
@@ -344,11 +405,12 @@ unary_formula:
   | MODALITY sub=term60                           #modality_term
 ;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
-comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
+comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL|UTF_PRECEDES|UTF_SUBSET_EQ|UTF_SUBSEQ|UTF_IN) b=weak_arith_term)?;
+weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS|UTF_UNION|UTF_INTERSECT|UTF_SETMINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
-strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
-update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
+strong_arith_term_2: a=atom_prefix (op+=(PERCENT|SLASH) b+=atom_prefix)*;
+update_term: (LBRACE u=parallel_term RBRACE) (atom_prefix | unary_formula);
+
 substitution_term:
  LBRACE SUBST  bv=one_bound_variable SEMI
      replacement=comparison_term RBRACE
@@ -383,7 +445,7 @@ primitive_term:
   | abbreviation
   | accessterm
   | literals
-;
+  ;
 
 /*
 weigl, 2021-03-12:
@@ -442,8 +504,17 @@ term
  */
 accessterm
 :
+  // OLD
   (sortId DOUBLECOLON)?
   firstName=simple_ident
+  formal_sort_args?
+
+  /*Faster version
+  simple_ident_dots
+  ( EMPTYBRACKETS*
+    DOUBLECOLON
+    simple_ident
+  )?*/
   call?
   ( attribute )*
 ;
@@ -522,8 +593,9 @@ argument_list
     RPAREN
 ;
 
+integer_with_minux: MINUS? integer;
 integer:
-  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 floatnum: // called floatnum because "float" collide with the Java language
@@ -627,6 +699,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISARRAY
   | ISARRAYLENGTH
   | IS_ABSTRACT_OR_INTERFACE
+  | IS_FINAL
   | ENUM_CONST
   | FINAL
   | STATIC
@@ -639,11 +712,13 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISCONSTANT
   | HASLABEL
   | ISSTATICFIELD
+  | ISMODELFIELD
   | HASSUBFORMULAS
   | FIELDTYPE
   | NEW
   | NEW_TYPE_OF
   | NEW_DEPENDING_ON
+  | NEW_LOCAL_VARS
   | HAS_ELEMENTARY_SORT
   | SAME
   | ISSUBTYPE
@@ -666,8 +741,9 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
 
 varexp_argument
 :
-    sortId //also covers possible varId
-  | TYPEOF LPAREN y=varId RPAREN
+    //weigl: Ambguity between term (which can also contain simple_ident_dots and sortId)
+    //       suggestion add an explicit keyword to request the sort by name or manually resolve later in builder
+    TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
   | term
@@ -692,8 +768,7 @@ option
 option_list
 :
   LPAREN
-    ( (option (COMMA option)*)
-      | option_expr)
+    (option_expr (COMMA option_expr)*)
   RPAREN
 ;
 
@@ -708,7 +783,7 @@ option_expr
 
 goalspec
 :
-  (name=string_value COLON)?
+  (name=string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)?
   ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?
@@ -760,7 +835,7 @@ one_contract
 :
    contractName = simple_ident LBRACE
    (prog_var_decls)?
-   fma=term MODIFIES modifiesClause=term
+   fma=term MODIFIABLE modifiableClause=term
    RBRACE SEMI
 ;
 
@@ -802,13 +877,59 @@ profile: PROFILE name=string_value SEMI;
 
 preferences
 :
-	KEYSETTINGS LBRACE (s=string_value)? RBRACE
+	KEYSETTINGS (LBRACE s=string_value? RBRACE
+	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
-proofScript
+proofScriptEntry
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT
+    ( STRING_LITERAL SEMI?
+    | LBRACE proofScript RBRACE
+    )
 ;
+
+proofScriptEOF: proofScript EOF;
+proofScript: proofScriptCommand*;
+proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
+
+proofScriptParameters: proofScriptParameter*;
+proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
+proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
+proofScriptExpression:
+    boolean_literal
+  | char_literal
+  | integer
+  | floatnum
+  | string_literal
+  | LPAREN (term | seq) RPAREN
+  | simple_ident
+  | abbreviation
+  | literals
+  | proofScriptCodeBlock
+  ;
+
+proofScriptCodeBlock: LBRACE proofScript RBRACE;
 
 // PROOF
 proof: PROOF EOF;
+
+// Config
+cfile: cvalue* EOF;
+//csection: LBRACKET IDENT RBRACKET;
+ckv: doc=DOC_COMMENT? ckey ':' cvalue;
+ckey: IDENT | STRING_LITERAL;
+cvalue:
+    IDENT #csymbol
+  | STRING_LITERAL #cstring
+  | BIN_LITERAL #cintb
+  | HEX_LITERAL #cinth
+  | MINUS? INT_LITERAL #cintd
+  | MINUS? FLOAT_LITERAL #cfpf
+  | MINUS? DOUBLE_LITERAL #cfpd
+  | MINUS? REAL_LITERAL #cfpr
+  | (TRUE|FALSE) #cbool
+  | LBRACE
+     (ckv (COMMA ckv)*)? COMMA?
+    RBRACE #table
+  | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;

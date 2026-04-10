@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.util.Collection;
 import java.util.function.Function;
 
 import de.uka.ilkd.key.gui.mergerule.predicateabstraction.PredicateAbstractionCompletion;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.util.collection.Pair;
 
 /**
  * A completion class for merge procedures. Certain procedures, such as
@@ -54,7 +58,8 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      * @param partners The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
-    public abstract C complete(final C proc, final Pair<Goal, PosInOccurrence> mergeGoalPio,
+    public abstract C complete(final C proc,
+            final Pair<Goal, PosInOccurrence> mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**

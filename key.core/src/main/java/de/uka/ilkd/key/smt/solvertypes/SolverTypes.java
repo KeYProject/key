@@ -1,7 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import java.util.*;
-import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Facade for the management of {@link SolverType}. This class holds references to common and known
@@ -15,15 +20,15 @@ import javax.annotation.Nonnull;
 public final class SolverTypes {
 
     /**
-     * All available solver types, including legacy solvers. The objects in this map are identically
-     * returned whenever {@link #getSolverTypes()} is called.
+     * All available solver types, including experimental solvers. The objects in this map are
+     * identically returned whenever {@link #getSolverTypes()} is called.
      */
     private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
     /**
-     * The available legacy solvers out of the {@link #SOLVERS} list. The objects in this map are
-     * identically returned whenever {@link #getLegacySolvers()} is called.
+     * The available experimental solvers out of the {@link #SOLVERS} list. The objects in this map
+     * are identically returned whenever {@link #getExperimentalSolvers()} is called.
      */
-    private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(1);
+    private static final Collection<SolverType> EXPERIMENTAL_SOLVERS = new ArrayList<>(1);
 
     private SolverTypes() {
 
@@ -33,29 +38,28 @@ public final class SolverTypes {
      * Loads and returns the available solver types using the {@link SolverPropertiesLoader}. The
      * returned SolverType objects don't change (singletons).
      *
-     * @return the available solver types, including legacy solvers
+     * @return the available solver types, including experimental solvers
      */
-    @Nonnull
-    public static Collection<SolverType> getSolverTypes() {
+    public static @NonNull Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
             SOLVERS.addAll(solverLoader.getSolvers());
-            LEGACY_SOLVERS.addAll(solverLoader.getLegacySolvers());
+            EXPERIMENTAL_SOLVERS.addAll(solverLoader.getExperimentalSolvers());
         }
         return new ArrayList<>(SOLVERS);
     }
 
     /**
-     * Returns the available legacy solver types according to the {@link SolverPropertiesLoader}.
+     * Returns the available experimental solver types according to the
+     * {@link SolverPropertiesLoader}.
      *
-     * @return the available legacy solver types
+     * @return the available experimental solver types
      */
-    @Nonnull
-    public static Collection<SolverType> getLegacySolvers() {
+    public static @NonNull Collection<SolverType> getExperimentalSolvers() {
         if (SOLVERS.isEmpty()) {
             getSolverTypes();
         }
-        return new ArrayList<>(LEGACY_SOLVERS);
+        return new ArrayList<>(EXPERIMENTAL_SOLVERS);
     }
 
     /**

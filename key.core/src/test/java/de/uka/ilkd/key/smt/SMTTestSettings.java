@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.io.File;
@@ -9,12 +12,15 @@ import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+/**
+ * Special settings for the SMT solvers tests.
+ */
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
-
-
-    public long getGlobalBound() {
-        return 0;
-    }
+    /*
+     * We set the default timeout to 50s. This should be sufficient for the unsat/sat cases which we
+     * have currently. For the unknown/timeout cases, we set a shorter timeout via setTimeout().
+     */
+    private long timeout = 50000;
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -38,7 +44,17 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
     @Override
     public long getTimeout() {
-        return 300000;
+        return timeout;
+    }
+
+    /**
+     * This is needed as a quick fix, so we can set a shorter timeout for test cases with expected
+     * unknown results, while keeping the default timeout for all other cases.
+     *
+     * @param timeout the timeout in milliseconds
+     */
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
     @Override
@@ -79,13 +95,13 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     @Override
     public long getMaximumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMaxInteger();
     }
 
     @Override
     public long getMinimumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMinInteger();
     }
 
     @Override
@@ -133,6 +149,4 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     public NewSMTTranslationSettings getNewSettings() {
         return new NewSMTTranslationSettings();
     }
-
-
 }

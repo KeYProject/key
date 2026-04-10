@@ -1,20 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the
- * macro given by {@link getProofMacro()} as long the given bound of steps is not reached yet, the
- * condition given by {@link getCondition()} holds, and the macro is applicable. When this becomes
- * false and the step bound is not reached yet, the macro given by {@link getAltProofMacro()} is
+ * macro given by {@link #getProofMacro()} as long the given bound of steps is not reached yet, the
+ * condition given by {@link #getCondition()} holds, and the macro is applicable. When this becomes
+ * false and the step bound is not reached yet, the macro given by {@link #getAltProofMacro()} is
  * applied.
  *
  * @author Michael Kirsten
@@ -45,7 +48,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(proof, goals, posInOcc);
         } else {

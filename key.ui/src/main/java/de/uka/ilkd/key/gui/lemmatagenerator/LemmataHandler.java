@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +30,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +61,14 @@ public class LemmataHandler implements TacletFilter {
         println("Start problem creation:");
         println(options.toString());
 
-        File file = new File(options.getPathOfRuleFile());
-        Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
+        Path file = options.getPathOfRuleFile();
+        Collection<Path> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
             new ProblemInitializer(null, new Services(profile), new Listener());
 
-        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null, new Listener(),
-            problemInitializer, profile, file, filesForAxioms);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
+            null, new Listener(), problemInitializer, profile, file, filesForAxioms);
 
 
         LoaderListener loaderListener = new LoaderListener() {
@@ -74,7 +79,7 @@ public class LemmataHandler implements TacletFilter {
             }
 
             @Override
-            public void stopped(ProofAggregate pa, ImmutableSet<Taclet> taclets,
+            public void stopped(@Nullable ProofAggregate pa, ImmutableSet<Taclet> taclets,
                     boolean addAsAxioms) {
                 if (pa == null) {
                     println("There is no taclet to be proven.");
@@ -118,10 +123,10 @@ public class LemmataHandler implements TacletFilter {
         loader.start();
     }
 
-    private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<>();
+    private Collection<Path> createFilesForAxioms(Collection<String> filenames) {
+        Collection<Path> list = new LinkedList<>();
         for (String filename : filenames) {
-            list.add(new File(filename));
+            list.add(Paths.get(filename));
         }
         return list;
     }
@@ -146,7 +151,7 @@ public class LemmataHandler implements TacletFilter {
         }
     }
 
-    private void saveProof(Proof p) throws IOException {
+    private void saveProof(Proof p) {
         ProofSaver saver =
             new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();

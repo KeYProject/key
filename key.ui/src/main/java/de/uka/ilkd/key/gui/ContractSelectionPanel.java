@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -8,9 +11,11 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -140,7 +145,7 @@ public class ContractSelectionPanel extends JPanel {
                 lay.setAlignment(FlowLayout.LEFT);
                 JPanel result = new JPanel(lay);
                 result.add(label);
-                label.setVerticalAlignment(SwingConstants.TOP);
+                label.setVerticalAlignment(TOP);
 
                 result.setBackground(supComp.getBackground());
 

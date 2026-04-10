@@ -1,0 +1,5 @@
+contains:
+  - "(assert (not (= (f2u (fp #b0 #b01111111 #b00000000000000000000000)) (f2u (fp\
+    \ #b0 #b10000000 #b00000000000000000000000)))))"
+expected: IRRELEVANT
+keySrc: "\\problem { 1.0f = 2.0f }"

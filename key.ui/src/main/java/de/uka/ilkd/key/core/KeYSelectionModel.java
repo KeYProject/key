@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.util.*;
@@ -6,11 +9,17 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
+
+    // the KeYMediator is informed before all
+    private final KeYMediator primary;
 
     /** the proof to listen to */
     private Proof proof;
@@ -20,29 +29,25 @@ public class KeYSelectionModel {
     private Goal selectedGoal;
     /** the current displayed node */
     private Node selectedNode;
+    /**
+     * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
+     * we are displaying an OSS node.
+     */
+    private Sequent selectedSequent;
+    /**
+     * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
+     * unless we are displaying an OSS node.
+     */
+    private RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
-    /** cached selected node event */
-    private final KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
 
-    public KeYSelectionModel() {
+    /** cached selected node event */
+
+    public KeYSelectionModel(KeYMediator primary) {
+        this.primary = primary;
         listenerList = Collections.synchronizedList(new ArrayList<>(5));
         goalIsValid = false;
-    }
-
-    /**
-     * Does not take care of GUI effects
-     */
-    public void setProof(Proof p) {
-        proof = Objects.requireNonNull(p);
-        Goal g = proof.openGoals().iterator().next();
-        if (g == null) {
-            selectedNode = proof.root().leavesIterator().next();
-        } else {
-            goalIsValid = true;
-            selectedNode = g.node();
-            selectedGoal = g;
-        }
     }
 
     /**
@@ -50,25 +55,34 @@ public class KeYSelectionModel {
      *
      * @param p the proof to select.
      *
-     * @see KeYMediator#setProof(Proof)
+     * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
-    public void setSelectedProof(Proof p) {
+    public synchronized void setSelectedProof(Proof p) {
+        final Proof previousProof = proof;
         goalIsValid = false;
         proof = p;
+        primary.setProof(p, previousProof);
         if (proof != null) {
-            Goal g = proof.openGoals().iterator().next();
-            if (g == null) {
+            if (proof.openGoals().isEmpty()) {
                 selectedNode = proof.root().leavesIterator().next();
+                selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
             } else {
+                final Goal g = proof.openGoals().iterator().next();
                 goalIsValid = true;
                 selectedNode = g.node();
+                selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
                 selectedGoal = g;
             }
         } else {
             selectedNode = null;
+            selectedSequent = null;
+            selectedRuleApp = null;
             selectedGoal = null;
         }
-        fireSelectedProofChanged();
+
+        fireSelectedProofChanged(previousProof);
     }
 
     /**
@@ -85,14 +99,38 @@ public class KeYSelectionModel {
      *
      * @param n the selected node
      */
-    public void setSelectedNode(Node n) {
+    public synchronized void setSelectedNode(Node n) {
+        final Node previousSelectedNode = selectedNode;
         // switch proof if needed
         if (n.proof() != getSelectedProof()) {
             setSelectedProof(n.proof());
         }
         goalIsValid = false;
         selectedNode = n;
-        fireSelectedNodeChanged();
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        fireSelectedNodeChanged(previousSelectedNode);
+    }
+
+    /**
+     * Sets the node and sequent focused by the user.
+     *
+     * @param node selected node
+     * @param sequent selected sequent
+     */
+    public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
+            RuleApp ruleApp) {
+        final Node previousNode = selectedNode;
+        // switch proof if needed
+        if (node.proof() != getSelectedProof()) {
+            setSelectedProof(node.proof());
+        }
+        goalIsValid = true;
+        selectedGoal = null;
+        selectedNode = node;
+        selectedSequent = sequent;
+        selectedRuleApp = ruleApp;
+        fireSelectedNodeChanged(previousNode);
     }
 
     /**
@@ -100,11 +138,14 @@ public class KeYSelectionModel {
      *
      * @param g the Goal that contains the selected node
      */
-    public void setSelectedGoal(Goal g) {
+    public synchronized void setSelectedGoal(Goal g) {
+        final Node previousNode = selectedNode;
         goalIsValid = true;
         selectedGoal = g;
         selectedNode = g.node();
-        fireSelectedNodeChanged();
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        fireSelectedNodeChanged(previousNode);
     }
 
     /**
@@ -114,6 +155,14 @@ public class KeYSelectionModel {
      */
     public Node getSelectedNode() {
         return selectedNode;
+    }
+
+    public Sequent getSelectedSequent() {
+        return selectedSequent;
+    }
+
+    public RuleApp getSelectedRuleApp() {
+        return selectedRuleApp;
     }
 
     /**
@@ -126,7 +175,7 @@ public class KeYSelectionModel {
             throw new IllegalStateException("No proof loaded.");
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getGoal(selectedNode);
+            selectedGoal = proof.getOpenGoal(selectedNode);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -165,35 +214,34 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START:
-                    currentPos = POS_LEAVES;
-                    if (selectedNode != null) {
-                        nodeIt = selectedNode.leavesIterator();
-                    } else {
-                        nodeIt = null;
-                    }
-                    break;
-                case POS_LEAVES:
-                    if (nodeIt == null || !nodeIt.hasNext()) {
-                        currentPos = POS_GOAL_LIST;
-                        if (!proof.openGoals().isEmpty()) {
-                            goalIt = proof.openGoals().iterator();
+                    case POS_START -> {
+                        currentPos = POS_LEAVES;
+                        if (selectedNode != null) {
+                            nodeIt = selectedNode.leavesIterator();
                         } else {
-                            goalIt = null;
+                            nodeIt = null;
                         }
-                    } else {
-                        nextOne = proof.getGoal(nodeIt.next());
                     }
-                    break;
-
-                case POS_GOAL_LIST:
-                    if (goalIt == null || !goalIt.hasNext()) {
-                        // no more items
-                        return;
-                    } else {
-                        nextOne = goalIt.next();
+                    case POS_LEAVES -> {
+                        if (nodeIt == null || !nodeIt.hasNext()) {
+                            currentPos = POS_GOAL_LIST;
+                            if (!proof.openGoals().isEmpty()) {
+                                goalIt = proof.openGoals().iterator();
+                            } else {
+                                goalIt = null;
+                            }
+                        } else {
+                            nextOne = proof.getOpenGoal(nodeIt.next());
+                        }
                     }
-                    break;
+                    case POS_GOAL_LIST -> {
+                        if (goalIt == null || !goalIt.hasNext()) {
+                            // no more items
+                            return;
+                        } else {
+                            nextOne = goalIt.next();
+                        }
+                    }
                 }
             }
         }
@@ -222,14 +270,10 @@ public class KeYSelectionModel {
      */
     public void defaultSelection() {
         Goal g = null;
-        Goal firstG = null;
         Iterator<Goal> it = new DefaultSelectionIterator();
 
         while (g == null && it.hasNext()) {
             g = it.next();
-            if (firstG == null) {
-                firstG = g;
-            }
         }
 
         /*
@@ -239,18 +283,14 @@ public class KeYSelectionModel {
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            if (firstG != null) {
-                setSelectedGoal(firstG);
-            } else {
-                setSelectedNode(proof.root().leavesIterator().next());
-            }
+            setSelectedNode(proof.root().leavesIterator().next());
         }
     }
 
     /**
      * selects the first open goal below the given node <tt>old</tt> if no open goal is available
-     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof the
-     * proof root is selected
+     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
+     * proof root is selected.
      *
      * @param old the Node to start looking for open goals
      */
@@ -289,7 +329,7 @@ public class KeYSelectionModel {
         while (it.hasNext()) {
             final Node node = it.next();
             if (!node.isClosed()) {
-                return proof.getGoal(node);
+                return proof.getOpenGoal(node);
             }
         }
         return null;
@@ -317,17 +357,21 @@ public class KeYSelectionModel {
         }
     }
 
-    public synchronized void fireSelectedNodeChanged() {
+    public synchronized void fireSelectedNodeChanged(Node previousNode) {
         synchronized (listenerList) {
+            final KeYSelectionEvent<Node> selectionEvent =
+                new KeYSelectionEvent<>(this, previousNode);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedNodeChanged(selectionEvent);
             }
         }
     }
 
-    public synchronized void fireSelectedProofChanged() {
+    public synchronized void fireSelectedProofChanged(Proof previousProof) {
         synchronized (listenerList) {
             LOGGER.debug("Selected Proof changed, firing...");
+            final KeYSelectionEvent<Proof> selectionEvent =
+                new KeYSelectionEvent<>(this, previousProof);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }

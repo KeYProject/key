@@ -1,10 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.Configuration;
+
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * <p>
@@ -13,13 +20,15 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  * files.
  * </p>
  * <p>
- * During save process the {@link ProofSaver} calls method {@link #fillSaveProperties(Properties)}.
+ * During save process the {@link ProofSaver} calls method {@link #createLoaderConfig()}.
  * This proof obligation has to store all information in the given {@link Properties} which are
- * required to reconstruct it. The class ({@link #getClass()}) of this class must be stored in the
+ * required to reconstruct it. The class ({@link Object#getClass()}) of this class must be stored in
+ * the
  * {@link Properties} with key {@link #PROPERTY_CLASS}.
  * </p>
  * <p>
- * During load process the {@link ProblemLoader} tries to execute a static method on the class
+ * During load process the {@link de.uka.ilkd.key.proof.io.AbstractProblemLoader} tries to execute a
+ * static method on the class
  * defined via {@link Properties} key {@link #PROPERTY_CLASS} with the following signature:
  * {@code public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException}
  * The returned {@link LoadedPOContainer} contains the instantiated {@link ProofOblInput} together
@@ -28,11 +37,11 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  *
  * @author Martin Hentschel
  * @see ProofSaver
- * @see ProblemLoader
+ * @see de.uka.ilkd.key.proof.io.AbstractProblemLoader
  */
 public interface IPersistablePO extends ProofOblInput {
     /**
-     * The key used to store {@link #getClass()}.
+     * The key used to store {@link Object#getClass()}.
      */
     String PROPERTY_CLASS = "class";
 
@@ -63,16 +72,31 @@ public interface IPersistablePO extends ProofOblInput {
      * instantiate the proof obligation again and this instance should create the same
      * {@link Sequent} (if code and specifications are unchanged).
      *
-     * @param properties The {@link Properties} to fill with the proof obligation specific settings.
+     * @return
      * @throws IOException Occurred Exception.
      */
-    void fillSaveProperties(Properties properties) throws IOException;
+    Configuration createLoaderConfig() throws IOException;
+
+    /// Called to manifest the proof manifest the proof obligation configuration
+    /// into the given {@link PrintWriter}
+    /// If the method returns `true`, a `\proofObligation` statement was successfully written
+    /// to the `ps`. Therefore, no `\problem` statement is printed.
+    ///
+    /// @return true if a `\proofObligation` was written successfully.
+    default boolean printProofObligation(PrintWriter ps, Proof proof) throws IOException {
+        var loadingConfig = createLoaderConfig();
+        ps.println("\\proofObligation ");
+        loadingConfig.save(ps, "");
+        ps.println("\n");
+        return true;
+    }
 
     /**
      * The class stored in a {@link Properties} instance via key must provide the static method with
      * the following signature:
      * {@code public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException}
-     * This method is called by the {@link ProblemLoader} to recreate a proof obligation. This class
+     * This method is called by the {@link de.uka.ilkd.key.proof.io.AbstractProblemLoader} to
+     * recreate a proof obligation. This class
      * defines the result of this method which is the created proof obligation and its proof number.
      *
      * @author Martin Hentschel

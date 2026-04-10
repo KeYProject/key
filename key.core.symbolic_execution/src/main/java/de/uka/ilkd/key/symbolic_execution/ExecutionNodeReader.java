@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -11,19 +14,18 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -31,10 +33,13 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 import org.xml.sax.Attributes;
@@ -405,7 +410,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
+        public void endElement(String uri, String localName, String qName) {
             if (isConstraint(uri, localName, qName)) {
                 // Nothing to do.
             } else if (isCallStateVariable(uri, localName, qName)) {
@@ -1141,7 +1146,7 @@ public class ExecutionNodeReader {
          *
          * @param name The name of this node.
          */
-        public AbstractKeYlessExecutionElement(String name) {
+        protected AbstractKeYlessExecutionElement(String name) {
             this.name = name;
         }
 
@@ -1299,7 +1304,7 @@ public class ExecutionNodeReader {
          * @param formatedPathCondition The formated path condition.
          * @param pathConditionChanged Is the path condition changed compared to parent?
          */
-        public AbstractKeYlessExecutionNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessExecutionNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged) {
             super(name);
             this.parent = parent;
@@ -1336,7 +1341,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getPathCondition() throws ProofInputException {
+        public JTerm getPathCondition() throws ProofInputException {
             return null;
         }
 
@@ -1428,7 +1433,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getVariables(Term condition) {
+        public IExecutionVariable[] getVariables(JTerm condition) {
             return null;
         }
 
@@ -1485,7 +1490,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+        public JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
                 throws ProofInputException {
             return null;
         }
@@ -1592,7 +1597,7 @@ public class ExecutionNodeReader {
          * @param blockOpened {@code false} block is definitively not opened, {@code true} block is
          *        or might be opened.
          */
-        public AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged, boolean blockOpened) {
             super(parent, name, formatedPathCondition, pathConditionChanged);
             this.blockOpened = blockOpened;
@@ -1689,7 +1694,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBranchCondition() {
+        public JTerm getBranchCondition() {
             return null;
         }
 
@@ -1721,7 +1726,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term[] getMergedBranchCondtions() throws ProofInputException {
+        public JTerm[] getMergedBranchCondtions() throws ProofInputException {
             return null;
         }
 
@@ -1820,7 +1825,7 @@ public class ExecutionNodeReader {
          * @param name The name of this node.
          * @param formatedPathCondition The formated path condition.
          * @param pathConditionChanged Is the path condition changed compared to parent?
-         * @param exceptionalTermination Exceptional termination?
+         * @param terminationKind kind of termination
          * @param branchVerified The branch verified flag.
          */
         public KeYlessTermination(IExecutionNode<?> parent, String name,
@@ -1853,16 +1858,16 @@ public class ExecutionNodeReader {
         @Override
         public String getElementType() {
             switch (getTerminationKind()) {
-            case EXCEPTIONAL:
-                return "Exceptional Termination";
-            case LOOP_BODY:
-                return "Loop Body Termination";
-            case BLOCK_CONTRACT_EXCEPTIONAL:
-                return "Block Contract Exceptional Termination";
-            case BLOCK_CONTRACT_NORMAL:
-                return "Block Contract Termination";
-            default:
-                return "Termination";
+                case EXCEPTIONAL:
+                    return "Exceptional Termination";
+                case LOOP_BODY:
+                    return "Loop Body Termination";
+                case BLOCK_CONTRACT_EXCEPTIONAL:
+                    return "Block Contract Exceptional Termination";
+                case BLOCK_CONTRACT_NORMAL:
+                    return "Block Contract Termination";
+                default:
+                    return "Termination";
             }
         }
 
@@ -2126,7 +2131,7 @@ public class ExecutionNodeReader {
          * @param signature The signature.
          * @param formatedMethodReturn The formated method return condition.
          */
-        public AbstractKeYlessBaseExecutionNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessBaseExecutionNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged, String signature,
                 String formatedMethodReturn) {
             super(parent, name, formatedPathCondition, pathConditionChanged);
@@ -2171,7 +2176,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getMethodReturnCondition() throws ProofInputException {
+        public JTerm getMethodReturnCondition() throws ProofInputException {
             return null;
         }
 
@@ -2179,7 +2184,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getFormatedMethodReturnCondition() throws ProofInputException {
+        public String getFormattedMethodReturnCondition() throws ProofInputException {
             return formatedMethodReturn;
         }
     }
@@ -2373,7 +2378,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getReturnValue() throws ProofInputException {
+        public JTerm getReturnValue() throws ProofInputException {
             return null;
         }
 
@@ -2397,7 +2402,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public JTerm getCondition() throws ProofInputException {
             return null;
         }
 
@@ -2626,7 +2631,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getResultTerm() throws ProofInputException {
+        public JTerm getResultTerm() throws ProofInputException {
             return null;
         }
 
@@ -2634,7 +2639,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getExceptionTerm() throws ProofInputException {
+        public JTerm getExceptionTerm() throws ProofInputException {
             return null;
         }
 
@@ -2658,7 +2663,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getSelfTerm() throws ProofInputException {
+        public JTerm getSelfTerm() throws ProofInputException {
             return null;
         }
 
@@ -2666,7 +2671,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getContractParams() throws ProofInputException {
+        public ImmutableList<JTerm> getContractParams() throws ProofInputException {
             return null;
         }
 
@@ -2840,7 +2845,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getTerm() {
+        public JTerm getTerm() {
             return null;
         }
 
@@ -2884,7 +2889,7 @@ public class ExecutionNodeReader {
         /**
          * Constructor.
          *
-         * @param parentVariable The parent {@link IExecutionValue} if available.
+         * @param parentValue The parent {@link IExecutionValue} if available.
          * @param isArrayIndex The is array flag.
          * @param arrayIndexString The array index.
          * @param name The name.
@@ -2926,7 +2931,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -2966,7 +2971,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getAdditionalCondition() {
+        public JTerm getAdditionalCondition() {
             return null;
         }
 
@@ -2982,7 +2987,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term createSelectTerm() {
+        public JTerm createSelectTerm() {
             return null;
         }
     }
@@ -3023,7 +3028,7 @@ public class ExecutionNodeReader {
         /**
          * Sets the source.
          *
-         * @param target The source to set.
+         * @param source The source to set.
          */
         public void setSource(IExecutionNode<?> source) {
             this.source = source;
@@ -3156,7 +3161,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getChildVariables() throws ProofInputException {
+        public IExecutionVariable[] getChildVariables() {
             return childVariables.toArray(new IExecutionVariable[0]);
         }
 
@@ -3180,7 +3185,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() throws ProofInputException {
+        public JTerm getValue() throws ProofInputException {
             return null;
         }
 
@@ -3196,7 +3201,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public JTerm getCondition() throws ProofInputException {
             return null;
         }
 
@@ -3213,7 +3218,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionConstraint[] getConstraints() throws ProofInputException {
+        public IExecutionConstraint[] getConstraints() {
             return constraints.toArray(new IExecutionConstraint[0]);
         }
 

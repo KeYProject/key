@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
@@ -23,17 +26,17 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * The array index.
      */
-    private final Term arrayIndex;
+    private final JTerm arrayIndex;
 
     /**
      * The array start index or {@code null} if not used.
      */
-    private final Term arrayStartIndex;
+    private final JTerm arrayStartIndex;
 
     /**
      * The array end index or {@code null} if not used.
      */
-    private final Term arrayEndIndex;
+    private final JTerm arrayEndIndex;
 
     /**
      * The {@link IProgramVariable}.
@@ -48,7 +51,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * The optional condition under which this association is valid.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * Constructor.
@@ -59,8 +62,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(Services services, Term arrayIndex, ISymbolicObject target,
-            Term condition, IModelSettings settings) {
+    public SymbolicAssociation(Services services, JTerm arrayIndex, ISymbolicObject target,
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -84,8 +87,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(Services services, Term arrayIndex, Term arrayStartIndex,
-            Term arrayEndIndex, ISymbolicObject target, Term condition, IModelSettings settings) {
+    public SymbolicAssociation(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
+            JTerm arrayEndIndex, ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -108,7 +111,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, IProgramVariable programVariable,
-            ISymbolicObject target, Term condition, IModelSettings settings) {
+            ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;
@@ -181,7 +184,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public Term getArrayIndex() {
+    public JTerm getArrayIndex() {
         return arrayIndex;
     }
 
@@ -221,7 +224,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 
@@ -246,7 +249,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The array start index.
      */
-    public Term getArrayStartIndex() {
+    public JTerm getArrayStartIndex() {
         return arrayStartIndex;
     }
 
@@ -264,7 +267,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The array end index.
      */
-    public Term getArrayEndIndex() {
+    public JTerm getArrayEndIndex() {
         return arrayEndIndex;
     }
 

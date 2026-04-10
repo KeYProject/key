@@ -1,22 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class CharListLDT extends LDT {
@@ -72,10 +75,10 @@ public final class CharListLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private String translateCharTerm(Term t) {
-        char charVal = 0;
-        int intVal = 0;
-        String result = printlastfirst(t.sub(0)).toString();
+    private String translateCharTerm(JTerm t) {
+        char charVal;
+        int intVal;
+        String result = printLastFirst(t.sub(0)).toString();
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
@@ -90,11 +93,11 @@ public final class CharListLDT extends LDT {
     }
 
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printLastFirst(JTerm t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printlastfirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name());
         }
     }
 
@@ -161,34 +164,35 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, JTerm left,
+            JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final TermBuilder tb = services.getTermBuilder();
-        final Term term_empty = tb.func(seqLDT.getSeqEmpty());
+        final JTerm term_empty = tb.func(seqLDT.getSeqEmpty());
 
         char[] charArray;
-        Term result = term_empty;
+        JTerm result = term_empty;
 
         if (lit instanceof StringLiteral) {
             charArray = ((StringLiteral) lit).getValue().toCharArray();
@@ -203,7 +207,7 @@ public final class CharListLDT extends LDT {
         }
 
         for (int i = charArray.length - 2; i >= 1; i--) {
-            Term singleton =
+            JTerm singleton =
                 tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services));
             result = tb.seqConcat(singleton, result);
         }
@@ -213,7 +217,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -227,9 +231,9 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         final StringBuilder result = new StringBuilder();
-        Term term = t;
+        JTerm term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));
             term = term.sub(1);
@@ -239,20 +243,17 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }
 
-    @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
-        case "add":
+        if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");
-        default:
-            return null;
         }
+        return null;
     }
 }

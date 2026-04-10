@@ -1,6 +1,6 @@
-/**
- * Created on: Mar 17, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -29,8 +29,7 @@ public class SMTFunction {
     protected SMTSort imageSort;
 
     /**
-     * @param id
-     * @param domainSorts
+     * creates an inital SMT function
      */
     public SMTFunction() {
         super();
@@ -122,10 +121,9 @@ public class SMTFunction {
             return true;
         }
 
-        if (!(obj instanceof SMTFunction)) {
+        if (!(obj instanceof SMTFunction f)) {
             return false;
         }
-        SMTFunction f = (SMTFunction) obj;
 
         if (!this.id.equals(f.id)) {
             return false;

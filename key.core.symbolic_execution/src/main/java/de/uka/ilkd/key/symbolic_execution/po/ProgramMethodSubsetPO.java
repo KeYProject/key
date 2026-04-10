@@ -1,28 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.BranchStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.Configuration;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+// need to switch spotless off for this comment as it replaces @code with &#64;code
+// spotless:off
 /**
  * <p>
  * This proof obligation executes selected statements of the body of a given {@link IProgramMethod}.
@@ -35,11 +44,18 @@ import org.key_project.util.collection.ImmutableSLList;
  * position of the previous statement is exactly the start position of the following statement.
  * </p>
  * <p>
- * Imagine the following snippet: <code><pre>
- * int x = 1; // from 3/59 to 4/16
- * int y = 2; // from 4/16 to 5/16
- * int z = 3; // from 5/16 to 6/16
- * </pre></code> To execute only the last two statements a user would select intuitively the source
+ * Imagine the following snippet:
+ *
+ * <pre>
+ * {@code
+ *     int x = 1; // from 3/59 to 4/16
+ *     int y = 2; // from 4/16 to 5/16
+ *     int z = 3; // from 5/16 to 6/16
+ * }
+ * </pre>
+ * </p>
+ * <p>
+ * To execute only the last two statements a user would select intuitively the source
  * range 5/0 to 6/16 (the text without leading white space) which matches exactly the used selection
  * definition.
  * </p>
@@ -47,23 +63,33 @@ import org.key_project.util.collection.ImmutableSLList;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodFrame&gt;&lt;selectedStatements&gt;}catch(java.lang.Exception e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <methodFrame><selectedStatements>
+ * } catch(java.lang.Exception e) {
+ *  exc = e
+ * }
+ * <modalityEnd>
+ * (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  *
  * @author Martin Hentschel
  */
+//spotless:on
 public class ProgramMethodSubsetPO extends ProgramMethodPO {
+    public static final String START_LINE = "startLine";
+    public static final String START_COLUMN = "startColumn";
+    public static final String END_LINE = "endLine";
+    public static final String END_COLUMN = "endColumn";
     /**
      * Contains all undeclared variables used in the method part to execute.
      */
@@ -172,8 +198,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                 // Continue search in children
                 if (s instanceof StatementContainer) {
                     collectStatementsToExecute(toFill, (StatementContainer) s);
-                } else if (s instanceof BranchStatement) {
-                    BranchStatement bs = (BranchStatement) s;
+                } else if (s instanceof BranchStatement bs) {
                     for (int j = 0; j < bs.getBranchCount(); j++) {
                         Branch branch = bs.getBranchAt(j);
                         collectStatementsToExecute(toFill, branch);
@@ -202,10 +227,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
     }
@@ -214,10 +239,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFreePre(ProgramVariable selfVar, KeYJavaType selfKJT,
-            ImmutableList<ProgramVariable> paramVars, List<LocationVariable> heaps,
+    protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services proofServices) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
     }
@@ -226,10 +251,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<LocationVariable> formalParamVars, ProgramVariable exceptionVar,
+    protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services proofServices) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars,
             exceptionVar, name, proofServices);
@@ -241,8 +266,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param c The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
-    protected static ImmutableList<ProgramVariable> convert(Collection<LocationVariable> c) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+    protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (LocationVariable var : c) {
             result = result.append(var);
         }
@@ -263,8 +288,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodSubsetPO) {
-            ProgramMethodSubsetPO other = (ProgramMethodSubsetPO) obj;
+        if (obj instanceof ProgramMethodSubsetPO other) {
             return super.equals(obj)
                     && Objects.equals(getStartPosition(), other.getStartPosition())
                     && Objects.equals(getEndPosition(), other.getEndPosition());
@@ -293,34 +317,21 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
         if (getStartPosition() != null) {
-            properties.setProperty("startLine", getStartPosition().line() + "");
-            properties.setProperty("startColumn", getStartPosition().column() + "");
+            c.set(START_LINE, getStartPosition().line() + "");
+            c.set(START_COLUMN, getStartPosition().column() + "");
         }
         if (getEndPosition() != null) {
-            properties.setProperty("endLine", getEndPosition().line() + "");
-            properties.setProperty("endColumn", getEndPosition().column() + "");
+            c.set(END_LINE, getEndPosition().line() + "");
+            c.set(END_COLUMN, getEndPosition().column() + "");
         }
-    }
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig, getName(properties),
-            getProgramMethod(initConfig, properties), getPrecondition(properties),
-            getStartPosition(properties), getEndPosition(properties),
-            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
+        return c;
     }
 
     /**
@@ -330,12 +341,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The defined start {@link Position}.
      * @throws IOException Occurred Exception if it was not possible to read the start position.
      */
-    protected static Position getStartPosition(Properties properties) throws IOException {
-        String line = properties.getProperty("startLine");
+    protected static Position getStartPosition(Configuration properties) throws IOException {
+        String line = properties.getString(START_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("Start line property \"startLine\" is not available or empty.");
         }
-        String column = properties.getProperty("startColumn");
+        String column = properties.getString(START_COLUMN);
         if (column == null || column.isEmpty()) {
             throw new IOException(
                 "Start column property \"startColumn\" is not available or empty.");
@@ -364,16 +375,18 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the end position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined end {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the end position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the end position.
      */
-    protected static Position getEndPosition(Properties properties) throws IOException {
-        String line = properties.getProperty("endLine");
+    protected static Position getEndPosition(Configuration properties) throws IOException {
+        String line = properties.getString(END_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("End line property \"endLine\" is not available or empty.");
         }
-        String column = properties.getProperty("endColumn");
+        String column = properties.getString(END_COLUMN);
         if (column == null || column.isEmpty()) {
             throw new IOException("End column property \"endColumn\" is not available or empty.");
         }

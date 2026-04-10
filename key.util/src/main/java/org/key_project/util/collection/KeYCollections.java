@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Arrays;
@@ -7,9 +10,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Utilities for Collections.
- *
  *
  * @author Alexander Weigl
  * @version 1 (29.03.19)
@@ -24,9 +29,11 @@ public class KeYCollections {
      * first one.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+        @Nullable
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
-        return res;
+        // After arraycopy, all elements of res are NonNull.
+        return NullnessUtil.castNonNullDeep(res);
     }
 
     // =======================================================
@@ -39,7 +46,7 @@ public class KeYCollections {
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
-        Map<S, U> res = null;
+        Map<S, U> res;
         final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {
@@ -55,9 +62,12 @@ public class KeYCollections {
         }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
-            final U value = m1.get(e.getValue());
-            if (value != null) {
-                res.put(e.getKey(), value);
+            final T v1 = e.getValue();
+            if (v1 != null) {
+                final U value = m1.get(v1);
+                if (value != null) {
+                    res.put(e.getKey(), value);
+                }
             }
         }
         return res;

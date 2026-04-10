@@ -1,42 +1,57 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.Constructor;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * The program method represents a (pure) method in the logic. In case of a non-static method the
  * first argument represents the object on which the method is invoked.
+ * <p>
+ * This data is used in
+ * {@link de.uka.ilkd.key.speclang.QueryAxiom#getTaclets(ImmutableSet, Services)}.
  */
 public final class ProgramMethod extends ObserverFunction
         implements ProgramInLogic, IProgramMethod {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramMethod.class);
 
+    /**
+     * The referenced method.
+     */
     private final MethodDeclaration method;
     /**
      * Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE for void methods.
      */
     private final KeYJavaType returnType;
+    /**
+     * Where the method is located in a .java file.
+     */
     private final PositionInfo pi;
 
     // -------------------------------------------------------------------------
@@ -60,6 +75,12 @@ public final class ProgramMethod extends ObserverFunction
     // internal methods
     // -------------------------------------------------------------------------
 
+    /**
+     * Get the java types of the parameters required by the method md.
+     *
+     * @param md some method declaration
+     * @return java types of the parameters required by md
+     */
     private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
         KeYJavaType[] result = new KeYJavaType[md.getParameterDeclarationCount()];
         for (int i = 0; i < result.length; i++) {
@@ -77,11 +98,6 @@ public final class ProgramMethod extends ObserverFunction
     // MethodDeclaration
     // in a direct way
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getMethodDeclaration()
-     */
     @Override
     public MethodDeclaration getMethodDeclaration() {
         return method;
@@ -161,18 +177,6 @@ public final class ProgramMethod extends ObserverFunction
         return pi.getEndPosition();
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return pi.getRelativePosition();
-    }
-
     @Override
     public PositionInfo getPositionInfo() {
         return pi;
@@ -241,7 +245,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
         return method.getModifiers();
     }
 
@@ -255,16 +259,13 @@ public final class ProgramMethod extends ObserverFunction
         return null;
     }
 
-    /**
-     * equals modulo renaming is described in class SourceElement.
-     */
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof IProgramMethod)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IProgramMethod ipm)) {
             return false;
         }
 
-        return method == ((IProgramMethod) se).getMethodDeclaration();
+        return method == ipm.getMethodDeclaration();
     }
 
     @Deprecated
@@ -283,7 +284,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public Expression convertToProgram(Term t, ExtList l) {
+    public Expression convertToProgram(JTerm t, ExtList l) {
         ProgramElement called;
         if (isStatic()) {
             called = new TypeRef(getContainerType());
@@ -354,7 +355,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean isImplicit() {
-        return getName().startsWith("<");
+        return getName().startsWith(JavaDLFieldNames.IMPLICIT_NAME_PREFIX + "");
     }
 
     /*

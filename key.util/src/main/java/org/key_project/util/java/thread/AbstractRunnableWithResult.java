@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -17,13 +22,13 @@ public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWith
     /**
      * The result.
      */
-    private T result;
+    private @Nullable T result;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T getResult() {
+    public @Nullable T getResult() {
         return result;
     }
 
@@ -32,7 +37,7 @@ public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWith
      *
      * @param result The result to set.
      */
-    protected void setResult(T result) {
+    protected void setResult(@Nullable T result) {
         this.result = result;
     }
 }

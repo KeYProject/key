@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
@@ -13,6 +14,8 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -69,7 +72,7 @@ class TacletConditions {
 
     }
 
-    public boolean containsIsReferenceArray(Term t) {
+    public boolean containsIsReferenceArray(JTerm t) {
 
         for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
 
@@ -106,9 +109,8 @@ class TacletConditions {
     private boolean containsAbstractInterfaceCondition(Sort s, boolean negated) {
         for (AbstractOrInterfaceType cond : abstractInterfaceCondition) {
             if ((negated && cond.isNegated()) || (!negated && !cond.isNegated())) {
-                if (cond.getTypeResolver() instanceof GenericSortResolver) {
+                if (cond.getTypeResolver() instanceof GenericSortResolver res) {
 
-                    GenericSortResolver res = (GenericSortResolver) cond.getTypeResolver();
                     if (res.getGenericSort().equals(s)) {
                         return true;
                     }
@@ -203,9 +205,8 @@ class TacletConditions {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver
-                        && tcc.getFirstResolver() instanceof GenericSortResolver) {
+                        && tcc.getFirstResolver() instanceof GenericSortResolver first) {
 
-                    GenericSortResolver first = (GenericSortResolver) tcc.getFirstResolver();
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =
                             ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();

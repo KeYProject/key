@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.event.ActionEvent;
@@ -17,9 +20,6 @@ import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
  * @author lanzinger
  */
 public class SourceViewFrame extends JSplitPane {
-
-    private static final long serialVersionUID = 382427737154314400L;
-
     /** The source view contained in this frame. */
     private final SourceView sourceView;
 
@@ -38,7 +38,7 @@ public class SourceViewFrame extends JSplitPane {
      * @param mainWindow the main window.
      */
     public SourceViewFrame(MainWindow mainWindow) {
-        super(JSplitPane.VERTICAL_SPLIT);
+        super(VERTICAL_SPLIT);
 
         sourceView = SourceView.getSourceView(mainWindow);
         tabbedPane = new JTabbedPane();

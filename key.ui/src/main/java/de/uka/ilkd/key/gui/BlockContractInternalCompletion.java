@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
@@ -41,18 +45,18 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractInternalRule.INSTANCE
-                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+                .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<BlockContract> configurator =
             new AuxiliaryContractConfigurator<>("Block Contract Configurator",
                 new BlockContractSelectionPanel(services, true), mainWindow, services,
                 contracts.toArray(new BlockContract[contracts.size()]),
-                "Contracts for Block: " + instantiation.statement);
+                "Contracts for Block: " + instantiation.statement());
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
-                HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.statement, configurator.getContract(),
+                HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
+            result.update(instantiation.statement(), configurator.getContract(),
                 heaps);
         }
         return result;

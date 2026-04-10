@@ -1,18 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
 
 /**
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
  * also a continuation on sequents, traversing all of the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor {
+public class BoundVarsVisitor implements DefaultVisitor {
 
-    private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.nil();
+    private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();
 
 
     /**
@@ -25,6 +30,7 @@ public class BoundVarsVisitor extends DefaultVisitor {
     /**
      * only called by execPostOrder in Term.
      */
+    @Override
     public void visit(Term visited) {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {
             for (int j = 0,

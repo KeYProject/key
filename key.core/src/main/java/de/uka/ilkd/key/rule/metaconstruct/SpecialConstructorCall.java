@@ -1,14 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SpecialConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Name;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -22,8 +27,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * The normal form identifier {@link ProgramElementName}.
      */
     private static final ProgramElementName NORMALFORM_IDENTIFIER =
-        new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+        new ProgramElementName(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
      * @param consRef The constructor reference.

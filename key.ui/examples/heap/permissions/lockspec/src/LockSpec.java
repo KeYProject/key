@@ -105,6 +105,7 @@ public class Counter implements LockSpec {
         lock.lock();
         val++;
         lock.unlock();
+        //@ assert lockStatus(\dl_FALSE());
     }
 }
 

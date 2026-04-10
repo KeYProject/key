@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.GridBagConstraints;
@@ -37,9 +40,9 @@ class SequentViewPanel extends JPanel {
         gbc.gridwidth = 2;
         add(sequentView, gbc);
 
-        if (sequentView instanceof InnerNodeView) {
+        if (sequentView instanceof InnerNodeView innerNodeView) {
             gbc.gridy = 2;
-            add(((InnerNodeView) sequentView).tacletInfo, gbc);
+            add(((InnerNodeView) sequentView).getTacletInfo(), gbc);
         }
 
         gbc.fill = GridBagConstraints.BOTH;

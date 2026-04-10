@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -9,24 +12,27 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -40,6 +46,7 @@ public class Node implements Iterable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
+    private static final String CACHED_GOAL = "Closed goal (via cache)";
 
     private static final String NODES = "nodes";
 
@@ -47,13 +54,13 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
     private BranchLocation branchLocation = null;
 
-    private Sequent seq = Sequent.EMPTY_SEQUENT;
+    private Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
@@ -104,9 +111,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
-
+    private @Nullable Lookup userData = null;
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
@@ -116,7 +121,7 @@ public class Node implements Iterable<Node> {
         DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
@@ -191,7 +196,8 @@ public class Node implements Iterable<Node> {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            SequentChangeInfo oldSeqChangeInfo =
+                this.nodeInfo.getSequentChangeInfo();
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
         } else {
@@ -226,10 +232,10 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
@@ -252,7 +258,7 @@ public class Node implements Iterable<Node> {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends Function> elements) {
+    public void addLocalFunctions(Collection<Function> elements) {
         for (Function op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
@@ -270,7 +276,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 
@@ -452,7 +458,14 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for all nodes in the subtree.
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
+     * @return an iterator for all nodes in the subtree (including this node).
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
@@ -592,8 +605,10 @@ public class Node implements Iterable<Node> {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                final Goal goal = proof().getGoal(this);
-                if (this.isClosed()) {
+                final Goal goal = proof().getOpenGoal(this);
+                if (this.isClosed() && lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
                     // should never happen (please check)
@@ -602,7 +617,7 @@ public class Node implements Iterable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal != null) {
+                } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
                 return cachedName;
@@ -617,7 +632,7 @@ public class Node implements Iterable<Node> {
                 return nodeInfo.getFirstStatementString();
             }
 
-            cachedName = rap.rule().displayName();
+            cachedName = rap.displayName();
             if (cachedName == null) {
                 cachedName = RULE_WITHOUT_NAME;
             }
@@ -745,27 +760,9 @@ public class Node implements Iterable<Node> {
      *
      * @return iterator over children.
      */
-    public Iterator<Node> iterator() {
+    @Override
+    public Iterator<@NonNull Node> iterator() {
         return childrenIterator();
-    }
-
-    /**
-     * Retrieves a user-defined data.
-     *
-     * @param service the class for which the data were registered
-     * @param <T> any class
-     * @return null or the previous data
-     * @see #register(Object, Class)
-     */
-    public <T> T lookup(Class<T> service) {
-        try {
-            if (userData == null) {
-                return null;
-            }
-            return userData.get(service);
-        } catch (IllegalStateException ignored) {
-            return null;
-        }
     }
 
     /**
@@ -773,7 +770,7 @@ public class Node implements Iterable<Node> {
      *
      * @param obj an object to be registered
      * @param service the key under it should be registered
-     * @param <T>
+     * @param <T> the type of the object to be registered
      */
     public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
@@ -793,11 +790,30 @@ public class Node implements Iterable<Node> {
     }
 
     /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T> any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> @Nullable T lookup(Class<T> service) {
+        try {
+            if (userData == null) {
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
      * Get the assocated lookup of user-defined data.
      *
-     * @return
+     * @return the lookup table for the user data
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

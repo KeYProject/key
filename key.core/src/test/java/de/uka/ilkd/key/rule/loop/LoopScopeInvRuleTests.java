@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.loop;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -21,9 +24,8 @@ import org.junit.jupiter.api.Test;
  * @author Dominic Scheurer
  */
 public class LoopScopeInvRuleTests {
-
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "loopScopeInvRule/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("loopScopeInvRule/");
 
     /**
      * Automatic proof of a benchmark with labeled breaks and continues.

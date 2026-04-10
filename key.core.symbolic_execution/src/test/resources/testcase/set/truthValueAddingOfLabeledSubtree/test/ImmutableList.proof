@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Wed Mar 23 14:12:50 CET 2016
-name=ImmutableList[ImmutableList\\:\\:down2()].JML normal_behavior operation contract.0
-addSymbolicExecutionLabel=true
-contract=ImmutableList[ImmutableList\\:\\:down2()].JML normal_behavior operation contract.0
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "ImmutableList[ImmutableList::down2()].JML normal_behavior operation contract.0",
+	"addSymbolicExecutionLabel": true,
+	"contract": "ImmutableList[ImmutableList::down2()].JML normal_behavior operation contract.0",
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
@@ -269,7 +268,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
       (branch "Use Axiom"
          (builtin "One Step Simplification" (formula "15"))
          (rule "cut_direct" (formula "9") (term "0"))
-         (branch "CUT: current_0.<created> = TRUE TRUE"
+         (branch "CUT: current_0.$created = TRUE TRUE"
             (builtin "One Step Simplification" (formula "10"))
             (rule "true_left" (formula "10"))
             (rule "cut_direct" (formula "15") (term "0"))
@@ -291,7 +290,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (opengoal " ")
             )
          )
-         (branch "CUT: current_0.<created> = TRUE FALSE"
+         (branch "CUT: current_0.$created = TRUE FALSE"
             (builtin "One Step Simplification" (formula "9"))
             (rule "cut_direct" (formula "16") (term "0"))
             (branch "CUT: SETAccumulate(heap[anon({}, anon_heap_LOOP<<anonHeapFunction>>)], null)<<F(\"9.0\", \"10.0\")>> TRUE"

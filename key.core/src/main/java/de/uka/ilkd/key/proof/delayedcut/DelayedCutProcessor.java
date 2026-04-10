@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.delayedcut;
 
 import java.util.Iterator;
@@ -5,27 +8,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -78,7 +75,7 @@ public class DelayedCutProcessor implements Runnable {
     private final LinkedList<DelayedCutListener> listeners = new LinkedList<>();
     private final Proof proof;
     private final Node node;
-    private final Term descisionPredicate;
+    private final JTerm descisionPredicate;
     private final int mode;
     private boolean used = false;
 
@@ -96,7 +93,7 @@ public class DelayedCutProcessor implements Runnable {
         return list;
     }
 
-    public DelayedCutProcessor(Proof proof, Node node, Term descisionPredicate, int mode) {
+    public DelayedCutProcessor(Proof proof, Node node, JTerm descisionPredicate, int mode) {
         super();
         this.proof = proof;
         this.node = node;
@@ -172,7 +169,8 @@ public class DelayedCutProcessor implements Runnable {
         return goal.apply(app);
     }
 
-    private ImmutableList<Goal> apply(final String tacletName, Goal goal, PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String tacletName, Goal goal,
+            PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -181,7 +179,7 @@ public class DelayedCutProcessor implements Runnable {
         };
 
         ImmutableList<NoPosTacletApp> apps =
-            goal.ruleAppIndex().getFindTaclet(filter, pio, goal.proof().getServices());
+            goal.ruleAppIndex().getFindTaclet(filter, pio);
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
 
@@ -194,7 +192,8 @@ public class DelayedCutProcessor implements Runnable {
      */
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
 
-        SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
+        SequentFormula sf =
+            getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
@@ -281,14 +280,12 @@ public class DelayedCutProcessor implements Runnable {
      * @return
      */
     private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
-        if (app instanceof TacletApp) {
-            TacletApp tapp = (TacletApp) app;
+        if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
-            final Iterator<SchemaVariable> svIt = insts.svIterator();
-            while (svIt.hasNext()) {
-                final SchemaVariable sv = svIt.next();
+            for (var entry : insts.getInstantiationMap()) {
+                final SchemaVariable sv = entry.key();
                 if (sv instanceof SkolemTermSV) {
-                    final Term inst = (Term) insts.getInstantiation(sv);
+                    final JTerm inst = (JTerm) insts.getInstantiation(sv);
                     services.getNamespaces().functions().remove(inst.op().name());
                 }
             }
@@ -329,14 +326,12 @@ public class DelayedCutProcessor implements Runnable {
             throw new RuntimeException("Problem with replaying node " + pair.node.serialNr(), e);
         }
 
-        if (oldRuleApp instanceof PosTacletApp) {
-            PosTacletApp app = (PosTacletApp) oldRuleApp;
+        if (oldRuleApp instanceof PosTacletApp app) {
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
-                app.ifFormulaInstantiations(), newPos, services);
+                app.assumesFormulaInstantiations(), newPos, services);
         }
 
-        if (oldRuleApp instanceof IBuiltInRuleApp) {
-            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
+        if (oldRuleApp instanceof IBuiltInRuleApp app) {
             return app.replacePos(newPos);
         }
 
@@ -344,7 +339,8 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app, PosInOccurrence newPos, Services services) {
+    private void check(Goal goal, final RuleApp app,
+            PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -364,8 +360,8 @@ public class DelayedCutProcessor implements Runnable {
 
         }
 
-        if (app instanceof TacletApp) {
-            NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp((Taclet) app.rule());
+        if (app instanceof TacletApp tacletApp) {
+            NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp(tacletApp.taclet());
             if (noPosApp.matchFind(newPos, services) == null) {
 
                 throw new RuntimeException("Cannot apply taclet-app");
@@ -400,7 +396,8 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
+        return PosInOccurrence.findInSequent(pair.goal.sequent(),
+            formulaNumber,
             oldRuleApp.posInOccurrence().posInTerm());
     }
 

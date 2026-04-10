@@ -1,30 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
+
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
-public class OracleInvariantTranslator {
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
-    private final Services services;
-
-    public OracleInvariantTranslator(Services services) {
-        this.services = services;
-    }
-
-    public Term getInvariantTerm(Sort s) {
+public record OracleInvariantTranslator(Services services) {
+    public JTerm getInvariantTerm(Sort s) {
         JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
@@ -33,8 +32,7 @@ public class OracleInvariantTranslator {
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
-
-        KeYJavaType kjt = info.getKeYJavaType(s);
+        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(s));
 
         if (!(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration
@@ -44,23 +42,22 @@ public class OracleInvariantTranslator {
 
         LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
 
-        Term result = tb.tt();
+        JTerm result = tb.tt();
 
         for (ClassAxiom c : spec.getClassAxioms(kjt)) {
 
-            if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                RepresentsAxiom ra = (RepresentsAxiom) c;
+            if (c instanceof RepresentsAxiom ra && c.getKJT().equals(kjt)) {
 
-                Term t = ra.getAxiom(h, o, services);
+                JTerm t = ra.getAxiom(h, o, services);
 
                 if (t.op().equals(Equality.EQV)) {
 
-                    Term[] heaps = new Term[1];
+                    JTerm[] heaps = new JTerm[1];
                     heaps[0] = tb.var(h);
 
-                    Term inv = tb.inv(heaps, tb.var(o));
-                    Term left = t.sub(0);
-                    Term right = t.sub(1);
+                    JTerm inv = tb.inv(heaps, tb.var(o));
+                    JTerm left = t.sub(0);
+                    JTerm right = t.sub(1);
 
                     if (left.op().name().equals(inv.op().name())) {
                         if (!right.equals(tb.tt())) {
@@ -71,19 +68,9 @@ public class OracleInvariantTranslator {
                             result = tb.and(result, left);
                         }
                     }
-
-
                 }
-
-
             }
-
         }
-
         return tb.tt();
-
-
-
     }
-
 }

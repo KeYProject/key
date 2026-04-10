@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.HashMap;
@@ -8,17 +11,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,14 +26,21 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
@@ -88,7 +95,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -114,7 +121,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // node has also been closed, and to remove the mark as linked
         // node if the merge node has been pruned.
         final Node mergeNodeF = closeApp.getCorrespondingMergeNode();
-        services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+        goal.proof().addProofTreeListener(new ProofTreeAdapter() {
 
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -126,7 +133,7 @@ public class CloseAfterMerge implements BuiltInRule {
                 // a closed goal when loading a proof without the GUI (e.g.
                 // in a JUnit test).
 
-                if (e.getGoals().size() == 0 && mergeNodeF.isClosed()) {
+                if (e.getGoals().isEmpty() && mergeNodeF.isClosed()) {
                     // The merged node was closed; now also close this node.
 
                     e.getSource().closeGoal(linkedGoal);
@@ -140,8 +147,8 @@ public class CloseAfterMerge implements BuiltInRule {
         if (generateIsWeakeningGoal) {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(MERGED_NODE_IS_WEAKENING_TITLE);
-
-            Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
+            var services = goal.getOverlayServices();
+            JTerm isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
             isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
                 isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
             // Delete previous sequents
@@ -165,7 +172,7 @@ public class CloseAfterMerge implements BuiltInRule {
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    private Term getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
+    private JTerm getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
             Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
@@ -180,7 +187,7 @@ public class CloseAfterMerge implements BuiltInRule {
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
-        final LinkedList<Term> origQfdVarTerms = new LinkedList<>();
+        final LinkedList<JTerm> origQfdVarTerms = new LinkedList<>();
 
         // Collect sorts and create logical variables for
         // closing over program variables.
@@ -194,17 +201,18 @@ public class CloseAfterMerge implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final Function predicateSymb =
-            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
+            new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
+                new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
-            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces().getParent());
 
         // Create the predicate term
-        final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
+        final JTerm predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new JTerm[] {}));
 
         // Obtain set of new Skolem constants in merge state
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
@@ -214,7 +222,7 @@ public class CloseAfterMerge implements BuiltInRule {
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
         //@formatter:on
-        Term result = tb.imp(
+        JTerm result = tb.imp(
             allClosure(
                 tb.imp(closeApp.getMergeState().getPathCondition(),
                     tb.apply(closeApp.getMergeState().getSymbolicState(), predTerm)),
@@ -234,13 +242,14 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param constsToReplace Skolem constants to replace before the universal closure.
      * @param services The services object.
      * @return A new term which is equivalent to the universal closure of the argument term, with
-     *         Skolem constants in constsToReplace having been replaced by fresh variables before.
+     *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
+     *         before.
      */
-    private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
+    private JTerm allClosure(final JTerm term, final HashSet<Function> constsToReplace,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
+        JTerm termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
             new HashMap<>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
@@ -272,14 +281,15 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param mergeNodeState The SE state for the merge node; needed for adding an implicative
      *        premise ensuring the soundness of merge rules.
      * @param partnerState The SE state for the partner node.
-     * @param pc The program counter common to the two states -- a formula of the form U\<{...}\>
-     *        PHI, where U is an update in normal form and PHI is a DL formula).
+     * @param pc The program counter common to the two states -- a formula of the form
+     *        {@code U\<{...}\>
+     *        PHI}, where U is an update in normal form and PHI is a DL formula).
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
     public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
             Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
+            SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
             correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }

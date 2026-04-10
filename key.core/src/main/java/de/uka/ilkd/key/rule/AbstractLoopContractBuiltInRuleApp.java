@@ -1,32 +1,38 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Application of {@link AbstractLoopContractRule}.
  *
  * @author lanzinger
  */
-public abstract class AbstractLoopContractBuiltInRuleApp
-        extends AbstractAuxiliaryContractBuiltInRuleApp {
+public abstract class AbstractLoopContractBuiltInRuleApp<T extends BuiltInRule>
+        extends AbstractAuxiliaryContractBuiltInRuleApp<T> {
 
     /**
      * @see #getContract()
      */
-    protected LoopContract contract;
+    protected @Nullable LoopContract contract;
 
     /**
      *
@@ -34,13 +40,13 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
      */
-    public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+    protected AbstractLoopContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
+            @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
     @Override
-    public LoopContract getContract() {
+    public @Nullable LoopContract getContract() {
         return contract;
     }
 
@@ -50,17 +56,18 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      * @param rule the rule being applied.
      * @return this.
      */
-    public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal,
+    public AbstractLoopContractBuiltInRuleApp<T> tryToInstantiate(final Goal goal,
             final AbstractLoopContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
         final Services services = goal.proof().getServices();
         final AbstractLoopContractRule.Instantiation instantiation =
-            rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate((JTerm) posInOccurrence().subTerm(), goal);
+        final var lcir = LoopContractInternalRule.INSTANCE;
         final ImmutableSet<LoopContract> contracts =
-            AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
-        setStatement(instantiation.statement);
+            lcir.getApplicableContracts(instantiation, goal, services);
+        setStatement(instantiation.statement());
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.nil();
         for (LoopContract cont : contracts) {
             if (cont.isOnBlock() && cont.getBlock().getStartPosition().line() == getStatement()
@@ -72,7 +79,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
             }
         }
         contract = LoopContractImpl.combine(cons, services);
-        heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+        heaps = HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
         return this;
     }
 

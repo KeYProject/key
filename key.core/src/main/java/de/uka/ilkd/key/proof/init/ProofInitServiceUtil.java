@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -90,7 +93,7 @@ public final class ProofInitServiceUtil {
      */
     public static Profile getDefaultProfile(String profileName) {
         DefaultProfileResolver resolver =
-            ProofInitServiceUtil.getDefaultProfileResolver(profileName);
+            getDefaultProfileResolver(profileName);
         if (resolver != null) {
             return resolver.getDefaultProfile();
         } else {

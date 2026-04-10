@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
@@ -31,7 +34,7 @@ public class UnparameterizedMergeContract implements MergeContract {
     }
 
     @Override
-    public UnparameterizedMergeContract map(UnaryOperator<Term> op, Services services) {
+    public UnparameterizedMergeContract map(UnaryOperator<JTerm> op, Services services) {
         return this;
     }
 

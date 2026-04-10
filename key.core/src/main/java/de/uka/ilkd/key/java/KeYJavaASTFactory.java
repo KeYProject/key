@@ -1,72 +1,80 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.Default;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.ForUpdates;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.ArrayReference;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.Case;
+import de.uka.ilkd.key.java.ast.statement.Catch;
+import de.uka.ilkd.key.java.ast.statement.Continue;
+import de.uka.ilkd.key.java.ast.statement.Default;
+import de.uka.ilkd.key.java.ast.statement.Do;
+import de.uka.ilkd.key.java.ast.statement.Else;
+import de.uka.ilkd.key.java.ast.statement.EmptyStatement;
+import de.uka.ilkd.key.java.ast.statement.EnhancedFor;
+import de.uka.ilkd.key.java.ast.statement.Finally;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.ForUpdates;
+import de.uka.ilkd.key.java.ast.statement.Guard;
+import de.uka.ilkd.key.java.ast.statement.IForUpdates;
+import de.uka.ilkd.key.java.ast.statement.IGuard;
+import de.uka.ilkd.key.java.ast.statement.ILoopInit;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopInit;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.Return;
+import de.uka.ilkd.key.java.ast.statement.Switch;
+import de.uka.ilkd.key.java.ast.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.ast.statement.Then;
+import de.uka.ilkd.key.java.ast.statement.Throw;
+import de.uka.ilkd.key.java.ast.statement.Try;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
@@ -90,13 +98,13 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create an assignment.
      *
-     * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
+     * @param parameters
+     *        the assignment parameters (variable, expression) as {@link ExtList}
      * @return a new {@link CopyAssignment} as defined by <code>parameters</code>
      */
     public static CopyAssignment assign(final ExtList parameters) {
-        final CopyAssignment assignment = new CopyAssignment(parameters);
 
-        return assignment;
+        return new CopyAssignment(parameters);
     }
 
     /**
@@ -121,16 +129,17 @@ public abstract class KeYJavaASTFactory {
      * type name;
      * </pre>
      *
-     * @param name the {@link ProgramElementName} of the variable to be declared
-     * @param type the static {@link KeYJavaType} of the variable to be declared
+     * @param name
+     *        the {@link ProgramElementName} of the variable to be declared
+     * @param type
+     *        the static {@link KeYJavaType} of the variable to be declared
      * @return a new {@link LocalVariableDeclaration} of a variable with static type
      *         <code>type</code> and name <code>name</code>
      */
     public static LocalVariableDeclaration declare(final ProgramElementName name,
             final KeYJavaType type) {
-        final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(name, null, type);
 
-        return declaration;
+        return declare(name, null, type);
     }
 
     /**
@@ -138,7 +147,8 @@ public abstract class KeYJavaASTFactory {
      * </br>
      * <code>type name = init; </code>
      */
-    public static LocalVariableDeclaration declare(ProgramElementName name, Expression init,
+    public static LocalVariableDeclaration declare(ProgramElementName name,
+            @Nullable Expression init,
             KeYJavaType type) {
         return new LocalVariableDeclaration(new TypeRef(type),
             new VariableSpecification(new LocationVariable(name, type), init, type));
@@ -151,15 +161,18 @@ public abstract class KeYJavaASTFactory {
      * type var = init;
      * </pre>
      *
-     * @param var the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>var</code> is initialized with
-     * @param type the static {@link KeYJavaType} of <code>var</code>
+     * @param var
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>var</code> is initialized with
+     * @param type
+     *        the static {@link KeYJavaType} of <code>var</code>
      * @return a {@link LocalVariableDeclaration} of <code>var</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(IProgramVariable var, Expression init,
             KeYJavaType type) {
-        return KeYJavaASTFactory.declare(new Modifier[0], var, init, type);
+        return declare(new Modifier[0], var, init, type);
     }
 
     /**
@@ -169,11 +182,15 @@ public abstract class KeYJavaASTFactory {
      * type name{unique} = initializer;
      * </pre>
      *
-     * @param services the {@link Services} whose {@link VariableNamer} is used to determine a
+     * @param services
+     *        the {@link Services} whose {@link VariableNamer} is used to determine a
      *        unique variable name
-     * @param name the {@link String} on which the variable's unique name is based
-     * @param initializer the {@link Expression} the declared variable is initialized with
-     * @param type the static {@link KeYJavaType} of the to be declared variable
+     * @param name
+     *        the {@link String} on which the variable's unique name is based
+     * @param initializer
+     *        the {@link Expression} the declared variable is initialized with
+     * @param type
+     *        the static {@link KeYJavaType} of the to be declared variable
      * @return a {@link LocalVariableDeclaration} of variable named uniquely after <code>name</code>
      *         with static type <code>type</code> and initial value <code>initializer</code>
      */
@@ -181,10 +198,8 @@ public abstract class KeYJavaASTFactory {
             final Expression initializer, final KeYJavaType type) {
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(uniqueName, initializer, type);
 
-        return declaration;
+        return declare(uniqueName, initializer, type);
     }
 
     /**
@@ -194,13 +209,15 @@ public abstract class KeYJavaASTFactory {
      * type var;
      * </pre>
      *
-     * @param var the named and typed {@link IProgramVariable} to be declared
-     * @param type the static {@link KeYJavaType} of <code>var</code>
+     * @param var
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param type
+     *        the static {@link KeYJavaType} of <code>var</code>
      * @return a {@link LocalVariableDeclaration} of <code>var</code> with static type
      *         <code>type</code>
      */
     public static LocalVariableDeclaration declare(IProgramVariable var, KeYJavaType type) {
-        return KeYJavaASTFactory.declare(var, null, type);
+        return declare(var, null, type);
     }
 
     /**
@@ -228,9 +245,12 @@ public abstract class KeYJavaASTFactory {
      * kjt var
      * </pre>
      *
-     * @param javaInfo the Java model containing <code>kjt</code>
-     * @param kjt the static {@link KeYJavaType} of <code>var</code>
-     * @param var the named and typed {@link IProgramVariable} to be declared as parameter
+     * @param javaInfo
+     *        the Java model containing <code>kjt</code>
+     * @param kjt
+     *        the static {@link KeYJavaType} of <code>var</code>
+     * @param var
+     *        the named and typed {@link IProgramVariable} to be declared as parameter
      * @return a {@link ParameterDeclaration} of <code>var</code> with static type <code>kjt</code>
      */
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo, KeYJavaType kjt,
@@ -253,25 +273,25 @@ public abstract class KeYJavaASTFactory {
      * (expression)
      * </pre>
      *
-     * @param expression the {@link Expression} to be parenthesized
+     * @param expression
+     *        the {@link Expression} to be parenthesized
      * @return a new {@link ParenthesizedExpression} of <code>expression</code>
      */
     public static ParenthesizedExpression parenthesizedExpression(final Expression expression) {
-        final ParenthesizedExpression parenthesized = new ParenthesizedExpression(expression);
 
-        return parenthesized;
+        return new ParenthesizedExpression(expression);
     }
 
     /**
      * Create an inactive expression.
      *
-     * @param expression the {@link Expression} to be marked inactive
+     * @param expression
+     *        the {@link Expression} to be marked inactive
      * @return a new {@link PassiveExpression} version of <code>expression</code>
      */
     public static PassiveExpression passiveExpression(final Expression expression) {
-        final PassiveExpression passive = new PassiveExpression(expression);
 
-        return passive;
+        return new PassiveExpression(expression);
     }
 
     /**
@@ -284,26 +304,37 @@ public abstract class KeYJavaASTFactory {
     /**
      * create a local variable
      */
-    public static ProgramVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
+    public static LocationVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
         return new LocationVariable(name, kjt);
     }
 
     /**
      * Create a local variable with a unique name.
      *
-     * @param services the {@link Services} whose {@link VariableNamer} is used
-     * @param name the {@link String} on which the variable's unique name is based
-     * @param type the variable's static {@link KeYJavaType}
+     * @param services
+     *        the {@link Services} whose {@link VariableNamer} is used
+     * @param name
+     *        the {@link String} on which the variable's unique name is based
+     * @param type
+     *        the variable's static {@link KeYJavaType}
      * @return a new {@link ProgramVariable} of static type <code>type</code> and with a unique name
      *         based on <code>name</code>
      */
     public static ProgramVariable localVariable(final Services services, final String name,
             final KeYJavaType type) {
+        // first check for a saved name for this variable
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        for (var prop : nameRecorder.getSetProposals()) {
+            if (prop.toString().startsWith(name + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                return localVariable(new ProgramElementName(prop.toString()),
+                    type);
+            }
+        }
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
-        final ProgramVariable variable = KeYJavaASTFactory.localVariable(uniqueName, type);
+        nameRecorder.addProposal(new Name(uniqueName.getProgramName()));
 
-        return variable;
+        return localVariable(uniqueName, type);
     }
 
     /**
@@ -313,14 +344,15 @@ public abstract class KeYJavaASTFactory {
      * left &amp; right
      * </pre>
      *
-     * @param left the left operand {@link Expression}
-     * @param right the right operand <code>Expression</code>
+     * @param left
+     *        the left operand {@link Expression}
+     * @param right
+     *        the right operand <code>Expression</code>
      * @return a new {@link LogicalAnd} of <code>left</code> and <code>right</code>
      */
     public static LogicalAnd logicalAndOperator(final Expression left, final Expression right) {
-        final LogicalAnd operator = new LogicalAnd(left, right);
 
-        return operator;
+        return new LogicalAnd(left, right);
     }
 
     /**
@@ -330,26 +362,27 @@ public abstract class KeYJavaASTFactory {
      * left | right
      * </pre>
      *
-     * @param left the left operand {@link Expression}
-     * @param right the right operand {@link Expression}
+     * @param left
+     *        the left operand {@link Expression}
+     * @param right
+     *        the right operand {@link Expression}
      * @return a new {@link LogicalOr} of <code>left</code> and <code>right</code>
      */
     public static LogicalOr logicalOrOperator(final Expression left, final Expression right) {
-        final LogicalOr operator = new LogicalOr(left, right);
 
-        return operator;
+        return new LogicalOr(left, right);
     }
 
     /**
      * Create a catch clause.
      *
-     * @param parameters the catch clause parameters (exception, body) as {@link ExtList}
+     * @param parameters
+     *        the catch clause parameters (exception, body) as {@link ExtList}
      * @return a new {@link Catch} as defined by <code>parameters</code>
      */
     public static Catch catchClause(final ExtList parameters) {
-        final Catch clause = new Catch(parameters);
 
-        return clause;
+        return new Catch(parameters);
     }
 
     /**
@@ -370,17 +403,18 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param parameter the to be caught {@link ParameterDeclaration}
-     * @param statements the body {@link Statement}s
+     * @param parameter
+     *        the to be caught {@link ParameterDeclaration}
+     * @param statements
+     *        the body {@link Statement}s
      * @return a new {@link Catch} clause for execution of <code>statements</code> in case of
      *         <code>parameter</code>
      */
     public static Catch catchClause(final ParameterDeclaration parameter,
             final Statement[] statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
-        final Catch clause = KeYJavaASTFactory.catchClause(parameter, body);
+        final StatementBlock body = block(statements);
 
-        return clause;
+        return catchClause(parameter, body);
     }
 
     /**
@@ -391,10 +425,14 @@ public abstract class KeYJavaASTFactory {
      *    body
      * </pre>
      *
-     * @param javaInfo the {@link JavaInfo} containing <code>kjt</code>
-     * @param param the {@link String} name of the exception object variable
-     * @param kjt the {@link KeYJavaType} of the exception object variable
-     * @param body the {@link StatementBlock} catch clause body
+     * @param javaInfo
+     *        the {@link JavaInfo} containing <code>kjt</code>
+     * @param param
+     *        the {@link String} name of the exception object variable
+     * @param kjt
+     *        the {@link KeYJavaType} of the exception object variable
+     * @param body
+     *        the {@link StatementBlock} catch clause body
      * @return a new {@link Catch} with parameter <code>param</code> of static type <code>kjt</code>
      *         and body <code>body</code>
      */
@@ -412,11 +450,15 @@ public abstract class KeYJavaASTFactory {
      *    body
      * </pre>
      *
-     * @param javaInfo the {@link JavaInfo} containing a {@link KeYJavaType} named <code>type</code>
-     * @param param the {@link String} name of the exception object variable
-     * @param type the <code>String</code> name of the exception object variable's
+     * @param javaInfo
+     *        the {@link JavaInfo} containing a {@link KeYJavaType} named <code>type</code>
+     * @param param
+     *        the {@link String} name of the exception object variable
+     * @param type
+     *        the <code>String</code> name of the exception object variable's
      *        <code>KeYJavaType</code>
-     * @param body the {@link StatementBlock} catch clause body
+     * @param body
+     *        the {@link StatementBlock} catch clause body
      * @return a new {@link Catch} with parameter <code>param</code> of static type
      *         <code>type</code> and body <code>body</code>
      */
@@ -433,23 +475,12 @@ public abstract class KeYJavaASTFactory {
      * throw e
      * </pre>
      *
-     * @param e the throw {@link Expression}
+     * @param e
+     *        the throw {@link Expression}
      * @return a new {@link Throw} statement with expression <code>e</code>
      */
     public static Throw throwClause(Expression e) {
         return new Throw(e);
-    }
-
-    /**
-     * Create a transaction statement.
-     *
-     * @param type the transaction statement type
-     * @return a new {@link TransactionStatement} of type <code>type</code>
-     */
-    public static TransactionStatement transactionStatement(final int type) {
-        final TransactionStatement statement = new TransactionStatement(type);
-
-        return statement;
     }
 
     /**
@@ -458,9 +489,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Guard} with expression <code>true</code>
      */
     public static Guard trueGuard() {
-        final Guard guard = new Guard(BooleanLiteral.TRUE);
 
-        return guard;
+        return new Guard(BooleanLiteral.TRUE);
     }
 
     /**
@@ -471,14 +501,15 @@ public abstract class KeYJavaASTFactory {
      *     body
      * </pre>
      *
-     * @param condition the loop condition {@link Expression}
-     * @param body the loop body {@link Statement}
+     * @param condition
+     *        the loop condition {@link Expression}
+     * @param body
+     *        the loop body {@link Statement}
      * @return a new {@link While} loop defined by <code>condition</code> and <code>body</code>
      */
     public static Statement whileLoop(final Expression condition, final Statement body) {
-        final While loop = new While(condition, body);
 
-        return loop;
+        return new While(condition, body);
     }
 
     /**
@@ -489,17 +520,19 @@ public abstract class KeYJavaASTFactory {
      *     body
      * </pre>
      *
-     * @param condition the loop condition {@link Expression}
-     * @param body the loop body {@link Statement}
-     * @param position the new source element's {@link PositionInfo}
+     * @param condition
+     *        the loop condition {@link Expression}
+     * @param body
+     *        the loop body {@link Statement}
+     * @param position
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link While} loop defined by <code>condition</code> and <code>body</code>, and
      *         positioned at <code>position</code>
      */
     public static While whileLoop(final Expression condition, final Statement body,
             final PositionInfo position) {
-        final While loop = new While(condition, body, position);
 
-        return loop;
+        return new While(condition, body, position);
     }
 
     /**
@@ -509,7 +542,8 @@ public abstract class KeYJavaASTFactory {
      * return e
      * </pre>
      *
-     * @param e the return {@link Expression}
+     * @param e
+     *        the return {@link Expression}
      * @return a new {@link Return} statement with expression <code>e</code>
      */
     public static Return returnClause(Expression e) {
@@ -524,14 +558,15 @@ public abstract class KeYJavaASTFactory {
      *    then
      * </pre>
      *
-     * @param guard the if statement condition {@link Expression}
-     * @param then the if statement then branch {@link Statement}
+     * @param guard
+     *        the if statement condition {@link Expression}
+     * @param then
+     *        the if statement then branch {@link Statement}
      * @return an {@link If} with expression <code>guard</code> and then branch <code>then</code>
      */
     public static If ifThen(Expression guard, Statement then) {
-        final If statement = KeYJavaASTFactory.ifThen(guard, new Then(then));
 
-        return statement;
+        return ifThen(guard, new Then(then));
     }
 
     /**
@@ -543,16 +578,17 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param guard the if statement condition {@link Expression}
-     * @param statements the if statement then branch {@link Statement}s
+     * @param guard
+     *        the if statement condition {@link Expression}
+     * @param statements
+     *        the if statement then branch {@link Statement}s
      * @return an {@link If} with condition <code>guard</code> and then branch
      *         <code>statements</code>
      */
     public static If ifThen(final Expression guard, final Statement... statements) {
-        final StatementBlock block = KeYJavaASTFactory.block(statements);
-        final If statement = KeYJavaASTFactory.ifThen(guard, block);
+        final StatementBlock block = block(statements);
 
-        return statement;
+        return ifThen(guard, block);
     }
 
     /**
@@ -563,26 +599,27 @@ public abstract class KeYJavaASTFactory {
      *    then
      * </pre>
      *
-     * @param guard the if statement condition {@link Expression}
-     * @param then the if statement then branch {@link Then}
+     * @param guard
+     *        the if statement condition {@link Expression}
+     * @param then
+     *        the if statement then branch {@link Then}
      * @return an {@link If} with expression <code>guard</code> and then branch <code>then</code>
      */
     public static If ifThen(final Expression guard, final Then then) {
-        final If statement = new If(guard, then);
 
-        return statement;
+        return new If(guard, then);
     }
 
     /**
      * Create an if statement.
      *
-     * @param parameters the if statement parameters (guard, body, else branch) as {@link ExtList}
+     * @param parameters
+     *        the if statement parameters (guard, body, else branch) as {@link ExtList}
      * @return a new {@link If} as defined by <code>parameters</code>
      */
     public static If ifStatement(final ExtList parameters) {
-        final If statement = new If(parameters);
 
-        return statement;
+        return new If(parameters);
     }
 
     /**
@@ -595,9 +632,12 @@ public abstract class KeYJavaASTFactory {
      *    els
      * </pre>
      *
-     * @param guard the if statement condition {@link Expression}
-     * @param then the if statement then branch {@link Statement}
-     * @param els the if statement else branch <code>Statement</code>
+     * @param guard
+     *        the if statement condition {@link Expression}
+     * @param then
+     *        the if statement then branch {@link Statement}
+     * @param els
+     *        the if statement else branch <code>Statement</code>
      * @return an {@link If} with expression <code>guard</code>, then branch <code>then</code> and
      *         else branch <code>els</code>
      */
@@ -615,11 +655,14 @@ public abstract class KeYJavaASTFactory {
      *    elseStatement
      * </pre>
      *
-     * @param guard the if clause condition {@link Expression}
+     * @param guard
+     *        the if clause condition {@link Expression}
      *
-     * @param thenStatement the if clause then branch {@link Statement}
+     * @param thenStatement
+     *        the if clause then branch {@link Statement}
      *
-     * @param elseStatement the if clause else branch <code>Statement</code>
+     * @param elseStatement
+     *        the if clause else branch <code>Statement</code>
      *
      * @return a new {@link If} with condition <code>guard</code>, then branch
      *         <code>thenStatement</code> and else branch <code>elseStatement</code>
@@ -628,15 +671,15 @@ public abstract class KeYJavaASTFactory {
             final Statement elseStatement) {
         final Then then = new Then(thenStatement);
         final Else els = new Else(elseStatement);
-        final If ifElse = KeYJavaASTFactory.ifElse(guard, then, els);
 
-        return ifElse;
+        return ifElse(guard, then, els);
     }
 
     /**
      * Create a break statement.
      *
-     * @param l the break destination {@link Label}
+     * @param l
+     *        the break destination {@link Label}
      * @return a new {@link Break} with label <code>l</code>
      */
     public static Break breakStatement(Label l) {
@@ -650,16 +693,18 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a case block.
      *
-     * @param parameters the case block parameters (body) as {@link ExtList}
-     * @param expression the case block {@link Expression}
-     * @param position the new source element's {@link PositionInfo}
+     * @param parameters
+     *        the case block parameters (body) as {@link ExtList}
+     * @param expression
+     *        the case block {@link Expression}
+     * @param position
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link Case} as defined by <code>parameters</code> and <code>expression</code>
      */
     public static Case caseBlock(final ExtList parameters, final Expression expression,
             final PositionInfo position) {
-        final Case block = new Case(parameters, expression, position);
 
-        return block;
+        return new Case(parameters, expression, position);
     }
 
     /**
@@ -670,16 +715,17 @@ public abstract class KeYJavaASTFactory {
      *     statement
      * </pre>
      *
-     * @param expression the case {@link Expression}
-     * @param statement the to be executed {@link Statement}
+     * @param expression
+     *        the case {@link Expression}
+     * @param statement
+     *        the to be executed {@link Statement}
      * @return a new {@link Case} for execution of <code>statement</code> in case of
      *         <code>expression</code>
      */
     public static Case caseBlock(final Expression expression, final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
-        final Case block = KeYJavaASTFactory.caseBlock(expression, statements);
+        final Statement[] statements = { statement };
 
-        return block;
+        return caseBlock(expression, statements);
     }
 
     /**
@@ -691,15 +737,16 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param expression the case {@link Expression}
-     * @param statements the to be executed {@link Statement}s
+     * @param expression
+     *        the case {@link Expression}
+     * @param statements
+     *        the to be executed {@link Statement}s
      * @return a new {@link Case} for execution of <code>statements</code> in case of
      *         <code>expression</code>
      */
     public static Case caseBlock(final Expression expression, final Statement[] statements) {
-        final Case block = new Case(expression, statements);
 
-        return block;
+        return new Case(expression, statements);
     }
 
     public static Continue continueStatement(Label label) {
@@ -718,14 +765,13 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create an enhanced for loop.
      *
-     * @param parameters the loop definition parameters (initializer, guard, body) as
+     * @param parameters
+     *        the loop definition parameters (initializer, guard, body) as
      *        {@link ExtList}
      * @return a new {@link For} as defined by <code>parameters</code>
      */
     public static EnhancedFor enhancedForLoop(final ExtList parameters) {
-        final EnhancedFor loop = new EnhancedFor(parameters);
-
-        return loop;
+        return new EnhancedFor(parameters);
     }
 
     /**
@@ -735,13 +781,13 @@ public abstract class KeYJavaASTFactory {
      * expression == null
      * </pre>
      *
-     * @param expression the {@link Expression} to be compared against <code>null</code>
+     * @param expression
+     *        the {@link Expression} to be compared against <code>null</code>
      * @return a new {@link Equals} that compares <code>expression</code> against <code>null</code>
      */
     public static Equals equalsNullOperator(final Expression expression) {
-        final Equals operator = KeYJavaASTFactory.equalsOperator(expression, NullLiteral.NULL);
 
-        return operator;
+        return equalsOperator(expression, NullLiteral.NULL);
     }
 
     /**
@@ -751,14 +797,15 @@ public abstract class KeYJavaASTFactory {
      * left == right
      * </pre>
      *
-     * @param left the left operand {@link Expression}
-     * @param right the right operand <code>Expression</code>
+     * @param left
+     *        the left operand {@link Expression}
+     * @param right
+     *        the right operand <code>Expression</code>
      * @return a new {@link Equals} of <code>left</code> and <code>right</code>
      */
     public static Equals equalsOperator(final Expression left, final Expression right) {
-        final Equals statement = new Equals(left, right);
 
-        return statement;
+        return new Equals(left, right);
     }
 
     /**
@@ -768,54 +815,58 @@ public abstract class KeYJavaASTFactory {
      * operand{1} == operand{2}
      * </pre>
      *
-     * @param operands the operands {@link ExtList}
+     * @param operands
+     *        the operands {@link ExtList}
      * @return a new {@link Equals} of <code>operands</code>
      */
     public static Equals equalsOperator(final ExtList operands) {
-        final Equals statement = new Equals(operands);
 
-        return statement;
+        return new Equals(operands);
     }
 
     /**
      * Create an execution context.
      *
-     * @param classType the enclosing class {@link KeYJavaType}
-     * @param method the enclosing {@link IProgramMethod} defined in <code>classType</code>
-     * @param reference the {@link ReferencePrefix} <code>method</code> is called on
+     * @param classType
+     *        the enclosing class {@link KeYJavaType}
+     * @param method
+     *        the enclosing {@link IProgramMethod} defined in <code>classType</code>
+     * @param reference
+     *        the {@link ReferencePrefix} <code>method</code> is called on
      * @return a new {@link ExecutionContext} for calls on <code>reference</code> to
      *         <code>method</code> from <code>classType</code>
      */
     public static ExecutionContext executionContext(final KeYJavaType classType,
             final IProgramMethod method, final ReferencePrefix reference) {
         final TypeRef type = new TypeRef(classType);
-        final ExecutionContext context = new ExecutionContext(type, method, reference);
 
-        return context;
+        return new ExecutionContext(type, method, reference);
     }
 
     /**
      * Insert a statement in a block of statements.
      *
-     * @param statement the {@link Statement} to be inserted into <code>block</code>
-     * @param block the {@link StatementBlock} <code>statement</code> is inserted into
+     * @param statement
+     *        the {@link Statement} to be inserted into <code>block</code>
+     * @param block
+     *        the {@link StatementBlock} <code>statement</code> is inserted into
      * @return a new <code>StatementBlock</code> that contains both the <code>Statement</code>s from
      *         <code>block</code> and <code>statement</code>
      */
     public static StatementBlock insertStatementInBlock(final Statement statement,
             final StatementBlock block) {
-        final Statement[] statements = new Statement[] { statement };
-        final StatementBlock statementBlock =
-            KeYJavaASTFactory.insertStatementInBlock(statements, block);
+        final Statement[] statements = { statement };
 
-        return statementBlock;
+        return insertStatementInBlock(statements, block);
     }
 
     /**
      * inserts the given statements at the begin of the block
      *
-     * @param stmnt array of Statement those have to be inserted
-     * @param b the Statementblock where to insert
+     * @param stmnt
+     *        array of Statement those have to be inserted
+     * @param b
+     *        the Statementblock where to insert
      */
     public static StatementBlock insertStatementInBlock(Statement[] stmnt, StatementBlock b) {
 
@@ -828,8 +879,10 @@ public abstract class KeYJavaASTFactory {
     /**
      * inserts the given statements at the begin of the block
      *
-     * @param stmnt array of Statement those have to be inserted
-     * @param b the Statementblock where to insert
+     * @param stmnt
+     *        array of Statement those have to be inserted
+     * @param b
+     *        the Statementblock where to insert
      */
     public static StatementBlock insertStatementInBlock(StatementBlock stmnt, StatementBlock b) {
         Statement[] stmnts = new Statement[stmnt.getStatementCount()];
@@ -847,18 +900,18 @@ public abstract class KeYJavaASTFactory {
      * statements
      * </pre>
      *
-     * @param block the original {@link StatementBlock}
-     * @param statements the inserted {@link Statement}s
+     * @param block
+     *        the original {@link StatementBlock}
+     * @param statements
+     *        the inserted {@link Statement}s
      * @return a new <code>StatementBlock</code> that contains <code>block</code> first and
      *         <code>statements</code> second
      */
     public static StatementBlock insertStatementInBlock(final StatementBlock block,
             Statement[] statements) {
-        final StatementBlock blockEnd = KeYJavaASTFactory.block(statements);
-        final StatementBlock blockComplete =
-            KeYJavaASTFactory.insertStatementInBlock(block, blockEnd);
+        final StatementBlock blockEnd = block(statements);
 
-        return blockComplete;
+        return insertStatementInBlock(block, blockEnd);
     }
 
     /**
@@ -868,16 +921,17 @@ public abstract class KeYJavaASTFactory {
      * expression instance of type
      * </pre>
      *
-     * @param expression the {@link Expression} operand, whose runtime type is to be checked
-     * @param type the {@link KeYJavaType} operand <code>expression</code>'s type is checked against
+     * @param expression
+     *        the {@link Expression} operand, whose runtime type is to be checked
+     * @param type
+     *        the {@link KeYJavaType} operand <code>expression</code>'s type is checked against
      * @return a new {@link Instanceof} for checking <code>expression</code>'s type against
      *         <code>type</code>
      */
     public static Instanceof instanceOf(final Expression expression, final KeYJavaType type) {
         final TypeRef typeRef = new TypeRef(type);
-        final Instanceof instanceOf = new Instanceof(expression, typeRef);
 
-        return instanceOf;
+        return new Instanceof(expression, typeRef);
     }
 
     /**
@@ -887,16 +941,18 @@ public abstract class KeYJavaASTFactory {
      * type variable = 0;
      * </pre>
      *
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
-     * @param variable the named and typed {@link IProgramVariable} to be declared
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value zero
      */
     public static LocalVariableDeclaration declareZero(final KeYJavaType type,
             final IProgramVariable variable) {
-        final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
+        final IntLiteral zeroLiteral = zeroLiteral();
 
-        return KeYJavaASTFactory.declare(variable, zeroLiteral, type);
+        return declare(variable, zeroLiteral, type);
     }
 
     /**
@@ -906,18 +962,22 @@ public abstract class KeYJavaASTFactory {
      * type variable = reference.method();
      * </pre>
      *
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param method the method's name {@link String}
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param method
+     *        the method's name {@link String}
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value <code>reference.method()</code>
      */
     public static LocalVariableDeclaration declareMethodCall(final KeYJavaType type,
             final IProgramVariable variable, final ReferencePrefix reference, final String method) {
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method);
+        final MethodReference call = methodCall(reference, method);
 
-        return KeYJavaASTFactory.declare(variable, call, type);
+        return declare(variable, call, type);
     }
 
     /**
@@ -930,29 +990,32 @@ public abstract class KeYJavaASTFactory {
      * where <code>type</code> is variable's {@link KeYJavaType} as it is returned by
      * {@link IProgramVariable#getKeYJavaType()}.
      *
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param method the method's name {@link String}
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param method
+     *        the method's name {@link String}
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value <code>reference.method()</code>
      */
     public static LocalVariableDeclaration declareMethodCall(final IProgramVariable variable,
             final ReferencePrefix reference, final String method) {
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method);
+        final MethodReference call = methodCall(reference, method);
 
-        return KeYJavaASTFactory.declare(variable, call);
+        return declare(variable, call);
     }
 
     /**
      * Create a default block.
      *
-     * @param parameters the default block parameters (body) as {@link ExtList}
+     * @param parameters
+     *        the default block parameters (body) as {@link ExtList}
      * @return a new {@link Default} as defined by <code>parameters</code>
      */
     public static Default defaultBlock(final ExtList parameters) {
-        final Default block = new Default(parameters);
 
-        return block;
+        return new Default(parameters);
     }
 
     /**
@@ -963,14 +1026,14 @@ public abstract class KeYJavaASTFactory {
      *     statement
      * </pre>
      *
-     * @param statement the to be executed {@link Statement}
+     * @param statement
+     *        the to be executed {@link Statement}
      * @return a new {@link Default} that contains <code>statement</code>
      */
     public static Default defaultBlock(final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
-        final Default block = KeYJavaASTFactory.defaultBlock(statements);
+        final Statement[] statements = { statement };
 
-        return block;
+        return defaultBlock(statements);
     }
 
     /**
@@ -982,13 +1045,13 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the to be executed {@link Statement}s
+     * @param statements
+     *        the to be executed {@link Statement}s
      * @return a new {@link Default} that contains <code>statements</code>
      */
     public static Default defaultBlock(final Statement[] statements) {
-        final Default block = new Default(statements);
 
-        return block;
+        return new Default(statements);
     }
 
     /**
@@ -1000,29 +1063,31 @@ public abstract class KeYJavaASTFactory {
      * while (condition);
      * </pre>
      *
-     * @param condition the do-loop condition {@link Expression}
-     * @param statement the do-loop body {@link Statement}
-     * @param positionInfo the new source element's {@link PositionInfo}
+     * @param condition
+     *        the do-loop condition {@link Expression}
+     * @param statement
+     *        the do-loop body {@link Statement}
+     * @param positionInfo
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link Do} that executes <code>statement</code> while <code>condition</code>
      *         holds
      */
     public static Do doLoop(final Expression condition, final Statement statement,
             final PositionInfo positionInfo) {
-        final Do loop = new Do(condition, statement, positionInfo);
 
-        return loop;
+        return new Do(condition, statement, positionInfo);
     }
 
     /**
      * Create an else block.
      *
-     * @param parameters the else block parameters (body) as {@link ExtList}
+     * @param parameters
+     *        the else block parameters (body) as {@link ExtList}
      * @return a new {@link Else} as defined by <code>parameters</code>
      */
     public static Else elseBlock(final ExtList parameters) {
-        final Else block = new Else(parameters);
 
-        return block;
+        return new Else(parameters);
     }
 
     /**
@@ -1033,13 +1098,13 @@ public abstract class KeYJavaASTFactory {
      *     statement
      * </pre>
      *
-     * @param statement the {@link Statement} to be executed
+     * @param statement
+     *        the {@link Statement} to be executed
      * @return a new {@link Else} block consisting of <code>statement</code> solely
      */
     public static Else elseBlock(final Statement statement) {
-        final Else block = new Else(statement);
 
-        return block;
+        return new Else(statement);
     }
 
     /**
@@ -1051,14 +1116,14 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the {@link Statement}s to be executed
+     * @param statements
+     *        the {@link Statement}s to be executed
      * @return a new {@link Else} block consisting of <code>statements</code> solely
      */
     public static Else elseBlock(final Statement[] statements) {
-        final StatementBlock statement = KeYJavaASTFactory.block(statements);
-        final Else block = KeYJavaASTFactory.elseBlock(statement);
+        final StatementBlock statement = block(statements);
 
-        return block;
+        return elseBlock(statement);
     }
 
     /**
@@ -1068,7 +1133,8 @@ public abstract class KeYJavaASTFactory {
      * init
      * </pre>
      *
-     * @param init the single {@link LoopInitializer}
+     * @param init
+     *        the single {@link LoopInitializer}
      * @return a new {@link ILoopInit} that consists of <code>init</code> only
      */
     public static ILoopInit loopInit(final LoopInitializer init) {
@@ -1084,30 +1150,33 @@ public abstract class KeYJavaASTFactory {
      * type variable = 0
      * </pre>
      *
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
-     * @param variable the named and typed {@link IProgramVariable} to be declared
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link ILoopInit} that declares variable <code>variable</code> with static type
      *         <code>type</code> and initial value zero
      */
     public static ILoopInit loopInitZero(final KeYJavaType type, final IProgramVariable variable) {
-        final LoopInitializer initializer = KeYJavaASTFactory.declareZero(type, variable);
+        final LoopInitializer initializer = declareZero(type, variable);
 
-        return KeYJavaASTFactory.loopInit(initializer);
+        return loopInit(initializer);
     }
 
     /**
      * Create an array initializer.
      *
-     * @param expressions the initial value {@link Expression}s
-     * @param type the array type {@link KeYJavaType}
+     * @param expressions
+     *        the initial value {@link Expression}s
+     * @param type
+     *        the array type {@link KeYJavaType}
      * @return a new {@link ArrayInitializer} which contains <code>expressions</code> and is of type
      *         <code>type</code>
      */
     public static ArrayInitializer arrayInitializer(final Expression[] expressions,
             final KeYJavaType type) {
-        final ArrayInitializer initializer = new ArrayInitializer(expressions, type);
 
-        return initializer;
+        return new ArrayInitializer(expressions, type);
     }
 
     /**
@@ -1117,16 +1186,17 @@ public abstract class KeYJavaASTFactory {
      * array.length
      * </pre>
      *
-     * @param model the {@link JavaInfo} to retrieve the array super class type, which holds the
+     * @param model
+     *        the {@link JavaInfo} to retrieve the array super class type, which holds the
      *        length attribute, from
-     * @param array the {@link ReferencePrefix} whose length attribute is accessed
+     * @param array
+     *        the {@link ReferencePrefix} whose length attribute is accessed
      * @return a new {@link FieldReference} for <code>array</code>'s length attribute
      */
     public static FieldReference arrayLength(final JavaInfo model, final ReferencePrefix array) {
         final ProgramVariable lengthField = model.getArrayLength();
-        final FieldReference reference = new FieldReference(lengthField, array);
 
-        return reference;
+        return new FieldReference(lengthField, array);
     }
 
     /**
@@ -1136,14 +1206,15 @@ public abstract class KeYJavaASTFactory {
      * left &lt; right
      * </pre>
      *
-     * @param left the {@link Expression} to be compared less than <code>right</code>
-     * @param right the <code>Expression</code> to be compared greater than <code>left</code>
+     * @param left
+     *        the {@link Expression} to be compared less than <code>right</code>
+     * @param right
+     *        the <code>Expression</code> to be compared greater than <code>left</code>
      * @return a new {@link Guard} that compares <code>left</code> less than <code>right</code>
      */
     public static IGuard lessThanGuard(final Expression left, final Expression right) {
-        final IGuard guard = new Guard(new LessThan(left, right));
 
-        return guard;
+        return new Guard(new LessThan(left, right));
     }
 
     /**
@@ -1153,14 +1224,15 @@ public abstract class KeYJavaASTFactory {
      * left &lt; right
      * </pre>
      *
-     * @param left the left operand {@link Expression}
-     * @param right the right operand {@link Expression}
+     * @param left
+     *        the left operand {@link Expression}
+     * @param right
+     *        the right operand {@link Expression}
      * @return a new {@link LessThan} that compares <code>left</code> less than <code>right</code>
      */
     public static LessThan lessThanOperator(final Expression left, final Expression right) {
-        final LessThan operator = new LessThan(left, right);
 
-        return operator;
+        return new LessThan(left, right);
     }
 
     /**
@@ -1170,14 +1242,14 @@ public abstract class KeYJavaASTFactory {
      * expression &lt; 0
      * </pre>
      *
-     * @param expression the left operand {@link Expression}
+     * @param expression
+     *        the left operand {@link Expression}
      * @return a new {@link LessThan} that compares <code>expression</code> less than <code>0</code>
      */
     public static LessThan lessThanZeroOperator(final Expression expression) {
-        final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
-        final LessThan operator = KeYJavaASTFactory.lessThanOperator(expression, zeroLiteral);
+        final IntLiteral zeroLiteral = zeroLiteral();
 
-        return operator;
+        return lessThanOperator(expression, zeroLiteral);
     }
 
     /**
@@ -1187,20 +1259,22 @@ public abstract class KeYJavaASTFactory {
      * variable &lt; array.length
      * </pre>
      *
-     * @param model the {@link JavaInfo} to retrieve the array super class type, which holds the
+     * @param model
+     *        the {@link JavaInfo} to retrieve the array super class type, which holds the
      *        length attribute, from
-     * @param variable the {@link ProgramVariable} to be compared less than <code>array</code>'s
+     * @param variable
+     *        the {@link ProgramVariable} to be compared less than <code>array</code>'s
      *        length
-     * @param array the {@link ReferencePrefix} whose length attribute is accessed
+     * @param array
+     *        the {@link ReferencePrefix} whose length attribute is accessed
      * @return a new {@link Guard} that compares <code>variable</code> less than
      *         <code>array</code>'s length
      */
     public static IGuard lessThanArrayLengthGuard(final JavaInfo model,
             final ProgramVariable variable, final ReferencePrefix array) {
-        final FieldReference length = KeYJavaASTFactory.arrayLength(model, array);
-        final IGuard guard = KeYJavaASTFactory.lessThanGuard(variable, length);
+        final FieldReference length = arrayLength(model, array);
 
-        return guard;
+        return lessThanGuard(variable, length);
     }
 
     /**
@@ -1210,13 +1284,13 @@ public abstract class KeYJavaASTFactory {
      * update
      * </pre>
      *
-     * @param update the single update {@link Expression}
+     * @param update
+     *        the single update {@link Expression}
      * @return a new {@link ForUpdates} that consists of <code>update</code> only
      */
     public static IForUpdates forUpdates(final Expression update) {
-        final IForUpdates forUpdates = new ForUpdates(new ImmutableArray<>(update));
 
-        return forUpdates;
+        return new ForUpdates(new ImmutableArray<>(update));
     }
 
     /**
@@ -1226,14 +1300,14 @@ public abstract class KeYJavaASTFactory {
      * variable++
      * </pre>
      *
-     * @param variable the {@link ProgramVariable} to be post incremented during the loop updates
+     * @param variable
+     *        the {@link ProgramVariable} to be post incremented during the loop updates
      * @return a new {@link ForUpdates} that consists of the post increment of <code>variable</code>
      */
     public static IForUpdates postIncrementForUpdates(final ProgramVariable variable) {
         final Expression update = new PostIncrement(variable);
-        final IForUpdates forUpdates = KeYJavaASTFactory.forUpdates(update);
 
-        return forUpdates;
+        return forUpdates(update);
     }
 
     /**
@@ -1243,28 +1317,29 @@ public abstract class KeYJavaASTFactory {
      * array[index]
      * </pre>
      *
-     * @param array the {@link ReferencePrefix} to be accessed
-     * @param index the array access index {@link Expression}
+     * @param array
+     *        the {@link ReferencePrefix} to be accessed
+     * @param index
+     *        the array access index {@link Expression}
      * @return a new {@link ArrayReference} for access of <code>array</code> at <code>index</code>
      */
     public static ArrayReference arrayFieldAccess(final ReferencePrefix array,
             final Expression index) {
-        final Expression[] indices = new Expression[] { index };
-        final ArrayReference access = new ArrayReference(array, indices);
+        final Expression[] indices = { index };
 
-        return access;
+        return new ArrayReference(array, indices);
     }
 
     /**
      * Create a block from an arbitrary number of statements.
      *
-     * @param statements the block statements as {@link ExtList}
+     * @param statements
+     *        the block statements as {@link ExtList}
      * @return a new {@link StatementBlock} consisting of <code>statements</code>
      */
     public static StatementBlock block(final ExtList statements) {
-        final StatementBlock block = new StatementBlock(statements);
 
-        return block;
+        return new StatementBlock(statements);
     }
 
     /**
@@ -1276,14 +1351,14 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the {@link Statement}s to appear in the block
+     * @param statements
+     *        the {@link Statement}s to appear in the block
      * @return a new {@link StatementBlock} that consists of the given <code>statements</code> in
      *         the very same order
      */
     public static StatementBlock block(final Statement... statements) {
-        final StatementBlock block = new StatementBlock(statements);
 
-        return block;
+        return new StatementBlock(statements);
     }
 
     /**
@@ -1295,28 +1370,28 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the {@link Statement}s to appear in the block
+     * @param statements
+     *        the {@link Statement}s to appear in the block
      * @return a new {@link StatementBlock} that consists of the given <code>statements</code> in
      *         the very same order
      */
     public static StatementBlock block(final List<Statement> statements) {
         final Statement[] s = new Statement[statements.size()];
-        final StatementBlock block = KeYJavaASTFactory.block(statements.toArray(s));
 
-        return block;
+        return block(statements.toArray(s));
     }
 
     /**
      * Create a for loop.
      *
-     * @param parameters the loop definition parameters (initializer, guard, updates, body) as
+     * @param parameters
+     *        the loop definition parameters (initializer, guard, updates, body) as
      *        {@link ExtList}
      * @return a new {@link For} as defined by <code>parameters</code>
      */
     public static For forLoop(final ExtList parameters) {
-        final For loop = new For(parameters);
 
-        return loop;
+        return new For(parameters);
     }
 
     /**
@@ -1328,16 +1403,20 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param init the {@link ILoopInit} loop initializations
-     * @param guard the {@link IGuard} loop condition
-     * @param updates the {@link IForUpdates} loop updates
-     * @param statements the body {@link Statement}s
+     * @param init
+     *        the {@link ILoopInit} loop initializations
+     * @param guard
+     *        the {@link IGuard} loop condition
+     * @param updates
+     *        the {@link IForUpdates} loop updates
+     * @param statements
+     *        the body {@link Statement}s
      * @return a new {@link For} with initializers <code>init</code>, condition <code>guard</code>,
      *         updates <code>updates</code> and body <code>statements</code>
      */
     public static For forLoop(final ILoopInit init, final IGuard guard, final IForUpdates updates,
             final Statement... statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
+        final StatementBlock body = block(statements);
 
         return new For(init, guard, updates, body);
     }
@@ -1350,16 +1429,18 @@ public abstract class KeYJavaASTFactory {
      *     body
      * </pre>
      *
-     * @param guard the {@link IGuard} loop condition
-     * @param updates the {@link IForUpdates} loop updates
-     * @param body the body {@link Statement}
+     * @param guard
+     *        the {@link IGuard} loop condition
+     * @param updates
+     *        the {@link IForUpdates} loop updates
+     * @param body
+     *        the body {@link Statement}
      * @return a new {@link For} with condition <code>guard</code>, updates <code>updates</code> and
      *         body <code>body</code>
      */
     public static For forLoop(final IGuard guard, final IForUpdates updates, final Statement body) {
-        final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
 
-        return loop;
+        return forLoop(null, guard, updates, body);
     }
 
     /**
@@ -1370,17 +1451,19 @@ public abstract class KeYJavaASTFactory {
      *     body
      * </pre>
      *
-     * @param guard the {@link IGuard} loop condition
-     * @param updates the {@link IForUpdates} loop updates
-     * @param body the body {@link Statement}s
+     * @param guard
+     *        the {@link IGuard} loop condition
+     * @param updates
+     *        the {@link IForUpdates} loop updates
+     * @param body
+     *        the body {@link Statement}s
      * @return a new {@link For} with condition <code>guard</code>, updates <code>updates</code> and
      *         body <code>body</code>
      */
     public static For forLoop(final IGuard guard, final IForUpdates updates,
             final Statement[] body) {
-        final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
 
-        return loop;
+        return forLoop(null, guard, updates, body);
     }
 
     /**
@@ -1390,31 +1473,33 @@ public abstract class KeYJavaASTFactory {
      * variable = array[index];
      * </pre>
      *
-     * @param variable the {@link ProgramVariable} to be assigned to
-     * @param array the array {@link ReferencePrefix} to be accessed
-     * @param index the array access index {@link Expression}
+     * @param variable
+     *        the {@link ProgramVariable} to be assigned to
+     * @param array
+     *        the array {@link ReferencePrefix} to be accessed
+     * @param index
+     *        the array access index {@link Expression}
      * @return a new {@link CopyAssignment} of <code>array</code> element at <code>index</code> to
      *         <code>variable</code>
      */
     public static CopyAssignment assignArrayField(final ProgramVariable variable,
             final ReferencePrefix array, final Expression index) {
-        final ArrayReference element = KeYJavaASTFactory.arrayFieldAccess(array, index);
-        final CopyAssignment assignment = KeYJavaASTFactory.assign(variable, element);
+        final ArrayReference element = arrayFieldAccess(array, index);
 
-        return assignment;
+        return assign(variable, element);
     }
 
     /**
      * Create a local variable declaration without initialization.
      *
-     * @param parameters the declaration parameters (modifiers, type reference, variable
+     * @param parameters
+     *        the declaration parameters (modifiers, type reference, variable
      *        specifications) as {@link ExtList}
      * @return a new {@link LocalVariableDeclaration} as defined by <code>parameters</code>
      */
     public static LocalVariableDeclaration declare(final ExtList parameters) {
-        final LocalVariableDeclaration declaration = new LocalVariableDeclaration(parameters);
 
-        return declaration;
+        return new LocalVariableDeclaration(parameters);
     }
 
     /**
@@ -1427,14 +1512,13 @@ public abstract class KeYJavaASTFactory {
      * where <code>type</code> is <code>variable</code>'s {@link KeYJavaType} as it is returned by
      * {@link IProgramVariable#getKeYJavaType()}.
      *
-     * @param variable the named and typed {@link IProgramVariable} to be declared
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      */
     public static LocalVariableDeclaration declare(final IProgramVariable variable) {
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(variable, (Expression) null);
 
-        return declaration;
+        return declare(variable, (Expression) null);
     }
 
     /**
@@ -1447,17 +1531,17 @@ public abstract class KeYJavaASTFactory {
      * where <code>type</code> is <code>variable</code>'s {@link KeYJavaType} as it is returned by
      * {@link IProgramVariable#getKeYJavaType()}.
      *
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      */
     public static LocalVariableDeclaration declare(final IProgramVariable variable,
             final Expression init) {
         final KeYJavaType type = variable.getKeYJavaType();
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(variable, init, type);
 
-        return declaration;
+        return declare(variable, init, type);
     }
 
     /**
@@ -1467,20 +1551,22 @@ public abstract class KeYJavaASTFactory {
      * modifier type variable = init;
      * </pre>
      *
-     * @param modifier the {@link Modifier}
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
+     * @param modifier
+     *        the {@link Modifier}
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier modifier,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> modifiers = new ImmutableArray<>(modifier);
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, type);
 
-        return declaration;
+        return declare(modifiers, variable, init, type);
     }
 
     /**
@@ -1490,20 +1576,22 @@ public abstract class KeYJavaASTFactory {
      * modifiers type variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifier}s
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier[] modifiers,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> m = new ImmutableArray<>(modifiers);
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(m, variable, init, type);
 
-        return declaration;
+        return declare(m, variable, init, type);
     }
 
     /**
@@ -1513,20 +1601,22 @@ public abstract class KeYJavaASTFactory {
      * modifiers type variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifier}s
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
-     * @param type the static {@link KeYJavaType} of <code>variable</code>
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
+     * @param type
+     *        the static {@link KeYJavaType} of <code>variable</code>
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final TypeRef typeRef = new TypeRef(type);
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
 
-        return declaration;
+        return declare(modifiers, variable, init, typeRef);
     }
 
     /**
@@ -1536,21 +1626,23 @@ public abstract class KeYJavaASTFactory {
      * modifiers typeRef variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifier}s
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
-     * @param typeRef the static {@link TypeRef} of <code>variable</code>
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
+     * @param typeRef
+     *        the static {@link TypeRef} of <code>variable</code>
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>typeRef</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init, final TypeReference typeRef) {
         final VariableSpecification varSpec =
-            KeYJavaASTFactory.variableSpecification(variable, init, typeRef.getKeYJavaType());
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, typeRef, varSpec);
+            variableSpecification(variable, init, typeRef.getKeYJavaType());
 
-        return declaration;
+        return declare(modifiers, typeRef, varSpec);
     }
 
     /**
@@ -1560,18 +1652,19 @@ public abstract class KeYJavaASTFactory {
      * modifiers typeRef specification
      * </pre>
      *
-     * @param modifiers the {@link Modifier}s
-     * @param typeRef the static {@link TypeRef} of the variable to be declared
-     * @param specification the {@link VariableSpecification} of the variable to be declared
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param typeRef
+     *        the static {@link TypeRef} of the variable to be declared
+     * @param specification
+     *        the {@link VariableSpecification} of the variable to be declared
      * @return a new {@link LocalVariableDeclaration} of the variable specified by
      *         <code>specification</code> with static type <code>typeRef</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final TypeReference typeRef, final VariableSpecification specification) {
-        final LocalVariableDeclaration declaration =
-            new LocalVariableDeclaration(modifiers, typeRef, specification);
 
-        return declaration;
+        return new LocalVariableDeclaration(modifiers, typeRef, specification);
     }
 
     /**
@@ -1581,18 +1674,19 @@ public abstract class KeYJavaASTFactory {
      * modifiers typeRef specification{1}, ...
      * </pre>
      *
-     * @param modifiers the {@link Modifier}s
-     * @param typeRef the static {@link TypeRef} of the variable to be declared
-     * @param specifications the {@link VariableSpecification}s of the variables to be declared
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param typeRef
+     *        the static {@link TypeRef} of the variable to be declared
+     * @param specifications
+     *        the {@link VariableSpecification}s of the variables to be declared
      * @return a new {@link LocalVariableDeclaration} of the variables specified by
      *         <code>specifications</code> with static type <code>typeRef</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final TypeReference typeRef, final VariableSpecification[] specifications) {
-        final LocalVariableDeclaration declaration =
-            new LocalVariableDeclaration(modifiers, typeRef, specifications);
 
-        return declaration;
+        return new LocalVariableDeclaration(modifiers, typeRef, specifications);
     }
 
     /**
@@ -1602,18 +1696,20 @@ public abstract class KeYJavaASTFactory {
      * reference.name(args);
      * </pre>
      *
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param name the method's name {@link String}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param name
+     *        the method's name {@link String}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>reference</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final ImmutableArray<? extends Expression> args) {
         final ProgramElementName method = new ProgramElementName(name);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method, args);
 
-        return call;
+        return methodCall(reference, method, args);
     }
 
     /**
@@ -1623,18 +1719,20 @@ public abstract class KeYJavaASTFactory {
      * type.name(args);
      * </pre>
      *
-     * @param type the {@link KeYJavaType} the method is called on
-     * @param name the method's name {@link String}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param type
+     *        the {@link KeYJavaType} the method is called on
+     * @param name
+     *        the method's name {@link String}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>type</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name,
             final ImmutableArray<? extends Expression> args) {
         final TypeReference typeRef = new TypeRef(type);
-        final MethodReference call = KeYJavaASTFactory.methodCall(typeRef, name, args);
 
-        return call;
+        return methodCall(typeRef, name, args);
     }
 
     /**
@@ -1644,18 +1742,20 @@ public abstract class KeYJavaASTFactory {
      * type.name(args);
      * </pre>
      *
-     * @param type the {@link KeYJavaType} the method is called on
-     * @param name the method's name {@link String}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param type
+     *        the {@link KeYJavaType} the method is called on
+     * @param name
+     *        the method's name {@link String}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>type</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name,
             final Expression... args) {
         final TypeReference typeRef = new TypeRef(type);
-        final MethodReference call = KeYJavaASTFactory.methodCall(typeRef, name, args);
 
-        return call;
+        return methodCall(typeRef, name, args);
     }
 
     /**
@@ -1665,16 +1765,17 @@ public abstract class KeYJavaASTFactory {
      * type.name();
      * </pre>
      *
-     * @param type the {@link KeYJavaType} the method is called on
-     * @param name the method's name {@link String}
+     * @param type
+     *        the {@link KeYJavaType} the method is called on
+     * @param name
+     *        the method's name {@link String}
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>type</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name) {
         final ImmutableArray<? extends Expression> args = new ImmutableArray<>();
-        final MethodReference call = KeYJavaASTFactory.methodCall(type, name, args);
 
-        return call;
+        return methodCall(type, name, args);
     }
 
     /**
@@ -1684,16 +1785,17 @@ public abstract class KeYJavaASTFactory {
      * reference.name();
      * </pre>
      *
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param name the method's name {@link String}
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param name
+     *        the method's name {@link String}
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>reference</code> with no arguments
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name) {
         final ImmutableArray<Expression> args = new ImmutableArray<>();
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, args);
 
-        return call;
+        return methodCall(reference, name, args);
     }
 
     /**
@@ -1703,18 +1805,20 @@ public abstract class KeYJavaASTFactory {
      * reference.name(args);
      * </pre>
      *
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param name the method's name {@link String}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param name
+     *        the method's name {@link String}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>reference</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final Expression... args) {
         final ImmutableArray<? extends Expression> a = new ImmutableArray<>(args);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
-        return call;
+        return methodCall(reference, name, a);
     }
 
     /**
@@ -1724,18 +1828,20 @@ public abstract class KeYJavaASTFactory {
      * reference.name(args);
      * </pre>
      *
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param name the {@link MethodName}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param name
+     *        the {@link MethodName}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>reference</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final MethodName name,
             final Expression... args) {
         final ImmutableArray<Expression> a = new ImmutableArray<>(args);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
-        return call;
+        return methodCall(reference, name, a);
     }
 
     /**
@@ -1745,17 +1851,19 @@ public abstract class KeYJavaASTFactory {
      * reference.name(args);
      * </pre>
      *
-     * @param reference the {@link ReferencePrefix} the method is called on
-     * @param name the {@link MethodName}
-     * @param args the argument {@link Expression}s to be passed to the method
+     * @param reference
+     *        the {@link ReferencePrefix} the method is called on
+     * @param name
+     *        the {@link MethodName}
+     * @param args
+     *        the argument {@link Expression}s to be passed to the method
      * @return a new {@link MethodReference} for call of method <code>name</code> on
      *         <code>reference</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final MethodName name,
             final ImmutableArray<? extends Expression> args) {
-        final MethodReference call = new MethodReference(args, name, reference);
 
-        return call;
+        return new MethodReference(args, name, reference);
     }
 
     /**
@@ -1765,12 +1873,16 @@ public abstract class KeYJavaASTFactory {
      * (expression).name
      * </pre>
      *
-     * @param services the {@link Services} to determine both <code>expression</code> 's
+     * @param services
+     *        the {@link Services} to determine both <code>expression</code> 's
      *        {@link KeYJavaType} and the {@link ProgramVariable} corresponding to the field
      *        <code>name</code>
-     * @param name the to be accessed field's name {@link String}
-     * @param expression the {@link Expression} on which the field is accessed
-     * @param context the {@link ExecutionContext}, which is needed to determine
+     * @param name
+     *        the to be accessed field's name {@link String}
+     * @param expression
+     *        the {@link Expression} on which the field is accessed
+     * @param context
+     *        the {@link ExecutionContext}, which is needed to determine
      *        <code>expression</code>'s <code>KeYJavaType</code>
      * @return a new {@link FieldReference} of field <code>name</code> on <code>expression</code>
      */
@@ -1778,10 +1890,8 @@ public abstract class KeYJavaASTFactory {
             final Expression expression, final ExecutionContext context) {
         final KeYJavaType classType = expression.getKeYJavaType(services, context);
         final ProgramVariable field = services.getJavaInfo().getAttribute(name, classType);
-        final FieldReference reference =
-            KeYJavaASTFactory.fieldReference(new ParenthesizedExpression(expression), field);
 
-        return reference;
+        return fieldReference(new ParenthesizedExpression(expression), field);
     }
 
     /**
@@ -1791,27 +1901,28 @@ public abstract class KeYJavaASTFactory {
      * prefix.field
      * </pre>
      *
-     * @param prefix the {@link ReferencePrefix} on which <code>field</code> is accessed
-     * @param field the {@link ProgramVariable} to be accessed
+     * @param prefix
+     *        the {@link ReferencePrefix} on which <code>field</code> is accessed
+     * @param field
+     *        the {@link ProgramVariable} to be accessed
      * @return a new {@link FieldReference} of <code>field</code> on <code>prefix</code>
      */
     public static FieldReference fieldReference(final ReferencePrefix prefix,
             final ProgramVariable field) {
-        final FieldReference reference = new FieldReference(field, prefix);
 
-        return reference;
+        return new FieldReference(field, prefix);
     }
 
     /**
      * Create a finally block.
      *
-     * @param parameters the finally block parameters (body) as {@link ExtList}
+     * @param parameters
+     *        the finally block parameters (body) as {@link ExtList}
      * @return a new {@link Finally} as defined by <code>parameters</code>
      */
     public static Finally finallyBlock(final ExtList parameters) {
-        final Finally block = new Finally(parameters);
 
-        return block;
+        return new Finally(parameters);
     }
 
     /**
@@ -1822,14 +1933,14 @@ public abstract class KeYJavaASTFactory {
      *     statement
      * </pre>
      *
-     * @param statement the {@link Statement} to be executed
+     * @param statement
+     *        the {@link Statement} to be executed
      * @return a new {@link Finally} block consisting of <code>statement</code> solely
      */
     public static Finally finallyBlock(final Statement statement) {
-        final StatementBlock body = KeYJavaASTFactory.block(statement);
-        final Finally block = KeYJavaASTFactory.finallyBlock(body);
+        final StatementBlock body = block(statement);
 
-        return block;
+        return finallyBlock(body);
     }
 
     /**
@@ -1841,14 +1952,14 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the {@link Statement}s to be executed
+     * @param statements
+     *        the {@link Statement}s to be executed
      * @return a new {@link Finally} block consisting of <code>statements</code> solely
      */
     public static Finally finallyBlock(final Statement[] statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
-        final Finally block = KeYJavaASTFactory.finallyBlock(body);
+        final StatementBlock body = block(statements);
 
-        return block;
+        return finallyBlock(body);
     }
 
     /**
@@ -1859,13 +1970,13 @@ public abstract class KeYJavaASTFactory {
      *     body
      * </pre>
      *
-     * @param body the {@link StatementBlock} to be executed
+     * @param body
+     *        the {@link StatementBlock} to be executed
      * @return a new {@link Finally} block consisting of <code>body</code> solely
      */
     public static Finally finallyBlock(final StatementBlock body) {
-        final Finally block = new Finally(body);
 
-        return block;
+        return new Finally(body);
     }
 
     /**
@@ -1875,13 +1986,20 @@ public abstract class KeYJavaASTFactory {
      * modifiers typePrefix.baseType[] variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifiers}
-     * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
-     * @param typeName the type's {@link ProgramElementName}
-     * @param dimensions the type's dimensions
-     * @param typePrefix the type's {@link ReferencePrefix}
-     * @param baseType the base {@link KeYJavaType}
+     * @param modifiers
+     *        the {@link Modifier}s
+     * @param variable
+     *        the named and typed {@link IProgramVariable} to be declared
+     * @param init
+     *        the {@link Expression} <code>variable</code> is initialized with
+     * @param typeName
+     *        the type's {@link ProgramElementName}
+     * @param dimensions
+     *        the type's dimensions
+     * @param typePrefix
+     *        the type's {@link ReferencePrefix}
+     * @param baseType
+     *        the base {@link KeYJavaType}
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code> with static type
      *         <code>baseType[dimensions]</code> and initial value <code>init</code>
      */
@@ -1890,10 +2008,8 @@ public abstract class KeYJavaASTFactory {
             final ProgramElementName typeName, final int dimensions,
             final ReferencePrefix typePrefix, final KeYJavaType baseType) {
         final TypeRef typeRef = new TypeRef(typeName, dimensions, typePrefix, baseType);
-        final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
 
-        return declaration;
+        return declare(modifiers, variable, init, typeRef);
     }
 
     /**
@@ -1902,13 +2018,19 @@ public abstract class KeYJavaASTFactory {
      * Note that <code>classType</code> is also used as visibility context when looking for
      * <code>methodName</code> in its definition.
      *
-     * @param model the {@link JavaInfo} that contains <code>classType.methodName</code>
-     * @param result the {@link ProgramVariable} the return value is assigned to or
+     * @param model
+     *        the {@link JavaInfo} that contains <code>classType.methodName</code>
+     * @param result
+     *        the {@link ProgramVariable} the return value is assigned to or
      *        <code>null</code>
-     * @param reference the {@link ReferencePrefix} invocation target
-     * @param classType the {@link KeYJavaType} in which the method is declared
-     * @param methodName the method's {@link String} name
-     * @param arguments the <code>ProgramVariable</code> and their static types the method is called
+     * @param reference
+     *        the {@link ReferencePrefix} invocation target
+     * @param classType
+     *        the {@link KeYJavaType} in which the method is declared
+     * @param methodName
+     *        the method's {@link String} name
+     * @param arguments
+     *        the <code>ProgramVariable</code> and their static types the method is called
      *        with
      * @return a new {@link MethodBodyStatement} for <code>classType.methodName</code> when called
      *         with <code>arguments</code> or <code>null</code> when the former is not defined
@@ -1921,7 +2043,7 @@ public abstract class KeYJavaASTFactory {
         MethodBodyStatement methodBody = null;
 
         if (method != null) {
-            methodBody = KeYJavaASTFactory.methodBody(result, reference, method, arguments);
+            methodBody = methodBody(result, reference, method, arguments);
         }
 
         return methodBody;
@@ -1930,11 +2052,15 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a method body shortcut.
      *
-     * @param result the {@link ProgramVariable} the return value is assigned to or
+     * @param result
+     *        the {@link ProgramVariable} the return value is assigned to or
      *        <code>null</code>
-     * @param reference the {@link ReferencePrefix} invocation target
-     * @param method the {@link IProgramMethod} reference
-     * @param arguments the <code>Expression</code>s and their static types the method is called
+     * @param reference
+     *        the {@link ReferencePrefix} invocation target
+     * @param method
+     *        the {@link IProgramMethod} reference
+     * @param arguments
+     *        the <code>Expression</code>s and their static types the method is called
      *        with
      * @return a new {@link MethodBodyStatement} for <code>method</code> when called with
      *         <code>arguments</code>
@@ -1942,20 +2068,23 @@ public abstract class KeYJavaASTFactory {
     public static MethodBodyStatement methodBody(final ProgramVariable result,
             final ReferencePrefix reference, final IProgramMethod method,
             final Expression[] arguments) {
-        final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(result, reference,
-            method, new ImmutableArray<>(arguments));
 
-        return methodBody;
+        return methodBody(result, reference,
+            method, new ImmutableArray<>(arguments));
     }
 
     /**
      * Create a method body shortcut.
      *
-     * @param result the {@link ProgramVariable} the return value is assigned to or
+     * @param result
+     *        the {@link ProgramVariable} the return value is assigned to or
      *        <code>null</code>
-     * @param reference the {@link ReferencePrefix} invocation target
-     * @param method the {@link IProgramMethod} reference
-     * @param arguments the <code>Expression</code>s and their static types the method is called
+     * @param reference
+     *        the {@link ReferencePrefix} invocation target
+     * @param method
+     *        the {@link IProgramMethod} reference
+     * @param arguments
+     *        the <code>Expression</code>s and their static types the method is called
      *        with
      * @return a new {@link MethodBodyStatement} for <code>method</code> when called with
      *         <code>arguments</code>
@@ -1963,105 +2092,112 @@ public abstract class KeYJavaASTFactory {
     public static MethodBodyStatement methodBody(final ProgramVariable result,
             final ReferencePrefix reference, final IProgramMethod method,
             final ImmutableArray<Expression> arguments) {
-        final MethodBodyStatement methodBody =
-            new MethodBodyStatement(method, reference, result, arguments);
 
-        return methodBody;
+        return new MethodBodyStatement(method, reference, result, arguments);
     }
 
     /**
      * Create a method call substitution.
      *
-     * @param executionContext the <code>block</code>'s {@link IExecutionContext}
-     * @param block the {@link StatementBlock} to be put in <code>executionContext</code>
+     * @param executionContext
+     *        the <code>block</code>'s {@link IExecutionContext}
+     * @param block
+     *        the {@link StatementBlock} to be put in <code>executionContext</code>
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code>
      */
     public static MethodFrame methodFrame(final IExecutionContext executionContext,
             final StatementBlock block) {
-        final MethodFrame frame = KeYJavaASTFactory.methodFrame(null, executionContext, block);
 
-        return frame;
+        return methodFrame(null, executionContext, block);
     }
 
     /**
      * Create a method call substitution at a specific source position.
      *
-     * @param executionContext the <code>block</code>'s {@link IExecutionContext}
-     * @param block the {@link StatementBlock} to be put in <code>executionContext</code>
-     * @param position the new source element's {@link PositionInfo}
+     * @param executionContext
+     *        the <code>block</code>'s {@link IExecutionContext}
+     * @param block
+     *        the {@link StatementBlock} to be put in <code>executionContext</code>
+     * @param position
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code> and positions it at <code>position</code>
      */
     public static MethodFrame methodFrame(final IExecutionContext executionContext,
             final StatementBlock block, final PositionInfo position) {
-        final MethodFrame frame =
-            KeYJavaASTFactory.methodFrame(null, executionContext, block, position);
 
-        return frame;
+        return methodFrame(null, executionContext, block, position);
     }
 
     /**
      * Create a method call substitution with a return value assignment.
      *
-     * @param result the {@link IProgramVariable} <code>block</code>'s return value is assigned to
-     * @param executionContext the <code>block</code>'s {@link IExecutionContext}
-     * @param block the {@link StatementBlock} to be put in <code>executionContext</code>
+     * @param result
+     *        the {@link IProgramVariable} <code>block</code>'s return value is assigned to
+     * @param executionContext
+     *        the <code>block</code>'s {@link IExecutionContext}
+     * @param block
+     *        the {@link StatementBlock} to be put in <code>executionContext</code>
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code>
      */
     public static MethodFrame methodFrame(final IProgramVariable result,
             final IExecutionContext executionContext, final StatementBlock block) {
-        final MethodFrame frame = new MethodFrame(result, executionContext, block);
 
-        return frame;
+        return new MethodFrame(result, executionContext, block);
     }
 
     /**
      * Create a method call substitution with a return value assignment at a specific source
      * position.
      *
-     * @param result the {@link IProgramVariable} <code>block</code>'s return value is assigned to
-     * @param executionContext the <code>block</code>'s {@link IExecutionContext}
-     * @param block the {@link StatementBlock} to be put in <code>executionContext</code>
-     * @param position the new source element's {@link PositionInfo}
+     * @param result
+     *        the {@link IProgramVariable} <code>block</code>'s return value is assigned to
+     * @param executionContext
+     *        the <code>block</code>'s {@link IExecutionContext}
+     * @param block
+     *        the {@link StatementBlock} to be put in <code>executionContext</code>
+     * @param position
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code> and positions it at <code>position</code>
      */
     public static MethodFrame methodFrame(final IProgramVariable result,
             final IExecutionContext executionContext, final StatementBlock block,
             final PositionInfo position) {
-        final MethodFrame frame = new MethodFrame(result, executionContext, block, position);
 
-        return frame;
+        return new MethodFrame(result, executionContext, block, position);
     }
 
     /**
      * Create an integer literal.
      *
-     * @param value the {@link Integer} to be turned into an literal
+     * @param value
+     *        the {@link Integer} to be turned into an literal
      * @return a new {@link IntLiteral} representing <code>value</code>
      */
     public static IntLiteral intLiteral(final Integer value) {
-        final IntLiteral literal = new IntLiteral(value);
 
-        return literal;
+        return new IntLiteral(value);
     }
 
     /**
      * Create a labeled statement.
      *
-     * @param parameters the parameters (statement) as {@link ExtList}
-     * @param label the {@link Label}
-     * @param position the new source element's {@link PositionInfo}
+     * @param parameters
+     *        the parameters (statement) as {@link ExtList}
+     * @param label
+     *        the {@link Label}
+     * @param position
+     *        the new source element's {@link PositionInfo}
      * @return a new {@link LabeledStatement} as defined by <code>parameters</code> and
      *         <code>label</code>
      */
     public static LabeledStatement labeledStatement(final ExtList parameters, final Label label,
             final PositionInfo position) {
-        final LabeledStatement statement = new LabeledStatement(parameters, label, position);
 
-        return statement;
+        return new LabeledStatement(parameters, label, position);
     }
 
     /**
@@ -2071,15 +2207,16 @@ public abstract class KeYJavaASTFactory {
      * label: statement
      * </pre>
      *
-     * @param label the {@link Label}
-     * @param statement the {@link Statement} to be labeled
+     * @param label
+     *        the {@link Label}
+     * @param statement
+     *        the {@link Statement} to be labeled
      * @return a new {@link LabeledStatement} that adds <code>label</code> to <code>statement</code>
      */
     public static LabeledStatement labeledStatement(final Label label, final Statement statement,
             PositionInfo pos) {
-        final LabeledStatement labeled = new LabeledStatement(label, statement, pos);
 
-        return labeled;
+        return new LabeledStatement(label, statement, pos);
     }
 
     /**
@@ -2091,17 +2228,18 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param label the {@link Label}
-     * @param statements the {@link Statement}s to be labeled
+     * @param label
+     *        the {@link Label}
+     * @param statements
+     *        the {@link Statement}s to be labeled
      * @return a new {@link LabeledStatement} that adds <code>label</code> to
      *         <code>statements</code>
      */
     public static Statement labeledStatement(final Label label, final Statement[] statements,
             PositionInfo pos) {
-        final StatementBlock block = KeYJavaASTFactory.block(statements);
-        final LabeledStatement labeled = KeYJavaASTFactory.labeledStatement(label, block, pos);
+        final StatementBlock block = block(statements);
 
-        return labeled;
+        return labeledStatement(label, block, pos);
     }
 
     /**
@@ -2111,21 +2249,24 @@ public abstract class KeYJavaASTFactory {
      * new typeRef[sizes{1}]...[sizes{dimensions}] initializer
      * </pre>
      *
-     * @param sizes the size {@link Expression}s for each dimension
-     * @param typeRef the static array base type
-     * @param keyJavaType the array element type
-     * @param initializer the {@link ArrayInitializer}
-     * @param dimensions the number of dimensions
+     * @param sizes
+     *        the size {@link Expression}s for each dimension
+     * @param typeRef
+     *        the static array base type
+     * @param keyJavaType
+     *        the array element type
+     * @param initializer
+     *        the {@link ArrayInitializer}
+     * @param dimensions
+     *        the number of dimensions
      * @return a new {@link NewArray} for the instantiation of an array of base type
      *         <code>typeRef</code> with <code>dimensions</code> dimensions
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression[] sizes, final ArrayInitializer initializer,
             final KeYJavaType keyJavaType) {
-        final NewArray newArray =
-            new NewArray(sizes, typeRef, keyJavaType, initializer, dimensions);
 
-        return newArray;
+        return new NewArray(sizes, typeRef, keyJavaType, initializer, dimensions);
     }
 
     /**
@@ -2135,19 +2276,21 @@ public abstract class KeYJavaASTFactory {
      * new typeRef[sizes{1}]...[sizes{dimensions}]
      * </pre>
      *
-     * @param typeRef the static array base type
-     * @param dimensions the number of dimensions
-     * @param sizes the size {@link Expression}s for each dimension
-     * @param keyJavaType the array element type
+     * @param typeRef
+     *        the static array base type
+     * @param dimensions
+     *        the number of dimensions
+     * @param sizes
+     *        the size {@link Expression}s for each dimension
+     * @param keyJavaType
+     *        the array element type
      * @return a new {@link NewArray} for the instantiation of an array of base type
      *         <code>typeRef</code> with <code>dimensions</code> dimensions
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression[] sizes, final KeYJavaType keyJavaType) {
-        final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
-        return newArray;
+        return newArray(typeRef, dimensions, sizes, null, keyJavaType);
     }
 
     /**
@@ -2157,20 +2300,22 @@ public abstract class KeYJavaASTFactory {
      * new typeRef[size]
      * </pre>
      *
-     * @param typeRef the static array base type
-     * @param dimensions the number of dimensions
-     * @param size the size {@link Expression} for the first dimension
-     * @param keyJavaType the array element type
+     * @param typeRef
+     *        the static array base type
+     * @param dimensions
+     *        the number of dimensions
+     * @param size
+     *        the size {@link Expression} for the first dimension
+     * @param keyJavaType
+     *        the array element type
      * @return a new {@link NewArray} for the instantiation of an array of base type
      *         <code>typeRef</code> with <code>dimensions</code> dimensions
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression size, final KeYJavaType keyJavaType) {
-        final Expression[] sizes = new Expression[] { size };
-        final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
+        final Expression[] sizes = { size };
 
-        return newArray;
+        return newArray(typeRef, dimensions, sizes, null, keyJavaType);
     }
 
     /**
@@ -2180,20 +2325,22 @@ public abstract class KeYJavaASTFactory {
      * new typeRef[]...[] initializer
      * </pre>
      *
-     * @param typeRef the static array base type
-     * @param keyJavaType the array element type
-     * @param initializer the {@link ArrayInitializer}
-     * @param dimensions the number of dimensions
+     * @param typeRef
+     *        the static array base type
+     * @param keyJavaType
+     *        the array element type
+     * @param initializer
+     *        the {@link ArrayInitializer}
+     * @param dimensions
+     *        the number of dimensions
      * @return a new {@link NewArray} for the instantiation of an array of base type
      *         <code>typeRef</code> with <code>dimensions</code> dimensions
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final ArrayInitializer initializer, final KeYJavaType keyJavaType) {
         final Expression[] sizes = new Expression[0];
-        final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
 
-        return newArray;
+        return newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
     }
 
     /**
@@ -2203,17 +2350,19 @@ public abstract class KeYJavaASTFactory {
      * new referencePrefix.typeReference(args)
      * </pre>
      *
-     * @param referencePrefix the <code>typeReference</code>'s {@link ReferencePrefix}
-     * @param typeReference a {@link TypeReference} to the class type that is instantiated
-     * @param args the {@link Expression} arguments to be passed to the constructor
+     * @param referencePrefix
+     *        the <code>typeReference</code>'s {@link ReferencePrefix}
+     * @param typeReference
+     *        a {@link TypeReference} to the class type that is instantiated
+     * @param args
+     *        the {@link Expression} arguments to be passed to the constructor
      * @return a new {@link New} operator that allocates a new instance of
      *         <code>typeReference</code> parameterized with <code>args</code>
      */
     public static New newOperator(final ReferencePrefix referencePrefix,
             final TypeReference typeReference, final Expression[] args) {
-        final New operator = new New(args, typeReference, referencePrefix);
 
-        return operator;
+        return new New(args, typeReference, referencePrefix);
     }
 
     /**
@@ -2223,18 +2372,20 @@ public abstract class KeYJavaASTFactory {
      * new referencePrefix.type(args)
      * </pre>
      *
-     * @param referencePrefix the <code>type</code>'s {@link ReferencePrefix}
-     * @param type the {@link KeYJavaType} to be instantiated
-     * @param args the {@link Expression} arguments to be passed to the constructor
+     * @param referencePrefix
+     *        the <code>type</code>'s {@link ReferencePrefix}
+     * @param type
+     *        the {@link KeYJavaType} to be instantiated
+     * @param args
+     *        the {@link Expression} arguments to be passed to the constructor
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      *         parameterized with <code>args</code>
      */
     public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type,
             final Expression[] args) {
         final TypeReference typeRef = new TypeRef(type);
-        final New operator = KeYJavaASTFactory.newOperator(referencePrefix, typeRef, args);
 
-        return operator;
+        return newOperator(referencePrefix, typeRef, args);
     }
 
     /**
@@ -2244,15 +2395,16 @@ public abstract class KeYJavaASTFactory {
      * new referencePrefix.type()
      * </pre>
      *
-     * @param referencePrefix the <code>type</code>'s {@link ReferencePrefix}
-     * @param type the {@link KeYJavaType} to be instantiated
+     * @param referencePrefix
+     *        the <code>type</code>'s {@link ReferencePrefix}
+     * @param type
+     *        the {@link KeYJavaType} to be instantiated
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      */
     public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type) {
         final Expression[] args = new Expression[0];
-        final New operator = KeYJavaASTFactory.newOperator(referencePrefix, type, args);
 
-        return operator;
+        return newOperator(referencePrefix, type, args);
     }
 
     /**
@@ -2262,13 +2414,13 @@ public abstract class KeYJavaASTFactory {
      * new type()
      * </pre>
      *
-     * @param type the {@link KeYJavaType} to be instantiated
+     * @param type
+     *        the {@link KeYJavaType} to be instantiated
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      */
     public static New newOperator(final KeYJavaType type) {
-        final New operator = KeYJavaASTFactory.newOperator(null, type);
 
-        return operator;
+        return newOperator(null, type);
     }
 
     /**
@@ -2278,13 +2430,13 @@ public abstract class KeYJavaASTFactory {
      * operands{1} != operands{2}
      * </pre>
      *
-     * @param operands the operands {@link ExtList}
+     * @param operands
+     *        the operands {@link ExtList}
      * @return a new {@link NotEquals} of <code>operands</code>
      */
     public static NotEquals notEqualsOperator(final ExtList operands) {
-        final NotEquals operator = new NotEquals(operands);
 
-        return operator;
+        return new NotEquals(operands);
     }
 
     /**
@@ -2294,15 +2446,16 @@ public abstract class KeYJavaASTFactory {
      * super(args)
      * </pre>
      *
-     * @param referencePrefix the enclosing class type
-     * @param args the {@link Expression} arguments to be passed to constructor
+     * @param referencePrefix
+     *        the enclosing class type
+     * @param args
+     *        the {@link Expression} arguments to be passed to constructor
      * @return a new {@link SuperConstructorReference} parameterized with <code>args</code>
      */
     public static SuperConstructorReference superConstructor(final ReferencePrefix referencePrefix,
             final Expression[] args) {
-        final SuperConstructorReference constructor = new SuperConstructorReference(args);
 
-        return constructor;
+        return new SuperConstructorReference(args);
     }
 
     /**
@@ -2311,9 +2464,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link SuperReference}
      */
     public static SuperReference superReference() {
-        final SuperReference reference = new SuperReference();
 
-        return reference;
+        return new SuperReference();
     }
 
     /**
@@ -2325,51 +2477,52 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param expression the to be evaluated {@link Expression}
-     * @param branches the switch-case {@link Branch}es
+     * @param expression
+     *        the to be evaluated {@link Expression}
+     * @param branches
+     *        the switch-case {@link Branch}es
      * @return a new {@link Switch} block that executes <code>branches</code> depending on the value
      *         of <code>expression</code>
      */
     public static Switch switchBlock(final Expression expression, final Branch[] branches) {
-        final Switch block = new Switch(expression, branches);
 
-        return block;
+        return new Switch(expression, branches);
     }
 
     /**
      * Create a switch block.
      *
-     * @param parameters the switch-case parameters (guard, body, branches) as {@link ExtList}
+     * @param parameters
+     *        the switch-case parameters (guard, body, branches) as {@link ExtList}
      * @return a new {@link Switch} as defined by <code>parameters</code>
      */
     public static Switch switchBlock(final ExtList parameters) {
-        final Switch block = new Switch(parameters);
 
-        return block;
+        return new Switch(parameters);
     }
 
     /**
      * Create a synchronized block.
      *
-     * @param parameters the synchronized block parameters (monitor, body) as {@link ExtList}
+     * @param parameters
+     *        the synchronized block parameters (monitor, body) as {@link ExtList}
      * @return a new {@link SynchronizedBlock} as defined by <code>parameters</code>
      */
     public static SynchronizedBlock synchronizedBlock(final ExtList parameters) {
-        final SynchronizedBlock block = new SynchronizedBlock(parameters);
 
-        return block;
+        return new SynchronizedBlock(parameters);
     }
 
     /**
      * Create a then block.
      *
-     * @param parameters the then block parameters (body) as {@link ExtList}
+     * @param parameters
+     *        the then block parameters (body) as {@link ExtList}
      * @return a new {@link Then} as defined by <code>parameters</code>
      */
     public static Then thenBlock(final ExtList parameters) {
-        final Then block = new Then(parameters);
 
-        return block;
+        return new Then(parameters);
     }
 
     /**
@@ -2380,13 +2533,13 @@ public abstract class KeYJavaASTFactory {
      *     statement
      * </pre>
      *
-     * @param statement the to be executed {@link Statement}
+     * @param statement
+     *        the to be executed {@link Statement}
      * @return a new {@link Then} block that consists of <code>statement</code> solely
      */
     public static Then thenBlock(final Statement statement) {
-        final Then block = new Then(statement);
 
-        return block;
+        return new Then(statement);
     }
 
     /**
@@ -2398,14 +2551,14 @@ public abstract class KeYJavaASTFactory {
      * }
      * </pre>
      *
-     * @param statements the to be executed {@link Statement}s
+     * @param statements
+     *        the to be executed {@link Statement}s
      * @return a new {@link Then} block that consists of <code>statements</code> solely
      */
     public static Then thenBlock(final Statement[] statements) {
-        final StatementBlock statement = KeYJavaASTFactory.block(statements);
-        final Then block = KeYJavaASTFactory.thenBlock(statement);
+        final StatementBlock statement = block(statements);
 
-        return block;
+        return thenBlock(statement);
     }
 
     /**
@@ -2415,13 +2568,13 @@ public abstract class KeYJavaASTFactory {
      * this(args)
      * </pre>
      *
-     * @param args the {@link Expression} arguments to be passed to constructor
+     * @param args
+     *        the {@link Expression} arguments to be passed to constructor
      * @return a new {@link ThisConstructorReference} parameterized with <code>args</code>
      */
     public static ThisConstructorReference thisConstructor(final Expression[] args) {
-        final ThisConstructorReference constructor = new ThisConstructorReference(args);
 
-        return constructor;
+        return new ThisConstructorReference(args);
     }
 
     /**
@@ -2430,9 +2583,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link ThisReference}
      */
     public static ThisReference thisReference() {
-        final ThisReference reference = new ThisReference();
 
-        return reference;
+        return new ThisReference();
     }
 
     /**
@@ -2447,13 +2599,13 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a try block.
      *
-     * @param parameters the try-catch parameters (body, branches) as {@link ExtList}
+     * @param parameters
+     *        the try-catch parameters (body, branches) as {@link ExtList}
      * @return a new {@link Try} as defined by <code>parameters</code>
      */
     public static Try tryBlock(final ExtList parameters) {
-        final Try block = new Try(parameters);
 
-        return block;
+        return new Try(parameters);
     }
 
     /**
@@ -2465,15 +2617,16 @@ public abstract class KeYJavaASTFactory {
      * branches
      * </pre>
      *
-     * @param body the {@link StatementBlock} to be executed
-     * @param branches the try-catch {@link Branch}es
+     * @param body
+     *        the {@link StatementBlock} to be executed
+     * @param branches
+     *        the try-catch {@link Branch}es
      * @return a new {@link Try} block for the execution of <code>branches</code> depending on the
      *         events during the execution of <code>body</code>
      */
     public static Try tryBlock(final StatementBlock body, final Branch[] branches) {
-        final Try block = new Try(body, branches);
 
-        return block;
+        return new Try(body, branches);
     }
 
     /**
@@ -2485,16 +2638,17 @@ public abstract class KeYJavaASTFactory {
      * branches
      * </pre>
      *
-     * @param statement the {@link Statement} to be executed
-     * @param branches the try-catch {@link Branch}es
+     * @param statement
+     *        the {@link Statement} to be executed
+     * @param branches
+     *        the try-catch {@link Branch}es
      * @return a new {@link Try} block for the execution of <code>branches</code> depending on the
      *         events during the execution of <code>statement</code>
      */
     public static Try tryBlock(final Statement statement, final Branch[] branches) {
-        final StatementBlock body = KeYJavaASTFactory.block(statement);
-        final Try tryBlock = KeYJavaASTFactory.tryBlock(body, branches);
+        final StatementBlock body = block(statement);
 
-        return tryBlock;
+        return tryBlock(body, branches);
     }
 
     /**
@@ -2506,16 +2660,17 @@ public abstract class KeYJavaASTFactory {
      * branch
      * </pre>
      *
-     * @param statement the {@link Statement} to be executed
-     * @param branches the try-catch {@link Branch}
+     * @param statement
+     *        the {@link Statement} to be executed
+     * @param branch
+     *        the try-catch {@link Branch}
      * @return a new {@link Try} block for the execution of <code>branch</code> depending on the
      *         events during the execution of <code>statement</code>
      */
     public static Try tryBlock(final Statement statement, final Branch branch) {
-        final Branch[] branches = new Branch[] { branch };
-        final Try tryBlock = KeYJavaASTFactory.tryBlock(statement, branches);
+        final Branch[] branches = { branch };
 
-        return tryBlock;
+        return tryBlock(statement, branches);
     }
 
     /**
@@ -2525,13 +2680,13 @@ public abstract class KeYJavaASTFactory {
      * type
      * </pre>
      *
-     * @param type the {@link KeYJavaType} to be referenced
+     * @param type
+     *        the {@link KeYJavaType} to be referenced
      * @return a new {@link TypeRef} that references <code>type</code>
      */
     public static TypeRef typeRef(final KeYJavaType type) {
-        final TypeRef typeRef = new TypeRef(type);
 
-        return typeRef;
+        return new TypeRef(type);
     }
 
     /**
@@ -2541,14 +2696,15 @@ public abstract class KeYJavaASTFactory {
      * type[]...[]
      * </pre>
      *
-     * @param type the base {@link KeYJavaType}
-     * @param dimensions the number of dimensions
+     * @param type
+     *        the base {@link KeYJavaType}
+     * @param dimensions
+     *        the number of dimensions
      * @return a new {@link TypeRef} for <code>dimensions</code> dimensions of <code>type</code>
      */
     public static TypeRef typeRef(final KeYJavaType type, final int dimensions) {
-        final TypeRef typeRef = new TypeRef(type, dimensions);
 
-        return typeRef;
+        return new TypeRef(type, dimensions);
     }
 
     /**
@@ -2563,36 +2719,39 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a variable specification.
      *
-     * @param variable the {@link IProgramVariable} to be specified
-     * @param dimensions the number of dimensions
-     * @param initializer the initializer {@link Expression}
-     * @param type the {@link Type}
+     * @param variable
+     *        the {@link IProgramVariable} to be specified
+     * @param dimensions
+     *        the number of dimensions
+     * @param initializer
+     *        the initializer {@link Expression}
+     * @param type
+     *        the {@link Type}
      * @return a new {@link VariableSpecification} for <code>variable</code> of type
      *         <code>type[dimensions]</code>, initialized to <code>initializer</code>
      */
     public static VariableSpecification variableSpecification(final IProgramVariable variable,
             final int dimensions, final Expression initializer, final Type type) {
-        final VariableSpecification specification =
-            new VariableSpecification(variable, dimensions, initializer, type);
 
-        return specification;
+        return new VariableSpecification(variable, dimensions, initializer, type);
     }
 
     /**
      * Create a variable specification.
      *
-     * @param variable the {@link IProgramVariable} to be specified
-     * @param initializer the initializer {@link Expression}
-     * @param keyJavaType the {@link KeYJavaType}
+     * @param variable
+     *        the {@link IProgramVariable} to be specified
+     * @param initializer
+     *        the initializer {@link Expression}
+     * @param keyJavaType
+     *        the {@link KeYJavaType}
      * @return a new {@link VariableSpecification} for <code>variable</code> of type
      *         <code>type</code>, initialized to <code>initializer</code>
      */
     public static VariableSpecification variableSpecification(final IProgramVariable variable,
             final Expression initializer, final KeYJavaType keyJavaType) {
-        final VariableSpecification specification =
-            new VariableSpecification(variable, initializer, keyJavaType);
 
-        return specification;
+        return new VariableSpecification(variable, initializer, keyJavaType);
     }
 
     /**
@@ -2605,9 +2764,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link IntLiteral} that represents the integer value <code>0</code>
      */
     public static IntLiteral zeroLiteral() {
-        final IntLiteral literal = KeYJavaASTFactory.intLiteral(0);
 
-        return literal;
+        return intLiteral(0);
     }
 
     public static TypeCast cast(final Expression expression, final KeYJavaType targetType) {

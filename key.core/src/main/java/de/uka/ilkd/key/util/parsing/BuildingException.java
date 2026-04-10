@@ -1,16 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.annotation.Nullable;
+import java.net.URI;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -55,17 +56,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
         return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         if (offendingSymbol != null) {
-            var source = offendingSymbol.getTokenSource().getSourceName();
-            URL url = null;
-            if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-                url = MiscTools.parseURL(source);
-            }
-            return new Location(url, Position.fromToken(offendingSymbol));
+            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            return new Location(uri, Position.fromToken(offendingSymbol));
         }
-        return null;
+        return Location.UNDEFINED;
     }
 }

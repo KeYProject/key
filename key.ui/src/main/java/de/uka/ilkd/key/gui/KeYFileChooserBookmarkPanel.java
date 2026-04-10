@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -6,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -14,6 +16,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.
@@ -24,13 +28,10 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  * @author Jonas Klamroth
  * @author weigl
- * @see ViewSettings#USER_FOLDER_BOOKMARKS
  * @see ViewSettings#getFolderBookmarks()
  */
 public class KeYFileChooserBookmarkPanel extends JPanel {
-    private static final long serialVersionUID = -6498548666886815605L;
-
-    private final @Nonnull JFileChooser chooser;
+    private final @NonNull JFileChooser chooser;
 
     private final ViewSettings viewSettings =
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
@@ -48,10 +49,8 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
      *
      * @param chooser non null {@link JFileChooser}
      */
-    public KeYFileChooserBookmarkPanel(@Nonnull JFileChooser chooser) {
+    public KeYFileChooserBookmarkPanel(@NonNull JFileChooser chooser) {
         this.chooser = chooser;
-        // register ad the given file chooser
-        chooser.setAccessory(this);
 
         // listen for current directory of the file chooser
         chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, e -> {
@@ -72,6 +71,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
         listBookmarks.setCellRenderer(new BookmarkRenderer());
         listBookmarks.addKeyListener(new KeyAdapter() {
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     setBookmark();
@@ -80,6 +80,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
         });
 
         listBookmarks.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     setBookmark();
@@ -151,9 +152,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddBookmarkAction extends KeyAction {
-
-        private static final long serialVersionUID = 3800814610168973715L;
-
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
             setTooltip("Adds the current directory to the bookmarks.");
@@ -175,9 +173,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddExternalBookmarkAction extends KeyAction {
-
-        private static final long serialVersionUID = 6594623530260257684L;
-
         AddExternalBookmarkAction() {
             setIcon(IconFactory.PLUS_SQUARED.get(16));
             setTooltip("Opens a new file selection dialog to select a new bookmark.");
@@ -214,9 +209,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class RemoveBookmarkAction extends KeyAction {
-
-        private static final long serialVersionUID = -728674460657577694L;
-
         RemoveBookmarkAction() {
             setName("");
             setIcon(IconFactory.minus(16));

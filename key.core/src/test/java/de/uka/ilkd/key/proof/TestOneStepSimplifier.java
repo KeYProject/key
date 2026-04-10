@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -12,7 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TestOneStepSimplifier {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void loadWithRestriction() throws ProblemLoaderException {
@@ -21,8 +24,9 @@ public class TestOneStepSimplifier {
         // (if more rules are added to the OSS set, this restriction may increase the chances that
         // old proofs still load)
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory, "ossRestriction.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve("ossRestriction.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
+        env.dispose();
     }
 }

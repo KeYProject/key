@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 
@@ -5,11 +8,6 @@ public final class ProblemLoaderException extends Exception {
 
     private static final long serialVersionUID = 5683051720482052601L;
     private final AbstractProblemLoader origin;
-
-    public ProblemLoaderException(AbstractProblemLoader origin, Throwable cause) {
-        super(cause.getMessage(), cause);
-        this.origin = origin;
-    }
 
     public ProblemLoaderException(AbstractProblemLoader origin, String msg, Throwable cause) {
         super(msg, cause);

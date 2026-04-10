@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
@@ -5,9 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -17,6 +19,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionBranchCondition}.
@@ -31,9 +35,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     private final String additionalBranchLabel;
 
     /**
-     * The {@link Term} which represents the branch condition.
+     * The {@link JTerm} which represents the branch condition.
      */
-    private Term branchCondition;
+    private JTerm branchCondition;
 
     /**
      * The human readable branch condition.
@@ -43,7 +47,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * The path condition to reach this node.
      */
-    private Term pathCondition;
+    private JTerm pathCondition;
 
     /**
      * The human readable path condition to reach this node.
@@ -58,7 +62,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * Contains the merged branch conditions.
      */
-    private Term[] mergedBranchCondtions;
+    private JTerm[] mergedBranchCondtions;
 
     /**
      * Constructor.
@@ -113,7 +117,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public Term getBranchCondition() throws ProofInputException {
+    public JTerm getBranchCondition() throws ProofInputException {
         if (branchCondition == null) {
             lazyComputeBranchCondition();
         }
@@ -133,11 +137,11 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             // Compute branch condition
             if (isMergedBranchCondition()) {
                 // Add all merged branch conditions
-                Term[] mergedConditions = getMergedBranchCondtions();
+                JTerm[] mergedConditions = getMergedBranchCondtions();
                 branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
                 // Simplify merged branch conditions
                 if (mergedConditions.length >= 2) {
-                    if (getSettings().isSimplifyConditions()) {
+                    if (getSettings().simplifyConditions()) {
                         branchCondition =
                             SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
                     }
@@ -146,7 +150,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 }
             } else {
                 branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             // Format branch condition
             formatedBranchCondition = formatTerm(branchCondition, services);
@@ -165,7 +169,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public Term getPathCondition() throws ProofInputException {
+    public JTerm getPathCondition() throws ProofInputException {
         if (pathCondition == null) {
             lazyComputePathCondition();
         }
@@ -194,20 +198,20 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
         if (initConfig != null) { // Otherwise proof is disposed.
             final Services services = initConfig.getServices();
             // Get path to parent
-            Term parentPath;
+            JTerm parentPath;
             if (getParent() != null) {
                 parentPath = getParent().getPathCondition();
             } else {
                 parentPath = services.getTermBuilder().tt();
             }
             // Add current branch condition to path
-            Term branchCondition = getBranchCondition();
+            JTerm branchCondition = getBranchCondition();
             if (branchCondition == null) {
                 return; // Proof disposed in between.
             }
             pathCondition = services.getTermBuilder().and(parentPath, branchCondition);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 pathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
             }
@@ -244,7 +248,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public Term[] getMergedBranchCondtions() throws ProofInputException {
+    public JTerm[] getMergedBranchCondtions() throws ProofInputException {
         if (mergedBranchCondtions == null) {
             mergedBranchCondtions = lazyComputeMergedBranchCondtions();
         }
@@ -257,17 +261,17 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      *
      * @throws ProofInputException Occurred Exception
      */
-    protected Term[] lazyComputeMergedBranchCondtions() throws ProofInputException {
+    protected JTerm[] lazyComputeMergedBranchCondtions() throws ProofInputException {
         if (isMergedBranchCondition()) {
-            Term[] result = new Term[mergedProofNodes.size()];
+            JTerm[] result = new JTerm[mergedProofNodes.size()];
             Iterator<Node> iter = mergedProofNodes.iterator();
             for (int i = 0; i < result.length; i++) {
                 result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             return result;
         } else {
-            return new Term[0];
+            return new JTerm[0];
         }
     }
 
@@ -309,7 +313,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+        JTerm modalityTerm = (JTerm) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

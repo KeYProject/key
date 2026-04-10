@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -16,9 +18,11 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -49,7 +53,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -62,7 +66,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -75,7 +79,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchCondition.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -182,37 +186,37 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     }
 
     /**
-     * Tests example: /set/blockContractAssignableEverything
+     * Tests example: /set/blockContractModifiableEverything
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
-            "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+            "/set/blockContractModifiableEverything/test/BlockContractModifiableEverything.proof",
+            "/set/blockContractModifiableEverything/oracle/BlockContractModifiableEverything.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableLocationNotRequested
+     * Tests example: /set/blockContractModifiableLocationNotRequested
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
-            "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+            "/set/blockContractModifiableLocationNotRequested/test/BlockContractModifiableLocationNotRequested.proof",
+            "/set/blockContractModifiableLocationNotRequested/oracle/BlockContractModifiableLocationNotRequested.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableRequestedLocation
+     * Tests example: /set/blockContractModifiableRequestedLocation
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
-            "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+            "/set/blockContractModifiableRequestedLocation/test/BlockContractModifiableRequestedLocation.proof",
+            "/set/blockContractModifiableRequestedLocation/oracle/BlockContractModifiableRequestedLocation.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
@@ -536,7 +540,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     @Test
     public void testSymbolicExecutionCompletionsTest() throws Exception {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             String javaPathInBaseDir =
@@ -645,9 +649,12 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
      */
     protected void doJavaProfileTest(String proofFilePathInBaseDir, String oraclePathInBaseDirFile)
             throws Exception {
+        proofFilePathInBaseDir = cleanStartSlash(proofFilePathInBaseDir);
+        oraclePathInBaseDirFile = cleanStartSlash(oraclePathInBaseDirFile);
+
         // Ensure that JavaProfile was used before
         KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-            new File(testCaseDirectory, proofFilePathInBaseDir), null, null, null, true);
+            testCaseDirectory.resolve(proofFilePathInBaseDir), null, null, null, true);
         env.dispose();
         // Test symbolic execution
         doSETTestAndDispose(testCaseDirectory, proofFilePathInBaseDir, oraclePathInBaseDirFile,
@@ -657,6 +664,13 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory, proofFilePathInBaseDir, oraclePathInBaseDirFile,
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
+    }
+
+    private static @NonNull String cleanStartSlash(String proofFilePathInBaseDir) {
+        if (proofFilePathInBaseDir.startsWith("/")) {
+            proofFilePathInBaseDir = proofFilePathInBaseDir.substring(1);
+        }
+        return proofFilePathInBaseDir;
     }
 
     /**

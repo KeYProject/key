@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.rule.Taclet;
@@ -47,10 +50,12 @@ public abstract class TacletIndexKit {
      */
     private static class SingleThreadedTacletIndexKit extends TacletIndexKit {
 
+        @Override
         public TacletIndex createTacletIndex() {
             return new SingleThreadedTacletIndex();
         }
 
+        @Override
         public TacletIndex createTacletIndex(Iterable<Taclet> tacletSet) {
             return new SingleThreadedTacletIndex(tacletSet);
         }
@@ -62,10 +67,12 @@ public abstract class TacletIndexKit {
      */
     private static class MultiThreadedTacletIndexKit extends TacletIndexKit {
 
+        @Override
         public TacletIndex createTacletIndex() {
             return new MultiThreadedTacletIndex();
         }
 
+        @Override
         public TacletIndex createTacletIndex(Iterable<Taclet> tacletSet) {
             return new MultiThreadedTacletIndex(tacletSet);
         }

@@ -1,20 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * ExplorationAction that handles the addition of formulas to the sequent. This action is
@@ -27,32 +33,43 @@ import org.key_project.util.collection.ImmutableList;
  * Adding formulas to the antecedent: '==> p' as goal node and adding q to the antecedent results in
  * two branches:
  * <p>
- * 1) q ==> p 2) ==> p,q <-- this branch is set to interactive such that the automatic strategies do
- * not expand it Adding formulas to the succedent: '==> p' as goal node and adding q to the
+ * <ol>
+ * <li>{@code q ==> p}</li>
+ * <li>{@code ==> p,q} {@code <--} this branch is set to interactive such that the automatic
+ * strategies do
+ * not expand it.</li>
+ * </ol>
+ * Adding formulas to the succedent: '==> p' as goal node and adding q to the
  * succedent results in two branches:
+ * </ol>
  * <p>
- * 1) q ==> p <-- this branch is set to interactive such that the automatic strategies do not expand
- * it 2) ==> p,q
+ * <ol>
+ * <li>{@code q ==> p} {@code <--} this branch is set to interactive such that the automatic
+ * strategies do not expand
+ * it</li>
+ * <li>{@code ==> p,q}</li>
+ * </ol>
  *
  * @author Sarah Grebing
  * @author Alexander Weigl
  * @version 1 (20.08.19)
  */
 
+@SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
-    private final @Nonnull Proof proof;
-    private final @Nonnull Services services;
+    private final @NonNull Proof proof;
+    private final @NonNull Services services;
 
-    public ProofExplorationService(@Nonnull Proof proof, @Nonnull Services services) {
+    public ProofExplorationService(@NonNull Proof proof, @NonNull Services services) {
         this.proof = proof;
         this.services = services;
     }
 
-    public static @Nonnull ProofExplorationService get(KeYMediator mediator) {
+    public static @NonNull ProofExplorationService get(KeYMediator mediator) {
         return get(mediator.getSelectedProof());
     }
 
-    private static @Nonnull ProofExplorationService get(Proof selectedProof) {
+    private static @NonNull ProofExplorationService get(Proof selectedProof) {
         @Nullable
         ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
@@ -74,7 +91,7 @@ public class ProofExplorationService {
     /**
      * Finds the `cut` taclet in the current proof environment.
      */
-    public @Nonnull Taclet getCutTaclet() {
+    public @NonNull Taclet getCutTaclet() {
         return Objects.requireNonNull(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
@@ -86,13 +103,12 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
+    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-        Semisequent semisequent = new Semisequent(new SequentFormula(t));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
+        app = app.addCheckedInstantiation(sv, t, services, true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
         if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
@@ -126,12 +142,13 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@Nonnull Goal g, @Nonnull PosInOccurrence pio,
-            @Nonnull Term term, @Nonnull Term newTerm) {
+    public Node applyChangeFormula(@NonNull Goal g,
+            @NonNull PosInOccurrence pio,
+            @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
-        @Nonnull
+        @NonNull
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
             String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
@@ -150,7 +167,8 @@ public class ProofExplorationService {
         // region hide
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
-            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, null),
+            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS,
+                services),
             pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
@@ -167,17 +185,17 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@Nonnull PosInOccurrence pio, @Nonnull Term term,
-            @Nonnull Term newTerm) {
+    private TacletApp soundChange(@NonNull PosInOccurrence pio,
+            @NonNull JTerm term,
+            @NonNull JTerm newTerm) {
         Taclet cut = getCutTaclet();
-        Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
+        app = app.addCheckedInstantiation(sv, newTerm, services, true);
         return app;
     }
 
-    public void soundHide(Goal g, PosInOccurrence pio, Term term) {
+    public void soundHide(Goal g, PosInOccurrence pio, JTerm term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);
@@ -187,8 +205,8 @@ public class ProofExplorationService {
 
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        MatchConditions match = tap.getMatcher().matchFind(pio.subTerm(),
+        final var matchingConditions = tap.getMatcher().matchFind(pio.subTerm(),
             MatchConditions.EMPTY_MATCHCONDITIONS, services);
-        return PosTacletApp.createPosTacletApp(tap, match, pio, services);
+        return PosTacletApp.createPosTacletApp(tap, matchingConditions, pio, services);
     }
 }

@@ -1,14 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import org.key_project.util.Streams;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class providing various methods to read properties.
@@ -24,7 +26,7 @@ public final class SettingsConverter {
      * <li>"#newline" in a props file encodes "\n"</li>
      * </ul>
      * <br>
-     *
+     * <p>
      * Note that, in order to guarantee dec(enc(*)) = enc(dec(*)) = id(*), care has to be taken:
      * <ol>
      * <li>The replacement order needs to be inverted for dec
@@ -33,7 +35,7 @@ public final class SettingsConverter {
      * to change these and vice versa. Otherwise, cases like the following will break:
      * dec("=") = "="; enc("=") = "#equals" -> enc(dec("=")) = "#equals" != "="</li>
      * </ol>
-     *
+     * <p>
      * TODO enc(dec(*)) = id is currently not guaranteed.
      * 2. is only guaranteed by enc because any occurrence of "#..." will be encoded to
      * "#hash...". Thus,
@@ -59,7 +61,8 @@ public final class SettingsConverter {
     /**
      * The class doesn't need to be instantiated as it only contains static methods.
      */
-    private SettingsConverter() {}
+    private SettingsConverter() {
+    }
 
     /**
      * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding encoding String.
@@ -127,7 +130,7 @@ public final class SettingsConverter {
      * @param str the String to decode
      * @return the decoded version of str
      */
-    public static String decode(@Nonnull String str) {
+    public static String decode(@NonNull String str) {
         int i = str.indexOf(PREFIX);
         if (i == 0) {
             str = str.substring(PREFIX.length());
@@ -162,7 +165,7 @@ public final class SettingsConverter {
      * @param str the String to encode
      * @return the encoded version of str
      */
-    public static String encode(@Nonnull String str) {
+    public static String encode(@NonNull String str) {
         return PREFIX + encodeString(str) + POSTFIX;
     }
 
@@ -201,6 +204,24 @@ public final class SettingsConverter {
                 .filter(k -> !Arrays.asList(supportedKeys).contains(k))
                 .collect(Collectors.toList());
     }
+
+
+    ///
+    public static Collection<String> unsupportedPropertiesKeysInSubSections(
+            Configuration config, String[] supportedKeys) {
+
+        Set<String> supKeys = new HashSet<>(Arrays.asList(supportedKeys));
+
+        List<String> error = new ArrayList<>();
+
+        for (var section : config.getSectionsWithNames()) {
+            Set<String> keys = new TreeSet<>(section.second.keys());
+            keys.removeAll(supKeys);
+            error.addAll(keys.stream().map(it -> section.first + "." + it).toList());
+        }
+        return error;
+    }
+
 
     /**
      * Read a raw String property without paying attention to {@link #ENCODINGS}s.
@@ -430,8 +451,8 @@ public final class SettingsConverter {
      * @param key the key whose value is the enum constant's ordinal in enum T
      * @param defaultValue the default enum constant of T to return
      * @param values the enum values of T from which to choose the value to read
-     * @return the value of the read enum constant
      * @param <T> the enum which the read constant belongs to
+     * @return the value of the read enum constant
      */
     public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
             T[] values) {
@@ -455,4 +476,5 @@ public final class SettingsConverter {
     public static <T extends Enum<?>> void store(Properties props, String key, T value) {
         store(props, key, value.ordinal());
     }
+
 }

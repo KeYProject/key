@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -106,7 +109,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
          *
          * @param numApplPreds The number of applicable predicates for the lattice.
          */
-        public AbstractPredicateLatticeIterator(int numApplPreds) {
+        protected AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of
             // predicates). Each bit represents a predicate; when the bit is
             // set to 1, the respective predicate should occur in the

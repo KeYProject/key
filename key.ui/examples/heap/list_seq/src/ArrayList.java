@@ -20,7 +20,6 @@ public class ArrayList implements List {
         this.array = newArray(10);
         //@set seq = \seq_empty;
         //@set footprint = \set_union(\all_fields(array), \all_fields(this));
-        {}
     }
 
     /*@ private normal_behavior
@@ -62,14 +61,20 @@ public class ArrayList implements List {
         return size;
     }
 
-
     public Object get(int index) {
         if(index < 0 || size <= index) {
             throw new IndexOutOfBoundsException();
         }
         return array[index];
     }
-
+    
+    public void set(int index, Object o) {
+        if(index < 0 || size <= index) {
+            throw new IndexOutOfBoundsException();
+        }
+        array[index] = o;
+        //@ set seq = \seq_upd(seq, index, o);
+    }
 
     public boolean contains(Object o) {
         /*@ loop_invariant 0 <= i && i <= size
@@ -85,14 +90,12 @@ public class ArrayList implements List {
         return false;
     }
 
-
     public void add(Object o) {
         if(size == array.length) {
             enlarge();
         }
         array[size++] = o;
         //@set seq = \seq_concat(seq, \seq_singleton(o));
-        {}
     }
 
     public void remove(Object o) {
@@ -114,7 +117,7 @@ public class ArrayList implements List {
                     array[j] = array[j+1];
                 }
                 size--;
-                //@ set seq = \seq_concat(\seq_sub(seq, 0, i), \seq_sub(seq,i+1, \seq_length(seq)));
+                //@ set seq = \seq_concat(\seq_sub(seq, 0, i), \seq_sub(seq,i+1, seq.length));
                 return;
             }
         }

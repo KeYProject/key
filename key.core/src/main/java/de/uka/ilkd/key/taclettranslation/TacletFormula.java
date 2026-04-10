@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
 import java.util.Collection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -28,7 +31,7 @@ public interface TacletFormula {
      *         instantiations (e.g. the taclet has some generic sorts) the returned term is a
      *         conjunction of these instantiations.
      */
-    Term getFormula(TermServices services);
+    JTerm getFormula(TermServices services);
 
     /**
      * @return if the taclet can not be translated the reason why. Otherwise a empty string.
@@ -40,6 +43,6 @@ public interface TacletFormula {
      * It can be that a taclet is translated into several formulas, i.e. in the case that the
      * generics are instantiated. This method returns the set of resulting formulas.
      */
-    Collection<Term> getInstantiations();
+    Collection<JTerm> getInstantiations();
 
 }
