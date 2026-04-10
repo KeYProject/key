@@ -1,24 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import javax.annotation.Nullable;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
-import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.ComparativeOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.TypeCast;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -54,22 +59,23 @@ public final class FloatingPointBalancedCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
-            Services services) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo mc,
+            LogicServices services) {
 
-        SVInstantiations svInst = mc.getInstantiations();
+        var svInst = (SVInstantiations) mc.getInstantiations();
         Object untypedInstantiation = svInst.getInstantiation(unbalanced);
         if (!(untypedInstantiation instanceof BinaryOperator
                 || untypedInstantiation instanceof ComparativeOperator)) {
             return null;
         }
         Operator inInst = (Operator) untypedInstantiation;
-        JavaProgramElement outInst = (JavaProgramElement) svInst.getInstantiation(balanced);
+        JavaProgramElement outInst = svInst.getInstantiation(balanced);
         if (inInst == null) {
             return mc;
         }
 
-        Operator properResultInst = balance(inInst, services);
+        Operator properResultInst = balance(inInst, (Services) services);
         if (properResultInst == null) {
             return null;
         } else if (outInst == null) {
