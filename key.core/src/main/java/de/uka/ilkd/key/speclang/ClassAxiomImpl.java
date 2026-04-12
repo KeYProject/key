@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -20,10 +20,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 /**
  * Represents an axiom specified in a class.
@@ -36,7 +33,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
     private final String name;
     private final KeYJavaType kjt;
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     private final JTerm originalRep;
     private final LocationVariable originalSelfVar;
 
@@ -47,7 +44,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final boolean isStatic;
 
 
-    public ClassAxiomImpl(String name, KeYJavaType kjt, VisibilityModifier visibility, JTerm rep,
+    public ClassAxiomImpl(String name, KeYJavaType kjt, ModifierKind visibility, JTerm rep,
             LocationVariable selfVar) {
         assert name != null;
         assert kjt != null;
@@ -63,7 +60,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm rep, LocationVariable selfVar) {
+            ModifierKind visibility, JTerm rep, LocationVariable selfVar) {
         this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }
@@ -122,7 +119,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 

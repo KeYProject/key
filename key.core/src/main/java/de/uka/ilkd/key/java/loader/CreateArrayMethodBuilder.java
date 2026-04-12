@@ -21,11 +21,9 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
@@ -209,7 +207,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public IProgramMethod getArrayInstanceAllocatorMethod(TypeReference arrayTypeReference) {
 
-        final Modifier[] modifiers = { new Private(), new Static() };
+        final Modifier[] modifiers =
+            Modifier.createModifierList(ModifierKind.PRIVATE, ModifierKind.STATIC);
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -313,7 +312,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayHelperMethod(TypeReference arrayTypeReference,
             ProgramVariable length, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = { new Private() };
+        final Modifier[] modifiers = Modifier.createModifierList(ModifierKind.PRIVATE);
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
@@ -332,7 +331,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
             IProgramMethod prepare, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = { new Protected(), new Static() };
+        final Modifier[] modifiers =
+            Modifier.createModifierList(ModifierKind.PROTECTED, ModifierKind.STATIC);
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -386,9 +386,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
 
-        final MethodDeclaration md = new MethodDeclaration(new Modifier[] { new Private() },
-            arrayRef, new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE),
-            new ParameterDeclaration[0], null, body, false);
+        final MethodDeclaration md =
+            new MethodDeclaration(Modifier.createModifierList(ModifierKind.PRIVATE),
+                arrayRef, new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE),
+                new ParameterDeclaration[0], null, body, false);
 
         return new ProgramMethod(md, arrayType, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
             heapSort);

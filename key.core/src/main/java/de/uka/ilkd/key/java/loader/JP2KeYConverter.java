@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.modifier.*;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
@@ -86,7 +86,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
+import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.*;
+import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 import static java.lang.String.format;
 
 /**
@@ -762,11 +764,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return switch (n.getKind()) {
             case MarkerStatementHelper.KIND_ASSERT -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(Kind.ASSERT, construct, pi);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
             }
             case MarkerStatementHelper.KIND_ASSUME -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(Kind.ASSUME, construct, pi);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
             }
             case MarkerStatementHelper.KIND_SET -> {
                 KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
@@ -909,8 +911,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         StatementBlock body = accept(n.getBody());
         de.uka.ilkd.key.java.ast.declaration.Modifier[] mods =
-            n.isStatic() ? new de.uka.ilkd.key.java.ast.declaration.Modifier[] { new Static() }
-                    : new de.uka.ilkd.key.java.ast.declaration.Modifier[0];
+            n.isStatic()
+                    ? createModifierList(ModifierKind.STATIC)
+                    : createModifierList();
         return new ClassInitializer(mods, body, pi, c);
     }
 
@@ -1596,56 +1599,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return null;
         }
 
-        return switch ((Modifier.DefaultKeyword) k) {
-            case PUBLIC -> new Public(pi, c);
-            case PROTECTED -> new Protected(pi, c);
-            case PRIVATE -> new Private(pi, c);
-            case ABSTRACT -> new Abstract(pi, c);
-            case STATIC -> new Static(pi, c);
-            case FINAL -> new Final(pi, c);
-            case TRANSIENT -> new Transient(pi, c);
-            case VOLATILE -> new Volatile(pi, c);
-            case SYNCHRONIZED -> new Synchronized(pi, c);
-            case NATIVE -> new Native(pi, c);
-            case STRICTFP -> new StrictFp(pi, c);
-            case TRANSITIVE -> new Modifiers.TRANSITIVE(pi, c);
-            case SEALED -> new Modifiers.SEALED(pi, c);
-            case NON_SEALED -> new Modifiers.NON_SEALED(pi, c);
-            case JML_PACKAGE -> new Modifiers.JML_PACKAGE(pi, c);
-            case JML_PURE -> new Modifiers.JML_PURE(pi, c);
-            case JML_STRICTLY_PURE -> new Modifiers.JML_STRICTLY_PURE(pi, c);
-            case JML_HELPER -> new Modifiers.JML_HELPER(pi, c);
-            case JML_INSTANCE -> new Modifiers.JML_INSTANCE(pi, c);
-            case JML_NULLABLE_BY_DEFAULT -> new Modifiers.JML_NULLABLE_BY_DEFAULT(pi, c);
-            case JML_NON_NULL -> new Modifiers.JML_NON_NULL(pi, c);
-            case JML_NULLABLE -> new Modifiers.JML_NULLABLE(pi, c);
-            case JML_GHOST -> new Ghost(pi, c);
-            case JML_MODEL -> new Model(pi, c);
-            case JML_TWO_STATE -> new TwoState(pi, c);
-            case JML_SPEC_PUBLIC -> new Modifiers.JML_SPEC_PUBLIC(pi, c);
-            case JML_SPEC_PACKAGE -> new Modifiers.JML_SPEC_PACKAGE(pi, c);
-            case JML_SPEC_PROTECTED -> new Modifiers.JML_SPEC_PROTECTED(pi, c);
-            case JML_SPEC_PRIVATE -> new Modifiers.JML_SPEC_PRIVATE(pi, c);
-            case JML_NO_STATE -> new NoState(pi, c);
-            case JML_NON_NULL_BY_DEFAULT -> new Modifiers.JML_NON_NULL_BY_DEFAULT(pi, c);
-            case JML_NON_NULL_ELEMENTS -> new Modifiers.JML_NON_NULL_ELEMENTS(pi, c);
-            case JML_UNPARSABLE_MODIFIERS -> new Modifiers.JML_UNPARSABLE_MODIFIERS(pi, c);
-            case JML_CODE_BIGINT_MATH -> new Modifiers.JML_CODE_BIGINT_MATH(pi, c);
-            case JML_CODE_JAVA_MATH -> new Modifiers.JML_CODE_JAVA_MATH(pi, c);
-            case JML_CODE_SAFE_MATH -> new Modifiers.JML_CODE_SAFE_MATH(pi, c);
-            case JML_SPEC_BIGINT_MATH -> new Modifiers.JML_SPEC_BIGINT_MATH(pi, c);
-            case JML_SPEC_JAVA_MATH -> new Modifiers.JML_SPEC_JAVA_MATH(pi, c);
-            case JML_SPEC_SAFE_MATH -> new Modifiers.JML_SPEC_SAFE_MATH(pi, c);
-            case JML_CODE -> new Modifiers.JML_CODE(pi, c);
-            case JML_OT_PEER -> new Modifiers.JML_OT_PEER(pi, c);
-            case JML_OT_REP -> new Modifiers.JML_OT_REP(pi, c);
-            case JML_OT_READ_ONLY -> new Modifiers.JML_OT_READ_ONLY(pi, c);
-            case DEFAULT -> new Modifiers.DEFAULT(pi, c);
-            default -> {
-                reportUnsupportedElement(n);
-                yield null;
-            }
-        };
+        var kind = ModifierKind.valueOf(
+            ((Modifier.DefaultKeyword) k).name());
+        if (kind == null) {
+            reportUnsupportedElement(n);
+        }
+        return new de.uka.ilkd.key.java.ast.declaration.Modifier(pi, c, kind);
     }
 
 

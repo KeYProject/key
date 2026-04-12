@@ -8,16 +8,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
@@ -370,14 +367,15 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private VisibilityModifier getVisibility(TextualJMLConstruct textualConstruct) {
+    private ModifierKind getVisibility(TextualJMLConstruct textualConstruct) {
         for (JMLModifier modifier : textualConstruct.getModifiers()) {
-            if (modifier.equals(JMLModifier.PRIVATE)) {
-                return new Private();
-            } else if (modifier.equals(JMLModifier.PROTECTED)) {
-                return new Protected();
-            } else if (modifier.equals(JMLModifier.PUBLIC)) {
-                return new Public();
+            switch (modifier) {
+                case PRIVATE:
+                    return (ModifierKind.PRIVATE);
+                case PROTECTED:
+                    return (ModifierKind.PROTECTED);
+                case PUBLIC:
+                    return (ModifierKind.PUBLIC);
             }
         }
         return null;
@@ -1112,7 +1110,7 @@ public class JMLSpecFactory {
     // public interface
     // -------------------------------------------------------------------------
     public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt,
-            VisibilityModifier visibility, boolean isStatic,
+            ModifierKind visibility, boolean isStatic,
             @NonNull LabeledParserRuleContext originalInv) {
         var context = Context.inClass(kjt, isStatic, tb);
 
@@ -1148,7 +1146,7 @@ public class JMLSpecFactory {
     }
 
     public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
-            VisibilityModifier visibility, @NonNull LabeledParserRuleContext original) {
+            ModifierKind visibility, @NonNull LabeledParserRuleContext original) {
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
@@ -1158,7 +1156,7 @@ public class JMLSpecFactory {
 
         // create invariant
         String name = getInicName();
-        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, context.selfVar(),
+        return new InitiallyClauseImpl(name, name, kjt, ModifierKind.PUBLIC, inv, context.selfVar(),
             original);
 
     }
@@ -1168,7 +1166,7 @@ public class JMLSpecFactory {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
     }
 
-    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, VisibilityModifier visibility,
+    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, ModifierKind visibility,
             @NonNull LabeledParserRuleContext originalRep, boolean isStatic)
             throws SLTranslationException {
 
@@ -1224,10 +1222,8 @@ public class JMLSpecFactory {
      * Creates a class axiom from a textual JML representation. As JML axioms are always without
      * modifiers, they are implicitly non-static and public.
      *
-     * @param kjt
-     *        the type where the axiom is declared
-     * @param textual
-     *        textual representation
+     * @param kjt the type where the axiom is declared
+     * @param textual textual representation
      * @return created {@link ClassAxiom}
      */
     public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
@@ -1246,7 +1242,8 @@ public class JMLSpecFactory {
         String name = "class axiom in " + kjt.getFullName();
         String displayName = textual.getName() == null ? name
                 : "class axiom \"" + textual.getName() + "\" in " + kjt.getFullName();
-        return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, context.selfVar());
+        return new ClassAxiomImpl(name, displayName, kjt, ModifierKind.PUBLIC, ax,
+            context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
@@ -1350,7 +1347,7 @@ public class JMLSpecFactory {
                 new UnparameterizedMergeContract(mergeProc, mps, kjt);
             result = result.add(unparameterizedMergeContract);
         } else if (mergeProc instanceof ParametricMergeProcedure) { // arguments expected looking
-                                                                    // for params
+            // for params
             if (!(mergeProc instanceof MergeWithPredicateAbstraction)) {
                 throw new IllegalStateException("Currently, MergeWithPredicateAbstraction(Factory) "
                     + "is the only supported ParametricMergeProcedure");

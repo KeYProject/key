@@ -14,8 +14,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
@@ -764,7 +763,7 @@ public class SpecificationRepository {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
         }
         // inherit non-private, non-static invariants
-        if (!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
+        if (!inv.isStatic() && inv.getVisibility().allowsInheritance()) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
@@ -792,7 +791,7 @@ public class SpecificationRepository {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);
-                if (VisibilityModifier.allowsInheritance(inv.getVisibility())) {
+                if (inv.getVisibility().allowsInheritance()) {
                     final ImmutableList<KeYJavaType> subs =
                         services.getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
@@ -896,22 +895,26 @@ public class SpecificationRepository {
 
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                        kjt, new Private(), null, invDef, selfVar, ImmutableList.nil(), null);
+                        kjt, Modifier.ModifierKind.PRIVATE, null, invDef, selfVar,
+                        ImmutableList.nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                    new Private(), null, staticInvDef, null, ImmutableList.nil(), null);
+                    Modifier.ModifierKind.PRIVATE, null, staticInvDef, null, ImmutableList.nil(),
+                    null);
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
                     "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                    new Private(), null, freeInvDef, selfVar, ImmutableList.nil(), null);
+                    Modifier.ModifierKind.PRIVATE, null, freeInvDef, selfVar, ImmutableList.nil(),
+                    null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
                     "Free static class invariant axiom for " + kjt.getFullName(),
-                    freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
+                    freeStaticInvSymbol, kjt, Modifier.ModifierKind.PRIVATE, null, freeStaticInvDef,
+                    null,
                     ImmutableList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
 
@@ -988,7 +991,7 @@ public class SpecificationRepository {
                         if (representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility
                             // issues of model fields/methods.
-                            // VisibilityModifier visibility = pm.isPrivate() ?
+                            // Modifier visibility = pm.isPrivate() ?
                             // new Private() :
                             // (pm.isProtected() ? new Protected() :
                             // (pm.isPublic() ? new Public() : null));
@@ -996,7 +999,8 @@ public class SpecificationRepository {
                                 new RepresentsAxiom(
                                     "Definition axiom for " + pm.getName() + " in "
                                         + kjt.getFullName(),
-                                    pm, kjt, new Private(), preContract, representsFromContract,
+                                    pm, kjt, Modifier.ModifierKind.PRIVATE, preContract,
+                                    representsFromContract,
                                     selfVar, paramVars, atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
                             break;
@@ -1023,7 +1027,8 @@ public class SpecificationRepository {
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
                                 "Contract axiom for " + pm.getName() + " in " + kjt.getFullName(),
                                 pm,
-                                kjt, new Private(), preFromContract, freePreFromContract,
+                                kjt, Modifier.ModifierKind.PRIVATE, preFromContract,
+                                freePreFromContract,
                                 postFromContract, freePostFromContract, mbyFromContract, atPreVars,
                                 selfVar, resultVar, paramVars);
                             result = result.add(modelMethodContractAxiom);
@@ -1054,7 +1059,7 @@ public class SpecificationRepository {
                 axioms.put(kjt, currentAxioms.add(ax));
             }
             // inherit represents clauses to subclasses and conjoin together
-            if (VisibilityModifier.allowsInheritance(ax.getVisibility())) {
+            if (ax.getVisibility().allowsInheritance()) {
                 final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
