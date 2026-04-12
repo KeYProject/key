@@ -10,8 +10,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -107,8 +106,8 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public VisibilityModifier getVisibility() {
-        return new Private();
+    public ModifierKind getVisibility() {
+        return ModifierKind.PRIVATE;
     }
 
 

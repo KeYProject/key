@@ -21,17 +21,15 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
-import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
 import de.uka.ilkd.key.java.ast.reference.ArrayReference;
 import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
@@ -50,6 +48,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LESS_THAN;
+import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.POST_INCREMENT;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
@@ -209,7 +210,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public IProgramMethod getArrayInstanceAllocatorMethod(TypeReference arrayTypeReference) {
 
-        final Modifier[] modifiers = { new Private(), new Static() };
+        final Modifier[] modifiers =
+            Modifier.createModifierList(ModifierKind.PRIVATE, ModifierKind.STATIC);
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -313,7 +315,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayHelperMethod(TypeReference arrayTypeReference,
             ProgramVariable length, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = { new Private() };
+        final Modifier[] modifiers = Modifier.createModifierList(ModifierKind.PRIVATE);
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
@@ -332,7 +334,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
             IProgramMethod prepare, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = { new Protected(), new Static() };
+        final Modifier[] modifiers =
+            Modifier.createModifierList(ModifierKind.PROTECTED, ModifierKind.STATIC);
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -380,15 +383,16 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
         final For forLoop = new For(new LoopInitializer[] { forInit },
-            new LessThan(pv, new FieldReference(length, new ThisReference())),
-            new Expression[] { new PostIncrement(pv) },
+            new BinaryOperator(LESS_THAN, pv, new FieldReference(length, new ThisReference())),
+            new Expression[] { new UnaryOperator(POST_INCREMENT, pv) },
             assign(new ArrayReference(new ThisReference(), new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
 
-        final MethodDeclaration md = new MethodDeclaration(new Modifier[] { new Private() },
-            arrayRef, new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE),
-            new ParameterDeclaration[0], null, body, false);
+        final MethodDeclaration md =
+            new MethodDeclaration(Modifier.createModifierList(ModifierKind.PRIVATE),
+                arrayRef, new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE),
+                new ParameterDeclaration[0], null, body, false);
 
         return new ProgramMethod(md, arrayType, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
             heapSort);

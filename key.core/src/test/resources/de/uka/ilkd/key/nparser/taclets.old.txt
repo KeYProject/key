@@ -3905,8 +3905,8 @@ compound_assignment_op_and_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute &
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute & #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3944,8 +3944,8 @@ compound_assignment_op_div_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute /
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute / #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3983,8 +3983,8 @@ compound_assignment_op_minus_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute - #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4022,8 +4022,8 @@ compound_assignment_op_mod_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute %
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute % #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4061,8 +4061,8 @@ compound_assignment_op_mul_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute *
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute * #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4100,8 +4100,8 @@ compound_assignment_op_or_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute |
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute | #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4139,8 +4139,8 @@ compound_assignment_op_plus_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute + #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4178,8 +4178,8 @@ compound_assignment_op_shiftleft_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute <<
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute << #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4217,8 +4217,8 @@ compound_assignment_op_shiftright_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute >> #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4256,8 +4256,8 @@ compound_assignment_op_unsigned_shiftright_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>>
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute >>> #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4295,8 +4295,8 @@ compound_assignment_op_xor_attr {
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v = #e0;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute ^
-                                           #e);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute ^ #e);
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -7620,8 +7620,8 @@ eval_order_iterated_assignments_10_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute |
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute | #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7650,8 +7650,8 @@ eval_order_iterated_assignments_11_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute ^
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute ^ #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7680,8 +7680,8 @@ eval_order_iterated_assignments_1_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute *
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute * #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7710,8 +7710,8 @@ eval_order_iterated_assignments_2_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute /
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute / #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7740,8 +7740,8 @@ eval_order_iterated_assignments_3_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute %
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute % #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7770,8 +7770,8 @@ eval_order_iterated_assignments_4_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute +
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute + #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7800,8 +7800,8 @@ eval_order_iterated_assignments_5_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute -
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute - #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7830,8 +7830,8 @@ eval_order_iterated_assignments_6_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute <<
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute << #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7860,8 +7860,8 @@ eval_order_iterated_assignments_7_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute >> #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7890,8 +7890,8 @@ eval_order_iterated_assignments_8_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>>
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute >>> #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7920,8 +7920,8 @@ eval_order_iterated_assignments_9_1 {
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e0) #v0 = #e0;
-  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute &
-                                            #e);
+  #v0.#attribute =
+    (#typeof(#attribute)) (#v0.#attribute & #e);
   #lhs0 = #v0.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -11651,7 +11651,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == intro (intro) =========================================
 intro {
-\add [equals(t,sk)]==>[] 
+\add [equals(t,sk)]==>[]
 
 Choices: true}
 -----------------------------------------------------
@@ -14456,8 +14456,8 @@ postdecrement_assignment_attribute {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
   #typeof(#lhs0) #v1 = #v.#attribute;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute - 1);
   #lhs0 = #v1;
 ... }}| (post)) 
 \heuristics(simplify_expression)
@@ -14471,8 +14471,8 @@ postdecrement_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute - 1);
 ... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14541,8 +14541,8 @@ postincrement_assignment_attribute {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
   #typeof(#lhs0) #v1 = #v.#attribute;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute + 1);
   #lhs0 = #v1;
 ... }}| (post)) 
 \heuristics(simplify_expression)
@@ -14556,8 +14556,8 @@ postincrement_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute + 1);
 ... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14848,8 +14848,8 @@ predecrement_assignment_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute - 1);
   #lhs = #v.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_expression)
@@ -14863,8 +14863,8 @@ predecrement_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute - 1);
 ... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14929,8 +14929,8 @@ preincrement_assignment_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute + 1);
   #lhs0 = #v.#attribute;
 ... }}| (post)) 
 \heuristics(simplify_expression)
@@ -14944,8 +14944,8 @@ preincrement_attribute {
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v = #e;
-  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
-                                           1);
+  #v.#attribute =
+    (#typeof(#attribute)) (#v.#attribute + 1);
 ... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -18200,7 +18200,7 @@ tryCatchThrow {
   } catch (#t #v0) {
     #slist1
   }
-... }}| (post)) 
+... }}| (post))
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18739,7 +18739,7 @@ Choices: programRules:Java}
 == variableDeclarationGhost (ghostDeclaration) =========================================
 variableDeclarationGhost {
 \find(#allmodal ((modal operator))|{{ ..
-  ghost #t #v0;
+  /*@ghost*/ #t #v0;
 ... }}| (post))
 \addprogvars {#v0 (program Variable)} \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18748,10 +18748,10 @@ Choices: programRules:Java}
 == variableDeclarationGhostAssign (ghostDeclaration) =========================================
 variableDeclarationGhostAssign {
 \find(#allmodal ((modal operator))|{{ ..
-  ghost #t #v0 = #vi;
+  /*@ghost*/ #t #v0 = #vi;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  ghost #t #v0;
+  /*@ghost*/ #t #v0;
   #v0 = #vi;
 ... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)

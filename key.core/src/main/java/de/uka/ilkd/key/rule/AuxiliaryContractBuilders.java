@@ -13,10 +13,10 @@ import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.statement.Catch;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
@@ -50,7 +50,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
@@ -1634,8 +1633,9 @@ public final class AuxiliaryContractBuilders {
                     KeYJavaASTFactory.returnClause(variables.result)));
             }
             ifCascade.add(KeYJavaASTFactory.ifThen(
-                new NotEquals(
-                    new ExtList(new Expression[] { variables.exception, NullLiteral.NULL })),
+                new BinaryOperator(BinaryOperatorKind.NOT_EQUALS,
+                    variables.exception,
+                    NullLiteral.NULL),
                 KeYJavaASTFactory.throwClause(variables.exception)));
             return new StatementBlock(ifCascade.toArray(new Statement[0]));
         }
@@ -1691,8 +1691,7 @@ public final class AuxiliaryContractBuilders {
                 terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            final JTerm[] posts = { post, postNext };
-            return posts;
+            return new JTerm[] { post, postNext };
         }
     }
 }

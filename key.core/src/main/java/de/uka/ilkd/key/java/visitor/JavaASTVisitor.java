@@ -3,26 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -46,10 +40,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param services
-     *        the Services object
+     * @param root the ProgramElement where to begin
+     * @param services the Services object
      */
     protected JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
@@ -100,8 +92,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node
-     *        the node described above
+     * @param node the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
 
@@ -136,41 +127,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnBinaryAnd(BinaryAnd x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryNot(BinaryNot x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryOr(BinaryOr x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryXOr(BinaryXOr x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnBooleanLiteral(BooleanLiteral x) {
         doDefaultAction(x);
     }
@@ -180,86 +136,18 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnSingleton(Singleton x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSetUnion(SetUnion x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnIntersect(Intersect x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSetMinus(SetMinus x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnAllFields(AllFields x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnAllObjects(AllObjects x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnEmptySeqLiteral(EmptySeqLiteral x) {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnSeqSingleton(SeqSingleton x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqConcat(SeqConcat x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqSub(SeqSub x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqReverse(SeqReverse x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqPut(SeqPut x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         doDefaultAction(x);
     }
 
-
-    @Override
-    public void performActionOnSeqIndexOf(SeqIndexOf x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqGet(SeqGet x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqLength(SeqLength x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnBreak(Break x) {
@@ -327,11 +215,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnSetStatement(SetStatement x) {
         doDefaultAction(x);
     }
@@ -341,15 +224,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnDivide(Divide x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnDivideAssignment(DivideAssignment x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnDo(Do x) {
@@ -371,10 +245,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnEquals(Equals x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnExactInstanceof(ExactInstanceof x) {
@@ -432,16 +302,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnGreaterThan(GreaterThan x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnGuard(Guard x) {
         doDefaultAction(x);
     }
@@ -487,16 +347,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnLessOrEquals(LessOrEquals x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnLessThan(LessThan x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
         doDefaultAction(x);
     }
@@ -507,21 +357,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         // to performActionOnProgramVariable
         // doDefaultAction(x);
         performActionOnProgramVariable(x);
-    }
-
-    @Override
-    public void performActionOnLogicalAnd(LogicalAnd x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnLogicalNot(LogicalNot x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnLogicalOr(LogicalOr x) {
-        doDefaultAction(x);
     }
 
     @Override
@@ -536,11 +371,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnMetaClassReference(MetaClassReference x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnMethod(IProgramMethod x) {
         doDefaultAction(x);
     }
 
@@ -564,35 +394,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnMinus(Minus x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnMinusAssignment(MinusAssignment x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnModifier(Modifier x) {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnModulo(Modulo x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnModuloAssignment(ModuloAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnNegative(Negative x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnNew(New x) {
@@ -604,10 +411,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnNotEquals(NotEquals x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnNullLiteral(NullLiteral x) {
@@ -639,40 +442,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnPlus(Plus x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPlusAssignment(PlusAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPositive(Positive x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPostDecrement(PostDecrement x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPostIncrement(PostIncrement x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPreDecrement(PreDecrement x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnPreIncrement(PreIncrement x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnProgramConstant(ProgramConstant x) {
@@ -702,10 +471,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
-    @Override
-    public void performActionOnIProgramVariable(IProgramVariable x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnReturn(Return x) {
@@ -722,25 +487,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction((ProgramSV) x);
     }
 
-    @Override
-    public void performActionOnShiftLeft(ShiftLeft x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftRight(ShiftRight x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
-        doDefaultAction(x);
-    }
 
     @Override
     public void performActionOnStatementBlock(StatementBlock x) {
@@ -749,11 +495,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnStringLiteral(StringLiteral x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnSubtype(Subtype x) {
         doDefaultAction(x);
     }
 
@@ -813,16 +554,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnTimes(Times x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnTimesAssignment(TimesAssignment x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnTry(Try x) {
         doDefaultAction(x);
     }
@@ -834,16 +565,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnTypeReference(TypeReference x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
         doDefaultAction(x);
     }
 
@@ -980,5 +701,29 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     public void performActionOnJmlAssert(JmlAssert x) {
         doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAssignment(Assignment x) {
+        doDefaultAction(x);
+
+    }
+
+    @Override
+    public void performActionOnBinaryOperator(BinaryOperator x) {
+        doDefaultAction(x);
+
+    }
+
+    @Override
+    public void performActionOnLogicFunctionalOperator(LogicFunctionalOperator x) {
+        doDefaultAction(x);
+
+    }
+
+    @Override
+    public void performActionOnUnaryOperator(UnaryOperator x) {
+        doDefaultAction(x);
+
     }
 }

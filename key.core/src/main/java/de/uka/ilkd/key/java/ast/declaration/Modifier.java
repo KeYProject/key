@@ -5,58 +5,62 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.ast.Comment;
-import de.uka.ilkd.key.java.ast.JavaProgramElement;
-import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
- * Modifier. taken from COMPOST and changed to achieve an immutable structure
+ *
+ *
  */
+@NullMarked
+public class Modifier extends JavaProgramElement {
+    public static Modifier[] createModifierList(ModifierKind... modifierKind) {
+        Modifier[] modifiers = new Modifier[modifierKind.length];
+        for (int i = 0; i < modifierKind.length; i++) {
+            modifiers[i] = new Modifier(modifierKind[i]);
+        }
+        return modifiers;
+    }
 
-public abstract class Modifier extends JavaProgramElement {
+    public ModifierKind getKind() {
+        return keyword;
+    }
 
-    /**
-     * Modifier.
-     */
+    private final ModifierKind keyword;
 
-    public Modifier() {}
+    public Modifier(ModifierKind keyword) {
+        this.keyword = keyword;
+    }
 
-    /**
-     * Modifier.
-     */
-    public Modifier(PositionInfo pi, List<Comment> c) {
+    public Modifier(PositionInfo pi, List<Comment> c, ModifierKind keyword) {
         super(pi, c);
+        this.keyword = keyword;
     }
 
-    /**
-     * Get symbol.
-     *
-     * @return the string.
-     */
-
-    protected abstract String getSymbol();
-
-    /**
-     * Get symbol text.
-     *
-     * @return the symbol text.
-     */
     public String getText() {
-        return getSymbol();
+        return keyword.asString();
     }
 
-    /**
-     * calls the corresponding method of a visitor in order to perform some action/transformation on
-     * this element
-     *
-     * @param v
-     *        the Visitor
-     */
     public void visit(Visitor v) {
         v.performActionOnModifier(this);
+    }
+
+
+    @Override
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+        final ProgramElement src = source.getSource();
+        if (src instanceof Modifier other) {
+            if (this.keyword.equals(other.getKind())) {
+                return super.match(source, matchCond);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -70,13 +74,17 @@ public abstract class Modifier extends JavaProgramElement {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
+    public final boolean equals(Object o) {
+        if (!(o instanceof Modifier modifier))
             return false;
-        Modifier other = (Modifier) o;
-        return other.getSymbol().equals(getSymbol()) && super.equals(other);
+        if (!super.equals(o))
+            return false;
+
+        return keyword.equals(modifier.keyword);
     }
 
+    @Override
+    public int computeHashCode() {
+        return 31 * keyword.hashCode();
+    }
 }
