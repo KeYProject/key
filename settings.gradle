@@ -14,6 +14,7 @@ include "key.util"
 include "key.ncore"
 include 'key.ncore.calculus'
 include 'key.ncore.matcher'
+include 'key.ncore.java'
 
 include "key.core"
 //include "key.core.rifl"
