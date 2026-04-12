@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -305,7 +305,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
         SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());
-        if (!(firstElement instanceof CopyAssignment assignment)) {
+        if (!(firstElement instanceof Assignment assignment)) {
             return null;
         }
         ProgramElement rightChild = assignment.getChildAt(1);

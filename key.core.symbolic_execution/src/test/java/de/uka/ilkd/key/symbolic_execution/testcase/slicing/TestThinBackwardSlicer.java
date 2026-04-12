@@ -10,7 +10,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.proof.Node;
@@ -781,8 +781,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertInstanceOf(CopyAssignment.class, activeStatemt);
-            CopyAssignment assignment = (CopyAssignment) activeStatemt;
+            Assertions.assertInstanceOf(Assignment.class, activeStatemt);
+            Assignment assignment = (Assignment) activeStatemt;
             SourceElement seedLocation = assignment.getChildAt(1);
             return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
         }
@@ -818,8 +818,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertInstanceOf(CopyAssignment.class, activeStatemt);
-            CopyAssignment assignment = (CopyAssignment) activeStatemt;
+            Assertions.assertInstanceOf(Assignment.class, activeStatemt);
+            Assignment assignment = (Assignment) activeStatemt;
             SourceElement seedLocation = assignment.getChildAt(0);
             return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
         }

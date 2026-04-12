@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
@@ -114,7 +114,8 @@ public class InitArrayCreation extends InitArray {
             pvars[i] = (ProgramVariable) argDecl.getVariables().get(0).getProgramVariable();
 
             bodyStmnts.add(argDecl);
-            final LessThan negativeDimension = KeYJavaASTFactory.lessThanZeroOperator(pvars[i]);
+            final BinaryOperator negativeDimension =
+                KeYJavaASTFactory.lessThanZeroOperator(pvars[i]);
             if (i == 0) {
                 checkDimensions = negativeDimension;
             } else {
@@ -192,10 +193,9 @@ public class InitArrayCreation extends InitArray {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
-        final Expression array = (Expression) svInst.getInstantiation(newObjectSV);
+        final Expression array = svInst.getInstantiation(newObjectSV);
 
-        NewArray na = null;
-
+        NewArray na;
         if (pe instanceof NewArray) {
             na = (NewArray) pe;
             if (na.getArrayInitializer() == null) {
@@ -204,7 +204,7 @@ public class InitArrayCreation extends InitArray {
             }
         } else if (pe instanceof ArrayInitializer init) {
             final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
-            ArrayType arrayType = null;
+            ArrayType arrayType;
             try {
                 arrayType = (ArrayType) kjt.getJavaType();
             } catch (ClassCastException e) {

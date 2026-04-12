@@ -9,8 +9,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
@@ -38,7 +38,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             throws ProofInputException {
         try {
             boolean accept = false;
-            if (activeStatement instanceof CopyAssignment copyAssignment) {
+            if (activeStatement instanceof Assignment copyAssignment) {
                 ImmutableArray<Expression> arguments = copyAssignment.getArguments();
                 if (arguments.size() >= 1) {
                     SourceElement originalTarget = arguments.get(0);
