@@ -9,7 +9,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
@@ -42,7 +42,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The visibility of the class invariant (null for default visibility).
      */
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     /**
      * The original invariant from which the class invariant is derived.
      */
@@ -77,7 +77,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
+            ModifierKind visibility, JTerm inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -93,7 +93,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
+            ModifierKind visibility, JTerm inv, LocationVariable selfVar,
             boolean free) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -186,7 +186,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 

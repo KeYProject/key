@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
@@ -1446,7 +1446,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public Modifier.ModifierKind getVisibility() {
         assert false; // this is currently not applicable for contracts
         return null;
     }

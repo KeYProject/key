@@ -9,7 +9,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -30,7 +30,7 @@ public final class ContractAxiom extends ClassAxiom {
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     private final JTerm originalPre;
     private final JTerm originalFreePre;
     private final JTerm originalPost;
@@ -42,7 +42,7 @@ public final class ContractAxiom extends ClassAxiom {
     private final Map<LocationVariable, LocationVariable> atPreVars;
 
     public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
+            ModifierKind visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
             JTerm mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
@@ -50,7 +50,7 @@ public final class ContractAxiom extends ClassAxiom {
     }
 
     public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm originalPre, JTerm originalFreePre,
+            ModifierKind visibility, JTerm originalPre, JTerm originalFreePre,
             JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
             Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
@@ -146,7 +146,7 @@ public final class ContractAxiom extends ClassAxiom {
     }
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 

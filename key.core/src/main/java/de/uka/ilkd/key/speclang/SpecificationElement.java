@@ -7,10 +7,9 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.logic.JTerm;
 
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -32,8 +31,7 @@ public interface SpecificationElement {
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    @Nullable
-    VisibilityModifier getVisibility();
+    Modifier.ModifierKind getVisibility();
 
 
     /**

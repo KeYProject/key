@@ -6,15 +6,15 @@ package de.uka.ilkd.key.java.ast.declaration;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
+
 
 public class ClassInitializer extends JavaDeclaration
         implements MemberDeclaration, StatementContainer {
-
 
 
     protected final StatementBlock body;
@@ -26,8 +26,10 @@ public class ClassInitializer extends JavaDeclaration
     }
 
 
-    public ClassInitializer(Static modifier, StatementBlock body) {
-        super(new Modifier[] { modifier });
+    public ClassInitializer(boolean isStatic, StatementBlock body) {
+        super(
+            isStatic ? createModifierList(Modifier.ModifierKind.STATIC)
+                    : createModifierList());
         this.body = body;
     }
 
@@ -40,15 +42,13 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Class initializer.
      *
-     * @param children
-     *        list with all children. May include: a StatementBlock (taken as body of the
+     * @param children list with all children. May include: a StatementBlock (taken as body of the
      *        ClassInitialiyer), several Modifier (taken as modifiers of the declaration), a Comment
      */
     public ClassInitializer(ExtList children) {
         super(children);
         body = children.get(StatementBlock.class);
     }
-
 
 
     public StatementBlock getBody() {
@@ -92,11 +92,9 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -116,7 +114,9 @@ public class ClassInitializer extends JavaDeclaration
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** A binary class initializer does not occur. */
+    /**
+     * A binary class initializer does not occur.
+     */
 
     public boolean isBinary() {
         return false;
@@ -171,8 +171,7 @@ public class ClassInitializer extends JavaDeclaration
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnClassInitializer(this);

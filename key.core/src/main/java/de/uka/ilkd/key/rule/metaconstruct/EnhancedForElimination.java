@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
@@ -253,7 +252,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         data.setValuesVariable(KeYJavaASTFactory.localVariable(services, VALUES, seqType));
 
         // ghost \seq values = \seq_empty
-        final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(), data.valuesVariable(),
+        final Statement valuesInit = KeYJavaASTFactory.declare(
+            new Modifier(Modifier.ModifierKind.JML_GHOST), data.valuesVariable(),
             EmptySeqLiteral.INSTANCE, seqType);
 
         // Iterator itVar = expression.iterator();

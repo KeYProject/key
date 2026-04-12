@@ -7,7 +7,7 @@ package de.uka.ilkd.key.speclang.jml;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -68,9 +68,9 @@ public final class JMLInfoExtractor {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
         var specBigintMath =
-            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
-        var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
-        var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
+            methodDeclaration.containsModifier(ModifierKind.JML_SPEC_BIGINT_MATH);
+        var specSafeMath = methodDeclaration.containsModifier(ModifierKind.JML_SPEC_SAFE_MATH);
+        var specJavaMath = methodDeclaration.containsModifier(ModifierKind.JML_SPEC_JAVA_MATH);
         // Consistency: bigint > safe > java
         var specMathMode = specBigintMath ? SpecMathMode.BIGINT
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
@@ -118,14 +118,14 @@ public final class JMLInfoExtractor {
      * @return modifiers
      */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
-        var pure = methodDeclaration.containsModifier(Modifiers.JML_PURE.class);
-        var strictlyPure = methodDeclaration.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
-        var helper = methodDeclaration.containsModifier(Modifiers.JML_HELPER.class);
+        var pure = methodDeclaration.containsModifier(ModifierKind.JML_PURE);
+        var strictlyPure = methodDeclaration.containsModifier(ModifierKind.JML_STRICTLY_PURE);
+        var helper = methodDeclaration.containsModifier(ModifierKind.JML_HELPER);
 
         var specBigintMath =
-            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
-        var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
-        var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
+            methodDeclaration.containsModifier(ModifierKind.JML_SPEC_BIGINT_MATH);
+        var specSafeMath = methodDeclaration.containsModifier(ModifierKind.JML_SPEC_SAFE_MATH);
+        var specJavaMath = methodDeclaration.containsModifier(ModifierKind.JML_SPEC_JAVA_MATH);
         // Consistency: bigint > safe > java
         var specMathMode = specBigintMath ? SpecMathMode.BIGINT
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
@@ -155,7 +155,7 @@ public final class JMLInfoExtractor {
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, Class<? extends Modifier> modifier) {
+    public static boolean hasJMLModifier(FieldDeclaration fd, ModifierKind modifier) {
         return fd.containsModifier(modifier);
     }
 
@@ -212,9 +212,9 @@ public final class JMLInfoExtractor {
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
         var comments = getJMLComments(td);
 
-        var pure = td.containsModifier(Modifiers.JML_PURE.class);
-        var strictlyPure = td.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
-        var nullableByDefault = td.containsModifier(Modifiers.JML_NULLABLE_BY_DEFAULT.class);
+        var pure = td.containsModifier(ModifierKind.JML_PURE);
+        var strictlyPure = td.containsModifier(ModifierKind.JML_STRICTLY_PURE);
+        var nullableByDefault = td.containsModifier(ModifierKind.JML_NULLABLE_BY_DEFAULT);
 
         var specMathMode = checkForSpecMathMode(td);
 
@@ -228,8 +228,8 @@ public final class JMLInfoExtractor {
      */
     public static boolean isNullable(FieldDeclaration decl, TypeDeclaration td) {
 
-        boolean non_null = decl.containsModifier(Modifiers.JML_NON_NULL.class);
-        boolean nullable = decl.containsModifier(Modifiers.JML_NULLABLE.class);
+        boolean non_null = decl.containsModifier(ModifierKind.JML_NON_NULL);
+        boolean nullable = decl.containsModifier(ModifierKind.JML_NULLABLE);
 
         if (!non_null && !nullable) {
             return td.getJmlModifiers().nullableByDefault();
@@ -258,8 +258,8 @@ public final class JMLInfoExtractor {
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd) : "parameter " + pd
             + " does not belong to method declaration " + pm;
-        boolean non_null = pd.containsModifier(Modifiers.JML_NON_NULL.class);
-        boolean nullable = pd.containsModifier(Modifiers.JML_NULLABLE.class);
+        boolean non_null = pd.containsModifier(ModifierKind.JML_NON_NULL);
+        boolean nullable = pd.containsModifier(ModifierKind.JML_NULLABLE);
 
         if (!non_null && !nullable) {
             return isNullableByDefault(pm.getContainerType());
@@ -271,8 +271,8 @@ public final class JMLInfoExtractor {
 
     public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration decl = pm.getMethodDeclaration();
-        boolean non_null = decl.containsModifier(Modifiers.JML_NON_NULL.class);
-        boolean nullable = decl.containsModifier(Modifiers.JML_NULLABLE.class);
+        boolean non_null = decl.containsModifier(ModifierKind.JML_NON_NULL);
+        boolean nullable = decl.containsModifier(ModifierKind.JML_NULLABLE);
 
         if (!non_null && !nullable) {
             return isNullableByDefault(pm.getContainerType());
