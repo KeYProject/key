@@ -148,8 +148,6 @@ public class Modifier extends JavaProgramElement {
 
     @Override
     public int computeHashCode() {
-        int result = super.hashCode();
-        result = 31 * result + keyword.hashCode();
-        return result;
+        return 31 * keyword.hashCode();
     }
 }

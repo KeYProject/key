@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.POST_INCREMENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -68,7 +69,7 @@ public class TestVariableNamer {
     }
 
     private SequentFormula constructFormula(ProgramVariable containedVar) {
-        Statement statement = new PostIncrement(containedVar);
+        Statement statement = new UnaryOperator(POST_INCREMENT, containedVar);
         StatementBlock statementBlock = new StatementBlock(statement);
         JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
@@ -115,7 +116,7 @@ public class TestVariableNamer {
 
         SchemaVariable sv = SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
             ProgramSVSort.STATEMENT, false);
-        Statement statement = new PostIncrement(containedVar);
+        Statement statement = new UnaryOperator(POST_INCREMENT, containedVar);
         app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement,
             goal.proof().getServices(), false);
 
@@ -132,8 +133,9 @@ public class TestVariableNamer {
             SVInstantiations insts = noPosTacletApp.instantiations();
             for (var e : insts.getInstantiationMap()) {
                 Object inst = e.value().getInstantiation();
-                if (inst instanceof PostIncrement postIncrement
-                        && postIncrement.getFirstElement() == containedVar) {
+                if (inst instanceof UnaryOperator uo
+                        && uo.kind == POST_INCREMENT
+                        && uo.getFirstElement() == containedVar) {
                     return true;
                 }
             }

@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -342,17 +343,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            try (var s = Files.walk(tmpDir)) {
-                s.sorted(Comparator.reverseOrder())
-                        // .map(Path::toFile)
-                        .forEach(path -> {
-                            try {
-                                Files.delete(path);
-                                // path.delete();
-                            } catch (IOException e) {
-                                LOGGER.info("Failed to delete file", e);
-                            }
-                        });
+            try (Stream<Path> s = Files.walk(tmpDir).sorted(Comparator.reverseOrder())) {
+                s.forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                        // path.delete();
+                    } catch (IOException e) {
+                        LOGGER.info("Could not clean up temp directory {}", path);
+                    }
+                });
             }
         }
     }

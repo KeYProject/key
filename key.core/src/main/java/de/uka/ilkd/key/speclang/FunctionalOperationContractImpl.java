@@ -12,8 +12,8 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -979,7 +979,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (originalResultVar == null) {
             callStatement = mr;
         } else {
-            callStatement = new CopyAssignment(originalResultVar, mr);
+            callStatement = new Assignment(Assignment.AssignmentKind.COPY, originalResultVar, mr);
         }
         final CatchAllStatement cas = new CatchAllStatement(new StatementBlock(callStatement),
             originalExcVar);

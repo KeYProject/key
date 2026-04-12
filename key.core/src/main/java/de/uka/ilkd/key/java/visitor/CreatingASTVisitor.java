@@ -12,12 +12,8 @@ import de.uka.ilkd.key.java.ast.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -599,17 +595,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new CopyAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
     public void performActionOnSetStatement(SetStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -623,99 +608,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnPreIncrement(PreIncrement x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new PreIncrement(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPostIncrement(PostIncrement x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new PostIncrement(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPlus(Plus x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Plus(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnTimes(Times x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Times(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnMinus(Minus x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Minus(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnEquals(Equals x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Equals(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnNotEquals(NotEquals x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new NotEquals(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
     public void performActionOnReturn(Return x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return new Return(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnLessThan(LessThan x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new LessThan(changeList);
             }
         };
         def.doAction(x);
@@ -754,192 +651,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    @Override
-    public void performActionOnGreaterThan(GreaterThan x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new GreaterThan(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
-    @Override
-    public void performActionOnBinaryAnd(BinaryAnd x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryAnd(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryOr(BinaryOr x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryOr(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryXOr(BinaryXOr x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryXOr(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryNot(BinaryNot x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryNot(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryAndAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryOrAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new BinaryXOrAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnDivideAssignment(DivideAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new DivideAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnMinusAssignment(MinusAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new MinusAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnModuloAssignment(ModuloAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ModuloAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPlusAssignment(PlusAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new PlusAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPostDecrement(PostDecrement x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new PostDecrement(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPreDecrement(PreDecrement x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new PreDecrement(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ShiftLeftAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ShiftRightAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnTimesAssignment(TimesAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new TimesAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
     @Override
     public void performActionOnConditional(Conditional x) {
@@ -952,27 +664,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    @Override
-    public void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new UnsignedShiftRightAssignment(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnDivide(Divide x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Divide(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
     @Override
     public void performActionOnNewArray(NewArray x) {
@@ -1012,104 +703,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    @Override
-    public void performActionOnLogicalNot(LogicalNot x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new LogicalNot(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnLogicalAnd(LogicalAnd x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new LogicalAnd(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnLogicalOr(LogicalOr x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new LogicalOr(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnModulo(Modulo x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Modulo(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnNegative(Negative x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Negative(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnPositive(Positive x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Positive(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftLeft(ShiftLeft x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ShiftLeft(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnShiftRight(ShiftRight x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ShiftRight(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new UnsignedShiftRight(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
     // ppp
     @Override
@@ -1281,28 +874,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnLessOrEquals(LessOrEquals x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new LessOrEquals(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new GreaterOrEquals(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
     public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -1381,105 +952,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnSingleton(Singleton x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Singleton(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSetUnion(SetUnion x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SetUnion(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnIntersect(Intersect x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new Intersect(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSetMinus(SetMinus x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SetMinus(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnAllFields(AllFields x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new AllFields(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqSingleton(SeqSingleton x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqSingleton(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqConcat(SeqConcat x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqConcat(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqReverse(SeqReverse x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqReverse(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnSeqPut(SeqPut x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqPut(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -1491,25 +963,23 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnSeqSub(SeqSub x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqSub(changeList);
-            }
-        };
-        def.doAction(x);
+    public void performActionOnBinaryOperator(BinaryOperator x) {
+        super.performActionOnBinaryOperator(x);
     }
 
     @Override
-    public void performActionOnSeqLength(SeqLength x) {
-        DefaultAction def = new DefaultAction(x) {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SeqLength(changeList);
-            }
-        };
-        def.doAction(x);
+    public void performActionOnUnaryOperator(UnaryOperator x) {
+        super.performActionOnUnaryOperator(x);
+    }
+
+    @Override
+    public void performActionOnLogicFunctionalOperator(LogicFunctionalOperator x) {
+        super.performActionOnLogicFunctionalOperator(x);
+    }
+
+    @Override
+    public void performActionOnAssignment(Assignment x) {
+        super.performActionOnAssignment(x);
     }
 
     @Override

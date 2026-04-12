@@ -13,8 +13,8 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.MethodOrConstructorReference;
@@ -77,7 +77,7 @@ public class EvaluateArgs extends ProgramTransformer {
         final ExecutionContext ec = svInst.getExecutionContext();
 
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
-        (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1) : pe);
+        (pe instanceof Assignment a ? a.getChildAt(1) : pe);
 
         List<Statement> evalstat = new LinkedList<>();
 
@@ -119,8 +119,8 @@ public class EvaluateArgs extends ProgramTransformer {
             resMR = null;
         }
 
-        if (pe instanceof CopyAssignment) {
-            res[res.length - 1] = KeYJavaASTFactory.assign(((CopyAssignment) pe).getExpressionAt(0),
+        if (pe instanceof Assignment a) {
+            res[res.length - 1] = KeYJavaASTFactory.assign(a.getExpressionAt(0),
                 (Expression) resMR);
         } else {
             res[res.length - 1] = resMR;

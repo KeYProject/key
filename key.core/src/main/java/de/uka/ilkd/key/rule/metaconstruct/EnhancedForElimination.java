@@ -19,8 +19,6 @@ import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
@@ -38,6 +36,10 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqConcat;
+import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqSingleton;
 
 /**
  *
@@ -305,9 +307,11 @@ public class EnhancedForElimination extends ProgramTransformer {
         final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable
                 : "Since this is a concrete program, the spec must not be schematic";
-        final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
-        final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
-        return new CopyAssignment(valuesVar, seqConcat);
+        final Expression seqSingleton =
+            new LogicFunctionalOperator(SeqSingleton, (ProgramVariable) element);
+        final Expression seqConcat =
+            new LogicFunctionalOperator(SeqConcat, valuesVar, seqSingleton);
+        return new Assignment(COPY, valuesVar, seqConcat);
     }
 
     /**

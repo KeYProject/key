@@ -9,7 +9,9 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
@@ -118,7 +120,10 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
-        return sub != null && sub.sort().extendsTrans(targetSort()) && op instanceof Negative;
+        return sub != null && sub.sort().extendsTrans(targetSort()) &&
+                op instanceof UnaryOperator u
+                && u.getKind() == UnaryOperatorKind.NEGATIVE;
+
     }
 
     @Override
@@ -133,17 +138,25 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        return switch (op) {
-            case GreaterThan ignored -> getGreaterThan();
-            case LessThan ignored -> getLessThan();
-            case GreaterOrEquals ignored -> getGreaterOrEquals();
-            case LessOrEquals ignored -> getLessOrEquals();
-            case Negative ignored -> getJavaUnaryMinus();
-            case Plus ignored -> getJavaAdd();
-            case Minus ignored -> getJavaSub();
-            case Times ignored -> getJavaMul();
-            case Divide ignored -> getJavaDiv();
-            case Modulo ignored -> getJavaMod();
+        if ((op instanceof UnaryOperator u)
+                && u.getKind() == UnaryOperatorKind.NEGATIVE) {
+            return getJavaUnaryMinus();
+        }
+
+        if (!(op instanceof BinaryOperator b)) {
+            return null;
+        }
+
+        return switch (b.getKind()) {
+            case GREATER_THAN -> getGreaterThan();
+            case LESS_THAN -> getLessThan();
+            case GREATER_OR_EQUALS -> getGreaterOrEquals();
+            case LESS_OR_EQUALS -> getLessOrEquals();
+            case PLUS -> getJavaAdd();
+            case MINUS -> getJavaSub();
+            case TIMES -> getJavaMul();
+            case DIVIDE -> getJavaDiv();
+            case MODULO -> getJavaMod();
             default -> null;
         };
     }
