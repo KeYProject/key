@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
@@ -134,9 +135,8 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
-        return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
-                || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
-                || op instanceof SeqLength || op instanceof SeqPut;
+        return op instanceof LogicFunctionalOperator lfo
+                && lfo.getFunction().returnType == PrimitiveType.JAVA_SEQ;
     }
 
 
@@ -149,15 +149,19 @@ public final class SeqLDT extends LDT {
 
     @Override
     public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
-        return switch (op) {
-            case SeqSingleton ignored -> seqSingleton;
-            case SeqConcat ignored -> seqConcat;
-            case SeqSub ignored -> seqSub;
-            case SeqReverse ignored -> seqReverse;
-            case SeqPut ignored -> seqUpd;
-            case SeqIndexOf ignored -> seqIndexOf;
-            case SeqGet ignored -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
-            case SeqLength ignored -> seqLen;
+        if (!(op instanceof LogicFunctionalOperator lfo)) {
+            throw new IllegalArgumentException("Not a logical functional");
+        }
+
+        return switch (lfo.getFunction()) {
+            case SeqSingleton -> seqSingleton;
+            case SeqConcat -> seqConcat;
+            case SeqSub -> seqSub;
+            case SeqReverse -> seqReverse;
+            case SeqPut -> seqUpd;
+            case SeqIndexOf -> seqIndexOf;
+            case SeqGet -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
+            case SeqLength -> seqLen;
             default -> throw new AssertionError();
         };
     }

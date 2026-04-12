@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.Throw;
@@ -90,7 +89,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof CopyAssignment ca) {
+        } else if (activeStatement instanceof Assignment ca) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -328,7 +327,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
 
-            assert pe instanceof CopyAssignment || pe instanceof MethodReference
+            assert pe instanceof Assignment || pe instanceof MethodReference
                     || pe instanceof New;
 
             int i = length - 1;
@@ -341,7 +340,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             } while (i >= 0);
 
         } else {
-            assert pe instanceof CopyAssignment || pe instanceof MethodReference
+            assert pe instanceof Assignment || pe instanceof MethodReference
                     || pe instanceof New;
         }
         return result;
@@ -927,7 +926,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             if (inst.actualResult == null) {
                 resultAssign = new StatementBlock();
             } else {
-                final CopyAssignment ca = new CopyAssignment(inst.actualResult, resultVar);
+                final Assignment ca =
+                    new Assignment(Assignment.AssignmentKind.COPY, inst.actualResult, resultVar);
                 resultAssign = new StatementBlock(ca);
             }
             final StatementBlock postSB = replaceStatement(jb, resultAssign);

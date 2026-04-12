@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.*;
@@ -29,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.NEGATIVE;
 
 /**
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
@@ -436,8 +437,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (pe instanceof Negative) {
-                return ((Negative) pe).getChildAt(0) instanceof Literal;
+            if (pe instanceof UnaryOperator uo && uo.getKind() == NEGATIVE) {
+                return uo.getChildAt(0) instanceof Literal;
             }
 
             if (pe instanceof StringLiteral) {
@@ -453,16 +454,10 @@ public abstract class ProgramSVSort extends SortImpl {
                 return VARIABLE.canStandFor(v, services);
             }
 
-            if (pe instanceof SetUnion || pe instanceof Singleton || pe instanceof Intersect
-                    || pe instanceof SetMinus || pe instanceof AllFields || pe instanceof AllObjects
-                    || pe instanceof SeqSingleton || pe instanceof SeqConcat
-                    || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
-                    || pe instanceof SeqSub || pe instanceof SeqReverse || pe instanceof SeqPut) {
-                if (pe instanceof NonTerminalProgramElement npe) {
-                    for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
-                        if (!canStandFor(npe.getChildAt(i), services)) {
-                            return false;
-                        }
+            if (pe instanceof LogicFunctionalOperator npe) {
+                for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
+                    if (!canStandFor(npe.getChildAt(i), services)) {
+                        return false;
                     }
                 }
                 return true;

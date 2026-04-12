@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -88,6 +89,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
      * @param visibility the visibility of the invariant (null for default visibility)
+     *        TODO weigl: what is the "default visibility"?
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      * @param free whether this contract is free.
@@ -95,15 +97,20 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
             ModifierKind visibility, JTerm inv, LocationVariable selfVar,
             boolean free) {
-        assert name != null && !name.isEmpty();
-        assert displayName != null && !displayName.isEmpty();
-        assert kjt != null;
-        assert inv != null;
-        this.name = name;
-        this.displayName = displayName;
-        this.kjt = kjt;
-        this.visibility = visibility;
-        this.originalInv = inv;
+
+        this.name = Objects.requireNonNull(name);
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("name must not be blank");
+        }
+
+        this.displayName = Objects.requireNonNull(displayName);
+        if (displayName.isEmpty()) {
+            throw new IllegalArgumentException("displayName must not be empty");
+        }
+
+        this.kjt = Objects.requireNonNull(kjt);
+        this.visibility = Objects.requireNonNullElse(visibility, ModifierKind.PUBLIC);
+        this.originalInv = Objects.requireNonNull(inv);
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);

@@ -8,7 +8,8 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
@@ -50,21 +51,24 @@ public final class SortLDT extends LDT {
     public boolean isResponsible(Operator op, JTerm[] subs,
             Services services,
             ExecutionContext ec) {
-        return op instanceof Subtype;
+        return op instanceof BinaryOperator lfo
+                && lfo.getKind() == BinaryOperatorKind.SUBTYPE;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services,
             ExecutionContext ec) {
-        return op instanceof Subtype;
+        return op instanceof BinaryOperator lfo
+                && lfo.getKind() == BinaryOperatorKind.SUBTYPE;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services,
             ExecutionContext ec) {
-        return op instanceof Subtype;
+        return op instanceof BinaryOperator lfo
+                && lfo.getKind() == BinaryOperatorKind.SUBTYPE;
     }
 
     @Override
@@ -76,7 +80,8 @@ public final class SortLDT extends LDT {
     @Override
     public Function getFunctionFor(Operator op, Services services,
             ExecutionContext ec) {
-        if (op instanceof Subtype) {
+        if (op instanceof BinaryOperator lfo
+                && lfo.getKind() == BinaryOperatorKind.SUBTYPE) {
             return ssubsort;
         }
 

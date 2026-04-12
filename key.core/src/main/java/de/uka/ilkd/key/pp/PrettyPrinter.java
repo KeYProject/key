@@ -12,10 +12,8 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
-import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -44,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * A configurable pretty printer for Java source elements originally from COMPOST.
  *
  * @author AL
- *
+ *         <p>
  *         CHANGED FOR KeY. Comments are not printed!
  */
 @NullMarked
@@ -63,7 +61,9 @@ public class PrettyPrinter implements Visitor {
     private final boolean useUnicodeSymbols;
     private final boolean hidePackagePrefix;
 
-    /** creates a new PrettyPrinter */
+    /**
+     * creates a new PrettyPrinter
+     */
     public PrettyPrinter(PosTableLayouter out) {
         this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true, true);
     }
@@ -322,88 +322,10 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    @Override
-    public void performActionOnSingleton(Singleton x) {
-        printDLFunctionOperator("\\singleton", x);
-    }
-
-    @Override
-    public void performActionOnSetUnion(SetUnion x) {
-        printDLFunctionOperator("\\set_union", x);
-    }
-
-    @Override
-    public void performActionOnIntersect(Intersect x) {
-        printDLFunctionOperator("\\intersect", x);
-    }
-
-    @Override
-    public void performActionOnSetMinus(SetMinus x) {
-        printDLFunctionOperator("\\set_minus", x);
-    }
-
-
-    @Override
-    public void performActionOnAllFields(AllFields x) {
-        printDLFunctionOperator("\\all_fields", x);
-    }
-
-    @Override
-    public void performActionOnAllObjects(
-            AllObjects x) {
-        printDLFunctionOperator("\\all_objects", x);
-    }
 
     @Override
     public void performActionOnEmptySeqLiteral(EmptySeqLiteral x) {
         layouter.print("\\seq_empty");
-    }
-
-    @Override
-    public void performActionOnSeqLength(SeqLength x) {
-        x.getChildAt(0).visit(this);
-        layouter.print(".length");
-    }
-
-    @Override
-    public void performActionOnSeqGet(SeqGet x) {
-        x.getChildAt(0).visit(this);
-        layouter.print("[");
-        x.getChildAt(1).visit(this);
-        layouter.print("]");
-    }
-
-    @Override
-    public void performActionOnSeqSingleton(
-            SeqSingleton x) {
-        printDLFunctionOperator("\\seq_singleton", x);
-    }
-
-    @Override
-    public void performActionOnSeqConcat(SeqConcat x) {
-        printDLFunctionOperator("\\seq_concat", x);
-    }
-
-    @Override
-    public void performActionOnSeqIndexOf(
-            SeqIndexOf x) {
-        printDLFunctionOperator("\\indexOf", x);
-    }
-
-    @Override
-    public void performActionOnSeqSub(SeqSub x) {
-        printDLFunctionOperator("\\seq_sub", x);
-    }
-
-    @Override
-    public void performActionOnSeqReverse(
-            SeqReverse x) {
-        printDLFunctionOperator("\\seq_reverse", x);
-    }
-
-    @Override
-    public void performActionOnSeqPut(SeqPut x) {
-        printDLFunctionOperator("\\seq_upd", x);
     }
 
     @Override
@@ -499,11 +421,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnIProgramVariable(IProgramVariable x) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
         // No idea what to do here
     }
@@ -593,8 +510,23 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSubtype(Subtype x) {
-        printOperator(x, "<:");
+    public void performActionOnBinaryOperator(BinaryOperator op) {
+        printOperator(op, op.getKind().symbol);
+    }
+
+    @Override
+    public void performActionOnUnaryOperator(UnaryOperator op) {
+        printOperator(op, op.getKind().symbol);
+    }
+
+    @Override
+    public void performActionOnLogicFunctionalOperator(LogicFunctionalOperator op) {
+        op.getFunction().format.call(this, op);
+    }
+
+    @Override
+    public void performActionOnAssignment(Assignment assignment) {
+        printOperator(assignment, assignment.getKind().symbol + "=");
     }
 
     private void performActionOnType(@Nullable Type type) {
@@ -1296,108 +1228,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnBinaryAnd(BinaryAnd x) {
-        printOperator(x, "&");
-    }
-
-    @Override
-    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
-        printOperator(x, "&=");
-    }
-
-    @Override
-    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
-        printOperator(x, "|=");
-    }
-
-    @Override
-    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
-        printOperator(x, "^=");
-    }
-
-    @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-        x.getArguments().get(0).visit(this);
-        layouter.print(" = ");
-        x.getArguments().get(1).visit(this);
-    }
-
-    @Override
-    public void performActionOnDivideAssignment(DivideAssignment x) {
-        printOperator(x, "/=");
-    }
-
-    @Override
-    public void performActionOnMinusAssignment(MinusAssignment x) {
-        printOperator(x, "-=");
-    }
-
-    @Override
-    public void performActionOnModuloAssignment(ModuloAssignment x) {
-        printOperator(x, "%=");
-    }
-
-    @Override
-    public void performActionOnPlusAssignment(PlusAssignment x) {
-        printOperator(x, "+=");
-    }
-
-    @Override
-    public void performActionOnPostDecrement(PostDecrement x) {
-        printOperator(x, "--");
-    }
-
-    @Override
-    public void performActionOnPostIncrement(PostIncrement x) {
-        printOperator(x, "++");
-    }
-
-    @Override
-    public void performActionOnPreDecrement(PreDecrement x) {
-        printOperator(x, "--");
-    }
-
-    @Override
-    public void performActionOnPreIncrement(PreIncrement x) {
-        printOperator(x, "++");
-    }
-
-    @Override
-    public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
-        printOperator(x, "<<=");
-    }
-
-    @Override
-    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
-        printOperator(x, ">>=");
-    }
-
-    @Override
-    public void performActionOnTimesAssignment(TimesAssignment x) {
-        printOperator(x, "*=");
-    }
-
-    @Override
-    public void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
-        printOperator(x, ">>>=");
-    }
-
-    @Override
-    public void performActionOnBinaryNot(BinaryNot x) {
-        printOperator(x, "~");
-    }
-
-    @Override
-    public void performActionOnBinaryOr(BinaryOr x) {
-        printOperator(x, "|");
-    }
-
-    @Override
-    public void performActionOnBinaryXOr(BinaryXOr x) {
-        printOperator(x, "^");
-    }
-
-    @Override
     public void performActionOnConditional(Conditional x) {
         boolean addParentheses = x.isToBeParenthesized();
         if (x.getArguments() != null) {
@@ -1415,41 +1245,6 @@ public class PrettyPrinter implements Visitor {
             }
             layouter.end();
         }
-    }
-
-    @Override
-    public void performActionOnDivide(Divide x) {
-        printOperator(x, "/");
-    }
-
-    @Override
-    public void performActionOnEquals(Equals x) {
-        printOperator(x, "==");
-    }
-
-    @Override
-    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
-        printOperator(x, ">=");
-    }
-
-    @Override
-    public void performActionOnGreaterThan(GreaterThan x) {
-        printOperator(x, ">");
-    }
-
-    @Override
-    public void performActionOnLessOrEquals(LessOrEquals x) {
-        printOperator(x, "<=");
-    }
-
-    @Override
-    public void performActionOnLessThan(LessThan x) {
-        printOperator(x, "<");
-    }
-
-    @Override
-    public void performActionOnNotEquals(NotEquals x) {
-        printOperator(x, "!=");
     }
 
     @Override
@@ -1549,66 +1344,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnLogicalAnd(LogicalAnd x) {
-        printOperator(x, "&&");
-    }
-
-    @Override
-    public void performActionOnLogicalNot(LogicalNot x) {
-        printOperator(x, "!");
-    }
-
-    @Override
-    public void performActionOnLogicalOr(LogicalOr x) {
-        printOperator(x, "||");
-    }
-
-    @Override
-    public void performActionOnMinus(Minus x) {
-        printOperator(x, "-");
-    }
-
-    @Override
-    public void performActionOnModulo(Modulo x) {
-        printOperator(x, "%");
-    }
-
-    @Override
-    public void performActionOnNegative(Negative x) {
-        printOperator(x, "-");
-    }
-
-    @Override
-    public void performActionOnPlus(Plus x) {
-        printOperator(x, "+");
-    }
-
-    @Override
-    public void performActionOnPositive(Positive x) {
-        printOperator(x, "+");
-    }
-
-    @Override
-    public void performActionOnShiftLeft(ShiftLeft x) {
-        printOperator(x, "<<");
-    }
-
-    @Override
-    public void performActionOnShiftRight(ShiftRight x) {
-        printOperator(x, ">>");
-    }
-
-    @Override
-    public void performActionOnTimes(Times x) {
-        printOperator(x, "*");
-    }
-
-    @Override
-    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
-        printOperator(x, ">>>");
-    }
-
-    @Override
     public void performActionOnArrayReference(ArrayReference x) {
         x.getReferencePrefix().visit(this);
         int s = x.getDimensionExpressions().size();
@@ -1640,11 +1375,6 @@ public class PrettyPrinter implements Visitor {
         }
 
         printArguments(x.getArguments());
-    }
-
-    @Override
-    public void performActionOnMethod(IProgramMethod x) {
-        layouter.print(x.name().toString());
     }
 
     public void writeFullMethodSignature(IProgramMethod x) {
@@ -2013,6 +1743,43 @@ public class PrettyPrinter implements Visitor {
             hidePackagePrefix);
         lp.printTerm(t);
         return lp.result();
+    }
+
+
+    public interface PrintOp {
+        void call(PrettyPrinter pp, LogicFunctionalOperator op);
+    }
+
+    public static PrintOp AsFunction(String fnSymbol) {
+        return (pp, op) -> {
+            pp.layouter.print(fnSymbol);
+            pp.layouter.print("(");
+            final var arguments = op.getArguments();
+            for (int i = 0; i < arguments.size(); i++) {
+                arguments.get(i).visit(pp);
+                if (i < arguments.size() - 1) {
+                    pp.layouter.print(", ");
+                }
+            }
+            pp.layouter.print(")");
+        };
+    }
+
+    public static PrintOp AsArrayAccess() {
+        return (pp, op) -> {
+            op.getArguments().get(0).visit(pp);
+            pp.layouter.print("[");
+            op.getArguments().get(1).visit(pp);
+            pp.layouter.print("]");
+        };
+    }
+
+    public static PrintOp AsSuffix(String field) {
+        return (pp, op) -> {
+            op.getArguments().get(0).visit(pp);
+            pp.layouter.print(".");
+            pp.layouter.print(field);
+        };
     }
 
 }

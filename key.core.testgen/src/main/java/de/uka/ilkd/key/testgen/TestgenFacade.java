@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -66,7 +67,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
 
                     tg.generateJUnitTestSuite(finishedSolvers);
                     reporter.writeln("Compile the generated files using a Java compiler.");
-                } catch (IOException e) {
+                } catch (NoSuchElementException | IOException e) {
                     reporter.reportException(e);
                 }
             }
