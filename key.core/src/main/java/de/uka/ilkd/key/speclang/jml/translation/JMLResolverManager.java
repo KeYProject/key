@@ -7,10 +7,8 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
@@ -33,13 +31,12 @@ public final class JMLResolverManager extends SLResolverManager {
 
 
     @Override
-    public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-            Modifiers.JML_SPEC_PUBLIC.class)) {
-            return new Public();
+    public Modifier getSpecVisibility(MemberDeclaration md) {
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, ModifierKind.JML_SPEC_PUBLIC)) {
+            return new Modifier(ModifierKind.PUBLIC);
         } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
-            Modifiers.JML_SPEC_PROTECTED.class)) {
-            return new Protected();
+            ModifierKind.JML_SPEC_PROTECTED)) {
+            return new Modifier(ModifierKind.PRIVATE);
         } else {
             return null;
         }

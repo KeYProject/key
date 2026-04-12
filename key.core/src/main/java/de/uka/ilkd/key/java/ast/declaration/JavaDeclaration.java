@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.declaration.modifier.*;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Java declaration.
@@ -98,11 +99,12 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * is one, null otherwise. A return value of null can usually be
      * interpreted as package visibility.
      */
-    public VisibilityModifier getVisibilityModifier() {
+    public @Nullable Modifier getModifier() {
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
             Modifier m = modArray.get(i);
-            if (m instanceof VisibilityModifier) {
-                return (VisibilityModifier) m;
+            var k = m.getKind();
+            if (k.isVisibility()) {
+                return m;
             }
         }
         return null;
@@ -119,10 +121,10 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         return attachedJml;
     }
 
-    public boolean containsModifier(Class<?> type) {
+    public boolean containsModifier(ModifierKind type) {
         int s = modArray.size();
         for (int i = 0; i < s; i += 1) {
-            if (type.isInstance(modArray.get(i))) {
+            if (type == modArray.get(i).getKind()) {
                 return true;
             }
         }
@@ -134,7 +136,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is abstract.
      */
     protected boolean isAbstract() {
-        return containsModifier(Abstract.class);
+        return containsModifier(ModifierKind.ABSTRACT);
     }
 
 
@@ -142,7 +144,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is private.
      */
     protected boolean isPrivate() {
-        return containsModifier(Private.class);
+        return containsModifier(ModifierKind.PRIVATE);
     }
 
 
@@ -150,7 +152,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is protected.
      */
     protected boolean isProtected() {
-        return containsModifier(Protected.class);
+        return containsModifier(ModifierKind.PROTECTED);
     }
 
 
@@ -158,7 +160,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is public.
      */
     protected boolean isPublic() {
-        return containsModifier(Public.class);
+        return containsModifier(ModifierKind.PUBLIC);
     }
 
 
@@ -166,7 +168,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is static.
      */
     protected boolean isStatic() {
-        return containsModifier(Static.class);
+        return containsModifier(ModifierKind.STATIC);
     }
 
 
@@ -174,7 +176,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is transient.
      */
     protected boolean isTransient() {
-        return containsModifier(Transient.class);
+        return containsModifier(ModifierKind.TRANSIENT);
     }
 
 
@@ -182,17 +184,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is model (the jml modifier is meant).
      */
     protected boolean isModel() {
-        return containsModifier(Model.class);
+        return containsModifier(ModifierKind.JML_MODEL);
     }
 
     /**
      * Get the state count of the declaration
      */
     protected int getStateCount() {
-        if (containsModifier(TwoState.class)) {
+        if (containsModifier(ModifierKind.JML_TWO_STATE)) {
             return 2;
         }
-        if (containsModifier(NoState.class)) {
+        if (containsModifier(ModifierKind.JML_NO_STATE)) {
             return 0;
         }
         return 1;
@@ -202,7 +204,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is ghost (the jml modifier is meant).
      */
     protected boolean isGhost() {
-        return containsModifier(Ghost.class);
+        return containsModifier(ModifierKind.JML_GHOST);
     }
 
 
@@ -210,7 +212,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is volatile.
      */
     protected boolean isVolatile() {
-        return containsModifier(Volatile.class);
+        return containsModifier(ModifierKind.VOLATILE);
     }
 
 
@@ -218,7 +220,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is strictfp.
      */
     protected boolean isStrictFp() {
-        return containsModifier(StrictFp.class);
+        return containsModifier(ModifierKind.STRICTFP);
     }
 
 
@@ -226,7 +228,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is final.
      */
     protected boolean isFinal() {
-        return containsModifier(Final.class);
+        return containsModifier(ModifierKind.FINAL);
     }
 
 
@@ -234,7 +236,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is native.
      */
     protected boolean isNative() {
-        return containsModifier(Native.class);
+        return containsModifier(ModifierKind.NATIVE);
     }
 
 
@@ -242,6 +244,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Test whether the declaration is synchronized.
      */
     protected boolean isSynchronized() {
-        return containsModifier(Synchronized.class);
+        return containsModifier(ModifierKind.SYNCHRONIZED);
     }
 }

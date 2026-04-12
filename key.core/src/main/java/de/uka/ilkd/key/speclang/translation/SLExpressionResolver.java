@@ -7,10 +7,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 
 /**
@@ -78,29 +75,30 @@ public abstract class SLExpressionResolver {
     /**
      * Helper for isVisible().
      */
-    private final boolean isVisibleHelper(MemberDeclaration md, KeYJavaType containingType,
+    private boolean isVisibleHelper(MemberDeclaration md, KeYJavaType containingType,
             KeYJavaType inType) {
         // use spec visibility
-        VisibilityModifier mod = manager.getSpecVisibility(md);
+        final var specVisibility = manager.getSpecVisibility(md);
+        ModifierKind mod = specVisibility == null ? null : specVisibility.getKind();
 
         // no spec visibility? -> use ordinary Java visibility
         if (mod == null) {
             if (md.isPublic()) {
-                mod = new Public();
+                mod = ModifierKind.PUBLIC;
             } else if (md.isProtected()) {
-                mod = new Protected();
+                mod = ModifierKind.PROTECTED;
             } else if (md.isPrivate()) {
-                mod = new Private();
+                mod = ModifierKind.PRIVATE;
             }
         }
 
         // check according to visibility rules
-        if (mod instanceof Public) {
+        if (mod == ModifierKind.PUBLIC) {
             return true;
-        } else if (mod instanceof Protected) {
+        } else if (mod == ModifierKind.PROTECTED) {
             return inType.getSort().extendsTrans(containingType.getSort())
                     || areInSamePackage(inType, containingType);
-        } else if (mod instanceof Private) {
+        } else if (mod == ModifierKind.PRIVATE) {
             return inType.equals(containingType);
         } else {
             return areInSamePackage(inType, containingType);
