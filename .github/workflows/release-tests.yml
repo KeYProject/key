@@ -31,7 +31,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v3
         with:
           cvc5Version: ${{ env.cvc5 }}
           z3Version: ${{ env.z3 }}
@@ -90,7 +90,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v3
         with:
           cvc5Version: ${{ env.cvc5 }}
           z3Version: ${{ env.z3 }}
@@ -136,7 +136,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0.3.0
+        uses: keyproject/setup-smt@v3
         with:
           cvc5Version: ${{ matrix.cvc5 }}
           z3Version: ${{ matrix.z3 }}
