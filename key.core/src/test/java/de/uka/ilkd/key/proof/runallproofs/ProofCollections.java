@@ -990,6 +990,10 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/switch/large_switch.key");
 
 
+        // tests that KeY can deal with identical classes in different packages
+        g.provable("standard_key/java_dl/identical_classes/pkgA_inc.key");
+        g.provable("standard_key/java_dl/identical_classes/pkgB_inc.key");
+
         g = c.group("redux");
         g.provable("redux/arrays/Arrays.copyOf.key");
         g.provable("redux/arrays/Arrays.copyOf.float.key");
