@@ -2263,6 +2263,30 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private record FullVariableDeclarator(
             VariableDeclarator decl, ClassOrInterfaceDeclaration container, boolean isFinal,
             boolean isStatic, boolean isModel, boolean isGhost) {
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass())
+                return false;
+            FullVariableDeclarator that = (FullVariableDeclarator) o;
+            final boolean generatedEquals = isFinal == that.isFinal && isModel == that.isModel &&
+                    isGhost == that.isGhost &&
+                    isStatic == that.isStatic &&
+                    Objects.equals(decl, that.decl) &&
+                    Objects.equals(container, that.container);
+
+            if (!generatedEquals) {
+                return false;
+            }
+            return container != null ? Objects.equals(container.getFullyQualifiedName(),
+                that.container.getFullyQualifiedName()) : generatedEquals;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(decl, container,
+                container != null ? container.getFullyQualifiedName() : 17, isFinal, isStatic,
+                isModel, isGhost);
+        }
     }
 
 }
