@@ -10,7 +10,7 @@ dependencies {
     // we also export these dependency into src/test/java.
     testFixturesApi(project(':key.util'))
 
-    testFixturesApi(platform("org.junit:junit-bom:5.14.2"))
+    testFixturesApi(platform("org.junit:junit-bom:5.14.3"))
     testFixturesApi("org.junit.jupiter:junit-jupiter-api")
     testFixturesApi("org.junit.jupiter:junit-jupiter-params")
     testFixturesApi("org.assertj:assertj-core:3.27.7")
@@ -19,8 +19,8 @@ dependencies {
     testFixturesApi("ch.qos.logback:logback-classic:1.5.32")
 
     // test fixtures
-    testFixturesApi("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0")
-    testFixturesApi("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
+    testFixturesApi("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
+    testFixturesApi("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     def eisop_version = "3.49.3-eisop1"
     testFixturesCompileOnly( "io.github.eisop:checker-qual:$eisop_version")
