@@ -138,7 +138,7 @@ public class VariableNameProposer implements InstantiationProposer {
             name = basename + cnt;
             l_name = new Name(name);
             cnt++;
-        } while (nss.lookup(l_name) != null && !previousProposals.contains(name));
+        } while (nss.lookup(l_name) != null || previousProposals.contains(name));
 
 
         return name;
