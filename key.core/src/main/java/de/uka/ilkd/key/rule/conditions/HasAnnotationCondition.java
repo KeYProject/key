@@ -33,12 +33,12 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SyntaxElement subst,
             SVInstantiations svInst, Services services) {
 
-
         if (var != variable)
             return true;
-/*
-        var inst = svInst.getInstantiation(variable);
 
+        var inst = svInst.getInstantiation(variable);
+        LOGGER.info("{}", inst);
+/*
         if (inst instanceof TypeOperator) {
             var out = ((TypeOperator) inst)
                     .getAnnotations()

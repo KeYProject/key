@@ -2057,7 +2057,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(AnnotationDeclaration n, Void arg) {
-        return reportUnsupportedElement(n);
+        //return reportUnsupportedElement(n);
+        return null;
     }
 
     @Override

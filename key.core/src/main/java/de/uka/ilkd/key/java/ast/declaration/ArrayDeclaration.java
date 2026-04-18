@@ -14,6 +14,9 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * KeY used to model arrays using only the {@link ArrayType}. As
  * the only attribute of an array has been the length attribute, it has been handled in a different
@@ -27,6 +30,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArrayDeclaration.class);
 
     /**
      * reference to the type the elements of this array must subclass
@@ -213,13 +217,14 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         return null;
     }
 
-
     public String getAlternativeNameRepresentation() {
         if (altNameRepresentation == null) {
             final StringBuilder alt = new StringBuilder();
             Type baseType = this.baseType.getKeYJavaType().getJavaType();
 
-            if (baseType instanceof ArrayType) {
+            if (baseType == null) {
+                alt.append(this.baseType.getKeYJavaType().getName());
+            } else if (baseType instanceof ArrayType) {
                 alt.append(((ArrayType) baseType).getAlternativeNameRepresentation());
             } else {
                 if (baseType instanceof ClassType) {
@@ -233,7 +238,6 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         }
         return altNameRepresentation;
     }
-
 
     /**
      * returns the local declared supertypes
