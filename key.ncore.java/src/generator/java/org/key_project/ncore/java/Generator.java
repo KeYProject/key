@@ -1,4 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
+import org.key_project.ncore.java.PostSteps.PostStep;
+import org.key_project.ncore.java.PreSteps.PreStep;
 
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
@@ -21,15 +37,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-
 import static com.github.javaparser.StaticJavaParser.*;
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -45,6 +52,7 @@ public class Generator implements Callable<Integer> {
 
     List<NodeStep> nodeSteps = new ArrayList<>(64);
     List<PreStep> preSteps = new ArrayList<>(64);
+    List<PostStep> postSteps = new ArrayList<>(64);
 
     public static void main(String[] args) throws Exception {
         new Generator().call();
@@ -67,10 +75,16 @@ public class Generator implements Callable<Integer> {
         addStep(Generator::addOverrideConstructor2);
         addStep(Generator::addGetProperties);
         addStep(Generator::processFieldsAccessor);
+
+        postSteps.add(PostSteps::createVisitor);
+        postSteps.add(PostSteps::createVoidVisitor);
+        postSteps.add(PostSteps::createTraversalVisitor);
+        postSteps.add(PostSteps::createDeepCopyVisitor);
     }
 
     private static void addBuilder(ClassOrInterfaceDeclaration target) {
-        if(target.isInterface()) return;
+        if (target.isInterface())
+            return;
 
         var builder = new ClassOrInterfaceDeclaration();
         builder.setName("Builder");
@@ -79,7 +93,7 @@ public class Generator implements Callable<Integer> {
         for (var field : target.getFields()) {
             for (var variable : field.variables()) {
                 var f = builder.addField(variable.getType().clone(),
-                        variable.getNameAsString(), PUBLIC);
+                    variable.getNameAsString(), PUBLIC);
                 f.addAnnotation(Nullable.class);
             }
         }
@@ -89,17 +103,18 @@ public class Generator implements Callable<Integer> {
 
         var args = builder.getFields().stream().flatMap(it -> it.variables().stream())
                 .map(it -> (Expression) it.getNameAsExpression())
-                .collect(Collectors.toList());
+                .toList();
         build.getBody().get().addStatement(new ReturnStmt(
-                new ObjectCreationExpr(null,
-                        new ClassOrInterfaceType(null, target.getNameAsString()),
-                        new NodeList<>(args))));
+            new ObjectCreationExpr(null,
+                new ClassOrInterfaceType(null, target.getNameAsString()),
+                new NodeList<>(args))));
 
         builder.getFields().stream().flatMap(it -> it.variables().stream()).forEach(it -> {
             var m = builder.addMethod(it.getNameAsString(), PUBLIC);
             m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
             m.setType(new ClassOrInterfaceType(null, "Builder"));
-            m.getBody().get().addStatement("this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
+            m.getBody().get().addStatement(
+                "this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
             m.getBody().get().addStatement("return this;");
         });
 
@@ -108,11 +123,14 @@ public class Generator implements Callable<Integer> {
                 .filter(Generator::isList)
                 .forEach(it -> {
                     var m = builder.addMethod(it.getNameAsString(), PUBLIC);
-                    var t = it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
+                    var t =
+                        it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
                     m.addParameter(new Parameter(t.clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, "Builder"));
-                    m.getBody().get().addStatement("if(this.%s==null) this.%s = new ArrayList<>();".formatted(it.getNameAsString(), it.getNameAsString()));
-                    m.getBody().get().addStatement("this.%s.add(%s);".formatted(it.getNameAsString(), it.getNameAsString()));
+                    m.getBody().get().addStatement("if(this.%s==null) this.%s = new ArrayList<>();"
+                            .formatted(it.getNameAsString(), it.getNameAsString()));
+                    m.getBody().get().addStatement(
+                        "this.%s.add(%s);".formatted(it.getNameAsString(), it.getNameAsString()));
                     m.getBody().get().addStatement("return this;");
                 });
 
@@ -122,8 +140,8 @@ public class Generator implements Callable<Integer> {
         tb.setType(new ClassOrInterfaceType(null, "Builder"));
         final var b = tb.getBody().get();
         b.addStatement("Builder b =  new Builder();");
-        builder.getFields().stream().flatMap(it -> it.variables().stream()).forEach(it ->
-                b.addStatement("b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
+        builder.getFields().stream().flatMap(it -> it.variables().stream()).forEach(it -> b
+                .addStatement("b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
         b.addStatement("return b;");
     }
 
@@ -135,23 +153,23 @@ public class Generator implements Callable<Integer> {
         target.getFields().stream()
                 .flatMap(it -> it.getVariables().stream()).forEach(it -> {
                     var args =
-                            target.getFields().stream()
-                                    .flatMap(f -> f.getVariables().stream())
-                                    .map(v -> {
-                                        if (v == it) {
-                                            return (Expression) v.getNameAsExpression();
-                                        } else {
-                                            return new MethodCallExpr(null, v.getNameAsString());
-                                        }
-                                    }).toList();
+                        target.getFields().stream()
+                                .flatMap(f -> f.getVariables().stream())
+                                .map(v -> {
+                                    if (v == it) {
+                                        return (Expression) v.getNameAsExpression();
+                                    } else {
+                                        return new MethodCallExpr(null, v.getNameAsString());
+                                    }
+                                }).toList();
 
                     var m = target.addMethod("with" + it.getNameAsString(), PUBLIC);
                     m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, target.getNameAsString()));
                     m.getBody().get().addStatement(new ReturnStmt(
-                            new ObjectCreationExpr(null,
-                                    new ClassOrInterfaceType(null, target.getNameAsString()),
-                                    new NodeList<>(args))));
+                        new ObjectCreationExpr(null,
+                            new ClassOrInterfaceType(null, target.getNameAsString()),
+                            new NodeList<>(args))));
                 });
     }
 
@@ -167,11 +185,12 @@ public class Generator implements Callable<Integer> {
         equals.getParameters().add(o);
         BlockStmt body = equals.getBody().get();
         body.addStatement(parseStatement("if(this == o) return true;"));
-        body.addStatement(parseStatement("if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
+        body.addStatement(parseStatement(
+            "if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
         Expression equalFields = target.getFields().stream()
                 .flatMap(it -> it.getVariables().stream())
                 .map(it -> callObjects("equals", it.getNameAsExpression(),
-                        new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
+                    new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
                 .reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND))
                 .orElse(new BooleanLiteralExpr(true));
         body.addStatement(new ReturnStmt(equalFields));
@@ -197,8 +216,7 @@ public class Generator implements Callable<Integer> {
             assert false : "No defined fields";
         else
             hashCode.getBody().get().addStatement(new ReturnStmt(
-                    callObjects("hash", args)
-            ));
+                callObjects("hash", args)));
     }
 
     private static void ToString(ClassOrInterfaceDeclaration clazz) {
@@ -209,15 +227,17 @@ public class Generator implements Callable<Integer> {
         MethodDeclaration toString = clazz.addMethod("toString", PUBLIC, FINAL);
         toString.addAnnotation(Override.class);
         toString.setType(String.class);
-        var parameters = clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
+        var parameters =
+            clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
         var sb = (clazz.getNameAsString() + "[")
-                + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
-                .collect(Collectors.joining(", ")) + "]";
+            + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
+                    .collect(Collectors.joining(", "))
+            + "]";
 
         var args = parameters.stream().map(NodeWithSimpleName::getNameAsExpression)
                 .map(it -> (Expression) it).toList();
         toString.getBody().get().addStatement(new ReturnStmt(
-                new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
+            new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
     }
 
     private static Expression callObjects(String method, Expression... args) {
@@ -243,10 +263,9 @@ public class Generator implements Callable<Integer> {
             for (var variable : field.getVariables()) {
                 params.add(new Parameter(variable.getType().clone(), variable.getNameAsString()));
                 body.addStatement(
-                        new ExpressionStmt(new AssignExpr(
-                                new FieldAccessExpr(new ThisExpr(), variable.getNameAsString()),
-                                variable.getNameAsExpression(), AssignExpr.Operator.ASSIGN
-                        )));
+                    new ExpressionStmt(new AssignExpr(
+                        new FieldAccessExpr(new ThisExpr(), variable.getNameAsString()),
+                        variable.getNameAsExpression(), AssignExpr.Operator.ASSIGN)));
             }
         }
 
@@ -263,14 +282,15 @@ public class Generator implements Callable<Integer> {
         var body = constr.getBody().get();
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
-        params.add(new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+        params.add(
+            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         params.add(new Parameter(parseType("Properties"), "map"));
 
         var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
-                .map(it ->
-                        (Expression) parseExpression("map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
+                .map(it -> (Expression) parseExpression(
+                    "map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -288,8 +308,8 @@ public class Generator implements Callable<Integer> {
 
         var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
-                .map(it ->
-                        (Expression) parseExpression("map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
+                .map(it -> (Expression) parseExpression(
+                    "map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -308,7 +328,8 @@ public class Generator implements Callable<Integer> {
         body.addStatement("Properties p = new DefaultProperties();");
         target.getFields().stream()
                 .flatMap(it -> it.getVariables().stream())
-                .forEach(variable -> body.addStatement("p.set(PROPERTY_%s, %s());".formatted(variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
+                .forEach(variable -> body.addStatement("p.set(PROPERTY_%s, %s());".formatted(
+                    variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
         body.addStatement("return p;");
     }
 
@@ -322,22 +343,23 @@ public class Generator implements Callable<Integer> {
         var body = constr.getBody().get();
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
-        params.add(new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+        params.add(
+            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         /*
-        for (var field : target.getFields()) {
-            for (var variable : field.getVariables()) {
-                //params.add(new Parameter(variable.getType().clone(), variable.getNameAsString()));
-                body.addStatement(
-                        new ExpressionStmt(new AssignExpr(
-                                new FieldAccessExpr(new ThisExpr(), variable.getNameAsString()),
-                                new FieldAccessExpr(new NameExpr("other"), variable.getNameAsString()),
-                                AssignExpr.Operator.ASSIGN
-                        ))
-                );
-            }
-        }
-        */
+         * for (var field : target.getFields()) {
+         * for (var variable : field.getVariables()) {
+         * //params.add(new Parameter(variable.getType().clone(), variable.getNameAsString()));
+         * body.addStatement(
+         * new ExpressionStmt(new AssignExpr(
+         * new FieldAccessExpr(new ThisExpr(), variable.getNameAsString()),
+         * new FieldAccessExpr(new NameExpr("other"), variable.getNameAsString()),
+         * AssignExpr.Operator.ASSIGN
+         * ))
+         * );
+         * }
+         * }
+         */
 
         var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
@@ -347,8 +369,10 @@ public class Generator implements Callable<Integer> {
 
     }
 
-    static Multimap<String, String> inheritanceMap = MultimapBuilder.treeKeys().treeSetValues().build();
-    static Multimap<String, String> permittedTypes = MultimapBuilder.treeKeys().treeSetValues().build();
+    static Multimap<String, String> inheritanceMap =
+        MultimapBuilder.treeKeys().treeSetValues().build();
+    static Multimap<String, String> permittedTypes =
+        MultimapBuilder.treeKeys().treeSetValues().build();
 
     private static final PreStep pushFieldsDown = types -> {
         TreeMap<String, ClassOrInterfaceDeclaration> fields = new TreeMap<>();
@@ -410,7 +434,9 @@ public class Generator implements Callable<Integer> {
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_25);
 
         StaticJavaParser.setConfiguration(config);
-        metaModel = StaticJavaParser.parse(new File("key.ncore.java/src/adt/java-ast.java").getAbsoluteFile());
+        metaModel = StaticJavaParser
+                .parse(new File("key.ncore.java/src/adt/java-ast.java").getAbsoluteFile());
+        Files.createDirectories(ROOT);
         SourceRoot sourceRoot = new SourceRoot(ROOT);
 
         final var types = metaModel.getTypes();
@@ -418,6 +444,7 @@ public class Generator implements Callable<Integer> {
             nodeStep.applyOn(types);
         }
 
+        List<CompilationUnit> nodeUnits = new ArrayList<>(types.size());
         for (var type : types) {
             var cu = new CompilationUnit();
             cu.addType(type);
@@ -429,7 +456,12 @@ public class Generator implements Callable<Integer> {
                 nodeStep.applyOn((ClassOrInterfaceDeclaration) type);
             }
 
+            nodeUnits.add(cu);
             sourceRoot.add(cu);
+        }
+
+        for (var nodeStep : postSteps) {
+            nodeStep.applyOn(nodeUnits, sourceRoot);
         }
 
         sourceRoot.saveAll();
@@ -467,17 +499,20 @@ public class Generator implements Callable<Integer> {
 
 
     private static void processFieldsAccessor(ClassOrInterfaceDeclaration target) {
-        if (target.isInterface()) return;
+        if (target.isInterface())
+            return;
 
         target.findCompilationUnit().get().addImport("org.key_project.java.ast.Property");
 
         for (var field : target.getFields()) {
             for (var variable : field.getVariables()) {
                 final var dataKey = new ClassOrInterfaceType(null, new SimpleName("Property"),
-                        new NodeList<>(toBoxType(variable.getType().clone())));
+                    new NodeList<>(toBoxType(variable.getType().clone())));
                 var f = target.addField(
-                        dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC, FINAL);
-                f.getVariables().getFirst().setInitializer("new Property<>(\"%s\")".formatted(variable.getNameAsString()));
+                    dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC,
+                    FINAL);
+                f.getVariables().getFirst().setInitializer(
+                    "new Property<>(\"%s\")".formatted(variable.getNameAsString()));
             }
         }
     }
@@ -509,10 +544,11 @@ public class Generator implements Callable<Integer> {
                 }
 
                 if (isAbstract) {
-                    //getter.addModifier(Modifier.DefaultKeyword.ABSTRACT);
+                    // getter.addModifier(Modifier.DefaultKeyword.ABSTRACT);
                     getter.setBody(null);
                 } else {
-                    getter.getBody().get().addStatement(new ReturnStmt(variable.getNameAsExpression()));
+                    getter.getBody().get()
+                            .addStatement(new ReturnStmt(variable.getNameAsExpression()));
                     getter.addModifier(PUBLIC, FINAL);
                 }
                 field.getAnnotationByName("Override")
@@ -524,7 +560,4 @@ public class Generator implements Callable<Integer> {
         }
     }
 
-    private interface PreStep {
-        void applyOn(NodeList<TypeDeclaration<?>> types);
-    }
 }
