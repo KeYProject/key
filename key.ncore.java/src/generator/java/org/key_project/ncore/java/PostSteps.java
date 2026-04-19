@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
@@ -17,9 +20,6 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.utils.SourceRoot;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static org.key_project.ncore.java.Generator.ROOT;
@@ -36,8 +36,10 @@ public class PostSteps {
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
-                if (!(t instanceof ClassOrInterfaceDeclaration c)) continue;
-                if (c.isInterface()) continue;
+                if (!(t instanceof ClassOrInterfaceDeclaration c))
+                    continue;
+                if (c.isInterface())
+                    continue;
 
                 var m = type.addMethod("visit");
                 m.addParameter(new ClassOrInterfaceType(null, t.getNameAsString()), "n");
@@ -47,9 +49,11 @@ public class PostSteps {
                 var accept = t.addMethod("accept", PUBLIC);
                 accept.setType(generic.clone());
                 accept.getTypeParameters().add(generic.clone());
-                accept.addParameter(new ClassOrInterfaceType(null, new SimpleName(type.getFullyQualifiedName().get()),
-                                new NodeList<>(generic.clone())),
-                        "visitor");
+                accept.addParameter(
+                    new ClassOrInterfaceType(null,
+                        new SimpleName(type.getFullyQualifiedName().get()),
+                        new NodeList<>(generic.clone())),
+                    "visitor");
                 accept.getBody().get()
                         .addStatement("return visitor.visit(this);");
             } catch (Exception e) {
@@ -60,7 +64,8 @@ public class PostSteps {
 
         var s = StaticJavaParser.parseBlock("{return defaultVisit(n);}");
         var visitorWithDefaults = cu.clone();
-        visitorWithDefaults.setStorage(ROOT.resolve("org/key_project/java/ast/visitor/VisitorWithDefaults.java"));
+        visitorWithDefaults.setStorage(
+            ROOT.resolve("org/key_project/java/ast/visitor/VisitorWithDefaults.java"));
         final var vwdef = visitorWithDefaults.getType(0);
         vwdef.setName("VisitorWithDefaults");
         for (var method : vwdef.getMethods()) {
@@ -83,8 +88,10 @@ public class PostSteps {
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
-                if (!(t instanceof ClassOrInterfaceDeclaration c)) continue;
-                if (c.isInterface()) continue;
+                if (!(t instanceof ClassOrInterfaceDeclaration c))
+                    continue;
+                if (c.isInterface())
+                    continue;
 
                 var m = type.addMethod("visit");
                 m.addParameter(new ClassOrInterfaceType(null, t.getNameAsString()), "n");
@@ -92,8 +99,9 @@ public class PostSteps {
 
 
                 var accept = t.addMethod("accept", PUBLIC);
-                accept.addParameter(new ClassOrInterfaceType(null, type.getFullyQualifiedName().get()),
-                        "visitor");
+                accept.addParameter(
+                    new ClassOrInterfaceType(null, type.getFullyQualifiedName().get()),
+                    "visitor");
                 accept.getBody().get().addStatement("visitor.visit(this);");
 
 
@@ -104,19 +112,22 @@ public class PostSteps {
         sourceRoot.add(cu);
     }
 
-    public static void createTraversalVisitor(List<CompilationUnit> nodeUnits, SourceRoot sourceRoot) {
+    public static void createTraversalVisitor(List<CompilationUnit> nodeUnits,
+            SourceRoot sourceRoot) {
         var cu = new CompilationUnit();
         var type = createTypeAndSetDefaults(cu, "CopyVisitor", PUBLIC);
         type.getImplementedTypes().add(
-                (ClassOrInterfaceType) StaticJavaParser.parseType("Visitor<JavaSourceElement>"));
+            (ClassOrInterfaceType) StaticJavaParser.parseType("Visitor<JavaSourceElement>"));
         addAcceptMethods(type);
 
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
 
-                if (!(t instanceof ClassOrInterfaceDeclaration c)) continue;
-                if (c.isInterface()) continue;
+                if (!(t instanceof ClassOrInterfaceDeclaration c))
+                    continue;
+                if (c.isInterface())
+                    continue;
 
                 var m = type.addMethod("visit", PUBLIC);
                 m.addParameter(new ClassOrInterfaceType(null, t.getNameAsString()), "n");
@@ -125,12 +136,11 @@ public class PostSteps {
                 body.addStatement("var b = n.builder();");
                 t.getFields()
                         .stream().filter(NodeWithPrivateModifier::isPrivate)
-                        .forEach(f ->
-                                body.addStatement(
-                                        "b.%s = (%s) accept(n.%s());"
-                                                .formatted(f.getVariable(0).getNameAsExpression(),
-                                                        f.getVariable(0).getTypeAsString(),
-                                                        f.getVariable(0).getNameAsExpression())));
+                        .forEach(f -> body.addStatement(
+                            "b.%s = (%s) accept(n.%s());"
+                                    .formatted(f.getVariable(0).getNameAsExpression(),
+                                        f.getVariable(0).getTypeAsString(),
+                                        f.getVariable(0).getNameAsExpression())));
                 body.addStatement("return b.build();");
                 m.setType(new ClassOrInterfaceType(null, t.getFullyQualifiedName().get()));
             } catch (Exception e) {
@@ -140,12 +150,13 @@ public class PostSteps {
         sourceRoot.add(cu);
     }
 
-    public static void createTraversalCopyOnDemandVisitor(List<CompilationUnit> nodeUnits, SourceRoot sourceRoot) {
+    public static void createTraversalCopyOnDemandVisitor(List<CompilationUnit> nodeUnits,
+            SourceRoot sourceRoot) {
         var cu = new CompilationUnit();
         var type = createTypeAndSetDefaults(cu, "CopyOnWriteVisitor", PUBLIC);
 
         type.getImplementedTypes().add(
-                (ClassOrInterfaceType) StaticJavaParser.parseType("Visitor<JavaSourceElement>"));
+            (ClassOrInterfaceType) StaticJavaParser.parseType("Visitor<JavaSourceElement>"));
         addAcceptMethods(type);
 
 
@@ -153,8 +164,10 @@ public class PostSteps {
             try {
                 var t = clazz.getPrimaryType().get();
 
-                if (!(t instanceof ClassOrInterfaceDeclaration c)) continue;
-                if (c.isInterface()) continue;
+                if (!(t instanceof ClassOrInterfaceDeclaration c))
+                    continue;
+                if (c.isInterface())
+                    continue;
 
                 var m = type.addMethod("visit", PUBLIC);
                 m.addParameter(new ClassOrInterfaceType(null, t.getNameAsString()), "n");
@@ -165,22 +178,20 @@ public class PostSteps {
                         .stream()
                         .filter(NodeWithPrivateModifier::isPrivate)
                         .filter(PostSteps::isAstNode)
-                        .forEach(f ->
-                                body.addStatement(
-                                        "b.%s = (%s) accept(n.%s());"
-                                                .formatted(f.getVariable(0).getNameAsExpression(),
-                                                        f.getVariable(0).getTypeAsString(),
-                                                        f.getVariable(0).getNameAsExpression())));
+                        .forEach(f -> body.addStatement(
+                            "b.%s = (%s) accept(n.%s());"
+                                    .formatted(f.getVariable(0).getNameAsExpression(),
+                                        f.getVariable(0).getTypeAsString(),
+                                        f.getVariable(0).getNameAsExpression())));
                 final var formatted = "boolean clean = %s;".formatted(
-                        t.getFields().isEmpty() ? "false" :
-                                t.getFields()
-                                .stream().filter(NodeWithPrivateModifier::isPrivate)
-                                .map(it -> {
-                                    final var n = it.getVariable(0).getNameAsString();
-                                    return "(n.%s() == b.%s)".formatted(n, n);
-                                })
-                                .collect(Collectors.joining("&&"))
-                );
+                    t.getFields().isEmpty() ? "false"
+                            : t.getFields()
+                                    .stream().filter(NodeWithPrivateModifier::isPrivate)
+                                    .map(it -> {
+                                        final var n = it.getVariable(0).getNameAsString();
+                                        return "(n.%s() == b.%s)".formatted(n, n);
+                                    })
+                                    .collect(Collectors.joining("&&")));
                 body.addStatement(formatted);
                 body.addStatement("return clean?n:b.build();");
                 m.setType(new ClassOrInterfaceType(null, t.getFullyQualifiedName().get()));
@@ -214,7 +225,8 @@ public class PostSteps {
                 c.toUnboxedType();
                 return false;
             } catch (UnsupportedOperationException e) {
-                return !(name.contains("Kind") || name.equals("PositionInfo") || name.equals("JMLModifiers"));
+                return !(name.contains("Kind") || name.equals("PositionInfo")
+                        || name.equals("JMLModifiers"));
             }
         }
         return false;
@@ -223,10 +235,10 @@ public class PostSteps {
     ///
     /// ```java
     /// <T extends Visitable> T accept(T n) {
-    ///     return n != null ? n.accept(this) : null;
+    /// return n != null ? n.accept(this) : null;
     /// }
     /// <T extends Visitable> RoList<T> accept(RoList<T> n) {
-    ///    return n != null ? n.stream().map(it -> (T) it.accept(this)).toList() : null;
+    /// return n != null ? n.stream().map(it -> (T) it.accept(this)).toList() : null;
     /// }
     /// ```
     private static void addAcceptMethods(ClassOrInterfaceDeclaration type) {
@@ -246,7 +258,8 @@ public class PostSteps {
             acceptList.addTypeParameter(t.clone());
             acceptList.addParameter(StaticJavaParser.parseType("RoList<T>"), "n");
             acceptList.setType("RoList<T>");
-            acceptList.getBody().get().addStatement("return n != null ? n.stream().map(it -> (T) it.accept(this)).collect(RoList.collector()) : null;");
+            acceptList.getBody().get().addStatement(
+                "return n != null ? n.stream().map(it -> (T) it.accept(this)).collect(RoList.collector()) : null;");
         }
 
         {
@@ -258,7 +271,8 @@ public class PostSteps {
         }
     }
 
-    private static ClassOrInterfaceDeclaration createTypeAndSetDefaults(CompilationUnit cu, String typeName, Modifier.DefaultKeyword... mods) {
+    private static ClassOrInterfaceDeclaration createTypeAndSetDefaults(CompilationUnit cu,
+            String typeName, Modifier.DefaultKeyword... mods) {
         String name = "org.key_project.java.ast.visitor";
         cu.setPackageDeclaration(name);
         cu.addImport("org.key_project.java.ast.visitor.*");
@@ -283,8 +297,10 @@ public class PostSteps {
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
-                if (!(t instanceof ClassOrInterfaceDeclaration c)) continue;
-                if (c.isInterface()) continue;
+                if (!(t instanceof ClassOrInterfaceDeclaration c))
+                    continue;
+                if (c.isInterface())
+                    continue;
 
                 cu.addImport(t.getFullyQualifiedName().get());
 
@@ -298,9 +314,11 @@ public class PostSteps {
                 accept.setType(generic.clone());
                 accept.getTypeParameters().add(generic.clone());
                 accept.getTypeParameters().add(argType.clone());
-                accept.addParameter(new ClassOrInterfaceType(null, new SimpleName(type.getFullyQualifiedName().get()),
-                                new NodeList<>(generic.clone(), argType.clone())),
-                        "visitor");
+                accept.addParameter(
+                    new ClassOrInterfaceType(null,
+                        new SimpleName(type.getFullyQualifiedName().get()),
+                        new NodeList<>(generic.clone(), argType.clone())),
+                    "visitor");
                 accept.addParameter(argType.clone(), "arg");
                 accept.getBody().get()
                         .addStatement("return visitor.visit(this,arg);");
@@ -312,7 +330,8 @@ public class PostSteps {
     }
 
 
-    public static void createDeepCopyVisitor(List<CompilationUnit> nodeUnits, SourceRoot sourceRoot) {
+    public static void createDeepCopyVisitor(List<CompilationUnit> nodeUnits,
+            SourceRoot sourceRoot) {
 
     }
 

@@ -3,16 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
-import com.github.javaparser.ParseProblemException;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.utils.SourceRoot;
-import org.key_project.ncore.java.NodeSteps.NodeStep;
-import org.key_project.ncore.java.PostSteps.PostStep;
-import org.key_project.ncore.java.PreSteps.PreStep;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
+
+import org.key_project.ncore.java.NodeSteps.NodeStep;
+import org.key_project.ncore.java.PostSteps.PostStep;
+import org.key_project.ncore.java.PreSteps.PreStep;
+
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.utils.SourceRoot;
 
 /**
  *

@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
-
-import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -9,6 +10,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -101,11 +104,11 @@ public interface RoList<E extends @Nullable Object> extends Iterable<E> {
     }
 
     static <T> RoList<T> fromList(List<T> a) {
-        if(a.isEmpty()) {
+        if (a.isEmpty()) {
             return RoList.empty();
-        }else if(a.size()==1){
+        } else if (a.size() == 1) {
             return RoList.singleton(a.getFirst());
-        }else{
+        } else {
             return new ImmutableArray<>(a);
         }
     }
@@ -119,16 +122,21 @@ public interface RoList<E extends @Nullable Object> extends Iterable<E> {
     }
 
     int size();
+
     E get(int index);
 
     boolean isEmpty();
+
     default boolean isNonEmpty() {
         return !isEmpty();
     }
 
     boolean contains(Object e);
+
     Iterator<E> iterator();
+
     E getFirst();
+
     E getLast();
 
     Stream<E> stream();
