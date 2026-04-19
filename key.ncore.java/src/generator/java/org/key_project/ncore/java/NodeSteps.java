@@ -147,18 +147,62 @@ public class NodeSteps {
         constr.setModifiers(PUBLIC);
 
         for (var field : target.getFields()) {
+            var isOptional = field.getAnnotations().stream().anyMatch(it -> it.getNameAsString().equals("Nullable"));
             for (var variable : field.getVariables()) {
-                params.add(new Parameter(variable.getType().clone(), variable.getNameAsString()));
-                body.addStatement(
-                        new ExpressionStmt(new AssignExpr(
-                                new FieldAccessExpr(new ThisExpr(), variable.getNameAsString()),
-                                variable.getNameAsExpression(), AssignExpr.Operator.ASSIGN)));
+                final var p = new Parameter(variable.getType().clone(), variable.getNameAsString());
+                field.getAnnotations().stream().map(AnnotationExpr::clone)
+                        .forEach(p::addAnnotation);
+                params.add(p);
+                if(isOptional){
+                    body.addStatement(
+                            "this.%s = %s;".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
+                }else {
+                    body.addStatement(
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
+                }
             }
         }
 
 
         target.addMember(constr);
     }
+
+    static void addAllWoOptFieldsConstructor(ClassOrInterfaceDeclaration target) {
+        if (target.isInterface()) {
+            return;
+        }
+        ConstructorDeclaration constr = new ConstructorDeclaration();
+        var body = constr.getBody().get();
+        var params = constr.getParameters();
+        constr.setName(target.getNameAsString());
+        constr.setModifiers(PUBLIC);
+
+        for (var field : target.getFields()) {
+            var isOptional = field.getAnnotations().stream().anyMatch(it -> it.getNameAsString().equals("Nullable"));
+
+
+            for (var variable : field.getVariables()) {
+                if(isOptional){
+                    body.addStatement(
+                            "this.%s = null;".formatted(variable.getNameAsString()));
+                }else {
+                    final var p = new Parameter(variable.getType().clone(), variable.getNameAsString());
+                    field.getAnnotations().stream().map(AnnotationExpr::clone)
+                            .forEach(p::addAnnotation);
+                    params.add(p);
+                    body.addStatement(
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
+                }
+            }
+        }
+
+
+        target.addMember(constr);
+    }
+
 
     static void addOverrideConstructor(ClassOrInterfaceDeclaration target) {
         if (target.isInterface()) {
@@ -322,6 +366,12 @@ public class NodeSteps {
             }
 
             for (var variable : field.getVariables()) {
+                if(isList(variable)) {
+                    var old = variable.getType().asClassOrInterfaceType();
+                    old.setName("RoList");
+                }
+
+
                 var getter = target.addMethod(variable.getNameAsString());
                 getter.setType(variable.getType().clone());
 
@@ -411,7 +461,10 @@ public class NodeSteps {
     }
 
     private static boolean isList(VariableDeclarator type) {
-        return type.getTypeAsString().startsWith("List<");
+        if(type.getType().isClassOrInterfaceType()) {
+            return type.getType().asClassOrInterfaceType().getNameAsString().equals("List");
+        }
+        return false;
     }
 
     interface NodeStep {

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -46,6 +47,7 @@ public class Generator implements Callable<Integer> {
         addStep(NodeSteps::setPackage);
         addStep(NodeSteps::processFields);
         addStep(NodeSteps::addAllFieldsConstructor);
+        addStep(NodeSteps::addAllWoOptFieldsConstructor);
         addStep(NodeSteps::addCopyConstructor);
         addStep(NodeSteps::addEquals);
         addStep(NodeSteps::ToString);
@@ -58,6 +60,7 @@ public class Generator implements Callable<Integer> {
         addStep(NodeSteps::processFieldsAccessor);
 
         postSteps.add(PostSteps::createVisitor);
+        postSteps.add(PostSteps::createArgVisitor);
         postSteps.add(PostSteps::createVoidVisitor);
         postSteps.add(PostSteps::createTraversalVisitor);
         postSteps.add(PostSteps::createDeepCopyVisitor);
