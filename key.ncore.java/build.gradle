@@ -10,6 +10,7 @@ sourceSets {
 }
 
 dependencies {
+    implementation project(':key.core')
     generatorImplementation(project(":key.core"))
 
 

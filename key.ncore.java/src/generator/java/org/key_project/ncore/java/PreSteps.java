@@ -1,9 +1,80 @@
 package org.key_project.ncore.java;
 
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+
+import java.util.ArrayList;
+import java.util.TreeMap;
+
+import static com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT;
 
 public class PreSteps {
+    final static class PreComputation implements PreStep {
+        Multimap<String, String> inheritanceMap = MultimapBuilder.treeKeys().treeSetValues().build();
+        Multimap<String, String> permittedTypes = MultimapBuilder.treeKeys().treeSetValues().build();
+
+        @Override
+        public void applyOn(NodeList<TypeDeclaration<?>> types) {
+            TreeMap<String, ClassOrInterfaceDeclaration> fields = new TreeMap<>();
+
+            for (TypeDeclaration<?> decl : types) {
+                fields.put(decl.getNameAsString(), (ClassOrInterfaceDeclaration) decl);
+
+                var zuper = ((ClassOrInterfaceDeclaration) decl).getExtendedTypes().getOFirst()
+                        .map(NodeWithSimpleName::getNameAsString);
+                zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
+            }
+
+            // compute transitive closure
+            boolean changed = true;
+            while (changed) {
+                changed = false;
+                for (var clazz : inheritanceMap.keySet()) {
+                    final var strings = new ArrayList<>(inheritanceMap.get(clazz));
+                    for (var zuper : strings) {
+                        changed = changed || inheritanceMap.putAll(clazz, inheritanceMap.get(zuper));
+                    }
+                }
+            }
+
+            for (var decl : fields.sequencedValues()) {
+                if (decl.hasModifier(ABSTRACT)) {
+                    continue;
+                }
+
+                var newFields = new TreeMap<String, FieldDeclaration>();
+                for (var c : inheritanceMap.get(decl.getNameAsString())) {
+                    final var classOrInterfaceDeclaration = fields.get(c);
+                    if (classOrInterfaceDeclaration != null) {
+                        for (FieldDeclaration it : classOrInterfaceDeclaration.getFields()) {
+                            var name = it.getVariable(0).getNameAsString();
+                            newFields.computeIfAbsent(name, (k) -> {
+                                final var clone = it.clone();
+                                clone.addAnnotation(Override.class.getName());
+                                clone.setRange(null);
+                                return clone;
+                            });
+                        }
+                    }
+                }
+                decl.getMembers().addAll(newFields.values());
+            }
+
+            fillPermittedTypes();
+        }
+
+        private void fillPermittedTypes() {
+            for (var entry : inheritanceMap.entries()) {
+                permittedTypes.put(entry.getValue(), entry.getKey());
+            }
+        }
+    }
+
     interface PreStep {
         void applyOn(NodeList<TypeDeclaration<?>> types);
     }

@@ -1,5 +1,7 @@
+// Imports are copied to every file
 import org.jspecify.annotations.Nullable;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 
 // ROOT
 abstract class JavaSourceElement {
@@ -202,124 +204,11 @@ class VariableSpecification extends JavaNonTerminalProgramElement {
     IProgramVariable programVariable;
 }
 
-class Abstract extends Modifier {}
-
 class AnnotationUseSpecification extends Modifier {
 
     TypeReference tr;
 }
 
-class Final extends Modifier {}
-
-class Ghost extends Modifier {}
-
-class Model extends Modifier {}
-
-class ABSTRACT extends Modifier {}
-
-class DEFAULT extends Modifier {}
-
-class FINAL extends Modifier {}
-
-class JML_CODE extends Modifier {}
-
-class JML_CODE_BIGINT_MATH extends Modifier {}
-
-class JML_CODE_JAVA_MATH extends Modifier {}
-
-class JML_CODE_SAFE_MATH extends Modifier {}
-
-class JML_HELPER extends Modifier {}
-
-class JML_INSTANCE extends Modifier {}
-
-class JML_NON_NULL extends Modifier {}
-
-class JML_NON_NULL_BY_DEFAULT extends Modifier {}
-
-class JML_NON_NULL_ELEMENTS extends Modifier {}
-
-class JML_NO_STATE extends Modifier {}
-
-class JML_NULLABLE extends Modifier {}
-
-class JML_NULLABLE_BY_DEFAULT extends Modifier {}
-
-class JML_OT_READ_ONLY extends Modifier {}
-
-class JML_OT_REP extends Modifier {}
-
-class JML_PACKAGE extends Modifier {}
-
-class JML_PURE extends Modifier {}
-
-class JML_SPEC_BIGINT_MATH extends Modifier {}
-
-class JML_SPEC_JAVA_MATH extends Modifier {}
-
-class JML_SPEC_PACKAGE extends Modifier {}
-
-class JML_SPEC_PRIVATE extends Modifier {}
-
-class JML_SPEC_PROTECTED extends Modifier {}
-
-class JML_SPEC_PUBLIC extends Modifier {}
-
-class JML_SPEC_SAFE_MATH extends Modifier {}
-
-class JML_STRICTLY_PURE extends Modifier {}
-
-class JML_TWO_STATE extends Modifier {}
-
-class JML_UNPARSABLE_MODIFIERS extends Modifier {}
-
-class NATIVE extends Modifier {}
-
-class NON_SEALED extends Modifier {}
-
-class PRIVATE extends Modifier {}
-
-class PROTECTED extends Modifier {}
-
-class PUBLIC extends Modifier {}
-
-class SEALED extends Modifier {}
-
-class STATIC extends Modifier {}
-
-class STRICTFP extends Modifier {}
-
-class SYNCHRONIZED extends Modifier {}
-
-class TRANSIENT extends Modifier {}
-
-class TRANSITIVE extends Modifier {}
-
-class VOLATILE extends Modifier {}
-
-class Native extends Modifier {}
-
-class NoState extends Modifier {}
-
-class Private extends VisibilityModifier {}
-
-class Protected extends VisibilityModifier {}
-
-class Public extends VisibilityModifier {}
-
-class Static extends Modifier {}
-
-class StrictFp extends Modifier {}
-
-class Synchronized extends Modifier {}
-
-class Transient extends Modifier {}
-
-class TwoState extends Modifier {}
-
-abstract class VisibilityModifier extends Modifier {}
-
-class Volatile extends Modifier {}
 
 class ArrayInitializer extends JavaNonTerminalProgramElement {
     KeYJavaType kjt;
@@ -334,7 +223,9 @@ class ParenthesizedExpression extends Operator {
     Expression child;
 }
 
-class PassiveExpression extends ParenthesizedExpression {}
+class PassiveExpression extends Operator{
+    Expression child;
+}
 
 abstract class Literal extends JavaProgramElement {
     String value;
@@ -535,35 +426,38 @@ class VariableReference extends JavaNonTerminalProgramElement {
     ProgramVariable variable;
 }
 
-class Assert extends JavaStatement {}
+class Assert extends JavaStatement {
+    Expression expression;
+    @Nullable String message;
+}
 
 abstract class Branch {}
-
-abstract class BranchImp extends JavaNonTerminalProgramElement {}
 
 abstract class BranchStatement extends JavaStatement {}
 
 class Break extends LabelJumpStatement {}
 
-class Case extends BranchImp {
+class Case extends Branch {
     Expression expression;
     List<Statement> body;
 }
 
-class Catch extends BranchImp {
+class Default extends Branch {
+    List<Statement> body;
+}
+
+
+abstract class CatchClause
+
+class SingleCatch {
     ParameterDeclaration parameter;
     StatementBlock body;
 }
 
-class CatchAllStatement extends JavaNonTerminalProgramElement {}
-
-class Ccatch extends BranchImp {}
+class CatchAllStatement extends CatchClause {}
+class Ccatch extends CatchClause {}
 
 class Continue extends LabelJumpStatement {}
-
-class Default extends BranchImp {
-    List<Statement> body;
-}
 
 class Do extends LoopStatement {}
 
@@ -655,10 +549,8 @@ class Return extends ExpressionJumpStatement {}
 class SetStatement extends JavaStatement {}
 
 class Switch extends BranchStatement {
-
-    List<Branch> branches;
-
     Expression expression;
+    List<Branch> branches;
 }
 
 class SynchronizedBlock extends JavaStatement {
@@ -674,7 +566,11 @@ class Throw extends ExpressionJumpStatement {}
 
 class TransactionStatement extends JavaStatement {}
 
-class Try extends BranchStatement {}
+class Try extends BranchStatement {
+    StatementBlock tryBlock;
+    List<Catch> catches;
+    @Nullable StatementBlock finallyBlock;
+}
 
 class While extends LoopStatement {}
 
@@ -691,13 +587,10 @@ class PermIndProgramElementName extends IndProgramElementName {}
 class TempIndProgramElementName extends IndProgramElementName {}
 
 abstract class IProgramMethod {}
-
 abstract class IProgramVariable {}
 
 class LocationVariable extends ProgramVariable {}
-
 class ProgramConstant extends ProgramVariable {}
-
 class ProgramMethod extends ObserverFunction {}
 
 class ProgramSV extends JOperatorSV {}
@@ -706,32 +599,19 @@ abstract class ProgramVariable extends JAbstractSortedOperator {}
 
 abstract class AbstractProgramElement {}
 
-class ArrayLength extends ProgramTransformer {}
-
-class ArrayPostDecl extends ProgramTransformer {}
-
-class ConstructorCall extends ProgramTransformer {}
-
-class CreateObject extends ProgramTransformer {}
-
-class DoBreak extends ProgramTransformer {}
-
-class EnhancedForElimination extends ProgramTransformer {}
-
-class EvaluateArgs extends ProgramTransformer {}
-
-class ExpandMethodBody extends ProgramTransformer {}
-
-class ForInitUnfoldTransformer extends ProgramTransformer {}
-
-class ForToWhile extends ProgramTransformer {}
-
-abstract class InitArray extends ProgramTransformer {}
-
 class InitArrayCreation extends InitArray {}
 
+abstract class ProgramTransformer extends JavaNonTerminalProgramElement {}
+class ReattachLoopInvariant extends ProgramTransformer {}
+class SpecialConstructorCall extends ProgramTransformer {}
+class StaticInitialisation extends ProgramTransformer {}
+class SwitchToIf extends ProgramTransformer {}
+class TypeOf extends ProgramTransformer {}
+class Unpack extends ProgramTransformer {}
+class UnwindLoop extends ProgramTransformer {}
+class MultipleVarDecl extends ProgramTransformer {}
+class PostWork extends ProgramTransformer {}
 class IsStatic extends ProgramTransformer {}
-
 class MethodCall extends ProgramTransformer {
     MethodReference methRef;
     ReferencePrefix newContext;
@@ -739,23 +619,14 @@ class MethodCall extends ProgramTransformer {
     List<Expression> arguments;
     KeYJavaType staticPrefixType;
 }
-
-class MultipleVarDecl extends ProgramTransformer {}
-
-class PostWork extends ProgramTransformer {}
-
-abstract class ProgramTransformer extends JavaNonTerminalProgramElement {}
-
-class ReattachLoopInvariant extends ProgramTransformer {}
-
-class SpecialConstructorCall extends ProgramTransformer {}
-
-class StaticInitialisation extends ProgramTransformer {}
-
-class SwitchToIf extends ProgramTransformer {}
-
-class TypeOf extends ProgramTransformer {}
-
-class Unpack extends ProgramTransformer {}
-
-class UnwindLoop extends ProgramTransformer {}
+class ArrayLength extends ProgramTransformer {}
+class ArrayPostDecl extends ProgramTransformer {}
+class ConstructorCall extends ProgramTransformer {}
+class CreateObject extends ProgramTransformer {}
+class DoBreak extends ProgramTransformer {}
+class EnhancedForElimination extends ProgramTransformer {}
+class EvaluateArgs extends ProgramTransformer {}
+class ExpandMethodBody extends ProgramTransformer {}
+class ForInitUnfoldTransformer extends ProgramTransformer {}
+class ForToWhile extends ProgramTransformer {}
+abstract class InitArray extends ProgramTransformer {}
