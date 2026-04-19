@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -155,14 +156,17 @@ public abstract class TypeResolver {
                 JTerm gsTerm = null;
                 if (inst instanceof JTerm) {
                     gsTerm = (JTerm) inst;
+                    s = gsTerm.sort();
+                } else if (inst instanceof BinaryOperator) {
+                    s = services.getTypeConverter().getKeYJavaType((BinaryOperator) inst).getSort();
                 } else if (inst instanceof ProgramElement) {
                     gsTerm = services.getTypeConverter().convertToLogicElement(
                         (ProgramElement) inst, instMap.getExecutionContext());
+                    s = gsTerm.sort();
                 } else {
                     Debug.fail("Unexpected substitution for sv " + resolveSV + ":" + inst);
                     return null;
                 }
-                s = gsTerm.sort();
             }
             return s;
         }
