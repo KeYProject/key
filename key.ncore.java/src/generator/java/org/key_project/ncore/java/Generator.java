@@ -45,6 +45,7 @@ public class Generator implements Callable<Integer> {
         preSteps.add(new PreSteps.PreComputation());
 
         addStep(NodeSteps::setPackage);
+        addStep(NodeSteps::enforceHierarchy);
         addStep(NodeSteps::processFields);
         addStep(NodeSteps::addAllFieldsConstructor);
         addStep(NodeSteps::addAllWoOptFieldsConstructor);
@@ -63,6 +64,7 @@ public class Generator implements Callable<Integer> {
         postSteps.add(PostSteps::createArgVisitor);
         postSteps.add(PostSteps::createVoidVisitor);
         postSteps.add(PostSteps::createTraversalVisitor);
+        postSteps.add(PostSteps::createTraversalCopyOnDemandVisitor);
         postSteps.add(PostSteps::createDeepCopyVisitor);
     }
 

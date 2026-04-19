@@ -467,6 +467,12 @@ public class NodeSteps {
         return false;
     }
 
+    public static void enforceHierarchy(ClassOrInterfaceDeclaration decl) {
+        if(decl.getExtendedTypes().isEmpty()) {
+            decl.addExtendedType("JavaSourceElement");
+        }
+    }
+
     interface NodeStep {
         void applyOn(ClassOrInterfaceDeclaration target);
     }
