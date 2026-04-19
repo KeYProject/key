@@ -2,9 +2,10 @@
 import org.jspecify.annotations.Nullable;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.java.ast.PositionInfo;
+import org.key_project.util.collection.*;
 
-// ROOT
-abstract class JavaSourceElement {
+@Root
+abstract class JavaSourceElement implements Visitable {
     @EqEx @Nullable PositionInfo positionInfo;
 }
 
