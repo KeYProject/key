@@ -5,7 +5,7 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 
 // ROOT
 abstract class JavaSourceElement {
-    @EqEx PositionInfo positionInfo;
+    @EqEx @Nullable PositionInfo positionInfo;
 }
 
 class CompilationUnit extends JavaNonTerminalProgramElement {
@@ -447,7 +447,7 @@ class Default extends Branch {
 }
 
 
-abstract class CatchClause
+abstract class CatchClause {}
 
 class SingleCatch {
     ParameterDeclaration parameter;

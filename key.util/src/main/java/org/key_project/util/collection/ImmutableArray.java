@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ImmutableArray<S extends @Nullable Object>
-        implements java.lang.Iterable<S>, java.io.Serializable {
+        implements RoList<S>, java.io.Serializable {
 
     private static final long serialVersionUID = -9041545065066866250L;
 
@@ -106,7 +106,7 @@ public class ImmutableArray<S extends @Nullable Object>
         return content.length == 0;
     }
 
-    public boolean contains(S op) {
+    public boolean contains(Object op) {
         for (S el : content) {
             if (Objects.equals(el, op)) {
                 return true;
@@ -172,6 +172,16 @@ public class ImmutableArray<S extends @Nullable Object>
     @Override
     public Iterator<S> iterator() {
         return new ArrayIterator<S>(this);
+    }
+
+    @Override
+    public S getFirst() {
+        return this.content[0];
+    }
+
+    @Override
+    public S getLast() {
+        return this.content[this.content.length - 1];
     }
 
     private static class ArrayIterator<T extends @Nullable Object> implements Iterator<T> {
