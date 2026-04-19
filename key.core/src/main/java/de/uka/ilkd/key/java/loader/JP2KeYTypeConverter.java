@@ -183,7 +183,6 @@ public class JP2KeYTypeConverter {
             return getObjectType();
         }
 
-
         {
             // lookup in the cache
             var kjt = jp2KeY.resolvedTypeToKeY(type, services.getJavaService());

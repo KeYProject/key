@@ -179,9 +179,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         if (anonymousClass != null) {
             result++;
         }
-        if (annotations != null) {
-            result += annotations.size();
-        }
         return result;
     }
 
@@ -213,12 +210,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
                 return anonymousClass;
             }
             index--;
-        }
-        if (annotations != null) {
-            len = annotations.size();
-            if (len > index) {
-                return annotations.get(index);
-            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

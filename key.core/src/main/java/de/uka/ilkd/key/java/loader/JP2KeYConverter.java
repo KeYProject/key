@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.modifier.*;
+import de.uka.ilkd.key.java.ast.expression.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
@@ -2057,8 +2058,28 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(AnnotationDeclaration n, Void arg) {
-        //return reportUnsupportedElement(n);
-        return null;
+        final var ref = new ReferenceTypeImpl(n.resolve());
+        var kjt = createOrCachedKeyJavaType(ref);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+
+        ProgramElementName name = createProgramElementName(n.getName());
+        ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
+        
+        boolean isLibrary = mapping.isParsingLibraries();
+        boolean parentIsInterface = false;
+
+        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
+            map(n.getModifiers());
+        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
+
+        TypeDeclaration td = new AnnotationInterfaceDeclaration(
+                pi, c, modArray, name, fullName, members,
+                parentIsInterface, isLibrary, getClassSpec(n));
+        kjt.setJavaType(td);
+
+        mapping.registerType(ref, kjt);
+        return addToMapping(n, td);
     }
 
     @Override
@@ -2093,7 +2114,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(MarkerAnnotationExpr n, Void arg) {
-        return reportUnsupportedElement(n);
+        var rt = n.calculateResolvedType();
+        var kjt = getKeYJavaType(rt);
+        return new MarkerAnnotation(kjt);
     }
 
     @Override

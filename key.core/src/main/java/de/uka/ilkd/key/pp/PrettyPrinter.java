@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.ccatch.*;
@@ -736,6 +735,32 @@ public class PrettyPrinter implements Visitor {
         performActionOnMemberDeclarations(x.getMembers());
     }
 
+    @Override
+    public void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x) {
+        layouter.beginC();
+        layouter.beginC(0);
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+        }
+        if (x.getProgramElementName() != null) {
+            if (hasMods) {
+                layouter.print(" ");
+            }
+            layouter.keyWord("@interface").print(" ");
+            performActionOnProgramElementName(x.getProgramElementName());
+        }
+        layouter.end();
+        // not an anonymous class
+        if (x.getProgramElementName() != null) {
+            layouter.print(" ");
+        }
+        layouter.end();
+
+        performActionOnMemberDeclarations(x.getMembers());
+    }
+
     private void performActionOnMemberDeclarations(
             @Nullable ImmutableArray<MemberDeclaration> members) {
         if (members != null && !members.isEmpty()) {
@@ -1455,13 +1480,6 @@ public class PrettyPrinter implements Visitor {
             layouter.print("(");
         }
 
-        ImmutableArray<AnnotationUseSpecification> annots = x.getAnnotations();
-        boolean hasAnnots = annots != null && !annots.isEmpty();
-        if (hasAnnots) {
-            writeKeywordList(annots);
-            layouter.print(" ");
-        }
-
         layouter.print("new ");
 
         x.getTypeReference().visit(this);
@@ -1522,13 +1540,6 @@ public class PrettyPrinter implements Visitor {
         }
         printReferencePrefix(x.getReferencePrefix());
         layouter.keyWord("new").print(" ");
-
-        ImmutableArray<AnnotationUseSpecification> annots = x.getAnnotations();
-        boolean hasAnnots = annots != null && !annots.isEmpty();
-        if (hasAnnots) {
-            writeKeywordList(annots);
-            layouter.print(" ");
-        }
 
         x.getTypeReference().visit(this);
         printArguments(x.getArguments());
@@ -1727,6 +1738,12 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnThen(Then x) {
         handleBlockOrSingleStatement(x.getBody());
+    }
+
+    @Override
+    public void performActionOnAnnotationExpression(AnnotationExpression x) {
+        layouter.print("@");
+        performActionOnType(x.getKeYJavaType().getJavaType());
     }
 
     @Override

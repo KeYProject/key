@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.ast.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -33,12 +32,6 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     protected final TypeReference typeReference;
 
     /**
-     * Annotations.
-     */
-    protected final ImmutableArray<AnnotationUseSpecification> annotations;
-
-
-    /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children
@@ -49,8 +42,6 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     protected TypeOperator(ExtList children) {
         super(children);
         typeReference = children.get(TypeReference.class);
-        annotations = new ImmutableArray<>(
-            children.collect(AnnotationUseSpecification.class));
     }
 
     /**
@@ -64,39 +55,26 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     protected TypeOperator(ExtList children, PositionInfo pi) {
         super(children);
         typeReference = children.get(TypeReference.class);
-        annotations = new ImmutableArray<>(
-            children.collect(AnnotationUseSpecification.class));
     }
 
     protected TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
         typeReference = typeref;
-        annotations = null;
     }
 
     protected TypeOperator(Expression[] arguments, TypeReference typeref) {
         super(arguments);
         typeReference = typeref;
-        annotations = null;
-    }
-
-    protected TypeOperator(Expression[] arguments, TypeReference typeref,
-            ImmutableArray<AnnotationUseSpecification> annotations) {
-        super(arguments);
-        typeReference = typeref;
-        this.annotations = annotations;
     }
 
     protected TypeOperator() {
         typeReference = null;
-        annotations = null;
     }
 
     public TypeOperator(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
             TypeReference type) {
         super(pi, c, arguments);
         typeReference = type;
-        annotations = null;
     }
 
     /**
@@ -141,14 +119,5 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return getTypeReference().getKeYJavaType();
-    }
-
-    /**
-     * A getter for the annotations.
-     *
-     * @return the annotations.
-     */
-    public ImmutableArray<AnnotationUseSpecification> getAnnotations() {
-        return annotations;
     }
 }

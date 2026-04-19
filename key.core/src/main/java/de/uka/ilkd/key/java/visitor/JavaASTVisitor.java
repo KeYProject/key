@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
@@ -469,6 +470,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnIntLiteral(IntLiteral x) {
         doDefaultAction(x);
     }
@@ -623,6 +629,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnParenthesizedExpression(ParenthesizedExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAnnotationExpression(AnnotationExpression x) {
         doDefaultAction(x);
     }
 
