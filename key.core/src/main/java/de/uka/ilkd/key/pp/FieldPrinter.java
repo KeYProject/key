@@ -150,7 +150,8 @@ class FieldPrinter {
 
     /*
      * Determine whether the field constant is a generic object property. Those are prefixed by the
-     * separator `#` and the implicit symbol `$`, e.g. o.$created
+     * separator `::`, the field prefix `#`, and the marker for implicit symbols `$`, e.g.
+     * `java.lang.Object::#$created`
      */
     protected boolean isBuiltinObjectProperty(JTerm fieldTerm) {
         final String implicitFieldMarker = JavaDLFieldNames.SEPARATOR +
