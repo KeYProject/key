@@ -448,7 +448,7 @@ public final class HeapLDT extends LDT {
             }
             final Name kind = new Name(name.toString().substring(index + 2));
 
-            final String nameWithoutFieldPrefix = kind.toString().substring(1);
+            final String nameWithoutFieldPrefix = kind.toString().substring(1); // '#'
             var firstInstance =
                 services.getNamespaces().parametricFunctions().lookup(nameWithoutFieldPrefix);
             if (firstInstance != null && firstInstance.sort().extendsTrans(fieldSort)) {
