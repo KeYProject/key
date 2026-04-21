@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import org.key_project.logic.Term;
@@ -23,26 +23,26 @@ import org.key_project.logic.sort.Sort;
  */
 public class CastHandler implements SMTHandler {
 
-    private SortDependingFunction anyCast;
+    private ParametricFunctionDecl anyCast;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) throws IOException {
-        this.anyCast = services.getJavaDLTheory().getCastSymbol(JavaDLTheory.ANY, services);
+        this.anyCast = services.getJavaDLTheory().getCastSymbol(services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        return op instanceof SortDependingFunction
-                && ((SortDependingFunction) op).isSimilar(anyCast);
+        return op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == (anyCast);
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        SortDependingFunction op = (SortDependingFunction) term.op();
+        var op = (ParametricFunctionInstance) term.op();
         SExpr inner = trans.translate(term.sub(0));
-        Sort depSort = op.getSortDependingOn();
+        Sort depSort = op.getArgs().head().sort();
         trans.addSort(depSort);
         trans.introduceSymbol("cast");
         return SExprs.castExpr(SExprs.sortExpr(depSort), inner);

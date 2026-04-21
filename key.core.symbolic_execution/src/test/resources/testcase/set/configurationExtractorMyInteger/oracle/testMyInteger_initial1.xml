@@ -10,6 +10,6 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="MyInteger">
-      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,self,MyInteger::$value)" type="int" condition="true"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="select<[int]>(heap,self,MyInteger::$value)" type="int" condition="true"/>
    </object>
 </model>

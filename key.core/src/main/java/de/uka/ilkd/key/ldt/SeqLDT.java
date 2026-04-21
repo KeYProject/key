@@ -11,14 +11,17 @@ import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +32,7 @@ public final class SeqLDT extends LDT {
     public static final Name SEQGET_NAME = new Name("seqGet");
 
     // getters
-    private final SortDependingFunction seqGet;
+    private final ParametricFunctionDecl seqGet;
     private final Function seqLen;
     private final Function seqIndexOf;
 
@@ -45,7 +48,7 @@ public final class SeqLDT extends LDT {
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
-        seqGet = addSortDependingFunction(services, "seqGet");
+        seqGet = addParametricFunction((Services) services, "seqGet");
         seqLen = addFunction(services, "seqLen");
         seqEmpty = addFunction(services, "seqEmpty");
         seqSingleton = addFunction(services, "seqSingleton");
@@ -58,9 +61,13 @@ public final class SeqLDT extends LDT {
         values = addFunction(services, "values");
     }
 
+    public ParametricFunctionDecl getSeqGet() {
+        return seqGet;
+    }
 
-    public SortDependingFunction getSeqGet(Sort instanceSort, TermServices services) {
-        return seqGet.getInstanceFor(instanceSort, services);
+    public ParametricFunctionInstance getSeqGet(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(seqGet,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
@@ -149,7 +156,7 @@ public final class SeqLDT extends LDT {
             case SeqReverse ignored -> seqReverse;
             case SeqPut ignored -> seqUpd;
             case SeqIndexOf ignored -> seqIndexOf;
-            case SeqGet ignored -> seqGet;
+            case SeqGet ignored -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
             case SeqLength ignored -> seqLen;
             default -> throw new AssertionError();
         };

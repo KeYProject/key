@@ -182,7 +182,7 @@
       (builtin "One Step Simplification" (formula "1"))
       (rule "true_left" (formula "1"))
       (rule "onlyCreatedObjectsAreReferenced" (formula "12") (term "0,1,0") (ifseqformula "1"))
-      (rule "allLeft" (formula "10") (inst "t=int::select(heap,
+      (rule "allLeft" (formula "10") (inst "t=select<[int]>(heap,
             index,
             ArrayIndexAsVariableFieldTest.Index::$value)"))
       (rule "inEqSimp_contradInEq0" (formula "10") (term "1,0") (ifseqformula "9"))
@@ -273,7 +273,7 @@
                (rule "true_left" (formula "1"))
                (rule "onlyCreatedObjectsAreReferenced" (formula "14") (term "0,1,0") (ifseqformula "2"))
                (rule "allLeft" (formula "11") (inst "t=add(Z(1(#)),
-    int::select(heap,
+    select<[int]>(heap,
                 index,
                 ArrayIndexAsVariableFieldTest.Index::$value))"))
                (rule "inEqSimp_homoInEq1" (formula "11") (term "1,0"))
@@ -476,7 +476,7 @@
                                     (rule "emptyModality" (formula "17") (term "1"))
                                     (builtin "One Step Simplification" (formula "17"))
                                     (rule "ifthenelse_split" (formula "1") (term "0"))
-                                    (branch " ArrayIndexAsVariableFieldTest::select(heap, array, arr(add(Z(1(#)), int::select(heap, index, ArrayIndexAsVariableFieldTest.Index::$value)))) = ArrayIndexAsVariableFieldTest::select(heap, array, arr(int::select(heap, index, ArrayIndexAsVariableFieldTest.Index::$value))) TRUE"
+                                    (branch " ArrayIndexAsVariableFieldTest::select(heap, array, arr(add(Z(1(#)), select<[int]>(heap, index, ArrayIndexAsVariableFieldTest.Index::$value)))) = ArrayIndexAsVariableFieldTest::select(heap, array, arr(select<[int]>(heap, index, ArrayIndexAsVariableFieldTest.Index::$value))) TRUE"
                                        (rule "hideAuxiliaryEq" (formula "2"))
                                        (rule "applyEq" (formula "2") (term "1,0") (ifseqformula "1"))
                                        (rule "applyEq" (formula "12") (term "0") (ifseqformula "1"))
@@ -484,7 +484,7 @@
                                        (builtin "One Step Simplification" (formula "15"))
                                        (opengoal " ")
                                     )
-                                    (branch " ArrayIndexAsVariableFieldTest::select(heap, array, arr(add(Z(1(#)), int::select(heap, index, ArrayIndexAsVariableFieldTest.Index::$value)))) = ArrayIndexAsVariableFieldTest::select(heap, array, arr(int::select(heap, index, ArrayIndexAsVariableFieldTest.Index::$value))) FALSE"
+                                    (branch " ArrayIndexAsVariableFieldTest::select(heap, array, arr(add(Z(1(#)), select<[int]>(heap, index, ArrayIndexAsVariableFieldTest.Index::$value)))) = ArrayIndexAsVariableFieldTest::select(heap, array, arr(select<[int]>(heap, index, ArrayIndexAsVariableFieldTest.Index::$value))) FALSE"
                                        (rule "hideAuxiliaryEq" (formula "1"))
                                        (opengoal " ")
                                     )

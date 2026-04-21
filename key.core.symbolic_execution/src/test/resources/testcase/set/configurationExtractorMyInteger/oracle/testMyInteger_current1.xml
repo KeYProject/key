@@ -10,6 +10,6 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="MyInteger">
-      <value name="value" programVariable="value" isArrayIndex="false" value="mul(int::select(heap,self,MyInteger::$value),Z(2(#)))" type="int" condition="true"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="mul(select<[int]>(heap,self,MyInteger::$value),Z(2(#)))" type="int" condition="true"/>
    </object>
 </model>

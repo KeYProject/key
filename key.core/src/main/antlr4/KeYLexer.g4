@@ -382,8 +382,8 @@ GREATEREQUAL
 :   '>' '=' | '\u2265'
       ;
 
-OPENTYPEPARAMS : '<[';
-CLOSETYPEPARAMS : ']>';
+OPENTYPEPARAMS : '<' '[';
+CLOSETYPEPARAMS : ']' '>';
 
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
@@ -391,7 +391,6 @@ LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<' | '«' | '‹';
 RGUILLEMETS: '>''>' | '»' | '›';
-IMPLICIT_IDENT: '<' '$'? (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 CHAR_LITERAL

@@ -341,7 +341,7 @@
                      (builtin "One Step Simplification" (formula "10"))
                      (rule "true_left" (formula "10"))
                      (rule "cut_direct" (formula "14") (term "1,0"))
-                     (branch "CUT: leq(int::select(heap, self, Calendar::$entrySize), add(Z(neglit(2(#))), length(Calendar.Entry[]::select(heap, self, Calendar::$entries)))) TRUE"
+                     (branch "CUT: leq(select<[int]>(heap, self, Calendar::$entrySize), add(Z(neglit(2(#))), length(Calendar.Entry[]::select(heap, self, Calendar::$entries)))) TRUE"
                         (builtin "One Step Simplification" (formula "15"))
                         (rule "inEqSimp_subsumption0" (formula "11") (ifseqformula "1"))
                         (rule "inEqSimp_homoInEq0" (formula "11") (term "0"))
@@ -437,7 +437,7 @@
                            (rule "closeFalse" (formula "1"))
                         )
                      )
-                     (branch "CUT: leq(int::select(heap, self, Calendar::$entrySize), add(Z(neglit(2(#))), length(Calendar.Entry[]::select(heap, self, Calendar::$entries)))) FALSE"
+                     (branch "CUT: leq(select<[int]>(heap, self, Calendar::$entrySize), add(Z(neglit(2(#))), length(Calendar.Entry[]::select(heap, self, Calendar::$entries)))) FALSE"
                         (builtin "One Step Simplification" (formula "15"))
                         (rule "false_right" (formula "15"))
                         (rule "inEqSimp_leqRight" (formula "14"))

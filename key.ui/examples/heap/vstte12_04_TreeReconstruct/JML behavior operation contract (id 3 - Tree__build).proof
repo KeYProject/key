@@ -3327,11 +3327,11 @@
                                     (builtin "One Step Simplification" (formula "37"))
                                     (rule "true_left" (formula "37"))
                                     (rule "ifthenelse_split" (formula "39") (term "0"))
-                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, $created)) = TRUE TRUE"
+                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, self_4, $created)) = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "40"))
                                        (rule "closeTrue" (formula "40"))
                                     )
-                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, $created)) = TRUE FALSE"
+                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, self_4, $created)) = TRUE FALSE"
                                        (rule "ifthenelse_split" (formula "41") (term "0"))
                                        (branch "result_3.$created = TRUE TRUE"
                                           (builtin "One Step Simplification" (formula "42"))
@@ -3398,7 +3398,7 @@
                                                    (builtin "One Step Simplification" (formula "17") (ifInst ""  (formula "16")))
                                                    (rule "true_left" (formula "17"))
                                                    (rule "cut_direct" (formula "47") (term "1,0,0"))
-                                                   (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
+                                                   (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
                                                       (builtin "One Step Simplification" (formula "48"))
                                                       (rule "cut_direct" (formula "48") (term "0,0"))
                                                       (branch "CUT: java.lang.Object::$inv(heapAfter_Tree, s) TRUE"
@@ -3440,7 +3440,7 @@
                                                             (rule "polySimp_mulLiterals" (formula "1") (term "0"))
                                                             (rule "polySimp_elimOne" (formula "1") (term "0"))
                                                             (rule "ifthenelse_split" (formula "51") (term "0"))
-                                                            (branch "int::select(anonHeap_build, s, p) >= 1 + i_3 + s.p TRUE"
+                                                            (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_3 + s.p TRUE"
                                                                (rule "allLeft" (formula "21") (inst "t=i_3"))
                                                                (rule "polySimp_homoEq" (formula "21") (term "1"))
                                                                (rule "polySimp_addComm0" (formula "21") (term "0,2,0,1,0,1"))
@@ -3488,7 +3488,7 @@
                                                                (builtin "One Step Simplification" (formula "21"))
                                                                (rule "closeFalse" (formula "21"))
                                                             )
-                                                            (branch "int::select(anonHeap_build, s, p) >= 1 + i_3 + s.p FALSE"
+                                                            (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_3 + s.p FALSE"
                                                                (rule "inEqSimp_geqRight" (formula "51"))
                                                                (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
                                                                (rule "polySimp_rightDist" (formula "1") (term "0,1,0,0"))
@@ -3521,8 +3521,8 @@
                                                                (rule "leq_literals" (formula "3") (term "0"))
                                                                (builtin "One Step Simplification" (formula "3"))
                                                                (rule "true_left" (formula "3"))
-                                                               (rule "allLeft" (formula "29") (inst "t=add(add(i_3, int::select(heap, s, List::$p)),
-    mul(int::select(anonHeap_build, s, List::$p),
+                                                               (rule "allLeft" (formula "29") (inst "t=add(add(i_3, select<[int]>(heap, s, List::$p)),
+    mul(select<[int]>(anonHeap_build, s, List::$p),
         Z(neglit(1(#)))))"))
                                                                (rule "polySimp_homoEq" (formula "29") (term "1"))
                                                                (rule "polySimp_addComm1" (formula "29") (term "0,1"))
@@ -3839,7 +3839,7 @@
                                                          )
                                                       )
                                                    )
-                                                   (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
+                                                   (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
                                                       (builtin "One Step Simplification" (formula "48"))
                                                       (rule "false_right" (formula "48"))
                                                       (rule "inEqSimp_geqRight" (formula "47"))
@@ -3884,11 +3884,11 @@
                                                    (builtin "One Step Simplification" (formula "17"))
                                                    (rule "true_left" (formula "17"))
                                                    (rule "cut_direct" (formula "25") (term "0,1,0"))
-                                                   (branch "CUT: boolean::select(anonHeap_build, null, $created) = TRUE TRUE"
+                                                   (branch "CUT: select<[boolean]>(anonHeap_build, null, $created) = TRUE TRUE"
                                                       (builtin "One Step Simplification" (formula "26") (ifInst ""  (formula "24")))
                                                       (rule "true_left" (formula "26"))
                                                       (rule "cut_direct" (formula "48") (term "1,0,0"))
-                                                      (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
+                                                      (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
                                                          (builtin "One Step Simplification" (formula "49"))
                                                          (rule "cut_direct" (formula "49") (term "0,0"))
                                                          (branch "CUT: java.lang.Object::$inv(heapAfter_Tree, s) TRUE"
@@ -3930,7 +3930,7 @@
                                                                (rule "polySimp_mulLiterals" (formula "2") (term "0"))
                                                                (rule "polySimp_elimOne" (formula "2") (term "0"))
                                                                (rule "ifthenelse_split" (formula "52") (term "0"))
-                                                               (branch "int::select(anonHeap_build, s, p) >= 1 + i_2 + s.p TRUE"
+                                                               (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_2 + s.p TRUE"
                                                                   (rule "allLeft" (formula "21") (inst "t=i_2"))
                                                                   (rule "polySimp_homoEq" (formula "21") (term "1"))
                                                                   (rule "polySimp_addComm0" (formula "21") (term "0,2,0,1,0,1"))
@@ -3978,7 +3978,7 @@
                                                                   (rule "leq_literals" (formula "21"))
                                                                   (rule "closeFalse" (formula "21"))
                                                                )
-                                                               (branch "int::select(anonHeap_build, s, p) >= 1 + i_2 + s.p FALSE"
+                                                               (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_2 + s.p FALSE"
                                                                   (rule "inEqSimp_geqRight" (formula "52"))
                                                                   (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
                                                                   (rule "polySimp_rightDist" (formula "1") (term "0,1,0,0"))
@@ -4011,8 +4011,8 @@
                                                                   (rule "leq_literals" (formula "2") (term "0"))
                                                                   (builtin "One Step Simplification" (formula "2"))
                                                                   (rule "true_left" (formula "2"))
-                                                                  (rule "allLeft" (formula "29") (inst "t=add(add(i_2, int::select(heap, s, List::$p)),
-    mul(int::select(anonHeap_build, s, List::$p),
+                                                                  (rule "allLeft" (formula "29") (inst "t=add(add(i_2, select<[int]>(heap, s, List::$p)),
+    mul(select<[int]>(anonHeap_build, s, List::$p),
         Z(neglit(1(#)))))"))
                                                                   (rule "polySimp_homoEq" (formula "29") (term "1"))
                                                                   (rule "polySimp_addComm1" (formula "29") (term "0,1"))
@@ -4117,11 +4117,11 @@
                                                                (rule "replace_known_right" (formula "52") (term "0,0,0,2,0") (ifseqformula "50"))
                                                                (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "50")) (ifInst ""  (formula "51")))
                                                                (rule "ifthenelse_split" (formula "52") (term "0,0,1,0,0"))
-                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, $created)) = TRUE TRUE"
+                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_4, $created)) = TRUE TRUE"
                                                                   (builtin "One Step Simplification" (formula "53") (ifInst ""  (formula "1")))
                                                                   (rule "closeTrue" (formula "53"))
                                                                )
-                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, $created)) = TRUE FALSE"
+                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_4, $created)) = TRUE FALSE"
                                                                   (rule "replace_known_right" (formula "53") (term "0,1,0,2,0") (ifseqformula "52"))
                                                                   (builtin "One Step Simplification" (formula "53"))
                                                                   (rule "ifthenelse_negated" (formula "53") (term "2,0"))
@@ -4337,7 +4337,7 @@
                                                             )
                                                          )
                                                       )
-                                                      (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
+                                                      (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
                                                          (builtin "One Step Simplification" (formula "49"))
                                                          (rule "false_right" (formula "49"))
                                                          (rule "inEqSimp_geqRight" (formula "48"))
@@ -4373,11 +4373,11 @@
                                                          (rule "closeFalse" (formula "23"))
                                                       )
                                                    )
-                                                   (branch "CUT: boolean::select(anonHeap_build, null, $created) = TRUE FALSE"
+                                                   (branch "CUT: select<[boolean]>(anonHeap_build, null, $created) = TRUE FALSE"
                                                       (builtin "One Step Simplification" (formula "25"))
                                                       (rule "true_left" (formula "25"))
                                                       (rule "cut_direct" (formula "48") (term "1,0,0"))
-                                                      (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
+                                                      (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
                                                          (builtin "One Step Simplification" (formula "49"))
                                                          (rule "cut_direct" (formula "49") (term "0,0"))
                                                          (branch "CUT: java.lang.Object::$inv(heapAfter_Tree, s) TRUE"
@@ -4419,7 +4419,7 @@
                                                                (rule "polySimp_mulLiterals" (formula "1") (term "0"))
                                                                (rule "polySimp_elimOne" (formula "1") (term "0"))
                                                                (rule "ifthenelse_split" (formula "52") (term "0"))
-                                                               (branch "int::select(anonHeap_build, s, p) >= 1 + i_1 + s.p TRUE"
+                                                               (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_1 + s.p TRUE"
                                                                   (rule "allLeft" (formula "21") (inst "t=i_1"))
                                                                   (rule "polySimp_homoEq" (formula "21") (term "1"))
                                                                   (rule "polySimp_addComm1" (formula "21") (term "0,1"))
@@ -4467,7 +4467,7 @@
                                                                   (builtin "One Step Simplification" (formula "21"))
                                                                   (rule "closeFalse" (formula "21"))
                                                                )
-                                                               (branch "int::select(anonHeap_build, s, p) >= 1 + i_1 + s.p FALSE"
+                                                               (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_1 + s.p FALSE"
                                                                   (rule "inEqSimp_geqRight" (formula "52"))
                                                                   (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
                                                                   (rule "polySimp_rightDist" (formula "1") (term "0,1,0,0"))
@@ -4500,8 +4500,8 @@
                                                                   (rule "leq_literals" (formula "3") (term "0"))
                                                                   (builtin "One Step Simplification" (formula "3"))
                                                                   (rule "true_left" (formula "3"))
-                                                                  (rule "allLeft" (formula "29") (inst "t=add(add(i_1, int::select(heap, s, List::$p)),
-    mul(int::select(anonHeap_build, s, List::$p),
+                                                                  (rule "allLeft" (formula "29") (inst "t=add(add(i_1, select<[int]>(heap, s, List::$p)),
+    mul(select<[int]>(anonHeap_build, s, List::$p),
         Z(neglit(1(#)))))"))
                                                                   (rule "polySimp_homoEq" (formula "29") (term "1"))
                                                                   (rule "polySimp_addComm1" (formula "29") (term "0,1"))
@@ -4606,7 +4606,7 @@
                                                                (rule "replace_known_right" (formula "52") (term "0,0,0,2,0") (ifseqformula "50"))
                                                                (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "50")) (ifInst ""  (formula "51")))
                                                                (rule "ifthenelse_split" (formula "52") (term "0"))
-                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, $created)) = TRUE TRUE"
+                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build_0, o_3, $created)) = TRUE TRUE"
                                                                   (rule "andLeft" (formula "1"))
                                                                   (rule "notLeft" (formula "1"))
                                                                   (rule "notLeft" (formula "1"))
@@ -4617,7 +4617,7 @@
                                                                   (builtin "One Step Simplification" (formula "38"))
                                                                   (rule "closeTrue" (formula "38"))
                                                                )
-                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, $created)) = TRUE FALSE"
+                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build_0, o_3, $created)) = TRUE FALSE"
                                                                   (rule "ifthenelse_split" (formula "53") (term "0,0,1,0,0"))
                                                                   (branch "o_3.$created = TRUE TRUE"
                                                                      (builtin "One Step Simplification" (formula "54"))
@@ -4830,7 +4830,7 @@
                                                             )
                                                          )
                                                       )
-                                                      (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
+                                                      (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
                                                          (builtin "One Step Simplification" (formula "49"))
                                                          (rule "false_right" (formula "49"))
                                                          (rule "inEqSimp_geqRight" (formula "48"))
@@ -4911,7 +4911,7 @@
                                                 (rule "replace_known_right" (formula "47") (term "0,1,0") (ifseqformula "37"))
                                                 (builtin "One Step Simplification" (formula "47"))
                                                 (rule "cut_direct" (formula "47") (term "1,0,0"))
-                                                (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
+                                                (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p TRUE"
                                                    (builtin "One Step Simplification" (formula "48"))
                                                    (rule "cut_direct" (formula "48") (term "0,0"))
                                                    (branch "CUT: java.lang.Object::$inv(heapAfter_Tree, s) TRUE"
@@ -4953,7 +4953,7 @@
                                                          (rule "polySimp_mulLiterals" (formula "1") (term "0"))
                                                          (rule "polySimp_elimOne" (formula "1") (term "0"))
                                                          (rule "ifthenelse_split" (formula "51") (term "0"))
-                                                         (branch "int::select(anonHeap_build, s, p) >= 1 + i_0 + s.p TRUE"
+                                                         (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_0 + s.p TRUE"
                                                             (rule "allLeft" (formula "21") (inst "t=i_0"))
                                                             (rule "polySimp_homoEq" (formula "21") (term "1"))
                                                             (rule "polySimp_addComm0" (formula "21") (term "0,2,0,1,0,1"))
@@ -5001,7 +5001,7 @@
                                                             (builtin "One Step Simplification" (formula "21"))
                                                             (rule "closeFalse" (formula "21"))
                                                          )
-                                                         (branch "int::select(anonHeap_build, s, p) >= 1 + i_0 + s.p FALSE"
+                                                         (branch "select<[int]>(anonHeap_build, s, p) >= 1 + i_0 + s.p FALSE"
                                                             (rule "inEqSimp_geqRight" (formula "51"))
                                                             (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
                                                             (rule "polySimp_rightDist" (formula "1") (term "0,1,0,0"))
@@ -5034,8 +5034,8 @@
                                                             (rule "leq_literals" (formula "3") (term "0"))
                                                             (builtin "One Step Simplification" (formula "3"))
                                                             (rule "true_left" (formula "3"))
-                                                            (rule "allLeft" (formula "29") (inst "t=add(add(i_0, int::select(heap, s, List::$p)),
-    mul(int::select(anonHeap_build, s, List::$p),
+                                                            (rule "allLeft" (formula "29") (inst "t=add(add(i_0, select<[int]>(heap, s, List::$p)),
+    mul(select<[int]>(anonHeap_build, s, List::$p),
         Z(neglit(1(#)))))"))
                                                             (rule "polySimp_homoEq" (formula "29") (term "1"))
                                                             (rule "polySimp_addComm1" (formula "29") (term "0,1"))
@@ -5140,11 +5140,11 @@
                                                          (rule "replace_known_right" (formula "51") (term "0,0,0,2,2,0") (ifseqformula "49"))
                                                          (builtin "One Step Simplification" (formula "51") (ifInst ""  (formula "49")) (ifInst ""  (formula "50")))
                                                          (rule "ifthenelse_split" (formula "51") (term "0,0,1,0,0"))
-                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, $created)) = TRUE TRUE"
+                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_2, $created)) = TRUE TRUE"
                                                             (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "1")))
                                                             (rule "closeTrue" (formula "52"))
                                                          )
-                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, $created)) = TRUE FALSE"
+                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (select<[boolean]>(anonHeap_build, o_2, $created)) = TRUE FALSE"
                                                             (rule "replace_known_right" (formula "52") (term "0,1,0,2,0") (ifseqformula "51"))
                                                             (builtin "One Step Simplification" (formula "52"))
                                                             (rule "ifthenelse_negated" (formula "52") (term "2,0"))
@@ -5335,7 +5335,7 @@
                                                       )
                                                    )
                                                 )
-                                                (branch "CUT: int::select(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
+                                                (branch "CUT: select<[int]>(anonHeap_build_0, s, p) >= 1 + s.p FALSE"
                                                    (builtin "One Step Simplification" (formula "48"))
                                                    (rule "false_right" (formula "48"))
                                                    (rule "inEqSimp_geqRight" (formula "47"))
@@ -5900,7 +5900,7 @@
                                              (rule "inEqSimp_sepPosMonomial1" (formula "11") (term "1,0,0"))
                                              (rule "polySimp_mulLiterals" (formula "11") (term "1,1,0,0"))
                                              (rule "polySimp_elimOne" (formula "11") (term "1,1,0,0"))
-                                             (rule "allLeft" (formula "11") (inst "t=int::select(heap, s, List::$p)"))
+                                             (rule "allLeft" (formula "11") (inst "t=select<[int]>(heap, s, List::$p)"))
                                              (rule "cut_direct" (formula "11") (term "1,0"))
                                              (branch "CUT: s.p >= null.length TRUE"
                                                 (builtin "One Step Simplification" (formula "12"))
@@ -6075,7 +6075,7 @@
                                              (rule "inEqSimp_sepPosMonomial1" (formula "11") (term "1,0,0"))
                                              (rule "polySimp_mulLiterals" (formula "11") (term "1,1,0,0"))
                                              (rule "polySimp_elimOne" (formula "11") (term "1,1,0,0"))
-                                             (rule "allLeft" (formula "11") (inst "t=int::select(heap, s, List::$p)"))
+                                             (rule "allLeft" (formula "11") (inst "t=select<[int]>(heap, s, List::$p)"))
                                              (rule "cut_direct" (formula "11") (term "1,0"))
                                              (branch "CUT: s.p >= null.length TRUE"
                                                 (builtin "One Step Simplification" (formula "12"))
@@ -6271,7 +6271,7 @@
                                           (rule "inEqSimp_sepPosMonomial1" (formula "11") (term "1,0,0"))
                                           (rule "polySimp_mulLiterals" (formula "11") (term "1,1,0,0"))
                                           (rule "polySimp_elimOne" (formula "11") (term "1,1,0,0"))
-                                          (rule "allLeft" (formula "11") (inst "t=int::select(heap, s, List::$p)"))
+                                          (rule "allLeft" (formula "11") (inst "t=select<[int]>(heap, s, List::$p)"))
                                           (rule "cut_direct" (formula "11") (term "0,0"))
                                           (branch "CUT: s.p <= -1 TRUE"
                                              (builtin "One Step Simplification" (formula "12"))
@@ -6454,7 +6454,7 @@
                                                 (rule "add_zero_right" (formula "15") (term "0,0,0,0,0"))
                                                 (rule "inEqSimp_sepPosMonomial0" (formula "15") (term "0,0,0"))
                                                 (rule "mul_literals" (formula "15") (term "1,0,0,0"))
-                                                (rule "allLeft" (formula "15") (inst "t=int::select(heap, s, List::$p)"))
+                                                (rule "allLeft" (formula "15") (inst "t=select<[int]>(heap, s, List::$p)"))
                                                 (rule "inEqSimp_contradInEq0" (formula "15") (term "1,0") (ifseqformula "1"))
                                                 (rule "inEqSimp_homoInEq1" (formula "15") (term "0,1,0"))
                                                 (rule "polySimp_mulComm0" (formula "15") (term "1,0,0,1,0"))
@@ -6668,7 +6668,7 @@
                               (rule "inEqSimp_sepPosMonomial1" (formula "8") (term "1,0,0"))
                               (rule "polySimp_mulLiterals" (formula "8") (term "1,1,0,0"))
                               (rule "polySimp_elimOne" (formula "8") (term "1,1,0,0"))
-                              (rule "allLeft" (formula "8") (inst "t=int::select(heap, s, List::$p)"))
+                              (rule "allLeft" (formula "8") (inst "t=select<[int]>(heap, s, List::$p)"))
                               (rule "cut_direct" (formula "8") (term "1,0"))
                               (branch "CUT: s.p >= null.length TRUE"
                                  (builtin "One Step Simplification" (formula "9"))
@@ -6804,7 +6804,7 @@
                               (rule "add_literals" (formula "8") (term "0,0,0,0,0"))
                               (rule "inEqSimp_sepPosMonomial0" (formula "8") (term "0,0,0"))
                               (rule "mul_literals" (formula "8") (term "1,0,0,0"))
-                              (rule "allLeft" (formula "8") (inst "t=int::select(heap, s, List::$p)"))
+                              (rule "allLeft" (formula "8") (inst "t=select<[int]>(heap, s, List::$p)"))
                               (rule "cut_direct" (formula "8") (term "0,0"))
                               (branch "CUT: s.p <= -1 TRUE"
                                  (builtin "One Step Simplification" (formula "9"))
@@ -6987,7 +6987,7 @@
                                     (rule "add_literals" (formula "12") (term "0,0,0,0,0"))
                                     (rule "inEqSimp_sepPosMonomial0" (formula "12") (term "0,0,0"))
                                     (rule "mul_literals" (formula "12") (term "1,0,0,0"))
-                                    (rule "allLeft" (formula "12") (inst "t=int::select(heap, s, List::$p)"))
+                                    (rule "allLeft" (formula "12") (inst "t=select<[int]>(heap, s, List::$p)"))
                                     (rule "inEqSimp_contradInEq1" (formula "12") (term "0,0") (ifseqformula "3"))
                                     (rule "qeq_literals" (formula "12") (term "0,0,0"))
                                     (builtin "One Step Simplification" (formula "12"))
