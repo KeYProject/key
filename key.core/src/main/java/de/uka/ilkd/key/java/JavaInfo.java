@@ -1181,12 +1181,8 @@ public final class JavaInfo {
      */
     public LocationVariable getArrayLength() {
         if (length == null) {
-            final KeYJavaType sadKjt = rec2key().getSuperArrayType();
-
-            if (sadKjt == null) return null;
-
             final SuperArrayDeclaration sad =
-                (SuperArrayDeclaration) sadKjt.getJavaType();
+                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
             length = (LocationVariable) sad.length().getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
