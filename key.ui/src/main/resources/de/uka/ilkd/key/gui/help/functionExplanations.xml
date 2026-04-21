@@ -21,16 +21,16 @@ Java has the peculiarity of covariant array types. They allow an array assignmen
 
 Integers are used to access the entries of entries within arrays stored on the heap. This function provides the injection of the integer domain into that of the type Field. It is ensured that this image of arr is disjoint from any defined field constant.
 
-The array access a[i], for instance for an int-array a, becomes select<[int]>(heap, a, arr(i)).</entry>
+The array access a[i], for instance for an int-array a, becomes select&lt;[int]&gt;(heap, a, arr(i)).</entry>
 
-<entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
-<entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
-<entry key="field/java.lang.Object::&lt;created&gt;">tbd</entry>
-<entry key="field/java.lang.Object::&lt;initialized&gt;">tbd</entry>
-<entry key="field/alpha::&lt;classPrepared&gt;">tbd</entry>
-<entry key="field/alpha::&lt;classInitialized&gt;">tbd</entry>
-<entry key="field/alpha::&lt;classInitializationInProgress&gt;">tbd</entry>
-<entry key="field/alpha::&lt;classErroneous&gt;">tbd</entry>
+<entry key="field/java.lang.Object::#$transient">tbd</entry>
+<entry key="field/java.lang.Object::#$transactionConditionallyUpdated">tbd</entry>
+<entry key="field/java.lang.Object::#$created">tbd</entry>
+<entry key="field/java.lang.Object::#$initialized">tbd</entry>
+<entry key="field/alpha::#$classPrepared">tbd</entry>
+<entry key="field/alpha::#$classInitialized">tbd</entry>
+<entry key="field/alpha::#$classInitializationInProgress">tbd</entry>
+<entry key="field/alpha::#$classErroneous">tbd</entry>
 
 <entry key="heap/heap">This program variable holds to the current heap state. Its type is Heap. Any assignment statement in a modality modifies the value of this program variable and any expression reading from the heap within a Java modality refers to the heap stored in this program variable.</entry>
 
@@ -48,13 +48,13 @@ It takes four arguments:
 4. The value v which is to be written in the designated location.
 The result is a heap which coincides with h in all locations but in (o,f), where v is stored.
 In the theory of arrays, store is somtimes called "write".
-The field java.lang.Object::$created cannot be updated using store; use "create".</entry>
+The field java.lang.Object::#$created cannot be updated using store; use "create".</entry>
 
 <entry key="heap/create">This function modifies a heap by changing the createdness of one object.
 It takes two arguments:
 1. The heap h which is to be modified
 2. The object reference o for the object which is to be set created.
-The result is a heap which coincides with h in all locations but in (o,java.lang.Object::$created), which has been set to true.
+The result is a heap which coincides with h in all locations but in (o,java.lang.Object::#$created), which has been set to true.
 There is no means to modify a heap by setting the createdness of an object to false.</entry>
 
 <entry key="heap/anon">tbd</entry>
@@ -65,9 +65,9 @@ It takes three arguments:
 2. The location set s whose locations are to be modified
 4. The value v which is to be written in the designated locations.
 The result is a heap which coincides with h in all locations but in the locations in s where v is stored.
-The field java.lang.Object::$created&gt; cannot be updated using memset; use "create".</entry>
+The field java.lang.Object::#$created cannot be updated using memset; use "create".</entry>
 
-<entry key="heap/alpha::select">tbd</entry>
+<entry key="heap/select&lt;[alpha]&gt;">tbd</entry>
     
 <entry key="locset/empty">The empty location set which does not contain any elements.</entry>
 
