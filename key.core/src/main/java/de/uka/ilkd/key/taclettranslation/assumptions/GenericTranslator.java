@@ -58,7 +58,7 @@ class GenericTranslator {
                 + " because there are not enough different sorts. " + generics + " " + sorts);
         }
 
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             for (JTerm gt : list) {
                 result.add(AssumptionGenerator.quantifyTerm(gt, services));
 
@@ -85,7 +85,6 @@ class GenericTranslator {
      *         <code>term</code> is of type {@link ParametricFunctionInstance} and
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
-
     private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
         JTerm[] subTerms = new JTerm[term.arity()];
@@ -123,9 +122,6 @@ class GenericTranslator {
                   // that should have isReference-Condition, but
                   // they don't
                   // have the condition.
-
-                // TODO(DD): Extend to more complex parametric functions; ask RB what is expected
-                // here
                 if (func.getArgs().size() == 1 && func.getArgs().head().sort().equals(generic)) {
                     if (instantiation.extendsTrans(services.getJavaInfo().nullSort())) {
                         return null;
