@@ -504,14 +504,14 @@ public final class StringUtil {
 
     /// Returns the string until the first match of the given regex.
     public static String takeUntil(String content, String regex) {
-        var array = content.split(regex, 1);
+        var array = content.split(regex, 2);
         return array[0];
     }
 
     /// Returns the string after the first match of the given regex.
     public static String takeAfter(String content, String regex) {
-        var array = content.split(regex, 1);
-        return array[0];
+        var array = content.split(regex, 2);
+        return array[1];
     }
 
 
