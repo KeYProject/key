@@ -60,6 +60,34 @@ public class NodeSteps {
         return c + nameAsString.substring(1);
     }
 
+    static void addMatch(ClassOrInterfaceDeclaration target) {
+        if (target.isAbstract() || target.isInterface()) {
+            return;
+        }
+        MethodDeclaration equals = target.addMethod("match", PUBLIC);
+        equals.addModifier(FINAL);
+        equals.addAnnotation(Override.class);
+        equals.addAnnotation(Nullable.class);
+        equals.setType("MatchConditions");
+        final var o = getNullableObject();
+        equals.getParameters().add(o);
+        equals.addParameter("MatchConditions", "cond");
+
+        BlockStmt body = equals.getBody().get();
+        body.addStatement(parseStatement(
+                "if(!(o instanceof %s other)) return null;".formatted(target.getNameAsString())));
+        var fields = target.getFields().stream()
+                .filter(it -> it.getAnnotationByName("EqEx").isEmpty())
+                .flatMap(it -> it.getVariables().stream())
+                .toList();
+        for (var field : fields) {
+            body.addStatement("cond = MatchHelper.match(%s, other.%s, cond);"
+                    .formatted(field.getNameAsString(), field.getNameAsString()));
+            body.addStatement("if(cond==null) {return null;}");
+        }
+        body.addStatement("return cond;");
+    }
+
     static void addEquals(ClassOrInterfaceDeclaration target) {
         if (target.isAbstract() || target.isInterface()) {
             return;
@@ -207,7 +235,6 @@ public class NodeSteps {
 
         target.addMember(constr);
     }
-
 
     static void addOverrideConstructor(ClassOrInterfaceDeclaration target) {
         if (target.isInterface()) {
