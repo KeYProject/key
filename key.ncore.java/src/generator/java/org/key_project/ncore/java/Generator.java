@@ -53,11 +53,12 @@ public class Generator implements Callable<Integer> {
         addStep(NodeSteps::addEquals);
         addStep(NodeSteps::ToString);
         addStep(NodeSteps::addHashCode);
+        addStep(NodeSteps::addMatch);
         addStep(NodeSteps::addWiths);
         addStep(NodeSteps::addBuilder);
         addStep(NodeSteps::addOverrideConstructor);
         addStep(NodeSteps::addOverrideConstructor2);
-        addStep(NodeSteps::addGetProperties);
+        //addStep(NodeSteps::addGetProperties);
         addStep(NodeSteps::processFieldsAccessor);
 
         postSteps.add(PostSteps::createVisitor);
