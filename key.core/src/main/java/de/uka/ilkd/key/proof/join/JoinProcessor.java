@@ -26,7 +26,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -106,7 +105,7 @@ public class JoinProcessor implements Runnable {
 
         orRight(result);
 
-        ImmutableList<Goal> list = ImmutableSLList.nil();
+        ImmutableList<Goal> list = ImmutableList.nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
             if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {

@@ -29,7 +29,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -235,7 +234,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> types = ImmutableList.<KeYJavaType>nil();
         if (extending != null) {
             for (int i = extending.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(extending.getTypeReferenceAt(i).getKeYJavaType());

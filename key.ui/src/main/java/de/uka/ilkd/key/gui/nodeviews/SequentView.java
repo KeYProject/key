@@ -36,7 +36,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -761,7 +760,7 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                        ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
                                 .<Integer>nil().prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
                         // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
@@ -780,7 +779,7 @@ public abstract class SequentView extends JEditorPane {
                     form, max_age + 2);
                 if (age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                    ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
                             .<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath

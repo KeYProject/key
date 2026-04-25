@@ -314,7 +314,7 @@ public class WhileInvariantRule implements BuiltInRule {
             var anonUpdate = createLocalAnonUpdate(localOuts, services);
             localAnonUpdate = anonUpdate != null ? anonUpdate : tb.skip();
             // Term anonAssumption = null;
-            ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
+            ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableList.nil();
             for (LocationVariable heap : heapContext) {
                 final AnonUpdateData tAnon =
                     createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);

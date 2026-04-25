@@ -13,7 +13,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -108,15 +107,15 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     public static ImmutableList<RuleAppContainer> createAppContainers(
             ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
+        ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
         if (rules.size() == 1) {
             result = result.prepend(createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
             ImmutableList<NoPosTacletApp> tacletApplications =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
 
             for (RuleApp rule : rules) {
                 if (rule instanceof NoPosTacletApp) {

@@ -136,7 +136,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
-        ImmutableList<JTerm> params = smaller.subs().toImmutableList().take(paramOffset);
+        ImmutableList<JTerm> params = smaller.subs().toImmutableList().skip(paramOffset);
 
         JTerm mod = contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
             Collections.emptyMap(), services);
@@ -178,7 +178,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
-        ImmutableList<JTerm> params = app.subs().toImmutableList().take(paramOffset);
+        ImmutableList<JTerm> params = app.subs().toImmutableList().skip(paramOffset);
 
         return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(),
             services);

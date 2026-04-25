@@ -110,7 +110,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                             if (goalsWhereStopConditionDoNotAllowNextRule.add(next)) {
                                 // Update selected list to get a new goal in next loop iteration
                                 Goal head = selectedList.head();
-                                selectedList = selectedList.take(1);
+                                selectedList = selectedList.tail();
                                 selectedList = selectedList.append(head);
                             } else {
                                 // Next rule not allowed, but all other goals also don't allow it,
@@ -124,7 +124,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                     if (goal == null) {
                         // Update selected list to get a new goal in next loop iteration
                         Goal head = selectedList.head();
-                        selectedList = selectedList.take(1);
+                        selectedList = selectedList.tail();
                         selectedList = selectedList.append(head);
                     }
                 }

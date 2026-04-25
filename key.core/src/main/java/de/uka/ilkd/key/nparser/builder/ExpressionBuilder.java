@@ -44,7 +44,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.parsing.Position;
@@ -603,7 +602,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
-            var ant = ImmutableSLList.singleton(new SequentFormula(head));
+            var ant = ImmutableList.singleton(new SequentFormula(head));
             return JavaDLSequentKit.createSequent(ant, ss);
         }
         if (head != null && s != null) {
@@ -612,7 +611,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return JavaDLSequentKit.createSequent(newAnt, s.succedent().asList());
         }
         if (ss != null) {
-            return JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ss);
+            return JavaDLSequentKit.createSequent(ImmutableList.nil(), ss);
         }
         assert (false);
         return null;
@@ -622,7 +621,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public ImmutableList<SequentFormula> visitSemisequent(JavaKeYParser.SemisequentContext ctx) {
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
-            ss = ImmutableSLList.nil();
+            ss = ImmutableList.nil();
         }
         JTerm head = accept(ctx.term());
         if (head != null) {

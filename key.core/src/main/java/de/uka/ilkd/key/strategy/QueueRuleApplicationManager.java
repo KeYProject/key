@@ -34,7 +34,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
@@ -334,7 +333,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
          * Working list contains rule apps that cannot be completed in the current round but will be
          * reconsidered during the next round.
          */
-        ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
+        ImmutableList<RuleAppContainer> workingList = ImmutableList.nil();
 
         // Wake parked assumes-bases whose \assumes top operator matches a formula added/modified
         // since the last round, re-inserting them into the active queue so they re-expand during

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.RuleContext;
 
@@ -17,7 +17,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
-        super(ImmutableSLList.nil(), kind.toString() + " " + clause);
+        super(ImmutableList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
     }

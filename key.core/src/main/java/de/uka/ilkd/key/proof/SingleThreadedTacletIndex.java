@@ -13,7 +13,6 @@ import org.key_project.logic.LogicServices;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -67,7 +66,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, LogicServices services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableList.nil();
 
         for (final NoPosTacletApp tacletApp : tacletApps) {
             if (!p_filter.filter(tacletApp.taclet())) {

@@ -19,7 +19,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -73,7 +73,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         }
 
         // instantiate with arbitrary remaining step
-        bapp = bapp.setAssumesInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
+        bapp = bapp.setAssumesInsts(ImmutableList.<PosInOccurrence>singleton(steps.get(0)));
         return true;
     }
 }

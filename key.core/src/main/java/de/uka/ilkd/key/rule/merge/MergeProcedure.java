@@ -16,7 +16,6 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -40,11 +39,11 @@ import org.key_project.util.collection.ImmutableSet;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableList.nil();
 
     static {
         CONCRETE_RULES =
-            ImmutableSLList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
+            ImmutableList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
                     .prepend(MergeWithPredicateAbstractionFactory.instance())
                     .prepend(MergeIfThenElseAntecedent.instance())
                     .prepend(MergeByIfThenElse.instance());

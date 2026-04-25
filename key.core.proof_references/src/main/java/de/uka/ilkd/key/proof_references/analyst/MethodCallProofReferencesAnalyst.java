@@ -31,7 +31,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Extracts called methods.
@@ -136,7 +136,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                 throw new IllegalArgumentException("Empty argument list expected.");
             }
             IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(),
-                method.toString(), ImmutableSLList.nil(), type.getKeYJavaType());
+                method.toString(), ImmutableList.nil(), type.getKeYJavaType());
             return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         }
     }

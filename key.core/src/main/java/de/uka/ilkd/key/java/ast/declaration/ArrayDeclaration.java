@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * KeY used to model arrays using only the {@link ArrayType}. As
@@ -239,7 +238,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        return ImmutableSLList.<KeYJavaType>nil().append(superType);
+        return ImmutableList.<KeYJavaType>nil().append(superType);
     }
 
     /**

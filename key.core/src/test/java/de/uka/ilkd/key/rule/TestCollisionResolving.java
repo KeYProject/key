@@ -22,7 +22,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -223,7 +222,7 @@ public class TestCollisionResolving {
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_name_conflict").taclet();
         final ImmutableList<SequentFormula> semiseq =
-            ImmutableSLList
+            ImmutableList
                     .singleton(new SequentFormula(TacletForTests.parseTerm("\\forall s x; p(x)")))
                     .append(new SequentFormula(TacletForTests.parseTerm("\\exists s x; p(x)")));
         Sequent seq = JavaDLSequentKit.createSuccSequent(semiseq);

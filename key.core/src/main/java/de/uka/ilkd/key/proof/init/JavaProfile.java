@@ -25,7 +25,6 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -97,11 +96,11 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
-            ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+            ImmutableList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-            ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
+            ImmutableList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
 
-        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+        ImmutableList<TermLabelConfiguration> result = ImmutableList.nil();
         result =
             result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
                 new SingletonLabelFactory<>(ParameterlessTermLabel.ANON_HEAP_LABEL)));

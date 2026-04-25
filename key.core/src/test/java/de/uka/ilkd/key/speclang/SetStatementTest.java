@@ -23,7 +23,6 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.parsing.Position;
 
 import org.junit.jupiter.api.Assertions;
@@ -86,7 +85,7 @@ public class SetStatementTest {
                 .context(Context.inClass(testClassType, false, services.getTermBuilder()))
                 .selfVar(selfVar)
                 .parameters(
-                    ImmutableSLList.<LocationVariable>nil().append(ghostLocal, normalLocal));
+                    ImmutableList.of(ghostLocal, normalLocal));
     }
 
     @Test

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.pp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This filter takes a {@link PosInOccurrence} and only shows the sub-formula at that position.
@@ -35,18 +34,18 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     @Override
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
         if (pos.isInAntec()) {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
+            return ImmutableList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
     }
 
     @Override
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
         if (!pos.isInAntec()) {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
+            return ImmutableList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
     }
 

@@ -19,7 +19,6 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -34,7 +33,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.singleton(BlockContractInternalRule.INSTANCE.name());
+        return ImmutableList.singleton(BlockContractInternalRule.INSTANCE.name());
     }
 
     /**

@@ -38,7 +38,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
@@ -1278,7 +1277,7 @@ public class ExecutionNodeReader {
         /**
          * The completed blocks.
          */
-        private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+        private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableList.nil();
 
         /**
          * The formated conditions under which a block is completed.
@@ -1289,12 +1288,12 @@ public class ExecutionNodeReader {
         /**
          * The contained outgoing links.
          */
-        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
+        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableList.nil();
 
         /**
          * The contained incoming links.
          */
-        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
+        private ImmutableList<IExecutionLink> incomingLinks = ImmutableList.nil();
 
         /**
          * Constructor.
@@ -1580,7 +1579,7 @@ public class ExecutionNodeReader {
         /**
          * The block completions.
          */
-        private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+        private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableList.nil();
 
         /**
          * Is a block opened?
@@ -1758,7 +1757,7 @@ public class ExecutionNodeReader {
         /**
          * The up to now discovered {@link IExecutionTermination}s.
          */
-        private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+        private ImmutableList<IExecutionTermination> terminations = ImmutableList.nil();
 
         /**
          * Constructor.
@@ -2014,7 +2013,7 @@ public class ExecutionNodeReader {
         /**
          * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
          */
-        private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+        private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableList.nil();
 
         /**
          * Constructor.

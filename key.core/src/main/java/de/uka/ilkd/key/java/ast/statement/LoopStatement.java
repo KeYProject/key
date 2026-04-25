@@ -13,7 +13,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -66,7 +65,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
@@ -76,7 +75,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body) {
@@ -84,7 +83,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
@@ -93,7 +92,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -119,7 +118,7 @@ public abstract class LoopStatement extends JavaStatement
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
     /**
@@ -144,7 +143,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -156,7 +155,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -182,7 +181,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -204,7 +203,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableSLList.nil();
+        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,

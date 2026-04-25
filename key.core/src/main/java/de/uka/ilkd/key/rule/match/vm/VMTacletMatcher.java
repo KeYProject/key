@@ -35,7 +35,6 @@ import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -188,12 +187,12 @@ public class VMTacletMatcher implements TacletMatcher {
         MatchProgram program = assumesMatchPrograms.get(p_template);
         final var mc = (MatchConditions) p_matchCond;
 
-        ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableList.nil();
         ImmutableList<MatchResultInfo> resMC =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
 
         final boolean updateContextPresent = !mc.getInstantiations().getUpdateContext().isEmpty();
-        ImmutableList<UpdateLabelPair> context = ImmutableSLList.nil();
+        ImmutableList<UpdateLabelPair> context = ImmutableList.nil();
 
         if (updateContextPresent) {
             context = mc.getInstantiations().getUpdateContext();
@@ -281,7 +280,7 @@ public class VMTacletMatcher implements TacletMatcher {
             assert assumesSequentIterator.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchAssumes(
-                ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
+                ImmutableList.singleton(candidateInst),
                 assumesSequentIterator.next().formula(), p_matchCond, p_services).matchConditions();
 
             if (newMC.isEmpty()) {

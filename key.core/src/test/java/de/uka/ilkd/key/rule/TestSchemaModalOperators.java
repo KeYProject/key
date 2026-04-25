@@ -25,7 +25,6 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.AfterEach;
@@ -51,10 +50,10 @@ public class TestSchemaModalOperators {
 
     private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return ImmutableSLList.singleton(cf0);
+        return ImmutableList.singleton(cf0);
     }
 
     @BeforeEach
@@ -145,7 +144,7 @@ public class TestSchemaModalOperators {
         rtb.setFind(find);
         rtb.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableSLList.nil(),
+                ImmutableList.nil(),
                 replace));
 
         RewriteTaclet t = rtb.getRewriteTaclet();

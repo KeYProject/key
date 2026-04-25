@@ -11,7 +11,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -27,7 +26,7 @@ public record GenericArgument(@NonNull Sort sort) implements TerminalSyntaxEleme
             return new GenericArgument(
                 svInst.getGenericSortInstantiations().getRealSort(gs, services));
         } else if (sort instanceof ParametricSortInstance psi) {
-            ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+            ImmutableList<GenericArgument> args = ImmutableList.nil();
 
             for (int i = psi.getArgs().size() - 1; i >= 0; i--) {
                 args = args.prepend(psi.getArgs().get(i).instantiate(svInst, services));

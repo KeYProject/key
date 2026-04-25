@@ -5,17 +5,16 @@ package de.uka.ilkd.key.proof;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class NameRecorder {
 
-    private ImmutableList<Name> pre = ImmutableSLList.nil();
+    private ImmutableList<Name> pre = ImmutableList.nil();
 
-    private ImmutableList<Name> post = ImmutableSLList.nil();
+    private ImmutableList<Name> post = ImmutableList.nil();
 
     public void setProposals(ImmutableList<Name> proposals) {
         if (proposals == null) {
-            pre = ImmutableSLList.nil();
+            pre = ImmutableList.nil();
         } else {
             pre = proposals;
         }

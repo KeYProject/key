@@ -15,7 +15,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
@@ -59,8 +58,8 @@ public class RenamingTermProperty implements Property<Term> {
         if (term2 == term1) {
             return true;
         }
-        return unifyHelp(term1, term2, ImmutableSLList.nil(),
-            ImmutableSLList.nil(), null);
+        return unifyHelp(term1, term2, ImmutableList.nil(),
+            ImmutableList.nil(), null);
     }
 
     /**
@@ -72,7 +71,7 @@ public class RenamingTermProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         // Labels can be completely ignored
-        return hashTermHelper(term, ImmutableSLList.nil(), 1);
+        return hashTermHelper(term, ImmutableList.nil(), 1);
     }
 
     // equals modulo renaming logic

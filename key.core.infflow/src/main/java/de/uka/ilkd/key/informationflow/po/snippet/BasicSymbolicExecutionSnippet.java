@@ -33,7 +33,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  *
@@ -47,7 +46,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         assert poVars.exceptionParameter.op() instanceof LocationVariable
                 : "Something is wrong with the catch variable";
 
-        ImmutableList<JTerm> posts = ImmutableSLList.nil();
+        ImmutableList<JTerm> posts = ImmutableList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }

@@ -23,7 +23,6 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
@@ -40,7 +39,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
-        } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
+        } else if (macro.canApplyTo(proof, ImmutableList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
             final var subTerm = posInOcc.subTerm();
@@ -124,7 +123,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 if (!isCached) {
                     // node has not been checked before, so do it
                     boolean canBeApplied =
-                        canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                        canApplyTo(proof, ImmutableList.<Goal>nil().prepend(goal), posInOcc);
                     if (!canBeApplied) {
                         // canApplyTo checks all open goals. thus, if it returns
                         // false, then this macro is not applicable at all and
@@ -143,7 +142,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                     synchronized (macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),
+                        info = macro.applyTo(uic, proof, ImmutableList.<Goal>nil().prepend(goal),
                             applicableAt, pml);
                     }
                     pml.taskFinished(info);

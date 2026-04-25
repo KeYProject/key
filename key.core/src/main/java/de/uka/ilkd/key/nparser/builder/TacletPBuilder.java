@@ -27,10 +27,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
-import org.key_project.logic.Choice;
-import org.key_project.logic.ChoiceExpr;
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -139,7 +136,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         TacletBuilder<?> b = peekTBuilder();
         JTerm t = accept(ctx.t);
         List<JTerm> avoidConditions = mapOf(ctx.avoidCond);
-        b.setTrigger(new Trigger(triggerVar, t, ImmutableList.fromList(avoidConditions)));
+        b.setTrigger(new Trigger(triggerVar, t, ImmutableList.<Term>fromList(avoidConditions)));
         return null;
     }
 
@@ -165,8 +162,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             TacletBuilder<?> b = createTacletBuilderFor(null, ApplicationRestriction.NONE, ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
-            Sequent addSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(sform));
-            ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
+            Sequent addSeq = JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(sform));
+            ImmutableList<Taclet> noTaclets = ImmutableList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, null, ctx);
             b.setName(new Name(name));
@@ -262,7 +259,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (genParams != null) {
             var psd = namespaces().parametricSorts().lookup(ctx.name.getText());
             assert psd != null;
-            ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+            ImmutableList<GenericArgument> args = ImmutableList.nil();
             for (int i = psd.getParameters().size() - 1; i >= 0; i--) {
                 args = args.prepend(new GenericArgument(psd.getParameters().get(i).sort()));
             }
@@ -368,7 +365,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
         tacletBuilder.setAssumesSequent(JavaDLSequentKit.createAnteSequent(
-            ImmutableSLList
+            ImmutableList
                     .singleton(new SequentFormula(tb.equals(tb.func(consFn, args), tb.var(x))))));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
         tacletBuilder.setApplicationRestriction(
@@ -423,8 +420,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var use = tb.all(qvar, tb.var(phi));
         var useCase = new TacletGoalTemplate(
-            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(new SequentFormula(use))),
-            ImmutableSLList.nil());
+            JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(new SequentFormula(use))),
+            ImmutableList.nil());
         useCase.setName("Use case of " + ctx.name.getText());
         cases.add(new GoalTemplAndVars(useCase, null));
 
@@ -439,8 +436,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
             JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(constr.term))),
-            ImmutableSLList.nil());
+                    .createSuccSequent(ImmutableList.singleton(new SequentFormula(constr.term))),
+            ImmutableList.nil());
         goal.setName(it.getText());
         return new GoalTemplAndVars(goal, constr.vars);
     }
@@ -476,8 +473,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var goal = new TacletGoalTemplate(
             JavaDLSequentKit
-                    .createAnteSequent(ImmutableSLList.singleton(new SequentFormula(axiom))),
-            ImmutableSLList.nil());
+                    .createAnteSequent(ImmutableList.singleton(new SequentFormula(axiom))),
+            ImmutableList.nil());
         tacletBuilder.addTacletGoalTemplate(goal);
 
         tacletBuilder.setName(new Name(String.format("DT_%s_Axiom", sort.name())));
@@ -564,9 +561,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             for (int i = 0; i < args.length; i++) {
                 args[i] = variables.get(context.argName.get(i).getText());
             }
-            Sequent addedSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList
+            Sequent addedSeq = JavaDLSequentKit.createAnteSequent(ImmutableList
                     .singleton(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args)))));
-            TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableSLList.nil());
+            TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableList.nil());
             goal.setName("#var = " + context.name.getText());
             b.addTacletGoalTemplate(goal);
         }
@@ -799,7 +796,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         String name = accept(ctx.string_value());
 
         Sequent addSeq = JavaDLSequentKit.getInstance().getEmptySequent();
-        ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
+        ImmutableList<Taclet> addRList = ImmutableList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 
         Object rwObj = accept(ctx.replacewith());

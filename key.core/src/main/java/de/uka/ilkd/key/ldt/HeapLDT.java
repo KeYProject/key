@@ -32,7 +32,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -125,7 +124,7 @@ public final class HeapLDT extends LDT {
         acc = addFunction(services, "acc");
         reach = addFunction(services, "reach");
         prec = addFunction(services, "prec");
-        heaps = ImmutableSLList.<LocationVariable>nil()
+        heaps = ImmutableList.<LocationVariable>nil()
                 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
                 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
         if (services instanceof Services s) {

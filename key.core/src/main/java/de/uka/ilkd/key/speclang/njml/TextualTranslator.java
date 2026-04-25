@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -38,8 +37,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     private final boolean attachOriginLabel;
 
-    public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
-    public ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
+    public ImmutableList<TextualJMLConstruct> constructs = ImmutableList.nil();
+    public ImmutableList<JMLModifier> mods = ImmutableList.nil();
     private @Nullable TextualJMLSpecCase methodContract;
     private @Nullable TextualJMLLoopSpec loopContract;
 
@@ -102,7 +101,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
      */
     protected void finishConstruct(TextualJMLConstruct construct) {
         constructs = constructs.append(construct);
-        mods = ImmutableSLList.nil();
+        mods = ImmutableList.nil();
         methodContract = null;
         loopContract = null;
     }
@@ -133,7 +132,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         constructs = constructs.append(methodContract);
         super.visitSpec_body(ctx.spec_body());
         methodContract = null;
-        mods = ImmutableSLList.nil();
+        mods = ImmutableList.nil();
         return null;
     }
 

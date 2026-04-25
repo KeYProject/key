@@ -114,7 +114,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
      * @return contracts without well-definedness checks
      */
     private static ImmutableSet<Contract> removeWdChecks(ImmutableSet<Contract> contracts) {
-        ImmutableList<Contract> result = ImmutableSLList.nil();
+        ImmutableList<Contract> result = ImmutableList.nil();
         if (contracts == null) {
             return contracts;
         }

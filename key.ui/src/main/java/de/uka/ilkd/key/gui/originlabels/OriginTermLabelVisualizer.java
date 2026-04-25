@@ -36,7 +36,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
@@ -503,7 +502,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private ImmutableList<Integer> getPosTablePath(
             PosInOccurrence pos) {
         if (pos == null) {
-            return ImmutableSLList.<Integer>nil().prepend(0);
+            return ImmutableList.<Integer>singleton(0);
         }
 
         InitialPositionTable posTable = view.posTable;

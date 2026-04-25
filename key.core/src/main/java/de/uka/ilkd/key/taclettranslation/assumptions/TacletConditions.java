@@ -17,7 +17,6 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
@@ -25,12 +24,12 @@ import org.key_project.util.collection.ImmutableSLList;
 class TacletConditions {
 
     //
-    private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
-    private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
+    private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableList.nil();
+    private ImmutableList<TypeCondition> typeCondition = ImmutableList.nil();
     private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
 
 
 
