@@ -132,7 +132,10 @@ public final class ProofManagementDialog extends JDialog {
                     } else if (ps.getProofClosedByCache()) {
                         label.setIcon(KEY_CACHED_CLOSED);
                     } else {
-                        assert ps.getProofOpen();
+                        if (!ps.getProofOpen()) {
+                            LOGGER.warn("Unknown proof status " + ps
+                                + " in ProofManagementDialog. Displaying open icon.");
+                        }
                         label.setIcon(KEY_OPEN);
                     }
                 }
