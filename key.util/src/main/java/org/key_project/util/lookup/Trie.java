@@ -5,30 +5,33 @@ package org.key_project.util.lookup;
 
 import java.util.*;
 
-/**
- * Implements a mutable trie structure for storing and retrieving values
- * associated with a sequence of keys (word). The sequence has to be
- * prefix unique, i.e., no sequence is a prefix of a different one.
- *
- * Values are only stored in leaves and a leaf must store a value.
- * The latter has also consequences for removal operations: if
- * a leaf stores no values after the remove operation, the leaf itself
- * is removed as a child of its parent. If the parent itself has
- * no other children it will also be removed. This continues until an
- * ancestor is reached with more than one child.
- *
- *
- * @param <K> the type of the key objects
- * @param <V> the type of the values stored in the trie
- */
+/// Implements a mutable trie structure for storing and retrieving values
+/// associated with a sequence of keys (word). The valid sequences have to be
+/// prefix codes, i.e., no sequence is a prefix of a different one.
+///
+/// Values are only stored in leaves and a leaf must store a value.
+/// The latter has also consequences for removal operations: if
+/// a leaf stores no values after the remove operation, the leaf itself
+/// is removed as a child of its parent. If the parent itself has
+/// no other children it will also be removed. This continues until an
+/// ancestor is reached with more than one child.
+///
+/// @param <K> the type of the key objects
+/// @param <V> the type of the values stored in the trie
 public class Trie<K, V> {
 
     private TrieNode<K, V> root;
 
-    public Trie() {
-    }
-
-    private boolean insert(Iterator<K> word, V value) {
+    /// Associates the provided value with given sequence of
+    /// keys. It returns true if the value had not been already
+    /// inserted, otherwise the trie remains unchanged and false
+    /// is returned.
+    /// @param word sequence of keys to be associated with the value
+    /// @param value to be associated
+    /// @return true iff the value has been associated and no
+    /// association existed before
+    /// @throws NullPointerException if a prefix code violation occurred
+    public boolean insert(Iterator<K> word, V value) {
         if (!word.hasNext()) {
             return false;
         }
@@ -38,19 +41,25 @@ public class Trie<K, V> {
         return root.insert(word, value);
     }
 
-    private Set<V> lookup(Iterator<K> word) {
+    /// Retrieves the values associated with the given sequence of
+    /// keys. If no values are associated with the provided list of keys
+    /// an empty set is returned
+    /// @param word sequence of keys to be associated with the value
+    /// @return set of values associated with sequence of keys
+    /// @throws NullPointerException if a prefix code violation occurred
+    public Set<V> lookup(Iterator<K> word) {
         return root == null ? Collections.emptySet() : root.lookup(word);
     }
 
-    private boolean removeAll(Iterator<K> word) {
+    public boolean removeAll(Iterator<K> word) {
         return root != null && root.removeAll(word);
     }
 
-    private Set<V> remove(Iterator<K> word, V value) {
+    public Set<V> remove(Iterator<K> word, V value) {
         return root == null ? Collections.emptySet() : root.remove(word, value);
     }
 
-    private boolean removeSubtrie(Iterator<K> word) {
+    public boolean removeSubtrie(Iterator<K> word) {
         if (word.hasNext()) {
             if (root == null) {
                 return false;
@@ -74,7 +83,8 @@ public class Trie<K, V> {
         private Map<K, TrieNode<K, V>> children;
         private Set<V> values;
 
-        private TrieNode() {}
+        private TrieNode() {
+        }
 
         public TrieNode(boolean inInner) {
             if (inInner) {
@@ -184,4 +194,3 @@ public class Trie<K, V> {
         }
     }
 }
-
