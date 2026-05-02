@@ -5,13 +5,12 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -31,29 +30,11 @@ public class Main implements Runnable {
     @Option(names = {"--color"}, description = "Color output mode: YES, NO, AUTO")
     private String color = "AUTO";
 
-    @Option(names = {"--xml-output"}, description = "Output JUnit XML file")
-    private File junitXmlOutput;
-
-    @Option(names = {"--measuring"}, description = "Enable proof coverage measurement")
-    private boolean enableMeasuring;
-
-    @Option(names = {"--includes"}, description = "Additional KeY files to include")
-    private List<String> includes = new ArrayList<>();
-
     @Option(names = {"--auto-mode-max-step"}, description = "Max steps in auto-mode", defaultValue = "10000")
     private int autoModeStep = 10000;
 
     @Option(names = {"-v", "--verbose"}, description = "Verbose output")
     private boolean verbose;
-
-    @Option(names = {"-d", "--debug"}, description = "Debug output")
-    private boolean debug;
-
-    @Option(names = {"--read-contract-names-from-file"}, description = "Read contract names from proof file")
-    private boolean readContractNames;
-
-    @Option(names = {"--no-auto-mode"}, description = "Disable auto-mode fallback")
-    private boolean disableAutoMode;
 
     @Option(names = {"--statistics"}, description = "Write proof statistics to JSON file")
     private File statisticsFile;
@@ -65,31 +46,65 @@ public class Main implements Runnable {
     private boolean dryRun;
 
     @Option(names = {"--classpath", "-cp"}, description = "Additional classpaths")
-    private List<String> classpath = new ArrayList<>();
+    private List<Path> classpath = new ArrayList<>();
 
     @Option(names = {"--bootClassPath", "-bcp"}, description = "Boot classpath")
-    private String bootClassPath;
+    private @Nullable Path bootClassPath;
+
+    @Option(names = {"--includes"}, description = "Additional KeY files to include")
+    private List<Path> includes = new ArrayList<>();
 
     @Option(names = {"--contract"}, description = "Include specific contract by name")
     private List<String> onlyContracts = new ArrayList<>();
 
-    @Option(names = {"--forbid-contract"}, description = "Exclude specific contract by name")
-    private List<String> forbidContracts = new ArrayList<>();
-
     @Parameters(index = "0..*", description = "Input KeY file or directory")
-    private List<String> inputFile = new ArrayList<>();
+    private List<Path> inputFile = new ArrayList<>();
 
-    @Option(names = {"--proof-path"}, description = "Directory to search for proof files")
-    private List<String> proofPath = new ArrayList<>();
+    @Option(names = "--show-properties", description = "list all Java properties and exit")
+    private boolean showProperties = false;
 
-    @Option(names = {"--default-script"}, description = "Default script file for fallback")
-    private File defaultScript;
+    @Option(names = {"--script", "-s"}, description = "Include specific contract by name")
+    private @Nullable String script = null;
 
-    private int errors = 0;
-    private TestSuites testSuites = new TestSuites();
+    @Option(names = {"--script-path", "-sp"}, description = "Include specific contract by name")
+    private @Nullable Path scriptPath = null;
+
+
+    /**
+     * This parameter disables the possibility to prune in
+     * closed branches. It is meant as a fallback solution
+     * if storing all closed goals needs too much memory.
+     */
+    @Option(names = "--no-pruning-closed",
+            description = "disables pruning and goal back in closed branches (saves memory)")
+    private boolean isNoPruningClosed = true;
+
+    /**
+     * If this option is set, the (Disk)FileRepo does not delete its temporary
+     * directories (can be
+     * used for debugging).
+     */
+    @Option(names = "--keep-fileRepos",
+            description = "disables the automatic deletion of temporary"
+                    + "directories of file repos (for debugging)")
+    private boolean isKeepFileRepos = false;
+
+
+    @Option(names = "--timeout", paramLabel = "INT",
+            description = "timeout for each automatic proof of a problem in ms (default: "
+                    + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
+    private int timeout = -1;
+
+
+    @CommandLine.ArgGroup(
+            heading = "Options for justify rules. autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument       The JUSTIFY_RULES option has a number of additional parameters you can set. The following options only apply if --jr-enable is used.")
+    private @Nullable LemmataAutoModeOptions justifyRulesOptions;
+
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new Main()).execute(args);
+        int exitCode = new CommandLine(new Main())
+                .setAbbreviatedSubcommandsAllowed(true)
+                .execute(args);
         System.exit(exitCode);
     }
 
@@ -104,7 +119,7 @@ public class Main implements Runnable {
         printm("Copyright: " + KeYConstants.COPYRIGHT);
 
         // Process each input file
-        for (String file : inputFile) {
+        for (Path file : inputFile) {
             run(file);
         }
 
@@ -113,19 +128,10 @@ public class Main implements Runnable {
             // Logic to write statistics (similar to Kotlin version)
         }
 
-        // Write JUnit XML if requested
-        if (junitXmlOutput != null) {
-            try (var writer = java.nio.file.Files.newBufferedWriter(junitXmlOutput.toPath())) {
-                testSuites.writeXml(writer);
-            } catch (Exception e) {
-                err("Failed to write XML: " + e.getMessage());
-            }
-        }
-
         System.exit(errors);
     }
 
-    private void run(String inputFile) {
+    private void run(Path inputFile) {
         info("Start with `" + inputFile + "`");
         currentPrintLevel++;
         // Load KeY environment
@@ -322,15 +328,5 @@ public class Main implements Runnable {
         if (enableMeasuring) {
             // Logic to print visited lines
         }
-    }
-
-    private Path findProofFile(String contractName) {
-        // Logic to find proof file (simplified)
-        return null; // Placeholder
-    }
-
-    private Path findScriptFile(String filename) {
-        // Logic to find script file (simplified)
-        return null; // Placeholder
     }
 }

@@ -7,14 +7,12 @@ description = "Command line interface for the deductive verification of Java pro
 
 dependencies {
     implementation project(":key.core")
-    implementation project(":key.core.rifl")
 
     implementation project(":key.core.infflow")
     implementation project(":key.core.wd")
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
-    implementation project(":key.removegenerics")
 
     implementation("info.picocli:picocli:4.7.7")
 
