@@ -149,8 +149,17 @@ subprojects {
             excludeTags "owntest", "interactive", "performance"
         }
 
-        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
-        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
+        addTestListener(new TestListener() {
+                void afterTest(TestDescriptor desc, TestResult result) {
+                    logger.error("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
+                }
+            })
+
+        addTestListener(new TestListener() {
+            void beforeTest(TestDescriptor descriptor) {
+                logger.error("> ${descriptor.getClassName()}#${descriptor.getName()}")
+            }
+        })
 
         testLogging {
             outputs.upToDateWhen { false }
