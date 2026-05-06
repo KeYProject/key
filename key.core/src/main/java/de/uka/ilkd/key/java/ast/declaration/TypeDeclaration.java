@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.abstraction.Package;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -166,6 +167,16 @@ public abstract class TypeDeclaration extends JavaDeclaration
      */
     public NullLiteral getDefaultValue() {
         return NullLiteral.NULL;
+    }
+
+    /**
+     * returns the annotations of the type resulting from the type declaration,
+     * which is no annotations.
+     *
+     * @return the annotations of the type declaration
+     */
+    public ImmutableArray<AnnotationExpression> getAnnotations() {
+        return new ImmutableArray<>();
     }
 
     /**

@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
+import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
-//import de.uka.ilkd.key.java.declaration.*;
-//import de.uka.ilkd.key.java.expression.operator.TypeOperator;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
@@ -36,17 +39,11 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         if (var != variable)
             return true;
 
-        var inst = svInst.getInstantiation(variable);
-        LOGGER.info("{}", inst);
-/*
-        if (inst instanceof TypeOperator) {
-            var out = ((TypeOperator) inst)
-                    .getAnnotations()
-                    .stream()
-                    .anyMatch(a -> a.getTypeReferenceAt(0).getName().equals(annot));
-            return out;
-        } else if (!(inst instanceof JTerm))
+        Object inst = svInst.getInstantiation(variable);
+
+        if (!(inst instanceof JTerm))
             return false;
+
         var op = ((JTerm) inst).op();
 
         if (op.arity() != 0)
@@ -54,14 +51,19 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         if (op instanceof Function) {
             return matchesField(services, (Function) op);
+        } else if (op instanceof ProgramElement) {
+            var decl = services.getJavaInfo().rec2key()
+                .nodeFromKeY((LocationVariable)op);
+            LOGGER.info("inst {}, type {}", inst, inst.getClass());
+            LOGGER.info("decl {}", decl);
         }
 
-*/
         return false;
     }
 
     public boolean matchesField(Services services, Function op) {
-        /*
+        LOGGER.info("{}", op);
+        
         var kpmi = services.getJavaInfo().getKeYProgModelInfo();
 
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
@@ -75,9 +77,13 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 !(classType.getJavaType() instanceof ClassDeclaration))
             return false;
 
-        var recoderTypeDecl =
-            (recoder.java.declaration.TypeDeclaration) kpmi.rec2key().toRecoder(classType);
+        LOGGER.info("{}", classType);
+        
+        var recoderTypeDecl = kpmi.rec2key()
+            .nodeFromKeY((ClassDeclaration)classType.getJavaType());
 
+        //LOGGER.info("{}", recoderTypeDecl);
+/*
         var fields = recoderTypeDecl.getAllFields();
         var field = fields.stream()
                 .filter(f -> f.getName().equals(name.attributeName()))

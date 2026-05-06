@@ -7,12 +7,16 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
+import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+
+import com.github.javaparser.ast.expr.AnnotationExpr;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -74,11 +78,22 @@ public class KeYJavaType implements Type {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         if (javaType == null) {
             return null;
         }
         return javaType.getDefaultValue();
+    }
+
+    /**
+     * @return null if this is not a real Java type and else its annotations.
+     */
+    public @Nullable ImmutableArray<AnnotationExpression> getAnnotations() {
+        if (javaType == null) {
+            return null;
+        }
+
+        return javaType.getAnnotations();
     }
 
     public String toString() {
