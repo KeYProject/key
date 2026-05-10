@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
-import java.util.ArrayList;
-import java.util.TreeMap;
-
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -14,14 +11,17 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
+import java.util.ArrayList;
+import java.util.TreeMap;
+
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT;
 
 public class PreSteps {
     final static class PreComputation implements PreStep {
         Multimap<String, String> inheritanceMap =
-            MultimapBuilder.treeKeys().treeSetValues().build();
+                MultimapBuilder.treeKeys().treeSetValues().build();
         Multimap<String, String> permittedTypes =
-            MultimapBuilder.treeKeys().treeSetValues().build();
+                MultimapBuilder.treeKeys().treeSetValues().build();
 
         @Override
         public void applyOn(NodeList<TypeDeclaration<?>> types) {
@@ -35,7 +35,7 @@ public class PreSteps {
                 zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
             }
 
-            // compute transitive closure
+            // compute transitive closure of inheritance
             boolean changed = true;
             while (changed) {
                 changed = false;
@@ -43,11 +43,12 @@ public class PreSteps {
                     final var strings = new ArrayList<>(inheritanceMap.get(clazz));
                     for (var zuper : strings) {
                         changed =
-                            changed || inheritanceMap.putAll(clazz, inheritanceMap.get(zuper));
+                                changed || inheritanceMap.putAll(clazz, inheritanceMap.get(zuper));
                     }
                 }
             }
 
+            // inherit fields into terminal AST nodes
             for (var decl : fields.sequencedValues()) {
                 if (decl.hasModifier(ABSTRACT)) {
                     continue;
@@ -68,7 +69,17 @@ public class PreSteps {
                         }
                     }
                 }
-                decl.getMembers().addAll(newFields.values());
+
+                // only inherit field, if not already exists. allows overriding of fields
+                // with more specific type
+                newFields.forEach((name, field) -> {
+                    var f = decl.getFieldByName(name);
+                    if (f.isPresent()) {
+                        f.get().getAnnotationByName("Override");
+                    } else {
+                        decl.addMember(field);
+                    }
+                });
             }
 
             fillPermittedTypes();

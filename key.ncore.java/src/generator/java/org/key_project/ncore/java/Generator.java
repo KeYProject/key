@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ParseProblemException;
 import org.key_project.ncore.java.NodeSteps.NodeStep;
 import org.key_project.ncore.java.PostSteps.PostStep;
 import org.key_project.ncore.java.PreSteps.PreStep;
@@ -38,7 +39,12 @@ public class Generator implements Callable<Integer> {
     List<PostStep> postSteps = new ArrayList<>(64);
 
     public static void main(String[] args) throws Exception {
-        INSTANCE.call();
+        try {
+            INSTANCE.call();
+        }catch (ParseProblemException ppe){
+            ppe.getProblems().forEach((it) -> System.err.format("%s: %s\n", it.getLocation(), it.getVerboseMessage()));
+            throw ppe;
+        }
     }
 
     public Generator() {

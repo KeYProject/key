@@ -46,4 +46,8 @@ public class MatchHelper {
     public static @Nullable MatchConditions match(JavaSourceElement e1, JavaSourceElement e2, MatchConditions cond) {
         return e1.match(e2, cond);
     }
+
+    public static MatchConditions match(boolean b1, boolean b2, MatchConditions cond) {
+        return b1 == b2 ? cond : null;
+    }
 }

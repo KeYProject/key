@@ -11,37 +11,33 @@ abstract class JavaSourceElement implements Visitable, Matchable {
     @EqEx @Nullable PositionInfo positionInfo;
 }
 
-class CompilationUnit extends JavaNonTerminalProgramElement {
-    @Nullable PackageSpecification packageSpec;
+class CompilationUnit extends JavaProgramElement {
+    @Nullable PackageReference packageReference;
     List<Import> imports;
     List<TypeDeclaration> typeDeclarations;
 }
 
-class ContextStatementBlock extends StatementBlock { }
-
-abstract class Declaration { }
-
-abstract class ExpressionContainer { }
-
-class Import extends JavaNonTerminalProgramElement {
-    boolean isMultiImport;
-    TypeReferenceInfix reference;
+class ContextStatementBlock extends StatementBlock {
+    IExecutionContext executionContext;
 }
 
-abstract class JavaNonTerminalProgramElement extends JavaProgramElement {}
+abstract class Declaration {
+    List<Modifier> getModifiers();
+}
 
-abstract class JavaProgramElement extends JavaSourceElement {}
+abstract class ExpressionContainer {}
+
+class Import extends JavaProgramElement {
+    boolean isMultiImport;
+    boolean isStatic;
+    TypeReferenceInfix reference;
+}
 
 abstract class Label {}
 
 abstract class LoopInitializer {}
 
 abstract class NamedProgramElement {}
-
-class PackageSpecification extends JavaNonTerminalProgramElement {
-
-    PackageReference reference;
-}
 
 abstract class ParameterContainer {}
 
@@ -55,31 +51,18 @@ abstract class ScopeDefiningElement {}
 
 abstract class Statement {}
 
-class StatementBlock extends JavaStatement {}
+class StatementBlock extends JavaStatement {
+    List<Statement> statement;
+    @Nullable MethodFrame innerMostMethodFrame;
+}
 
-abstract class StatementContainer {}
-
-abstract class TerminalProgramElement {}
-
-abstract class TypeScope {}
-
-abstract class VariableScope {}
-
-class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-class CcatchContinueParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-class CcatchContinueWildcardParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {}
-
-class CcatchReturnParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
-
-class CcatchReturnValParameterDeclaration extends CcatchNonstandardParameterDeclaration {}
+abstract class CcatchNonstandardParameterDeclaration extends JavaProgramElement {
+    ParameterDeclaration delegate;
+    boolean isWildcard;
+    boolean isBreak;
+    boolean isContinue;
+    boolean isReturn;
+}
 
 class ArrayDeclaration extends TypeDeclaration {}
 
@@ -112,50 +95,41 @@ class FieldDeclaration extends VariableDeclaration {
     List<FieldSpecification> fieldSpecs;
 }
 
-class FieldSpecification extends VariableSpecification {}
+class FieldSpecification extends VariableSpecification {
+    Type type;
+    int dimensions;
+    ProgramVariable var;
+    @Nullable Expression init;
+}
 
-class Implements extends InheritanceSpecification {}
+class Implements extends InheritanceSpecification {
+    List<TypeReference> typeRefs;
+}
 
-abstract class InheritanceSpecification extends JavaNonTerminalProgramElement {
-
+abstract class InheritanceSpecification extends JavaProgramElement {
     List<TypeReference> supertypes;
 }
 
 class InterfaceDeclaration extends TypeDeclaration {
-
-    Extends extending;
+    List<TypeReference> extending;
 }
 
-abstract class JavaDeclaration extends JavaNonTerminalProgramElement {
-
-    ImmutableList<de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct> attachedJml;
-
-    List<Modifier> modArray;
-}
+abstract class JavaDeclaration extends Declaration { }
 
 class LocalVariableDeclaration extends VariableDeclaration {
-
     List<VariableSpecification> varSpecs;
 }
 
 abstract class MemberDeclaration {}
 
 class MethodDeclaration extends JavaDeclaration {
-
     TypeReference returnType;
-
     Comment[] voidComments;
-
     ProgramElementName name;
-
     List<ParameterDeclaration> parameters;
-
     Throws exceptions;
-
     StatementBlock body;
-
     JMLModifiers jmlModifiers;
-
     boolean parentIsInterfaceDeclaration;
 }
 
@@ -165,62 +139,51 @@ class ParameterDeclaration extends VariableDeclaration {
     List<VariableSpecification> varSpec;
 }
 
-class SuperArrayDeclaration extends TypeDeclaration {}
+class SuperArrayDeclaration extends TypeDeclaration {
+    ProgramElementName name;
+    FieldDeclaration length;
+}
 
-class Throws extends JavaNonTerminalProgramElement {
-
+class Throws extends JavaProgramElement {
     List<TypeReference> exceptions;
 }
 
 abstract class TypeDeclaration extends JavaDeclaration {
-
     ProgramElementName name;
-
     ProgramElementName fullName;
-
     List<MemberDeclaration> members;
-
     boolean parentIsInterfaceDeclaration;
-
     boolean isLibrary;
-
     JMLModifiers jmlModifiers;
 }
 
 abstract class TypeDeclarationContainer {}
 
 abstract class VariableDeclaration extends JavaDeclaration {
-
     TypeReference typeReference;
-
     boolean parentIsInterfaceDeclaration;
 }
 
-class VariableSpecification extends JavaNonTerminalProgramElement {
-
+class VariableSpecification extends JavaProgramElement {
     Expression initializer;
-
     int dimensions;
-
     Type type;
-
     IProgramVariable programVariable;
 }
 
 class AnnotationUseSpecification extends Modifier {
-
     TypeReference tr;
 }
 
 
-class ArrayInitializer extends JavaNonTerminalProgramElement {
+class ArrayInitializer extends JavaProgramElement {
     KeYJavaType kjt;
 }
 abstract class Expression {}
 
 abstract class ExpressionStatement {}
 
-abstract class Operator extends JavaNonTerminalProgramElement {}
+abstract class Operator extends JavaProgramElement {}
 
 class ParenthesizedExpression extends Operator {
     Expression child;
@@ -321,12 +284,12 @@ abstract class TypeOperator extends Operator {
 }
 
 
-class ArrayLengthReference extends JavaNonTerminalProgramElement {
+class ArrayLengthReference extends JavaProgramElement {
 
     ReferencePrefix prefix;
 }
 
-class ArrayReference extends JavaNonTerminalProgramElement {
+class ArrayReference extends JavaProgramElement {
 
     ReferencePrefix prefix;
 
@@ -335,7 +298,7 @@ class ArrayReference extends JavaNonTerminalProgramElement {
 
 abstract class ConstructorReference {}
 
-class ExecutionContext extends JavaNonTerminalProgramElement {
+class ExecutionContext extends JavaProgramElement {
 
     TypeReference classContext;
 
@@ -351,7 +314,7 @@ abstract class IExecutionContext {}
 
 abstract class MemberReference {}
 
-class MetaClassReference extends JavaNonTerminalProgramElement {
+class MetaClassReference extends JavaProgramElement {
 
     TypeReference typeReference;
 }
@@ -360,7 +323,7 @@ abstract class MethodName {}
 
 abstract class MethodOrConstructorReference {}
 
-class MethodReference extends JavaNonTerminalProgramElement {
+class MethodReference extends JavaProgramElement {
 
     ReferencePrefix prefix;
 
@@ -371,7 +334,7 @@ class MethodReference extends JavaNonTerminalProgramElement {
 
 abstract class NameReference {}
 
-class PackageReference extends JavaNonTerminalProgramElement {
+class PackageReference extends JavaProgramElement {
 
     ReferencePrefix prefix;
 
@@ -391,7 +354,7 @@ class SchematicFieldReference extends FieldReference {
     SchemaVariable schemaVariable;
 }
 
-abstract class SpecialConstructorReference extends JavaNonTerminalProgramElement {
+abstract class SpecialConstructorReference extends JavaProgramElement {
 
     List<Expression> arguments;
 }
@@ -401,11 +364,11 @@ class SuperConstructorReference extends SpecialConstructorReference {
     ReferencePrefix prefix;
 }
 
-class SuperReference extends JavaNonTerminalProgramElement {}
+class SuperReference extends JavaProgramElement {}
 
 class ThisConstructorReference extends SpecialConstructorReference {}
 
-class ThisReference extends JavaNonTerminalProgramElement {}
+class ThisReference extends JavaProgramElement {}
 
 class TypeRef extends TypeReferenceImp {}
 
@@ -413,7 +376,7 @@ abstract class TypeReference {}
 
 abstract class TypeReferenceContainer {}
 
-abstract class TypeReferenceImp extends JavaNonTerminalProgramElement {
+abstract class TypeReferenceImp extends JavaProgramElement {
 
     ReferencePrefix prefix;
 
@@ -424,7 +387,7 @@ abstract class TypeReferenceImp extends JavaNonTerminalProgramElement {
 
 abstract class TypeReferenceInfix {}
 
-class VariableReference extends JavaNonTerminalProgramElement {
+class VariableReference extends JavaProgramElement {
 
     ProgramVariable variable;
 }
@@ -486,12 +449,12 @@ class Finally extends BranchImp {
 
 class For extends LoopStatement {}
 
-class ForUpdates extends JavaNonTerminalProgramElement {
+class ForUpdates extends JavaProgramElement {
 
     List<Expression> updates;
 }
 
-class Guard extends JavaNonTerminalProgramElement {
+class Guard extends JavaProgramElement {
 
     Expression expr;
 }
@@ -506,7 +469,7 @@ class If extends BranchStatement {
     Statement elseBranch;
 }
 
-abstract class JavaStatement extends JavaNonTerminalProgramElement {}
+abstract class JavaStatement extends JavaProgramElement {}
 
 class JmlAssert extends JavaStatement {}
 
@@ -521,7 +484,7 @@ class LabeledStatement extends JavaStatement {
     Statement body;
 }
 
-class LoopInit extends JavaNonTerminalProgramElement {
+class LoopInit extends JavaProgramElement {
     List<LoopInitializer> inits;
 }
 
@@ -543,7 +506,7 @@ class MergePointStatement extends JavaStatement {
     IProgramVariable identifier;
 }
 
-class MethodBodyStatement extends JavaNonTerminalProgramElement {}
+class MethodBodyStatement extends JavaProgramElement {}
 
 class MethodFrame extends JavaStatement {}
 
@@ -602,12 +565,27 @@ abstract class ProgramVariable extends JAbstractSortedOperator {}
 
 abstract class AbstractProgramElement {}
 
-class InitArrayCreation extends InitArray {}
+abstract class ProgramTransformer extends JavaProgramElement {
+    /** the name of the meta construct */
+    String name;
+    /** the encapsulated program element */
+    ProgramElement body;
+}
 
-abstract class ProgramTransformer extends JavaNonTerminalProgramElement {}
-class ReattachLoopInvariant extends ProgramTransformer {}
-class SpecialConstructorCall extends ProgramTransformer {}
-class StaticInitialisation extends ProgramTransformer {}
+class ReattachLoopInvariant extends ProgramTransformer {
+    String name = "#reattachLoopInvariant";
+    LoopStatment body;
+}
+
+class SpecialConstructorCall extends ProgramTransformer {
+    String name = "special-constructor-call";
+}
+
+class StaticInitialisation extends ProgramTransformer {
+    String name = "static-initialisation";
+    Expression body;
+}
+
 class SwitchToIf extends ProgramTransformer {}
 class TypeOf extends ProgramTransformer {}
 class Unpack extends ProgramTransformer {}
@@ -631,5 +609,56 @@ class EnhancedForElimination extends ProgramTransformer {}
 class EvaluateArgs extends ProgramTransformer {}
 class ExpandMethodBody extends ProgramTransformer {}
 class ForInitUnfoldTransformer extends ProgramTransformer {}
-class ForToWhile extends ProgramTransformer {}
+
+/**
+ * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
+ * only on while loops.
+ *
+ * It makes uses of the {@link ForToWhileTransformation} to create a transformed loop body which is
+ * then put into the corresponding context.
+ *
+ * <h2>Example</h2>
+ *
+ * <pre>
+ * for (int i = 0; i &lt; 100; i++) {
+ *     if (i == 2)
+ *         continue;
+ *     if (i == 3)
+ *         break;
+ * }
+ * </pre>
+ *
+ * is translated to
+ *
+ * <pre>
+ * _label1: {
+ *     int i = 0;
+ *     while (i &lt; 100) {
+ *         _label0: {
+ *             if (i == 2)
+ *                 break _label0;
+ *             if (i == 3)
+ *                 break _label1;
+ *         }
+ *         i++;
+ *     }
+ * }
+ * </pre>
+ *
+ * @see ForToWhileTransformation
+ * @author MU
+ */
+class ForToWhile extends ProgramTransformer {
+    SchemaVariable innerLabel;
+    SchemaVariable outerLabel;
+    Statement body;
+    String name = "#for-to-while";
+}
+
 abstract class InitArray extends ProgramTransformer {}
+class InitArrayCreation extends InitArray {
+    SchemaVariable newObjectSV;
+    ProgramElement body;
+    String name = "init-array-creation";
+}
+
