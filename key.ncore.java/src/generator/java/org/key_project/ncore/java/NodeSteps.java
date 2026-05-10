@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
-import java.util.stream.Collectors;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
@@ -21,6 +19,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.stream.Collectors;
+
 import static com.github.javaparser.StaticJavaParser.*;
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -33,26 +33,39 @@ import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 public class NodeSteps {
     static void addWiths(ClassOrInterfaceDeclaration target) {
         target.getFields().stream()
+                .filter(NodeSteps::fieldIsWritable)
                 .flatMap(it -> it.getVariables().stream()).forEach(it -> {
                     var args =
-                        target.getFields().stream()
-                                .flatMap(f -> f.getVariables().stream())
-                                .map(v -> {
-                                    if (v == it) {
-                                        return (Expression) v.getNameAsExpression();
-                                    } else {
-                                        return new MethodCallExpr(null, v.getNameAsString());
-                                    }
-                                }).toList();
+                            target.getFields().stream()
+                                    .flatMap(f -> f.getVariables().stream())
+                                    .map(v -> {
+                                        if (v == it) {
+                                            return (Expression) v.getNameAsExpression();
+                                        } else {
+                                            return new MethodCallExpr(null, v.getNameAsString());
+                                        }
+                                    }).toList();
 
                     var m = target.addMethod("with" + upperStart(it.getNameAsString()), PUBLIC);
                     m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, target.getNameAsString()));
                     m.getBody().get().addStatement(new ReturnStmt(
-                        new ObjectCreationExpr(null,
-                            new ClassOrInterfaceType(null, target.getNameAsString()),
-                            new NodeList<>(args))));
+                            new ObjectCreationExpr(null,
+                                    new ClassOrInterfaceType(null, target.getNameAsString()),
+                                    new NodeList<>(args))));
                 });
+    }
+
+    /// returns true, if the field is writable (no constant is set). Used for various places in which a field can get a value,
+    ///
+    /// @see NodeSteps#addWiths(ClassOrInterfaceDeclaration)
+    /// @see NodeSteps#addBuilder(ClassOrInterfaceDeclaration)
+    /// @see NodeSteps#addBuilder(ClassOrInterfaceDeclaration)
+    ///
+    private static boolean fieldIsWritable(FieldDeclaration fieldDeclaration) {
+        return fieldDeclaration.getVariables()
+                .getOFirst()
+                .map(NodeSteps::fieldIsWritable).orElse(true);
     }
 
     private static String upperStart(String nameAsString) {
@@ -65,7 +78,7 @@ public class NodeSteps {
             return;
         }
         MethodDeclaration equals = target.addMethod("match", PUBLIC);
-        equals.addModifier(FINAL);
+        //equals.addModifier(FINAL);
         equals.addAnnotation(Override.class);
         equals.addAnnotation(Nullable.class);
         equals.setType("MatchConditions");
@@ -93,7 +106,7 @@ public class NodeSteps {
             return;
         }
         MethodDeclaration equals = target.addMethod("equals", PUBLIC);
-        equals.addModifier(FINAL);
+        //equals.addModifier(FINAL);
         equals.addAnnotation(Override.class);
         equals.setType(Boolean.TYPE);
         final var o = getNullableObject();
@@ -101,12 +114,12 @@ public class NodeSteps {
         BlockStmt body = equals.getBody().get();
         body.addStatement(parseStatement("if(this == o) return true;"));
         body.addStatement(parseStatement(
-            "if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
+                "if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
         Expression equalFields = target.getFields().stream()
                 .filter(it -> it.getAnnotationByName("EqEx").isEmpty())
                 .flatMap(it -> it.getVariables().stream())
                 .map(it -> callObjects("equals", it.getNameAsExpression(),
-                    new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
+                        new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
                 .reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND))
                 .orElse(new BooleanLiteralExpr(true));
         body.addStatement(new ReturnStmt(equalFields));
@@ -118,7 +131,7 @@ public class NodeSteps {
         }
 
         MethodDeclaration hashCode = target.addMethod("hashCode", PUBLIC);
-        hashCode.addModifier(FINAL);
+        //hashCode.addModifier(FINAL);
         hashCode.addAnnotation(Override.class);
         hashCode.setType(Integer.TYPE);
         Expression[] args = target.getFields()
@@ -133,7 +146,7 @@ public class NodeSteps {
             assert false : "No defined fields";
         else
             hashCode.getBody().get().addStatement(new ReturnStmt(
-                callObjects("hash", args)));
+                    callObjects("hash", args)));
     }
 
     static void ToString(ClassOrInterfaceDeclaration clazz) {
@@ -141,20 +154,20 @@ public class NodeSteps {
             return;
         }
 
-        MethodDeclaration toString = clazz.addMethod("toString", PUBLIC, FINAL);
+        MethodDeclaration toString = clazz.addMethod("toString", PUBLIC);
         toString.addAnnotation(Override.class);
         toString.setType(String.class);
         var parameters =
-            clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
+                clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
         var sb = (clazz.getNameAsString() + "[")
-            + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
-                    .collect(Collectors.joining(", "))
-            + "]";
+                + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
+                .collect(Collectors.joining(", "))
+                + "]";
 
         var args = parameters.stream().map(NodeWithSimpleName::getNameAsExpression)
                 .map(it -> (Expression) it).toList();
         toString.getBody().get().addStatement(new ReturnStmt(
-            new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
+                new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
     }
 
     private static Expression callObjects(String method, Expression... args) {
@@ -180,18 +193,21 @@ public class NodeSteps {
             var isOptional = field.getAnnotations().stream()
                     .anyMatch(it -> it.getNameAsString().equals("Nullable"));
             for (var variable : field.getVariables()) {
+                if (variable.getInitializer().isPresent()) {
+                    continue;
+                }
                 final var p = new Parameter(variable.getType().clone(), variable.getNameAsString());
                 field.getAnnotations().stream().map(AnnotationExpr::clone)
                         .forEach(p::addAnnotation);
                 params.add(p);
                 if (isOptional) {
                     body.addStatement(
-                        "this.%s = %s;".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = %s;".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 } else {
                     body.addStatement(
-                        "this.%s = Objects.requireNonNull(%s);".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 }
             }
         }
@@ -204,6 +220,13 @@ public class NodeSteps {
         if (target.isInterface()) {
             return;
         }
+
+        var hasOptionalFields = target.getFields().stream().anyMatch(field ->
+                field.getAnnotations().stream().anyMatch(it -> it.getNameAsString().equals("Nullable")));
+        if (!hasOptionalFields) {
+            return;
+        }
+
         ConstructorDeclaration constr = new ConstructorDeclaration();
         var body = constr.getBody().get();
         var params = constr.getParameters();
@@ -216,22 +239,25 @@ public class NodeSteps {
 
 
             for (var variable : field.getVariables()) {
+                if (variable.getInitializer().isPresent()) {
+                    continue;
+                }
+
                 if (isOptional) {
                     body.addStatement(
-                        "this.%s = null;".formatted(variable.getNameAsString()));
+                            "this.%s = null;".formatted(variable.getNameAsString()));
                 } else {
                     final var p =
-                        new Parameter(variable.getType().clone(), variable.getNameAsString());
+                            new Parameter(variable.getType().clone(), variable.getNameAsString());
                     field.getAnnotations().stream().map(AnnotationExpr::clone)
                             .forEach(p::addAnnotation);
                     params.add(p);
                     body.addStatement(
-                        "this.%s = Objects.requireNonNull(%s);".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 }
             }
         }
-
 
         target.addMember(constr);
     }
@@ -246,14 +272,16 @@ public class NodeSteps {
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
         params.add(
-            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+                new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         params.add(new Parameter(parseType("Properties"), "map"));
 
-        var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
+        var args = target.getFields().stream()
+                .filter(NodeSteps::fieldIsWritable)
+                .flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
                 .map(it -> (Expression) parseExpression(
-                    "map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
+                        "map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -269,10 +297,12 @@ public class NodeSteps {
         constr.setName(target.getNameAsString());
         params.add(new Parameter(parseType("Properties"), "map"));
 
-        var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
+        var args = target.getFields().stream()
+                .filter(NodeSteps::fieldIsWritable)
+                .flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
                 .map(it -> (Expression) parseExpression(
-                    "map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
+                        "map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -291,7 +321,7 @@ public class NodeSteps {
         target.getFields().stream()
                 .flatMap(it -> it.getVariables().stream())
                 .forEach(variable -> body.addStatement("p.set(PROPERTY_%s, %s());".formatted(
-                    variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
+                        variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
         body.addStatement("return p;");
     }
 
@@ -305,7 +335,7 @@ public class NodeSteps {
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
         params.add(
-            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+                new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         /*
          * for (var field : target.getFields()) {
@@ -322,12 +352,18 @@ public class NodeSteps {
          * }
          */
 
-        var args = target.getFields().stream().flatMap(it -> it.getVariables().stream())
+        var args = target.getFields().stream()
+                .flatMap(it -> it.getVariables().stream())
+                .filter(NodeSteps::fieldIsWritable)
                 .map(NodeWithSimpleName::getNameAsString)
                 .map(it -> (Expression) new FieldAccessExpr(new NameExpr("other"), it))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
 
+    }
+
+    private static boolean fieldIsWritable(VariableDeclarator variableDeclarator) {
+        return variableDeclarator.getInitializer().isEmpty();
     }
 
     static void setPackage(ClassOrInterfaceDeclaration target) {
@@ -350,7 +386,7 @@ public class NodeSteps {
             target.addModifier(SEALED);
             target.removeModifier(ABSTRACT);
             var permittedTypes =
-                Generator.INSTANCE.getStep(PreSteps.PreComputation.class).permittedTypes;
+                    Generator.INSTANCE.getStep(PreSteps.PreComputation.class).permittedTypes;
             for (var s : permittedTypes.get(target.getNameAsString())) {
                 target.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
             }
@@ -370,12 +406,12 @@ public class NodeSteps {
         for (var field : target.getFields()) {
             for (var variable : field.getVariables()) {
                 final var dataKey = new ClassOrInterfaceType(null, new SimpleName("Property"),
-                    new NodeList<>(toBoxType(variable.getType().clone())));
+                        new NodeList<>(toBoxType(variable.getType().clone())));
                 var f = target.addField(
-                    dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC,
-                    FINAL);
+                        dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC,
+                        FINAL);
                 f.getVariables().getFirst().setInitializer(
-                    "new Property<>(\"%s\")".formatted(variable.getNameAsString()));
+                        "new Property<>(\"%s\")".formatted(variable.getNameAsString()));
             }
         }
     }
@@ -418,7 +454,7 @@ public class NodeSteps {
                 } else {
                     getter.getBody().get()
                             .addStatement(new ReturnStmt(variable.getNameAsExpression()));
-                    getter.addModifier(PUBLIC, FINAL);
+                    getter.addModifier(PUBLIC);
                 }
                 field.getAnnotationByName("Override")
                         .ifPresent(it -> {
@@ -439,45 +475,54 @@ public class NodeSteps {
 
         for (var field : target.getFields()) {
             for (var variable : field.variables()) {
-                var f = builder.addField(variable.getType().clone(),
-                    variable.getNameAsString(), PUBLIC);
-                f.addAnnotation(Nullable.class);
+                if (variable.getInitializer().isEmpty()) {
+                    var f =
+                            builder.addField(variable.getType().clone(), variable.getNameAsString(), PUBLIC);
+                    f.addAnnotation(Nullable.class);
+                }
             }
         }
 
         var build = builder.addMethod("build", PUBLIC);
         build.setType(new ClassOrInterfaceType(null, target.getNameAsString()));
 
-        var args = builder.getFields().stream().flatMap(it -> it.variables().stream())
+        var args = builder.getFields().stream()
+                .flatMap(it -> it.variables().stream())
+                .filter(NodeSteps::fieldIsWritable)
                 .map(it -> (Expression) it.getNameAsExpression())
                 .toList();
         build.getBody().get().addStatement(new ReturnStmt(
-            new ObjectCreationExpr(null,
-                new ClassOrInterfaceType(null, target.getNameAsString()),
-                new NodeList<>(args))));
+                new ObjectCreationExpr(null,
+                        new ClassOrInterfaceType(null, target.getNameAsString()),
+                        new NodeList<>(args))));
 
-        builder.getFields().stream().flatMap(it -> it.variables().stream()).forEach(it -> {
-            var m = builder.addMethod(it.getNameAsString(), PUBLIC);
-            m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
-            m.setType(new ClassOrInterfaceType(null, "Builder"));
-            m.getBody().get().addStatement(
-                "this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
-            m.getBody().get().addStatement("return this;");
-        });
+        builder.getFields().stream()
+                .flatMap(it -> it.variables().stream())
+                .filter(NodeSteps::fieldIsWritable)
+                .forEach(it -> {
+                    var m = builder.addMethod(it.getNameAsString(), PUBLIC);
+                    m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
+                    m.setType(new ClassOrInterfaceType(null, "Builder"));
+                    m.getBody().get().addStatement(
+                            "this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
+                    m.getBody().get().addStatement("return this;");
+                });
 
 
-        builder.getFields().stream().flatMap(it -> it.variables().stream())
+        builder.getFields().stream()
+                .flatMap(it -> it.variables().stream())
+                .filter(NodeSteps::fieldIsWritable)
                 .filter(NodeSteps::isList)
                 .forEach(it -> {
                     var m = builder.addMethod(it.getNameAsString(), PUBLIC);
                     var t =
-                        it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
+                            it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
                     m.addParameter(new Parameter(t.clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, "Builder"));
                     m.getBody().get().addStatement("if(this.%s==null) this.%s = new ArrayList<>();"
                             .formatted(it.getNameAsString(), it.getNameAsString()));
                     m.getBody().get().addStatement(
-                        "this.%s.add(%s);".formatted(it.getNameAsString(), it.getNameAsString()));
+                            "this.%s.add(%s);".formatted(it.getNameAsString(), it.getNameAsString()));
                     m.getBody().get().addStatement("return this;");
                 });
 
@@ -487,14 +532,18 @@ public class NodeSteps {
         tb.setType(new ClassOrInterfaceType(null, "Builder"));
         final var b = tb.getBody().get();
         b.addStatement("Builder b =  new Builder();");
-        builder.getFields().stream().flatMap(it -> it.variables().stream()).forEach(it -> b
-                .addStatement("b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
+        builder.getFields().stream()
+                .flatMap(it -> it.variables().stream())
+                .filter(NodeSteps::fieldIsWritable)
+                .forEach(it ->
+                        b.addStatement("b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
         b.addStatement("return b;");
     }
 
     private static boolean isList(VariableDeclarator type) {
         if (type.getType().isClassOrInterfaceType()) {
-            return type.getType().asClassOrInterfaceType().getNameAsString().equals("List");
+            final var name = type.getType().asClassOrInterfaceType().getNameAsString();
+            return name.equals("List") || name.equals("RoList");
         }
         return false;
     }
