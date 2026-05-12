@@ -28,7 +28,7 @@ public class ClassInitializer extends JavaDeclaration
 
     public ClassInitializer(boolean isStatic, StatementBlock body) {
         super(
-            isStatic ? createModifierList(Modifier.ModifierKind.STATIC)
+            isStatic ? createModifierList(ModifierKind.STATIC)
                     : createModifierList());
         this.body = body;
     }
