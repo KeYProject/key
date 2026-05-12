@@ -255,7 +255,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // ghost \seq values = \seq_empty
         final Statement valuesInit = KeYJavaASTFactory.declare(
-            new Modifier(Modifier.ModifierKind.JML_GHOST), data.valuesVariable(),
+            new Modifier(ModifierKind.JML_GHOST), data.valuesVariable(),
             EmptySeqLiteral.INSTANCE, seqType);
 
         // Iterator itVar = expression.iterator();

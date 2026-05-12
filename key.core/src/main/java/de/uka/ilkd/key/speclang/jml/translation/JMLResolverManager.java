@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
-import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;

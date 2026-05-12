@@ -9,7 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -195,7 +195,7 @@ public final class DLSpecFactory {
         final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
         assert kjt != null;
 
-        return new ClassInvariantImpl(name, displayName, kjt, Modifier.ModifierKind.PRIVATE, inv,
+        return new ClassInvariantImpl(name, displayName, kjt, ModifierKind.PRIVATE, inv,
             selfVar);
     }
 

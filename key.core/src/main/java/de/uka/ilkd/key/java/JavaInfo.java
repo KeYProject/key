@@ -33,7 +33,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind.*;
+import static de.uka.ilkd.key.java.ast.declaration.ModifierKind.*;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides
@@ -377,7 +377,7 @@ public final class JavaInfo {
         // TODO: package information not yet available
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
-        final Modifier.ModifierKind visibility = ax.getVisibility();
+        final ModifierKind visibility = ax.getVisibility();
         assert visibility != null && visibility.isVisibility();
 
         if (PUBLIC == visibility) {

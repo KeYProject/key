@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -17,9 +15,11 @@ import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -61,7 +61,7 @@ public final class UnaryOperator extends Operator implements ExpressionStatement
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if(src instanceof UnaryOperator other) {
+        if (src instanceof UnaryOperator other) {
             if (this.kind.equals(other.getKind())) {
                 return super.match(source, matchCond);
             }
@@ -72,7 +72,20 @@ public final class UnaryOperator extends Operator implements ExpressionStatement
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return null;
+        final TypeConverter tc = javaServ.getTypeConverter();
+
+        try {
+            return switch (kind) {
+                case POST_DECREMENT, POST_INCREMENT,
+                     PRE_DECREMENT, PRE_INCREMENT ->
+                        tc.getKeYJavaType((Expression) getChildAt(0), ec);
+                default ->
+                        tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
+            };
+        } catch (Exception e) {
+            throw new RuntimeException("Type promotion failed (see below). Operator was " + this,
+                    e);
+        }
     }
 
     @Override

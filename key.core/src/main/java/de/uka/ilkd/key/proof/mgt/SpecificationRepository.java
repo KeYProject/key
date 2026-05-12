@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
@@ -895,25 +895,25 @@ public class SpecificationRepository {
 
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                        kjt, Modifier.ModifierKind.PRIVATE, null, invDef, selfVar,
+                        kjt, ModifierKind.PRIVATE, null, invDef, selfVar,
                         ImmutableList.nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                    Modifier.ModifierKind.PRIVATE, null, staticInvDef, null, ImmutableList.nil(),
+                    ModifierKind.PRIVATE, null, staticInvDef, null, ImmutableList.nil(),
                     null);
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
                     "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                    Modifier.ModifierKind.PRIVATE, null, freeInvDef, selfVar, ImmutableList.nil(),
+                    ModifierKind.PRIVATE, null, freeInvDef, selfVar, ImmutableList.nil(),
                     null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
                     "Free static class invariant axiom for " + kjt.getFullName(),
-                    freeStaticInvSymbol, kjt, Modifier.ModifierKind.PRIVATE, null, freeStaticInvDef,
+                    freeStaticInvSymbol, kjt, ModifierKind.PRIVATE, null, freeStaticInvDef,
                     null,
                     ImmutableList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
@@ -999,7 +999,7 @@ public class SpecificationRepository {
                                 new RepresentsAxiom(
                                     "Definition axiom for " + pm.getName() + " in "
                                         + kjt.getFullName(),
-                                    pm, kjt, Modifier.ModifierKind.PRIVATE, preContract,
+                                    pm, kjt, ModifierKind.PRIVATE, preContract,
                                     representsFromContract,
                                     selfVar, paramVars, atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
@@ -1027,7 +1027,7 @@ public class SpecificationRepository {
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
                                 "Contract axiom for " + pm.getName() + " in " + kjt.getFullName(),
                                 pm,
-                                kjt, Modifier.ModifierKind.PRIVATE, preFromContract,
+                                kjt, ModifierKind.PRIVATE, preFromContract,
                                 freePreFromContract,
                                 postFromContract, freePostFromContract, mbyFromContract, atPreVars,
                                 selfVar, resultVar, paramVars);

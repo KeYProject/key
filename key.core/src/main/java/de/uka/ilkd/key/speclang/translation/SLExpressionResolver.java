@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.Modifier.ModifierKind;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 
 /**
