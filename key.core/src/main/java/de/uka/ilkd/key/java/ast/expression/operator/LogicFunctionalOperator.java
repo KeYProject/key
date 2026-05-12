@@ -18,10 +18,12 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.pp.PrettyPrinter;
-
 import de.uka.ilkd.key.rule.MatchConditions;
-import org.jspecify.annotations.Nullable;
+
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.pp.PrettyPrinter.*;
 
@@ -47,6 +49,11 @@ public class LogicFunctionalOperator extends Operator {
             ImmutableArray<Expression> args) {
         super(pi, c, args);
         this.function = fn;
+    }
+
+    public LogicFunctionalOperator(LogicFunction function, ExtList changeList) {
+        super(changeList);
+        this.function = function;
     }
 
 
@@ -109,7 +116,7 @@ public class LogicFunctionalOperator extends Operator {
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if(src instanceof LogicFunctionalOperator other) {
+        if (src instanceof LogicFunctionalOperator other) {
             if (getFunction().equals(other.getFunction())) {
                 return super.match(source, matchCond);
             }

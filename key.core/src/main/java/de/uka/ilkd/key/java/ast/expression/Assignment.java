@@ -13,16 +13,15 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import de.uka.ilkd.key.rule.MatchConditions;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
 
@@ -32,6 +31,11 @@ import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY
  */
 @NullMarked
 public final class Assignment extends Operator implements ExpressionStatement {
+    public Assignment(AssignmentKind kind, ExtList changeList) {
+        super(changeList);
+        this.kind = kind;
+    }
+
     @Override
     public void visit(Visitor v) {
         v.performActionOnAssignment(this);
@@ -109,7 +113,7 @@ public final class Assignment extends Operator implements ExpressionStatement {
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if(src instanceof Assignment other) {
+        if (src instanceof Assignment other) {
             if (getKind().equals(other.getKind())) {
                 return super.match(source, matchCond);
             }

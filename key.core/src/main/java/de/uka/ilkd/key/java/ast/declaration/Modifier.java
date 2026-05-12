@@ -6,14 +6,13 @@ package de.uka.ilkd.key.java.ast.declaration;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import de.uka.ilkd.key.rule.MatchConditions;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -56,7 +55,7 @@ public class Modifier extends JavaProgramElement {
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if(src instanceof Modifier other) {
+        if (src instanceof Modifier other) {
             if (this.keyword.equals(other.getKind())) {
                 return super.match(source, matchCond);
             }
