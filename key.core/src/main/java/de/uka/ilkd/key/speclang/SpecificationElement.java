@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 
 
@@ -31,7 +31,7 @@ public interface SpecificationElement {
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    Modifier.ModifierKind getVisibility();
+    ModifierKind getVisibility();
 
 
     /**

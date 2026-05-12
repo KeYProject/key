@@ -79,7 +79,7 @@ public final class BinaryOperator extends Operator {
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        final ProgramElement src = source.getSource();
+        final ProgramElement src = source.getSource(); // [ left, right ]
         if(src instanceof BinaryOperator other) {
             if (this.kind.equals(other.getKind())) {
                 return super.match(source, matchCond);
