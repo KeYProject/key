@@ -964,22 +964,45 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public void performActionOnBinaryOperator(BinaryOperator x) {
-        super.performActionOnBinaryOperator(x);
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new BinaryOperator(x.getKind(), changeList);
+            }
+        };
+        def.doAction(x);
     }
 
     @Override
     public void performActionOnUnaryOperator(UnaryOperator x) {
-        super.performActionOnUnaryOperator(x);
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new UnaryOperator(x.kind, changeList);
+            }
+        };
+        def.doAction(x);
     }
 
     @Override
     public void performActionOnLogicFunctionalOperator(LogicFunctionalOperator x) {
-        super.performActionOnLogicFunctionalOperator(x);
-    }
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new LogicFunctionalOperator(x.getFunction(), changeList);
+            }
+        };
+        def.doAction(x);    }
 
     @Override
     public void performActionOnAssignment(Assignment x) {
-        super.performActionOnAssignment(x);
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new Assignment(x.getKind(), changeList);
+            }
+        };
+        def.doAction(x);
     }
 
     @Override

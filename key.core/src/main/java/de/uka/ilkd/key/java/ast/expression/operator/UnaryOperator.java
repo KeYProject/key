@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.List;
@@ -37,6 +38,16 @@ public final class UnaryOperator extends Operator implements ExpressionStatement
     public UnaryOperator(PositionInfo pi, List<Comment> c, UnaryOperatorKind op, Expression child) {
         super(pi, c, new ImmutableArray<>(child));
         this.kind = op;
+    }
+
+    public UnaryOperator(ExtList changeList) {
+        super(changeList);
+        kind = changeList.get(UnaryOperatorKind.class);
+    }
+
+    public UnaryOperator(UnaryOperatorKind kind, ExtList changeList) {
+        super(changeList);
+        this.kind = kind;
     }
 
     public UnaryOperatorKind getKind() {
@@ -77,10 +88,8 @@ public final class UnaryOperator extends Operator implements ExpressionStatement
         try {
             return switch (kind) {
                 case POST_DECREMENT, POST_INCREMENT,
-                     PRE_DECREMENT, PRE_INCREMENT ->
-                        tc.getKeYJavaType((Expression) getChildAt(0), ec);
-                default ->
-                        tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
+                     PRE_DECREMENT, PRE_INCREMENT -> tc.getKeYJavaType((Expression) getChildAt(0), ec);
+                default -> tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
             };
         } catch (Exception e) {
             throw new RuntimeException("Type promotion failed (see below). Operator was " + this,

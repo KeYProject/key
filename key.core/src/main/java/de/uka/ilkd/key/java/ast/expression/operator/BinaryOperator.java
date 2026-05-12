@@ -17,8 +17,8 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -79,8 +79,8 @@ public final class BinaryOperator extends Operator {
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        final ProgramElement src = source.getSource(); // [ left, right ]
-        if(src instanceof BinaryOperator other) {
+        final ProgramElement src = source.getSource();
+        if (src instanceof BinaryOperator other) {
             if (this.kind.equals(other.getKind())) {
                 return super.match(source, matchCond);
             }
