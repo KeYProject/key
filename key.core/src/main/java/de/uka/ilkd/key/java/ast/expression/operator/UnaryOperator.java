@@ -83,6 +83,7 @@ public final class UnaryOperator extends Operator implements ExpressionStatement
 
         try {
             return switch (kind) {
+                case LOGICAL_NOT -> javaServ.getTypeConverter().getBooleanType();
                 case POST_DECREMENT, POST_INCREMENT,
                         PRE_DECREMENT, PRE_INCREMENT ->
                     tc.getKeYJavaType((Expression) getChildAt(0), ec);
