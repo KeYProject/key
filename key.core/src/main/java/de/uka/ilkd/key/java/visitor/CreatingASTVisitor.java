@@ -992,7 +992,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 return new LogicFunctionalOperator(x.getFunction(), changeList);
             }
         };
-        def.doAction(x);    }
+        def.doAction(x);
+    }
 
     @Override
     public void performActionOnAssignment(Assignment x) {
