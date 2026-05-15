@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.operator.Equals;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -59,9 +60,11 @@ public class SwitchToIf extends ProgramTransformer {
 
         final ExecutionContext ec = insts.getExecutionContext();
         ProgramVariable exV =
-            KeYJavaASTFactory.localVariable(name, sw.getExpression().getKeYJavaType(services, ec));
+            KeYJavaASTFactory.localVariable(name,
+                new TypeRef(sw.getExpression().getKeYJavaType(services, ec)));
         Statement s =
-            KeYJavaASTFactory.declare(name, sw.getExpression().getKeYJavaType(services, ec));
+            KeYJavaASTFactory.declare(name,
+                new TypeRef(sw.getExpression().getKeYJavaType(services, ec)));
 
         final var changeBreakResult = changeBreaks(sw, newBreak, true);
         sw = (Switch) changeBreakResult.result;

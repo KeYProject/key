@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.ast.statement.While;
@@ -249,7 +250,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final ProgramVariable loopScopeIdxVar = //
             KeYJavaASTFactory.localVariable( //
-                services.getVariableNamer().getTemporaryNameProposal("x"), booleanType);
+                services.getVariableNamer().getTemporaryNameProposal("x"),
+                new TypeRef(booleanType));
 
         return loopScopeIdxVar;
     }

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -85,14 +85,10 @@ public class NewLocalVarsCondition implements VariableCondition {
         for (var v : vars) {
             final var newName =
                 services.getVariableNamer().getTemporaryNameProposal(v.name() + "_before");
-            KeYJavaType type = v.getKeYJavaType();
-            var locVar = new LocationVariable(newName, type);
+            TypeReference typeRef = v.getTypeReference();
+            var locVar = new LocationVariable(newName, typeRef);
             var spec = new VariableSpecification(locVar);
-            int dim = 0;
-            if (type.getJavaType() instanceof ArrayType at) {
-                dim = at.getDimension();
-            }
-            decls.add(new LocalVariableDeclaration(new TypeRef(type, dim), spec));
+            decls.add(new LocalVariableDeclaration(typeRef, spec));
             updatesBefore = updatesBefore.append(tb.elementary(tb.var(locVar), tb.var(v)));
             updatesFrame = updatesFrame.append(tb.elementary(tb.var(v), tb.var(locVar)));
         }

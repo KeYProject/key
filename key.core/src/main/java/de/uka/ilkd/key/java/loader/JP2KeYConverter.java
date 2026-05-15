@@ -12,17 +12,16 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
 import de.uka.ilkd.key.java.ast.Statement;
-import de.uka.ilkd.key.java.ast.abstraction.AnnotatedType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.modifier.*;
-import de.uka.ilkd.key.java.ast.expression.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
@@ -719,36 +718,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(TypeExpr n, Void arg) {
-        return new TypeRef(getKeYJavaType(n.getType()));
-    }
-
-    private KeYJavaType getCachedKeYJavaType(Type type) {
-        var kjt = getCachedKeYJavaType(type.resolve());
-        annotate(type, kjt);
-        return kjt;
+        return new TypeRef(getKeYJavaType(n.getType().resolve()), map(n.getType().getAnnotations()),
+            0);
     }
 
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, false);
     }
 
-    private KeYJavaType getKeYJavaType(Type type) {
-        var kjt = getKeYJavaType(type.resolve());
-        annotate(type, kjt);
-        return kjt;
-    }
-
     private KeYJavaType getKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, false);
-    }
-
-    private void annotate(Type type, KeYJavaType kjt) {
-        if (kjt.getAnnotations().size() != 0) return;
-
-        var annotations = type.annotations();
-        if (annotations.size() != 0) {
-            kjt.setJavaType(new AnnotatedType(kjt.getJavaType(), map(annotations)));
-        }
     }
 
     private ClassOrInterfaceDeclaration getContainingClass(Node node) {
@@ -1157,7 +1136,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             type.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
         var name = createProgramElementName(type.getName());
         KeYJavaType resolvedType = getKeYJavaType(type.resolve());
-        return new TypeRef(name, 0, prefix, resolvedType);
+        return new TypeRef(name, map(type.getAnnotations()), 0, prefix, resolvedType);
     }
 
     private ParameterDeclaration visitNoMap(Parameter n) {
@@ -1180,7 +1159,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             pv = (IProgramVariable) lookupSchemaVariable(n.getName());
         } else {
             var name = VariableNamer.parseName(n.getName().asString());
-            pv = new LocationVariable(name, type.getKeYJavaType(), n.isFinal());
+            pv = new LocationVariable(name, type, n.isFinal());
         }
         var spec = new VariableSpecification(pi, c, null, pv, 0, type.getKeYJavaType());
         var isInInterface = parentIsInterface(n);
@@ -1196,7 +1175,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public TypeReference visit(PrimitiveType n, Void arg) {
-        return new TypeRef(getKeYJavaType(n));
+        return new TypeRef(getKeYJavaType(n.resolve()), map(n.getAnnotations()), 0);
     }
 
     @Override
@@ -1221,7 +1200,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } catch (IllegalStateException e) {
             System.out.println(e);
         }
-        return new TypeRef(getKeYJavaType(n));
+        return new TypeRef(getKeYJavaType(n.resolve()), map(n.getAnnotations()), 0);
     }
 
     @Override
@@ -1404,16 +1383,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(v);
         Expression init = accepto(v.getInitializer());
         IProgramVariable pv;
-        KeYJavaType kjt = type.getKeYJavaType();
         if (v.getNameAsString().startsWith("#")) {
             pv = (IProgramVariable) lookupSchemaVariable(v.getNameAsString(), v);
         } else {
             var name = VariableNamer.parseName(v.getNameAsString());
-            pv = new LocationVariable(name, kjt, modifiers.hasModifier(JML_GHOST),
+            pv = new LocationVariable(name, type, modifiers.hasModifier(JML_GHOST),
                 modifiers.hasModifier(FINAL));
         }
 
-        return addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, kjt));
+        return addToMapping(v,
+            new VariableSpecification(pi, c, init, pv, 0, type.getKeYJavaType()));
     }
 
     /**
@@ -1498,11 +1477,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             final Literal compileTimeConstant = getCompileTimeConstantInitializer(decl);
 
             if (compileTimeConstant == null) {
-                pv = new LocationVariable(pen, getKeYJavaType(t),
+                pv = new LocationVariable(pen, accept(t),
                     getKeYJavaType(classType), decl.isStatic, decl.isModel,
                     decl.isGhost, decl.isFinal);
             } else {
-                pv = new ProgramConstant(pen, getKeYJavaType(t),
+                pv = new ProgramConstant(pen, accept(t),
                     getKeYJavaType(classType), decl.isStatic,
                     compileTimeConstant);
             }
@@ -1532,9 +1511,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(v.decl);
         var c = createComments(v.decl);
         Expression init = accepto(v.decl.getInitializer());
-        var type = getKeYJavaType(v.decl.getType());
         var pv = getProgramVariableForFieldSpecification(v);
-        return new FieldSpecification(pi, c, init, pv, 0, type);
+        return new FieldSpecification(pi, c, init, pv, 0, accept(v.decl.getType()));
     }
 
     @Override
@@ -1545,7 +1523,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VoidType n, Void arg) {
-        return new TypeRef(getKeYJavaType(n));
+        return new TypeRef(getKeYJavaType(n.resolve()), map(n.annotations()), 0);
     }
 
     @Override
@@ -2081,7 +2059,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ProgramElementName name = createProgramElementName(n.getName());
         ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
-        
+
         boolean isLibrary = mapping.isParsingLibraries();
         boolean parentIsInterface = false;
 
@@ -2090,8 +2068,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<MemberDeclaration> members = map(n.getMembers());
 
         TypeDeclaration td = new AnnotationInterfaceDeclaration(
-                pi, c, modArray, name, fullName, members,
-                parentIsInterface, isLibrary, getClassSpec(n));
+            pi, c, modArray, name, fullName, members,
+            parentIsInterface, isLibrary, getClassSpec(n));
         kjt.setJavaType(td);
 
         mapping.registerType(ref, kjt);
@@ -2197,7 +2175,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VarType n, Void arg) {
-        return getKeYJavaType(n);
+        return new TypeRef(getKeYJavaType(n.resolve()), map(n.getAnnotations()), 0);
     }
 
     @Override

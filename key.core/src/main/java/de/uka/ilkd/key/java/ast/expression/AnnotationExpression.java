@@ -5,15 +5,15 @@ package de.uka.ilkd.key.java.ast.expression;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public abstract class AnnotationExpression extends JavaNonTerminalProgramElement
-implements Expression, ExpressionContainer {
+        implements Expression, ExpressionContainer {
 
     protected final KeYJavaType kjt;
-    
+
     public AnnotationExpression(KeYJavaType kjt) {
         this.kjt = kjt;
     }

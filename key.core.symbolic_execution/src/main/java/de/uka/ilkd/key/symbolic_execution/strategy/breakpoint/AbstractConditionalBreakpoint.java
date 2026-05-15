@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.StatementContainer;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -297,7 +298,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         // collect all variables needed to parse the condition
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
-            containerType, null, false, false));
+            new TypeRef(containerType), null, false, false));
         ImmutableList<LocationVariable> varsForCondition = ImmutableSLList.nil();
         if (getPm() != null) {
             // collect parameter variables

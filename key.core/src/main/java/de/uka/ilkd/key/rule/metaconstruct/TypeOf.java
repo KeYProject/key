@@ -9,10 +9,13 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 public class TypeOf extends ProgramTransformer {
 
@@ -36,21 +39,25 @@ public class TypeOf extends ProgramTransformer {
             ec = insts.getContextInstantiation().activeStatementContext();
         }
         KeYJavaType kjt = null;
+        ImmutableArray<AnnotationExpression> annotations = null;
         if (pe instanceof Expression) {
             kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
         } else {
             kjt = ((TypeRef) pe).getKeYJavaType();
+            annotations = ((TypeRef) pe).getAnnotations();
         }
+
+        annotations = annotations == null ? new ImmutableArray<>() : annotations;
 
         assert kjt != null;
 
         if (!(kjt.getJavaType() instanceof PrimitiveType)) {
             if (kjt.getJavaType() instanceof ArrayType) {
                 return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt,
-                    ((ArrayType) kjt.getJavaType()).getDimension()) };
+                    ((ArrayType) kjt.getJavaType()).getDimension(), annotations) };
             }
         }
 
-        return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt) };
+        return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt, 0, annotations) };
     }
 }

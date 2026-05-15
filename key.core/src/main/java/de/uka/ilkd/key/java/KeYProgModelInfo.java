@@ -238,7 +238,7 @@ public class KeYProgModelInfo {
 
         var refType = type.asReferenceType();
 
-        // methods for annotation declarations are currently not implemented in 
+        // methods for annotation declarations are currently not implemented in
         // javaparser
         if (refType.getTypeDeclaration()
                 .map(d -> d instanceof JavaParserAnnotationDeclaration)

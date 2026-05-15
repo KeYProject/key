@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
-import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
@@ -53,7 +51,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return matchesField(services, (Function) op);
         } else if (op instanceof ProgramElement) {
             var decl = services.getJavaInfo().rec2key()
-                .nodeFromKeY((LocationVariable)op);
+                    .nodeFromKeY((LocationVariable) op);
             LOGGER.info("inst {}, type {}", inst, inst.getClass());
             LOGGER.info("decl {}", decl);
         }
@@ -63,7 +61,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
     public boolean matchesField(Services services, Function op) {
         LOGGER.info("{}", op);
-        
+
         var kpmi = services.getJavaInfo().getKeYProgModelInfo();
 
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
@@ -78,41 +76,41 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return false;
 
         LOGGER.info("{}", classType);
-        
+
         var recoderTypeDecl = kpmi.rec2key()
-            .nodeFromKeY((ClassDeclaration)classType.getJavaType());
+                .nodeFromKeY((ClassDeclaration) classType.getJavaType());
 
-        //LOGGER.info("{}", recoderTypeDecl);
-/*
-        var fields = recoderTypeDecl.getAllFields();
-        var field = fields.stream()
-                .filter(f -> f.getName().equals(name.attributeName()))
-                .findFirst()
-                .orElse(null);
-
-        if (field == null)
-            return false;
-
-        var fType = field.getContainingClassType();
-        if (!(fType instanceof recoder.java.declaration.TypeDeclaration))
-            return false;
-
-        var fieldSpec = ((recoder.java.declaration.TypeDeclaration) fType)
-                .getFields().stream()
-                .filter(spec -> spec.getName().equals(name.attributeName()))
-                .findFirst()
-                .orElse(null);
-
-        if (fieldSpec == null)
-            return false;
-
-        var fieldDecl = fieldSpec.getParent();
-        var declAnnotations = fieldDecl.getAnnotations();
-        var value = declAnnotations.stream()
-                .anyMatch(a -> a.getTypeReference().getName().equals(annot));
-
-        return value;
-        */ 
+        // LOGGER.info("{}", recoderTypeDecl);
+        /*
+         * var fields = recoderTypeDecl.getAllFields();
+         * var field = fields.stream()
+         * .filter(f -> f.getName().equals(name.attributeName()))
+         * .findFirst()
+         * .orElse(null);
+         *
+         * if (field == null)
+         * return false;
+         *
+         * var fType = field.getContainingClassType();
+         * if (!(fType instanceof recoder.java.declaration.TypeDeclaration))
+         * return false;
+         *
+         * var fieldSpec = ((recoder.java.declaration.TypeDeclaration) fType)
+         * .getFields().stream()
+         * .filter(spec -> spec.getName().equals(name.attributeName()))
+         * .findFirst()
+         * .orElse(null);
+         *
+         * if (fieldSpec == null)
+         * return false;
+         *
+         * var fieldDecl = fieldSpec.getParent();
+         * var declAnnotations = fieldDecl.getAnnotations();
+         * var value = declAnnotations.stream()
+         * .anyMatch(a -> a.getTypeReference().getName().equals(annot));
+         *
+         * return value;
+         */
         return false;
     }
 

@@ -4,15 +4,17 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
-import de.uka.ilkd.key.logic.ProgramElementName;
+
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 
 public class AnnotationInterfaceDeclaration extends TypeDeclaration {
@@ -23,7 +25,7 @@ public class AnnotationInterfaceDeclaration extends TypeDeclaration {
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
             boolean isLibrary, List<TextualJMLConstruct> jmlAttachments) {
         super(pi, comments, modArray, name, fullName, members, parentIsInterfaceDeclaration,
-                isLibrary, ImmutableList.fromList(jmlAttachments));
+            isLibrary, ImmutableList.fromList(jmlAttachments));
     }
 
     /**
@@ -50,9 +52,12 @@ public class AnnotationInterfaceDeclaration extends TypeDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) result += modArray.size();
-        if (name != null)     result++;
-        if (members != null)  result += members.size();
+        if (modArray != null)
+            result += modArray.size();
+        if (name != null)
+            result++;
+        if (members != null)
+            result += members.size();
         return result;
     }
 
@@ -67,14 +72,17 @@ public class AnnotationInterfaceDeclaration extends TypeDeclaration {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) return modArray.get(index);
+            if (len > index)
+                return modArray.get(index);
             index -= len;
         }
         if (name != null) {
-            if (index == 0) return name;
+            if (index == 0)
+                return name;
             index--;
         }
-        if (members != null) return members.get(index);
+        if (members != null)
+            return members.get(index);
         throw new ArrayIndexOutOfBoundsException();
     }
 

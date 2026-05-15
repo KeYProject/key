@@ -612,7 +612,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      */
     public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
-        return inst.pm.isConstructor() ? tb.selfVar(inst.staticType, true)
+        return inst.pm.isConstructor() ? tb.selfVar(new TypeRef(inst.staticType), true)
                 : tb.resultVar(inst.pm, true);
     }
 

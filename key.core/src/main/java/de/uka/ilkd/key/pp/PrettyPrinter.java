@@ -616,8 +616,16 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnTypeReference(TypeReference x, boolean fullTypeNames) {
         if (x.getKeYJavaType() != null
                 && x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
+            for (AnnotationExpression expr : x.getAnnotations()) {
+                performActionOnAnnotationExpression(expr);
+            }
+            
             performActionOnArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
         } else if (x.getProgramElementName() != null) {
+            for (AnnotationExpression expr : x.getAnnotations()) {
+                performActionOnAnnotationExpression(expr);
+            }
+
             printTypeReference(x.getReferencePrefix(), x.getKeYJavaType(),
                 x.getProgramElementName(), fullTypeNames);
         }
