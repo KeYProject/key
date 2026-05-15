@@ -28,11 +28,13 @@ public final class BinaryOperator extends Operator {
     public BinaryOperator(BinaryOperatorKind binaryOperatorKind, ExtList operands) {
         super(operands);
         kind = Objects.requireNonNull(binaryOperatorKind);
+        assert getChildCount() == 2;
     }
 
     public BinaryOperator(BinaryOperatorKind kind, Expression lhs, Expression rhs) {
         super(lhs, rhs);
         this.kind = Objects.requireNonNull(kind);
+        assert getChildCount() == 2;
     }
 
     public BinaryOperator(PositionInfo pi, List<Comment> c,
@@ -40,6 +42,7 @@ public final class BinaryOperator extends Operator {
         super(pi, c,
             new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
         this.kind = Objects.requireNonNull(kind);
+        assert getChildCount() == 2;
     }
 
 
@@ -63,6 +66,10 @@ public final class BinaryOperator extends Operator {
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
+        if(kind.isBoolean()){
+            return javaServ.getTypeConverter().getBooleanType();
+        }
+
         try {
             return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec),
                 tc.getKeYJavaType((Expression) getChildAt(1), ec));

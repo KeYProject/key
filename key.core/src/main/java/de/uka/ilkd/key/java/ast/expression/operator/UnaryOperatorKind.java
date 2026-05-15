@@ -35,4 +35,12 @@ public enum UnaryOperatorKind {
         this.notation = notation;
         this.precedence = precedence;
     }
+
+    public boolean isBoolean() {
+        return this == LOGICAL_NOT;
+    }
+
+    public boolean isNumeric() {
+        return !isBoolean();
+    }
 }
