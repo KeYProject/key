@@ -23,28 +23,23 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 public final class BinaryOperator extends Operator {
-    public BinaryOperator(BinaryOperatorKind binaryOperatorKind, ExtList operands) {
-        super(operands);
-        kind = binaryOperatorKind;
-    }
-
     private final BinaryOperatorKind kind;
 
-    public BinaryOperator(ExtList children) {
-        super(children);
-        kind = children.get(BinaryOperatorKind.class);
+    public BinaryOperator(BinaryOperatorKind binaryOperatorKind, ExtList operands) {
+        super(operands);
+        kind = Objects.requireNonNull(binaryOperatorKind);
     }
 
     public BinaryOperator(BinaryOperatorKind kind, Expression lhs, Expression rhs) {
         super(lhs, rhs);
-        this.kind = kind;
+        this.kind = Objects.requireNonNull(kind);
     }
 
     public BinaryOperator(PositionInfo pi, List<Comment> c,
             BinaryOperatorKind kind, Expression lhs, Expression rhs) {
         super(pi, c,
             new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
-        this.kind = kind;
+        this.kind = Objects.requireNonNull(kind);
     }
 
 

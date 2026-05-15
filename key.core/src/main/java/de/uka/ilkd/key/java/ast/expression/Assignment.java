@@ -31,20 +31,6 @@ import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY
  */
 @NullMarked
 public final class Assignment extends Operator implements ExpressionStatement {
-    public Assignment(AssignmentKind kind, ExtList changeList) {
-        super(changeList);
-        this.kind = kind;
-    }
-
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnAssignment(this);
-    }
-
-    public AssignmentKind getKind() {
-        return kind;
-    }
-
     public enum AssignmentKind {
         COPY(""),
         BINARY_OR("|"),
@@ -68,29 +54,15 @@ public final class Assignment extends Operator implements ExpressionStatement {
 
     private final AssignmentKind kind;
 
-    public Assignment(ExtList children) {
-        super(children);
-        kind = children.get(AssignmentKind.class);
+    public Assignment(AssignmentKind kind, ExtList changeList) {
+        super(changeList);
+        this.kind = Objects.requireNonNull(kind);
     }
 
-    @Override
-    public int getArity() {
-        return 2;
-    }
-
-    @Override
-    public int getPrecedence() {
-        return 13;
-    }
-
-    @Override
-    public int getNotation() {
-        return INFIX;
-    }
 
     public Assignment(AssignmentKind kind, Expression lhs, Expression rhs) {
         super(lhs, rhs);
-        this.kind = kind;
+        this.kind = Objects.requireNonNull(kind);
     }
 
     public Assignment(Expression lhs, Expression rhs) {
@@ -101,7 +73,7 @@ public final class Assignment extends Operator implements ExpressionStatement {
     public Assignment(PositionInfo pi, List<Comment> c, AssignmentKind kind, Expression target,
             Expression expr) {
         super(pi, c, new ImmutableArray<>(target, expr));
-        this.kind = kind;
+        this.kind = Objects.requireNonNull(kind);
     }
 
     @Override
@@ -130,6 +102,32 @@ public final class Assignment extends Operator implements ExpressionStatement {
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getExpressionAt(0).getKeYJavaType(javaServ, ec);
+    }
+
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnAssignment(this);
+    }
+
+
+    @Override
+    public int getArity() {
+        return 2;
+    }
+
+    @Override
+    public int getPrecedence() {
+        return 13;
+    }
+
+    @Override
+    public int getNotation() {
+        return INFIX;
+    }
+
+    public AssignmentKind getKind() {
+        return kind;
     }
 
 

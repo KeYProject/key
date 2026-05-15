@@ -37,23 +37,23 @@ public class LogicFunctionalOperator extends Operator {
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> comments, LogicFunction function,
             Expression... args) {
         super(pi, comments, new ImmutableArray<>(args));
-        this.function = function;
+        this.function = Objects.requireNonNull(function);
     }
 
     public LogicFunctionalOperator(LogicFunction function, Expression... args) {
         super(args);
-        this.function = function;
+        this.function = Objects.requireNonNull(function);
     }
 
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> c, LogicFunction fn,
             ImmutableArray<Expression> args) {
         super(pi, c, args);
-        this.function = fn;
+        this.function = Objects.requireNonNull(fn);
     }
 
     public LogicFunctionalOperator(LogicFunction function, ExtList changeList) {
         super(changeList);
-        this.function = function;
+        this.function = Objects.requireNonNull(function);
     }
 
 
