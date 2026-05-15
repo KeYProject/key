@@ -338,7 +338,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         DefaultAction def = new DefaultAction() {
             @Override
             ProgramElement createNewElement(final ExtList changeList) {
-                return new Assignment(changeList);
+                return new Assignment(x.getKind(), changeList);
             }
         };
         def.doAction(x);

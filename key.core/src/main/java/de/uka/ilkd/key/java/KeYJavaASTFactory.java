@@ -63,7 +63,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static Assignment assign(final ExtList parameters) {
 
-        return new Assignment(parameters);
+        return new Assignment(COPY, parameters);
     }
 
     /**
