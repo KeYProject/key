@@ -56,16 +56,22 @@ public class Generator implements Callable<Integer> {
         addStep(NodeSteps::addAllFieldsConstructor);
         addStep(NodeSteps::addAllWoOptFieldsConstructor);
         addStep(NodeSteps::addCopyConstructor);
-        addStep(NodeSteps::addEquals);
-        addStep(NodeSteps::ToString);
-        addStep(NodeSteps::addHashCode);
         addStep(NodeSteps::addMatch);
         addStep(NodeSteps::addWiths);
         addStep(NodeSteps::addBuilder);
-        addStep(NodeSteps::addOverrideConstructor);
-        addStep(NodeSteps::addOverrideConstructor2);
+
+        // weigl: this block adds the processing of
+        // PROPERTY_* accessors and Node -> Map construction
+        //addStep(NodeSteps::addOverrideConstructor);
+        //addStep(NodeSteps::addOverrideConstructor2);
         //addStep(NodeSteps::addGetProperties);
-        addStep(NodeSteps::processFieldsAccessor);
+        //addStep(NodeSteps::processFieldsAccessor);
+
+        addStep(NodeSteps::addEquals);
+        addStep(NodeSteps::ToString);
+        addStep(NodeSteps::addHashCode);
+
+        addStep(NodeSteps::handleRoot);
 
         postSteps.add(PostSteps::createVisitor);
         postSteps.add(PostSteps::createArgVisitor);

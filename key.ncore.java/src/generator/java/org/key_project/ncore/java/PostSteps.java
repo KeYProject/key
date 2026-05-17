@@ -23,6 +23,8 @@ import com.github.javaparser.utils.SourceRoot;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static org.key_project.ncore.java.Generator.ROOT;
+import static org.key_project.ncore.java.NodeSteps.isNonTerminal;
+import static org.key_project.ncore.java.NodeSteps.isRoot;
 
 public class PostSteps {
     public static void createVisitor(List<CompilationUnit> nodeUnits, SourceRoot sourceRoot) {
@@ -38,7 +40,7 @@ public class PostSteps {
                 var t = clazz.getPrimaryType().get();
                 if (!(t instanceof ClassOrInterfaceDeclaration c))
                     continue;
-                if (c.isInterface())
+                if (isNonTerminal(c))
                     continue;
 
                 var m = type.addMethod("visit");
@@ -90,7 +92,7 @@ public class PostSteps {
                 var t = clazz.getPrimaryType().get();
                 if (!(t instanceof ClassOrInterfaceDeclaration c))
                     continue;
-                if (c.isInterface())
+                if (isNonTerminal(c))
                     continue;
 
                 var m = type.addMethod("visit");
@@ -126,7 +128,7 @@ public class PostSteps {
 
                 if (!(t instanceof ClassOrInterfaceDeclaration c))
                     continue;
-                if (c.isInterface())
+                if (NodeSteps.isNonTerminal(c))
                     continue;
 
                 var m = type.addMethod("visit", PUBLIC);
@@ -166,7 +168,7 @@ public class PostSteps {
 
                 if (!(t instanceof ClassOrInterfaceDeclaration c))
                     continue;
-                if (c.isInterface())
+                if (isNonTerminal(c))
                     continue;
 
                 var m = type.addMethod("visit", PUBLIC);
@@ -299,8 +301,9 @@ public class PostSteps {
                 var t = clazz.getPrimaryType().get();
                 if (!(t instanceof ClassOrInterfaceDeclaration c))
                     continue;
-                if (c.isInterface())
+                if (isNonTerminal(c)) {
                     continue;
+                }
 
                 cu.addImport(t.getFullyQualifiedName().get());
 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT;
+import static org.key_project.ncore.java.NodeSteps.isRoot;
 
 public class PreSteps {
     final static class PreComputation implements PreStep {
@@ -23,16 +24,28 @@ public class PreSteps {
         Multimap<String, String> permittedTypes =
                 MultimapBuilder.treeKeys().treeSetValues().build();
 
+        ClassOrInterfaceDeclaration root;
+
         @Override
         public void applyOn(NodeList<TypeDeclaration<?>> types) {
             TreeMap<String, ClassOrInterfaceDeclaration> fields = new TreeMap<>();
+            this.root = (ClassOrInterfaceDeclaration) types.stream()
+                    .filter(decl -> decl instanceof ClassOrInterfaceDeclaration clazz
+                            && isRoot(clazz))
+                    .findFirst().get();
 
             for (TypeDeclaration<?> decl : types) {
-                fields.put(decl.getNameAsString(), (ClassOrInterfaceDeclaration) decl);
+                if (decl instanceof ClassOrInterfaceDeclaration clazz) {
+                    if (isRoot(clazz)) {
+                        this.root = clazz;
+                    }
+                    fields.put(decl.getNameAsString(), clazz);
 
-                var zuper = ((ClassOrInterfaceDeclaration) decl).getExtendedTypes().getOFirst()
-                        .map(NodeWithSimpleName::getNameAsString);
-                zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
+                    inheritanceMap.put(decl.getNameAsString(), this.root.getNameAsString());
+                    var zuper =
+                            clazz.getExtendedTypes().getOFirst().map(NodeWithSimpleName::getNameAsString);
+                    zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
+                }
             }
 
             // compute transitive closure of inheritance

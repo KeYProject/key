@@ -4,7 +4,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import org.key_project.util.collection.*;
 import de.uka.ilkd.key.rule.MatchConditions;
-
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import org.key_project.logic.op.sv.*;
 
 @Root
 abstract class JavaSourceElement implements Visitable, Matchable {
@@ -179,39 +180,32 @@ class AnnotationUseSpecification extends Modifier {
 class ArrayInitializer extends JavaProgramElement {
     KeYJavaType kjt;
 }
-abstract class Expression {}
 
 abstract class ExpressionStatement {}
 
-abstract class Operator extends JavaProgramElement {}
+//region expressions
+abstract class Expression {
+    public KeYJavaType getType(Services services) {
+        return accept(new FindReturnType());
+    }
+}
 
-class ParenthesizedExpression extends Operator {
+class ParenthesizedExpression extends Expression{
     Expression child;
 }
 
-class PassiveExpression extends Operator{
+class PassiveExpression extends Expression {
     Expression child;
 }
 
-abstract class Literal extends JavaProgramElement {
+abstract class Literal extends Expression {
     String value;
 }
 
-abstract class AbstractIntegerLiteral extends Literal {
+class BooleanLiteral extends Literal {
 }
 
-class BooleanLiteral extends Literal {}
-
-class CharLiteral extends AbstractIntegerLiteral {}
-
 class DoubleLiteral extends Literal {}
-
-class EmptyMapLiteral extends Literal {}
-
-class EmptySeqLiteral extends Literal {}
-
-class EmptySetLiteral extends Literal {}
-
 class FloatLiteral extends Literal {
     String value;
 }
@@ -397,21 +391,18 @@ class Assert extends JavaStatement {
     @Nullable String message;
 }
 
-abstract class Branch {}
-
 abstract class BranchStatement extends JavaStatement {}
 
 class Break extends LabelJumpStatement {}
 
-class Case extends Branch {
+class Case {
     Expression expression;
     List<Statement> body;
 }
 
-class Default extends Branch {
+class Default {
     List<Statement> body;
 }
-
 
 abstract class CatchClause {}
 
@@ -427,11 +418,6 @@ class Continue extends LabelJumpStatement {}
 
 class Do extends LoopStatement {}
 
-class Else extends BranchImp {
-
-    Statement body;
-}
-
 class EmptyStatement extends JavaProgramElement {}
 
 class EnhancedFor extends LoopStatement {}
@@ -440,11 +426,6 @@ class Exec extends BranchStatement {}
 
 abstract class ExpressionJumpStatement extends JumpStatement {
     Expression expression;
-}
-
-class Finally extends BranchImp {
-
-    StatementBlock body;
 }
 
 class For extends LoopStatement {}
@@ -525,8 +506,6 @@ class SynchronizedBlock extends JavaStatement {
 
     StatementBlock body;
 }
-
-class Then extends BranchImp {}
 
 class Throw extends ExpressionJumpStatement {}
 

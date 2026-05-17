@@ -1,5 +1,6 @@
 package org.key_project.java.ast;
 
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.rule.MatchConditions;
 import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.RoList;
@@ -49,5 +50,9 @@ public class MatchHelper {
 
     public static MatchConditions match(boolean b1, boolean b2, MatchConditions cond) {
         return b1 == b2 ? cond : null;
+    }
+
+    public static MatchConditions match(KeYJavaType a, KeYJavaType b, MatchConditions cond) {
+        return Objects.equals(a, b) ? cond : null;
     }
 }
