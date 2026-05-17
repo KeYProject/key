@@ -11,6 +11,8 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
@@ -130,6 +132,12 @@ public class NodeSteps {
             return;
         }
 
+        FieldDeclaration field = target.addField(Integer.class, "hashCode", PRIVATE);
+        final var variable = field.getVariables().getFirst();
+        field.addAnnotation("EqEx");
+        field.addAnnotation("Nullable");
+        field.addAnnotation("Internal");
+
         MethodDeclaration hashCode = target.addMethod("hashCode", PUBLIC);
         //hashCode.addModifier(FINAL);
         hashCode.addAnnotation(Override.class);
@@ -144,9 +152,14 @@ public class NodeSteps {
 
         if (args.length == 0)
             assert false : "No defined fields";
-        else
-            hashCode.getBody().get().addStatement(new ReturnStmt(
-                    callObjects("hash", args)));
+        else {
+            final Expression compute = callObjects("hash", args);
+            final Expression hashCodeIsNull = new BinaryExpr(variable.getNameAsExpression(), new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
+            final var setHashCode = new ExpressionStmt(new AssignExpr(variable.getNameAsExpression(), compute, AssignExpr.Operator.ASSIGN));
+            hashCode.getBody().get().addStatement(
+                    new IfStmt(hashCodeIsNull, setHashCode, null));
+            hashCode.getBody().get().addStatement(new ReturnStmt(variable.getNameAsExpression()));
+        }
     }
 
     static void ToString(ClassOrInterfaceDeclaration clazz) {
@@ -168,6 +181,32 @@ public class NodeSteps {
                 .map(it -> (Expression) it).toList();
         toString.getBody().get().addStatement(new ReturnStmt(
                 new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
+    }
+
+    static void handleRoot(ClassOrInterfaceDeclaration clazz) {
+        if (isRoot(clazz)) {
+            clazz.setInterface(false);
+            clazz.addModifier(PUBLIC, ABSTRACT);
+            clazz.getExtendedTypes().clear();
+
+            for (var field : clazz.getMethods()) {
+                field.addModifier(PUBLIC, ABSTRACT);
+            }
+        } else if(isNonTerminal(clazz)) {
+
+        }
+    }
+
+    static boolean isRoot(ClassOrInterfaceDeclaration clazz) {
+        return clazz.getAnnotationByName("Root").isPresent();
+    }
+
+    static boolean isNonTerminal(ClassOrInterfaceDeclaration clazz) {
+        return isRoot(clazz) || clazz.isInterface();
+    }
+
+    static boolean isTerminal(ClassOrInterfaceDeclaration clazz) {
+        return !isNonTerminal(clazz);
     }
 
     private static Expression callObjects(String method, Expression... args) {
@@ -390,6 +429,8 @@ public class NodeSteps {
             for (var s : permittedTypes.get(target.getNameAsString())) {
                 target.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
             }
+            //target.setExtendedTypes(new NodeList<>());
+            target.getMethods().forEach(it -> it.addModifier(DEFAULT));
         } else {
             target.addModifier(FINAL);
             target.setImplementedTypes(target.getExtendedTypes());
@@ -549,7 +590,7 @@ public class NodeSteps {
     }
 
     public static void enforceHierarchy(ClassOrInterfaceDeclaration decl) {
-        if (decl.getExtendedTypes().isEmpty()) {
+        if (isTerminal(decl)) {
             decl.addExtendedType("JavaSourceElement");
         }
     }
