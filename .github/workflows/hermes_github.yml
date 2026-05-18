@@ -17,6 +17,7 @@ on:
   push:
     branches:
       - main
+      - weigl/hermes
   # NOTE: Do not delete the trigger on closed pull requests, the HERMES workflow needs this.
   pull_request:
     types:
