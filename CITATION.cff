@@ -8,7 +8,6 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - {}
   - given-names: Alexander
     family-names: Weigl
     email: weigl@kit.edu
