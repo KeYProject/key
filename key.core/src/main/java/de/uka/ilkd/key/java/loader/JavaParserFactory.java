@@ -28,7 +28,6 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -90,7 +89,6 @@ public class JavaParserFactory {
         typeSolver.lazyRebuild();
     }
 
-    @NonNull
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();

@@ -11,10 +11,6 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
-import org.key_project.util.java.IOUtil;
-
-import org.junit.jupiter.api.Assertions;
-
 /**
  * This class configuress the "runAllProofs" test runs.
  *
@@ -108,7 +104,7 @@ public class ProofCollections {
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
         // settings.setRunOnlyOn("performance, performancePOConstruction");
 
-        settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
         var c = new ProofCollection(settings);
 
@@ -994,6 +990,10 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/switch/large_switch.key");
 
 
+        // tests that KeY can deal with identical classes in different packages
+        g.provable("standard_key/java_dl/identical_classes/pkgA_inc.key");
+        g.provable("standard_key/java_dl/identical_classes/pkgB_inc.key");
+
         g = c.group("redux");
         g.provable("redux/arrays/Arrays.copyOf.key");
         g.provable("redux/arrays/Arrays.copyOf.float.key");
@@ -1018,6 +1018,12 @@ public class ProofCollections {
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
 
+        g = c.group("JavaFeatures");
+        g.loadable("Java/TextBlockLiterals/project.key");
+
+        g.loadable("Java/Records/Use.key");
+        g.loadable("Java/Records/Constructor.key");
+
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
@@ -1026,12 +1032,4 @@ public class ProofCollections {
         }
         return c;
     }
-
-
-    public static String loadFromFile(String name) throws IOException {
-        var stream = ProofCollections.class.getResourceAsStream(name);
-        Assertions.assertNotNull(stream, "Failed to find " + name);
-        return IOUtil.readFrom(stream);
-    }
-
 }

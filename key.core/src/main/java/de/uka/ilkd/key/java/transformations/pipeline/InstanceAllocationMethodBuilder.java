@@ -27,7 +27,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
  * to allocate a new object of the type it is declared in and to return it.
  * The functionality will be described using taclets
  */
-public class InstanceAllocationMethodBuilder extends JavaTransformer {
+public class InstanceAllocationMethodBuilder extends JavaTransformerAbstract {
 
     public InstanceAllocationMethodBuilder(TransformationPipelineServices services) {
         super(services);

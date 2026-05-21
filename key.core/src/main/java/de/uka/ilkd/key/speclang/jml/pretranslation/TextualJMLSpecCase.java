@@ -95,6 +95,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(DECREASES);
     }
 
+    public Iterable<ParserRuleContext> getClauses() {
+        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toList());
+    }
+
     /**
      * Heap-independent clauses
      */

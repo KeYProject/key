@@ -21,6 +21,7 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -234,7 +235,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 + " context and permissions not enabled.",
                 ctx);
         }
-        if (!term.op().name().toString().endsWith("::select")) {
+        if (!(term.op() instanceof ParametricFunctionInstance pfi)
+                || pfi.getBase() != services.getTypeConverter().getHeapLDT().getSelect()) {
             raiseError("\\permission expression used with non store-ref" + " expression.", ctx);
         }
         return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(),
@@ -252,7 +254,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     // region expression
-
     @Override
     public KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {
         if (ctx.BYTE() != null) {
@@ -636,7 +637,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        final SortDependingFunction f =
+        final ParametricFunctionInstance f =
             services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;
@@ -758,6 +759,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
         }
         return result;
+    }
+
+
+    @Override
+    public SLExpression visitKeyTerm(JmlParser.KeyTermContext ctx) {
+        var key = ctx.KEY_TERM().getText();
+        key = key.substring(1, key.length() - 1);
+        var nss = services.getNamespaces().copyWithParent();
+        nss.programVariables().add(selfVar);
+        nss.programVariables().add(excVar);
+        var keyIO = new KeyIO(services, nss);
+
+        var term = keyIO.parseExpression(key);
+        return new SLExpression(term);
     }
 
     @Override

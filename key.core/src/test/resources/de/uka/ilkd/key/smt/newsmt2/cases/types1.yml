@@ -3,5 +3,5 @@ contains:
 expected: VALID
 keySrc: |-
   \problem {
-     any::instance(42) = TRUE
+     instance<[any]>(42) = TRUE
   }

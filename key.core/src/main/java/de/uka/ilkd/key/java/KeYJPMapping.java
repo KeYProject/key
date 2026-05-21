@@ -45,7 +45,7 @@ public class KeYJPMapping {
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
-    private final HashMap<ResolvedType, KeYJavaType> typeMap;
+    private final HashMap<ResolvedTypeWrapper, KeYJavaType> typeMap;
     private final Map<KeYJavaType, ResolvedType> typeMapRev;
 
     /**
@@ -99,7 +99,7 @@ public class KeYJPMapping {
     @Nullable
     public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand,
             JavaService converter) {
-        var type = typeMap.get(pe);
+        var type = typeMap.get(new ResolvedTypeWrapper(pe));
 
         if (processOnDemand && type == null && pe.isReferenceType()) {
             try {
@@ -147,7 +147,7 @@ public class KeYJPMapping {
     }
 
     public void put(ResolvedType rec, KeYJavaType key) {
-        var formerValue = typeMap.putIfAbsent(rec, key);
+        var formerValue = typeMap.putIfAbsent(new ResolvedTypeWrapper(rec), key);
         if (formerValue != null && !Objects.equals(formerValue, key))
             LOGGER.error("Duplicate registration of kjt: {}, former kjt: {}", key, formerValue);
         var formerType = typeMapRev.putIfAbsent(key, rec);
@@ -242,7 +242,44 @@ public class KeYJPMapping {
 
     public void registerType(ResolvedType ref, KeYJavaType kjt) {
         LOGGER.trace("Registered {} // {}", ref, kjt);
-        this.typeMap.put(ref, kjt);
+        this.typeMap.put(new ResolvedTypeWrapper(ref), kjt);
         this.typeMapRev.put(kjt, ref);
+    }
+
+    /**
+     * Equals and hashcode of resolved types do not consider the fully qualified name or the
+     * position in the AST
+     * Hence, classes with same name that occur in different packages are not distinguished.
+     */
+    private static final class ResolvedTypeWrapper {
+        private final ResolvedType resolvedType;
+
+        public ResolvedTypeWrapper(ResolvedType resolvedType) {
+            this.resolvedType = resolvedType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ResolvedTypeWrapper other) {
+                final boolean eq = resolvedType.equals(other.resolvedType);
+                if (eq && resolvedType.isReferenceType()) {
+                    if (!other.resolvedType.isReferenceType()) {
+                        return false; // should not be reachable as then eq is false, but ...
+                    }
+                    return resolvedType.asReferenceType().getQualifiedName()
+                            .equals(other.resolvedType.asReferenceType().getQualifiedName());
+                }
+                return eq;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return resolvedType.hashCode() + (resolvedType.isReferenceType()
+                    ? resolvedType.asReferenceType().getQualifiedName().hashCode()
+                    : 0);
+        }
+
     }
 }

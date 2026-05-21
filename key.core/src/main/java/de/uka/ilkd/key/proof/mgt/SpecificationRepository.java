@@ -1022,7 +1022,8 @@ public class SpecificationRepository {
                             JTerm mbyFromContract =
                                 fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
-                                "Contract axiom for " + pm.getName() + " in " + kjt.getName(), pm,
+                                "Contract axiom for " + pm.getName() + " in " + kjt.getFullName(),
+                                pm,
                                 kjt, new Private(), preFromContract, freePreFromContract,
                                 postFromContract, freePostFromContract, mbyFromContract, atPreVars,
                                 selfVar, resultVar, paramVars);

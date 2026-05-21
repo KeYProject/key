@@ -39,7 +39,7 @@ import static de.uka.ilkd.key.java.transformations.AstFactory.*;
  * another implicit method <code>lt;prepare&gt;</code> for setting the fields
  * default values.
  */
-public class CreateBuilder extends JavaTransformer {
+public class CreateBuilder extends JavaTransformerAbstract {
 
     public static final String IMPLICIT_CREATE = "$create";
 

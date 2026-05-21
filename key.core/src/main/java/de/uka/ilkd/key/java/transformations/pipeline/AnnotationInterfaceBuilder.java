@@ -15,7 +15,7 @@ import com.github.javaparser.ast.body.AnnotationDeclaration;
  *
  * @author PiIsRational
  */
-public class AnnotationInterfaceBuilder extends JavaTransformer {
+public class AnnotationInterfaceBuilder extends JavaTransformerAbstract {
     /** 
      * a mapping of {@link AnnotationDeclarations} to 
      * {@link AnnotationInterfaceDeclarations} */

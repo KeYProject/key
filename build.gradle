@@ -8,7 +8,7 @@
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.3.0"
+    id "com.diffplug.spotless" version "8.4.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.61"
@@ -88,11 +88,12 @@ subprojects {
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation ("org.assertj:assertj-core:3.27.7")
-        testImplementation project(':key.util')
+        testImplementation (project(':key.util'))
+        testImplementation (testFixtures(project(":key.util")))
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.1")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.1")
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }

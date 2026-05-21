@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -30,10 +31,16 @@ public class PreParser {
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
+    public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer,
+            @Nullable Supplier<String[]> lines) {
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        p.getErrorReporter().throwException();
+        if (lines != null) {
+            p.getErrorReporter().throwException(lines);
+        } else {
+            p.getErrorReporter().throwException();
+        }
+
         jmlCheck(ctx);
         TextualTranslator translator = new TextualTranslator(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
@@ -62,7 +69,7 @@ public class PreParser {
      * parse tree.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String content) {
-        return parseClassLevel(JmlFacade.createLexer(content));
+        return parseClassLevel(JmlFacade.createLexer(content), () -> content.split("\n"));
     }
 
     /**
@@ -106,7 +113,7 @@ public class PreParser {
      */
     private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
         JmlLexer lexer = JmlFacade.createLexer(positionedString);
-        return parseClassLevel(lexer);
+        return parseClassLevel(lexer, () -> positionedString.getText().split("\n"));
     }
 
     /**

@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
-import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests.*;
+import static de.uka.ilkd.key.proof.runallproofs.GenerateUnitTestsUtil.*;
 
 /**
  * Generation of test cases (JUnit) for given proof collection files.
@@ -21,7 +19,7 @@ import static de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests.*;
  * {@code generateRunAllProofs}.
  * <p>
  * The considered proof collections files are configured statically in
- * {@link ProofCollections}.
+ * {@link InfFlowProofCollection}.
  *
  * @author Alexander Weigl
  * @version 1 (6/14/20)

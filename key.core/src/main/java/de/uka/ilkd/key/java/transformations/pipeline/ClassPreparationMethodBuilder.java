@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
-public class ClassPreparationMethodBuilder extends JavaTransformer {
+public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
 

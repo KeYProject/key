@@ -40,7 +40,7 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
-public class ConstantStringExpressionEvaluator extends JavaTransformer {
+public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
 
     public ConstantStringExpressionEvaluator(TransformationPipelineServices services) {
         super(services);

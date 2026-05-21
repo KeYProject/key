@@ -271,7 +271,7 @@ public final class ProblemInitializer {
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
             } catch (BuildingExceptions e) {
-                throw new ProofInputException("Failed to parse file", e);
+                throw new ProofInputException("Failed to parse file: " + javaPath, e);
             }
         }
         Path initialFile = envInput.getInitialFile();
@@ -296,8 +296,8 @@ public final class ProblemInitializer {
             }
         }
         for (Function n : initConfig.funcNS().allElements()) {
-            if (!(n instanceof SortDependingFunction
-                    && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
+            if (!(n instanceof ParametricFunctionInstance pfi
+                    && pfi.getArgs().stream().anyMatch(a -> a.sort() instanceof GenericSort))) {
                 newFuncNS.addSafely(n);
             }
         }

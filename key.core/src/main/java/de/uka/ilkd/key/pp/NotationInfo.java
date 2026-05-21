@@ -300,8 +300,8 @@ public final class NotationInfo {
 
         // heap operators
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
-        tbl.put(HeapLDT.FINAL_NAME, new Notation.FinalNotation());
+        tbl.put(heapLDT.getSelect(), new Notation.SelectNotation());
+        tbl.put(heapLDT.getFinal(), new Notation.FinalNotation());
         tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
         tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
         tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
@@ -313,7 +313,7 @@ public final class NotationInfo {
         // sequence operators
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
-        tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
+        tbl.put(seqLDT.getSeqGet(), new Notation.SeqGetNotation());
         tbl.put(seqLDT.getSeqConcat(), new Notation.SeqConcatNotation(seqLDT.getSeqConcat(),
             seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 
@@ -493,13 +493,6 @@ public final class NotationInfo {
 
         if (op instanceof IObserverFunction) {
             result = notationTable.get(IObserverFunction.class);
-            if (result != null) {
-                return result;
-            }
-        }
-
-        if (op instanceof SortDependingFunction) {
-            result = notationTable.get(((SortDependingFunction) op).getKind());
             if (result != null) {
                 return result;
             }

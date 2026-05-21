@@ -116,7 +116,7 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static Location getLocation(@NonNull Throwable exc)
+    public static @Nullable Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
