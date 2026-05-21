@@ -52,6 +52,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -67,6 +70,7 @@ import static java.util.Objects.requireNonNull;
  * @version 1 (5/10/20)
  */
 class Translator extends JmlParserBaseVisitor<Object> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmlParserBaseVisitor.class);
 
     private final static String[] DISCOURAGED_CLAUSE_NAMES =
         { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
@@ -2066,6 +2070,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {
+        LOGGER.info("ctx {}", ctx.getText());
         return accept(ctx.expression());
     }
 

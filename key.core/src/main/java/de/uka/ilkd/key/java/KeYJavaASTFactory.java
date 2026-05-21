@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
@@ -104,7 +104,6 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link CopyAssignment} as defined by <code>parameters</code>
      */
     public static CopyAssignment assign(final ExtList parameters) {
-
         return new CopyAssignment(parameters);
     }
 
@@ -1974,7 +1973,7 @@ public abstract class KeYJavaASTFactory {
     public static ProgramElement declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init,
             final ProgramElementName typeName, final int dimensions,
-            final ImmutableArray<AnnotationExpression> annotations,
+            final ImmutableArray<Annotation> annotations,
             final ReferencePrefix typePrefix, final KeYJavaType baseType) {
         final TypeRef typeRef =
             new TypeRef(typeName, annotations, dimensions, typePrefix, baseType);
@@ -2675,7 +2674,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link TypeRef} for <code>dimensions</code> dimensions of <code>type</code>
      */
     public static TypeRef typeRef(final KeYJavaType type, final int dimensions,
-            final ImmutableArray<AnnotationExpression> annotations) {
+            final ImmutableArray<Annotation> annotations) {
         return new TypeRef(type, annotations, dimensions);
     }
 

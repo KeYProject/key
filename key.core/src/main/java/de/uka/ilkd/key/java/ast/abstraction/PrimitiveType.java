@@ -8,14 +8,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.Name;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A program model element representing primitive types.
@@ -128,15 +126,6 @@ public final class PrimitiveType implements Type {
     @Override
     public Literal getDefaultValue() {
         return defaultValue;
-    }
-
-    /**
-     * returns the annotations of the primitive type, which is an empty array.
-     *
-     * @return the annotations of the type
-     */
-    public ImmutableArray<AnnotationExpression> getAnnotations() {
-        return new ImmutableArray<>();
     }
 
     /**

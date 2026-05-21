@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java.ast.abstraction;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -207,13 +206,6 @@ public class NullType implements ClassType {
      */
     public Literal getDefaultValue() {
         return null;
-    }
-
-    /**
-     * @return the annotations of the null type
-     */
-    public ImmutableArray<AnnotationExpression> getAnnotations() {
-        return new ImmutableArray<>();
     }
 
     public boolean equals(Object o) {

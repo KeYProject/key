@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
@@ -106,7 +106,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<AnnotationExpression> getAnnotations() {
+    public ImmutableArray<Annotation> getAnnotations() {
         return new ImmutableArray<>();
     }
 

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -26,7 +26,6 @@ public class TypeOf extends ProgramTransformer {
      */
     public TypeOf(ProgramElement pe) {
         super("#typeof", pe);
-
     }
 
     @Override
@@ -39,7 +38,7 @@ public class TypeOf extends ProgramTransformer {
             ec = insts.getContextInstantiation().activeStatementContext();
         }
         KeYJavaType kjt = null;
-        ImmutableArray<AnnotationExpression> annotations = null;
+        ImmutableArray<Annotation> annotations = null;
         if (pe instanceof Expression) {
             kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
         } else {

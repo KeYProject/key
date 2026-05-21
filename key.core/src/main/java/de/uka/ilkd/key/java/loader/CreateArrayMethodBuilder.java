@@ -52,12 +52,16 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
  * particular its helper method <code>&lt;createArrayHelper&gt;</code>. This class should be
  * replaced by a recoder transformation as soon as we port our array data structures to RecodeR.
  */
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
+    public static final Logger LOGGER = LoggerFactory.getLogger(CreateArrayMethodBuilder.class);
 
     public static final String IMPLICIT_ARRAY_CREATE = "$createArray";
 

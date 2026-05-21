@@ -616,14 +616,14 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnTypeReference(TypeReference x, boolean fullTypeNames) {
         if (x.getKeYJavaType() != null
                 && x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
-            for (AnnotationExpression expr : x.getAnnotations()) {
-                performActionOnAnnotationExpression(expr);
+            for (Annotation annot: x.getAnnotations()) {
+                performActionOnAnnotation(annot);
             }
             
             performActionOnArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
         } else if (x.getProgramElementName() != null) {
-            for (AnnotationExpression expr : x.getAnnotations()) {
-                performActionOnAnnotationExpression(expr);
+            for (Annotation expr : x.getAnnotations()) {
+                performActionOnAnnotation(expr);
             }
 
             printTypeReference(x.getReferencePrefix(), x.getKeYJavaType(),
@@ -1749,9 +1749,9 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnAnnotationExpression(AnnotationExpression x) {
+    public void performActionOnAnnotation(Annotation x) {
         layouter.print("@");
-        performActionOnType(x.getKeYJavaType().getJavaType());
+        layouter.print(x.getName());
     }
 
     @Override

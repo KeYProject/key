@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
-import de.uka.ilkd.key.java.ast.expression.annotation.MarkerAnnotation;
+import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
+import de.uka.ilkd.key.java.transformations.pipeline.AnnotationInterfaceDeclarationNode;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -346,9 +347,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Extends extending = new Extends(e);
         Implements implementing = new Implements(i);
 
-
         TypeDeclaration td;
-        if (n.isInterface()) {
+        if (n instanceof AnnotationInterfaceDeclarationNode) {
+            td = new AnnotationInterfaceDeclaration(
+                    pi, c, modArray, name, fullName, members, 
+                    parentIsInterface, isLibrary, getClassSpec(n));
+        } else if (n.isInterface()) {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
                 parentIsInterface, isLibrary, extending, getClassSpec(n));
@@ -1512,7 +1516,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(v.decl);
         Expression init = accepto(v.decl.getInitializer());
         var pv = getProgramVariableForFieldSpecification(v);
-        return new FieldSpecification(pi, c, init, pv, 0, accept(v.decl.getType()));
+        KeYJavaType type = ((TypeReference)accept(v.decl.getType())).getKeYJavaType();
+        return new FieldSpecification(pi, c, init, pv, 0, type);
     }
 
     @Override
@@ -1555,8 +1560,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // TODO: is the lookup correct? Seems to work in small examples ...
             String typename = n.getName().asString();
             KeYJavaType kjt = typeConverter.getKeYJavaType(typename);
-            TypeReference typeRef = new TypeRef(kjt);
-            return new Import(typeRef, n.isAsterisk(), pi, c);
+            return new Import(new TypeRef(kjt), n.isAsterisk(), pi, c);
         }
     }
 
@@ -2052,28 +2056,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(AnnotationDeclaration n, Void arg) {
-        final var ref = new ReferenceTypeImpl(n.resolve());
-        var kjt = createOrCachedKeyJavaType(ref);
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
-
-        ProgramElementName name = createProgramElementName(n.getName());
-        ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
-
-        boolean isLibrary = mapping.isParsingLibraries();
-        boolean parentIsInterface = false;
-
-        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
-            map(n.getModifiers());
-        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
-
-        TypeDeclaration td = new AnnotationInterfaceDeclaration(
-            pi, c, modArray, name, fullName, members,
-            parentIsInterface, isLibrary, getClassSpec(n));
-        kjt.setJavaType(td);
-
-        mapping.registerType(ref, kjt);
-        return addToMapping(n, td);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -2108,8 +2091,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(MarkerAnnotationExpr n, Void arg) {
-        var kjt = getKeYJavaType(new ReferenceTypeImpl(n.resolve()));
-        return new MarkerAnnotation(kjt);
+        return new MarkerAnnotation(n.getNameAsString());
     }
 
     @Override

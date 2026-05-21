@@ -48,23 +48,21 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return false;
 
         if (op instanceof Function) {
+            LOGGER.info("field {}", op);
             return matchesField(services, (Function) op);
         } else if (op instanceof ProgramElement) {
-            var decl = services.getJavaInfo().rec2key()
-                    .nodeFromKeY((LocationVariable) op);
-            LOGGER.info("inst {}, type {}", inst, inst.getClass());
-            LOGGER.info("decl {}", decl);
+            if (op instanceof LocationVariable) {
+                //LOGGER.info("type ref {}", ((LocationVariable)op).getTypeReference());
+                //LOGGER.info("annotations {}", ((LocationVariable)op).getTypeReference().getAnnotations());
+            }
         }
 
         return false;
     }
 
     public boolean matchesField(Services services, Function op) {
-        LOGGER.info("{}", op);
-
-        var kpmi = services.getJavaInfo().getKeYProgModelInfo();
-
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
+
         if (name == null)
             return false;
 
@@ -75,43 +73,21 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 !(classType.getJavaType() instanceof ClassDeclaration))
             return false;
 
-        LOGGER.info("{}", classType);
+        var classDecl = (ClassDeclaration)classType.getJavaType();
 
-        var recoderTypeDecl = kpmi.rec2key()
-                .nodeFromKeY((ClassDeclaration) classType.getJavaType());
+        var fields = classDecl.getAllFields(services);
 
-        // LOGGER.info("{}", recoderTypeDecl);
-        /*
-         * var fields = recoderTypeDecl.getAllFields();
-         * var field = fields.stream()
-         * .filter(f -> f.getName().equals(name.attributeName()))
-         * .findFirst()
-         * .orElse(null);
-         *
-         * if (field == null)
-         * return false;
-         *
-         * var fType = field.getContainingClassType();
-         * if (!(fType instanceof recoder.java.declaration.TypeDeclaration))
-         * return false;
-         *
-         * var fieldSpec = ((recoder.java.declaration.TypeDeclaration) fType)
-         * .getFields().stream()
-         * .filter(spec -> spec.getName().equals(name.attributeName()))
-         * .findFirst()
-         * .orElse(null);
-         *
-         * if (fieldSpec == null)
-         * return false;
-         *
-         * var fieldDecl = fieldSpec.getParent();
-         * var declAnnotations = fieldDecl.getAnnotations();
-         * var value = declAnnotations.stream()
-         * .anyMatch(a -> a.getTypeReference().getName().equals(annot));
-         *
-         * return value;
-         */
-        return false;
+        // this is a bit too brittle for me
+        var field = fields.stream()
+            .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
+            .findFirst()
+            .orElse(null);
+        
+        if (field == null) return false;
+        
+        var fieldType = field.getProgramVariable().getTypeReference();
+        var declAnnotations = fieldType.getAnnotations();
+        return declAnnotations.stream().anyMatch(a -> a.getName().equals(annot));
     }
 
     @Override

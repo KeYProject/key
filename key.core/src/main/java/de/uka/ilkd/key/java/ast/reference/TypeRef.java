@@ -8,7 +8,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.throwClause;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
@@ -38,7 +38,7 @@ public class TypeRef extends TypeReferenceImp {
      * ReferencePrefix, KeYJavaType) and take null as
      * last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt, ImmutableArray<AnnotationExpression> annotations,
+    public TypeRef(@NonNull KeYJavaType kjt, ImmutableArray<Annotation> annotations,
             int dim) {
         super(new ProgramElementName(kjt.getName()), annotations, dim, kjt.createPackagePrefix());
         this.kjt = kjt;
@@ -49,7 +49,7 @@ public class TypeRef extends TypeReferenceImp {
         this.kjt = kjt;
     }
 
-    public TypeRef(ProgramElementName name, ImmutableArray<AnnotationExpression> annotations,
+    public TypeRef(ProgramElementName name, ImmutableArray<Annotation> annotations,
             int dimension, ReferencePrefix prefix,
             KeYJavaType kjt) {
         super(name, annotations, dimension, prefix);

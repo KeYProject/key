@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
@@ -329,7 +329,7 @@ public interface Visitor {
 
     void performActionOnLoopInit(LoopInit x);
 
-    void performActionOnAnnotationExpression(AnnotationExpression annot);
+    void performActionOnAnnotation(Annotation annot);
 
     void performActionOnAssert(Assert assert1);
 

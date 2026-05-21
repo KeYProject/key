@@ -5,7 +5,7 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -25,7 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         implements TypeReference {
 
-
     /**
      * Prefix.
      */
@@ -44,7 +43,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Annotations.
      */
-    protected final ImmutableArray<AnnotationExpression> annotations;
+    protected final ImmutableArray<Annotation> annotations;
 
 
     /**
@@ -62,7 +61,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         prefix = children.get(ReferencePrefix.class);
         name = children.get(ProgramElementName.class);
         annotations = new ImmutableArray<>(
-            children.collect(AnnotationExpression.class));
+            children.collect(Annotation.class));
         dimensions = dim;
     }
 
@@ -73,7 +72,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
 
     protected TypeReferenceImp(
             ProgramElementName name,
-            ImmutableArray<AnnotationExpression> annotations,
+            ImmutableArray<Annotation> annotations,
             int dimension,
             ReferencePrefix prefix) {
         this.name = name;
@@ -135,7 +134,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public ImmutableArray<AnnotationExpression> getAnnotations() {
+    public ImmutableArray<Annotation> getAnnotations() {
         return annotations;
     }
 

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.abstraction.Package;
-import de.uka.ilkd.key.java.ast.expression.AnnotationExpression;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
@@ -175,7 +175,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the annotations of the type declaration
      */
-    public ImmutableArray<AnnotationExpression> getAnnotations() {
+    public ImmutableArray<Annotation> getAnnotations() {
         return new ImmutableArray<>();
     }
 
