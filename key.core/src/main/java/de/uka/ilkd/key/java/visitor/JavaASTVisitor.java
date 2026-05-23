@@ -475,6 +475,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnAnnotationInterfaceMemberDeclaration(AnnotationInterfaceMemberDeclaration x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnIntLiteral(IntLiteral x) {
         doDefaultAction(x);
     }

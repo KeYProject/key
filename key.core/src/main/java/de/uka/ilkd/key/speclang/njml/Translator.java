@@ -2085,7 +2085,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {
-        LOGGER.info("ctx {}", ctx.getText());
         return accept(ctx.expression());
     }
 

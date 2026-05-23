@@ -744,6 +744,22 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnAnnotationInterfaceMemberDeclaration(AnnotationInterfaceMemberDeclaration x) {
+        layouter.beginI();
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+            layouter.print(" ");
+        }
+
+        performActionOnTypeReference(x.getTypeRef());
+        layouter.print(" ");
+        performActionOnProgramElementName(x.getProgramElementName());
+        layouter.end();
+    }
+
+    @Override
     public void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x) {
         layouter.beginC();
         layouter.beginC(0);

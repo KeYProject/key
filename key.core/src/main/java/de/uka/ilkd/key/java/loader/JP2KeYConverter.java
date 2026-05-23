@@ -2061,7 +2061,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(AnnotationMemberDeclaration n, Void arg) {
-        return reportUnsupportedElement(n);
+        var existing = mapping.nodeToKeY(n);
+        if (existing != null) {
+            return existing;
+        }
+
+        TypeReference typeRef = requireTypeReference(n.getType());
+        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
+            map(n.getModifiers());
+        ProgramElementName name = createProgramElementName(n.getName());
+        var decl = new AnnotationInterfaceMemberDeclaration(typeRef, name, modifiers);
+        return addToMapping(n, decl);
     }
 
     @Override

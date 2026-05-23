@@ -121,6 +121,8 @@ public interface Visitor {
 
     void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x);
 
+    void performActionOnAnnotationInterfaceMemberDeclaration(AnnotationInterfaceMemberDeclaration x);
+
     void performActionOnFieldDeclaration(FieldDeclaration x);
 
     void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x);

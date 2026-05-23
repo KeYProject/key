@@ -27,6 +27,7 @@ public class AnnotationInterfaceDeclarationNode extends ClassOrInterfaceDeclarat
         for (var m : ad.modifiers()) {
             modifiers.add(m.clone());
         }
+
         setModifiers(modifiers);
         setInterface(true);
 
