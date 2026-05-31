@@ -1767,7 +1767,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnAnnotation(Annotation x) {
         layouter.print("@");
-        layouter.print(x.getName());
+        layouter.print(x.getKeyJavaType().getFullName());
     }
 
     @Override

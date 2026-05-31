@@ -87,7 +87,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         
         var fieldType = field.getProgramVariable().getTypeReference();
         var declAnnotations = fieldType.getAnnotations();
-        return declAnnotations.stream().anyMatch(a -> a.getName().equals(annot));
+        return declAnnotations.stream()
+            .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
     }
 
     @Override

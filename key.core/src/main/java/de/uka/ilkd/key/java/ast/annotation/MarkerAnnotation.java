@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.java.ast.annotation;
 
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 public class MarkerAnnotation extends Annotation {
-    public MarkerAnnotation(String name) {
-        super(name);
+    public MarkerAnnotation(KeYJavaType type) {
+        super(type);
     }
 
     @Override

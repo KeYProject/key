@@ -71,7 +71,7 @@ import static java.util.Objects.requireNonNull;
  * @version 1 (5/10/20)
  */
 class Translator extends JmlParserBaseVisitor<Object> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JmlParserBaseVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Translator.class);
 
     private final static String[] DISCOURAGED_CLAUSE_NAMES =
         { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };

@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
-import de.uka.ilkd.key.java.transformations.pipeline.AnnotationInterfaceDeclarationNode;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -348,11 +347,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Implements implementing = new Implements(i);
 
         TypeDeclaration td;
-        if (n instanceof AnnotationInterfaceDeclarationNode) {
-            td = new AnnotationInterfaceDeclaration(
-                    pi, c, modArray, name, fullName, members, 
-                    parentIsInterface, isLibrary, getClassSpec(n));
-        } else if (n.isInterface()) {
+        if (n.isInterface()) {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
                 parentIsInterface, isLibrary, extending, getClassSpec(n));
@@ -371,7 +366,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (kjt != null) {
             return kjt;
         }
-        return typeConverter.addReferenceType(ref);
+        return typeConverter.addReferenceType(ref.asReferenceType());
     }
 
     @NonNull
@@ -389,6 +384,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var parent = n.getParentNode().get();
             if (parent instanceof ClassOrInterfaceDeclaration) {
                 return ((ClassOrInterfaceDeclaration) parent).isInterface();
+            }
+
+            if (parent instanceof AnnotationDeclaration) {
+                return false;
             }
         }
         return false;
@@ -500,7 +499,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             body != null ? accept(body) : new StatementBlock(), isInInterface,
             getSpec(n));
 
-        var clazz = getContainingClass(n);
+        var clazz = getContaining(n);
         try {
             var containing = clazz.resolve();
 
@@ -727,20 +726,22 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
-        return typeConverter.getKeYJavaType(rtype, false);
+        return typeConverter.getKeYJavaType(rtype, true);
     }
 
     private KeYJavaType getKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, false);
     }
 
-    private ClassOrInterfaceDeclaration getContainingClass(Node node) {
-        if (node instanceof ClassOrInterfaceDeclaration) {
+    private com.github.javaparser.ast.body.TypeDeclaration getContaining(Node node) {
+        if (node instanceof ClassOrInterfaceDeclaration 
+                || node instanceof AnnotationDeclaration) {
             node = node.getParentNode().orElse(null);
         }
         while (node != null) {
-            if (node instanceof ClassOrInterfaceDeclaration) {
-                return (ClassOrInterfaceDeclaration) node;
+            if (node instanceof ClassOrInterfaceDeclaration 
+                    || node instanceof AnnotationDeclaration) {
+                return (com.github.javaparser.ast.body.TypeDeclaration)node;
             }
             node = node.getParentNode().orElse(null);
         }
@@ -979,7 +980,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             accepto(n.getBody()),
             isInInterface, ImmutableList.fromList(getSpec(n)));
 
-        var containing = getContainingClass(n).resolve();
+        var containing = getContaining(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerType = getKeYJavaType(new ReferenceTypeImpl(containing));
@@ -1472,21 +1473,24 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var varSpec = mapping.nodeToKeY(spec);
         if (varSpec == null) {
             var t = spec.getType();
-            var classNode = findContainingClass(spec).orElseThrow();
-            var classType = new ReferenceTypeImpl(classNode.resolve());
-            final ProgramElementName pen =
-                new ProgramElementName(spec.getName().asString(),
-                    classNode.getFullyQualifiedName().orElseThrow());
+            var containing = (com.github.javaparser.ast.body.TypeDeclaration)
+                findParent(spec, n -> 
+                    n instanceof ClassOrInterfaceDeclaration 
+                    || n instanceof AnnotationDeclaration).orElseThrow();
+
+            var refType = new ReferenceTypeImpl(containing.resolve());
+            final var pen = new ProgramElementName(spec.getName().asString(),
+                    (String)containing.getFullyQualifiedName().orElseThrow());
 
             final Literal compileTimeConstant = getCompileTimeConstantInitializer(decl);
 
             if (compileTimeConstant == null) {
                 pv = new LocationVariable(pen, accept(t),
-                    getKeYJavaType(classType), decl.isStatic, decl.isModel,
+                    getKeYJavaType(refType), decl.isStatic, decl.isModel,
                     decl.isGhost, decl.isFinal);
             } else {
                 pv = new ProgramConstant(pen, accept(t),
-                    getKeYJavaType(classType), decl.isStatic,
+                    getKeYJavaType(refType), decl.isStatic,
                     compileTimeConstant);
             }
         } else {
@@ -1496,11 +1500,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         assert pv != null;
         return pv;
-    }
-
-    private static Optional<ClassOrInterfaceDeclaration> findContainingClass(Node node) {
-        return findParent(node, n -> n instanceof ClassOrInterfaceDeclaration)
-                .map(c -> (ClassOrInterfaceDeclaration) c);
     }
 
     private static Optional<Node> findParent(Node node, Predicate<Node> filter) {
@@ -2056,7 +2055,25 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(AnnotationDeclaration n, Void arg) {
-        return reportUnsupportedElement(n);
+        final var ref = new ReferenceTypeImpl(n.resolve());
+        var kjt = createOrCachedKeyJavaType(ref);
+
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ProgramElementName name = createProgramElementName(n.getName());
+        ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
+        boolean isLibrary = mapping.isParsingLibraries();
+        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
+            map(n.getModifiers());
+        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
+        boolean parentIsInterface = false;
+
+        TypeDeclaration td = new AnnotationInterfaceDeclaration(
+                    pi, c, modArray, name, fullName, members, 
+                    parentIsInterface, isLibrary, getClassSpec(n));
+        kjt.setJavaType(td);
+        mapping.registerType(ref, kjt);
+        return addToMapping(n, td);
     }
 
     @Override
@@ -2101,7 +2118,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(MarkerAnnotationExpr n, Void arg) {
-        return new MarkerAnnotation(n.getNameAsString());
+        final var ref = new ReferenceTypeImpl(n.resolve());
+        var kjt = createOrCachedKeyJavaType(ref);
+        return new MarkerAnnotation(kjt);
     }
 
     @Override

@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public abstract class Annotation extends JavaNonTerminalProgramElement {
-    protected final String name;
+    protected final KeYJavaType type;
 
-    public Annotation(String name) {
-        this.name = name;
+    public Annotation(KeYJavaType type) {
+        this.type = type;
     }
 
     @Override
@@ -17,8 +18,8 @@ public abstract class Annotation extends JavaNonTerminalProgramElement {
         v.performActionOnAnnotation(this);
     }
 
-    public String getName() {
-        return name;
+    public KeYJavaType getKeyJavaType() {
+        return type;
     }
 
     @Override
@@ -27,6 +28,6 @@ public abstract class Annotation extends JavaNonTerminalProgramElement {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        return ((Annotation) o).name.equals(name) && super.equals(o);
+        return ((Annotation) o).type.equals(type) && super.equals(o);
     }
 }
