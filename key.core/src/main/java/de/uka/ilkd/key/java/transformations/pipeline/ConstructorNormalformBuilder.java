@@ -278,7 +278,8 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
-        if (!td.isClassOrInterfaceDeclaration()) return;
+        if (!td.isClassOrInterfaceDeclaration())
+            return;
 
         var cd = (ClassOrInterfaceDeclaration) td;
         if (cd.isInterface()) {

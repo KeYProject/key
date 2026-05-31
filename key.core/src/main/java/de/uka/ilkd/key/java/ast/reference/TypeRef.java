@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import static de.uka.ilkd.key.java.KeYJavaASTFactory.throwClause;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;

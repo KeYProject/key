@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.key_project.util.collection.ImmutableArray;
+
 public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration {
     private final TypeReference typeRef;
 
     private final ProgramElementName name;
 
-    public AnnotationInterfaceMemberDeclaration(TypeReference typeRef, ProgramElementName name, ImmutableArray<Modifier> modifiers) {
+    public AnnotationInterfaceMemberDeclaration(TypeReference typeRef, ProgramElementName name,
+            ImmutableArray<Modifier> modifiers) {
         super(modifiers);
 
         this.typeRef = typeRef;
@@ -23,13 +27,13 @@ public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration {
     public int getChildCount() {
         int result = 0;
 
-        if (modArray != null) 
+        if (modArray != null)
             result += modArray.size();
         if (name != null)
             result++;
         if (typeRef != null)
             result++;
-        
+
         return result;
     }
 

@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -218,7 +217,8 @@ public class ImplicitFieldAdder extends JavaTransformerAbstract {
     }
 
     public void apply(TypeDeclaration<?> td) {
-        if (td.isAnnotationDeclaration()) return;
+        if (td.isAnnotationDeclaration())
+            return;
 
         addImplicitFields(td);
         addFieldsForFinalVars(td);

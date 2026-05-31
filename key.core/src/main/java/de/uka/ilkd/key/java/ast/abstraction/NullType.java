@@ -6,7 +6,6 @@ package de.uka.ilkd.key.java.ast.abstraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**

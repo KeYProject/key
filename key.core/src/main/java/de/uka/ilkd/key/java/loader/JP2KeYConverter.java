@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
-import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
@@ -734,14 +734,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private com.github.javaparser.ast.body.TypeDeclaration getContaining(Node node) {
-        if (node instanceof ClassOrInterfaceDeclaration 
+        if (node instanceof ClassOrInterfaceDeclaration
                 || node instanceof AnnotationDeclaration) {
             node = node.getParentNode().orElse(null);
         }
         while (node != null) {
-            if (node instanceof ClassOrInterfaceDeclaration 
+            if (node instanceof ClassOrInterfaceDeclaration
                     || node instanceof AnnotationDeclaration) {
-                return (com.github.javaparser.ast.body.TypeDeclaration)node;
+                return (com.github.javaparser.ast.body.TypeDeclaration) node;
             }
             node = node.getParentNode().orElse(null);
         }
@@ -1473,14 +1473,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var varSpec = mapping.nodeToKeY(spec);
         if (varSpec == null) {
             var t = spec.getType();
-            var containing = (com.github.javaparser.ast.body.TypeDeclaration)
-                findParent(spec, n -> 
-                    n instanceof ClassOrInterfaceDeclaration 
-                    || n instanceof AnnotationDeclaration).orElseThrow();
+            var containing = (com.github.javaparser.ast.body.TypeDeclaration) findParent(spec,
+                n -> n instanceof ClassOrInterfaceDeclaration
+                        || n instanceof AnnotationDeclaration)
+                    .orElseThrow();
 
             var refType = new ReferenceTypeImpl(containing.resolve());
             final var pen = new ProgramElementName(spec.getName().asString(),
-                    (String)containing.getFullyQualifiedName().orElseThrow());
+                (String) containing.getFullyQualifiedName().orElseThrow());
 
             final Literal compileTimeConstant = getCompileTimeConstantInitializer(decl);
 
@@ -1515,7 +1515,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(v.decl);
         Expression init = accepto(v.decl.getInitializer());
         var pv = getProgramVariableForFieldSpecification(v);
-        KeYJavaType type = ((TypeReference)accept(v.decl.getType())).getKeYJavaType();
+        KeYJavaType type = ((TypeReference) accept(v.decl.getType())).getKeYJavaType();
         return new FieldSpecification(pi, c, init, pv, 0, type);
     }
 
@@ -2069,8 +2069,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         boolean parentIsInterface = false;
 
         TypeDeclaration td = new AnnotationInterfaceDeclaration(
-                    pi, c, modArray, name, fullName, members, 
-                    parentIsInterface, isLibrary, getClassSpec(n));
+            pi, c, modArray, name, fullName, members,
+            parentIsInterface, isLibrary, getClassSpec(n));
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
         return addToMapping(n, td);

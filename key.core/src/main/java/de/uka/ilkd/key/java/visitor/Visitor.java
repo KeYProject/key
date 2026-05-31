@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
@@ -121,7 +121,8 @@ public interface Visitor {
 
     void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x);
 
-    void performActionOnAnnotationInterfaceMemberDeclaration(AnnotationInterfaceMemberDeclaration x);
+    void performActionOnAnnotationInterfaceMemberDeclaration(
+            AnnotationInterfaceMemberDeclaration x);
 
     void performActionOnFieldDeclaration(FieldDeclaration x);
 

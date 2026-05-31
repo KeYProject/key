@@ -52,8 +52,9 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return matchesField(services, (Function) op);
         } else if (op instanceof ProgramElement) {
             if (op instanceof LocationVariable) {
-                //LOGGER.info("type ref {}", ((LocationVariable)op).getTypeReference());
-                //LOGGER.info("annotations {}", ((LocationVariable)op).getTypeReference().getAnnotations());
+                // LOGGER.info("type ref {}", ((LocationVariable)op).getTypeReference());
+                // LOGGER.info("annotations {}",
+                // ((LocationVariable)op).getTypeReference().getAnnotations());
             }
         }
 
@@ -73,22 +74,23 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 !(classType.getJavaType() instanceof ClassDeclaration))
             return false;
 
-        var classDecl = (ClassDeclaration)classType.getJavaType();
+        var classDecl = (ClassDeclaration) classType.getJavaType();
 
         var fields = classDecl.getAllFields(services);
 
         // this is a bit too brittle for me
         var field = fields.stream()
-            .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
-            .findFirst()
-            .orElse(null);
-        
-        if (field == null) return false;
-        
+                .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
+                .findFirst()
+                .orElse(null);
+
+        if (field == null)
+            return false;
+
         var fieldType = field.getProgramVariable().getTypeReference();
         var declAnnotations = fieldType.getAnnotations();
         return declAnnotations.stream()
-            .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
+                .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
     }
 
     @Override

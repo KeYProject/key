@@ -616,10 +616,10 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnTypeReference(TypeReference x, boolean fullTypeNames) {
         if (x.getKeYJavaType() != null
                 && x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
-            for (Annotation annot: x.getAnnotations()) {
+            for (Annotation annot : x.getAnnotations()) {
                 performActionOnAnnotation(annot);
             }
-            
+
             performActionOnArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
         } else if (x.getProgramElementName() != null) {
             for (Annotation expr : x.getAnnotations()) {
@@ -744,7 +744,8 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnAnnotationInterfaceMemberDeclaration(AnnotationInterfaceMemberDeclaration x) {
+    public void performActionOnAnnotationInterfaceMemberDeclaration(
+            AnnotationInterfaceMemberDeclaration x) {
         layouter.beginI();
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
