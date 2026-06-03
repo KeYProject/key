@@ -508,7 +508,6 @@ public class Configuration {
             if (comment == null) {
                 return this;
             }
-
             if (comment.contains("\n")) {
                 out.format("/* %s */\n", comment);
             } else {
