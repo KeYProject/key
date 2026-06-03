@@ -20,4 +20,9 @@ public class MarkerAnnotation extends Annotation {
     public ProgramElement getChildAt(int index) {
         throw new ArrayIndexOutOfBoundsException();
     }
+
+    @Override
+    public String toString() {
+        return "@" + type.getJavaType().toString();
+    }
 }

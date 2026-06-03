@@ -6,9 +6,10 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -48,31 +49,28 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return false;
 
         if (op instanceof Function) {
-            LOGGER.info("field {}", op);
-            return matchesField(services, (Function) op);
+            return matchesTypeAnnots(getFieldType(services, (Function) op));
         } else if (op instanceof ProgramElement) {
-            if (op instanceof LocationVariable) {
-                // LOGGER.info("type ref {}", ((LocationVariable)op).getTypeReference());
-                // LOGGER.info("annotations {}",
-                // ((LocationVariable)op).getTypeReference().getAnnotations());
+            if (op instanceof ProgramVariable variable) {
+                LOGGER.info("{} {}", variable, variable.getTypeReference().getAnnotations().toList());
+                return matchesTypeAnnots(variable.getTypeReference());
             }
         }
 
         return false;
     }
 
-    public boolean matchesField(Services services, Function op) {
+    public TypeReference getFieldType(Services services, Function op) {
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
 
-        if (name == null)
-            return false;
+        if (name == null) return null;
 
         var classType = ((Services) services).getJavaInfo()
                 .getTypeByName(name.className());
 
         if (classType == null ||
                 !(classType.getJavaType() instanceof ClassDeclaration))
-            return false;
+            return null;
 
         var classDecl = (ClassDeclaration) classType.getJavaType();
 
@@ -84,13 +82,15 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 .findFirst()
                 .orElse(null);
 
-        if (field == null)
-            return false;
+        if (field == null) return null;
 
-        var fieldType = field.getProgramVariable().getTypeReference();
-        var declAnnotations = fieldType.getAnnotations();
-        return declAnnotations.stream()
-                .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
+        return field.getProgramVariable().getTypeReference();
+    }
+
+    private boolean matchesTypeAnnots(TypeReference typeRef) {
+        if (typeRef == null) return false;
+        return typeRef.getAnnotations().stream()
+            .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
     }
 
     @Override

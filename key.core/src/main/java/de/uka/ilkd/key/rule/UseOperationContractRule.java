@@ -125,13 +125,14 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
     }
 
-    private static KeYJavaType getStaticPrefixType(MethodOrConstructorReference mr,
+    private static TypeReference getStaticPrefixType(MethodOrConstructorReference mr,
             Services services, ExecutionContext ec) {
         if (mr instanceof MethodReference) {
-            return ((MethodReference) mr).determineStaticPrefixType(services, ec);
+            return new TypeRef(
+                    ((MethodReference) mr).determineStaticPrefixType(services, ec));
         } else {
             New n = (New) mr;
-            return n.getKeYJavaType(services, ec);
+            return n.getTypeReference();
         }
     }
 
@@ -213,7 +214,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // there must be applicable contracts for the operation
-        return getApplicableContracts(services, inst.pm, inst.staticType, inst.modality.kind());
+        return getApplicableContracts(services, inst.pm, inst.staticType.getKeYJavaType(),
+                inst.modality.kind());
     }
 
     /**
@@ -418,9 +420,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // collect further information
-        final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
+        final TypeReference staticType = getStaticPrefixType(mr, services, ec);
         assert staticType != null;
-        final IProgramMethod pm = getProgramMethod(mr, staticType, ec, services);
+        final IProgramMethod pm = getProgramMethod(mr, staticType.getKeYJavaType(), ec, services);
         assert pm != null : "Getting program method failed.\nReference: " + mr + ", static type: "
             + staticType + ", execution context: " + ec;
         final JTerm actualSelf = getActualSelf(mr, pm, ec, services);
@@ -458,8 +460,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts =
-            getApplicableContracts(goal.proof().getServices(), inst.pm, inst.staticType,
-                inst.modality.kind());
+            getApplicableContracts(goal.proof().getServices(), inst.pm, 
+                    inst.staticType.getKeYJavaType(), inst.modality.kind());
         if (contracts.isEmpty()) {
             return false;
         }
@@ -520,7 +522,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      */
     public record Instantiation(JTerm u, JTerm progPost, JModality modality,
             Expression actualResult, JTerm actualSelf,
-            KeYJavaType staticType, MethodOrConstructorReference mr, IProgramMethod pm,
+            TypeReference staticType, MethodOrConstructorReference mr, IProgramMethod pm,
             ImmutableList<JTerm> actualParams, boolean transaction) {
         /**
          * Creates a new instantiation for the contract rule and the given variables.
@@ -612,7 +614,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      */
     public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
-        return inst.pm.isConstructor() ? tb.selfVar(new TypeRef(inst.staticType), true)
+        return inst.pm.isConstructor() ? tb.selfVar(inst.staticType, true)
                 : tb.resultVar(inst.pm, true);
     }
 
@@ -800,8 +802,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             excNull = tb.equals(tb.var(excVar), tb.NULL());
             excCreated = tb.created(tb.var(excVar));
-            freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
-                contractSelf, atPres, freeSpecPost, services);
+            freePost = getFreePost(heapContext, inst.pm, inst.staticType.getKeYJavaType(), 
+                contractResult, contractSelf, atPres, freeSpecPost, services);
             freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
             postAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
                 tb.and(anonAssumption,

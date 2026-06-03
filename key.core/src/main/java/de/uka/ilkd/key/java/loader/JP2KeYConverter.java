@@ -178,7 +178,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(ArrayCreationExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        TypeReference type = accept(n.getElementType());
+        TypeReference type = requireTypeReference(n.getElementType());
         // TODO javaparser how should int[5][4][][] be encoded in the key ast?
         ArrayInitializer ai;
         ImmutableArray<Expression> children;
@@ -2095,7 +2095,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(ClassExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        TypeReference rt = accept(n.getType());
+        TypeReference rt = requireTypeReference(n.getType());
         return new MetaClassReference(pi, c, rt);
     }
 
