@@ -414,15 +414,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return reportError(n, "Type arguments found.");
         }
 
-        final var name = n.getNameAsString();
-        if (name.startsWith("\\")) {
-            JavaInfo ji = services.getJavaInfo();
-            var type = ji.getPrimitiveKeYJavaType(name);
-            if (type == null) {
-                return reportError(n, "Unresolved KeY type");
-            }
-            return new TypeRef(type);
-        }
         return getKeYJavaType(n);
     }
 
@@ -1515,7 +1506,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(v.decl);
         Expression init = accepto(v.decl.getInitializer());
         var pv = getProgramVariableForFieldSpecification(v);
-        KeYJavaType type = ((TypeReference) accept(v.decl.getType())).getKeYJavaType();
+        KeYJavaType type = requireTypeReference(v.decl.getType()).getKeYJavaType();
         return new FieldSpecification(pi, c, init, pv, 0, type);
     }
 
