@@ -50,11 +50,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         if (op instanceof Function) {
             return matchesTypeAnnots(getFieldType(services, (Function) op));
-        } else if (op instanceof ProgramElement) {
-            if (op instanceof ProgramVariable variable) {
-                LOGGER.info("{} {}", variable, variable.getTypeReference().getAnnotations().toList());
-                return matchesTypeAnnots(variable.getTypeReference());
-            }
+        } else if (op instanceof ProgramVariable variable) {
+            return matchesTypeAnnots(variable.getTypeReference());
         }
 
         return false;
