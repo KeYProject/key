@@ -485,6 +485,7 @@ CHAR_LITERAL:
 fragment OCT_CHAR:
         (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
+KEY_TERM : '`' ~([`])* '`';
 STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';

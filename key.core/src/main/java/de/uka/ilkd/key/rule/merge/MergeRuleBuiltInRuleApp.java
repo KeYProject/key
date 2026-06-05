@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;

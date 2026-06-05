@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -55,7 +55,7 @@ public class LoopInvariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
+        final LoopStatement loop = svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //
             services.getSpecificationRepository().getLoopSpec(loop);
 
@@ -71,9 +71,7 @@ public class LoopInvariantCondition implements VariableCondition {
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        // TODO: handle exception
-        final JModality.JavaModalityKind modalityKind =
-            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
 
         JTerm invInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
@@ -84,6 +82,10 @@ public class LoopInvariantCondition implements VariableCondition {
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             invInst = maybeInvInst.map(inv -> tb.and(currentInvInst, inv)).orElse(invInst);
+        }
+
+        for (final LocationVariable modifiedVar : MiscTools.getLocalOuts(loop, services)) {
+            invInst = tb.and(invInst, tb.reachableValue(modifiedVar));
         }
 
         return matchCond.setInstantiations( //

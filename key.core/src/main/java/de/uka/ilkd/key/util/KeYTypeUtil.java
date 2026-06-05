@@ -6,16 +6,15 @@ package de.uka.ilkd.key.util;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -135,7 +134,7 @@ public final class KeYTypeUtil {
      *         method or explicit construcotr).
      */
     public static boolean isImplicitConstructor(IProgramMethod pm) {
-        return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER
+        return pm != null && PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER
                 .equals(pm.getName());
     }
 
@@ -150,7 +149,7 @@ public final class KeYTypeUtil {
     public static @Nullable IProgramMethod findExplicitConstructor(Services services,
             final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
-            ImmutableList<IProgramMethod> pms =
+            Iterable<IProgramMethod> pms =
                 services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
             return CollectionUtil.search(pms, element -> {
                 if (implicitConstructor.getParameterDeclarationCount() == element

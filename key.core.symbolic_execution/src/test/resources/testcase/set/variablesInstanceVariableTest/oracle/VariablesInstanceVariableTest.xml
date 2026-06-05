@@ -13,11 +13,11 @@
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="a" isArrayIndex="false">
-                  <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="a {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="b" isArrayIndex="false">
-                  <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="b {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="wrapper" isArrayIndex="false">
@@ -31,7 +31,7 @@
             </value>
             <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                <variable name="value" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -44,11 +44,11 @@
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="a" isArrayIndex="false">
-                     <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="a {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="b" isArrayIndex="false">
-                     <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="b {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="wrapper" isArrayIndex="false">
@@ -62,7 +62,7 @@
                </value>
                <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                   <variable name="value" isArrayIndex="false">
-                     <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="value {true}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -83,7 +83,7 @@
                         </value>
                      </variable>
                      <variable name="b" isArrayIndex="false">
-                        <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="b {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="wrapper" isArrayIndex="false">
@@ -97,7 +97,7 @@
                   </value>
                   <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                      <variable name="value" isArrayIndex="false">
-                        <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="value {true}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -132,7 +132,7 @@
                      </value>
                      <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                         <variable name="value" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="value {true}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -167,7 +167,7 @@
                         </value>
                         <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                            <variable name="value" isArrayIndex="false">
-                              <value name="value {not(equals(param,i_2))}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(param,i_2))">
+                              <value name="value {not(equals(param,i_2))}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(param,i_2))">
                               </value>
                            </variable>
                         </value>
@@ -462,11 +462,11 @@ this.a + this.b + x + this.wrapper.value + param.value;" pathCondition="true" pa
                                              <callStateVariable name="self" isArrayIndex="false">
                                                 <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="a" isArrayIndex="false">
-                                                      <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="a {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="b" isArrayIndex="false">
-                                                      <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="b {true}" typeString="int" valueString="select<[int]>(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="wrapper" isArrayIndex="false">
@@ -480,7 +480,7 @@ this.a + this.b + x + this.wrapper.value + param.value;" pathCondition="true" pa
                                                 </value>
                                                 <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                                                    <variable name="value" isArrayIndex="false">
-                                                      <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="value {true}" typeString="int" valueString="select<[int]>(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>

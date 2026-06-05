@@ -91,7 +91,7 @@
                               </value>
                               <value name="x {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))">
                                  <variable name="value" isArrayIndex="false">
-                                    <value name="value {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))}" typeString="int" valueString="int::select(heap,ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),ConditionalValuesTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))">
+                                    <value name="value {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))}" typeString="int" valueString="select<[int]>(heap,ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),ConditionalValuesTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))">
                                     </value>
                                  </variable>
                               </value>

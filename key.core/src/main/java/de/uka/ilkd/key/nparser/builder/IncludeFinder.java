@@ -5,7 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -59,12 +58,8 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         // whatsoever
         filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
         var path = base.resolve(filename).normalize();
-        String pathString = path.toString().replace(File.separatorChar, '/'); // URIs on Windows
 
-        if (!(pathString.startsWith("file:") || pathString.startsWith("jar:"))) {
-            pathString = "file:///" + pathString;
-        }
-        var url = URI.create(pathString).toURL();
+        var url = path.toUri().toURL();
         source = RuleSourceFactory.initRuleFile(url);
         if (ldt) {
             includes.putLDT(filename, source);

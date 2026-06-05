@@ -9,7 +9,7 @@ keySrc: |-
   }
 
   \problem {
-    \forall Seq s; (s = (seqDef{int u;}(0, s.length, any::seqGet(s, u))))
+    \forall Seq s; (s = (seqDef{int u;}(0, s.length, seqGet<[any]>(s, u))))
     & seqLen(seqSub(s1, 0, maxx - 1)) = maxx - 1
    ->
     s1.length = maxx - 1

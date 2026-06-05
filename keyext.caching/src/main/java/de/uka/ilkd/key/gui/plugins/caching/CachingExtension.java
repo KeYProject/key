@@ -201,18 +201,16 @@ public class CachingExtension
     }
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
-        if (kind.getType() == Node.class) {
-            Node node = (Node) underlyingObject;
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind, @NonNull T underlyingObject) {
+        if (underlyingObject instanceof Node node) {
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseByReference(this, mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
-        } else if (kind.getType() == Proof.class) {
-            Proof proof = (Proof) underlyingObject;
+        } else if (underlyingObject instanceof Proof proof) {
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseAllByReference(this, mediator, proof));
             return actions;

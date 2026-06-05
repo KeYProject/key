@@ -62,12 +62,12 @@
      -> \\forall int idx;
           (   leq(Z(0(#)), idx) & lt(idx, v_iv)
            ->   leq(Z(0(#)),
-                    (int)(any::seqGet(s, idx)))
-              & lt((int)(any::seqGet(s, idx)),
+                    (int)(seqGet<[any]>(s, idx)))
+              & lt((int)(seqGet<[any]>(s, idx)),
                    seqLen(s))
-              &   int::instance(any::seqGet(s, idx))
+              &   instance<[int]>(seqGet<[any]>(s, idx))
                 = TRUE))"))
-(branch "CUT: forall int v_iv; forall Seq s; ( seqNPerm(s) & s.length = v_iv -> forall int idx; ( 0 <= idx & idx < v_iv -> 0 <= (int)(s[idx]) & (int)(s[idx]) < s.length & int::instance(s[idx]) = TRUE)) TRUE"
+(branch "CUT: forall int v_iv; forall Seq s; ( seqNPerm(s) & s.length = v_iv -> forall int idx; ( 0 <= idx & idx < v_iv -> 0 <= (int)(s[idx]) & (int)(s[idx]) < s.length & instance<[int]>(s[idx]) = TRUE)) TRUE"
    (rule "allRight" (formula "3") (inst "sk=v_iv_0"))
    (rule "impRight" (formula "3"))
    (rule "andLeft" (formula "1"))
@@ -93,7 +93,7 @@
       (rule "close" (formula "7") (ifseqformula "4"))
    )
 )
-(branch "CUT: forall int v_iv; forall Seq s; ( seqNPerm(s) & s.length = v_iv -> forall int idx; ( 0 <= idx & idx < v_iv -> 0 <= (int)(s[idx]) & (int)(s[idx]) < s.length & int::instance(s[idx]) = TRUE)) FALSE"
+(branch "CUT: forall int v_iv; forall Seq s; ( seqNPerm(s) & s.length = v_iv -> forall int idx; ( 0 <= idx & idx < v_iv -> 0 <= (int)(s[idx]) & (int)(s[idx]) < s.length & instance<[int]>(s[idx]) = TRUE)) FALSE"
    (rule "auto_int_induction_geqZero" (formula "2") (inst "sk=v_iv_1"))
    (branch "Base Case"
       (rule "allRight" (formula "2") (inst "sk=s_0"))
@@ -1373,7 +1373,7 @@
                      (branch
                         (rule "andRight" (formula "15"))
                         (branch
-                           (rule "cut" (inst "cutFormula=leq(Z(0(#)), (int)(any::seqGet(s_1, jv_0)))"))
+                           (rule "cut" (inst "cutFormula=leq(Z(0(#)), (int)(seqGet<[any]>(s_1, jv_0)))"))
                            (branch "CUT: 0 <= (int)(s_1[jv_0]) TRUE"
                               (rule "eqSymm" (formula "2"))
                               (rule "castedGetAny" (formula "16") (term "1"))

@@ -660,10 +660,6 @@ RGUILLEMETS
    | '›'
    ;
 
-IMPLICIT_IDENT
-   : '<' (LETTER)+ '>' ('$lmtd')? -> type (IDENT)
-   ;
-
 EQV
    : '<->'
    | '\u2194'

@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -29,6 +29,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -175,7 +176,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private static boolean isSelectTerm(JTerm term) {
-        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+        return term.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().toString().equals("select") && term.arity() == 3;
     }
 
     @Override
@@ -610,34 +612,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         String cleanJava = trimJavaBlock(s);
         sjb.opName = operatorOfJavaBlock(s);
 
+        var jr = services.getJavaService();
+        var schema = javaSchemaModeAllowed ? schemaVariables() : null;
         try {
+            sjb.javaBlock =
+                jr.readBlockWithProgramVariables(programVariables(), cleanJava, schemaVariables());
+        } catch (Exception e) {
             try {
-                if (javaSchemaModeAllowed) {// TEST
-                    SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
-                    jr.setSVNamespace(schemaVariables());
-                    try {
-                        sjb.javaBlock =
-                            jr.readBlockWithProgramVariables(programVariables(), cleanJava);
-                    } catch (Exception e) {
-                        sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
-                    }
-                }
-            } catch (Exception e) {
-                if (cleanJava.startsWith("{..")) {// do not fallback
-                    throw e;
-                }
+                sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
+            } catch (BuildingExceptions e1) {
+                throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e1);
             }
-
-            if (sjb.javaBlock == null) {
-                JavaReader jr = new Recoder2KeY(services, nss);
-                try {
-                    sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
-                } catch (Exception e1) {
-                    sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
-                }
-            }
-        } catch (ConvertException e) {
-            throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e);
         }
         return sjb;
     }
@@ -688,20 +673,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
-                if (pv.isFinal() && FinalHeapResolution
-                        .isFinalEnabled(getServices().getProof().getSettings())) {
-                    if (pv.isStatic()) {
-                        result =
-                            getServices().getTermBuilder().staticFinalDot(pv.sort(), fieldSymbol);
-                    } else {
-                        result =
-                            getServices().getTermBuilder().finalDot(pv.sort(), result, fieldSymbol);
-                    }
-                } else if (pv.isStatic()) {
+                if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
-                }
-
-                else {
+                } else {
                     result = getServices().getTermBuilder().dot(pv.sort(), result, fieldSymbol);
                 }
             }
@@ -712,7 +686,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
-        Operator result = (JOperatorSV) schemaVariables().lookup(new Name(attributeName));
+        Operator result = schemaVariables().lookup(new Name(attributeName));
         // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
@@ -725,12 +699,6 @@ public class ExpressionBuilder extends DefaultBuilder {
             } catch (Exception ex) {
                 throw new BuildingException(ex);
             }
-        } else if (attributeName.equals("<inv>")) {
-            // The invariant observer "<inv>" is implicit and not part of the class declaration
-            // A special case is needed, hence.
-            result = javaInfo.getInvProgramVar();
-        } else if (attributeName.equals("<inv_free>")) {
-            result = javaInfo.getFreeInvProgramVar();
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {
@@ -740,8 +708,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         + "\\javaSource section.");
             }
 
+            var javaAttributeName = JavaDLFieldNames.split(attributeName).nameWithoutFieldPrefix();
             ProgramVariable var =
-                javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+                javaInfo.getCanonicalFieldProgramVariable(javaAttributeName, prefixKJT);
             if (var == null) {
                 LogicVariable logicalvar =
                     (LogicVariable) namespaces().variables().lookup(attributeName);
@@ -804,16 +773,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         Sort s = accept(ctx.sortId());
-        Sort objectSort = getServices().getJavaInfo().objectSort();
+        // Sort objectSort = getServices().getJavaInfo().objectSort();
         if (s == null) {
             semanticError(ctx, "Tried to cast to unknown type.");
-        } else if (objectSort != null && !s.extendsTrans(objectSort)
-                && result.sort().extendsTrans(objectSort)) {
-            semanticError(ctx, "Illegal cast from " + result.sort() + " to sort " + s
-                + ". Casts between primitive and reference types are not allowed. ");
-        }
+        } /*
+           * else if (objectSort != null && !s.extendsTrans(objectSort)
+           * && result.sort().extendsTrans(objectSort)) {
+           * semanticError(ctx, "Illegal cast from " + result.sort() + " to sort " + s
+           * + ". Casts between primitive and reference types are not allowed. ");
+           * }
+           */
         assert s != null;
-        SortDependingFunction castSymbol =
+        ParametricFunctionInstance castSymbol =
             getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);
     }
@@ -1194,7 +1165,6 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
-        Sort sortId = accept(ctx.sortId());
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
@@ -1219,7 +1189,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1231,7 +1201,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                null);
             if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
@@ -1426,7 +1396,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         sfxargs, classRef, false);
                 } else {
                     Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
-                        classRef + "::" + memberName);
+                        classRef + JavaDLFieldNames.SEPARATOR + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
 
@@ -1470,6 +1440,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         ImmutableArray<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;
+        KeYParser.Formal_sort_argsContext genericArgsCtxt = null;
+        if (ctx.formal_sort_args() != null) {
+            genericArgsCtxt = ctx.formal_sort_args();
+        }
         JTerm[] args = null;
         if (ctx.call() != null) {
             orig = variables();
@@ -1489,8 +1463,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1498,8 +1472,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
+            if (ctx.sortId() != null) {
+                firstName = ctx.sortId().getText() + "::" + firstName;
+            }
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                genericArgsCtxt);
         }
 
         JTerm current;
@@ -1861,7 +1838,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return abbrevMap;
     }
 
-    private static class PairOfStringAndJavaBlock {
+    public static class PairOfStringAndJavaBlock {
         String opName;
         JavaBlock javaBlock;
     }

@@ -65,9 +65,8 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @    requires cause == null;
      @    ensures \result == this && cause == arg0;
      @    assignable cause;
-     @ helper // needs to be helper because called in constructor
      @*/
-   public java.lang.Throwable initCause(java.lang.Throwable arg0) {
+   public /*@ helper @*/ java.lang.Throwable initCause(java.lang.Throwable arg0) { // needs to be helper because called in constructor
        //@ set cause = arg0;
        return this;
    }

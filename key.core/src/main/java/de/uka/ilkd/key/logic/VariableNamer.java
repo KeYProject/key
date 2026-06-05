@@ -6,14 +6,16 @@ package de.uka.ilkd.key.logic;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.EmptyStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.*;
@@ -380,7 +382,14 @@ public abstract class VariableNamer implements InstantiationProposer {
                         collision = false;
                         for (String previousProposal : previousProposals) {
                             if (previousProposal.equals(result.toString())) {
-                                result = createName(basename, ++cnt, null);
+                                cnt += 1;
+                                result = createName(basename, cnt, null);
+
+                                while (services.getNamespaces().lookupLogicSymbol(result) != null) {
+                                    cnt += 1;
+                                    result = createName(basename, cnt, null);
+                                }
+
                                 collision = true;
                                 break;
                             }

@@ -90,7 +90,7 @@
                         <variable name="value" isArrayIndex="false">
                            <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
                            </value>
-                           <value name="value {not(equals(y,x))}" typeString="int" valueString="int::select(heap,x,ConditionalValuesTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                           <value name="value {not(equals(y,x))}" typeString="int" valueString="select<[int]>(heap,x,ConditionalValuesTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
                            </value>
                         </variable>
                      </value>

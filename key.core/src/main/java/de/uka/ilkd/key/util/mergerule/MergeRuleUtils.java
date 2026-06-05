@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -1178,31 +1182,10 @@ public class MergeRuleUtils {
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof Function partnerFun) {
-                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (Function) mergeStateOp);
-                    thisGoalNamespaces.functions().add((Function) newOp1);
-                    thisGoalNamespaces.flushToParent();
 
-                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), partnerFun);
-                    thisGoalNamespaces.functions().add((Function) newOp2);
-                    thisGoalNamespaces.flushToParent();
-                } else if (partnerStateOp instanceof LocationVariable partnerLV) {
-                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
-                    thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
-                    thisGoalNamespaces.flushToParent();
+                newOp1 = renameMergeParticipantOp(partnerStateOp, mergeStateOp, thisGoal);
 
-                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), partnerLV);
-                    thisGoalNamespaces.programVariables().add((LocationVariable) newOp2);
-                    thisGoalNamespaces.flushToParent();
-                } else {
-                    throw new RuntimeException(
-                        "MergeRule: Unexpected type of Operator involved in name clash: "
-                            + partnerStateOp.getClass().getSimpleName());
-                }
+                newOp2 = renameMergeParticipantOp(partnerStateOp, partnerStateOp, thisGoal);
 
                 mergeState = new SymbolicExecutionState(
                     OpReplacer.replace(mergeStateOp, newOp1, mergeState.getSymbolicState(), tb.tf(),
@@ -1221,6 +1204,36 @@ public class MergeRuleUtils {
         }
 
         return new Pair<>(mergeState, mergePartnerState);
+    }
+
+    /**
+     * returns an operator of the same kind like <code>mergeStateOp</code> but with a unique name
+     *
+     * @param partnerStateOp the {@link Operator} on whose name the name is based
+     * @param mergeStateOp the {@link Operator} to rename
+     * @param thisGoal the {@link Goal} where the <code>mergeStateOp</code> occurs
+     * @return the renamed {@link Operator}
+     */
+    private static @NonNull Operator renameMergeParticipantOp(Operator partnerStateOp,
+            Operator mergeStateOp, Goal thisGoal) {
+        final TermBuilder tb = thisGoal.getOverlayServices().getTermBuilder();
+        final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
+        Operator newOp1;
+        if (mergeStateOp instanceof Function mergeFct) {
+            newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                thisGoal.getLocalNamespaces())), mergeFct);
+            thisGoalNamespaces.functions().add((Function) newOp1);
+        } else if (mergeStateOp instanceof LocationVariable mergeLV) {
+            newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                thisGoal.getLocalNamespaces())), mergeLV);
+            thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
+        } else {
+            throw new RuntimeException(
+                "MergeRule: Unexpected type of Operator involved in name clash: " +
+                    mergeStateOp + " : " + mergeStateOp.getClass().getSimpleName());
+        }
+        thisGoalNamespaces.flushToParent();
+        return newOp1;
     }
 
     /**

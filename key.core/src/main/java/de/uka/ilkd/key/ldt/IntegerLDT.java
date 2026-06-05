@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -19,7 +20,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.Operator;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
@@ -283,7 +283,7 @@ public final class IntegerLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private boolean isNumberLiteral(Operator f) {
+    private boolean isNumberLiteral(org.key_project.logic.op.Operator f) {
         String n = f.name().toString();
         if (n.length() == 1) {
             char c = n.charAt(0);
@@ -711,7 +711,7 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol for the given operation
      */
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
@@ -735,7 +735,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
@@ -743,7 +743,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+    public boolean isResponsible(Operator op, JTerm left,
             JTerm right,
             Services services, ExecutionContext ec) {
         return false;
@@ -751,7 +751,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -778,7 +778,7 @@ public final class IntegerLDT extends LDT {
 
     public String toNumberString(JTerm t) {
         StringBuilder sb = new StringBuilder();
-        Operator f = t.op();
+        var f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
             t = t.sub(0);

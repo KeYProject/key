@@ -7,12 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;

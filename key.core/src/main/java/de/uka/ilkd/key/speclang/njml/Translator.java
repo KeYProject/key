@@ -7,19 +7,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -226,9 +227,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         LocationVariable permissionHeap = getPermissionHeap();
         if (permissionHeap == null) {
             raiseError("\\permission expression used in a non-permission"
-                + " context and permissions not enabled.", ctx);
+                + " context and permissions not enabled.",
+                ctx);
         }
-        if (!term.op().name().toString().endsWith("::select")) {
+        if (!(term.op() instanceof ParametricFunctionInstance pfi)
+                || pfi.getBase() != services.getTypeConverter().getHeapLDT().getSelect()) {
             raiseError("\\permission expression used with non store-ref" + " expression.", ctx);
         }
         return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(),
@@ -246,7 +249,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     // region expression
-
     @Override
     public KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {
         if (ctx.BYTE() != null) {
@@ -630,7 +632,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        final SortDependingFunction f =
+        final ParametricFunctionInstance f =
             services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;
@@ -754,6 +756,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+
+    @Override
+    public SLExpression visitKeyTerm(JmlParser.KeyTermContext ctx) {
+        var key = ctx.KEY_TERM().getText();
+        key = key.substring(1, key.length() - 1);
+        var nss = services.getNamespaces().copyWithParent();
+        nss.programVariables().add(selfVar);
+        nss.programVariables().add(excVar);
+        var keyIO = new KeyIO(services, nss);
+
+        var term = keyIO.parseExpression(key);
+        return new SLExpression(term);
+    }
+
     @Override
     public Object visitMultexpr(JmlParser.MultexprContext ctx) {
         List<SLExpression> exprs = mapOf(ctx.unaryexpr());
@@ -763,7 +779,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression e = exprs.get(i);
             if (result.isType()) {
                 raiseError("Cannot build multiplicative expression from type "
-                    + result.getType().getName() + ".", ctx);
+                    + result.getType().getName() + ".",
+                    ctx);
             }
             if (e.isType()) {
                 raiseError("Cannot multiply by type " + e.getType().getName() + ".", ctx);
@@ -864,7 +881,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
-        String fieldName = "<transactionConditionallyUpdated>";
+        String fieldName = "$transactionConditionallyUpdated";
         return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
     }
 
@@ -1003,7 +1020,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return lookupIdentifier("<transient>", receiver, null, ctx);
+            return lookupIdentifier("$transient", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
@@ -1446,7 +1463,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         assert typ != null;
         JTerm resTerm = tb.equals(
-            tb.var(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
+            tb.var(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, typ)),
             tb.TRUE());
         return new SLExpression(resTerm);
     }
@@ -1751,7 +1768,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitOldexpression(JmlParser.OldexpressionContext ctx) {
         KeYJavaType typ;
         SLExpression result = accept(ctx.expression());
-        @Nullable
         String id = accept(ctx.IDENT());
 
         if (atPres == null || atPres.get(getBaseHeap()) == null) {

@@ -1,5 +1,5 @@
-import java.util.List;
 import java.io.InputStream;
+import java.util.List;
 
 public class Test {
     // check that all of these classes are correctly loaded:
@@ -10,9 +10,9 @@ public class Test {
     InputStream is;
 
     // classpath
-    A a;        // *.class
+    subdir.A a;        // *.class
     B b;        // *.java
-    C1 c1;      // loading from a zip
+    subdir.C1 c1;      // loading from a zip
     C2 c2;      // loading from a zip
     D d;        // *.java
 

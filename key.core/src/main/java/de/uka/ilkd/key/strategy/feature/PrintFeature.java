@@ -41,7 +41,7 @@ public class PrintFeature implements Feature {
         System.out.println(
             prefix + ":" + cost.toString() + ":" + (pos != null ? pos.subTerm() + ":" : "") + ":" +
                 app.rule().name());
-        LOGGER.debug("{}:{}:{}{}", prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "",
+        LOGGER.debug("{}:{}:{}{}", prefix, cost, pos != null ? pos.subTerm() + ":" : "",
             app.rule().name());
         return cost;
     }

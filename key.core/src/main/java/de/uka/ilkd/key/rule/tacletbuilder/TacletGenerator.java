@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -186,6 +186,8 @@ public class TacletGenerator {
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV);
         }

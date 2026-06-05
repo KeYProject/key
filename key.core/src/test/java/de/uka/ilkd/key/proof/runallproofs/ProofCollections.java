@@ -11,10 +11,6 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
-import org.key_project.util.java.IOUtil;
-
-import org.junit.jupiter.api.Assertions;
-
 /**
  * This class configuress the "runAllProofs" test runs.
  *
@@ -108,7 +104,7 @@ public class ProofCollections {
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
         // settings.setRunOnlyOn("performance, performancePOConstruction");
 
-        settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
         var c = new ProofCollection(settings);
 
@@ -405,6 +401,7 @@ public class ProofCollections {
         g.provable("standard_key/unicode_test.key");
         g.provable("heap/strictlyModular/mayExpand.key");
         g.notprovable("heap/strictlyModular/modularOnly.key");
+        g.notprovable("standard_key/GhostSetInLoop/set_ghost.key");
 
 
         g = c.group("SmansEtAl");
@@ -603,8 +600,8 @@ public class ProofCollections {
         g.notprovable("standard_key/java_dl/danglingElse.key");
         // commented out -in the current handling of this references(from branch mostThisRef)
         // inner classes do not work.According to Richard, there is a bug in handling inner classes
-        // that needs a non -trivial fix.
-        // provable: ./standard_key/java_dl/innerClasses/inner.key");
+        // that needs a non-trivial fix.
+        // g.provable("./standard_key/java_dl/innerClasses/inner.key");
         g.provable("standard_key/java_dl/iteratedAssignment.key");
         g.notprovable("standard_key/java_dl/assert/assert1.key");
         g.provable("standard_key/java_dl/assert/assert2.key");
@@ -639,7 +636,8 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/splittingWithQueries.key");
         g.provable("standard_key/java_dl/strassen/strassen.key");
         g.provable("standard_key/java_dl/symmArray.key");
-        g.provable("standard_key/java_dl/testcontext.key");
+        g.provable("standard_key/java_dl/methodResolution/testcontext.key");
+        g.provable("standard_key/java_dl/methodResolution/testMethodCallContextInnerClasses.key");
         g.provable("standard_key/staticInitialisation/cascadeStaticInitialisation.key");
         g.provable(
             "standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key");
@@ -791,13 +789,16 @@ public class ProofCollections {
 
 
         // Permission heap problems:
-        g = c.group("permissionHeap");
+        // var pHSettings = new ProofCollectionSettings(settings);
+        // settings.setResetEachTest(true);
+        g = c.group("permissionHeap1");
         g.provable("heap/permissions/permissions_method0.key");
         g.provable("heap/permissions/permissions_method1.key");
         g.provable("heap/permissions/permissions_method3.key");
         g.provable("heap/permissions/permissions_setAB.key");
         g.provable("heap/permissions/permissionProperties.key");
 
+        g = c.group("permissionHeap2");
         g.provable("heap/permissions/threads/AFilter_AFilter.key");
         g.provable("heap/permissions/threads/AFilter_initPost_accessible.key");
         g.provable("heap/permissions/threads/AFilter_inv_accessible1.key");
@@ -811,6 +812,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/AFilter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/AFilter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/AFilter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap3");
         g.provable("heap/permissions/threads/BFilter_BFilter.key");
         g.provable("heap/permissions/threads/BFilter_initPost_accessible.key");
         g.provable("heap/permissions/threads/BFilter_inv_accessible1.key");
@@ -824,6 +827,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/BFilter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/BFilter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/BFilter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap4");
         g.provable("heap/permissions/threads/Fib_Fib.key");
         g.provable("heap/permissions/threads/Fib_initPost_accessible.key");
         g.provable("heap/permissions/threads/Fib_inv1_accessible.key");
@@ -835,6 +840,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Fib_startTransfer_accessible.key");
         g.provable("heap/permissions/threads/Fib_startTransfer_contract.key");
         g.provable("heap/permissions/threads/Fib_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap5");
         g.provable("heap/permissions/threads/Plotter_initPost_accessible.key");
         g.provable("heap/permissions/threads/Plotter_inv_accessible1.key");
         g.provable("heap/permissions/threads/Plotter_inv_accessible2.key");
@@ -845,6 +852,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Plotter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/Plotter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/Plotter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap6");
         g.provable("heap/permissions/threads/Sampler_initPost_accessible.key");
         g.provable("heap/permissions/threads/Sampler_inv_accessible1.key");
         g.provable("heap/permissions/threads/Sampler_inv_accessible2.key");
@@ -852,6 +861,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Sampler_joinTransfer_contract.key");
         g.provable("heap/permissions/threads/Sampler_postJoin_accessible.key");
         g.provable("heap/permissions/threads/Sampler_preStart_accessible.key");
+
+        g = c.group("permissionHeap7");
         g.provable("heap/permissions/threads/Sampler_run.key");
         g.provable("heap/permissions/threads/Sampler_Sampler.key");
         g.provable("heap/permissions/threads/Sampler_startTransfer_accessible.key");
@@ -979,6 +990,10 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/switch/large_switch.key");
 
 
+        // tests that KeY can deal with identical classes in different packages
+        g.provable("standard_key/java_dl/identical_classes/pkgA_inc.key");
+        g.provable("standard_key/java_dl/identical_classes/pkgB_inc.key");
+
         g = c.group("redux");
         g.provable("redux/arrays/Arrays.copyOf.key");
         g.provable("redux/arrays/Arrays.copyOf.float.key");
@@ -998,6 +1013,16 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_list_appnil.proof");
         g.loadable("standard_key/adt/dt_color.proof");
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
+        g.loadable("standard_key/adt/dt_polymorphic.proof");
+
+        g = c.group("PolymorphicSorts");
+        g.loadable("standard_key/polymorphic/pseq.key");
+
+        g = c.group("JavaFeatures");
+        g.loadable("Java/TextBlockLiterals/project.key");
+
+        g.loadable("Java/Records/Use.key");
+        g.loadable("Java/Records/Constructor.key");
 
         // use for debugging purposes.
         // c.keep("VSTTE10");
@@ -1007,12 +1032,4 @@ public class ProofCollections {
         }
         return c;
     }
-
-
-    public static String loadFromFile(String name) throws IOException {
-        var stream = ProofCollections.class.getResourceAsStream(name);
-        Assertions.assertNotNull(stream, "Failed to find " + name);
-        return IOUtil.readFrom(stream);
-    }
-
 }

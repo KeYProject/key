@@ -6,8 +6,8 @@ package de.uka.ilkd.key.proof.init;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;

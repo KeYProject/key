@@ -8,16 +8,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -41,7 +40,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
      */
     protected static final URL REDUX_URL =
-        KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
+        KeYResourceManager.getManager().getResourceFile(JavaService.class, "JavaRedux/");
 
     /**
      * This matcher matches *.java files.
@@ -167,7 +166,42 @@ public abstract class AbstractFileRepo implements FileRepo {
         String rulesURLStr = RULES_URL.toString();
         String reduxURLStr = REDUX_URL.toString();
         return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
+    }
 
+    public String calcDirectorySHA1(Path d) throws IOException, NoSuchAlgorithmException {
+        StringBuilder sb = new StringBuilder();
+        // Since the checksum is highly order-dependent, sort the files in each directory by name
+        Files.walk(d).filter(Files::isRegularFile).sorted(Path::compareTo).forEachOrdered(p -> {
+            try {
+                String h = calcFileSHA1(p);
+                System.out.println("SHA1 of " + p + ": " + h);
+                sb.append(h);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        System.out.println(sb.toString());
+        byte[] digest = MessageDigest.getInstance("SHA1").digest(sb.toString().getBytes());
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : digest) {
+            hexString.append(String.format("%02x", b));
+        }
+        return hexString.toString();
+    }
+
+    public String calcFileSHA1(Path p) throws IOException, NoSuchAlgorithmException {
+        // TODO: check that p refers to a file
+        byte[] content = Files.readAllBytes(p);
+        byte[] digest = MessageDigest.getInstance("SHA1").digest(content);
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : digest) {
+            hexString.append(String.format("%02x", b));
+        }
+        return hexString.toString();
     }
 
     protected Path getJavaPath() {
@@ -326,7 +360,7 @@ public abstract class AbstractFileRepo implements FileRepo {
                     .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
                     .map(l -> l.replaceAll("\\\\javaSource \".*\";", "\\\\javaSource \"src\";"))
                     .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
-                        "\\\\bootclasspath \"bootclasspath\";"))
+                        ""))
                     .collect(Collectors.joining(System.lineSeparator()));
 
             // add classpath (has to be prior to javaSource)
@@ -465,8 +499,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
-    }
+    public void proofDisposing(ProofDisposedEvent e) {}
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {

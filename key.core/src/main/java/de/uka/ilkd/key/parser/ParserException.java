@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
  * @author Hubert Schmid
  */
 
-public final class ParserException extends Exception implements HasLocation {
+public final class ParserException extends RuntimeException implements HasLocation {
     /* --- constructors --- */
     /**
      * @param message The error message. The message may be shown to the user and should be
@@ -22,7 +22,7 @@ public final class ParserException extends Exception implements HasLocation {
      *        location is unknown or the error is independent of a location.
      */
     public ParserException(String message, Location location) {
-        super(message);
+        super(message + " at " + location);
         this.location = location;
     }
 

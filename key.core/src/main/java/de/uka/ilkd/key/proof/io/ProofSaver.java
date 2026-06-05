@@ -117,7 +117,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      */
     protected void save(Path file) throws IOException {
         try (var out = Files.newOutputStream(file)) {
-            save(out);
+            save(file.getParent(), out);
         }
     }
 
@@ -139,23 +139,6 @@ public class ProofSaver extends OutputStreamProofSaver {
         }
         fireProofSaved(new ProofSaverEvent(this, filename().toString(), errorMsg));
         return errorMsg;
-    }
-
-    @Override
-    protected Path getBasePath() throws IOException {
-        return computeBasePath(file);
-    }
-
-    /**
-     * Computes the base path of the given proof {@link File}.
-     * <p>
-     * This method is used by {@link #getBasePath()} and by the Eclipse integration.
-     *
-     * @param proofFile The proof {@link File}.
-     * @return The computed base path of the given proof {@link File}.
-     */
-    public static Path computeBasePath(Path proofFile) {
-        return proofFile.toAbsolutePath().getParent().toAbsolutePath();
     }
 
     /**

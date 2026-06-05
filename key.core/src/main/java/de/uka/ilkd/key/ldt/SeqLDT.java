@@ -3,29 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqPut;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -36,7 +32,7 @@ public final class SeqLDT extends LDT {
     public static final Name SEQGET_NAME = new Name("seqGet");
 
     // getters
-    private final SortDependingFunction seqGet;
+    private final ParametricFunctionDecl seqGet;
     private final Function seqLen;
     private final Function seqIndexOf;
 
@@ -52,7 +48,7 @@ public final class SeqLDT extends LDT {
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
-        seqGet = addSortDependingFunction(services, "seqGet");
+        seqGet = addParametricFunction((Services) services, "seqGet");
         seqLen = addFunction(services, "seqLen");
         seqEmpty = addFunction(services, "seqEmpty");
         seqSingleton = addFunction(services, "seqSingleton");
@@ -65,9 +61,13 @@ public final class SeqLDT extends LDT {
         values = addFunction(services, "values");
     }
 
+    public ParametricFunctionDecl getSeqGet() {
+        return seqGet;
+    }
 
-    public SortDependingFunction getSeqGet(Sort instanceSort, TermServices services) {
-        return seqGet.getInstanceFor(instanceSort, services);
+    public ParametricFunctionInstance getSeqGet(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(seqGet,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
@@ -148,27 +148,18 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(Operator op, Services serv,
-            ExecutionContext ec) {
-        if (op instanceof SeqSingleton) {
-            return seqSingleton;
-        } else if (op instanceof SeqConcat) {
-            return seqConcat;
-        } else if (op instanceof SeqSub) {
-            return seqSub;
-        } else if (op instanceof SeqReverse) {
-            return seqReverse;
-        } else if (op instanceof SeqPut) {
-            return seqUpd;
-        } else if (op instanceof SeqIndexOf) {
-            return seqIndexOf;
-        } else if (op instanceof SeqGet) {
-            return seqGet;
-        } else if (op instanceof SeqLength) {
-            return seqLen;
-        }
-        assert false;
-        return null;
+    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+        return switch (op) {
+            case SeqSingleton ignored -> seqSingleton;
+            case SeqConcat ignored -> seqConcat;
+            case SeqSub ignored -> seqSub;
+            case SeqReverse ignored -> seqReverse;
+            case SeqPut ignored -> seqUpd;
+            case SeqIndexOf ignored -> seqIndexOf;
+            case SeqGet ignored -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
+            case SeqLength ignored -> seqLen;
+            default -> throw new AssertionError();
+        };
     }
 
     @Override

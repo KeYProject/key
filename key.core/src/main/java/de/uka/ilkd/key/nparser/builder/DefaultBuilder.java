@@ -10,16 +10,15 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.*;
@@ -30,9 +29,12 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -138,13 +140,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * looks up a function, (program) variable or static query of the given name varfunc_id and the
      * argument terms args in the namespaces and java info.
      *
-     * @param varfuncName the String with the symbols name
+     * @param varfuncName
+     *        the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-            Sort sort) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName,
+            KeYParser.Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+            { schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
@@ -157,32 +160,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        if (sort != null || sortName != null) {
-            Name fqName =
-                new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
-            operators =
-                new Operator[] { (JOperatorSV) schemaVariables().lookup(fqName),
-                    variables().lookup(fqName),
-                    programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    functions().lookup(fqName),
-                    AbstractTermTransformer.name2metaop(fqName.toString()) };
-
-            for (Operator op : operators) {
-                if (op != null) {
-                    return op;
-                }
+        if (genericArgsCtxt != null) {
+            var d = nss.parametricFunctions().lookup(name);
+            if (d == null) {
+                semanticError(ctx, "Could not find parametric function: %s", name);
+                return null;
             }
-
-            SortDependingFunction firstInstance =
-                SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
-            if (sort == null)
-                semanticError(ctx, "Could not find sort: %s", sortName);
-            if (firstInstance != null) {
-                SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
-                if (v != null) {
-                    return v;
-                }
-            }
+            var args = getGenericArgs(genericArgsCtxt, d.getParameters());
+            return ParametricFunctionInstance.get(d, args, services);
         }
         semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
         return null;
@@ -223,6 +208,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 sorts().add(result);
             } else {
                 result = sorts().lookup(new Name("java.lang." + name));
+            }
+        }
+        // Look for alias
+        if (result == null) {
+            SortAlias alias = namespaces().sortAliases().lookup(name);
+            if (alias != null) {
+                result = alias.aliasedSort();
             }
         }
         return result;
@@ -323,6 +315,16 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitSortId(KeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
+        if (ctx.formal_sort_args() != null) {
+            // parametric sorts should be instantiated
+            ParametricSortDecl sortDecl = nss.parametricSorts().lookup(primitiveName);
+            if (sortDecl == null) {
+                semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
+            }
+            ImmutableList<GenericArgument> params =
+                getGenericArgs(ctx.formal_sort_args(), sortDecl.getParameters());
+            return ParametricSortInstance.get(sortDecl, params, services);
+        }
         // Special handling for byte, char, short, long:
         // these are *not* sorts, but they are nevertheless valid
         // prefixes for array sorts such as byte[], char[][][].
@@ -360,6 +362,21 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return s;
     }
 
+    private ImmutableList<GenericArgument> getGenericArgs(KeYParser.Formal_sort_argsContext ctx,
+            ImmutableList<GenericParameter> params) {
+        if (ctx.sortId().size() != params.size()) {
+            semanticError(ctx, "Expected %d sort arguments, got only %d",
+                params.size(), ctx.sortId().size());
+        }
+        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        for (int i = params.size() - 1; i >= 0; i--) {
+            var arg = ctx.sortId(i);
+            var sort = visitSortId(arg);
+            args = args.prepend(new GenericArgument(sort));
+        }
+        return args;
+    }
+
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
@@ -368,7 +385,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             array = true;
             type.append("[]");
         }
-        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type.toString());
+
+        KeYJavaType kjt;
+        kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
@@ -389,11 +408,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        // try as sort without Java type (neede e.g. for "Heap")
+        // try as sort without Java type (need e.g. for "Heap")
         if (kjt == null) {
             Sort sort = lookupSort(type.toString());
             if (sort != null) {
-                kjt = new KeYJavaType(null, sort);
+                kjt = new KeYJavaType(sort);
             }
         }
 
@@ -407,5 +426,35 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
         return ctx.getText();
+    }
+
+    @Override
+    public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
+            KeYParser.Formal_sort_param_declsContext ctx) {
+        return mapOf(ctx.formal_sort_param_decl());
+    }
+
+    @Override
+    public @Nullable GenericParameter visitFormal_sort_param_decl(
+            KeYParser.Formal_sort_param_declContext ctx) {
+
+        GenericParameter.Variance variance;
+        if (ctx.PLUS() != null) {
+            variance = GenericParameter.Variance.COVARIANT;
+        } else if (ctx.MINUS() != null) {
+            variance = GenericParameter.Variance.CONTRAVARIANT;
+        } else {
+            variance = GenericParameter.Variance.INVARIANT;
+        }
+
+        var name = ctx.simple_ident().getText();
+        Sort paramSort = sorts().lookup(name);
+        if (paramSort == null) {
+            semanticError(ctx, "Parameter sort %s not found", name);
+        }
+        if (!(paramSort instanceof GenericSort)) {
+            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
+        }
+        return new GenericParameter((GenericSort) paramSort, variance);
     }
 }

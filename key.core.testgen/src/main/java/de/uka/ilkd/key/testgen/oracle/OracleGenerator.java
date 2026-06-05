@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -319,7 +320,8 @@ public class OracleGenerator {
             return OracleConstant.FALSE;
         } else if (term.arity() == 0) {
             return new OracleConstant(name, term.sort());
-        } else if (name.endsWith("select")) {
+        } else if (op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getTypeConverter().getHeapLDT().getSelect()) {
             return translateSelect(term, initialSelect);
         } else if (name.equals("arr")) {
             OracleTerm index = generateOracle(term.sub(0), initialSelect);
@@ -327,7 +329,7 @@ public class OracleGenerator {
         } else if (name.equals("length")) {
             OracleTerm o = generateOracle(term.sub(0), initialSelect);
             return new OracleConstant(o + ".length", term.sort());
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) {
             if (fun instanceof IObserverFunction obs) {
 
                 Sort s = obs.getContainerType().getSort();
@@ -363,21 +365,14 @@ public class OracleGenerator {
 
                 return new OracleMethodCall(m, args);
             }
-        } else if (name.endsWith("::instance")) {
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getInstanceofSymbol(services)) {
+            Sort s = pfi.getArgs().head().sort();
 
-            if (fun instanceof SortDependingFunction sdf) {
-                Sort s = sdf.getSortDependingOn();
+            OracleTerm arg = generateOracle(term.sub(0), initialSelect);
+            OracleType type = new OracleType(s);
 
-
-                OracleTerm arg = generateOracle(term.sub(0), initialSelect);
-                OracleType type = new OracleType(s);
-
-                return new OracleBinTerm("instanceof", arg, type);
-
-
-            }
-
-
+            return new OracleBinTerm("instanceof", arg, type);
         } else if (op instanceof ProgramMethod) {
 
             return translateQuery(term, initialSelect, op);

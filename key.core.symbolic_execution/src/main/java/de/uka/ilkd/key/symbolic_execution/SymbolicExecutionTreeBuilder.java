@@ -7,10 +7,13 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;

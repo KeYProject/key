@@ -268,7 +268,7 @@
       (branch "Use Axiom"
          (builtin "One Step Simplification" (formula "15"))
          (rule "cut_direct" (formula "9") (term "0"))
-         (branch "CUT: current_0.<created> = TRUE TRUE"
+         (branch "CUT: current_0.$created = TRUE TRUE"
             (builtin "One Step Simplification" (formula "10"))
             (rule "true_left" (formula "10"))
             (rule "cut_direct" (formula "15") (term "0"))
@@ -290,7 +290,7 @@
                (opengoal " ")
             )
          )
-         (branch "CUT: current_0.<created> = TRUE FALSE"
+         (branch "CUT: current_0.$created = TRUE FALSE"
             (builtin "One Step Simplification" (formula "9"))
             (rule "cut_direct" (formula "16") (term "0"))
             (branch "CUT: SETAccumulate(heap[anon({}, anon_heap_LOOP<<anonHeapFunction>>)], null)<<F(\"9.0\", \"10.0\")>> TRUE"

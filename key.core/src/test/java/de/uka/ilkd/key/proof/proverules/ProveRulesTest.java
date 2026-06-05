@@ -56,7 +56,7 @@ public class ProveRulesTest {
     public void loadTacletProof(String tacletName, Taclet taclet, @Nullable Path proofFile)
             throws Exception {
         assertNotNull(proofFile,
-            "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
+            "Taclet " + tacletName + " was annotated with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile
             + " claims that it contains a proof for taclet " + tacletName
             + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
@@ -136,7 +136,7 @@ public class ProveRulesTest {
         }
 
         /*
-         * Create list of constructor parameters containig one entry for each taclet name. (that
+         * Create list of constructor parameters containing one entry for each taclet name. (that
          * means there will be one test case for each taclet)
          */
         return tacletNames.stream()

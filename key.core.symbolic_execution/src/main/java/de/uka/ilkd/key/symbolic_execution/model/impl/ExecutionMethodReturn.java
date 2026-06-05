@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;

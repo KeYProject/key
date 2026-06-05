@@ -32,24 +32,24 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseSequencePrettySyntax() throws Exception {
         /*
-         * Test any::seqGet(s,i)
+         * Test seqGet<[any]>(s,i)
          */
         String pp = "s[i]";
-        JTerm expected = parseTerm("any::seqGet(s,i)");
+        JTerm expected = parseTerm("seqGet<[any]>(s,i)");
         JTerm actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
-        assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
+        assertEqualsIgnoreWhitespaces(pp, printTerm(expected)); // test pretty-printing
 
         /*
-         * Test int::seqGet(s,i) Notice that pretty-printing of int::seqGet(s,i) results in:
-         * (int)s[i] But parsing of (int)s[i] results in: int::cast(any::seqGet(s,i)
+         * Test seqGet<[int]>(s,i) Notice that pretty-printing of seqGet<[int]>(s,i) results in:
+         * (int)s[i] But parsing of (int)s[i] results in: cast<[int]>(seqGet<[any]>(s,i)
          */
         pp = "(int)s[i]";
-        expected = parseTerm("int::cast(any::seqGet(s,i))");
+        expected = parseTerm("cast<[int]>(seqGet<[any]>(s,i))");
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         // test pretty-printing
-        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp);
+        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("seqGet<[int]>(s,i)")), pp);
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");

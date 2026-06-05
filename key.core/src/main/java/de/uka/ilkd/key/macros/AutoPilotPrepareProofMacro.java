@@ -122,7 +122,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.getZeroCost();
             }
 
-            // apply OSS to <inv>() calls.
+            // apply OSS to $inv() calls.
             if (rule instanceof OneStepSimplifier) {
                 var target = pio.subTerm();
                 if (target.op() instanceof UpdateApplication) {

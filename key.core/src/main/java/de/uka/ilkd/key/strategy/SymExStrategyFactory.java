@@ -13,59 +13,66 @@ import org.key_project.logic.Name;
 /// Creates [SymExStrategy]. Handles strategy settings for symbolic execution.
 public class SymExStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_LOOP_INVARIANT =
-        "<html>" + "Use loop invariants for loops.<br>" + "Three properties have to be shown:<br>"
-            + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
-            + "loop guard and loop body (initially valid).</li>"
-            + "<li>If the invariant was valid at the start of the loop, it holds <br>"
-            + "after arbitrarily many loop iterations (body preserves invariant).</li>"
-            + "<li>Invariant holds after the loop terminates (use case).</li>" + "</ul></html>";
+        """
+                <html>Use loop invariants for loops.<br>Three properties have to be shown:<br>\
+                <ul><li>Validity of invariant of a loop is preserved by the<br>\
+                loop guard and loop body (initially valid).</li>\
+                <li>If the invariant was valid at the start of the loop, it holds <br>\
+                after arbitrarily many loop iterations (body preserves invariant).</li>\
+                <li>Invariant holds after the loop terminates (use case).</li></ul></html>""";
     public static final String TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET =
-        "<html>" + "Use the loop scope-based invariant taclet, i.e. not the built-in rules.<br>"
-            + "Three properties have to be shown:<br>"
-            + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
-            + "loop guard and loop body (initially valid).</li>"
-            + "<li>If the invariant was valid at the start of the loop, it holds <br>"
-            + "after arbitrarily many loop iterations (body preserves invariant).</li>"
-            + "<li>Invariant holds after the loop terminates (use case).</li>" + "</ul>"
-            + "<p>The last two are combined into a single goal or split into two<br>"
-            + "goals based on the 'javaLoopTreatment' strategy option.</p>" + "</html>";
+        """
+                <html>Use the loop scope-based invariant taclet, i.e. not the built-in rules.<br>\
+                Three properties have to be shown:<br>\
+                <ul><li>Validity of invariant of a loop is preserved by the<br>\
+                loop guard and loop body (initially valid).</li>\
+                <li>If the invariant was valid at the start of the loop, it holds <br>\
+                after arbitrarily many loop iterations (body preserves invariant).</li>\
+                <li>Invariant holds after the loop terminates (use case).</li></ul>\
+                <p>The last two are combined into a single goal or split into two<br>\
+                goals based on the 'javaLoopTreatment' strategy option.</p></html>""";
     public static final String TOOL_TIP_LOOP_SCOPE_EXPAND =
-        "<html>" + "Unroll loop body, but with the loop scope technology.<br>"
-            + "This requires less program transformation for irregular<br>"
-            + "termination behavior." + "</html>";
-    public static final String TOOL_TIP_LOOP_EXPAND = "<html>" + "Unroll loop body." + "</html>";
-    public static final String TOOL_TIP_LOOP_NONE = "<html>" + "Leave loops untouched." + "</html>";
-    public static final String TOOL_TIP_BLOCK_CONTRACT_INTERNAL = "<html>"
-        + "Java blocks are replaced by their contracts.<br>" + "Three properties are shown:"
-        + "<ul><li>Validity of block contract in the method context</li>"
-        + "<li>Precondition of contract holds</li>"
-        + "<li>Postcondition holds after block terminates</li>" + "</ul>" + "</html>";
+        """
+                <html>Unroll loop body, but with the loop scope technology.<br>\
+                This requires less program transformation for irregular<br>\
+                termination behavior.</html>""";
+    public static final String TOOL_TIP_LOOP_EXPAND = "<html>Unroll loop body.</html>";
+    public static final String TOOL_TIP_LOOP_NONE = "<html>Leave loops untouched.</html>";
+    public static final String TOOL_TIP_BLOCK_CONTRACT_INTERNAL = """
+            <html>\
+            Java blocks are replaced by their contracts.<br>Three properties are shown:\
+            <ul><li>Validity of block contract in the method context</li>\
+            <li>Precondition of contract holds</li>\
+            <li>Postcondition holds after block terminates</li></ul></html>""";
     public static final String TOOL_TIP_BLOCK_CONTRACT_EXTERNAL =
-        "<html>" + "Java blocks are replaced by their contracts.<br>" + "Two properties are shown:"
-            + "<ul><li>Precondition of contract holds</li>"
-            + "<li>Postcondition holds after block terminates</li>" + "</ul></html>";
+        """
+                <html>Java blocks are replaced by their contracts.<br>Two properties are shown:\
+                <ul><li>Precondition of contract holds</li>\
+                <li>Postcondition holds after block terminates</li></ul></html>""";
     public static final String TOOL_TIP_BLOCK_EXPAND =
-        "<html>" + "Do not use block contracts for Java blocks. Expand Java blocks." + "</html>";
+        "<html>Do not use block contracts for Java blocks. Expand Java blocks.</html>";
     public static final String TOOL_TIP_METHOD_CONTRACT =
-        "<html>Replace method calls by contracts. In some cases<br>"
-            + "a method call may also be replaced by its method body.<br>"
-            + "If query treatment is activated, this behavior applies<br>"
-            + "to queries as well.</html>";
+        """
+                <html>Replace method calls by contracts. In some cases<br>\
+                a method call may also be replaced by its method body.<br>\
+                If query treatment is activated, this behavior applies<br>\
+                to queries as well.</html>""";
     public static final String TOOL_TIP_METHOD_EXPAND =
-        "<html>Replace method calls by their bodies, i.e. by their<br>"
-            + "implementation. Method contracts are strictly deactivated.</html>";
+        """
+                <html>Replace method calls by their bodies, i.e. by their<br>\
+                implementation. Method contracts are strictly deactivated.</html>""";
     public static final String TOOL_TIP_METHOD_NONE =
         "<html>" + "Stop when encountering a method" + "</html>";
     public static final String TOOL_TIP_MPS_MERGE =
-        "<html>Use merge point statements for merging. That is,<br>"
-            + "whenever all branches with a given merge point statement<br>"
-            + "have reached it, the strategies will eventually merge<br>"
-            + "the branches together using the merge point specification.</html>";
+        """
+                <html>Use merge point statements for merging. That is,<br>\
+                whenever all branches with a given merge point statement<br>\
+                have reached it, the strategies will eventually merge<br>\
+                the branches together using the merge point specification.</html>""";
     public static final String TOOL_TIP_MPS_SKIP =
-        "<html>Simply removes (skips) the merge point statment;<br>"
-            + "no state merging is applied.</html>";
+        "<html>Simply removes (skips) the merge point statment;<br>no state merging is applied.</html>";
     public static final String TOOL_TIP_MPS_NONE =
-        "<html>" + "Stop when encountering a merge point statement" + "</html>";
+        "<html>Stop when encountering a merge point statement</html>";
 
     @Override
     public SymExStrategy create(Proof proof, StrategyProperties strategyProperties) {
