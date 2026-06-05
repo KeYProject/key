@@ -42,14 +42,14 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     private final RuleSetDispatchFeature costComputationDispatcher;
 
     /// Useful [TermFeature] collections
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
     private final boolean stopAtFirstNonCloseableGoal;
 
     public StringStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
-        this.tf = new ArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();

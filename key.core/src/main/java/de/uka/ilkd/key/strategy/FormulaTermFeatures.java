@@ -9,12 +9,13 @@ import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 
 import org.key_project.logic.op.Function;
+import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-class FormulaTermFeatures extends StaticFeatureCollection {
+class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTermFeatures {
 
-    public FormulaTermFeatures(ArithTermFeatures tf) {
+    public FormulaTermFeatures(JavaArithTermFeatures tf) {
         forF = extendsTrans(JavaDLTheory.FORMULA);
         orF = op(Junctor.OR);
         andF = op(Junctor.AND);
@@ -100,4 +101,134 @@ class FormulaTermFeatures extends StaticFeatureCollection {
     final TermFeature cutAllowed;
     final TermFeature cutAllowedBelowQuantifier;
     final TermFeature cutPriority;
+
+    @Override
+    public TermFeature forF() {
+        return forF;
+    }
+
+    @Override
+    public TermFeature orF() {
+        return orF;
+    }
+
+    @Override
+    public TermFeature andF() {
+        return andF;
+    }
+
+    @Override
+    public TermFeature impF() {
+        return impF;
+    }
+
+    @Override
+    public TermFeature notF() {
+        return notF;
+    }
+
+    @Override
+    public TermFeature propJunctor() {
+        return propJunctor;
+    }
+
+    @Override
+    public TermFeature ifThenElse() {
+        return ifThenElse;
+    }
+
+    @Override
+    public TermFeature notExecutable() {
+        return notExecutable;
+    }
+
+    @Override
+    public TermFeature notContainsExecutable() {
+        return notContainsExecutable;
+    }
+
+    @Override
+    public TermFeature quantifiedFor() {
+        return quantifiedFor;
+    }
+
+    @Override
+    public TermFeature quantifiedOr() {
+        return quantifiedOr;
+    }
+
+    @Override
+    public TermFeature quantifiedAnd() {
+        return quantifiedAnd;
+    }
+
+    @Override
+    public TermFeature atom() {
+        return atom;
+    }
+
+    @Override
+    public TermFeature literal() {
+        return literal;
+    }
+
+    @Override
+    public TermFeature clause() {
+        return clause;
+    }
+
+    @Override
+    public TermFeature clauseSet() {
+        return clauseSet;
+    }
+
+    @Override
+    public TermFeature quantifiedClauseSet() {
+        return quantifiedClauseSet;
+    }
+
+    @Override
+    public TermFeature pureLitConjDisj() {
+        return pureLitConjDisj;
+    }
+
+    @Override
+    public TermFeature quantifiedPureLitConjDisj() {
+        return quantifiedPureLitConjDisj;
+    }
+
+    @Override
+    public TermFeature elemUpdate() {
+        return elemUpdate;
+    }
+
+    @Override
+    public TermFeature update() {
+        return update;
+    }
+
+    @Override
+    public TermFeature program() {
+        return program;
+    }
+
+    @Override
+    public TermFeature modalOperator() {
+        return modalOperator;
+    }
+
+    @Override
+    public TermFeature cutAllowed() {
+        return cutAllowed;
+    }
+
+    @Override
+    public TermFeature cutAllowedBelowQuantifier() {
+        return cutAllowedBelowQuantifier;
+    }
+
+    @Override
+    public TermFeature cutPriority() {
+        return cutPriority;
+    }
 }

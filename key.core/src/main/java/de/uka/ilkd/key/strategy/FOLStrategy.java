@@ -61,7 +61,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     private final Feature approvalF;
     private final Feature instantiationF;
 
-    protected final ArithTermFeatures tf;
+    protected final JavaArithTermFeatures tf;
     protected final FormulaTermFeatures ff;
 
     public FOLStrategy(Proof proof, StrategyProperties strategyProperties) {
@@ -69,7 +69,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
         this.strategyProperties = (StrategyProperties) strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();

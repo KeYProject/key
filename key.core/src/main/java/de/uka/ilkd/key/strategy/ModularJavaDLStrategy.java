@@ -51,7 +51,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final StrategyProperties strategyProperties;
 
     private final Feature reduceInstTillMaxF;
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final Feature totalCost;
 
     private final ResponsibleStrategyCache responsibleStrategyCache;
@@ -61,7 +61,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         super(proof);
         strategies.addAll(componentStrategies);
         this.strategyProperties = (StrategyProperties) properties.clone();
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
 
         responsibleStrategyCache = new ResponsibleStrategyCache(strategies);
 
@@ -126,7 +126,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
      */
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
         var folStrat = responsibleStrategyCache.getStrategyByName(JFOLStrategy.NAME);
-        var intStrat = responsibleStrategyCache.getStrategyByName(IntegerStrategy.NAME);
+        var intStrat = responsibleStrategyCache.getStrategyByName(JavaIntegerStrategy.NAME);
         switch (rs.name().toString()) {
             case "order_terms" -> {
                 bindRuleSet(d, "order_terms",

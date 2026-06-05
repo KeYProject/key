@@ -5,7 +5,7 @@ package org.key_project.prover.strategy;
 
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-public interface FormulaTermFeatures {
+public interface IFormulaTermFeatures {
     TermFeature forF();
 
     TermFeature orF();

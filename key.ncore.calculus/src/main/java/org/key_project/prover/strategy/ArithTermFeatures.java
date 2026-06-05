@@ -26,10 +26,10 @@ public class ArithTermFeatures extends StaticFeatureCollection {
 
     final TermFeature addF;
     final TermFeature mulF;
-    final TermFeature modF;
-    final TermFeature divF;
+    final protected TermFeature modF;
+    final protected TermFeature divF;
 
-    final TermFeature eqF;
+    final public TermFeature eqF;
     final TermFeature leqF;
     final TermFeature geqF;
 
@@ -40,9 +40,9 @@ public class ArithTermFeatures extends StaticFeatureCollection {
     // left-associatively arranged monomials
     final TermFeature monomial;
     // left-associatively arranged polynomials
-    final TermFeature polynomial;
+    final public TermFeature polynomial;
 
-    final TermFeature literal;
+    final public TermFeature literal;
     final TermFeature posLiteral;
     final TermFeature negLiteral;
     final TermFeature nonNegLiteral;
@@ -58,15 +58,15 @@ public class ArithTermFeatures extends StaticFeatureCollection {
     final TermFeature nonNegOrNonCoeffMonomial;
     final TermFeature atLeastTwoCoeffMonomial;
 
-    final TermFeature intEquation;
+    final public TermFeature intEquation;
     final TermFeature linearEquation;
     final TermFeature monomialEquation;
-    final TermFeature intInEquation;
+    final public TermFeature intInEquation;
     final TermFeature linearInEquation;
     final TermFeature intRelation;
 
-    final TermFeature notContainsProduct;
-    final TermFeature notContainsDivMod;
+    final public TermFeature notContainsProduct;
+    public TermFeature notContainsDivMod;
 
     public ArithTermFeatures(IIntLdt numbers, Operator eq) {
         Z = numbers.getNumberSymbol();

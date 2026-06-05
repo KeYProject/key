@@ -51,7 +51,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         super(proof);
 
         this.strategyProperties = strategyProperties;
-        var tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        var tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         ff = new FormulaTermFeatures(tf);
 
         costComputationDispatcher = setupCostComputationF();

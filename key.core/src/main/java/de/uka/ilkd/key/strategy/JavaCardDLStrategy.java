@@ -57,7 +57,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     private final HeapLDT heapLDT;
 
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
 
@@ -67,7 +67,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
         this.strategyProperties = (StrategyProperties) strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();

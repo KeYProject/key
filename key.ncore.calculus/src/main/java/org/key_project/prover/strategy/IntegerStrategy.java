@@ -45,8 +45,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     private final RuleSetDispatchFeature instantiationDispatcher;
 
     /// Useful [TermFeature] collections
-    private final ArithTermFeatures tf;
-    private final FormulaTermFeatures ff;
+    protected final ArithTermFeatures tf;
+    protected final IFormulaTermFeatures ff;
 
     /// configuration options extracted from [StrategyProperties]
     private final boolean nonLinearArithmeticEnabled;
@@ -55,7 +55,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     FeatureConstants<G> featureConstants;
 
-    public IntegerStrategy(ArithTermFeatures tf, FormulaTermFeatures ff,
+    public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
             boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
             boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants) {
         this.tf = tf;
@@ -96,7 +96,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         return nonLinearArithmeticEnabled;
     }
 
-    private boolean arithDefOps() {
+    protected boolean arithDefOps() {
         return divAndModuloReasoningEnabled;
     }
 
@@ -166,7 +166,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         return d;
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
+    protected RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         final IIntLdt numbers = intLDT();
 
@@ -882,8 +882,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
-
+    protected void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
         if (arithDefOps()) {
             // the axiom defining division only has to be inserted once, because
             // it adds equations to the antecedent
@@ -894,16 +893,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     applyTF("divDenom", tf.notContainsDivMod),
                     ifZero(isBelow(ff.modalOperator()), longConst(200))));
 
-            bindRuleSet(d, "defOps_jdiv",
-                SumFeature.createSum(featureConstants.nonDuplicateAppModPositionFeature(),
-                    applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
-                    applyTF("divNum", tf.notContainsDivMod),
-                    applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator()), longConst(200))));
-
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.polynomial), longConst(-5000)));
-
             setupDefOpsExpandMod(d);
 
             bindRuleSet(d, "defOps_expandRanges", -8000);
@@ -911,10 +900,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             bindRuleSet(d, "defOps_modHomoEq", -5000);
         } else {
             bindRuleSet(d, "defOps_div", inftyConst());
-            bindRuleSet(d, "defOps_jdiv", inftyConst());
-
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(-4000)));
 
             bindRuleSet(d, "defOps_mod", add(applyTF("divNum", tf.literal),
                 applyTF("divDenom", tf.literal), longConst(-4000)));
