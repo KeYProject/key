@@ -416,6 +416,11 @@ public abstract class TacletApp implements ITacletApp {
         return missingSorts;
     }
 
+    @Override
+    public ITacletApp addCheckedInstantiation(SchemaVariable sv, Term term, LogicServices services,
+            boolean interesting) {
+        return addCheckedInstantiation(sv, (JTerm) term, (Services) services, interesting);
+    }
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with the given term.

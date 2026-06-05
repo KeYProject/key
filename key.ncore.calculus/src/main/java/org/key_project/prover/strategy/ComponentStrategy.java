@@ -23,5 +23,5 @@ public interface ComponentStrategy<GOAL extends ProofGoal<GOAL>> extends Strateg
 
     /// Whether this strategy is responsible for the given [IBuiltInRule]. This is necessary as
     /// built-in rules have no rule sets.
-    boolean isResponsibleFor(IBuiltInRule rule);
+    boolean isResponsibleFor(IBuiltInRule<GOAL> rule);
 }
