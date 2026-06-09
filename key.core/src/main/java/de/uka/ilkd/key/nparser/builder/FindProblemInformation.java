@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
 
@@ -24,7 +24,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     private final @NonNull ProblemInformation information = new ProblemInformation();
 
     @Override
-    public Object visitFile(KeYParser.FileContext ctx) {
+    public Object visitFile(JavaKeYParser.FileContext ctx) {
         if (ctx.profile() != null) {
             information.setProfile(accept(ctx.profile()));
         }
@@ -36,7 +36,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
             it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
@@ -45,7 +45,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitProblem(KeYParser.ProblemContext ctx) {
+    public Object visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
                 information.setChooseContract(accept(ctx.chooseContract));
@@ -66,38 +66,37 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
 
     @Override
-    public String visitBootClassPath(KeYParser.BootClassPathContext ctx) {
+    public String visitBootClassPath(JavaKeYParser.BootClassPathContext ctx) {
         return accept(ctx.string_value());
     }
 
     @Override
-    public List<String> visitClassPaths(KeYParser.ClassPathsContext ctx) {
+    public List<String> visitClassPaths(JavaKeYParser.ClassPathsContext ctx) {
         return mapOf(ctx.string_value());
     }
 
     @Override
-    public String visitString_value(KeYParser.String_valueContext ctx) {
+    public String visitString_value(JavaKeYParser.String_valueContext ctx) {
         return ParsingFacade.getValueDocumentation(ctx);
     }
 
-
     @Override
-    public String visitJavaSource(KeYParser.JavaSourceContext ctx) {
+    public String visitJavaSource(JavaKeYParser.JavaSourceContext ctx) {
         return ctx.oneJavaSource() != null ? (String) accept(ctx.oneJavaSource()) : null;
     }
 
     @Override
-    public String visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
+    public String visitOneJavaSource(JavaKeYParser.OneJavaSourceContext ctx) {
         return StringUtil.trim(ctx.getText(), '"');
     }
 
     @Override
-    public Object visitProfile(KeYParser.ProfileContext ctx) {
+    public Object visitProfile(JavaKeYParser.ProfileContext ctx) {
         return accept(ctx.name);
     }
 
     @Override
-    public String visitPreferences(KeYParser.PreferencesContext ctx) {
+    public String visitPreferences(JavaKeYParser.PreferencesContext ctx) {
         return ctx.s != null ? (String) accept(ctx.s) : null;
     }
 

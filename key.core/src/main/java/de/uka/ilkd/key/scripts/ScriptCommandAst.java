@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 
@@ -74,7 +74,7 @@ public record ScriptCommandAst(
             return b.asCommandLine();
         }
 
-        if (value instanceof KeYParser.ProofScriptCodeBlockContext ctx) {
+        if (value instanceof JavaKeYParser.ProofScriptCodeBlockContext ctx) {
             asReadableString(KeyAst.ProofScript.asAst(null, ctx));
         }
         if (value instanceof ParserRuleContext ctx) {

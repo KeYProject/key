@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
@@ -190,12 +190,12 @@ public abstract class AbstractProblemLoader {
     private static final Map<Integer, String> missedErrors = new HashMap<>();
 
     static {
-        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors.put(new Pair<>(JavaKeYLexer.SEMI, JavaKeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
-        missedErrors.put(KeYLexer.RBRACE, "closing brace");
-        missedErrors.put(KeYLexer.SEMI, "semicolon");
+        missedErrors.put(JavaKeYLexer.RPAREN, "closing parenthesis");
+        missedErrors.put(JavaKeYLexer.RBRACE, "closing brace");
+        missedErrors.put(JavaKeYLexer.SEMI, "semicolon");
     }
 
     /**

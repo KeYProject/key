@@ -5,8 +5,7 @@ import KeYTacletParser;
 options { tokenVocab = KeYLexer; }
 decls
    : (string = programSource // for problems
-   | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls | contracts // for problems
-   | invariants // for problems
+   | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls
    | rulesOrAxioms // for problems
    )*
    ;
@@ -78,22 +77,6 @@ datatype_constructor
 
 func_decls
    : FUNCTIONS LBRACE (func_decl)* RBRACE
-   ;
-
-contracts
-   : CONTRACTS LBRACE (one_contract)* RBRACE
-   ;
-
-invariants
-   : INVARIANTS LPAREN selfVar = one_bound_variable RPAREN LBRACE (one_invariant)* RBRACE
-   ;
-
-one_contract
-   : contractName = simple_ident LBRACE (prog_var_decls)? fma = term MODIFIES modifiesClause = term RBRACE SEMI
-   ;
-
-one_invariant
-   : invName = simple_ident LBRACE fma = term (DISPLAYNAME displayName = string_value)? RBRACE SEMI
    ;
 
 prog_var_decls

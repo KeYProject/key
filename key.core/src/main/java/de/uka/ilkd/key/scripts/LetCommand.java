@@ -8,7 +8,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
@@ -64,7 +64,7 @@ public class LetCommand implements ProofScriptCommand {
                 throw new ScriptException(key + " is already fixed in this script");
             }
             try {
-                final var termCtx = (KeYParser.ProofScriptExpressionContext) entry.getValue();
+                final var termCtx = (JavaKeYParser.ProofScriptExpressionContext) entry.getValue();
                 final var value = termCtx.accept(stateMap.getEvaluator());
                 final var term = stateMap.getValueInjector().convert(value, JTerm.class);
                 abbrMap.put(term, key, true);

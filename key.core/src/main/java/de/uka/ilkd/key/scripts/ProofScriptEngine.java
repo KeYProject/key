@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
@@ -189,7 +189,7 @@ public class ProofScriptEngine {
     }
 
 
-    public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
+    public static String prettyPrintCommand(JavaKeYParser.ProofScriptCommandContext ctx) {
         return ctx.cmd.getText() +
             (ctx.proofScriptParameters() != null
                     ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()

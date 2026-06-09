@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -52,19 +52,19 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapOf(ctx.contracts());
         mapOf(ctx.invariants());
         return null;
     }
 
     @Override
-    public Object visitContracts(KeYParser.ContractsContext ctx) {
+    public Object visitContracts(JavaKeYParser.ContractsContext ctx) {
         return mapOf(ctx.one_contract());
     }
 
     @Override
-    public Object visitOne_contract(KeYParser.One_contractContext ctx) {
+    public Object visitOne_contract(JavaKeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
         // for program variable declarations
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
@@ -87,7 +87,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
 
 
     @Override
-    public Object visitInvariants(KeYParser.InvariantsContext ctx) {
+    public Object visitInvariants(JavaKeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
         selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
@@ -96,7 +96,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
+    public Object visitOne_invariant(JavaKeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
         JTerm fma = accept(ctx.fma);
         String displayName = ctx.displayName != null ? ctx.displayName.getText() : null;

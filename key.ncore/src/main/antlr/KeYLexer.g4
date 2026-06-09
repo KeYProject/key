@@ -18,23 +18,20 @@ lexer grammar KeYLexer;
    static {
       modNames.put("\\<","diamond");
       modNames.put("\\diamond","diamond");
-      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\[","box");
       modNames.put("\\box","box");
+
+      modPairs.put("\\modality","\\endmodality");
+      modPairs.put("\\diamond","\\endmodality");
+      modPairs.put("\\box","\\endmodality");
+
+      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\box_transaction","box_transaction");
       modNames.put("\\[[","throughout");
       modNames.put("\\throughout","throughout");
       modNames.put("\\throughout_transaction","throughout_transaction");
 
-      modPairs.put("\\<","\\>");
-      modPairs.put("\\[","\\]");
-
-      //modPairs.put("\\[[","\\]]");
-
-      modPairs.put("\\modality","\\endmodality");
-      modPairs.put("\\diamond","\\endmodality");
       modPairs.put("\\diamond_transaction","\\endmodality");
-      modPairs.put("\\box","\\endmodality");
       modPairs.put("\\box_transaction","\\endmodality");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
@@ -44,7 +41,7 @@ lexer grammar KeYLexer;
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
-       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceeded by an '('
+       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
            for (int k = 1; k <= MAX_K; k++) {
                int codePoint = _input.LA(k);
                if (Character.isWhitespace(codePoint)) continue;
@@ -94,8 +91,10 @@ ONEOF
 ABSTRACT
    : '\\abstract'
    ;
+ALIAS: '\\alias';
+
    // Keywords used in schema variable declarations
-   
+  
 SCHEMAVARIABLES
    : '\\schemaVariables'
    ;
@@ -139,18 +138,9 @@ SKOLEMTERM
 SKOLEMFORMULA
    : '\\skolemFormula'
    ;
-
-TERMLABEL
-   : '\\termlabel'
-   ;
-   // Keywords used in program variable declarations
    
 PROGRAMVARIABLES
    : '\\programVariables'
-   ;
-
-SAME_OBSERVER
-   : '\\sameObserver'
    ;
 
 VARCOND
@@ -161,20 +151,8 @@ APPLY_UPDATE_ON_RIGID
    : '\\applyUpdateOnRigid'
    ;
 
-DEPENDINGON
-   : '\\dependingOn'
-   ;
-
-DISJOINTMODULONULL
-   : '\\disjointModuloNull'
-   ;
-
 DROP_EFFECTLESS_ELEMENTARIES
    : '\\dropEffectlessElementaries'
-   ;
-
-DROP_EFFECTLESS_STORES
-   : '\\dropEffectlessStores'
    ;
 
 SIMPLIFY_IF_THEN_ELSE_UPDATE
@@ -187,10 +165,6 @@ HASSORT
 
 ISINDUCTVAR
    : '\\isInductVar'
-   ;
-
-ISOBSERVER
-   : '\\isObserver'
    ;
 
 DIFFERENT
@@ -213,10 +187,6 @@ NEW_TYPE_OF
    : '\\newTypeOf'
    ;
 
-NEW_DEPENDING_ON
-   : '\\newDependingOn'
-   ;
-
 HAS_ELEMENTARY_SORT
    : '\\hasElementarySort'
    ;
@@ -224,10 +194,6 @@ HAS_ELEMENTARY_SORT
    
 NOT_
    : '\\not'
-   ;
-
-NOTFREEIN
-   : '\\notFreeIn'
    ;
 
 SAME
@@ -631,6 +597,9 @@ GREATEREQUAL
    | '\u2265'
    ;
 
+OPENTYPEPARAMS : '<' '[';
+CLOSETYPEPARAMS : ']' '>';
+
 WS
    : [ \t\n\r\u00a0]+ -> channel (HIDDEN)
    ; //U+00A0 = non breakable whitespace
@@ -760,10 +729,6 @@ MODALITYB
    : '\\[' -> more , pushMode (modBox)
    ;
 
-MODALITYBB
-   : '\\[[' -> more , pushMode (modBoxBox)
-   ;
-
 MODAILITYGENERIC1
    : '\\box' -> more , pushMode (modGeneric)
    ;
@@ -775,11 +740,6 @@ MODAILITYGENERIC2
 MODAILITYGENERIC4
    : '\\modality' -> more , pushMode (modGeneric)
    ;
-
-MODAILITYGENERIC6
-   : '\\throughout' -> more , pushMode (modGeneric)
-   ;
-   //BACKSLASH:  '\\';
    
 ERROR_CHAR
    : .

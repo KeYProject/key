@@ -1,4 +1,4 @@
-parser grammar KeYParser;
+parser grammar JavaKeYParser;
 
 @header {
   import de.uka.ilkd.key.util.parsing.*;
@@ -9,7 +9,7 @@ private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
-options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
+options { tokenVocab=JavaKeYLexer; } // use tokens from STLexer.g4
 
 file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
 
