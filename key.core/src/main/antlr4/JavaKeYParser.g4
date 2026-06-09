@@ -11,8 +11,6 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=JavaKeYLexer; } // use tokens from STLexer.g4
 
-file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
-
 decls
 :
     ( bootClassPath          // for problems
@@ -35,76 +33,6 @@ decls
     )*
 ;
 
-problem
-:
-  ( PROBLEM LBRACE ( t=termorseq ) RBRACE
-  | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-  | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
-  )
-  proofScriptEntry?
-;
-
-
-
-one_include_statement
-:
-    (INCLUDE | INCLUDELDTS)
-    one_include (COMMA one_include)* SEMI
-;
-
-one_include 
-:
-    absfile=IDENT | relfile=string_value
-;
-
-options_choice
-:
-  WITHOPTIONS activated_choice (COMMA activated_choice)* SEMI
-;
-
-activated_choice
-:
-    cat=IDENT COLON choice_=IDENT
-;
-
-option_decls
-:
-    OPTIONSDECL LBRACE (choice SEMI)* RBRACE
-;
-
-choice
-:
-  maindoc+=DOC_COMMENT*
-  category=IDENT
-  (COLON LBRACE optionDecl (COMMA optionDecl)* RBRACE)?
-;
-
-optionDecl: doc+=DOC_COMMENT? choice_option+=IDENT;
-
-sort_decls
-:
- SORTS LBRACE (one_sort_decl)* RBRACE
-;
-
-one_sort_decl
-:
-  doc=DOC_COMMENT?
-  (
-     GENERIC  sortIds=simple_ident_dots_comma_list
-        (ONEOF sortOneOf = oneof_sorts)?
-        (EXTENDS sortExt = extends_sorts)? SEMI
-    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
-    | ALIAS simple_ident_dots EQUALS sortId SEMI
-  )
-;
-
-parametric_sort_decl
-:
-    simple_ident_dots
-    formal_sort_param_decls
-;
-
 simple_ident_dots
 :
   simple_ident (DOT simple_ident)*
@@ -113,36 +41,6 @@ simple_ident_dots
 simple_ident_dots_comma_list
 :
   simple_ident_dots (COMMA simple_ident_dots)*
-;
-
-
-extends_sorts
-:
-    sortId (COMMA sortId)*
-;
-
-oneof_sorts
-:
-    LBRACE
-    s = sortId (COMMA s = sortId) *
-    RBRACE
-;
-
-keyjavatype
-:
-    type = simple_ident_dots (EMPTYBRACKETS)*
-;
-
-prog_var_decls
-:
-    PROGRAMVARIABLES
-    LBRACE
-    (
-        kjt = keyjavatype
-        var_names = simple_ident_comma_list
-        SEMI
-    )*
-    RBRACE
 ;
 
 //this rule produces a StringLiteral
@@ -159,13 +57,6 @@ simple_ident
 simple_ident_comma_list
 :
     id = simple_ident (COMMA id = simple_ident )*
-;
-
-
-schema_var_decls :
-    SCHEMAVARIABLES LBRACE
-    ( one_schema_var_decl SEMI)*
-    RBRACE
 ;
 
 //TODO Split
@@ -212,63 +103,6 @@ one_schema_modal_op_decl
     LBRACE ids = simple_ident_comma_list RBRACE id = simple_ident
 ;
 
-pred_decl
-:
-  doc=DOC_COMMENT?
-  pred_name = funcpred_name
-  formal_sort_param_decls?
-  (whereToBind=where_to_bind)?
-  argSorts=arg_sorts
-  SEMI
-;
-
-pred_decls
-:
-  PREDICATES LBRACE (pred_decl)* RBRACE
-;
-
-func_decl
-:
-  doc=DOC_COMMENT?
-  (UNIQUE)?
-  retSort = sortId
-  func_name = funcpred_name
-  formal_sort_param_decls?
-  whereToBind=where_to_bind?
-  argSorts = arg_sorts
-  SEMI
-;
-
-/**
-\datatypes {
- \free List = Nil | Cons(any head, List tail);
-}
-*/
-datatype_decls:
-  DATATYPES LBRACE datatype_decl* RBRACE
-;
-
-datatype_decl:
-  doc=DOC_COMMENT?
-  // weigl: all datatypes are free!
-  // FREE?
-  name=simple_ident formal_sort_param_decls?
-  EQUALS
-  datatype_constructor (OR datatype_constructor)*
-  SEMI
-;
-
-datatype_constructor:
-  name=simple_ident
-  (
-    LPAREN
-    (argSort+=sortId argName+=simple_ident
-     (COMMA argSort+=sortId argName+=simple_ident)*
-    )?
-    RPAREN
-  )?
-;
-
 formal_sort_param_decls
 : OPENTYPEPARAMS
       formal_sort_param_decl (COMMA formal_sort_param_decl)*
@@ -280,68 +114,8 @@ formal_sort_param_decl
     (PLUS | MINUS)? simple_ident
 ;
 
-func_decls
-    :
-        FUNCTIONS
-        LBRACE
-        (
-            func_decl
-        ) *
-        RBRACE
-    ;
-
-
-// like arg_sorts but admits also the keyword "\formula"
-arg_sorts_or_formula
-:
-    ( LPAREN
-      arg_sorts_or_formula_helper
-      (COMMA arg_sorts_or_formula_helper)*
-      RPAREN
-    )?
-;
-
-arg_sorts_or_formula_helper
-:
-    sortId | FORMULA
-;
-
-transform_decl
-:
-    doc=DOC_COMMENT?
-    (retSort = sortId
-    | FORMULA
-    )
-
-    trans_name=funcpred_name
-    argSorts=arg_sorts_or_formula
-    SEMI
-;
-
-
-transform_decls:
-    TRANSFORMERS LBRACE (transform_decl)* RBRACE
-;
-
 arrayopid:
         EMPTYBRACKETS LPAREN componentType=keyjavatype RPAREN
-;
-
-arg_sorts:
-        (LPAREN sortId (COMMA sortId)* RPAREN)?
-;
-
-where_to_bind:
-        LBRACE
-        b+=(TRUE | FALSE)
-        (COMMA b+=(TRUE | FALSE) )*
-        RBRACE
-        
-   ;
-
-ruleset_decls
-:
-  HEURISTICSDECL LBRACE  (doc+=DOC_COMMENT? id+=simple_ident SEMI)* RBRACE
 ;
 
 sortId
@@ -846,13 +620,6 @@ one_invariant
      RBRACE SEMI
 ;
 
-rulesOrAxioms:
-    doc=DOC_COMMENT?
-    (RULES|AXIOMS)
-    (choices = option_list)?
-    (LBRACE (s=taclet SEMI)* RBRACE)
-;
-
 bootClassPath
 :
   BOOTCLASSPATH id=string_value SEMI
@@ -871,64 +638,3 @@ oneJavaSource
   | COLON
   )+ 
 ;
-
-profile: PROFILE name=string_value SEMI;
-
-preferences
-:
-	KEYSETTINGS (LBRACE s=string_value? RBRACE
-	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
-;
-
-proofScriptEntry
-:
-  PROOFSCRIPT
-    ( STRING_LITERAL SEMI?
-    | LBRACE proofScript RBRACE
-    )
-;
-
-proofScriptEOF: proofScript EOF;
-proofScript: proofScriptCommand*;
-proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
-
-proofScriptParameters: proofScriptParameter*;
-proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
-proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
-proofScriptExpression:
-    boolean_literal
-  | char_literal
-  | integer
-  | floatnum
-  | string_literal
-  | LPAREN (term | seq) RPAREN
-  | simple_ident
-  | abbreviation
-  | literals
-  | proofScriptCodeBlock
-  ;
-
-proofScriptCodeBlock: LBRACE proofScript RBRACE;
-
-// PROOF
-proof: PROOF EOF;
-
-// Config
-cfile: cvalue* EOF;
-//csection: LBRACKET IDENT RBRACKET;
-ckv: doc=DOC_COMMENT? ckey ':' cvalue;
-ckey: IDENT | STRING_LITERAL;
-cvalue:
-    IDENT #csymbol
-  | STRING_LITERAL #cstring
-  | BIN_LITERAL #cintb
-  | HEX_LITERAL #cinth
-  | MINUS? INT_LITERAL #cintd
-  | MINUS? FLOAT_LITERAL #cfpf
-  | MINUS? DOUBLE_LITERAL #cfpd
-  | MINUS? REAL_LITERAL #cfpr
-  | (TRUE|FALSE) #cbool
-  | LBRACE
-     (ckv (COMMA ckv)*)? COMMA?
-    RBRACE #table
-  | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;

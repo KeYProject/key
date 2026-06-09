@@ -44,7 +44,7 @@ schema_var_decls
    ;
 
 pred_decl
-   : doc = DOC_COMMENT? pred_name = funcpred_name (whereToBind = where_to_bind)? argSorts = arg_sorts SEMI
+   : doc = DOC_COMMENT? pred_name = funcpred_name formal_sort_param_decls? (whereToBind = where_to_bind)? argSorts = arg_sorts SEMI
    ;
 
 pred_decls
@@ -52,7 +52,7 @@ pred_decls
    ;
 
 func_decl
-   : doc = DOC_COMMENT? (UNIQUE)? retSort = sortId func_name = funcpred_name whereToBind = where_to_bind? argSorts = arg_sorts SEMI
+   : doc = DOC_COMMENT? (UNIQUE)? retSort = sortId func_name = funcpred_name formal_sort_param_decls? whereToBind = where_to_bind? argSorts = arg_sorts SEMI
    ;
 
 /**
@@ -68,7 +68,7 @@ datatype_decl
    // weigl: all datatypes are free!
    
    // FREE?
-   name = simple_ident EQUALS datatype_constructor (OR datatype_constructor)* SEMI
+   name = simple_ident formal_sort_param_decls? EQUALS datatype_constructor (OR datatype_constructor)* SEMI
    ;
 
 datatype_constructor
@@ -104,8 +104,23 @@ sort_decls
    ;
 
 one_sort_decl
-   : doc = DOC_COMMENT? (GENERIC sortIds = simple_ident_dots_comma_list (ONEOF sortOneOf = oneof_sorts)? (EXTENDS sortExt = extends_sorts)? SEMI | PROXY sortIds = simple_ident_dots_comma_list (EXTENDS sortExt = extends_sorts)? SEMI | ABSTRACT? sortIds = simple_ident_dots_comma_list (EXTENDS sortExt = extends_sorts)? SEMI)
-   ;
+:
+  doc=DOC_COMMENT?
+  (
+     GENERIC  sortIds=simple_ident_dots_comma_list
+        (ONEOF sortOneOf = oneof_sorts)?
+        (EXTENDS sortExt = extends_sorts)? SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ALIAS simple_ident_dots EQUALS sortId SEMI
+  )
+;
+
+parametric_sort_decl
+:
+    simple_ident_dots
+    formal_sort_param_decls
+;
 
 extends_sorts
    : sortId (COMMA sortId)*
