@@ -1,4 +1,5 @@
 parser grammar JavaKeYParser;
+import KeYParser;
 
 @header {
   import de.uka.ilkd.key.util.parsing.*;
@@ -33,31 +34,8 @@ decls
     )*
 ;
 
-simple_ident_dots
-:
-  simple_ident (DOT simple_ident)*
-;
-
-simple_ident_dots_comma_list
-:
-  simple_ident_dots (COMMA simple_ident_dots)*
-;
-
 //this rule produces a StringLiteral
 string_literal: id=STRING_LITERAL;
-
-//this rule produces a String
-string_value: STRING_LITERAL;
-
-simple_ident
-:
-    id=IDENT
-;
-
-simple_ident_comma_list
-:
-    id = simple_ident (COMMA id = simple_ident )*
-;
 
 //TODO Split
 one_schema_var_decl
@@ -103,43 +81,9 @@ one_schema_modal_op_decl
     LBRACE ids = simple_ident_comma_list RBRACE id = simple_ident
 ;
 
-formal_sort_param_decls
-: OPENTYPEPARAMS
-      formal_sort_param_decl (COMMA formal_sort_param_decl)*
-      CLOSETYPEPARAMS
-;
-
-formal_sort_param_decl
-:
-    (PLUS | MINUS)? simple_ident
-;
-
 arrayopid:
-        EMPTYBRACKETS LPAREN componentType=keyjavatype RPAREN
+        EMPTYBRACKETS LPAREN componentType=typemapping RPAREN
 ;
-
-sortId
-:
-    id=simple_ident_dots formal_sort_args? (EMPTYBRACKETS)*
-;
-
-formal_sort_args
-:
-    OPENTYPEPARAMS
-    sortId (COMMA sortId)*
-    CLOSETYPEPARAMS
-;
-
-id_declaration
-:
-  id=IDENT ( COLON s=sortId )?
-;
-
-funcpred_name
-:
-  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
-;
-
 
 /**
  * In the special but important case of Taclets, we don't yet know
@@ -381,10 +325,6 @@ floatnum: // called floatnum because "float" collide with the Java language
 char_literal:
     CHAR_LITERAL;
 
-
-varId: id=IDENT;
-varIds: ids=simple_ident_comma_list;
-
 triggers
 :
   TRIGGER
@@ -428,22 +368,6 @@ modifiers
   | HELPTEXT htext=string_value
   | triggers
   ) *
-;
-
-seq: ant=semisequent SEQARROW suc=semisequent;
-
-seqEOF: seq EOF;
-
-termorseq
-:
-      head=term (COMMA s=seq | SEQARROW ss=semisequent) ?
-    | SEQARROW ss=semisequent
-;
-
-semisequent
-:
-    /* empty */
-  | head=term ( COMMA ss=semisequent) ?
 ;
 
 varexplist : varexp (COMMA varexp)* ;

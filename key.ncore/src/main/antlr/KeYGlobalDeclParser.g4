@@ -43,6 +43,17 @@ schema_var_decls
    : SCHEMAVARIABLES LBRACE (one_schema_var_decl SEMI)* RBRACE
    ;
 
+formal_sort_param_decls
+: OPENTYPEPARAMS
+      formal_sort_param_decl (COMMA formal_sort_param_decl)*
+      CLOSETYPEPARAMS
+;
+
+formal_sort_param_decl
+:
+    (PLUS | MINUS)? simple_ident
+;
+
 pred_decl
    : doc = DOC_COMMENT? pred_name = funcpred_name formal_sort_param_decls? (whereToBind = where_to_bind)? argSorts = arg_sorts SEMI
    ;

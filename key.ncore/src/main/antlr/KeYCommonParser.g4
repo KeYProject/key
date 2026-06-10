@@ -1,6 +1,5 @@
 parser grammar KeYCommonParser;
 
-
 options { tokenVocab = KeYLexer; }
 simple_ident
    : id = IDENT
@@ -11,8 +10,16 @@ simple_ident_comma_list
    ;
 
 sortId
-   : id = simple_ident_dots (EMPTYBRACKETS)*
-   ;
+:
+    id=simple_ident_dots formal_sort_args? (EMPTYBRACKETS)*
+;
+
+formal_sort_args
+:
+    OPENTYPEPARAMS
+    sortId (COMMA sortId)*
+    CLOSETYPEPARAMS
+;
 
 simple_ident_dots
    : simple_ident (DOT simple_ident)*
