@@ -34,9 +34,6 @@ decls
     )*
 ;
 
-//this rule produces a StringLiteral
-string_literal: id=STRING_LITERAL;
-
 //TODO Split
 one_schema_var_decl
 :
@@ -67,20 +64,6 @@ one_schema_var_decl
      ids=simple_ident_comma_list
 ;
 
-schema_modifiers
-    :
-        LBRACKET
-        opts = simple_ident_comma_list
-        RBRACKET
-       
-    ;
-
-one_schema_modal_op_decl
-:
-    (LPAREN sort = sortId RPAREN)?
-    LBRACE ids = simple_ident_comma_list RBRACE id = simple_ident
-;
-
 arrayopid:
         EMPTYBRACKETS LPAREN componentType=typemapping RPAREN
 ;
@@ -95,9 +78,6 @@ arrayopid:
 
 //region terms and formulas
 
-termEOF: term EOF; // toplevel
-
-boolean_literal: TRUE | FALSE;
 literals:
     boolean_literal
   | char_literal
@@ -107,35 +87,8 @@ literals:
   | emptyset
 ;
 
-emptyset: UTF_EMPTY;
-term: parallel_term; // weigl: should normally be equivalence_term
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
-parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
-elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
-equivalence_term: a=implication_term (EQV b+=implication_term)*;
-implication_term: a=disjunction_term (IMP b=implication_term)?;
-disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
-conjunction_term: a=term60 (AND b+=term60)*;
-term60: unary_formula | equality_term;
-unary_formula:
-    NOT sub=term60                                #negation_term
-  | (FORALL | EXISTS) bound_variables sub=term60  #quantifierterm
-  | MODALITY sub=term60                           #modality_term
-;
-equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
-comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL|UTF_PRECEDES|UTF_SUBSET_EQ|UTF_SUBSEQ|UTF_IN) b=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS|UTF_UNION|UTF_INTERSECT|UTF_SETMINUS) b+=strong_arith_term_1)*;
-strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
-strong_arith_term_2: a=atom_prefix (op+=(PERCENT|SLASH) b+=atom_prefix)*;
-update_term: (LBRACE u=parallel_term RBRACE) (atom_prefix | unary_formula);
 
-substitution_term:
- LBRACE SUBST  bv=one_bound_variable SEMI
-     replacement=comparison_term RBRACE
-     (atom_prefix|unary_formula)
-;
-cast_term: (LPAREN sort=sortId RPAREN) sub=atom_prefix;
-unary_minus_term: MINUS sub=atom_prefix;
 atom_prefix:
     update_term
   | substitution_term
@@ -154,16 +107,6 @@ brace_suffix:
 ;
 primitive_labeled_term:
   primitive_term ( LGUILLEMETS labels= label RGUILLEMETS )?;
-termParen: LPAREN term RPAREN (attribute)*;
-abbreviation: AT name=simple_ident;
-primitive_term:
-    termParen
-  | ifThenElseTerm
-  | ifExThenElseTerm
-  | abbreviation
-  | accessterm
-  | literals
-  ;
 
 /*
 weigl, 2021-03-12:
@@ -216,36 +159,11 @@ term
 ;
 */
 
-
-/**
- * Access: a.b.c@f, T.staticQ()
- */
-accessterm
-:
-  // OLD
-  (sortId DOUBLECOLON)?
-  firstName=simple_ident
-  formal_sort_args?
-
-  /*Faster version
-  simple_ident_dots
-  ( EMPTYBRACKETS*
-    DOUBLECOLON
-    simple_ident
-  )?*/
-  call?
-  ( attribute )*
-;
-
 attribute:
     DOT STAR                                                             #attribute_star
   | DOT id=simple_ident call? (AT heap=bracket_term)?                    #attribute_simple
   | DOT LPAREN sort=sortId DOUBLECOLON id=simple_ident RPAREN
      call? (AT heap=bracket_term)?                                       #attribute_complex
-;
-
-call:
-  ((LBRACE boundVars=bound_variables RBRACE)? argument_list)
 ;
 
 label
@@ -271,21 +189,6 @@ location_term
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
 ;
 
-ifThenElseTerm
-:
-  IF LPAREN condF = term RPAREN
-  THEN LPAREN thenT = term RPAREN
-  ELSE LPAREN elseT = term RPAREN
-;
-
-ifExThenElseTerm
-:
-  IFEX exVars = bound_variables
-  LPAREN condF = term RPAREN
-  THEN LPAREN thenT = term RPAREN
-  ELSE LPAREN elseT = term RPAREN
-;
-
 locset_term
 :
     LBRACE
@@ -294,92 +197,8 @@ locset_term
     RBRACE
 ;
 
-bound_variables
-:
-    var=one_bound_variable (COMMA var=one_bound_variable)* SEMI
-;
-
-one_bound_variable 
-:
-  s=sortId? id=simple_ident
-;
-
-argument_list
-:
-    LPAREN
-    (term (COMMA term)*)?
-    RPAREN
-;
-
-integer_with_minux: MINUS? integer;
-integer:
-  (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
-;
-
-floatnum: // called floatnum because "float" collide with the Java language
-    (MINUS)? FLOAT_LITERAL  #floatLiteral
-  | (MINUS)? DOUBLE_LITERAL #doubleLiteral
-  | (MINUS)? REAL_LITERAL   #realLiteral
-;
-
 char_literal:
     CHAR_LITERAL;
-
-triggers
-:
-  TRIGGER
-  LBRACE id=simple_ident RBRACE
-  t=term
-    (AVOID avoidCond+=term
-      (COMMA avoidCond+=term )*)?
-  SEMI
-;
-
-taclet
-:
-  doc=DOC_COMMENT?
-  (LEMMA)?
-  name=IDENT (choices_=option_list)?
-  LBRACE
-  ( form=term
-  |
-    ( SCHEMAVAR one_schema_var_decl SEMI) *
-    ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-    ( FIND LPAREN find=termorseq RPAREN
-        (   SAMEUPDATELEVEL
-          | INSEQUENTSTATE
-          | ANTECEDENTPOLARITY
-          | SUCCEDENTPOLARITY
-        )*
-    )?
-
-    ( VARCOND LPAREN varexplist RPAREN )*
-    goalspecs
-    modifiers
-  )
-  RBRACE
-;
-
-modifiers
-:
-  ( rs = rulesets
-  | NONINTERACTIVE
-  | DISPLAYNAME dname=string_value
-  | HELPTEXT htext=string_value
-  | triggers
-  ) *
-;
-
-varexplist : varexp (COMMA varexp)* ;
-
-varexp
-:
-  negate=NOT_?
-  varexpId
-  (LBRACKET  parameter+=IDENT (COMMA parameter+=IDENT)* RBRACKET)?
-  (LPAREN varexp_argument (COMMA varexp_argument)* RPAREN)?
-;
-
 
 varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier. Only for backwards compatibility.
     APPLY_UPDATE_ON_RIGID
@@ -446,71 +265,9 @@ varexp_argument
   | term
 ;
 
-goalspecs:
-      CLOSEGOAL
-    | goalspecwithoption (SEMI goalspecwithoption)*
-;
-
-goalspecwithoption
- :
-    soc=option_list LBRACE goalspec RBRACE
-  | goalspec
-;
-
-option
-:
-  cat=IDENT COLON value=IDENT
-;
-
-option_list
-:
-  LPAREN
-    (option_expr (COMMA option_expr)*)
-  RPAREN
-;
-
-option_expr
-:
-    option_expr AND option_expr #option_expr_and
-  | option_expr OR option_expr  #option_expr_or
-  | NOT option_expr             #option_expr_not
-  | LPAREN option_expr RPAREN   #option_expr_paren
-  | option                      #option_expr_prop
-;
-
-goalspec
-:
-  (name=string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)?
-  ( rwObj=replacewith
-    addSeq=add?
-    addRList=addrules?
-    addpv=addprogvar?
-  | addSeq=add (addRList=addrules)?
-  | addRList=addrules
-  )
-;
-
-replacewith:  REPLACEWITH LPAREN o=termorseq RPAREN;
-add:          ADD LPAREN s=seq RPAREN;
-addrules:     ADDRULES LPAREN lor=tacletlist RPAREN;
-addprogvar:   ADDPROGVARS LPAREN pvs=pvset RPAREN;
-tacletlist:   taclet (COMMA taclet)*;
-
-pvset: varId (COMMA varId)*;
-
-rulesets:
-  HEURISTICS LPAREN ruleset
-  (COMMA ruleset) * RPAREN
-;
-
-ruleset: id=IDENT;
-
-metaId:  id=simple_ident ;
-
 metaTerm:
     vf=metaId (LPAREN t+=term (COMMA t+=term)* RPAREN)?
 ;
-
 
 contracts
 :

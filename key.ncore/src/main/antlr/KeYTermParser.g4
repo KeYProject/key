@@ -118,7 +118,6 @@ boolean_literal
 
 literals
    : boolean_literal
-   | char_literal
    | integer
    | floatnum
    | string_literal
@@ -157,10 +156,6 @@ floatnum
    | (MINUS)? REAL_LITERAL # realLiteral
    ;
 
-char_literal
-   : CHAR_LITERAL
-   ;
-
 ifThenElseTerm
    : IF LPAREN condF = term RPAREN THEN LPAREN thenT = term RPAREN ELSE LPAREN elseT = term RPAREN
    ;
@@ -174,7 +169,7 @@ ifExThenElseTerm
  */ accessterm
    :
    // OLD
-   (sortId DOUBLECOLON)? firstName = simple_ident
+   (sortId DOUBLECOLON)? firstName = simple_ident formal_sort_args?
 /*Faster version
   simple_ident_dots
   ( EMPTYBRACKETS*

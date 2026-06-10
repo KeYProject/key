@@ -4,7 +4,7 @@ import KeYSequentParser;
 
 options { tokenVocab = KeYLexer; }
 taclet
-   : doc = DOC_COMMENT? (LEMMA)? name = IDENT (choices_ = option_list)? LBRACE (form = term | (SCHEMAVAR one_schema_var_decl SEMI)* (ASSUMES LPAREN ifSeq = seq RPAREN)? (FIND LPAREN find = termorseq RPAREN (SAMEUPDATELEVEL | INSEQUENTSTATE | ANTECEDENTPOLARITY | SUCCEDENTPOLARITY)*)? (VARCOND LPAREN varexplist RPAREN)* goalspecs modifiers) RBRACE
+   : doc = DOC_COMMENT? (LEMMA)? name = IDENT (choices_ = option_list)? LBRACE (form = term | (SCHEMAVAR one_schema_var_decl SEMI)* (ASSUMES LPAREN assumesSeq = seq RPAREN)? (FIND LPAREN find = termorseq RPAREN (SAMEUPDATELEVEL | INSEQUENTSTATE | ANTECEDENTPOLARITY | SUCCEDENTPOLARITY)*)? (VARCOND LPAREN varexplist RPAREN)* goalspecs modifiers) RBRACE
    ;
 
 option_list
@@ -24,7 +24,7 @@ option_expr
    ;
 
 goalspec
-   : (name = string_value COLON)? (rwObj = replacewith addSeq = add? addRList = addrules? addpv = addprogvar? | addSeq = add (addRList = addrules)? | addRList = addrules)
+   : (name = string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)? (rwObj = replacewith addSeq = add? addRList = addrules? addpv = addprogvar? | addSeq = add (addRList = addrules)? | addRList = addrules)
    ;
 
 replacewith
