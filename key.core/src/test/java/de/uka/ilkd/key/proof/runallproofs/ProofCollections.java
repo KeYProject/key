@@ -653,6 +653,7 @@ public class ProofCollections {
         g.provable("../../key.core/src/test/resources/testcase/classpath/classpath.key");
         g.notprovable("heap/inconsistent_represents/MyClass_m.key");
         g.notprovable("heap/inconsistent_represents/MyClass_n.key");
+        g.provable("standard_key/java_dl/typeInference.key");
 
 
         g = c.group("FOL");

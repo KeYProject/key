@@ -2158,7 +2158,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VarType n, Void arg) {
-        return getKeYJavaType(n.resolve());
+        var kjt = getKeYJavaType(n.resolve());
+        return new TypeRef(kjt);
     }
 
     @Override
