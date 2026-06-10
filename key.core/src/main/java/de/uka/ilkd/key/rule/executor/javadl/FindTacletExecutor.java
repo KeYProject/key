@@ -168,7 +168,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      * creates a new position information object, describing where to add the formulas or
      * {@code null} if it should just be added to the beginning
      *
-     * @param tacletApp a TacletApp with application information
+     * @param tacletApp a ITacletApp with application information
      * @param gt the TacletGoalTemplate to be applied
      * @param currentSequent the current sequent (the one of the new goal)
      * @return the PosInOccurrence object describing where to add the formula

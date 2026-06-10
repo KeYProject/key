@@ -109,7 +109,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     protected JPanel createTacletDisplay() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new TitledBorder("Selected Taclet - " + model[0].taclet().name()));
-        LOGGER.debug("TacletApp: {}", model[0].taclet());
+        LOGGER.debug("ITacletApp: {}", model[0].taclet());
 
         Taclet taclet = model[0].taclet();
         StringBuilder tacletSB = new StringBuilder();

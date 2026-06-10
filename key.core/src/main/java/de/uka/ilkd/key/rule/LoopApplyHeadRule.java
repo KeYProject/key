@@ -9,13 +9,13 @@ import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
@@ -123,7 +123,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, LogicServices services) {
         return new LoopApplyHeadBuiltInRuleApp(this, pos);
     }
 

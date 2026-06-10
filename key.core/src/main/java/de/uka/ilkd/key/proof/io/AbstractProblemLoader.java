@@ -30,7 +30,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.Pair;
@@ -724,7 +724,7 @@ public abstract class AbstractProblemLoader {
             StrategyProperties newProps =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             replayer = new IntermediateProofReplayer(this, proof, parserResult);
@@ -758,7 +758,7 @@ public abstract class AbstractProblemLoader {
             StrategyProperties newProps =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             result = new ReplayResult(status, errors, lastTouchedNode);

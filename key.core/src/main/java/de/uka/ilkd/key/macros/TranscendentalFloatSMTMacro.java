@@ -8,9 +8,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 
 import org.jspecify.annotations.NonNull;
 

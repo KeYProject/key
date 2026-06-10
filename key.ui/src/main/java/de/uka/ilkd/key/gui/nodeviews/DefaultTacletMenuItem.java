@@ -30,7 +30,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     /**
      * creates TacletMenuItem attached to a Taclet
      *
-     * @param connectedTo the TacletApp that is represented by the item
+     * @param connectedTo the ITacletApp that is represented by the item
      * @param notationInfo the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(TacletApp connectedTo, NotationInfo notationInfo,

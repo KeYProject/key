@@ -12,7 +12,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -268,7 +268,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 protocol.add(app);
             }
             return result;
-            // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
+            // TODO Idea: return new Pair<ITacletApp, SequentFormula>(null, null);
         }
         return null;
     }
@@ -724,7 +724,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new OneStepSimplifierRuleApp(this, pos);
     }
 

@@ -8,16 +8,15 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -150,7 +149,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
 
     /**
      * Checks if the query term is supported. The functionality is identical to
-     * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
+     * {@link BuiltInRule#isApplicable(org.key_project.prover.proof.ProofGoal, PosInOccurrence)}.
      *
      * @param goal The {@link Goal}.
      * @param pmTerm The {@link JTerm} to with the query to check.
@@ -182,7 +181,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

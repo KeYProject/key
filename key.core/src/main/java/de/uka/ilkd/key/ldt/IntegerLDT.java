@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * convert java number types to their logic counterpart.
  */
 @SuppressWarnings("unused")
-public final class IntegerLDT extends LDT {
+public final class IntegerLDT extends LDT implements IIntLdt {
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegerLDT.class);
 
     public static final Name NAME = new Name("int");

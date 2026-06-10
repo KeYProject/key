@@ -217,7 +217,7 @@ public abstract class AbstractProofReplayer {
             originalTacletApp = tacletApp;
         }
         assert originalTacletApp != null
-                : "Tried to construct TacletApp for a rule that is not a taclet";
+                : "Tried to construct ITacletApp for a rule that is not a taclet";
 
         final String tacletName = originalTacletApp.rule().name().toString();
 

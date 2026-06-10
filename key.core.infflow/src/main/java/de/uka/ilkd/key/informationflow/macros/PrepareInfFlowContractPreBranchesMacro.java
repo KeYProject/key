@@ -9,19 +9,21 @@ import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaAbstractFeatureStrategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.hasLabel;
 
 
 /**
@@ -67,7 +69,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name starts with a string in the
      * admitted set and rejects everything else.
      */
-    protected static class RemovePostStrategy extends AbstractFeatureStrategy {
+    protected static class RemovePostStrategy extends JavaAbstractFeatureStrategy {
 
         private final Name NAME = new Name("RemovePostStrategy");
 

@@ -35,7 +35,8 @@ public class JFOLStrategyFactory implements StrategyFactory {
             might cause proof splitting.</html>""";
 
     @Override
-    public Strategy<Goal> create(Proof proof, StrategyProperties strategyProperties) {
+    public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
+            StrategyProperties strategyProperties) {
         return new JFOLStrategy(proof, strategyProperties);
     }
 

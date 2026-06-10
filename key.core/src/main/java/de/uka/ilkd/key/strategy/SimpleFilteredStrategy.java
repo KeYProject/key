@@ -24,7 +24,7 @@ import org.jspecify.annotations.NonNull;
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp. A TacletFilter is used to filter out RuleApps.
  */
-public class SimpleFilteredStrategy implements Strategy<Goal> {
+public class SimpleFilteredStrategy implements JavaStrategy {
 
     private static final Name NAME = new Name("Simple ruleset");
 
@@ -90,7 +90,7 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
 
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            RuleAppCostCollector collector) {}
+            org.key_project.prover.strategy.RuleAppCostCollector collector) {}
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {

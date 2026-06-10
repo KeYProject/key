@@ -10,7 +10,6 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
@@ -119,7 +119,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 
