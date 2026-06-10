@@ -4,6 +4,17 @@
 package org.keyproject.key.api;
 
 
+import com.google.gson.GsonBuilder;
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.websocket.jakarta.WebSocketLauncherBuilder;
+import org.jspecify.annotations.Nullable;
+import org.keyproject.key.api.adapters.KeyAdapter;
+import org.keyproject.key.api.remoteclient.ClientApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,17 +23,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import javax.annotation.Nullable;
-
-import com.google.gson.GsonBuilder;
-import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.websocket.jakarta.WebSocketLauncherBuilder;
-import org.keyproject.key.api.adapters.KeyAdapter;
-import org.keyproject.key.api.remoteclient.ClientApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
 
 /**
  * @author Alexander Weigl
@@ -96,18 +96,6 @@ public class StartServer implements Runnable {
             return;
         }
 
-        if (serverPort != null) {
-            var server = new ServerSocket(serverPort);
-            LOGGER.info("Waiting on port {}", serverPort);
-            socket = server.accept();
-            LOGGER.info("Connection to client established: {}", socket.getRemoteSocketAddress());
-            socket.setKeepAlive(true);
-            socket.setTcpNoDelay(true);
-            in = socket.getInputStream();
-            out = socket.getOutputStream();
-            return;
-        }
-
         if (inFile != null) {
             in = new FileInputStream(inFile);
         }
@@ -157,6 +145,11 @@ public class StartServer implements Runnable {
         try {
             final var keyApi = new KeyApiImpl();
 
+            if (serverPort != null && !websocket) {
+                runTcpServer(keyApi);
+                return;
+            }
+
             if (websocket) {
                 var launcherBuilder = new WebSocketLauncherBuilder<ClientApi>()
                         .setOutput(out)
@@ -197,6 +190,48 @@ public class StartServer implements Runnable {
     }
 
 
+    /// TCP server mode: serve one client at a time, but keep accepting new
+    /// connections after a client disconnects. This allows the UI to be
+    /// restarted (or to reconnect) without restarting the server. Loaded
+    /// environments and proofs survive across connections.
+    private void runTcpServer(KeyApiImpl keyApi)
+            throws IOException, InterruptedException, ExecutionException {
+        try (var server = new ServerSocket(serverPort)) {
+            while (true) {
+                LOGGER.info("Waiting on port {}", serverPort);
+                Socket s = server.accept();
+                LOGGER.info("Connection to client established: {}", s.getRemoteSocketAddress());
+                s.setKeepAlive(true);
+                s.setTcpNoDelay(true);
+                socket = s;
+                try (s; var lin = s.getInputStream(); var lout = s.getOutputStream()) {
+                    in = lin;
+                    out = lout;
+                    var listener = launch(lout, lin, keyApi);
+                    LOGGER.info("JSON-RPC is listening for requests");
+                    keyApi.setClientApi(listener.getRemoteProxy());
+                    keyApi.setExitHandler(unused -> StartServer.this.shutdownHandler());
+                    listenerFuture = listener.startListening();
+                    try {
+                        listenerFuture.get();
+                    } catch (CancellationException e) {
+                        // exitHandler / shutdown requested: stop the server entirely.
+                        LOGGER.info("Listener was cancelled; shutting down...");
+                        return;
+                    } catch (ExecutionException e) {
+                        // Client went away (EOF / broken pipe): back to accept().
+                        LOGGER.info("Client connection ended: {}", e.getCause() != null
+                                ? e.getCause().toString()
+                                : e.toString());
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn("Connection error; awaiting next connection", e);
+                }
+                LOGGER.info("Client disconnected; awaiting next connection");
+            }
+        }
+    }
+
     public static void configureJson(GsonBuilder gsonBuilder) {
         gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new KeyAdapter.ThrowableAdapter());
@@ -205,7 +240,8 @@ public class StartServer implements Runnable {
         gsonBuilder.serializeNulls();
     }
 
-    public static Launcher<ClientApi> launch(OutputStream out, InputStream in, KeyApiImpl keyApi) {
+    public static Launcher<ClientApi> launch(OutputStream out, InputStream in,
+            KeyApiImpl keyApi) {
         // var localServices = getLocalServices();
         // var remoteInterfaces = getRemoteInterfaces();
         var launcherBuilder = new Launcher.Builder<ClientApi>()

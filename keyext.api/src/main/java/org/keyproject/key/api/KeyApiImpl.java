@@ -4,11 +4,14 @@
 package org.keyproject.key.api;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -26,13 +29,16 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptException;
@@ -54,7 +60,7 @@ import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
-import static de.uka.ilkd.key.proof.ProofNodeDescription.collectPathInformation;
+import static org.keyproject.key.api.data.ProofNodeDescription.collectPathInformation;
 
 public final class KeyApiImpl implements KeyApi {
     private final KeyIdentifications data = new KeyIdentifications();
@@ -65,7 +71,7 @@ public final class KeyApiImpl implements KeyApi {
     private final ProverTaskListener clientListener = new ProverTaskListener() {
         @Override
         public void taskStarted(org.key_project.prover.engine.TaskStartedInfo info) {
-            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
+            clientApi.taskStarted(TaskStartedInfo.from(info));
         }
 
         @Override
@@ -253,7 +259,17 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<List<NodeDesc>> pruneTo(NodeId nodeId) {
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            var proof = data.find(nodeId.proofId());
+            var node = data.find(nodeId);
+
+            var nodes = proof.pruneProof(node);
+            if (nodes == null) {
+                return List.of();
+            }
+
+            return asNodeDesc(nodeId.proofId(), nodes.stream());
+        });
     }
 
     /*
@@ -265,6 +281,24 @@ public final class KeyApiImpl implements KeyApi {
      * });
      * }
      */
+
+    @Override
+    public CompletableFuture<Boolean> save(ProofId proofId, String path) {
+        return CompletableFuture.supplyAsync(() -> {
+            var proof = data.find(proofId);
+            var saver = new OutputStreamProofSaver(proof);
+
+            try {
+                var file = new File(path);
+                var writer = new FileOutputStream(file);
+                saver.save(file.toPath(), writer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return true;
+        });
+    }
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
@@ -280,15 +314,49 @@ public final class KeyApiImpl implements KeyApi {
         });
     }
 
+    @Override
+    public CompletableFuture<List<ProofId>> list() {
+        return CompletableFuture.completedFuture(data.allProofIds());
+    }
+
 
     @Override
     public CompletableFuture<List<TreeNodeDesc>> treeChildren(ProofId proof, TreeNodeId nodeId) {
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            var serial = Integer.parseInt(nodeId.id());
+
+            Node root = data.find(proof).root();
+            var stack = new Stack<Node>();
+            stack.push(root);
+
+            while (!stack.empty()) {
+                var node = stack.pop();
+                if (node.serialNr() == serial) {
+                    var children = new ArrayList<TreeNodeDesc>();
+
+                    var iter = node.childrenIterator();
+                    while (iter.hasNext()) {
+                        var child_node = iter.next();
+                        children.add(TreeNodeDesc.from(proof, child_node));
+                    }
+
+                    return children;
+                }
+
+                var iter = node.childrenIterator();
+                while (iter.hasNext()) {
+                    var child_node = iter.next();
+                    stack.push(child_node);
+                }
+            }
+
+            return List.of();
+        });
     }
 
     @Override
     public CompletableFuture<List<TreeNodeDesc>> treeSubtree(ProofId proof, TreeNodeId nodeId) {
-        return null;
+        return CompletableFuture.completedFuture(List.of());
     }
 
     @Override
@@ -355,18 +423,49 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(nodeId.proofId().env());
             var notInfo = new NotationInfo();
             final var layouter =
-                new PosTableLayouter(options.width(), options.indentation(), options.pure());
+                new PosTableLayouter(options.width(), options.indentation(), false);
             var lp = new LogicPrinter(notInfo, env.getServices(), layouter);
             lp.printSequent(node.sequent());
 
             var id = new NodeTextId(nodeId, uniqueCounter.getAndIncrement());
             var t = new NodeText(lp.result(), layouter.getInitialPositionTable());
             data.register(id, t);
-            return new NodeTextDesc(id, lp.result());
+
+            String tacletApplicationInfo = null;
+            var rule = node.getAppliedRuleApp();
+            if (rule instanceof TacletApp tapp) {
+                var taclet = tapp.taclet();
+                tacletApplicationInfo = taclet.toString();
+            }
+
+            var terms = expandTermsForTable(layouter.getInitialPositionTable());
+            return new NodeTextDesc(id, lp.result(), terms, tacletApplicationInfo);
         });
     }
 
-    private final IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter();
+    private NodeTextSpan[] expandTermsForTable(PositionTable table) {
+        int nonEmptyRanges = 0;
+        for (int i = 0; i < table.getRows(); i++) {
+            if (table.getRange(i).length() != 0) {
+                nonEmptyRanges++;
+            }
+        }
+
+        var terms = new NodeTextSpan[nonEmptyRanges];
+        int j = 0;
+        for (int i = 0; i < table.getRows(); i++) {
+            var range = table.getRange(i);
+            if (range.length() == 0) {
+                continue;
+            }
+
+            var children = expandTermsForTable(table.getChild(i));
+            terms[j] = new NodeTextSpan(range.start(), range.end(), children);
+            j++;
+        }
+
+        return terms;
+    }
 
     @Override
     public CompletableFuture<List<TermActionDesc>> actions(NodeTextId printId, int caretPos) {
@@ -375,9 +474,13 @@ public final class KeyApiImpl implements KeyApi {
             var proof = data.find(printId.nodeId().proofId());
             var goal = proof.getOpenGoal(node);
             var nodeText = data.find(printId);
+
+            var filter = new IdentitySequentPrintFilter();
+            filter.setSequent(node.sequent());
+
             var pis = nodeText.table().getPosInSequent(caretPos, filter);
             return new TermActionUtil(printId, data.find(printId.nodeId().proofId().env()), pis,
-                goal)
+                goal, caretPos)
                     .getActions();
         });
 
@@ -385,7 +488,23 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<Boolean> applyAction(TermActionId id) {
-        return CompletableFuture.completedFuture(false);
+        // FIXME: We can probably cache this work in `actions`.
+        return CompletableFuture.supplyAsync(() -> {
+            var node = data.find(id.nodeTextId().nodeId());
+            var proof = data.find(id.nodeTextId().nodeId().proofId());
+            var goal = proof.getOpenGoal(node);
+            var nodeText = data.find(id.nodeTextId());
+
+            var filter = new IdentitySequentPrintFilter();
+            filter.setSequent(node.sequent());
+
+            var pis = nodeText.table().getPosInSequent(id.caretPos(), filter);
+            var util = new TermActionUtil(id.nodeTextId(),
+                data.find(id.nodeTextId().nodeId().proofId().env()), pis, goal, id.caretPos());
+
+            var env = data.find(id.nodeTextId().nodeId().proofId().env());
+            return util.applyAction(id, env.getServices());
+        });
     }
 
     @Override
@@ -410,7 +529,7 @@ public final class KeyApiImpl implements KeyApi {
                 KeYEnvironment<?> env = null;
                 try {
                     var loader = control.load(JavaProfile.getDefaultProfile(),
-                        ex.getObligationFile(),
+                        ex.getObligationFile().toPath(),
                         null, null, null, null, true, null);
                     InitConfig initConfig = loader.getInitConfig();
 
@@ -522,7 +641,7 @@ public final class KeyApiImpl implements KeyApi {
     private class MyDefaultUserInterfaceControl extends DefaultUserInterfaceControl {
         @Override
         public void taskStarted(org.key_project.prover.engine.TaskStartedInfo info) {
-            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
+            clientApi.taskStarted(TaskStartedInfo.from(info));
         }
 
         @Override
@@ -531,13 +650,13 @@ public final class KeyApiImpl implements KeyApi {
         }
 
         @Override
-        public void taskFinished(org.key_project.prover.engine.TaskFinishedInfo info) {
+        public void taskFinished(TaskFinishedInfo info) {
             clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override
         protected void macroStarted(org.key_project.prover.engine.TaskStartedInfo info) {
-            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
+            clientApi.taskStarted(TaskStartedInfo.from(info));
         }
 
         @Override

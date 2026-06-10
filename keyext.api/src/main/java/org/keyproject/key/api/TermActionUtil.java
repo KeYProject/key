@@ -4,10 +4,13 @@
 package org.keyproject.key.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -15,14 +18,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.jspecify.annotations.NonNull;
-import org.keyproject.key.api.data.KeyIdentifications;
 import org.keyproject.key.api.data.KeyIdentifications.NodeTextId;
+import org.keyproject.key.api.data.KeyIdentifications.TermActionId;
 import org.keyproject.key.api.data.TermActionDesc;
 import org.keyproject.key.api.data.TermActionKind;
 
@@ -72,47 +76,60 @@ public class TermActionUtil {
     private final List<TermActionDesc> actions = new ArrayList<>(1024);
     private final NodeTextId nodeTextId;
 
+    private final HashMap<Integer, TacletApp> tacletRules = new LinkedHashMap<>();
+
     public TermActionUtil(@NonNull NodeTextId nodeTextId, @NonNull KeYEnvironment<?> env,
-            @NonNull PosInSequent pos, @NonNull Goal goal) {
+            @NonNull PosInSequent pos, @NonNull Goal goal, int caretPos) {
         this.pos = pos;
         this.goal = goal;
         this.nodeTextId = nodeTextId;
         occ = pos.getPosInOccurrence();
         ProofControl c = env.getUi().getProofControl();
-        final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(goal, occ);
+        // final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(goal, occ);
         var macros = ClassLoaderUtil.loadServices(ProofMacro.class);
         for (ProofMacro macro : macros) {
-            var id = new KeyIdentifications.TermActionId(nodeTextId.nodeId(), pos.toString(),
-                "macro:" + macro.getScriptCommandName());
+            var id = new TermActionId(nodeTextId, pos.toString(),
+                "macro:" + macro.getScriptCommandName(), caretPos);
             TermActionDesc ta = new TermActionDesc(id, macro.getName(), macro.getDescription(),
                 macro.getCategory(), TermActionKind.Macro);
             add(ta);
         }
         ImmutableList<TacletApp> findTaclet = c.getFindTaclet(goal, occ);
-        var find = removeRewrites(findTaclet)
-                .prepend(c.getRewriteTaclet(goal, occ));
-        var nofind = c.getNoFindTaclet(goal);
+        ImmutableList<? extends TacletApp> findTaclets =
+                occ != null ? goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, occ, goal.getOverlayServices())
+                        : ImmutableList.of();
+        ImmutableList<NoPosTacletApp> noFindTaclets =
+                goal.ruleAppIndex().getNoFindTaclet(TacletFilter.TRUE, goal.getOverlayServices());
 
 
-        for (TacletApp tacletApp : find) {
-            var id = new KeyIdentifications.TermActionId(nodeTextId.nodeId(), pos.toString(),
-                "find:" + tacletApp.rule());
+        for (TacletApp tacletApp : findTaclets) {
+            if (!tacletApp.complete()) {
+                continue;
+            }
+            var id = new TermActionId(nodeTextId, pos.toString(),
+                "find:" + tacletApp.rule(), caretPos);
             TermActionDesc ta = new TermActionDesc(id, tacletApp.rule().displayName(),
                 tacletApp.rule().toString(), "", TermActionKind.Taclet);
-            add(ta);
+            var index = add(ta);
+
+            tacletRules.put(index, tacletApp);
         }
 
-        for (TacletApp tacletApp : nofind) {
-            var id = new KeyIdentifications.TermActionId(nodeTextId.nodeId(), pos.toString(),
-                "nofind:" + tacletApp.rule());
+        for (TacletApp tacletApp : noFindTaclets) {
+            var id = new TermActionId(nodeTextId, pos.toString(),
+                "nofind:" + tacletApp.rule(), caretPos);
             TermActionDesc ta = new TermActionDesc(id, tacletApp.rule().displayName(),
                 tacletApp.rule().toString(), "", TermActionKind.Taclet);
-            add(ta);
+            var index = add(ta);
+
+            tacletRules.put(index, tacletApp);
         }
     }
 
-    private void add(TermActionDesc ta) {
+    private int add(TermActionDesc ta) {
+        var index = actions.size();
         actions.add(ta);
+        return index;
     }
 
     /**
@@ -133,5 +150,29 @@ public class TermActionUtil {
 
     public List<TermActionDesc> getActions() {
         return actions;
+    }
+
+    // Applies the action with the given `id` on the goal used to create this instance.
+    // Returns `true` if the rule was found and applied, `false` otherwise.
+    public boolean applyAction(TermActionId id, Services services) {
+        for (int i = 0; i < actions.size(); i++) {
+            var desc = actions.get(i);
+
+            if (desc.commandId().id().equals(id.id())) {
+                switch (desc.kind()) {
+                    case Taclet:
+                        var rule = tacletRules.get(i);
+                        var inst = rule.setPosInOccurrence(occ, services);
+                        goal.apply(inst);
+                        break;
+                    default:
+                        throw new RuntimeException("not yet implemented");
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

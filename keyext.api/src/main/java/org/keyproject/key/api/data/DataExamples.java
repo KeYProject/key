@@ -109,7 +109,8 @@ public class DataExamples {
     }
 
     private KeyIdentifications.TermActionId getTermActionId() {
-        return new KeyIdentifications.TermActionId(getNodeId(), "0.1.0", "taclet-andLeft-010");
+        return new KeyIdentifications.TermActionId(
+            new KeyIdentifications.NodeTextId(getNodeId(), 0), "0.1.0", "taclet-andLeft-010", 0);
     }
 
     private KeyIdentifications.NodeId getNodeId() {

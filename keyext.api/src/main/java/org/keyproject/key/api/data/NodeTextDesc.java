@@ -10,10 +10,13 @@ import org.keyproject.key.api.data.KeyIdentifications.NodeTextId;
  * A printed sequent.
  *
  * @param id a handle identifying this print-out
- * @param result the plain textual notation of the sequent
+ * @param sequent the plain textual notation of the sequent
+ * @param terms position table of the printed terms, for term selection in the UI
+ * @param tacletAppInfo textual description of the taclet applied at this node (may be null)
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
-public record NodeTextDesc(NodeTextId id, String result)
+public record NodeTextDesc(NodeTextId id, String sequent, NodeTextSpan[] terms,
+        String tacletAppInfo)
         implements KeYDataTransferObject {
 }

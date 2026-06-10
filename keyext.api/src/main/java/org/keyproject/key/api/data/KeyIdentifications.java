@@ -9,15 +9,15 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
 public class KeyIdentifications {
-    private final BiMap<EnvironmentId, KeyEnvironmentContainer> mapEnv = HashBiMap.create(16);
+    private final Map<EnvironmentId, KeyEnvironmentContainer> mapEnv = new HashMap<>(16);
 
     public KeyEnvironmentContainer getContainer(EnvironmentId environmentId) {
         return Objects.requireNonNull(mapEnv.get(environmentId),
@@ -90,6 +90,14 @@ public class KeyIdentifications {
         return proofId;
     }
 
+    /// All proofs currently registered (across all environments).
+    /// Used to let a reconnecting client resume existing proofs.
+    public java.util.List<ProofId> allProofIds() {
+        var result = new java.util.ArrayList<ProofId>();
+        mapEnv.forEach((envId, c) -> result.addAll(c.mapProof().keySet()));
+        return result;
+    }
+
 
     /**
      * @author Alexander Weigl
@@ -128,7 +136,7 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (13.10.23)
      */
-    public record TermActionId(NodeId nodeId, String pio, String id)
+    public record TermActionId(NodeTextId nodeTextId, String pio, String id, int caretPos)
             implements KeYDataTransferObject {
     }
 
@@ -145,10 +153,10 @@ public class KeyIdentifications {
      * @version 1 (28.10.23)
      */
     public record KeyEnvironmentContainer(KeYEnvironment<?> env,
-            BiMap<ProofId, ProofContainer> mapProof) {
+            Map<ProofId, ProofContainer> mapProof) {
 
         public KeyEnvironmentContainer(KeYEnvironment<?> env) {
-            this(env, HashBiMap.create(1));
+            this(env, new HashMap<>(1));
         }
 
         void dispose() {
@@ -158,11 +166,14 @@ public class KeyIdentifications {
     }
 
     private record ProofContainer(Proof wProof,
-            BiMap<NodeId, Node> mapNode,
-            BiMap<TreeNodeId, TreeNodeDesc> mapTreeNode,
-            BiMap<NodeTextId, NodeText> mapGoalText) {
+            Map<NodeId, Node> mapNode,
+            Map<TreeNodeId, TreeNodeDesc> mapTreeNode,
+            // A plain Map, NOT a BiMap: values are records with structural
+            // equality, and printing the same goal twice (e.g. pure prints,
+            // where the position table is null) yields equal values.
+            Map<NodeTextId, NodeText> mapGoalText) {
         public ProofContainer(Proof proof) {
-            this(proof, HashBiMap.create(16), HashBiMap.create(16), HashBiMap.create(16));
+            this(proof, new HashMap<>(16), new HashMap<>(16), new HashMap<>(16));
         }
 
         void dispose() {

@@ -4,9 +4,9 @@
 package org.keyproject.key.api;
 
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nullable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.data.TaskFinishedInfo;
 import org.keyproject.key.api.data.TaskStartedInfo;
 import org.keyproject.key.api.remoteclient.*;

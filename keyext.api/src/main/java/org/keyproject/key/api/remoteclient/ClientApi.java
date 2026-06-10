@@ -4,12 +4,12 @@
 package org.keyproject.key.api.remoteclient;
 
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nullable;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.data.TaskFinishedInfo;
 import org.keyproject.key.api.data.TaskStartedInfo;
 
