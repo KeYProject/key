@@ -262,7 +262,8 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code file}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code JavaKeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param file non-null {@link Path} object
      * @return monad that encapsluate the ParserRuleContext
@@ -284,7 +285,8 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code JavaKeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param stream non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
@@ -299,7 +301,8 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code JavaKeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param input non-null {@link CharStream} object
      * @return a configuration object with the data deserialize from the given file

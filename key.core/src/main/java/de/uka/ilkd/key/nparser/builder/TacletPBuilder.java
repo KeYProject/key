@@ -145,7 +145,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(JavaKeYParser.TacletContext ctx) {
-        Sequent ifSeq = JavaDLSequentKit.getInstance().getEmptySequent();
+        Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
@@ -183,8 +183,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         setSchemaVariables(new Namespace<>(schemaVariables()));
         mapOf(ctx.one_schema_var_decl());
 
-        if (ctx.ifSeq != null) {
-            ifSeq = accept(ctx.ifSeq);
+        if (ctx.assumesSeq != null) {
+            assumesSeq = accept(ctx.assumesSeq);
         }
 
         @Nullable
@@ -211,7 +211,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
-        b.setIfSequent(ifSeq);
+        b.setAssumesSequent(assumesSeq);
         b.setName(new Name(name));
         accept(ctx.goalspecs());
         mapOf(ctx.varexplist());
@@ -362,7 +362,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var res = schemaVariables[argIndex];
 
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
-        tacletBuilder.setIfSequent(JavaDLSequentKit.createAnteSequent(
+        tacletBuilder.setAssumesSequent(JavaDLSequentKit.createAnteSequent(
             ImmutableSLList
                     .singleton(new SequentFormula(tb.equals(tb.func(consFn, args), tb.var(x))))));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));

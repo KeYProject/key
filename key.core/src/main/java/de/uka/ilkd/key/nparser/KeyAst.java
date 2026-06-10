@@ -343,7 +343,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
                 @Override
-                public @Nullable Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
+                public @Nullable Object visitOptions_choice(
+                        JavaKeYParser.Options_choiceContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
@@ -361,7 +362,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
                 @Override
-                public @Nullable Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
+                public @Nullable Object visitProg_var_decls(
+                        JavaKeYParser.Prog_var_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
@@ -386,13 +388,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
                 @Override
-                public @Nullable Object visitTransform_decls(JavaKeYParser.Transform_declsContext ctx) {
+                public @Nullable Object visitTransform_decls(
+                        JavaKeYParser.Transform_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitDatatype_decls(JavaKeYParser.Datatype_declsContext ctx) {
+                public @Nullable Object visitDatatype_decls(
+                        JavaKeYParser.Datatype_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }

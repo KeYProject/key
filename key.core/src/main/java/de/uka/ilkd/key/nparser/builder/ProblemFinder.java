@@ -47,7 +47,7 @@ public class ProblemFinder extends ExpressionBuilder {
 
     @Override
     public @Nullable KeYJavaType visitArrayopid(JavaKeYParser.ArrayopidContext ctx) {
-        return accept(ctx.keyjavatype());
+        return accept(ctx.typemapping());
     }
 
     /**

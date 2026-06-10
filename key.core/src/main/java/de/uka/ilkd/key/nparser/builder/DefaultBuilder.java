@@ -110,7 +110,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /*
-     * @Override public Integer visitLocation_ident(JavaKeYParser.Location_identContext ctx) { var id =
+     * @Override public Integer visitLocation_ident(JavaKeYParser.Location_identContext ctx) { var
+     * id =
      * accept(ctx.simple_ident()); if ("Location".equals(id)) { return LOCATION_MODIFIER; } else if
      * (!"Location".equals(id)) { semanticError(ctx,
      * "%s Attribute of a Non Rigid Function can only be 'Location'", id); } return NORMAL_NONRIGID;
@@ -123,7 +124,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Sort visitArg_sorts_or_formula_helper(JavaKeYParser.Arg_sorts_or_formula_helperContext ctx) {
+    public Sort visitArg_sorts_or_formula_helper(
+            JavaKeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
             return JavaDLTheory.FORMULA;
         } else {
@@ -132,7 +134,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /*
-     * @Override public Sort visitAny_sortId(JavaKeYParser.Any_sortIdContext ctx) { Pair<Sort, Type> p =
+     * @Override public Sort visitAny_sortId(JavaKeYParser.Any_sortIdContext ctx) { Pair<Sort, Type>
+     * p =
      * accept(ctx.any_sortId_help()); return toArraySort(p, ctx.EMPTYBRACKETS().size()); }
      */
 
@@ -296,7 +299,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public List<String> visitSimple_ident_comma_list(JavaKeYParser.Simple_ident_comma_listContext ctx) {
+    public List<String> visitSimple_ident_comma_list(
+            JavaKeYParser.Simple_ident_comma_listContext ctx) {
         return mapOf(ctx.simple_ident());
     }
 
@@ -378,7 +382,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public KeYJavaType visitKeyjavatype(JavaKeYParser.KeyjavatypeContext ctx) {
+    public KeYJavaType visitTypemapping(JavaKeYParser.TypemappingContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {

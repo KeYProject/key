@@ -91,7 +91,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
             List<String> varNames = accept(ctx.simple_ident_comma_list(i));
-            KeYJavaType kjt = accept(ctx.keyjavatype(i));
+            KeYJavaType kjt = accept(ctx.typemapping(i));
             assert varNames != null;
             for (String varName : varNames) {
                 if (varName.equals("null")) {

@@ -59,7 +59,8 @@ public class ProofReplayer {
     }
 
     /**
-     * Replays the proof behind the given {@code input}. This method uses the {@link JavaKeYLexer} to
+     * Replays the proof behind the given {@code input}. This method uses the {@link JavaKeYLexer}
+     * to
      * lex input stream, and parse them manually by consuming the tokens. It singals to the given
      * {@link IProofFileParser} at start or end of an expr.
      * <p>

@@ -103,7 +103,6 @@ proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=p
 proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
     boolean_literal
-  | char_literal
   | integer
   | floatnum
   | string_literal

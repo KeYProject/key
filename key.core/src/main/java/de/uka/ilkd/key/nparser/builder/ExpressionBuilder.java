@@ -411,7 +411,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         List<JTerm> termL = mapOf(ctx.b);
-        // List<String> opName = ctx.op.stream().map(it -> it.getType()== JavaKeYLexer.PERCENT ? "mod" :
+        // List<String> opName = ctx.op.stream().map(it -> it.getType()== JavaKeYLexer.PERCENT ?
+        // "mod" :
         // "div").collect(Collectors.toList());
 
         JTerm term = accept(ctx.a);
@@ -454,7 +455,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitBracket_term(JavaKeYParser.Bracket_termContext ctx) {
         JTerm t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
-            JavaKeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
+            JavaKeYParser.Brace_suffixContext brace_suffix =
+                ctx.bracket_suffix_heap(i).brace_suffix();
             ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
             if (heap != null) {
@@ -469,7 +471,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /*
      * @Override public String
-     * visitStaticAttributeOrQueryReference(JavaKeYParser.StaticAttributeOrQueryReferenceContext ctx) {
+     * visitStaticAttributeOrQueryReference(JavaKeYParser.StaticAttributeOrQueryReferenceContext
+     * ctx) {
      * //TODO weigl: this rule is a total grammar blower. String attrReference = ctx.id.getText();
      * for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) { attrReference += "[]"; }
      *
@@ -483,7 +486,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     // }
 
     /*
-     * @Override public Term visitStatic_attribute_suffix(JavaKeYParser.Static_attribute_suffixContext
+     * @Override public Term
+     * visitStatic_attribute_suffix(JavaKeYParser.Static_attribute_suffixContext
      * ctx) { Operator v = null; String attributeName =
      * accept(ctx.staticAttributeOrQueryReference()); String className; if
      * (attributeName.indexOf(':') != -1) { className = attributeName.substring(0,
@@ -733,7 +737,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * @Override public String visitAttrid(JavaKeYParser.AttridContext ctx) { return ctx.getText(); }
+     * @Override public String visitAttrid(JavaKeYParser.AttridContext ctx) { return ctx.getText();
+     * }
      */
 
     private String unescapeString(String string) {
@@ -795,7 +800,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * private Term createStaticAttributeOrMethod(JavaQuery jq, JavaKeYParser.AccesstermContext ctx) {
+     * private Term createStaticAttributeOrMethod(JavaQuery jq, JavaKeYParser.AccesstermContext ctx)
+     * {
      * final var kjt = jq.kjt; String mn = jq.attributeNames; if (jq.maybeAttr != null) {
      * ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt); if (maybeAttr != null) { var
      * op = getAttributeInPrefixSort(kjt.getSort(), mn); return createAttributeTerm(null, op, ctx);
@@ -808,7 +814,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
 
     @Override
-    public Object visitBracket_access_heap_update(JavaKeYParser.Bracket_access_heap_updateContext ctx) {
+    public Object visitBracket_access_heap_update(
+            JavaKeYParser.Bracket_access_heap_updateContext ctx) {
         JTerm heap = pop();
         JTerm target = accept(ctx.target);
         JTerm val = accept(ctx.val);
@@ -852,7 +859,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBracket_access_indexrange(JavaKeYParser.Bracket_access_indexrangeContext ctx) {
+    public Object visitBracket_access_indexrange(
+            JavaKeYParser.Bracket_access_indexrangeContext ctx) {
         // | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET
         // #bracket_access_indexrange
         JTerm term = pop();
@@ -1065,12 +1073,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
-    public List<QuantifiableVariable> visitBound_variables(JavaKeYParser.Bound_variablesContext ctx) {
+    public List<QuantifiableVariable> visitBound_variables(
+            JavaKeYParser.Bound_variablesContext ctx) {
         return mapOf(ctx.one_bound_variable());
     }
 
     @Override
-    public QuantifiableVariable visitOne_bound_variable(JavaKeYParser.One_bound_variableContext ctx) {
+    public QuantifiableVariable visitOne_bound_variable(
+            JavaKeYParser.One_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
         Sort sort = accept(ctx.sortId());
 
@@ -1250,7 +1260,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             }
 
-            while (ctx.attribute(currentSuffix) instanceof JavaKeYParser.Attribute_simpleContext a) {
+            while (ctx
+                    .attribute(currentSuffix) instanceof JavaKeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java Class name allowed
                 }
