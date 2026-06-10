@@ -34,12 +34,15 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoin
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+
 /// This strategy is the catch-all for Java related features that are either
 /// cross-cutting or one of the features that do not fit well into any other
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
+public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
+        implements ComponentStrategy<Goal> {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -77,6 +80,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
         approvalF = add(setupApprovalF(), approvalDispatcher);
+
+        computeCost(null, null, null);
     }
 
 
@@ -264,7 +269,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(d, "induction_var", ifZero(
-                applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+                applyTF(StaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
+                longConst(0), inftyConst()));
         }
 
         return d;
@@ -437,7 +443,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                  * the outer 'not' then ensures that the costs are infinite in the first and 0 in
                  * the latter case
                  */
-                not(sum(tb, HeapGenerator.INSTANCE, not(eq(instOf("sv_heap"), tb)))));
+                not(sum(tb, HeapGenerator.INSTANCE, not(
+                    StaticFeatureCollection.eq(StaticFeatureCollection.instOf("sv_heap"), tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(d, "classAxiom", add(sequentContainsNoPrograms(),

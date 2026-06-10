@@ -32,10 +32,12 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+
 /// Strategy for symbolic execution rules.
 ///
 /// Do not create directly. Use [SymExStrategyFactory] instead.
-public class SymExStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
+public class SymExStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("SymExStrategy");
 
     private final FormulaTermFeatures ff;

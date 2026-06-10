@@ -20,11 +20,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
@@ -302,5 +305,10 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
             new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
         return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
             not(applyTF(superTerm, t))));
+    }
+
+    @Override
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return null;
     }
 }

@@ -25,62 +25,62 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 ///
 /// @author Kai Wallisch \<kai.wallisch@ira.uka.de>
 public class StaticFeatureCollection {
-    protected static Feature longConst(long a) {
+    public static Feature longConst(long a) {
         return ConstFeature.createConst(cost(a));
     }
 
-    protected static Feature inftyConst() {
+    public static Feature inftyConst() {
         return ConstFeature.createConst(infty());
     }
 
-    protected static TermFeature any() {
+    public static TermFeature any() {
         return longTermConst(0);
     }
 
-    protected static TermFeature longTermConst(long a) {
+    public static TermFeature longTermConst(long a) {
         return ConstTermFeature.createConst(cost(a));
     }
 
-    protected static TermFeature inftyTermConst() {
+    public static TermFeature inftyTermConst() {
         return ConstTermFeature.createConst(infty());
     }
 
-    protected static Feature add(Feature a, Feature b) {
+    public static Feature add(Feature a, Feature b) {
         return SumFeature.createSum(a, b);
     }
 
-    protected static Feature add(Feature a, Feature b, Feature c) {
+    public static Feature add(Feature a, Feature b, Feature c) {
         return SumFeature.createSum(a, b, c);
     }
 
     @SafeVarargs
-    protected static Feature add(Feature... features) {
+    public static Feature add(Feature... features) {
         return SumFeature.createSum(features);
     }
 
-    protected static TermFeature add(TermFeature a, TermFeature b) {
+    public static TermFeature add(TermFeature a, TermFeature b) {
         return BinarySumTermFeature.createSum(a, b);
     }
 
-    protected static <G extends ProofGoal<G>> Feature sum(TermBuffer<G> x, TermGenerator<G> gen,
+    public static <G extends ProofGoal<G>> Feature sum(TermBuffer<G> x, TermGenerator<G> gen,
             Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 
-    protected static TermFeature add(TermFeature a, TermFeature b, TermFeature c) {
+    public static TermFeature add(TermFeature a, TermFeature b, TermFeature c) {
         // could be done more efficiently
         return add(a, add(b, c));
     }
 
-    protected static TermFeature or(TermFeature a, TermFeature b) {
+    public static TermFeature or(TermFeature a, TermFeature b) {
         return ifZero(a, longTermConst(0), b);
     }
 
-    protected static TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
+    public static TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
         return or(a, or(b, c));
     }
 
-    protected static TermFeature or(TermFeature... features) {
+    public static TermFeature or(TermFeature... features) {
         TermFeature orFeature = inftyTermConst();
         for (var f : features) {
             orFeature = or(orFeature, f);
@@ -88,16 +88,16 @@ public class StaticFeatureCollection {
         return orFeature;
     }
 
-    protected static Feature or(Feature a, Feature b) {
+    public static Feature or(Feature a, Feature b) {
         return ifZero(a, longConst(0), b);
     }
 
-    protected static Feature or(Feature a, Feature b, Feature c) {
+    public static Feature or(Feature a, Feature b, Feature c) {
         return or(a, or(b, c));
     }
 
     @SafeVarargs
-    protected static Feature or(Feature... features) {
+    public static Feature or(Feature... features) {
         Feature orFeature = inftyConst();
         for (Feature f : features) {
             orFeature = or(orFeature, f);
@@ -105,52 +105,52 @@ public class StaticFeatureCollection {
         return orFeature;
     }
 
-    protected static Feature ifZero(Feature cond, Feature thenFeature) {
+    public static Feature ifZero(Feature cond, Feature thenFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static Feature ifZero(Feature cond, Feature thenFeature,
+    public static Feature ifZero(Feature cond, Feature thenFeature,
             Feature elseFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
-    protected static TermFeature ifZero(TermFeature cond, TermFeature thenFeature) {
+    public static TermFeature ifZero(TermFeature cond, TermFeature thenFeature) {
         return ShannonTermFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static TermFeature ifZero(TermFeature cond, TermFeature thenFeature,
+    public static TermFeature ifZero(TermFeature cond, TermFeature thenFeature,
             TermFeature elseFeature) {
         return ShannonTermFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
-    protected static Feature not(Feature f) {
+    public static Feature not(Feature f) {
         return ifZero(f, inftyConst(), longConst(0));
     }
 
-    protected static TermFeature not(TermFeature f) {
+    public static TermFeature not(TermFeature f) {
         return ifZero(f, ConstTermFeature.createConst(TopRuleAppCost.INSTANCE), longTermConst(0));
     }
 
-    protected static Feature eq(Feature a, Feature b) {
+    public static Feature eq(Feature a, Feature b) {
         return CompareCostsFeature.eq(a, b);
     }
 
-    protected static <G extends ProofGoal<G>> Feature eq(ProjectionToTerm<G> t1,
+    public static <G extends ProofGoal<G>> Feature eq(ProjectionToTerm<G> t1,
             ProjectionToTerm<G> t2,
             java.util.function.Function<TermBuffer<G>, TermFeature> createEqTermFeature) {
         final TermBuffer<G> buf = new TermBuffer<>();
         return let(buf, t1, applyTF(t2, createEqTermFeature.apply(buf)));
     }
 
-    protected static Feature less(Feature a, Feature b) {
+    public static Feature less(Feature a, Feature b) {
         return CompareCostsFeature.less(a, b);
     }
 
-    protected static Feature leq(Feature a, Feature b) {
+    public static Feature leq(Feature a, Feature b) {
         return CompareCostsFeature.leq(a, b);
     }
 
-    protected static RuleAppCost cost(long p) {
+    public static RuleAppCost cost(long p) {
         return NumberRuleAppCost.create(p);
     }
 
@@ -164,7 +164,7 @@ public class StaticFeatureCollection {
     ///
     /// @param schemaVar schema variable
     /// @return projection of taclet applications
-    protected static <G extends ProofGoal<G>> ProjectionToTerm<G> instOf(String schemaVar) {
+    public static <G extends ProofGoal<G>> ProjectionToTerm<G> instOf(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), true);
     }
 
@@ -174,46 +174,46 @@ public class StaticFeatureCollection {
     ///
     /// @param schemaVar schema variable
     /// @return projection of taclet applications
-    protected static <G extends ProofGoal<G>> ProjectionToTerm<G> instOfNonStrict(
+    public static <G extends ProofGoal<G>> ProjectionToTerm<G> instOfNonStrict(
             String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), false);
     }
 
-    protected static TermFeature op(Operator op) {
+    public static TermFeature op(Operator op) {
         return OperatorTF.create(op);
     }
 
-    protected static TermFeature rec(TermFeature cond, TermFeature summand) {
+    public static TermFeature rec(TermFeature cond, TermFeature summand) {
         return RecSubTermFeature.create(cond, summand);
     }
 
-    protected static <G extends ProofGoal<G>> ProjectionToTerm<G> subAt(ProjectionToTerm<G> t,
+    public static <G extends ProofGoal<G>> ProjectionToTerm<G> subAt(ProjectionToTerm<G> t,
             PosInTerm pit) {
         return SubtermProjection.create(t, pit);
     }
 
-    protected static TermFeature sub(TermFeature sub0) {
+    public static TermFeature sub(TermFeature sub0) {
         return SubTermFeature.create(new TermFeature[] { sub0 });
     }
 
-    protected static TermFeature sub(TermFeature sub0, TermFeature sub1) {
+    public static TermFeature sub(TermFeature sub0, TermFeature sub1) {
         return SubTermFeature.create(new TermFeature[] { sub0, sub1 });
     }
 
-    protected static <G extends ProofGoal<G>> ProjectionToTerm<G> sub(ProjectionToTerm<G> t,
+    public static <G extends ProofGoal<G>> ProjectionToTerm<G> sub(ProjectionToTerm<G> t,
             int index) {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static TermFeature opSub(Operator op, TermFeature sub0) {
+    public static TermFeature opSub(Operator op, TermFeature sub0) {
         return add(op(op), sub(sub0));
     }
 
-    protected static TermFeature opSub(Operator op, TermFeature sub0, TermFeature sub1) {
+    public static TermFeature opSub(Operator op, TermFeature sub0, TermFeature sub1) {
         return add(op(op), sub(sub0, sub1));
     }
 
-    protected static <G extends ProofGoal<G>> Feature contains(ProjectionToTerm<G> bigTerm,
+    public static <G extends ProofGoal<G>> Feature contains(ProjectionToTerm<G> bigTerm,
             ProjectionToTerm<G> searchedTerm,
             java.util.function.Function<TermBuffer<G>, TermFeature> createEqTermFeature) {
         final TermBuffer<G> buf = new TermBuffer<>();
@@ -221,17 +221,17 @@ public class StaticFeatureCollection {
             applyTF(bigTerm, not(rec(any(), not(createEqTermFeature.apply(buf))))));
     }
 
-    protected static <G extends ProofGoal<G>> Feature let(TermBuffer<G> x,
+    public static <G extends ProofGoal<G>> Feature let(TermBuffer<G> x,
             ProjectionToTerm<G> value,
             Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    protected static <G extends ProofGoal<G>> Feature println(ProjectionToTerm<G> t) {
+    public static <G extends ProofGoal<G>> Feature println(ProjectionToTerm<G> t) {
         return applyTF(t, PrintTermFeature.INSTANCE);
     }
 
-    protected static TermFeature extendsTrans(Sort s) {
+    public static TermFeature extendsTrans(Sort s) {
         return SortExtendsTransTermFeature.create(s);
     }
 
@@ -242,7 +242,7 @@ public class StaticFeatureCollection {
     /// @param schemaVar schema variable
     /// @param tf term feature
     /// @return feature
-    protected static <G extends ProofGoal<G>> Feature applyTF(String schemaVar, TermFeature tf) {
+    public static <G extends ProofGoal<G>> Feature applyTF(String schemaVar, TermFeature tf) {
         return applyTF(StaticFeatureCollection.<G>instOf(schemaVar), tf);
     }
 
@@ -253,7 +253,7 @@ public class StaticFeatureCollection {
     /// @param schemaVar schema variable
     /// @param tf term feature
     /// @return feature
-    protected static <G extends ProofGoal<G>> Feature applyTFNonStrict(String schemaVar,
+    public static <G extends ProofGoal<G>> Feature applyTFNonStrict(String schemaVar,
             TermFeature tf) {
         return applyTFNonStrict(StaticFeatureCollection.<G>instOfNonStrict(schemaVar), tf);
     }
@@ -265,7 +265,7 @@ public class StaticFeatureCollection {
     /// @param term term describing the projection
     /// @param tf term feature
     /// @return feature
-    protected static <G extends ProofGoal<G>> Feature applyTF(ProjectionToTerm<G> term,
+    public static <G extends ProofGoal<G>> Feature applyTF(ProjectionToTerm<G> term,
             TermFeature tf) {
         return ApplyTFFeature.create(term, tf);
     }
@@ -277,17 +277,17 @@ public class StaticFeatureCollection {
     /// @param term term describing the projection
     /// @param tf term feature
     /// @return feature
-    protected static <G extends ProofGoal<G>> Feature applyTFNonStrict(ProjectionToTerm<G> term,
+    public static <G extends ProofGoal<G>> Feature applyTFNonStrict(ProjectionToTerm<G> term,
             TermFeature tf) {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
-    protected static TermFeature constantTermFeature() {
+    public static TermFeature constantTermFeature() {
         return TermPredicateTermFeature
                 .create(term -> term.op() instanceof Function && term.arity() == 0);
     }
 
-    protected static Feature isInstantiated(String schemaVar) {
+    public static Feature isInstantiated(String schemaVar) {
         return InstantiatedSVFeature.create(new Name(schemaVar));
     }
 }

@@ -26,7 +26,9 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal);
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return computeCost(app, pos, goal, new MutableState());
+    }
 
     /**
      * Checks if the {@link Strategy} should stop at the first non-closeable {@link Goal}.
@@ -55,6 +57,8 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
 
     boolean isResponsibleFor(RuleSet rs);
 
-    RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
-            Goal goal, MutableState mState);
+    default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            Goal goal, MutableState mState) {
+        return null;
+    }
 }

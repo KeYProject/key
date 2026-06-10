@@ -18,11 +18,11 @@ public class ArithTermFeatures extends StaticFeatureCollection {
     final Function mod;
     final Function div;
 
-    final Operator eq;
+    final public Operator eq;
     final Function leq;
     final Function geq;
 
-    final TermFeature intF;
+    final public TermFeature intF;
 
     final TermFeature addF;
     final TermFeature mulF;
@@ -34,7 +34,7 @@ public class ArithTermFeatures extends StaticFeatureCollection {
     final TermFeature geqF;
 
     final TermFeature constant;
-    final TermFeature atom;
+    final public TermFeature atom;
     final TermFeature linearMonomial;
 
     // left-associatively arranged monomials
@@ -44,8 +44,8 @@ public class ArithTermFeatures extends StaticFeatureCollection {
 
     final public TermFeature literal;
     final TermFeature posLiteral;
-    final TermFeature negLiteral;
-    final TermFeature nonNegLiteral;
+    final public TermFeature negLiteral;
+    final public TermFeature nonNegLiteral;
     final TermFeature nonPosLiteral;
     final TermFeature zeroLiteral;
     final TermFeature oneLiteral;

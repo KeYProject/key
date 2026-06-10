@@ -43,13 +43,15 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+
 /// Strategy for general FOL rules. This does not consider other
 /// theories like integers or Java-specific functions.
 ///
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
-public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
+public class FOLStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("FOL Strategy");
 
     protected final StrategyProperties strategyProperties;
@@ -118,7 +120,8 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
-            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE))));
+            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE,
+                t -> StaticFeatureCollection.eq((TermBuffer) t)))));
 
         bindRuleSet(d, "update_elim",
             add(longConst(-8000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
@@ -414,7 +417,8 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.INSTANCE, not(eq(instOf("t"), varInst)))),
+                not(sum(varInst, HeuristicInstantiation.INSTANCE,
+                    not(StaticFeatureCollection.eq(instOf("t"), varInst)))),
                 InstantiationCostScalerFeature.create(InstantiationCost.create(instOf("t")),
                     longConst(0))));
 
@@ -422,7 +426,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             bindRuleSet(d, "triggered",
                 add(isTriggerVariableInstantiated(),
                     not(sum(splitInst, TriggeredInstantiations.create(false),
-                        not(eq(instOfTriggerVariable(), splitInst))))));
+                        not(StaticFeatureCollection.eq(instOfTriggerVariable(), splitInst))))));
         } else {
             bindRuleSet(d, "gamma", inftyConst());
             bindRuleSet(d, "triggered", inftyConst());

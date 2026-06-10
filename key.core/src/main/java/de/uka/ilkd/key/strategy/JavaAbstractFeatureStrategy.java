@@ -16,16 +16,11 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.AbstractFeatureStrategy;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
-import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -35,12 +30,12 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
+public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrategy<Goal>
         implements JavaStrategy {
 
     private final Proof proof;
 
-    protected AbstractFeatureStrategy(Proof proof) {
+    protected JavaAbstractFeatureStrategy(Proof proof) {
         this.proof = proof;
     }
 
@@ -111,27 +106,6 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
 
     protected void clearRuleSetBindings(RuleSetDispatchFeature d, String ruleSet) {
         d.clear(getHeuristic(ruleSet));
-    }
-
-
-    @Override
-    public void instantiateApp(RuleApp app, PosInOccurrence pio,
-            Goal goal,
-            org.key_project.prover.strategy.RuleAppCostCollector collector) {
-        final MutableState mState = new MutableState();
-        final BackTrackingManager btManager = mState.getBacktrackingManager();
-        btManager.setup(app);
-        do {
-            final RuleAppCost cost = instantiateApp(app, pio, goal, mState);
-            if (cost instanceof TopRuleAppCost) {
-                continue;
-            }
-            final RuleApp res = btManager.getResultingapp();
-            if (res == app || res == null) {
-                continue;
-            }
-            collector.collect(res, cost);
-        } while (btManager.backtrack());
     }
 
     /**

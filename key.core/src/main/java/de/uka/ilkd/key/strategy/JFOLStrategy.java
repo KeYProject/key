@@ -15,6 +15,9 @@ import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.anonHeapTermFeature;
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.literalsSmallerThan;
+
 /// This strategy extends the classical [FOLStrategy] with heuristics
 /// for quantifier instantiation based on E-matching, which involves
 /// normalization of quantified formulas, as well as term features depending on

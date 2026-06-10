@@ -31,10 +31,12 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
+import static org.key_project.prover.strategy.StaticFeatureCollection.*;
+
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
-public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
+public class StringStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("String Strategy");
 
     /// The features defining the three phases: cost computation, approval,
@@ -138,8 +140,8 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
         bindRuleSet(d, "stringsConcatNotBothLiterals",
             ifZero(MatchedAssumesFeature.INSTANCE, ifZero(
-                add(applyTF(instOf("leftStr"), seqLiteral),
-                    applyTF(instOf("rightStr"), seqLiteral)),
+                add(applyTF(StaticFeatureCollection.instOf("leftStr"), seqLiteral),
+                    applyTF(StaticFeatureCollection.instOf("rightStr"), seqLiteral)),
                 inftyConst()), inftyConst()));
 
         bindRuleSet(d, "stringsReduceConcat", longConst(100));

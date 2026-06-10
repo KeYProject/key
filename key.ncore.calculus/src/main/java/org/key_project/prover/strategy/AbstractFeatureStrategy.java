@@ -5,9 +5,15 @@ package org.key_project.prover.strategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ForEachCP;
 import org.key_project.prover.strategy.costbased.feature.instantiator.OneOfCP;
 import org.key_project.prover.strategy.costbased.feature.instantiator.SVInstantiationCP;
@@ -74,4 +80,24 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
     }
 
     protected abstract Feature isBelow(TermFeature t);
+
+    @Override
+    public void instantiateApp(RuleApp app, PosInOccurrence pio,
+            G goal,
+            org.key_project.prover.strategy.RuleAppCostCollector collector) {
+        final MutableState mState = new MutableState();
+        final BackTrackingManager btManager = mState.getBacktrackingManager();
+        btManager.setup(app);
+        do {
+            final RuleAppCost cost = instantiateApp(app, pio, goal, mState);
+            if (cost instanceof TopRuleAppCost) {
+                continue;
+            }
+            final RuleApp res = btManager.getResultingapp();
+            if (res == app || res == null) {
+                continue;
+            }
+            collector.collect(res, cost);
+        } while (btManager.backtrack());
+    }
 }

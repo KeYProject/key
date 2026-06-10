@@ -43,7 +43,7 @@ import org.jspecify.annotations.NonNull;
 /// a conflict resolution [#resolveConflict(RuleSetDispatchFeature, RuleSet, List)].
 ///
 /// Do not create directly. Use [ModularJavaDLStrategyFactory] instead.
-public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
+public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
     public static final Name NAME = new Name("Modular JavaDL Strategy");
 
     /// List of component strategies. Order is not strictly important.

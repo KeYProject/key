@@ -40,6 +40,8 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.hasLabel;
+
 /**
  * {@link JavaStrategy} to use for symbolic execution.
  */
