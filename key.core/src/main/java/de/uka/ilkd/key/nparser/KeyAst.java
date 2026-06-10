@@ -321,7 +321,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public java.io.@Nullable File getJavaSourceLocation() {
             try {
                 JavaKeYParser.String_valueContext value =
-                    ctx.javaSource(0).oneJavaSource().string_value(0);
+                    ctx.programSource(0).oneProgramSource().string_value(0);
                 String v = ParsingFacade.getValueDocumentation(value);
                 return new java.io.File(v);
             } catch (NullPointerException | IndexOutOfBoundsException e) {

@@ -102,5 +102,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
-ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 
+DOC_COMMENT
+   : '/*!' -> more , pushMode (docComment)
+   ;

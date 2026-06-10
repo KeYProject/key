@@ -740,7 +740,9 @@ MODAILITYGENERIC2
 MODAILITYGENERIC4
    : '\\modality' -> more , pushMode (modGeneric)
    ;
-   
+
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
+
 ERROR_CHAR
    : .
    ;

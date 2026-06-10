@@ -16,7 +16,7 @@ decls
 :
     ( bootClassPath          // for problems
     | stlist=classPaths      // for problems
-    | string=javaSource      // for problems
+    | string=programSource      // for problems
     | one_include_statement
     | options_choice
     | option_decls
@@ -311,11 +311,4 @@ classPaths
   CLASSPATH s=string_value (COMMA s=string_value)* SEMI
 ;
 
-javaSource: JAVASOURCE result=oneJavaSource SEMI;
-
-oneJavaSource
-:
-  ( string_value
-  | COLON
-  )+ 
-;
+programSource: JAVASOURCE result=oneProgramSource SEMI;

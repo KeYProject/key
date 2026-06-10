@@ -40,7 +40,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
             it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
-        information.setJavaSource(acceptFirst(ctx.javaSource()));
+        information.setJavaSource(acceptFirst(ctx.programSource()));
         return null;
     }
 
@@ -81,12 +81,12 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     }
 
     @Override
-    public String visitJavaSource(JavaKeYParser.JavaSourceContext ctx) {
-        return ctx.oneJavaSource() != null ? (String) accept(ctx.oneJavaSource()) : null;
+    public String visitProgramSource(JavaKeYParser.ProgramSourceContext ctx) {
+        return ctx.oneProgramSource() != null ? (String) accept(ctx.oneProgramSource()) : null;
     }
 
     @Override
-    public String visitOneJavaSource(JavaKeYParser.OneJavaSourceContext ctx) {
+    public String visitOneProgramSource(JavaKeYParser.OneProgramSourceContext ctx) {
         return StringUtil.trim(ctx.getText(), '"');
     }
 
