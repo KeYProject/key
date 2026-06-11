@@ -30,7 +30,7 @@ simple_ident_dots_comma_list
    ;
 
 funcpred_name
-   : (sortId DOUBLECOLON)? (name = simple_ident_dots | num = INT_LITERAL)
+   : (simple_ident_dots DOUBLECOLON)? (name = simple_ident_dots | num = INT_LITERAL)
    ;
 
 varId
