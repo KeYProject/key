@@ -164,8 +164,9 @@ public interface KeYGuiExtension {
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
         @NonNull
-        List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
-                @NonNull Object underlyingObject);
+        <T> List<Action> getContextActions(@NonNull KeYMediator mediator,
+                @NonNull ContextMenuKind<T> kind,
+                @NonNull T underlyingObject);
     }
 
     /**

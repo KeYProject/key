@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -159,6 +159,22 @@ public class DeclarationBuilder extends DefaultBuilder {
         ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                 : Immutables.createSetFrom(sortExt);
 
+        if (ctx.ALIAS() != null) {
+            String aliasId = accept(ctx.simple_ident_dots());
+            assert aliasId != null;
+            Name name = new Name(aliasId);
+            if (namespaces().sorts().lookup(name) != null) {
+                semanticError(ctx, "A sort of name %s already exists", name);
+            }
+            if (namespaces().sortAliases().lookup(name) != null) {
+                semanticError(ctx, "A sort alias of name %s already exists", name);
+            }
+            Sort aliased = accept(ctx.sortId());
+            var alias = new SortAlias(name, aliased);
+            namespaces().sortAliases().addSafely(alias);
+            return alias;
+        }
+
         if (ctx.sortIds != null) {
             for (var idCtx : ctx.sortIds.simple_ident_dots()) {
                 String sortId = accept(idCtx);
@@ -198,8 +214,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                     createdSorts.add(s);
                 } else {
                     // weigl: agreement on KaKeY meeting: this should be ignored until we finally
-                    // have
-                    // local namespaces for generic sorts
+                    // have local namespaces for generic sorts
                     // addWarning(ctx, "Sort declaration is ignored, due to collision.");
                     LOGGER.debug(
                         "Sort declaration of {} in {} is ignored due to collision (already "

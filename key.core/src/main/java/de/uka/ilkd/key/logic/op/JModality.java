@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -30,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 public class JModality extends Modality implements Operator {
     /**
      * keeps track of created modalities
+     * TODO: needs to be moved to services cache to avoid problems when reloading a proof or
      */
     private static final WeakValueLinkedHashMap<Pair<JavaModalityKind, JavaProgramElement>, JModality> modalities =
         new WeakValueLinkedHashMap<>();

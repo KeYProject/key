@@ -5,17 +5,17 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.statement.Exec;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.statement.Exec;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopScopeBlock;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
@@ -36,8 +36,7 @@ public class ProgramContextAdder {
     /**
      * an empty private constructor to ensure the singleton property
      */
-    private ProgramContextAdder() {
-    }
+    private ProgramContextAdder() {}
 
     /**
      * wraps the context around the statements found in the putIn block
@@ -94,11 +93,14 @@ public class ProgramContextAdder {
      * inserts the content of the statement block <code>putIn</code> and adds succeeding children of
      * the innermost non terminal element (usually statement block) in the context.
      *
-     * @param wrapper the JavaNonTerminalProgramElement with the context that has to be wrapped
+     * @param wrapper
+     *        the JavaNonTerminalProgramElement with the context that has to be wrapped
      *        around the content of <code>putIn</code>
-     * @param putIn the StatementBlock with content that has to be wrapped by the elements hidden in
+     * @param putIn
+     *        the StatementBlock with content that has to be wrapped by the elements hidden in
      *        the context
-     * @param suffix the PosInProgram describing the position of the first element before the suffix
+     * @param suffix
+     *        the PosInProgram describing the position of the first element before the suffix
      *        of the context
      * @return the StatementBlock which encloses the content of <code>putIn</code> together with the
      *         succeeding context elements of the innermost context statement block (attention: in a
@@ -146,8 +148,10 @@ public class ProgramContextAdder {
      * returns the replacement block if it is the only child of the statement block to be
      * constructed and the chld is a statementblock too.
      *
-     * @param wrapper the StatementBlock where to replace the first statement
-     * @param replacement the StatementBlock that replaces the first statement of the block
+     * @param wrapper
+     *        the StatementBlock where to replace the first statement
+     * @param replacement
+     *        the StatementBlock that replaces the first statement of the block
      * @return the resulting statement block
      */
     protected StatementBlock createStatementBlockWrapper(StatementBlock wrapper,

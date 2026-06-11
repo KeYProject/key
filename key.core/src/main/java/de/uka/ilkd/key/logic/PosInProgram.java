@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.logic.IntIterator;
 

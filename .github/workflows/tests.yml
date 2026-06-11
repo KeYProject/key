@@ -8,6 +8,7 @@ on:
     branches:
       - "main"
       - "KeY-*"
+      - "releases/*"
   merge_group:
 
 permissions:
@@ -25,10 +26,10 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         java: [ 21 ]
         modules: [
-          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core, key.core.rifl,
+          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
-          key.util, key.core.example, keyext.caching,
-          keyext.proofmanagement, key.removegenerics ]
+          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
+          keyext.proofmanagement]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
@@ -55,10 +56,10 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
+        run: ./gradlew --continue :${{ matrix.modules }}:test
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -69,9 +70,6 @@ jobs:
             **/build/test-results/*/*.xml
             **/build/reports/
             !**/jacocoTestReport.xml
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
 
   integration-tests:
     env:
@@ -97,7 +95,7 @@ jobs:
         uses: keyproject/setup-smt@v0
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 
@@ -107,6 +105,7 @@ jobs:
         with:
           name: test-results-${{ matrix.test }}
           path: |
+            key.core/proofs/**        
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/

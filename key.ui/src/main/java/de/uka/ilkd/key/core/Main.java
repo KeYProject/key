@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -45,7 +45,6 @@ import org.xml.sax.SAXException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import recoder.ParserException;
 
 /**
  * The main entry point for KeY
@@ -132,13 +131,6 @@ public final class Main implements Callable<Integer> {
     @Option(names = "--examples", paramLabel = "FOLDER",
         description = "load the directory containing the example files on startup")
     private @Nullable String examplesFolder = null;
-
-    /**
-     * Path to a RIFL specification file.
-     */
-    @Option(names = "--rifl", paramLabel = "FILE",
-        description = "load RIFL specifications from file (requires GUI and startup file)")
-    public @Nullable Path riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation of multiple
@@ -311,14 +303,6 @@ public final class Main implements Callable<Integer> {
         }
 
         LOGGER.info("Debug.ENABLE_ASSERTION = {}", Debug.ENABLE_ASSERTION);
-
-        if (riflFileName != null) {
-            LOGGER.info("Loading RIFL specification from {}", riflFileName);
-            if (!Files.exists(riflFileName)) {
-                LOGGER.info("RIFL does not exists {}", riflFileName);
-                return 2;
-            }
-        }
 
         if (justifyRulesOptions != null) {
             try {
@@ -525,21 +509,6 @@ public final class Main implements Callable<Integer> {
      */
     private void preProcessInput()
             throws ParserException, IOException, ParserConfigurationException, SAXException {
-        // RIFL to JML transformation
-        if (riflFileName != null) {
-            if (inputFiles.isEmpty()) {
-                LOGGER.info("[RIFL] No Java file to load from.");
-                System.exit(-130826);
-            }
-            // only use one input file
-            Path fileNameOnStartUp = inputFiles.getFirst().toAbsolutePath();
-            RIFLTransformer transformer = new RIFLTransformer();
-            transformer.doTransform(riflFileName, fileNameOnStartUp,
-                RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-            LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
-            inputFiles = transformer.getProblemFiles();
-        }
-
         if (inputFiles != null && !inputFiles.isEmpty()) {
             Path f = inputFiles.get(0);
             if (Files.isDirectory(f)) {

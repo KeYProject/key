@@ -63,6 +63,7 @@ public class UrlRuleSource extends RuleSource {
             } catch (FileSystemNotFoundException e) {
                 URI rootFs = URI.create(StringUtil.takeUntil(uri.toString(), "!"));
                 String internal = StringUtil.takeAfter(uri.toString(), "!");
+                // keep the file system open.
                 FileSystem zipfs = FileSystems.newFileSystem(rootFs, new HashMap<>());
                 return zipfs.getPath(internal);
             }

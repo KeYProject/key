@@ -57,13 +57,12 @@ public abstract class GenericSortCondition {
     }
 
     /**
-     * Create the conditions to make a generic sort (s0) (or a collection sort of a generic sort)
-     * and
+     * Create the condition to make a generic sort (s0) (or a collection sort of a generic sort) and
      * a concrete sort (s1) equal
      *
      * @param p_identity true iff an identity condition should be generated (otherwise: a supersort
      *        condition is generated)
-     * @return the resulting conditions, if "s0" is of generic sort; null, if the sorts are either
+     * @return the resulting condition, if "s0" is of generic sort; null, if the sorts are either
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */

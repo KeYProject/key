@@ -101,7 +101,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         ExecutionNodeReader.KeYlessVariable selfContentVar =
             new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "select<[int]>(heap,n,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
@@ -111,7 +111,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         ExecutionNodeReader.KeYlessVariable nContentVar =
             new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
         nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int",
-            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "select<[int]>(heap,n,Number::$content)", "content {true}", false, false, "true"));
         nValue.addChildVariable(nContentVar);
         // exc
         result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
@@ -135,7 +135,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         ExecutionNodeReader.KeYlessVariable selfContentVar =
             new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-            "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
+            "select<[int]>(heap,self,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
@@ -145,7 +145,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         ExecutionNodeReader.KeYlessVariable nContentVar =
             new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
         nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int",
-            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "select<[int]>(heap,n,Number::$content)", "content {true}", false, false, "true"));
         nValue.addChildVariable(nContentVar);
         // exc
         result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
@@ -169,7 +169,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         ExecutionNodeReader.KeYlessVariable selfContentVar =
             new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-            "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
+            "select<[int]>(heap,self,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");

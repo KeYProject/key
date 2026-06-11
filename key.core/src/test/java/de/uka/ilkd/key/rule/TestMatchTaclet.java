@@ -6,12 +6,12 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -68,6 +68,10 @@ public class TestMatchTaclet {
         TacletForTests.parse();
 
         services = TacletForTests.services();
+        LocationVariable i = new LocationVariable(new ProgramElementName("i"),
+            services.getJavaInfo().getKeYJavaType("int"));
+        services.getNamespaces().programVariables().add(i);
+
         TB = services.getTermBuilder();
 
         all_left = (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_for_all").taclet();
@@ -282,10 +286,8 @@ public class TestMatchTaclet {
     // test match of update terms
     @Test
     public void testUpdateMatch() {
-        LocationVariable i = new LocationVariable(new ProgramElementName("i"),
-            services.getJavaInfo().getKeYJavaType("int"));
-        services.getNamespaces().programVariables().add(i);
-        JTerm match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
+        JTerm match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))", services,
+            services.getNamespaces());
         match = match.sub(0);
         assertNotNull(
             all_left.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services),
@@ -293,7 +295,8 @@ public class TestMatchTaclet {
                 + "only the term that is matched has an update and the "
                 + "template it is matched to has none.");
 
-        JTerm match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
+        JTerm match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true", services,
+            services.getNamespaces());
         match2 = match2.sub(0);
         assertNotNull(assign_n.getMatcher().matchFind(match2, EMPTY_MATCHCONDITIONS,
             services), "Instantiations should be found.");
@@ -302,7 +305,7 @@ public class TestMatchTaclet {
 
     @Test
     public void testProgramMatchEmptyBlock() {
-        JTerm match = TacletForTests.parseTerm("\\<{ }\\>true ");
+        JTerm match = TacletForTests.parseTerm("\\<{ }\\>true ", services);
         FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet("empty_diamond").taclet();
         MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
@@ -317,7 +320,7 @@ public class TestMatchTaclet {
 
         assertNotNull(mc);
 
-        match = TacletForTests.parseTerm("\\<{ {int i = 0;} }\\>true ");
+        match = TacletForTests.parseTerm("\\<{ {int i = 0;} }\\>true ", services);
         mc = (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS,
             services));
 
@@ -388,7 +391,8 @@ public class TestMatchTaclet {
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "Method-Frame should match");
 
-        JTerm termWithPV = TacletForTests.parseTerm("\\<{int i;}\\>i=0");
+        JTerm termWithPV =
+            TacletForTests.parseTerm("\\<{int i;}\\>i=0", services, services.getNamespaces());
         match = TacletForTests.parseTerm("\\<{return 2;}\\>true ");
         prg = (StatementBlock) match.javaBlock().program();
         mframe = new MethodFrame((IProgramVariable) termWithPV.sub(0).sub(0).op(), ec, prg);
@@ -468,7 +472,8 @@ public class TestMatchTaclet {
         FindTaclet unrestrictedTaclet =
             (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
 
-        JTerm match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
+        JTerm match =
+            TacletForTests.parseTerm("{ i := 0 } (i = 0)", services, services.getNamespaces());
         MatchResultInfo mc = (restrictedTaclet.getMatcher().matchFind(match,
             EMPTY_MATCHCONDITIONS, services));
         assertNull(mc, "Test inSequentState failed: matched on term with update prefix");
@@ -477,7 +482,7 @@ public class TestMatchTaclet {
             EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "Test inSequentState failed: did not match on term with update prefix");
 
-        match = TacletForTests.parseTerm("i = 0");
+        match = TacletForTests.parseTerm("i = 0", services, services.getNamespaces());
         mc = (restrictedTaclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS,
             services));
         assertNotNull(mc,

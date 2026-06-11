@@ -6,12 +6,14 @@ package de.uka.ilkd.key.logic.op;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
@@ -66,6 +68,7 @@ public final class ProgramSV extends JOperatorSV
         return new Comment[0];
     }
 
+
     @Override
     public SourceElement getFirstElement() {
         return this;
@@ -89,11 +92,6 @@ public final class ProgramSV extends JOperatorSV
     @Override
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override

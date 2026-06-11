@@ -231,7 +231,7 @@ public abstract class AbstractUserInterfaceControl
             if (loader != null && loader.getProof() != null) {
                 loader.getProof().dispose();
             }
-            throw new ProblemLoaderException(loader, e);
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 
@@ -252,8 +252,7 @@ public abstract class AbstractUserInterfaceControl
     }
 
     @Override
-    public void loadingStarted(AbstractProblemLoader loader) {
-    }
+    public void loadingStarted(AbstractProblemLoader loader) {}
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,

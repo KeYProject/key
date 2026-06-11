@@ -10,11 +10,11 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -140,10 +140,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * looks up a function, (program) variable or static query of the given name varfunc_id and the
      * argument terms args in the namespaces and java info.
      *
-     * @param varfuncName the String with the symbols name
+     * @param varfuncName
+     *        the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-            Sort sort, KeYParser.Formal_sort_argsContext genericArgsCtxt) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName,
+            KeYParser.Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
         Operator[] operators =
             { schemaVariables().lookup(name), variables().lookup(name),
@@ -159,33 +160,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        if (sort != null || sortName != null) {
-            Name fqName =
-                new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
-            operators =
-                new Operator[] { schemaVariables().lookup(fqName),
-                    variables().lookup(fqName),
-                    programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    functions().lookup(fqName),
-                    AbstractTermTransformer.name2metaop(fqName.toString()) };
-
-            for (Operator op : operators) {
-                if (op != null) {
-                    return op;
-                }
-            }
-
-            SortDependingFunction firstInstance =
-                SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
-            if (sort == null)
-                semanticError(ctx, "Could not find sort: %s", sortName);
-            if (firstInstance != null) {
-                SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
-                if (v != null) {
-                    return v;
-                }
-            }
-        }
         if (genericArgsCtxt != null) {
             var d = nss.parametricFunctions().lookup(name);
             if (d == null) {
@@ -234,6 +208,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 sorts().add(result);
             } else {
                 result = sorts().lookup(new Name("java.lang." + name));
+            }
+        }
+        // Look for alias
+        if (result == null) {
+            SortAlias alias = namespaces().sortAliases().lookup(name);
+            if (alias != null) {
+                result = alias.aliasedSort();
             }
         }
         return result;
@@ -404,7 +385,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             array = true;
             type.append("[]");
         }
-        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type.toString());
+
+        KeYJavaType kjt;
+        kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
@@ -425,11 +408,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        // try as sort without Java type (neede e.g. for "Heap")
+        // try as sort without Java type (need e.g. for "Heap")
         if (kjt == null) {
             Sort sort = lookupSort(type.toString());
             if (sort != null) {
-                kjt = new KeYJavaType(null, sort);
+                kjt = new KeYJavaType(sort);
             }
         }
 

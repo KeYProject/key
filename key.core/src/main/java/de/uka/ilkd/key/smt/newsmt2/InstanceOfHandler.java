@@ -6,13 +6,14 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This SMT translation handler takes care of instanceof and exactinstanceof functions.
@@ -22,37 +23,38 @@ import org.key_project.logic.op.Operator;
  */
 public class InstanceOfHandler implements SMTHandler {
 
-    private SortDependingFunction exactInstanceOfOp;
-    private SortDependingFunction instanceOfOp;
+    private ParametricFunctionDecl exactInstanceOfOp;
+    private ParametricFunctionDecl instanceOfOp;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
         this.instanceOfOp =
-            services.getJavaDLTheory().getInstanceofSymbol(JavaDLTheory.ANY, services);
+            services.getJavaDLTheory().getInstanceofSymbol(services);
         this.exactInstanceOfOp =
-            services.getJavaDLTheory().getExactInstanceofSymbol(JavaDLTheory.ANY, services);
+            services.getJavaDLTheory().getExactInstanceofSymbol(services);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        if (op instanceof SortDependingFunction sdf) {
-            return exactInstanceOfOp.isSimilar(sdf) || instanceOfOp.isSimilar(sdf);
+        if (op instanceof ParametricFunctionInstance pfi) {
+            return exactInstanceOfOp == (pfi.getBase()) || instanceOfOp == (pfi.getBase());
         }
         return false;
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        SortDependingFunction op = (SortDependingFunction) term.op();
+        var op = (ParametricFunctionInstance) term.op();
         SExpr inner = trans.translate(term.sub(0), Type.UNIVERSE);
-        if (exactInstanceOfOp.isSimilar(op)) {
-            trans.addSort(op.getSortDependingOn());
+        Sort sort = op.getArgs().head().sort();
+        if (exactInstanceOfOp == (op.getBase())) {
+            trans.addSort(sort);
             return new SExpr("exactinstanceof", Type.BOOL, inner,
-                SExprs.sortExpr(op.getSortDependingOn()));
-        } else if (instanceOfOp.isSimilar(op)) {
-            trans.addSort(op.getSortDependingOn());
-            return SExprs.instanceOf(inner, SExprs.sortExpr(op.getSortDependingOn()));
+                SExprs.sortExpr(sort));
+        } else if (instanceOfOp == (op.getBase())) {
+            trans.addSort(sort);
+            return SExprs.instanceOf(inner, SExprs.sortExpr(sort));
         } else {
             throw new SMTTranslationException("unexpected case in instanceof-handling: " + term);
         }

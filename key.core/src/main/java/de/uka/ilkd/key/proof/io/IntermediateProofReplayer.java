@@ -13,8 +13,8 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -46,6 +46,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.Levensthein;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
@@ -463,8 +464,13 @@ public class IntermediateProofReplayer {
         }
 
         if (ourApp == null) {
+            var availableTaclets = currGoal.indexOfTaclets().getAllTacletNames().map(Name::toString)
+                    .collect(Collectors.toSet());
+            var similarNames = Levensthein.findSimilarNames(tacletName, availableTaclets);
+            var three = similarNames.stream().limit(3).collect(Collectors.joining(", "));
             throw new TacletAppConstructionException(
-                "Unknown taclet with name \"" + tacletName + "\"");
+                "Unknown taclet with name \"" + tacletName + "\". Most three similar names are: "
+                    + three);
         }
 
         Services services = proof.getServices();
@@ -964,7 +970,7 @@ public class IntermediateProofReplayer {
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(),
+                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().sortAliases(),
                 proof.getNamespaces().parametricSorts(),
                 proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
@@ -1006,7 +1012,7 @@ public class IntermediateProofReplayer {
             sort = app.getRealSort(sv, services);
         } else {
             name = value.substring(0, colon);
-            sort = services.getNamespaces().sorts().lookup(value.substring(colon + 1));
+            sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
 
         }
         LogicVariable lv = new LogicVariable(new Name(name), sort);

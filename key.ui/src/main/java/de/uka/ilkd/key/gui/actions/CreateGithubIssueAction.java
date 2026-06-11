@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeBrands;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconProvider;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.slf4j.Logger;
@@ -77,7 +76,7 @@ public class CreateGithubIssueAction extends MainWindowAction {
         String java = "";
         Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
         if (proof != null) {
-            File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+            File javaSourceLocation = SendFeedbackAction.getJavaSourceLocation(proof);
             if (javaSourceLocation != null) {
                 Path path = javaSourceLocation.toPath();
                 try (final var walker = Files.walk(path)) {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -87,11 +87,6 @@ public final class JavaDLMatchVMInstructionSet {
                 "Do not know how to match " + op + " of type " + op.getClass());
         }
         return instruction;
-    }
-
-    public static SimilarSortDependingFunctionInstruction getSimilarSortDependingFunctionInstruction(
-            SortDependingFunction sortDependingFunction) {
-        return new SimilarSortDependingFunctionInstruction(sortDependingFunction);
     }
 
     public static SimilarParametricFunctionInstruction getSimilarParametricFunctionInstruction(

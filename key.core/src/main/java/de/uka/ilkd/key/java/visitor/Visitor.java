@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -173,8 +175,6 @@ public interface Visitor {
     void performActionOnVariableSpecification(VariableSpecification x);
 
     void performActionOnFieldSpecification(FieldSpecification x);
-
-    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -341,24 +341,30 @@ public interface Visitor {
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnLoopContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds loop contract for new loop statement to loop contract of old loop statement.
      *
-     * @param oldLoop the old loop statement
-     * @param newLoop the new loop statement
+     * @param oldLoop
+     *        the old loop statement
+     * @param newLoop
+     *        the new loop statement
      */
     void performActionOnLoopContract(final LoopStatement oldLoop, final LoopStatement newLoop);
 
@@ -403,7 +409,8 @@ public interface Visitor {
     /**
      * Performs action on JML assert statement.
      *
-     * @param jmlAssert the statement to perform the action on.
+     * @param jmlAssert
+     *        the statement to perform the action on.
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 

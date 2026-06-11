@@ -6,7 +6,6 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import org.jspecify.annotations.Nullable;
 
 public class ScriptException extends Exception implements HasLocation {
 
@@ -16,7 +15,7 @@ public class ScriptException extends Exception implements HasLocation {
 
     public ScriptException() {
         super();
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(String message, Location location, Throwable cause) {
@@ -32,22 +31,21 @@ public class ScriptException extends Exception implements HasLocation {
 
     public ScriptException(String message) {
         super(message);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(Throwable cause) {
         super(cause);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(String message, Throwable cause) {
         super(message, cause);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     @Override
-    public @Nullable Location getLocation() {
+    public Location getLocation() {
         return location;
     }
-
 }

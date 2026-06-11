@@ -32,11 +32,16 @@ import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
+import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -561,7 +566,11 @@ public final class IssueDialog extends JDialog {
         // make sure UI is usable after any exception
         MainWindow.getInstance().getMediator().startInterface(true);
 
-        Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
+        Set<PositionedIssueString> msg = extractMessage(exception);
+        if (exception instanceof BuildingExceptions) {
+            ((BuildingExceptions) exception).getErrors().forEach(
+                it -> LOGGER.info("Error", it));
+        }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
@@ -599,21 +608,38 @@ public final class IssueDialog extends JDialog {
      * @param exception the exception to extract the data from
      * @return a new PositionedIssueString created from the data
      */
-    private static PositionedIssueString extractMessage(Throwable exception) {
+    private static Set<PositionedIssueString> extractMessage(Throwable exception) {
+        { // Search for a BuildingException(s) first.
+            var e = exception;
+            while (e != null) {
+                switch (e) {
+                    case BuildingExceptions be -> {
+                        return extractMessages(be);
+                    }
+                    case BuildingException b -> {
+                        return extractMessage(b);
+                    }
+                    case JavaBuildingExceptions b -> {
+                        return extractMessages(b);
+                    }
+                    default -> {
+                    }
+                }
+                e = e.getCause();
+            }
+        }
+
         try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
 
-            if (exception instanceof ParseCancellationException) {
-                exception = exception.getCause();
-            }
-
-            if (exception instanceof InputMismatchException ime) {
-                message = ExceptionTools.getNiceMessage(ime);
-            }
-            if (exception instanceof NoViableAltException nvae) {
-                message = ExceptionTools.getNiceMessage(nvae);
+            switch (exception) {
+                case ParseCancellationException e -> exception = exception.getCause();
+                case InputMismatchException ime -> message = ExceptionTools.getNiceMessage(ime);
+                case NoViableAltException nvae -> message = ExceptionTools.getNiceMessage(nvae);
+                default -> {
+                }
             }
 
             // also add message of the cause to the string if available
@@ -628,22 +654,48 @@ public final class IssueDialog extends JDialog {
             Position pos = Position.UNDEFINED;
             Location location = ExceptionTools.getLocation(exception);
             if (location != null) {
-                var loc = location;
-                if (!loc.getPosition().isNegative()) {
-                    pos = loc.getPosition();
+                if (!location.getPosition().isNegative()) {
+                    pos = location.getPosition();
                 }
-                if (loc.getFileURI().isPresent()) {
-                    resourceLocation = loc.getFileURI().get();
+                if (location.getFileURI().isPresent()) {
+                    resourceLocation = location.getFileURI().get();
                 }
             }
-            return new PositionedIssueString(message == null ? exception.toString() : message,
-                new Location(resourceLocation, pos), info);
+            return Collections.singleton(
+                new PositionedIssueString(message == null ? exception.toString() : message,
+                    new Location(resourceLocation, pos), info));
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             LOGGER.debug("Creating a Location failed for {}", exception, e);
         }
-        return new PositionedIssueString("Constructing the error message failed!");
+        return Collections.singleton(
+            new PositionedIssueString("Constructing the error message failed!"));
     }
+
+    private static Set<PositionedIssueString> extractMessages(JavaBuildingExceptions e) {
+        return e.getIssues().stream().map(IssueDialog::extractMessage).collect(Collectors.toSet());
+    }
+
+    private static Set<PositionedIssueString> extractMessages(BuildingExceptions e) {
+        return e.getErrors().stream().map(IssueDialog::extractMessage).collect(Collectors.toSet());
+    }
+
+    private static PositionedIssueString extractMessage(BuildingIssue e) {
+        var ps = e.asPositionedString();
+        return new PositionedIssueString(ps.text, ps.location, "",
+            e.isWarning() ? PositionedIssueString.Kind.WARNING : PositionedIssueString.Kind.ERROR);
+    }
+
+    private static PositionedIssueString extractMessage(JavaBuildingIssue e) {
+        return new PositionedIssueString(e.getMessage(), new Location(e.getPath(), e.getPosition()),
+            "", PositionedIssueString.Kind.ERROR);
+    }
+
+    private static Set<PositionedIssueString> extractMessage(BuildingException e) {
+        return Collections.singleton(new PositionedIssueString(e.getMessage(), e.getLocation(), "",
+            PositionedIssueString.Kind.ERROR));
+    }
+
 
     private void accept() {
         if (!critical && chkIgnoreWarnings.isSelected()) {

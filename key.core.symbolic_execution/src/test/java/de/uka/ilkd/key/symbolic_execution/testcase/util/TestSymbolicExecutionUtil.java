@@ -10,7 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -43,7 +43,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     @Test
     public void test1ImproveReadability() throws ProblemLoaderException {
         Path location = testCaseDirectory.resolve(
-            "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
+            "readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
                 .toAbsolutePath();
         assertTrue(Files.exists(location), "Could not find required resource: " + location);
 

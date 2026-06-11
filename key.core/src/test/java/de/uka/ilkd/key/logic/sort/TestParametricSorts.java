@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
@@ -11,12 +10,12 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -25,7 +24,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class TestParametricSorts {
     private NamespaceSet nss;
@@ -35,21 +35,22 @@ class TestParametricSorts {
 
     @BeforeEach
     public void setUp() {
-        this.services = new Services(AbstractProfile.getDefaultProfile());
-        this.nss = services.getNamespaces();
-        this.io = new KeyIO(services, nss);
+        services = TacletForTests.services();
+        services.getJavaService().parseSpecialClasses(null);
+        nss = services.getNamespaces();
+        io = new KeyIO(services, nss);
 
+        nss.setSorts(new Namespace<>()); // fresh sorts
         nss.sorts().add(g1 = new GenericSort(new Name("G1")));
         nss.sorts().add(new GenericSort(new Name("G2")));
         nss.sorts().add(new GenericSort(new Name("G3")));
         nss.sorts().add(new GenericSort(new Name("G4")));
 
         NamespaceBuilder nb = new NamespaceBuilder(nss);
-        nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+        nb.addSort("boolean").addSort("int")
+                .addSort("Seq").addSort("LocSet").addSort("double")
                 .addSort("float");
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
     }
 
     private ParametricSortDecl addParametricSort(String name,
@@ -64,48 +65,6 @@ class TestParametricSorts {
             params, "", "");
         nss.parametricSorts().add(psd);
         return psd;
-    }
-
-
-    @Test
-    public void testParametricSortIdentical() {
-        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        var sdf = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false, services);
-        nss.functions().add(sdf);
-
-        var term = io.parseExpression("List<[int]>::someConst = List<[int]>::someConst");
-        assertEquals(term.sub(0), term.sub(1));
-        assertSame(term.sub(0).sort(), term.sub(1).sort());
-    }
-
-    @Test
-    public void testParametricSortDependentFunctionInstantiation() {
-        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        Sort intSort = nss.sorts().lookup("int");
-
-        var someConst = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false, services);
-        nss.functions().add(someConst);
-
-        var listOfInt =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)),
-                services);
-        var listOfG1 =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
-        var sdf = SortDependingFunction.createFirstInstance(g1, new Name("head"), g1,
-            new Sort[] { listOfG1 }, false, services);
-        nss.functions().add(sdf);
-
-        SortDependingFunction sdfInst = sdf.getInstanceFor(intSort, services);
-        assertEquals(intSort, sdfInst.sort());
-        assertEquals(listOfInt, sdfInst.argSort(0));
-
-        var term = io.parseExpression("int::head(List<[int]>::someConst) = int::someConst");
-        assertEquals("List<[int]>", term.sub(0).sub(0).sort().toString());
-        assertEquals("List<[int]>", ((JFunction) term.sub(0).op()).argSorts().get(0).toString());
-        assertEquals("int", term.sub(0).op().sort(new Sort[0]).toString());
-        assertSame(term.sub(0).sort(), term.sub(1).sort());
     }
 
     @Test

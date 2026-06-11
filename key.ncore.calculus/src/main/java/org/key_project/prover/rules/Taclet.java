@@ -297,6 +297,7 @@ public abstract class Taclet implements Rule {
     }
 
     /// @return an iterator over the rule sets.
+    @Override
     public Iterator<RuleSet> ruleSets() {
         return ruleSets.iterator();
     }

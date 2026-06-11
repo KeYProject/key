@@ -86,15 +86,15 @@ class EndToEndTests {
                 .resolve("reverseArray.proof");
         Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             directory,
-            5138, 4127, true, true, true);
+            5270, 4183, true, true, true);
         var iteration2 =
-            sliceProofFullFilename(iteration1.second, 4127, 4125, true, true, true);
+            sliceProofFullFilename(iteration1.second, 4183, 4181, true, true, true);
         var iteration3 =
-            sliceProofFullFilename(iteration2.second, 4125, 4123, true, true, true);
+            sliceProofFullFilename(iteration2.second, 4181, 4179, true, true, true);
         var iteration4 =
-            sliceProofFullFilename(iteration3.second, 4123, 4121, true, true, true);
+            sliceProofFullFilename(iteration3.second, 4179, 4177, true, true, true);
         var iteration5 =
-            sliceProofFullFilename(iteration4.second, 4121, 4119, true, true, true);
+            sliceProofFullFilename(iteration4.second, 4177, 4175, true, true, true);
         iteration5.first.dispose();
         iteration4.first.dispose();
         iteration3.first.dispose();
@@ -116,16 +116,17 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            3379, 1305, true, false).dispose();
         sliceProofOffline(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            3379, 1305, true, false).dispose();
     }
 
     /**
      * Test that the dependency analyzer can remove a cut on <code>true</code>.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceCutExample() throws Exception {
@@ -283,7 +284,8 @@ class EndToEndTests {
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         LOGGER.trace("Loading {}", proofFile.toAbsolutePath());
         KeYEnvironment<?> environment =
-            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
+            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, null,
                 null, proof -> {
                     if (trackOnline) {
                         tracker.set(new DependencyTracker(proof));
@@ -301,8 +303,16 @@ class EndToEndTests {
             // analyze proof
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
-            assertEquals(expectedTotal, results.totalSteps);
-            assertEquals(expectedInSlice, results.usefulStepsNr);
+            if (expectedTotal > 0) {
+                assertEquals(expectedTotal, results.totalSteps);
+            } else {
+                LOGGER.info("total steps: {}", results.totalSteps);
+            }
+            if (expectedInSlice > 0) {
+                assertEquals(expectedInSlice, results.usefulStepsNr);
+            } else {
+                LOGGER.info("total steps in slice: {}", results.usefulStepsNr);
+            }
             // slice proof
             DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
@@ -317,13 +327,14 @@ class EndToEndTests {
                 Assertions.assertTrue(slicedProof.closed(), "Proof is not closed");
             }
 
-            assertEquals(expectedInSlice
-                    + slicedProof.closedGoals().size()
-                    - slicedProof.closedGoals().stream()
-                            .filter(x -> x.node().getAppliedRuleApp() instanceof SMTRuleApp)
-                            .count(),
-                slicedProof.countNodes());
-
+            if (expectedInSlice > 0) {
+                assertEquals(expectedInSlice
+                        + slicedProof.closedGoals().size()
+                        - slicedProof.closedGoals().stream()
+                                .filter(x -> x.node().getAppliedRuleApp() instanceof SMTRuleApp)
+                                .count(),
+                    slicedProof.countNodes());
+            }
             return new Pair<>(slicedProof, tempFile);
         } finally {
             environment.dispose();

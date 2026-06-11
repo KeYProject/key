@@ -10,15 +10,17 @@ import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -41,7 +43,6 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -57,10 +58,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.key_project.util.java.IOUtil.safePathRelativeTo;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -83,26 +88,6 @@ public class OutputStreamProofSaver {
      */
     protected final boolean saveProofSteps;
 
-
-    /**
-     * Extracts java source directory from {@link Proof#header()}, if it exists.
-     *
-     * @param proof the Proof
-     * @return the location of the java source code or null if no such exists
-     */
-    public static @Nullable File getJavaSourceLocation(Proof proof) {
-        final String header = proof.header();
-        final int i = header.indexOf("\\javaSource");
-        if (i >= 0) {
-            final int begin = header.indexOf('\"', i);
-            final int end = header.indexOf('\"', begin + 1);
-            final String sourceLocation = header.substring(begin + 1, end);
-            if (!sourceLocation.isEmpty()) {
-                return new File(sourceLocation);
-            }
-        }
-        return null;
-    }
 
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
@@ -160,9 +145,9 @@ public class OutputStreamProofSaver {
         return String.format("\\settings %s \n", ps.settingsToString());
     }
 
-    public void save(OutputStream out) throws IOException {
+    public void save(Path basePath, OutputStream out) throws IOException {
         CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
-        try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
+        try (PrintWriter ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
@@ -185,16 +170,14 @@ public class OutputStreamProofSaver {
             ps.println(writeSettings(proof.getSettings()));
 
 
-            // declarations of symbols, sorts
-            // FIXME this should rather be an AST rewrite, than a bunch of regex.
-            String header = proof.header();
-            header = makePathsRelative(header);
-            ps.print(header);
+            KeyAst.Declarations header = proof.header();
+            String headerStr = makePathsRelative(basePath, header);
+            ps.print(headerStr);
 
             proof.printSymbols(ps);
 
             // \problem or \proofObligation
-            var hasProofObligation =
+            boolean hasProofObligation =
                 po instanceof IPersistablePO ppo && ppo.printProofObligation(ps, proof);
 
 
@@ -223,87 +206,70 @@ public class OutputStreamProofSaver {
         }
     }
 
-    protected @Nullable Path getBasePath() throws IOException {
-        File javaSourceLocation = getJavaSourceLocation(proof);
-        if (javaSourceLocation != null) {
-            return javaSourceLocation.toPath().toAbsolutePath();
-        } else {
-            return null;
+
+    /// Searches in the header for absolute paths to Java files and tries to replace them by paths
+    /// relative to the proof file to be saved.
+    /// If the given `header` is null, an empty string is returned. This is the case for proofs,
+    /// that are non-KeY-file not crated by KeY-files.
+    ///
+    /// @param header a string created a proper KeY-file content.
+    ///
+    ///
+    /// TODO weigl: If someone finds time, this function is a string manipulation mess.
+    /// You should rather parse the header using the [de.uka.ilkd.key.nparser.ParsingFacade]
+    /// and use the [de.uka.ilkd.key.nparser.builder.ProblemFinder] to extract the field.
+    /// Better would be to get rid of the header, and using an AST.
+    ///
+    ///
+    /// @see de.uka.ilkd.key.proof.init.KeYUserProblemFile#getProblemHeader()
+    /// @see de.uka.ilkd.key.proof.init.InitConfig#getProblemHeader()
+    private String makePathsRelative(Path basePath, KeyAst.@Nullable Declarations header) {
+        StringWriter sw = new StringWriter();
+        PrintWriter out = new PrintWriter(sw, true);
+
+        if (header != null) {
+            header.printDefinitions(out);
         }
-    }
 
-    /**
-     * Searches in the header for absolute paths to Java files and tries to replace them by paths
-     * relative to the proof file to be saved.
-     *
-     * TODO weigl: if someone finds time, this function is a string manipulation mess.
-     * You should rather parse the header using the {@link de.uka.ilkd.key.nparser.ParsingFacade}
-     * and
-     * use the {@link de.uka.ilkd.key.nparser.builder.ProblemFinder} to extract the field.
-     *
-     * Better would be to get rid of the header, and using an AST.
-     */
-    private String makePathsRelative(String header) {
-        final String[] search =
-            { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
-        final String basePath;
-        String tmp = header;
-        try {
-            basePath = getBasePath().toString();
-
-            // locate filenames in header
-            for (final String s : search) {
-                int i = tmp.indexOf(s);
-                if (i == -1) {
-                    continue; // entry not in file
+        JavaModel jm = proof.getServices().getJavaModel();
+        if (jm != null) {
+            out.println();
+            Path bootClassPath = jm.getBootClassPath();
+            if (bootClassPath != null) {
+                if (!bootClassPath.toUri().getScheme().equals("file")) {
+                    /*
+                     * This happens if JavaRedux (the default bootclasspath) is read from a zip.
+                     * Since we do not support non-file includes, we need to skip it ...
+                     */
+                    LOGGER.info("Bootclasspath is not a file (probably default bcp inside a zip/jar"
+                        + " file), skipping: " + bootClassPath);
+                } else {
+                    out.printf("\\bootclasspath \"%s\";\n",
+                        safePathRelativeTo(bootClassPath, basePath));
                 }
-
-                // put in everything before the keyword
-                // bugfix #1138: changed i-1 to i
-                String tmp2 = tmp.substring(0, i);
-                StringBuilder relPathString = new StringBuilder();
-                i += s.length();
-                final int l = tmp.indexOf(';', i);
-
-                // there may be more than one path
-                while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
-                    if (!relPathString.isEmpty()) {
-                        relPathString.append(", ");
-                    }
-
-                    // path is always put in quotation marks
-                    final int k = tmp.indexOf('"', i) + 1;
-                    final int j = tmp.indexOf('"', k);
-
-                    // add new relative path
-                    final String absPath = tmp.substring(k, j);
-                    final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
-                    relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
-                            .append("\"");
-                    i = j + 1;
-                }
-                tmp2 = tmp2 + s + relPathString + ";";
-
-                // put back in the rest
-                tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1) : "");
             }
-        } catch (final IOException e) {
-            LOGGER.warn("Failed to make relative", e);
-        }
-        return tmp;
-    }
 
-    /**
-     * Try to create a relative path, but return the absolute path if a relative path cannot be
-     * found. This may happen on Windows systems (bug #1480).
-     */
-    private static String tryToMakeFilenameRelative(String absPath, String basePath) {
-        try {
-            return MiscTools.makeFilenameRelative(absPath, basePath);
-        } catch (final RuntimeException e) {
-            return absPath;
+            List<Path> classPath = jm.getClassPath();
+            if (classPath != null && !classPath.isEmpty()) {
+                for (Path path : classPath) {
+                    out.printf("\\classpath \"%s\";\n", safePathRelativeTo(path, basePath));
+                }
+            }
+
+            Path javaSource = jm.getModelDir();
+            if (javaSource != null) {
+                out.printf("\\javaSource \"%s\";\n", safePathRelativeTo(javaSource, basePath));
+            }
+
+            List<Path> includedFiles = jm.getIncludedFiles();
+            if (includedFiles != null && !includedFiles.isEmpty()) {
+                for (Path includedFile : includedFiles) {
+                    out.printf("\\include \"%s\";\n",
+                        safePathRelativeTo(includedFile, basePath));
+                }
+            }
         }
+        return sw + "\n";
     }
 
     private String newNames2Proof(Node n) {
@@ -403,9 +369,9 @@ public class OutputStreamProofSaver {
             output.append(" (").append(ProofElementID.MERGE_USER_CHOICES.getRawName())
                     .append(" \"");
             boolean first = true;
-            for (var pair : userChoices.entrySet()) {
-                final var key = pair.getKey();
-                final var value = pair.getValue();
+            for (Map.Entry<ProgramVariable, AbstractDomainElement> pair : userChoices.entrySet()) {
+                final ProgramVariable key = pair.getKey();
+                final AbstractDomainElement value = pair.getValue();
                 if (first) {
                     first = false;
                 } else {
@@ -722,9 +688,10 @@ public class OutputStreamProofSaver {
      * @return the "interesting" instantiations (serialized)
      */
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
-        Collection<String> s = new ArrayList<>();
+        var s = new ArrayList<String>();
 
-        for (final var pair : inst.interesting()) {
+        for (final ImmutableMapEntry<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> pair : inst
+                .interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();
@@ -745,7 +712,7 @@ public class OutputStreamProofSaver {
             }
             s.add(singleInstantiation);
         }
-
+        Collections.sort(s); // Sorting makes the output format (more) reproducible.
         return s;
     }
 
@@ -836,22 +803,30 @@ public class OutputStreamProofSaver {
 
     public static String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
-        if (val instanceof ProgramElement) {
-            return printProgramElement((ProgramElement) val);
-        } else if (val instanceof JTerm) {
-            return printTerm((JTerm) val, services, shortAttrNotation);
-        } else if (val instanceof Sequent) {
-            return printSequent((Sequent) val, services);
-        } else if (val instanceof Name) {
-            return val.toString();
-        } else if (val instanceof InstantiationEntry<?> entry) {
-            return printAnything(entry.getInstantiation(), services);
-        } else if (val == null) {
-            return null;
-        } else {
-            LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
-            // try to String by chance
-            return val.toString();
+        switch (val) {
+            case ProgramElement programElement -> {
+                return printProgramElement(programElement);
+            }
+            case JTerm jTerm -> {
+                return printTerm(jTerm, services, shortAttrNotation);
+            }
+            case Sequent sequentFormulas -> {
+                return printSequent(sequentFormulas, services);
+            }
+            case Name name -> {
+                return val.toString();
+            }
+            case InstantiationEntry<?> entry -> {
+                return printAnything(entry.getInstantiation(), services);
+            }
+            case null -> {
+                return null;
+            }
+            default -> {
+                LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
+                // try to String by chance
+                return val.toString();
+            }
         }
     }
 
@@ -863,7 +838,7 @@ public class OutputStreamProofSaver {
 
     private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
 
-        final NotationInfo ni = new NotationInfo();
+        final NotationInfo ni = new NotationInfo(false, false, false);
 
         return LogicPrinter.purePrinter(ni, (shortAttrNotation ? serv : null));
     }

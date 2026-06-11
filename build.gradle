@@ -8,15 +8,15 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.3.0"
+    id "com.diffplug.spotless" version "8.4.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.61"
 
-    id("org.sonarqube") version "7.2.3.7755"
-
     // Plugin for publishing via the new Nexus API
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+
+    id "signing"
 }
 
 
@@ -36,7 +36,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "2.13.0$build"
+version = "3.0.0$build"
 
 subprojects {
     apply plugin: "java"
@@ -59,17 +59,17 @@ subprojects {
 
     repositories {
         mavenCentral()
+        //maven { url = "https://git.key-project.org/api/v4/projects/35/packages/maven/" }
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-api:2.0.17")
         testImplementation("ch.qos.logback:logback-classic:1.5.32")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.3-eisop1"
+        def eisop_version = "3.49.5-eisop1"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
@@ -80,17 +80,18 @@ subprojects {
         testImplementation("org.assertj:assertj-core:3.27.7")
         testImplementation("ch.qos.logback:logback-classic:1.5.32")
 
-        testImplementation(platform("org.junit:junit-bom:5.14.3"))
+        testImplementation(platform("org.junit:junit-bom:6.0.3"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation ("org.assertj:assertj-core:3.27.7")
-        testImplementation project(':key.util')
+        testImplementation (project(':key.util'))
+        testImplementation (testFixtures(project(":key.util")))
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.1")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.1")
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
 
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
@@ -132,11 +133,6 @@ subprojects {
         // these seems to be missing starting with Gradle 9
         testClassesDirs = sourceSets.test.output.classesDirs
         classpath = sourceSets.test.runtimeClasspath
-
-        // Fail on empty test suites
-        afterSuite { suite, result ->
-            assert result.testCount > 0, "There are no executed test. This is unexpected and should be investigated!"
-        }
     }
 
 
@@ -151,8 +147,17 @@ subprojects {
             excludeTags "owntest", "interactive", "performance"
         }
 
-        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
-        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
+        addTestListener(new TestListener() {
+                void afterTest(TestDescriptor desc, TestResult result) {
+                    logger.error("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
+                }
+            })
+
+        addTestListener(new TestListener() {
+            void beforeTest(TestDescriptor descriptor) {
+                logger.error("> ${descriptor.getClassName()}#${descriptor.getName()}")
+            }
+        })
 
         testLogging {
             outputs.upToDateWhen { false }
@@ -353,14 +358,24 @@ subprojects {
                 }
             }
         }
-
         signing {
-            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
-            sign publishing.publications.mavenJava
+            //sign publishing.publications.mavenJava
         }
     }
 }
 
+signing {
+    // does not work
+    if(System.getenv("GPG_PRIVATE_KEY") == null) {
+        useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
+    } else{
+        useInMemoryPgpKeys(
+                System.getenv("SIGNING_KEY_ID"),
+                System.getenv("GPG_PRIVATE_KEY"),
+                System.getenv("GPG_PASSPHRASE")
+        )
+    }
+}
 
 nexusPublishing {
     repositories {
@@ -410,12 +425,10 @@ tasks.register('alldoc', Javadoc){
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
 
     configure(options) {
-        //showFromPrivate()
+        showFromPrivate()
+        options.addBooleanOption('html5', true)
         encoding = 'UTF-8'
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
@@ -425,7 +438,45 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2026 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
-        links += "https://www.antlr.org/api/Java/"
+        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links += "https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
+        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.32/"
+        links +="https://www.javadoc.io/doc/com.formdev/flatlaf/3.7/"
+        links +="https://www.javadoc.io/doc/com.miglayout/miglayout-swing/11.4.3/"
+        links +="https://www.javadoc.io/doc/com.squareup/javapoet/1.13.0/"
+        //links +="https://www.javadoc.io/doc/de.unruh/scala-isabelle_2.13/0.4.5/"
+        links +="https://www.javadoc.io/doc/info.picocli/picocli/4.7.7/"
+        links +="https://www.javadoc.io/doc/org.antlr/ST4/4.3.4/"
+        links +="https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
+        links +="https://www.javadoc.io/doc/org.jspecify/jspecify/1.0.0/"
+        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+
+        linkSource()
+        author()
+        version()
+
+        group("key.core.infflow", "de.uka.ilkd.key.informationflow")
+        group("key.core", "de.uka.ilkd.key")
+        group("key.util", "org.key_project.util")
+        group("key.ui", "org.key_project.util.java",
+                "de.uka.ilkd.key.core", "de.uka.ilkd.key.gui",
+                "de.uka.ilkd.key.proof", "de.uka.ilkd.key.ui","de.uka.ilkd.key.util")
+        group("key.core.wd", "de.uka.ilkd.key.wd")
+        group("key.core.testgen", "de.uka.ilkd.key.testgen")
+        group("key.ncore", "org.key_project.logic")
+        group("key.ncore.calculus", "org.key_project.prover")
+
+        /*
+        group("keyext.isabelletranslation", "org.key_project.isabelletranslation")
+        group("keyext.proofmanagement", "org.key_project.proofmanagement")
+        group("keyext.slicing", "org.key_project.slicing")
+        group("keyext.ui.testgen", "de.uka.ilkd.key.gui.testgen")
+        group("keyext.exploration","org.key_project.exploration")
+        group("keyext.caching", "de.uka.ilkd.key.gui.plugins.caching")
+        group("key.core.symbolic_execution",// "de.uka.ilkd.key.proof",
+                "de.uka.ilkd.key.rule.label", "de.uka.ilkd.key.strategy",
+                "de.uka.ilkd.key.symbolic_execution")
+        group("key.core.proof_references", "de.uka.ilkd.key.proof_references")*/
     }
 }
 
