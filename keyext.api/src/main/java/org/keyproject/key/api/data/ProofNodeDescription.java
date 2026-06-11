@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
-import de.uka.ilkd.key.proof.Node;
-
 import java.io.Serializable;
+
+import de.uka.ilkd.key.proof.Node;
 
 public class ProofNodeDescription implements Serializable {
     /**

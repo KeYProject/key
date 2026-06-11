@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteapi;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.keyproject.key.api.data.KeyIdentifications.NodeId;
@@ -11,9 +14,6 @@ import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
 import org.keyproject.key.api.data.ProofStatus;
 import org.keyproject.key.api.data.StrategyOptions;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -49,7 +49,7 @@ public interface ProofApi {
      */
     @JsonRequest
     CompletableFuture<MacroStatistic> macro(ProofId proof, String macroName,
-                                            StrategyOptions options);
+            StrategyOptions options);
 
     /**
      * Executes the given {@code script} against the proof using the given {@code options}.

@@ -453,7 +453,7 @@ public final class Main implements Callable<Integer> {
         if (!Files.exists(examplesDir)) {
             examplesDir = setupExamples();
         }
-        if (examplesDir == null) {
+        if (examplesDir != null) {
             setExamplesDir(examplesDir.toAbsolutePath());
         }
     }

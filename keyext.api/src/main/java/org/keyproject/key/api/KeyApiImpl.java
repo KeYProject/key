@@ -529,7 +529,7 @@ public final class KeyApiImpl implements KeyApi {
                 KeYEnvironment<?> env = null;
                 try {
                     var loader = control.load(JavaProfile.getDefaultProfile(),
-                        ex.getObligationFile().toPath(),
+                        ex.getObligationFile(),
                         null, null, null, null, true, null);
                     InitConfig initConfig = loader.getInitConfig();
 

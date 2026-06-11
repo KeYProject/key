@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Alexander Weigl

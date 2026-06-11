@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -96,10 +96,12 @@ public class TermActionUtil {
         }
         ImmutableList<TacletApp> findTaclet = c.getFindTaclet(goal, occ);
         ImmutableList<? extends TacletApp> findTaclets =
-                occ != null ? goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, occ, goal.getOverlayServices())
-                        : ImmutableList.of();
+            occ != null
+                    ? goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, occ,
+                        goal.getOverlayServices())
+                    : ImmutableList.of();
         ImmutableList<NoPosTacletApp> noFindTaclets =
-                goal.ruleAppIndex().getNoFindTaclet(TacletFilter.TRUE, goal.getOverlayServices());
+            goal.ruleAppIndex().getNoFindTaclet(TacletFilter.TRUE, goal.getOverlayServices());
 
 
         for (TacletApp tacletApp : findTaclets) {
