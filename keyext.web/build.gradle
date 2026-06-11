@@ -1,0 +1,20 @@
+plugins {
+    id 'application'
+
+    // Used to create a single executable jar file with all dependencies
+    // see task "shadowJar" below
+    // https://github.com/GradleUp/shadow
+    id 'com.gradleup.shadow' version "9.4.1"
+}
+description = "A web interface for KeY "
+
+application {
+    mainClass.set("org.key_project.key.webui.WebUi")
+}
+
+dependencies {
+    implementation project(":key.ui")
+    implementation project(":keyext.api")
+    implementation("org.eclipse.jetty:jetty-server:12.1.10")
+    implementation("org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-server:12.1.10")
+}
