@@ -823,6 +823,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
+    /**
+     * Expands all currently visible nodes. Used by the collapsing search to reveal the (few)
+     * surviving matching nodes after the tree has been filtered down to them.
+     */
+    void expandFilteredTree() {
+        ProofTreeExpansionState.expandAll(delegateView,
+            ProofTreePopupFactory.ossPathFilter(isExpandOSSNodes()));
+    }
+
+    /**
+     * Re-selects the currently selected proof node in the tree. Used by the collapsing search to
+     * restore a valid selection after it removed the filter and rebuilt the tree (the rebuild
+     * drops the selection, which other actions such as the view filters rely on).
+     */
+    void selectCurrentNodeInTree() {
+        if (mediator != null) {
+            makeNodeVisible(mediator.getSelectedNode());
+        }
+    }
+
     @Override
     public @NonNull String getTitle() {
         return "Proof";
