@@ -327,6 +327,96 @@ public class ProofTreeView extends JPanel implements TabPanel {
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
 
         setMediator(m);
+
+        // The view only listens to the mediator and the proof while its tab is actually
+        // showing — a hidden tab costs (almost) nothing. When the tab becomes visible
+        // again, activatePanel() catches up.
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                if (isShowing()) {
+                    activatePanel();
+                } else {
+                    passivatePanel();
+                }
+            }
+        });
+        passivatePanel();
+    }
+
+    // ------------------------------------------------------------------- show/hide lifecycle
+
+    /** whether the tab is showing and the listeners are attached */
+    private boolean panelActive = true;
+    /** whether the proof changed while the tab was hidden */
+    private boolean dirtyWhileHidden = false;
+
+    /** minimal listener kept on the proof while hidden, only records "something changed" */
+    private final ProofTreeAdapter dirtyListener = new ProofTreeAdapter() {
+        @Override
+        public void proofExpanded(ProofTreeEvent e) {
+            dirtyWhileHidden = true;
+        }
+
+        @Override
+        public void proofPruned(ProofTreeEvent e) {
+            dirtyWhileHidden = true;
+        }
+
+        @Override
+        public void proofStructureChanged(ProofTreeEvent e) {
+            dirtyWhileHidden = true;
+        }
+
+        @Override
+        public void proofGoalRemoved(ProofTreeEvent e) {
+            dirtyWhileHidden = true;
+        }
+    };
+
+    private void activatePanel() {
+        if (panelActive) {
+            return;
+        }
+        panelActive = true;
+        register();
+        if (proof != null && !proof.isDisposed()) {
+            proof.removeProofTreeListener(dirtyListener);
+        }
+
+        Proof selected = mediator.getSelectedProof();
+        if (selected != proof) {
+            dirtyWhileHidden = false;
+            setProof(selected);
+        } else if (delegateModel != null) {
+            if (mediator.isInAutoMode()) {
+                // catch up in autoModeStopped, the dirty flag stays set until then
+                delegateModel.setAttentive(false);
+                return;
+            }
+            if (!delegateModel.isAttentive()) {
+                delegateModel.setAttentive(true);
+            }
+            if (dirtyWhileHidden) {
+                dirtyWhileHidden = false;
+                delegateModel.updateTree((Node) null);
+            }
+            makeNodeVisible(mediator.getSelectedNode());
+        }
+    }
+
+    private void passivatePanel() {
+        if (!panelActive) {
+            return;
+        }
+        panelActive = false;
+        unregister();
+        if (proof != null && !proof.isDisposed()) {
+            if (delegateModel != null && delegateModel.isAttentive()) {
+                delegateModel.setAttentive(false);
+            }
+            proof.removeProofTreeListener(dirtyListener);
+            proof.addProofTreeListener(dirtyListener);
+        }
     }
 
     public boolean isExpandOSSNodes() {
@@ -960,6 +1050,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             if (!delegateModel.isAttentive()) {
                 delegateModel.setAttentive(true);
+            }
+            if (dirtyWhileHidden) {
+                // the tab was (re-)activated while the strategy was running
+                dirtyWhileHidden = false;
+                delegateModel.updateTree((Node) null);
             }
             mediator.addKeYSelectionListenerChecked(proofListener);
             makeSelectedNodeVisible(mediator.getSelectedNode());
