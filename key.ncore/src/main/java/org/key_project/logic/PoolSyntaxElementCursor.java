@@ -6,6 +6,9 @@ package org.key_project.logic;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An iterator that walks in first-depth order through the syntax element. It allows to jump to
  * siblings.
@@ -62,7 +65,7 @@ public class PoolSyntaxElementCursor {
      * {@link #getCurrentElement()}; for all entries below the top, {@code nextChild} is
      * less than the arity of the corresponding element.
      */
-    private SyntaxElement[] elements = new SyntaxElement[INITIAL_STACK_SIZE];
+    private @Nullable SyntaxElement[] elements = new SyntaxElement[INITIAL_STACK_SIZE];
     private int[] nextChild = new int[INITIAL_STACK_SIZE];
     private int top = -1;
 
@@ -91,8 +94,12 @@ public class PoolSyntaxElementCursor {
         return top >= 1;
     }
 
-    public SyntaxElement getCurrentElement() {
-        return elements[top];
+    @SuppressWarnings("nullness")
+    public @NonNull SyntaxElement getCurrentElement() {
+        // cannot be null as then hasNext would have returned false (and top would be -1)
+        final SyntaxElement current = elements[top];
+        assert current != null;
+        return current;
     }
 
     private /* @ helper @ */ void gotoNextHelper() {
@@ -102,8 +109,12 @@ public class PoolSyntaxElementCursor {
         do {
             final SyntaxElement se = elements[top];
             final int pos = nextChild[top];
-            if (pos < se.getChildCount()) {
-                if (pos + 1 >= se.getChildCount()) {
+            assert se != null;
+            @SuppressWarnings("nullness") // se cannot be null, if elements[top] is null then we
+                                          // iterated over the whole term and top is < 0
+            final int childCount = se.getChildCount();
+            if (pos < childCount) {
+                if (pos + 1 >= childCount) {
                     // we visited all children of that element,
                     // so it can be removed from the stack
                     pop();

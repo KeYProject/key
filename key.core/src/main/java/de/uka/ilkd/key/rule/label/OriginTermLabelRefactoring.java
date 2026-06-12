@@ -135,7 +135,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      *         subterms; the returned set is unmodifiable and shared, do not mutate
      */
     @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(JTerm term, Map<JTerm, Set<Origin>> originsCache){
+    private Set<Origin> collectSubtermOrigins(JTerm term, Map<JTerm, Set<Origin>> originsCache) {
         Set<Origin> cached = originsCache.get(term);
         if (cached != null) {
             return cached;
