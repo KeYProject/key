@@ -1,4 +1,4 @@
-// msgContains: mismatched input '='
+// msgContains: expected, but found '='
 // position: 12/27
 // verbose: true
 

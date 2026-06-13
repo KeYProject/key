@@ -283,7 +283,10 @@ public final class ProblemInitializer {
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
             } catch (BuildingExceptions e) {
-                throw new ProofInputException("Failed to parse file: " + javaPath, e);
+                // Include the concrete parse problems in the message (not just the path), so the
+                // reason is visible even where only the message is shown (logs, plain getMessage).
+                throw new ProofInputException(
+                    "Failed to parse Java source in " + javaPath + ":\n" + e.getMessage(), e);
             }
         }
         Path initialFile = envInput.getInitialFile();

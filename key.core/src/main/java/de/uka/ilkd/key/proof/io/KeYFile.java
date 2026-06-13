@@ -285,8 +285,11 @@ public class KeYFile implements EnvInput {
                 absFile = parent.resolve(javaPath);
             }
             if (!Files.exists(absFile)) {
-                throw new ProofInputException(
-                    String.format("Declared Java source %s not found.", javaPath));
+                throw new ProofInputException(String.format(
+                    "The \\javaSource declared in %s could not be found.%n"
+                        + "    declared:    \"%s\"%n"
+                        + "    expected at: %s",
+                    file.file().getFileName(), javaPath, absFile.toAbsolutePath()));
             }
             return absFile.toAbsolutePath();
         }
