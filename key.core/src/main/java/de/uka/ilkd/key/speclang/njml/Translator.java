@@ -899,7 +899,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         if (expr == null) {
             raiseError(
-                format("The fully qualified name '%s' could not be resolved.", fullyQualifiedName),
+                format("Cannot resolve '%s'. No variable, field, model field, or type with this "
+                    + "name is in scope here (check for typos).", fullyQualifiedName),
                 ctx);
         }
         fullyQualifiedName = oldFqName;

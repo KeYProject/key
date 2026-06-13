@@ -28,8 +28,8 @@ import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -223,10 +223,20 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private JTerm binaryTerm(ParserRuleContext ctx, Operator operator,
             JTerm left, JTerm right) {
+        return binaryTerm(ctx, ctx, operator, left, right);
+    }
+
+    /**
+     * Like {@link #binaryTerm(ParserRuleContext, Operator, JTerm, JTerm)}, but reports a failure
+     * (e.g. a sort mismatch) at {@code errorCtx} - typically the operand that does not fit - while
+     * still attaching the origin of the whole expression {@code ctx}.
+     */
+    private JTerm binaryTerm(ParserRuleContext ctx, ParserRuleContext errorCtx, Operator operator,
+            JTerm left, JTerm right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }
-        return capsulateTf(ctx,
+        return capsulateTf(ctx, errorCtx,
             () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx,
                 services));
     }
@@ -336,7 +346,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.GREATEREQUAL() != null) {
             op_name = "geq";
         }
-        return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
+        return binaryLDTSpecificTerm(ctx, ctx.b, op_name, termL, termR);
 
     }
 
@@ -360,13 +370,13 @@ public class ExpressionBuilder extends DefaultBuilder {
                 default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             JTerm cur = terms.get(i);
-            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
+            last = binaryLDTSpecificTerm(ctx, ctx.b.get(i), opname, last, cur);
         }
         return last;
     }
 
-    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, JTerm last,
-            JTerm cur) {
+    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, ParserRuleContext errorCtx,
+            String opname, JTerm last, JTerm cur) {
         Sort sort = last.sort();
         if (sort == null) {
             semanticError(ctx, "No sort for %s", last);
@@ -380,7 +390,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (op == null) {
             semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
         }
-        return binaryTerm(ctx, op, last, cur);
+        // point a sort mismatch at the operand (errorCtx), not the whole expression
+        return binaryTerm(ctx, errorCtx, op, last, cur);
     }
 
 
@@ -392,8 +403,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         List<JTerm> terms = mapOf(ctx.b);
         JTerm last = termL;
-        for (JTerm cur : terms) {
-            last = binaryLDTSpecificTerm(ctx, IntegerLDT.MUL_STRING, last, cur);
+        for (int i = 0; i < terms.size(); i++) {
+            last = binaryLDTSpecificTerm(ctx, ctx.b.get(i), IntegerLDT.MUL_STRING, last,
+                terms.get(i));
         }
         return last;
     }
@@ -436,17 +448,33 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
                     sort);
             }
-            term = binaryTerm(ctx, op, term, termL.get(i));
+            term = binaryTerm(ctx, ctx.b.get(i), op, term, termL.get(i));
         }
         return term;
     }
 
     protected JTerm capsulateTf(ParserRuleContext ctx, Supplier<JTerm> termSupplier) {
+        return capsulateTf(ctx, ctx, termSupplier);
+    }
+
+    /**
+     * Builds a term and, on failure, raises a {@link BuildingException} that <em>describes</em> the
+     * whole term {@code ctx} but is <em>located</em> at {@code locationCtx} (e.g. the offending
+     * operand of a binary operation rather than the whole expression).
+     */
+    protected JTerm capsulateTf(ParserRuleContext ctx, ParserRuleContext locationCtx,
+            Supplier<JTerm> termSupplier) {
         try {
             return termSupplier.get();
         } catch (TermCreationException e) {
-            throw new BuildingException(ctx,
-                String.format("Could not build term on: %s", ctx.getText()), e);
+            // Surface the actual reason (usually an arity or sort/type mismatch) instead of the
+            // generic "Could not build term". The TermCreationException message lists the expected
+            // and actual argument sorts, including the sort hashes - these are kept on purpose:
+            // they let one distinguish two different sort objects that share the same name.
+            String reason = e.getMessage() == null ? "" : "\n" + e.getMessage();
+            String msg = String.format("Could not type-check term '%s'.%s", ctx.getText(), reason);
+            Token at = locationCtx != null ? locationCtx.start : (ctx != null ? ctx.start : null);
+            throw new BuildingException(at, null, msg, e);
         }
     }
 
@@ -619,12 +647,137 @@ public class ExpressionBuilder extends DefaultBuilder {
                 jr.readBlockWithProgramVariables(programVariables(), cleanJava, schemaVariables());
         } catch (Exception e) {
             try {
+                // Retry with an empty context: the first attempt may have failed only
+                // because the surrounding program variables were not needed/visible.
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
-            } catch (BuildingExceptions e1) {
-                throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e1);
+            } catch (Exception e1) {
+                // Both attempts failed. Report the failure from the first attempt
+                // (the one with the surrounding program variables in scope); it
+                // usually carries the most meaningful reason. Crucially, embed that
+                // reason into the message and attach a location so that the actual
+                // cause is no longer hidden behind a generic "Could not parse java"
+                // message (see ExceptionTools#getMessage). The inner exception
+                // reports a position relative to the Java block; map it back to the
+                // absolute position in the .key file so that the error points at the
+                // offending Java code rather than at the modality token.
+                Position pos = mapBlockPositionToFile(t, cleanJava, e);
+                // Report the underlying reason(s) directly, without the bundling exception's
+                // "Error occurred: <memory:/>:..." header noise.
+                String reason = ExceptionTools.getMessages(e).stream()
+                        .map(de.uka.ilkd.key.speclang.PositionedString::getText)
+                        .collect(Collectors.joining("\n"));
+                throw new BuildingException(t, pos,
+                    "Could not parse Java block '" + cleanJava + "':\n" + reason,
+                    e);
             }
         }
         return sjb;
+    }
+
+    /**
+     * Maps a position reported relative to a Java block back to the absolute position in the
+     * surrounding .key file. The Java block is contained in a single modality token {@code t};
+     * the inner exception {@code inner} reports a position relative to the cleaned Java code.
+     *
+     * @param t the modality token containing the Java block
+     * @param cleanJava the Java code (without modality markers) as handed to the Java parser
+     * @param inner the exception thrown while parsing the Java block
+     * @return the absolute position in the .key file, or {@code null} if it cannot be determined
+     *         (in which case the caller falls back to the token position)
+     */
+    private static @Nullable Position mapBlockPositionToFile(Token t, String cleanJava,
+            Throwable inner) {
+        Position blockPos = blockRelativePosition(inner, cleanJava);
+        if (blockPos == null) {
+            return null;
+        }
+
+        String raw = t.getText();
+        int idx = raw.indexOf(cleanJava);
+        if (idx < 0) {
+            return null;
+        }
+        // Walk from the start of the token to the start of the Java code, tracking the position.
+        int line = t.getLine(); // 1-based
+        int col = t.getCharPositionInLine() + 1; // 1-based
+        for (int i = 0; i < idx; i++) {
+            if (raw.charAt(i) == '\n') {
+                line++;
+                col = 1;
+            } else {
+                col++;
+            }
+        }
+        // Add the block-relative position (1-based line/column inside cleanJava).
+        if (blockPos.line() == 1) {
+            return Position.newOneBased(line, col + (blockPos.column() - 1));
+        }
+        return Position.newOneBased(line + (blockPos.line() - 1), blockPos.column());
+    }
+
+    /**
+     * Determines the position of an error <em>relative to the Java block</em> {@code cleanJava}
+     * (1-based line/column). It first asks the exception for a location; if there is none (e.g. an
+     * unresolved-type error from the symbol solver, which carries no source range), it falls back
+     * to locating the offending identifier name in the block so the error can still point at it.
+     */
+    private static @Nullable Position blockRelativePosition(Throwable inner, String cleanJava) {
+        try {
+            var loc = ExceptionTools.getLocation(inner);
+            if (loc != null && !loc.getPosition().isNegative()) {
+                return loc.getPosition();
+            }
+        } catch (Exception ignore) {
+            // fall through to the symbol-name heuristic
+        }
+        String symbol = unresolvedSymbolName(inner);
+        if (symbol != null) {
+            int idx = indexOfIdentifier(cleanJava, symbol);
+            if (idx >= 0) {
+                int line = 1;
+                int col = 1;
+                for (int i = 0; i < idx; i++) {
+                    if (cleanJava.charAt(i) == '\n') {
+                        line++;
+                        col = 1;
+                    } else {
+                        col++;
+                    }
+                }
+                return Position.newOneBased(line, col);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts the offending name from an "Unsolved symbol : X" message, or null.
+     * <p>
+     * Version-sensitive: this matches the JavaParser symbol solver's message format. If that ever
+     * changes, the match simply fails and we return null, so the caller falls back to the modality
+     * token position - no functionality is lost.
+     */
+    private static @Nullable String unresolvedSymbolName(Throwable inner) {
+        var m = java.util.regex.Pattern.compile("Unsolved symbol\\s*:\\s*([A-Za-z_$][\\w$.]*)")
+                .matcher(ExceptionTools.getMessage(inner));
+        return m.find() ? m.group(1) : null;
+    }
+
+    /** Index of {@code name} in {@code s} as a whole identifier (not a substring), or -1. */
+    private static int indexOfIdentifier(String s, String name) {
+        int from = 0;
+        int i;
+        while ((i = s.indexOf(name, from)) >= 0) {
+            boolean leftOk = i == 0 || !Character.isJavaIdentifierPart(s.charAt(i - 1));
+            int after = i + name.length();
+            boolean rightOk =
+                after >= s.length() || !Character.isJavaIdentifierPart(s.charAt(after));
+            if (leftOk && rightOk) {
+                return i;
+            }
+            from = i + 1;
+        }
+        return -1;
     }
 
     @Override
