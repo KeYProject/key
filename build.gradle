@@ -299,7 +299,7 @@ subprojects {
         ))
 
         pom {
-            name = it.name
+            name = project.name
             description = project.description
             url = 'https://key-project.org/'
 
