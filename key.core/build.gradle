@@ -236,7 +236,8 @@ tasks.register("testRAP", Test) {
     dependsOn('generateRAPUnitTests', 'testClasses')
 
     forkEvery = 1
-    // run the regression proofs on up to 10 parallel JVMs (overridable with -PrapForks=N)
+    // run the regression proofs on up to 10 parallel JVMs (overridable with -PrapForks=N);
+    // for clean perfTest timing reproduction use -PrapForks=1
     maxParallelForks = (project.findProperty('rapForks') ?: '10') as int
     useJUnitPlatform()
     it.filter {
