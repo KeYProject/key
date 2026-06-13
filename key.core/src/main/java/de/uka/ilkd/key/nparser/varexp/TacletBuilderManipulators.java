@@ -270,6 +270,8 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("static", StaticReferenceCondition.class, SV);
     public static final TacletBuilderCommand DIFFERENT_FIELDS =
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
+    public static final AbstractConditionBuilder ADD_ANNOTATION =
+        new ConstructorBasedBuilder("addAnnotation", AddAnnotation.class, SV, SV, S);
     public static final AbstractConditionBuilder HAS_ANNOTATION =
         new ConstructorBasedBuilder("hasAnnotation", HasAnnotationCondition.class, SV, S);
     public static final AbstractConditionBuilder SAME_OBSERVER =
@@ -385,7 +387,7 @@ public class TacletBuilderManipulators {
             STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
             META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP,
-            HAS_ANNOTATION);
+            HAS_ANNOTATION, ADD_ANNOTATION);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);
         loadWithServiceLoader();

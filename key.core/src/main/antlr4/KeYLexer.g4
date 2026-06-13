@@ -161,6 +161,7 @@ STRICT    : '\\strict';
 TYPEOF : '\\typeof';
 INSTANTIATE_GENERIC : '\\instantiateGeneric';
 HAS_ANNOTATION: '\\hasAnnotation';
+ADD_ANNOTATION: '\\addAnnotation';
 
 // Quantifiers, binding, substitution
 FORALL : '\\forall' | '\u2200';

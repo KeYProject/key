@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -62,8 +61,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         if (name == null) return null;
 
-        var classType = ((Services) services).getJavaInfo()
-                .getTypeByName(name.className());
+        var classType = services.getJavaInfo().getTypeByName(name.className());
 
         if (classType == null ||
                 !(classType.getJavaType() instanceof ClassDeclaration))
