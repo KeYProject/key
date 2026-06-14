@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Annotation;
-import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -26,17 +24,16 @@ import java.util.Arrays;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public final class AddAnnotation implements VariableCondition {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AddAnnotation.class);
-    private static final String[] ALLOWED = { "SimpleInstanceCreation" };
+public final class RemoveAnnotation implements VariableCondition {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoveAnnotation.class);
 
     private final SchemaVariable read, store;
     private final String annot;
 
 
-    public AddAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
-        assert store.sort().toString().equals(read.sort().toString()); 
-        assert Arrays.stream(ALLOWED).anyMatch(read.sort().toString()::equals);
+    public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
+        assert store.sort().toString().equals("SimpleInstanceCreation") 
+            && read.sort().toString().equals("SimpleInstanceCreation");
 
         this.read = read;
         this.store = store;
@@ -59,27 +56,22 @@ public final class AddAnnotation implements VariableCondition {
         if (!(inst instanceof New))
             return matchCond;
 
-        Annotation annotation = build((Services)logicServices);
-        TypeReference tRef = removeAnnotation(((New)inst).getTypeReference(), annotation);
+        TypeReference tRef = removeAnnotation(((New)inst).getTypeReference());
         New replacement = newFromTypeRef((New)inst, tRef);
 
         return matchCond.setInstantiations(
                 svInst.add(store, replacement, logicServices));
     }
 
-    private Annotation build(Services services) {
-        return new MarkerAnnotation(services.getJavaInfo().getTypeByName(annot));
-    }
-
-    private TypeReference removeAnnotation(TypeReference tRef, Annotation annotation) {
-        var arr = new Annotation[tRef.getAnnotations().size() + 1];
-        tRef.getAnnotations().arraycopy(0, arr, 1, arr.length - 1);
-        arr[0] = annotation;
-        var newAnnots = new ImmutableArray<>(arr);
+    private TypeReference removeAnnotation(TypeReference tRef) {
+        Annotation[] filtered = tRef.getAnnotations()
+            .stream()
+            .filter(a -> !a.getKeyJavaType().getFullName().equals(annot))
+            .toArray(Annotation[]::new);
 
         return new TypeRef(
                 tRef.getProgramElementName(),
-                newAnnots, tRef.getDimensions(),
+                new ImmutableArray<>(filtered), tRef.getDimensions(),
                 tRef.getReferencePrefix(),
                 tRef.getKeYJavaType());
     }

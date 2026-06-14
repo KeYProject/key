@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -38,6 +39,10 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             return true;
 
         Object inst = svInst.getInstantiation(variable);
+
+        if (inst instanceof New n) {
+            return matchesTypeAnnots(n.getTypeReference());
+        }
 
         if (!(inst instanceof JTerm))
             return false;

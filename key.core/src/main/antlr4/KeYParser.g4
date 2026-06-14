@@ -738,6 +738,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISINSTRICTFP
   | HAS_ANNOTATION
   | ADD_ANNOTATION 
+  | REMOVE_ANNOTATION 
 ;
 
 varexp_argument
