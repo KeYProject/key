@@ -178,12 +178,14 @@ public class ProofCollections {
                 .provable("performance-test/updateSimplification/straightline_4000.key");
         updateSimplificationPerformance
                 .provable("performance-test/updateSimplification/straightline_8000.key");
-        updateSimplificationPerformance
-                .provable("performance-test/updateSimplification/straightline_10000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/straightline_10000.key");
         updateSimplificationPerformance
                 .provable("performance-test/updateSimplification/loop_2000.key");
-        updateSimplificationPerformance
-                .provable("performance-test/updateSimplification/loop_5000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/loop_5000.key");
 
 
         // Tests for rule application restrictions
