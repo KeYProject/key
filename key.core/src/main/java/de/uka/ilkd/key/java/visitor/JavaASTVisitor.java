@@ -61,6 +61,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     protected void walk(ProgramElement node) {
         super.walk(node);
+        if (done()) {
+            return;
+        }
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
                 services.getSpecificationRepository().getLoopSpec((LoopStatement) node);

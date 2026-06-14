@@ -166,6 +166,27 @@ public class ProofCollections {
         performancePOConstruction.provable(
             "performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
 
+        // Symbolic-execution performance: straight-line code and (unrolled) bounded loops execute
+        // a long program with many parallel updates, which stresses the update-simplification
+        // machinery (\dropEffectlessElementaries). These close quickly with the targeted update
+        // simplification but degrade quadratically without it; straightline_10000 in particular is
+        // a regression canary -- fast as is, but it explodes if the quadratic behaviour returns.
+        var updateSimplificationPerformance = c.group("updateSimplificationPerformance");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_1000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_4000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_8000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/straightline_10000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/loop_2000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/loop_5000.key");
+
 
         // Tests for rule application restrictions
         var g = c.group("applicationRestrictions");
@@ -362,7 +383,6 @@ public class ProofCollections {
             "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
 
         g = c.group("quicksort");
-        g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
@@ -653,6 +673,7 @@ public class ProofCollections {
         g.provable("../../key.core/src/test/resources/testcase/classpath/classpath.key");
         g.notprovable("heap/inconsistent_represents/MyClass_m.key");
         g.notprovable("heap/inconsistent_represents/MyClass_n.key");
+        g.provable("standard_key/java_dl/typeInference.key");
 
 
         g = c.group("FOL");
@@ -1017,6 +1038,7 @@ public class ProofCollections {
 
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
+        g.provable("standard_key/polymorphic/setExample.key");
 
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");

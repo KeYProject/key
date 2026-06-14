@@ -16,10 +16,13 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.Processor;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.validator.postprocessors.Java10PostProcessor;
 import com.github.javaparser.resolution.Navigator;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -95,6 +98,14 @@ public class JavaParserFactory {
             config.setStoreTokens(true);
         }
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW);
+        config.getProcessors().add(() -> new Processor() {
+            @Override
+            public void postProcess(ParseResult<? extends Node> result,
+                    ParserConfiguration configuration) {
+                var pp = new Java10PostProcessor();
+                pp.postProcess(result, configuration);
+            }
+        });
         config.setSymbolResolver(getSymbolSolver());
         return config;
     }
