@@ -110,10 +110,13 @@ public class VMTacletMatcher implements TacletMatcher {
             findExp = findTaclet.find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
+            // both back-ends are derived from the unified match-plan framework (one dispatch per
+            // construct, see JavaMatchPlanBuilder), which falls back to the legacy hand-written
+            // matchers for the few constructs it does not build yet (term labels)
             final VMProgramInterpreter interpreter =
-                new VMProgramInterpreter(SyntaxElementMatchProgramGenerator.createProgram(findExp));
+                new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(findExp));
             if (Boolean.getBoolean(COMPILE_MATCHERS_PROPERTY)) {
-                final CompiledMatchProgram compiled = CompiledMatchProgram.compile(findExp);
+                final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgram(findExp);
                 findMatchProgram = compiled != null ? compiled : interpreter;
             } else {
                 findMatchProgram = interpreter;
@@ -128,7 +131,7 @@ public class VMTacletMatcher implements TacletMatcher {
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
                 new VMProgramInterpreter(
-                    SyntaxElementMatchProgramGenerator.createProgram((JTerm) sf.formula())));
+                    JavaMatchPlanBuilder.interpreterProgram((JTerm) sf.formula())));
         }
     }
 
