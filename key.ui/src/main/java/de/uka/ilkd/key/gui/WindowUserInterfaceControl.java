@@ -22,6 +22,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.tacletmatch.TacletMatchDialog;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -322,7 +323,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        new TacletMatchDialog(mainWindow, models, goal, mainWindow.getMediator());
     }
 
     @Override
