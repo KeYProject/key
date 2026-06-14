@@ -194,7 +194,7 @@ public class SyntaxElementMatchProgramGenerator {
      * active-statement matching; any other program is matched generically by a
      * {@link MatchSubProgramInstruction}.
      */
-    private static @Nullable VMInstruction buildProgramInstruction(JavaProgramElement prog) {
+    static @Nullable VMInstruction buildProgramInstruction(JavaProgramElement prog) {
         if (prog instanceof ContextStatementBlock csb) {
             final VMInstruction[] active = buildContextActiveStatementsProgram(csb);
             return active == null ? null

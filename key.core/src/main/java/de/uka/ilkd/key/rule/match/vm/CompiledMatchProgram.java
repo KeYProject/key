@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -307,40 +308,9 @@ public final class CompiledMatchProgram implements MatchProgram {
                     : getMatchIdentityInstruction(mod.kind());
 
         final JavaProgramElement prog = pattern.javaBlock().program();
-        final Step progMatch;
-        if (prog instanceof ContextStatementBlock csb) {
-            final ProgStep[] active = compileActiveStatements(csb);
-            if (active != null) {
-                // phase (3) of the context match, cursor-free: each active statement consumes one
-                // child
-                final ProgramChildrenMatcher phase3 = (parent, startChild, mc, services) -> {
-                    MatchResultInfo r = mc;
-                    for (int k = 0; k < active.length; k++) {
-                        r = active[k].match(parent.getChild(startChild + k), r, services);
-                        if (r == null) {
-                            return null;
-                        }
-                    }
-                    return r;
-                };
-                // phases (1)(2)(4) stay in ContextStatementBlock.match; only phase (3) is compiled
-                progMatch = (term, mc, services) -> csb.match(
-                    new SourceData(term.javaBlock().program(), -1, (Services) services),
-                    (MatchConditions) mc, phase3);
-            } else {
-                // an active statement is variable-arity (a list SV) or otherwise uncompilable:
-                // delegate the whole context match to the interpreter (its matchChildren handles
-                // list SVs); the surrounding term skeleton stays compiled
-                progMatch = (term, mc, services) -> csb.match(
-                    new SourceData(term.javaBlock().program(), -1, (Services) services),
-                    (MatchConditions) mc);
-            }
-        } else {
-            final ProgStep ps = compileProgram(prog);
-            if (ps == null) {
-                return null;
-            }
-            progMatch = (term, mc, services) -> ps.match(term.javaBlock().program(), mc, services);
+        final MatchProgram progMatch = compiledProgramMatcher(prog);
+        if (progMatch == null) {
+            return null;
         }
 
         final int arity = pattern.arity();
@@ -361,7 +331,7 @@ public final class CompiledMatchProgram implements MatchProgram {
             if (r == null) {
                 return null;
             }
-            r = progMatch.match(term, r, services);
+            r = progMatch.match(term.javaBlock(), r, services);
             if (r == null) {
                 return null;
             }
@@ -373,6 +343,57 @@ public final class CompiledMatchProgram implements MatchProgram {
             }
             return r;
         };
+    }
+
+    /**
+     * Compiles the cursor-free matcher for the Java program {@code prog} of a modality, applied
+     * directly to the source {@link JavaBlock} (it extracts the block's program element). A
+     * top-level
+     * {@link ContextStatementBlock} keeps phases (1)(2)(4) of the context match in
+     * {@code ContextStatementBlock.match} and compiles only phase (3) (each active statement
+     * consumes
+     * one source child), unless an active statement is variable-arity (a list SV) or otherwise
+     * uncompilable -- then the whole context match is delegated to
+     * {@code ContextStatementBlock.match}
+     * (its {@code matchChildren} handles list SVs) while the surrounding term skeleton stays
+     * compiled.
+     * Any other program is compiled by {@link #compileProgram}. Returns {@code null} only if that
+     * generic compilation cannot handle the program. Shared by {@link #compileModality} and the
+     * Java {@code ProgramMatchHook} so both reuse one program-matching implementation.
+     */
+    static @Nullable MatchProgram compiledProgramMatcher(JavaProgramElement prog) {
+        if (prog instanceof ContextStatementBlock csb) {
+            final ProgStep[] active = compileActiveStatements(csb);
+            if (active != null) {
+                // phase (3) of the context match, cursor-free: each active statement consumes one
+                // child
+                final ProgramChildrenMatcher phase3 = (parent, startChild, mc, services) -> {
+                    MatchResultInfo r = mc;
+                    for (int k = 0; k < active.length; k++) {
+                        r = active[k].match(parent.getChild(startChild + k), r, services);
+                        if (r == null) {
+                            return null;
+                        }
+                    }
+                    return r;
+                };
+                // phases (1)(2)(4) stay in ContextStatementBlock.match; only phase (3) is compiled
+                return (block, mc, services) -> csb.match(
+                    new SourceData(((JavaBlock) block).program(), -1, (Services) services),
+                    (MatchConditions) mc, phase3);
+            }
+            // an active statement is variable-arity (a list SV) or otherwise uncompilable:
+            // delegate the whole context match to the interpreter (its matchChildren handles
+            // list SVs); the surrounding term skeleton stays compiled
+            return (block, mc, services) -> csb.match(
+                new SourceData(((JavaBlock) block).program(), -1, (Services) services),
+                (MatchConditions) mc);
+        }
+        final ProgStep ps = compileProgram(prog);
+        if (ps == null) {
+            return null;
+        }
+        return (block, mc, services) -> ps.match(((JavaBlock) block).program(), mc, services);
     }
 
     /**
