@@ -29,6 +29,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -56,8 +57,18 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  */
 public class VMTacletMatcher implements TacletMatcher {
 
+    /**
+     * System property ({@code -Dkey.matcher.compiled=true}) selecting the cursor-free compiled find
+     * matcher (direct term navigation where the pattern allows, interpreter otherwise). Default
+     * {@code false} keeps the pure interpreter.
+     * <p>
+     * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
+     * class load, so toggling it and reloading the proof switches matchers.
+     */
+    public static final String COMPILE_MATCHERS_PROPERTY = "key.matcher.compiled";
+
     /** the matcher for the find expression of the taclet */
-    private final VMProgramInterpreter findMatchProgram;
+    private final MatchProgram findMatchProgram;
     /** the matcher for the taclet's assumes formulas */
     private final HashMap<Term, @NonNull VMProgramInterpreter> assumesMatchPrograms =
         new HashMap<>();
@@ -99,8 +110,14 @@ public class VMTacletMatcher implements TacletMatcher {
             findExp = findTaclet.find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
-            findMatchProgram =
+            final VMProgramInterpreter interpreter =
                 new VMProgramInterpreter(SyntaxElementMatchProgramGenerator.createProgram(findExp));
+            if (Boolean.getBoolean(COMPILE_MATCHERS_PROPERTY)) {
+                final CompiledMatchProgram compiled = CompiledMatchProgram.compile(findExp);
+                findMatchProgram = compiled != null ? compiled : interpreter;
+            } else {
+                findMatchProgram = interpreter;
+            }
 
         } else {
             ignoreTopLevelUpdates = false;
