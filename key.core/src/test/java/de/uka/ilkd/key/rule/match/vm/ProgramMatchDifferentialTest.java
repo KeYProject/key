@@ -26,6 +26,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.compiler.MatchPlan;
+import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.prover.sequent.SequentFormula;
@@ -90,6 +92,7 @@ public class ProgramMatchDifferentialTest {
             int convertedGeneric = 0;
             int compiledTaclets = 0;
             int compiledBoundVar = 0;
+            int planTaclets = 0;
             long matches = 0;
             int comparisons = 0;
             for (Taclet t : proof.getInitConfig().activatedTaclets()) {
@@ -107,6 +110,28 @@ public class ProgramMatchDifferentialTest {
                     if (containsBoundVars(find)) {
                         compiledBoundVar++;
                     }
+                }
+                // the unified match-plan framework (both back-ends from one description); null for
+                // constructs not yet migrated to the dispatch
+                final MatchPlan plan = JavaMatchPlanBuilder.buildPlan(find, false);
+                VMProgramInterpreter planInterp = null;
+                MatchProgram planCompiled = null;
+                if (plan != null) {
+                    planTaclets++;
+                    final List<VMInstruction> planInstr = new ArrayList<>();
+                    plan.emitInstructions(planInstr);
+                    planInterp = new VMProgramInterpreter(planInstr.toArray(new VMInstruction[0]));
+                    planCompiled = plan.compile();
+                }
+                // also verify the plan's interpreter with program-instruction conversion ON
+                // (production reads key.matcher.programInstructions; the plan must agree for both)
+                final MatchPlan planConv = JavaMatchPlanBuilder.buildPlan(find, true);
+                VMProgramInterpreter planConvInterp = null;
+                if (planConv != null) {
+                    final List<VMInstruction> planConvInstr = new ArrayList<>();
+                    planConv.emitInstructions(planConvInstr);
+                    planConvInterp =
+                        new VMProgramInterpreter(planConvInstr.toArray(new VMInstruction[0]));
                 }
                 // the converted interpreter (programInstructions=true) only differs for programs
                 VMProgramInterpreter converted = null;
@@ -133,6 +158,16 @@ public class ProgramMatchDifferentialTest {
                     if (compiled != null) {
                         assertSameResult(t, term, oracleRes, compiled.match(term, EMPTY, services));
                     }
+                    if (plan != null) {
+                        assertSameResult(t, term, oracleRes,
+                            planInterp.match(term, EMPTY, services));
+                        assertSameResult(t, term, oracleRes,
+                            planCompiled.match(term, EMPTY, services));
+                    }
+                    if (planConv != null) {
+                        assertSameResult(t, term, oracleRes,
+                            planConvInterp.match(term, EMPTY, services));
+                    }
                     if (oracleRes != null) {
                         matches++;
                     }
@@ -141,10 +176,13 @@ public class ProgramMatchDifferentialTest {
 
             System.out.printf(
                 "[program-match differential] findTaclets=%d programTaclets=%d convertedContext=%d "
-                    + "convertedGeneric=%d compiled=%d (boundVar=%d) corpus=%d comparisons=%d "
-                    + "matches=%d%n",
+                    + "convertedGeneric=%d compiled=%d (boundVar=%d) plan=%d corpus=%d "
+                    + "comparisons=%d matches=%d%n",
                 findTaclets, programTaclets, convertedContext, convertedGeneric, compiledTaclets,
-                compiledBoundVar, corpus.size(), comparisons, matches);
+                compiledBoundVar, planTaclets, corpus.size(), comparisons, matches);
+            // sanity floor: the run must actually exercise the unified match-plan framework
+            assertEquals(true, planTaclets > 0,
+                "expected at least some taclets to be built by the match-plan framework");
             // sanity floor: the run must actually exercise the step-2 context-block conversion
             assertEquals(true, convertedContext > 0,
                 "expected at least some taclets to use the converted context-block matcher");
