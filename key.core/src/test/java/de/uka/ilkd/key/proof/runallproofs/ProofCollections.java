@@ -166,6 +166,27 @@ public class ProofCollections {
         performancePOConstruction.provable(
             "performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
 
+        // Symbolic-execution performance: straight-line code and (unrolled) bounded loops execute
+        // a long program with many parallel updates, which stresses the update-simplification
+        // machinery (\dropEffectlessElementaries). These close quickly with the targeted update
+        // simplification but degrade quadratically without it; straightline_10000 in particular is
+        // a regression canary -- fast as is, but it explodes if the quadratic behaviour returns.
+        var updateSimplificationPerformance = c.group("updateSimplificationPerformance");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_1000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_4000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_8000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/straightline_10000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/loop_2000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/loop_5000.key");
+
 
         // Tests for rule application restrictions
         var g = c.group("applicationRestrictions");
