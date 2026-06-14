@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.match.vm.instructions.MatchContextStatementBlockInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchProgramElementInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSubProgramInstruction;
 
@@ -186,12 +188,42 @@ public class SyntaxElementMatchProgramGenerator {
     /**
      * Builds the instruction matching the Java program {@code prog} of a modality by direct tree
      * navigation, or returns {@code null} if {@code prog} uses a construct the converter does not
-     * handle (the caller then falls back to the monolithic {@code MatchProgramInstruction}). The
-     * program is matched generically by a {@link MatchSubProgramInstruction}.
+     * handle (the caller then falls back to the monolithic {@code MatchProgramInstruction}). A
+     * top-level {@link ContextStatementBlock} (the {@code .. ...} pattern of symbolic-execution
+     * taclets) is matched by a {@link MatchContextStatementBlockInstruction} that converts only the
+     * active-statement matching; any other program is matched generically by a
+     * {@link MatchSubProgramInstruction}.
      */
     private static @Nullable VMInstruction buildProgramInstruction(JavaProgramElement prog) {
+        if (prog instanceof ContextStatementBlock csb) {
+            final VMInstruction[] active = buildContextActiveStatementsProgram(csb);
+            return active == null ? null
+                    : new MatchContextStatementBlockInstruction(csb,
+                        new VMProgramInterpreter(active));
+        }
         final VMInstruction[] sub = buildProgramSubProgram(prog);
         return sub == null ? null : new MatchSubProgramInstruction(new VMProgramInterpreter(sub));
+    }
+
+    /**
+     * Builds a sub-program matching the active statements of the context block {@code csb} (its
+     * children from the active offset, i.e. skipping the execution context if present), or returns
+     * {@code null} if any active statement uses a construct the converter does not handle. The
+     * resulting program is meant to be run via
+     * {@link VMProgramInterpreter#matchChildrenFrom(org.key_project.logic.SyntaxElement, int, org.key_project.prover.rules.instantiation.MatchResultInfo, org.key_project.logic.LogicServices)}
+     * starting at the located source child, so that each per-statement matcher consumes exactly one
+     * source child -- mirroring {@code matchChildren} on the interpreter side.
+     */
+    private static VMInstruction @Nullable [] buildContextActiveStatementsProgram(
+            ContextStatementBlock csb) {
+        final int offset = csb.getExecutionContext() == null ? 0 : 1;
+        final List<VMInstruction> out = new ArrayList<>();
+        for (int i = offset, n = csb.getChildCount(); i < n; i++) {
+            if (!appendProgram(csb.getChildAt(i), out)) {
+                return null;
+            }
+        }
+        return out.toArray(new VMInstruction[0]);
     }
 
     /**
