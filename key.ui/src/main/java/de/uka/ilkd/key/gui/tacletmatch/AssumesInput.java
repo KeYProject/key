@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.tacletmatch;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -123,8 +126,42 @@ final class AssumesInput {
         if (msg == null || msg.isBlank() || msg.equalsIgnoreCase("unknown")) {
             msg = "syntax error";
         } else {
-            msg = TmText.firstLine(msg);
+            msg = humanize(TmText.firstLine(msg));
+            if (msg.isBlank()) {
+                msg = "syntax error";
+            }
         }
         return new SyntaxError(msg, pos);
+    }
+
+    /**
+     * the various parser phrasings (ANTLR's and KeY's "… expected, but found 'X'"), all of which
+     * quote the single offending token.
+     */
+    private static final Pattern OFFENDING = Pattern.compile(
+        "(?:missing \\S+ at|extraneous input|mismatched input|no viable alternative at input|"
+            + "token recognition error at:?|but found) '(.*?)'");
+
+    /**
+     * turns a raw parser message into a short, plain one. Strips a leading "line L:C" position (the
+     * offending spot is highlighted separately) and rephrases the parser's wordings to a simple
+     * "unexpected '&lt;token&gt;'". The implicit {@code ==>} separator and end-of-input are never
+     * named — each field holds only one side of the sequent, so the parser hitting them just means
+     * the formula there is unfinished ("incomplete formula"), not a missing sequent arrow.
+     */
+    static String humanize(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        String m = raw.trim().replaceFirst("^(line\\s+)?\\d+:\\d+:?\\s*", "");
+        Matcher tok = OFFENDING.matcher(m);
+        if (tok.find()) {
+            String t = tok.group(1);
+            if ("==>".equals(t) || "<EOF>".equals(t)) {
+                return "incomplete formula";
+            }
+            return "unexpected '" + t + "'";
+        }
+        return m;
     }
 }

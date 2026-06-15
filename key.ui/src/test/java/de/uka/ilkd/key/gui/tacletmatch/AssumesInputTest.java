@@ -166,6 +166,49 @@ public class AssumesInputTest {
         assertNull(err.position(), "an UNDEFINED position is treated as no position");
     }
 
+    @Test
+    public void humanizeRephrasesAntlrWordings() {
+        // the real case: a stray token in a single field is reported as a "missing SEQARROW"
+        assertEquals("unexpected '@'", AssumesInput.humanize("line 1:2 missing SEQARROW at '@'"));
+        assertEquals("unexpected '@'", AssumesInput.humanize("missing SEQARROW at '@'"));
+        assertEquals("unexpected ';'",
+            AssumesInput.humanize("mismatched input ';' expecting EOF"));
+        assertEquals("unexpected 'foo'",
+            AssumesInput.humanize("no viable alternative at input 'foo'"));
+        assertEquals("unexpected '#'", AssumesInput.humanize("token recognition error at: '#'"));
+        assertEquals("unexpected 'P'", AssumesInput.humanize("extraneous input 'P' expecting ABC"));
+    }
+
+    @Test
+    public void humanizeReportsIncompleteForSeparatorOrEof() {
+        // KeY's wording for an unfinished formula: it ran into the implicit "==>" separator
+        assertEquals("incomplete formula", AssumesInput.humanize(
+            "line 1:5 one of MODALITY, FORALL, EXISTS, 'true', ... expected, but found '==>'"));
+        // hitting end-of-input (e.g. an unclosed parenthesis) is likewise an incomplete formula
+        assertEquals("incomplete formula",
+            AssumesInput.humanize("line 3:0 missing RPAREN at '<EOF>'"));
+        // a genuine stray token in KeY's "but found" phrasing is still reported as unexpected
+        assertEquals("unexpected 'Q'",
+            AssumesInput.humanize("one of ... expected, but found 'Q'"));
+    }
+
+    @Test
+    public void humanizeKeepsUnrecognisedMessages() {
+        // semantic errors (e.g. a type clash) are passed through, minus the position prefix
+        assertEquals("Could not type-check term '1+TRUE'.",
+            AssumesInput.humanize("Could not type-check term '1+TRUE'."));
+        assertEquals("something odd", AssumesInput.humanize("2:7: something odd"));
+        assertEquals("", AssumesInput.humanize(null));
+    }
+
+    @Test
+    public void extractHumanizesTheParserMessage() {
+        AssumesInput.SyntaxError err =
+            AssumesInput.extract(new RuntimeException("line 1:2 missing SEQARROW at '@'"));
+        assertEquals("unexpected '@'", err.message(),
+            "no 'SEQARROW' jargon reaches the user");
+    }
+
     /** a throwable carrying a source location, to exercise the {@link HasLocation} branch. */
     private static final class LocatedException extends RuntimeException implements HasLocation {
         private static final long serialVersionUID = 1L;
