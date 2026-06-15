@@ -12,7 +12,7 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.4.0"
+    id "com.diffplug.spotless" version "8.6.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.61"
@@ -65,8 +65,8 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
+        implementation("org.slf4j:slf4j-api:2.0.18")
+        testImplementation("ch.qos.logback:logback-classic:1.5.34")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -78,22 +78,22 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
+        testImplementation("ch.qos.logback:logback-classic:1.5.34")
         testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
+        testImplementation("ch.qos.logback:logback-classic:1.5.34")
 
-        testImplementation(platform("org.junit:junit-bom:6.0.3"))
-        testImplementation("org.junit.jupiter:junit-jupiter-api")
-        testImplementation("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-        testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation(project(':key.util'))
-        testImplementation(testFixtures(project(":key.util")))
+        testImplementation(platform("org.junit:junit-bom:6.1.0"))
+        testImplementation ("org.junit.jupiter:junit-jupiter-api")
+        testImplementation ("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation ("org.assertj:assertj-core:3.27.7")
+        testImplementation (project(':key.util'))
+        testImplementation (testFixtures(project(":key.util")))
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.4")
 
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
@@ -391,9 +391,9 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2026 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
-        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.18/"
         links += "https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
-        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.32/"
+        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.34/"
         links +="https://www.javadoc.io/doc/com.formdev/flatlaf/3.7/"
         links +="https://www.javadoc.io/doc/com.miglayout/miglayout-swing/11.4.3/"
         links +="https://www.javadoc.io/doc/com.squareup/javapoet/1.13.0/"
@@ -402,7 +402,7 @@ tasks.register('alldoc', Javadoc){
         links +="https://www.javadoc.io/doc/org.antlr/ST4/4.3.4/"
         links +="https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
         links +="https://www.javadoc.io/doc/org.jspecify/jspecify/1.0.0/"
-        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.18/"
 
         linkSource()
         author()
