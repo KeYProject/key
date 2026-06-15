@@ -26,19 +26,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Isolated micro-benchmark for the find matcher (no taclet index, strategy or proof pipeline), over
- * the subset of the real taclet base that the compiler handles. It serves two purposes:
- *
- * <ol>
- * <li>the headline comparison {@link VMProgramInterpreter} vs {@link CompiledMatchProgram} (the
- * cursor-free win), and</li>
- * <li>the <em>no-overhead</em> check for the match-plan framework: the matchers built through
- * {@link JavaMatchPlanBuilder} (one description, two back-ends) are timed alongside the
- * hand-written
- * ones. Since the plan is lowered once at construction to the same {@code VMInstruction[]} /
- * cursor-free closures, the framework-built matchers must run at parity with the hand-written ones
- * (the IR adds no per-match cost).</li>
- * </ol>
+ * Isolated micro-benchmark for the find matcher (no taclet index, strategy or proof pipeline): it
+ * compares the interpreter ({@link VMProgramInterpreter} over the framework's instruction program)
+ * against the cursor-free compiled matcher, both built by the match-plan framework
+ * ({@link JavaMatchPlanBuilder}), over the real taclet base.
  *
  * <p>
  * By default it runs on the self-contained {@code tacletMatch1.key}. Point it at a wider set (e.g.
@@ -57,12 +48,7 @@ public class CompiledMatchProgramBenchmark {
         "1 + 2 * 3 = 7", "\\forall int x; \\forall int y; (x + y = y + x)"
     };
 
-    /**
-     * the four matchers built per compilable find-taclet: hand-written and framework, each
-     * back-end.
-     */
-    private record Task(List<VMProgramInterpreter> handInterps, List<MatchProgram> handComps,
-            List<VMProgramInterpreter> planInterps, List<MatchProgram> planComps,
+    private record Task(List<VMProgramInterpreter> interps, List<MatchProgram> comps,
             List<JTerm> corpus, Services services) {
     }
 
@@ -82,52 +68,32 @@ public class CompiledMatchProgramBenchmark {
         // warmup
         for (int pass = 0; pass < 5; pass++) {
             for (Task t : tasks) {
-                run(t.handInterps, t);
-                run(t.handComps, t);
-                run(t.planInterps, t);
-                run(t.planComps, t);
+                run(t.interps, t);
+                run(t.comps, t);
             }
         }
 
         // timed: alternate phases per pass to average out JIT / cache effects
         final int passes = 30;
-        long handInterpN = 0, handCompN = 0, planInterpN = 0, planCompN = 0;
-        long handInterpM = 0, handCompM = 0, planInterpM = 0, planCompM = 0;
+        long interpMatches = 0, compMatches = 0, interpNanos = 0, compNanos = 0;
         for (int pass = 0; pass < passes; pass++) {
             for (Task t : tasks) {
                 long t0 = System.nanoTime();
-                handInterpM += run(t.handInterps, t);
-                handInterpN += System.nanoTime() - t0;
+                interpMatches += run(t.interps, t);
+                interpNanos += System.nanoTime() - t0;
 
                 t0 = System.nanoTime();
-                planInterpM += run(t.planInterps, t);
-                planInterpN += System.nanoTime() - t0;
-
-                t0 = System.nanoTime();
-                handCompM += run(t.handComps, t);
-                handCompN += System.nanoTime() - t0;
-
-                t0 = System.nanoTime();
-                planCompM += run(t.planComps, t);
-                planCompN += System.nanoTime() - t0;
+                compMatches += run(t.comps, t);
+                compNanos += System.nanoTime() - t0;
             }
         }
 
-        System.out.printf("[isolated matcher, %d problem(s)]%n", tasks.size());
-        System.out.printf(
-            "  interpreter : hand-written=%.1f ms  framework=%.1f ms  (overhead %+.1f%%)%n",
-            handInterpN / 1e6, planInterpN / 1e6,
-            100.0 * (planInterpN - handInterpN) / handInterpN);
-        System.out.printf(
-            "  compiled    : hand-written=%.1f ms  framework=%.1f ms  (overhead %+.1f%%)%n",
-            handCompN / 1e6, planCompN / 1e6, 100.0 * (planCompN - handCompN) / handCompN);
-        System.out.printf("  speedup (framework compiled vs framework interpreter) = %.2fx%n",
-            (double) planInterpN / planCompN);
-        // all four matchers must see exactly the same matches
-        assertEquals(handInterpM, handCompM, "hand-written back-ends must agree on #matches");
-        assertEquals(handInterpM, planInterpM,
-            "framework interpreter must agree with hand-written");
-        assertEquals(handInterpM, planCompM, "framework compiled must agree with hand-written");
+        System.out.printf("[isolated matcher, %d problem(s)] interpreter=%.1f ms  compiled=%.1f ms"
+            + "  speedup=%.2fx  (matches interp=%d comp=%d)%n",
+            tasks.size(), interpNanos / 1e6, compNanos / 1e6,
+            (double) interpNanos / compNanos, interpMatches / passes, compMatches / passes);
+        assertEquals(interpMatches, compMatches,
+            "compiled and interpreter must agree on the number of matches");
     }
 
     private static List<String> problemPaths() {
@@ -160,10 +126,8 @@ public class CompiledMatchProgramBenchmark {
             }
         }
 
-        final List<VMProgramInterpreter> handInterps = new ArrayList<>();
-        final List<MatchProgram> handComps = new ArrayList<>();
-        final List<VMProgramInterpreter> planInterps = new ArrayList<>();
-        final List<MatchProgram> planComps = new ArrayList<>();
+        final List<VMProgramInterpreter> interps = new ArrayList<>();
+        final List<MatchProgram> comps = new ArrayList<>();
         int findTaclets = 0;
         for (Taclet t : pa.getFirstProof().getInitConfig().activatedTaclets()) {
             if (!(t instanceof FindTaclet ft)) {
@@ -171,22 +135,12 @@ public class CompiledMatchProgramBenchmark {
             }
             findTaclets++;
             final JTerm find = (JTerm) ft.find();
-            final MatchProgram handComp = CompiledMatchProgram.compile(find);
-            final MatchProgram planComp = JavaMatchPlanBuilder.compiledProgram(find);
-            if (handComp == null || planComp == null) {
-                continue; // restrict to the compilable subset, identical for both
-            }
-            handComps.add(handComp);
-            planComps.add(planComp);
-            handInterps.add(
-                new VMProgramInterpreter(SyntaxElementMatchProgramGenerator.createProgram(find)));
-            planInterps.add(
-                new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(find)));
+            comps.add(JavaMatchPlanBuilder.compiledProgram(find));
+            interps.add(new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(find)));
         }
-        System.out.printf("  %-22s findTaclets=%4d compilable=%4d (%2.0f%%) corpus=%d%n",
-            path.getFileName(), findTaclets, handComps.size(),
-            findTaclets == 0 ? 0 : 100.0 * handComps.size() / findTaclets, corpus.size());
-        return new Task(handInterps, handComps, planInterps, planComps, corpus, services);
+        System.out.printf("  %-22s findTaclets=%4d corpus=%d%n",
+            path.getFileName(), findTaclets, corpus.size());
+        return new Task(interps, comps, corpus, services);
     }
 
     private static long run(List<? extends MatchProgram> programs, Task t) {
