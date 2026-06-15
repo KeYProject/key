@@ -20,7 +20,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * program instruction ({@link SyntaxElementMatchProgramGenerator#buildProgramInstruction}, falling
  * back to the monolithic {@code MatchProgramInstruction} when conversion is off or unavailable);
  * the
- * compiled side reuses {@link CompiledMatchProgram#compiledProgramMatcher} (context-block phases +
+ * compiled side reuses {@link JavaProgramCompiler#compiledProgramMatcher} (context-block phases +
  * generic {@code getChild} navigation + value-leaf / list-SV delegation). Both are lifted verbatim
  * from the hand-written matchers, so the framework reproduces them exactly.
  */
@@ -47,7 +47,7 @@ public final class JavaProgramMatchHook implements ProgramMatchHook {
      */
     public static @Nullable JavaProgramMatchHook of(JavaProgramElement prog,
             boolean programInstructions) {
-        final MatchProgram compiled = CompiledMatchProgram.compiledProgramMatcher(prog);
+        final MatchProgram compiled = JavaProgramCompiler.compiledProgramMatcher(prog);
         if (compiled == null) {
             return null;
         }

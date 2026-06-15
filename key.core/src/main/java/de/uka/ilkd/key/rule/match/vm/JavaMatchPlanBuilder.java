@@ -13,30 +13,35 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.GenericOperatorHead;
 import org.key_project.prover.rules.matcher.compiler.MatchHead;
 import org.key_project.prover.rules.matcher.compiler.MatchPlan;
 import org.key_project.prover.rules.matcher.compiler.OperatorPlan;
 import org.key_project.prover.rules.matcher.compiler.SchemaVarPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchInstructionForSV;
+import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchTermLabelSV;
 
 /**
  * The single Java-DL dispatch that builds a {@link MatchPlan} for a find pattern, from which both
  * the interpreter and the compiled find-matcher are derived. Describing a construct here gives both
- * back-ends at once (the goal of the match-plan framework).
+ * back-ends at once -- this is the sole source of truth for find-matching; there is no separate
+ * hand-written interpreter generator or compiled matcher to keep in sync.
  *
  * <p>
- * It covers the FOL term skeleton (schema variables, ordinary operators with their subterms, bound
- * variables), elementary updates, parametric function instances and modalities (the Java program is
- * matched through a {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). It
- * returns {@code null} only for constructs outside this set (currently term labels) or when a
- * modality's program cannot be matched by the framework, so callers fall back to the legacy
- * hand-written matchers for those.
+ * It covers the whole Java-DL find-taclet base: the FOL term skeleton (schema variables, ordinary
+ * operators with their subterms, bound variables), term labels, elementary updates, parametric
+ * function instances and modalities (the Java program is matched through a
+ * {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). A pattern the dispatch
+ * genuinely cannot model yields {@code null} and the {@linkplain #interpreterProgram facades} raise
+ * a clear error pointing at the missing head (no current taclet hits this; adding a construct means
+ * adding one head, see the developer docs).
  */
 public final class JavaMatchPlanBuilder {
 
@@ -44,9 +49,7 @@ public final class JavaMatchPlanBuilder {
 
     /**
      * Builds the interpreter program for {@code pattern} through the match-plan framework, reading
-     * the {@code key.matcher.programInstructions} flag (as the legacy generator does). Falls back
-     * to
-     * the legacy generator for constructs the framework does not build (term labels).
+     * the {@code key.matcher.programInstructions} flag.
      *
      * @param pattern the find / assumes pattern
      * @return the VM instruction program
@@ -57,53 +60,58 @@ public final class JavaMatchPlanBuilder {
     }
 
     /**
-     * Builds the interpreter program for {@code pattern} through the match-plan framework, falling
-     * back to the legacy generator for constructs the framework does not build (term labels).
+     * Builds the interpreter program for {@code pattern} through the match-plan framework.
      *
      * @param pattern the find / assumes pattern
      * @param programInstructions whether modality programs are converted to VM instructions
      * @return the VM instruction program
      */
     public static VMInstruction[] interpreterProgram(JTerm pattern, boolean programInstructions) {
-        final MatchPlan plan = buildPlan(pattern, programInstructions);
-        if (plan == null) {
-            return SyntaxElementMatchProgramGenerator.createProgram(pattern, programInstructions);
-        }
         final List<VMInstruction> out = new ArrayList<>();
-        plan.emitInstructions(out);
+        planOrThrow(pattern, programInstructions).emitInstructions(out);
         return out.toArray(new VMInstruction[0]);
     }
 
     /**
-     * Builds the cursor-free compiled matcher for {@code pattern} through the match-plan framework,
-     * falling back to the legacy compiled matcher for constructs the framework does not build.
+     * Builds the cursor-free compiled matcher for {@code pattern} through the match-plan framework.
      *
      * @param pattern the find pattern
-     * @return the compiled matcher, or {@code null} if neither the framework nor the legacy
-     *         compiler
-     *         can build it (the caller then uses the interpreter)
+     * @return the compiled matcher
      */
-    public static @Nullable MatchProgram compiledProgram(JTerm pattern) {
-        final MatchPlan plan = buildPlan(pattern, false);
-        if (plan != null) {
-            return plan.compile();
+    public static MatchProgram compiledProgram(JTerm pattern) {
+        return planOrThrow(pattern, false).compile();
+    }
+
+    private static MatchPlan planOrThrow(JTerm pattern, boolean programInstructions) {
+        final MatchPlan plan = buildPlan(pattern, programInstructions);
+        if (plan == null) {
+            throw new UnsupportedOperationException(
+                "the match-plan framework has no head for this find pattern (op "
+                    + pattern.op() + "); add one (see the taclet-matching developer docs): "
+                    + pattern);
         }
-        return CompiledMatchProgram.compile(pattern);
+        return plan;
     }
 
     /**
-     * Builds a match plan for {@code pattern}, or returns {@code null} if it uses a construct not
-     * yet handled by the dispatch (the caller then uses the legacy matcher).
+     * Builds a match plan for {@code pattern}, or returns {@code null} if it uses a construct the
+     * dispatch cannot model (no current taclet does).
      *
      * @param pattern the find (sub)pattern
      * @param programInstructions whether modality programs are converted to VM instructions on the
      *        interpreter side (irrelevant for the FOL skeleton and the compiled back-end)
-     * @return a match plan, or {@code null} to fall back
+     * @return a match plan, or {@code null}
      */
     public static @Nullable MatchPlan buildPlan(JTerm pattern, boolean programInstructions) {
-        if (pattern.hasLabels()) {
-            return null; // term labels: not handled by the framework yet
+        final MatchPlan core = buildCore(pattern, programInstructions);
+        if (core == null || !pattern.hasLabels()) {
+            return core;
         }
+        // term labels are matched in place (no cursor move), before the operator/subterms
+        return new LabelPlan(matchTermLabelSV(pattern.getLabels()), core);
+    }
+
+    private static @Nullable MatchPlan buildCore(JTerm pattern, boolean programInstructions) {
         final Operator op = pattern.op();
 
         if (op instanceof SchemaVariable sv) {
@@ -116,7 +124,7 @@ public final class JavaMatchPlanBuilder {
 
         final MatchHead head = buildHead(pattern, programInstructions);
         if (head == null) {
-            return null; // unsupported construct or uncompilable program -> fall back
+            return null; // unsupported construct or uncompilable program
         }
 
         // the operator head plus a plan per subterm
@@ -125,7 +133,7 @@ public final class JavaMatchPlanBuilder {
         for (int i = 0; i < arity; i++) {
             final MatchPlan child = buildPlan(pattern.sub(i), programInstructions);
             if (child == null) {
-                return null; // a subterm is not handled -> the whole pattern falls back
+                return null; // a subterm is not handled -> the whole pattern is unsupported
             }
             children.add(child);
         }
@@ -148,5 +156,27 @@ public final class JavaMatchPlanBuilder {
             return ModalityHead.of(mod, pattern.javaBlock().program(), programInstructions);
         }
         return new GenericOperatorHead(op);
+    }
+
+    /**
+     * Wraps a plan with a term-label match: the labels are matched in place (the same
+     * {@code matchTermLabelSV} instruction the interpreter uses, no cursor move) before the wrapped
+     * operator/subterm matching. Reused by both back-ends.
+     */
+    private record LabelPlan(MatchInstruction labelInstr, MatchPlan inner) implements MatchPlan {
+        @Override
+        public void emitInstructions(List<VMInstruction> out) {
+            out.add(labelInstr);
+            inner.emitInstructions(out);
+        }
+
+        @Override
+        public MatchProgram compile() {
+            final MatchProgram innerCompiled = inner.compile();
+            return (element, mc, services) -> {
+                final MatchResultInfo r = labelInstr.match(element, mc, services);
+                return r == null ? null : innerCompiled.match(element, r, services);
+            };
+        }
     }
 }
