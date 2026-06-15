@@ -28,7 +28,7 @@ activated_choice
    ;
 
 rulesOrAxioms
-   : doc = DOC_COMMENT? (RULES | AXIOMS) (choices = option_list)? (LBRACE (s = taclet SEMI)* RBRACE)
+   : doc = DOC_COMMENT? (RULES | AXIOMS) (choices = option_list)? (LBRACE (s = taclet SEMI?)* RBRACE)
    ;
 
 programSource
