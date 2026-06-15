@@ -5,8 +5,7 @@ import KeYTacletParser;
 options { tokenVocab = KeYLexer; }
 decls
    : (string = programSource // for problems
-   | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls | contracts // for problems
-   | invariants // for problems
+   | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls
    | rulesOrAxioms // for problems
    )*
    ;
@@ -44,8 +43,19 @@ schema_var_decls
    : SCHEMAVARIABLES LBRACE (one_schema_var_decl SEMI)* RBRACE
    ;
 
+formal_sort_param_decls
+: OPENTYPEPARAMS
+      formal_sort_param_decl (COMMA formal_sort_param_decl)*
+      CLOSETYPEPARAMS
+;
+
+formal_sort_param_decl
+:
+    (PLUS | MINUS)? simple_ident
+;
+
 pred_decl
-   : doc = DOC_COMMENT? pred_name = funcpred_name (whereToBind = where_to_bind)? argSorts = arg_sorts SEMI
+   : doc = DOC_COMMENT? pred_name = funcpred_name formal_sort_param_decls? (whereToBind = where_to_bind)? argSorts = arg_sorts SEMI
    ;
 
 pred_decls
@@ -53,7 +63,7 @@ pred_decls
    ;
 
 func_decl
-   : doc = DOC_COMMENT? (UNIQUE)? retSort = sortId func_name = funcpred_name whereToBind = where_to_bind? argSorts = arg_sorts SEMI
+   : doc = DOC_COMMENT? (UNIQUE)? retSort = sortId func_name = funcpred_name formal_sort_param_decls? whereToBind = where_to_bind? argSorts = arg_sorts SEMI
    ;
 
 /**
@@ -69,7 +79,7 @@ datatype_decl
    // weigl: all datatypes are free!
    
    // FREE?
-   name = simple_ident EQUALS datatype_constructor (OR datatype_constructor)* SEMI
+   name = simple_ident formal_sort_param_decls? EQUALS datatype_constructor (OR datatype_constructor)* SEMI
    ;
 
 datatype_constructor
@@ -78,22 +88,6 @@ datatype_constructor
 
 func_decls
    : FUNCTIONS LBRACE (func_decl)* RBRACE
-   ;
-
-contracts
-   : CONTRACTS LBRACE (one_contract)* RBRACE
-   ;
-
-invariants
-   : INVARIANTS LPAREN selfVar = one_bound_variable RPAREN LBRACE (one_invariant)* RBRACE
-   ;
-
-one_contract
-   : contractName = simple_ident LBRACE (prog_var_decls)? fma = term MODIFIES modifiesClause = term RBRACE SEMI
-   ;
-
-one_invariant
-   : invName = simple_ident LBRACE fma = term (DISPLAYNAME displayName = string_value)? RBRACE SEMI
    ;
 
 prog_var_decls
@@ -121,8 +115,23 @@ sort_decls
    ;
 
 one_sort_decl
-   : doc = DOC_COMMENT? (GENERIC sortIds = simple_ident_dots_comma_list (ONEOF sortOneOf = oneof_sorts)? (EXTENDS sortExt = extends_sorts)? SEMI | PROXY sortIds = simple_ident_dots_comma_list (EXTENDS sortExt = extends_sorts)? SEMI | ABSTRACT? sortIds = simple_ident_dots_comma_list (EXTENDS sortExt = extends_sorts)? SEMI)
-   ;
+:
+  doc=DOC_COMMENT?
+  (
+     GENERIC  sortIds=simple_ident_dots_comma_list
+        (ONEOF sortOneOf = oneof_sorts)?
+        (EXTENDS sortExt = extends_sorts)? SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ALIAS simple_ident_dots EQUALS sortId SEMI
+  )
+;
+
+parametric_sort_decl
+:
+    simple_ident_dots
+    formal_sort_param_decls
+;
 
 extends_sorts
    : sortId (COMMA sortId)*
