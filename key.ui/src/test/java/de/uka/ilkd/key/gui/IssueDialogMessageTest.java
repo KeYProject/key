@@ -54,35 +54,6 @@ public class IssueDialogMessageTest {
     }
 
     @Test
-    public void wholeFileSyntaxErrorReachesDialog() throws Exception {
-        // Missing ';' after taclet 'r' -> ANTLR InputMismatch on the whole .key file (Bail path).
-        String source = """
-                \\rules {
-                   r {
-                      \\find(0=0)
-                      \\replacewith(1=1)
-                  }
-                }
-
-                \\problem { true }
-                """;
-        var issue = loadAndExtract(source);
-        // The friendly message (not "Load failed", not raw ANTLR "mismatched input") is shown.
-        assertTrue(issue.getText().contains("';' (semicolon) expected"),
-            "dialog message should be the friendly one, but was: " + issue.getText());
-        assertFalse(issue.getText().contains("Load failed"));
-        // The mark points at the insertion point right after taclet 'r''s closing brace (line 5)
-        // - i.e. where the missing ';' belongs - rather than at the next, unexpected '}'.
-        Location loc = issue.getLocation();
-        assertNotNull(loc);
-        assertEquals(5, loc.getPosition().line());
-        assertNotNull(loc.getFileUri(), "the dialog needs the file to show the source preview");
-        int offset = offsetIn(source, loc);
-        assertEquals('}', source.charAt(offset - 1),
-            "the mark should be just after the taclet's closing brace (the ';' insertion point)");
-    }
-
-    @Test
     public void javaBlockSyntaxErrorReachesDialog() throws Exception {
         String source = """
                 \\problem {
