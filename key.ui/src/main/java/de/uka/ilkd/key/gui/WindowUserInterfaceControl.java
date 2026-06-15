@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.tacletmatch.TacletMatchDialog;
+import de.uka.ilkd.key.gui.tacletmatch.classic.TacletMatchCompletionDialog;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -323,7 +324,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        new TacletMatchDialog(mainWindow, models, goal, mainWindow.getMediator());
+        // the redesigned dialog is the default; the classic one is offered as a migration fallback
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isUseClassicTacletDialog()) {
+            new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        } else {
+            new TacletMatchDialog(mainWindow, models, goal, mainWindow.getMediator());
+        }
     }
 
     @Override
