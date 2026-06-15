@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
+import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -60,12 +61,24 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * System property ({@code -Dkey.matcher.compiled=true}) selecting the cursor-free compiled find
      * matcher (direct term navigation where the pattern allows, interpreter otherwise). Default
-     * {@code false} keeps the pure interpreter.
+     * {@code false} keeps the pure interpreter. Mainly for headless / CI runs; in the GUI use the
+     * {@link #COMPILED_MATCHER_FEATURE} feature flag instead.
      * <p>
      * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches matchers.
      */
     public static final String COMPILE_MATCHERS_PROPERTY = "key.matcher.compiled";
+
+    /**
+     * Feature flag (Settings &rarr; Feature Flags, persistent) selecting the cursor-free compiled
+     * find matcher, the GUI-friendly equivalent of {@link #COMPILE_MATCHERS_PROPERTY}. Like the
+     * property it is read per taclet at construction time, so it takes effect for newly loaded
+     * proofs
+     * (or after reloading the current one) -- hence {@code restartRequired = true}.
+     */
+    public static final FeatureSettings.Feature COMPILED_MATCHER_FEATURE =
+        FeatureSettings.createFeature("MATCHER_COMPILED",
+            "Use the cursor-free compiled taclet find-matcher (reload the proof to apply).", true);
 
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
@@ -111,11 +124,12 @@ public class VMTacletMatcher implements TacletMatcher {
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             // both back-ends are derived from the unified match-plan framework (one dispatch per
-            // construct, see JavaMatchPlanBuilder), which falls back to the legacy hand-written
-            // matchers for the few constructs it does not build yet (term labels)
+            // construct, see JavaMatchPlanBuilder); the compiled matcher is selected by the system
+            // property or the feature flag, otherwise the interpreter is used
             final VMProgramInterpreter interpreter =
                 new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(findExp));
-            if (Boolean.getBoolean(COMPILE_MATCHERS_PROPERTY)) {
+            if (Boolean.getBoolean(COMPILE_MATCHERS_PROPERTY)
+                    || FeatureSettings.isFeatureActivated(COMPILED_MATCHER_FEATURE)) {
                 final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgram(findExp);
                 findMatchProgram = compiled != null ? compiled : interpreter;
             } else {
