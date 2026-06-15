@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.MatchProgram;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,12 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for the cursor-free {@link CompiledMatchProgram} find-matcher, the compiled
- * counterpart of {@link VMTacletMatcherTest} (which covers the interpreter). For the same taclets
- * and the same matching / non-matching terms it asserts that the compiled matcher produces the
- * expected result -- success with the expected schema-variable instantiations, and {@code null} on
- * the failure cases -- so the compiled path is checked independently of the differential test, and
- * in particular against explicit expectations rather than only against the interpreter.
+ * Unit tests for the cursor-free compiled find-matcher built by the match-plan framework
+ * ({@link JavaMatchPlanBuilder#compiledProgram}), the compiled counterpart of
+ * {@link VMTacletMatcherTest} (which covers the interpreter). For the same taclets and the same
+ * matching / non-matching terms it asserts that the compiled matcher produces the expected result
+ * -- success with the expected schema-variable instantiations, and {@code null} on the failure
+ * cases -- so the compiled path is checked against explicit expectations.
  *
  * <p>
  * Coverage focuses on term-level matching (propositional / function patterns) and, importantly,
@@ -63,20 +64,20 @@ public class CompiledMatchProgramTest {
         return (FindTaclet) t;
     }
 
-    /** compiles the find expression; the taclets here are all within the compiler's coverage. */
-    private static CompiledMatchProgram compile(FindTaclet t) {
-        final CompiledMatchProgram p = CompiledMatchProgram.compile((JTerm) t.find());
+    /** compiles the find expression; the taclets here are all within the framework's coverage. */
+    private static MatchProgram compile(FindTaclet t) {
+        final MatchProgram p = JavaMatchPlanBuilder.compiledProgram((JTerm) t.find());
         assertNotNull(p, "find pattern of " + t.name() + " was expected to compile");
         return p;
     }
 
-    private MatchResultInfo match(CompiledMatchProgram p, String term) throws ParserException {
+    private MatchResultInfo match(MatchProgram p, String term) throws ParserException {
         return p.match(services.getTermBuilder().parseTerm(term), EMPTY, services);
     }
 
     @Test
     public void compiledPropositionalMatching() throws ParserException {
-        final CompiledMatchProgram p = compile(propositional);
+        final MatchProgram p = compile(propositional);
 
         final JTerm toMatch = services.getTermBuilder().parseTerm("A & B");
         final MatchResultInfo mc = p.match(toMatch, EMPTY, services);
@@ -97,7 +98,7 @@ public class CompiledMatchProgramTest {
 
     @Test
     public void compiledFunctionMatching() throws ParserException {
-        final CompiledMatchProgram p = compile(function);
+        final MatchProgram p = compile(function);
 
         for (String matching : new String[] { "f(1, 1, 2)", "f(c, c, d)" }) {
             assertNotNull(match(p, matching), "compiled matcher should match " + matching);
@@ -111,7 +112,7 @@ public class CompiledMatchProgramTest {
 
     @Test
     public void compiledBoundVariableMatching() throws ParserException {
-        final CompiledMatchProgram p = compile(binder);
+        final MatchProgram p = compile(binder);
 
         assertNotNull(match(p, "\\forall int x; x + 1 > 0"),
             "compiled matcher should match the bound-variable pattern");

@@ -13,33 +13,28 @@ import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
-import de.uka.ilkd.key.logic.GenericArgument;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchContextStatementBlockInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchProgramElementInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSubProgramInstruction;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.op.Modality;
-import org.key_project.logic.op.Operator;
-import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
-import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
-import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.*;
 
 /**
- * This class generates a matching program for a given syntax element that can be
- * interpreted by the virtual machine's interpreter
+ * Converts the Java program of a modality into VM match-instructions ({@link VMInstruction}s) by
+ * direct tree navigation, for the interpreter side of the match-plan framework (used by the Java
+ * {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). The term skeleton itself
+ * is built by {@link JavaMatchPlanBuilder}; this class only handles the program-element conversion
+ * (generic structural elements and non-list program schema variables; anything else is matched by
+ * the monolithic {@code MatchProgramInstruction}).
  *
  * @see org.key_project.prover.rules.matcher.vm.VMProgramInterpreter
  */
@@ -62,128 +57,6 @@ public class SyntaxElementMatchProgramGenerator {
      * caches, per program-element class, whether it uses the generic {@code match} (no override).
      */
     private static final Map<Class<?>, Boolean> GENERIC_MATCH = new ConcurrentHashMap<>();
-
-    /**
-     * creates a matcher for the given pattern
-     *
-     * @param pattern the {@link JTerm} specifying the pattern
-     * @return the specialized matcher for the given pattern
-     */
-    public static VMInstruction[] createProgram(JTerm pattern) {
-        return createProgram(pattern, Boolean.getBoolean(PROGRAM_INSTRUCTIONS_PROPERTY));
-    }
-
-    /**
-     * creates a matcher for the given pattern, choosing explicitly whether the Java program of a
-     * modality is matched by converted {@link VMInstruction} sub-programs ({@code true}) or by the
-     * monolithic {@code MatchProgramInstruction} ({@code false}). The production path uses
-     * {@link #createProgram(JTerm)} which reads the {@code key.matcher.programInstructions} flag;
-     * this overload exists mainly to build both variants in one JVM for differential testing.
-     *
-     * @param pattern the {@link JTerm} specifying the pattern
-     * @param programInstructions whether to convert program matching to VM sub-programs
-     * @return the specialized matcher for the given pattern
-     */
-    public static VMInstruction[] createProgram(JTerm pattern, boolean programInstructions) {
-        ArrayList<VMInstruction> program = new ArrayList<>();
-        createProgram(pattern, program, programInstructions);
-        return program.toArray(new VMInstruction[0]);
-    }
-
-    /**
-     * creates a matching program for the given pattern. It appends the necessary match instruction
-     * to the given list of instructions
-     *
-     * @param pattern the {@link JTerm} used as pattern for which to create a matcher
-     * @param program the list of {@link MatchInstruction} to which the instructions for matching
-     *        {@code pattern} are added.
-     * @param programInstructions whether to convert program matching to VM sub-programs
-     */
-    private static void createProgram(JTerm pattern, ArrayList<VMInstruction> program,
-            boolean programInstructions) {
-        final Operator op = pattern.op();
-
-        final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
-
-        if (!boundVars.isEmpty()) {
-            program.add(matchAndBindVariables(boundVars));
-        }
-
-        if (pattern.hasLabels()) {
-            program.add(matchTermLabelSV(pattern.getLabels()));
-        }
-
-        if (op instanceof SchemaVariable sv) {
-            program.add(getMatchInstructionForSV(sv));
-            program.add(gotoNextSiblingInstruction());
-        } else {
-            program.add(getCheckNodeKindInstruction(JTerm.class));
-            program.add(gotoNextInstruction());
-            switch (op) {
-                case ParametricFunctionInstance pfi -> {
-                    program.add(getCheckNodeKindInstruction(ParametricFunctionInstance.class));
-                    program.add(getSimilarParametricFunctionInstruction(pfi));
-                    program.add(gotoNextInstruction());
-                    for (int i = 0; i < pfi.getChildCount(); i++) {
-                        var arg = (GenericArgument) pfi.getChild(i);
-                        if (arg.sort() instanceof GenericSort gs) {
-                            program.add(getMatchGenericSortInstruction(gs));
-                        } else if (arg.sort() instanceof ParametricSortInstance) {
-                            throw new UnsupportedOperationException(
-                                "TODO @ DD: Parametric sort in generic args!");
-                        } else {
-                            program.add(getMatchIdentityInstruction(arg));
-                        }
-                        program.add(gotoNextInstruction());
-                    }
-                }
-                case ElementaryUpdate elUp -> {
-                    program.add(getCheckNodeKindInstruction(ElementaryUpdate.class));
-                    program.add(gotoNextInstruction());
-                    if (elUp.lhs() instanceof SchemaVariable sv) {
-                        program.add(getMatchInstructionForSV(sv));
-                        program.add(gotoNextSiblingInstruction());
-                    } else if (elUp.lhs() instanceof LocationVariable locVar) {
-                        program.add(getMatchIdentityInstruction(locVar));
-                        program.add(gotoNextInstruction());
-                    }
-                }
-                case Modality mod -> {
-                    program.add(getCheckNodeKindInstruction(Modality.class));
-                    program.add(gotoNextInstruction());
-                    if (mod.kind() instanceof ModalOperatorSV modKindSV) {
-                        program.add(matchModalOperatorSV(modKindSV));
-                    } else {
-                        program.add(getMatchIdentityInstruction(mod.kind()));
-                    }
-                    program.add(gotoNextInstruction());
-                    final JavaProgramElement prog = pattern.javaBlock().program();
-                    final VMInstruction progInstr =
-                        programInstructions ? buildProgramInstruction(prog) : null;
-                    program.add(progInstr != null ? progInstr : matchProgram(prog));
-                    program.add(gotoNextSiblingInstruction());
-                }
-                default -> {
-                    program.add(getMatchIdentityInstruction(op));
-                    program.add(gotoNextInstruction());
-                }
-            }
-        }
-
-        if (!boundVars.isEmpty()) {
-            for (int i = 0; i < boundVars.size(); i++) {
-                program.add(gotoNextSiblingInstruction());
-            }
-        }
-
-        for (int i = 0; i < pattern.arity(); i++) {
-            createProgram(pattern.sub(i), program, programInstructions);
-        }
-
-        if (!boundVars.isEmpty()) {
-            program.add(unbindVariables(boundVars));
-        }
-    }
 
     /**
      * Builds the instruction matching the Java program {@code prog} of a modality by direct tree
