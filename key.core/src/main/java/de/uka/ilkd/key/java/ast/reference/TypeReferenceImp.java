@@ -262,7 +262,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof TypeReference tr) {
-            return tr.getDimensions() != getDimensions()
+            return tr.getDimensions() == getDimensions()
                 && tr.getAnnotations().equals(getAnnotations());
         }
 

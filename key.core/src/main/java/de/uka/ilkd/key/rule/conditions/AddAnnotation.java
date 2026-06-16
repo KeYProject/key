@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.prover.rules.VariableCondition;
@@ -17,7 +19,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-
+import org.key_project.logic.sort.Sort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +30,22 @@ import org.jspecify.annotations.Nullable;
 
 public final class AddAnnotation implements VariableCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddAnnotation.class);
-    private static final String[] ALLOWED = { "SimpleInstanceCreation" };
+    private static final Sort[] ALLOWED = { ProgramSVSort.SIMPLE_NEW };
 
     private final SchemaVariable read, store;
     private final String annot;
 
 
     public AddAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
-        assert store.sort().toString().equals(read.sort().toString()); 
-        assert Arrays.stream(ALLOWED).anyMatch(read.sort().toString()::equals);
+        if (!store.sort().equals(read.sort())) {
+            throw new RuntimeException("Expected left and right to have the same sort!");
+        }
+
+        if (!Arrays.stream(ALLOWED).anyMatch(read.sort()::equals)) {
+            throw new RuntimeException(
+                    "Unsupported sort: " + read.sort() + ", supported: " + 
+                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("", (a, b) -> a + " " + b));
+        }
 
         this.read = read;
         this.store = store;
