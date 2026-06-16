@@ -77,7 +77,7 @@ public class SetStatementTest {
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
         var selfVar = new LocationVariable(
-                new ProgramElementName("self"), new TypeRef(testClassType));
+            new ProgramElementName("self"), new TypeRef(testClassType));
 
         var normalLocal = new LocationVariable(new ProgramElementName("normalLocal"),
             new TypeRef(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT)));

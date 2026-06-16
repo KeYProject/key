@@ -64,7 +64,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
     public TypeReference getFieldType(Services services, Function op) {
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
 
-        if (name == null) return null;
+        if (name == null)
+            return null;
 
         var classType = services.getJavaInfo().getTypeByName(name.className());
 
@@ -82,15 +83,17 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                 .findFirst()
                 .orElse(null);
 
-        if (field == null) return null;
+        if (field == null)
+            return null;
 
         return field.getProgramVariable().getTypeReference();
     }
 
     private boolean matchesTypeAnnots(TypeReference typeRef) {
-        if (typeRef == null) return false;
+        if (typeRef == null)
+            return false;
         return typeRef.getAnnotations().stream()
-            .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
+                .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
     }
 
     @Override

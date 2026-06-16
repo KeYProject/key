@@ -18,8 +18,8 @@ class PrettyPrinterTest {
         // This is important for saving instantiations (see #3071)
         PrettyPrinter pp = PrettyPrinter.purePrinter();
         ProgramElementName name = new ProgramElementName("x");
-        LocationVariable variable = new LocationVariable(name, 
-                new TypeRef(KeYJavaType.VOID_TYPE));
+        LocationVariable variable = new LocationVariable(name,
+            new TypeRef(KeYJavaType.VOID_TYPE));
         pp.printFragment(variable);
         Assertions.assertEquals("x", pp.result());
     }

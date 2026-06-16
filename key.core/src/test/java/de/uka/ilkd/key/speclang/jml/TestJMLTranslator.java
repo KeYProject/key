@@ -154,7 +154,7 @@ public class TestJMLTranslator {
     public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
         LocationVariable var = new LocationVariable(
-                classPEN, new TypeRef(testClassType));
+            classPEN, new TypeRef(testClassType));
         jmlIO.parameters(ImmutableSLList.singleton(var)).parseExpression("(o.i)");
     }
 

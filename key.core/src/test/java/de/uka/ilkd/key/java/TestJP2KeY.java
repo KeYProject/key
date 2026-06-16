@@ -129,7 +129,8 @@ public class TestJP2KeY {
     @Test
     public void testReadBlockWithContext() {
         IProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-            new TypeRef(TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT)));
+            new TypeRef(
+                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT)));
         var list = Collections.singletonList(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =

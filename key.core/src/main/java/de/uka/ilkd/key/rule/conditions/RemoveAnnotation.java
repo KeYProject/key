@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Arrays;
+
 import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -10,20 +12,18 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class RemoveAnnotation implements VariableCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoveAnnotation.class);
@@ -41,8 +41,9 @@ public final class RemoveAnnotation implements VariableCondition {
 
         if (!Arrays.stream(ALLOWED).anyMatch(read.sort()::equals)) {
             throw new RuntimeException(
-                    "Unsupported sort: " + read.sort() + ", supported: " + 
-                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("", (a, b) -> a + " " + b));
+                "Unsupported sort: " + read.sort() + ", supported: " +
+                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("",
+                        (a, b) -> a + " " + b));
         }
 
         this.read = read;
@@ -51,12 +52,13 @@ public final class RemoveAnnotation implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+    public MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             @NonNull MatchResultInfo matchCond, @NonNull LogicServices logicServices) {
 
         final var svInst = (SVInstantiations) matchCond.getInstantiations();
 
-        if (svInst.getInstantiation(store) != null || 
+        if (svInst.getInstantiation(store) != null ||
                 svInst.getInstantiation(read) == null) {
             return matchCond;
         }
@@ -66,33 +68,33 @@ public final class RemoveAnnotation implements VariableCondition {
         if (!(inst instanceof New))
             return matchCond;
 
-        TypeReference tRef = removeAnnotation(((New)inst).getTypeReference());
-        New replacement = newFromTypeRef((New)inst, tRef);
+        TypeReference tRef = removeAnnotation(((New) inst).getTypeReference());
+        New replacement = newFromTypeRef((New) inst, tRef);
 
         return matchCond.setInstantiations(
-                svInst.add(store, replacement, logicServices));
+            svInst.add(store, replacement, logicServices));
     }
 
     private TypeReference removeAnnotation(TypeReference tRef) {
         Annotation[] filtered = tRef.getAnnotations()
-            .stream()
-            .filter(a -> !a.getKeyJavaType().getFullName().equals(annot))
-            .toArray(Annotation[]::new);
+                .stream()
+                .filter(a -> !a.getKeyJavaType().getFullName().equals(annot))
+                .toArray(Annotation[]::new);
 
         return new TypeRef(
-                tRef.getProgramElementName(),
-                new ImmutableArray<>(filtered), tRef.getDimensions(),
-                tRef.getReferencePrefix(),
-                tRef.getKeYJavaType());
+            tRef.getProgramElementName(),
+            new ImmutableArray<>(filtered), tRef.getDimensions(),
+            tRef.getReferencePrefix(),
+            tRef.getKeYJavaType());
     }
 
     private static New newFromTypeRef(New n, TypeReference tRef) {
         return new New(
-                n.getPositionInfo(),
-                Arrays.asList(n.getComments()),
-                n.getArguments(),
-                tRef,
-                n.getClassDeclaration());
+            n.getPositionInfo(),
+            Arrays.asList(n.getComments()),
+            n.getArguments(),
+            tRef,
+            n.getClassDeclaration());
     }
 
     @Override

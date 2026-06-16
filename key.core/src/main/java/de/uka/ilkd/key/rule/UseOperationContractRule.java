@@ -129,7 +129,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             Services services, ExecutionContext ec) {
         if (mr instanceof MethodReference) {
             return new TypeRef(
-                    ((MethodReference) mr).determineStaticPrefixType(services, ec));
+                ((MethodReference) mr).determineStaticPrefixType(services, ec));
         } else {
             New n = (New) mr;
             return n.getTypeReference();
@@ -215,7 +215,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         // there must be applicable contracts for the operation
         return getApplicableContracts(services, inst.pm, inst.staticType.getKeYJavaType(),
-                inst.modality.kind());
+            inst.modality.kind());
     }
 
     /**
@@ -460,8 +460,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts =
-            getApplicableContracts(goal.proof().getServices(), inst.pm, 
-                    inst.staticType.getKeYJavaType(), inst.modality.kind());
+            getApplicableContracts(goal.proof().getServices(), inst.pm,
+                inst.staticType.getKeYJavaType(), inst.modality.kind());
         if (contracts.isEmpty()) {
             return false;
         }
@@ -802,7 +802,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             excNull = tb.equals(tb.var(excVar), tb.NULL());
             excCreated = tb.created(tb.var(excVar));
-            freePost = getFreePost(heapContext, inst.pm, inst.staticType.getKeYJavaType(), 
+            freePost = getFreePost(heapContext, inst.pm, inst.staticType.getKeYJavaType(),
                 contractResult, contractSelf, atPres, freeSpecPost, services);
             freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
             postAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },

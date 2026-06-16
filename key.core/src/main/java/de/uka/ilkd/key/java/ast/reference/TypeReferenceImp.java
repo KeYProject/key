@@ -260,10 +260,11 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
+        if (obj == this)
+            return true;
         if (obj instanceof TypeReference tr) {
             return tr.getDimensions() == getDimensions()
-                && tr.getAnnotations().equals(getAnnotations());
+                    && tr.getAnnotations().equals(getAnnotations());
         }
 
         return false;
@@ -272,8 +273,9 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
-        if (!equals(pe)) return null;
-        
+        if (!equals(pe))
+            return null;
+
         return super.match(source, matchCond);
     }
 }
