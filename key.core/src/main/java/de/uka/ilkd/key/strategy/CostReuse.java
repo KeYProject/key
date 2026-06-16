@@ -76,6 +76,8 @@ public final class CostReuse {
     private static final Map<Taclet, Feature[]> classification = new ConcurrentHashMap<>();
     /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
     private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
+    /** Cached "not eligible for reuse" marker (the map forbids null values). */
+    private static final Feature[] INELIGIBLE = new Feature[0];
 
     private enum Kind {
         VETO, NON_LOCAL, LOCAL
@@ -89,9 +91,9 @@ public final class CostReuse {
     public static Feature @Nullable [] vetoesIfEligible(Object strategy, Taclet taclet) {
         final Feature[] r = classification.computeIfAbsent(taclet, t -> {
             final Feature[] res = classify(strategy, t);
-            return res == null ? new Feature[0] : res;
+            return res == null ? INELIGIBLE : res;
         });
-        return r.length == 0 ? null : r;
+        return r == INELIGIBLE ? null : r;
     }
 
     private static Feature @Nullable [] classify(Object strategy, Taclet taclet) {
