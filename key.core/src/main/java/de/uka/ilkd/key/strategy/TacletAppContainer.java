@@ -41,11 +41,30 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     // save any memory (at the moment).
     // This is because Java's memory alingment.
 
+    /**
+     * Creation time of this container ({@code -1} for an initial/just-loaded container). Since age
+     * became a first-class container-level cost term ({@link RuleAppContainer#withAge}) this field
+     * no longer feeds the cost; it is purely the {@link AssumesInstantiator} freshness key (was
+     * this
+     * container built before or after a given if-formula).
+     */
     private final long age;
+    /**
+     * The age-free strategy cost: {@code getCost()} without the goal-age term that
+     * {@link RuleAppContainer#withAge} adds. Stored so cost reuse can carry it forward unchanged
+     * across re-expansion and only re-add the current age, with no reconstruction arithmetic.
+     */
+    private final RuleAppCost ageFreeCost;
 
-    protected TacletAppContainer(RuleApp p_app, RuleAppCost p_cost, long p_age) {
+    protected TacletAppContainer(RuleApp p_app, RuleAppCost p_ageFreeCost, RuleAppCost p_cost,
+            long p_age) {
         super(p_app, p_cost);
+        ageFreeCost = p_ageFreeCost;
         age = p_age;
+    }
+
+    RuleAppCost getAgeFreeCost() {
+        return ageFreeCost;
     }
 
     protected NoPosTacletApp getTacletApp() {
@@ -71,14 +90,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
             PosInOccurrence p_pio,
-            Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
+            Goal p_goal, RuleAppCost p_ageFreeCost, boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
         final long localage = p_initial ? -1 : p_goal.getTime();
+        final RuleAppCost cost = withAge(p_ageFreeCost, p_goal);
         if (p_pio == null) {
-            return new NoFindTacletAppContainer(p_app, p_cost, localage);
+            return new NoFindTacletAppContainer(p_app, p_ageFreeCost, cost, localage);
         } else {
-            return new FindTacletAppContainer(p_app, p_pio, p_cost, p_goal, localage);
+            return new FindTacletAppContainer(p_app, p_pio, p_ageFreeCost, cost, p_goal, localage);
         }
     }
 
@@ -194,17 +214,18 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     /**
      * Re-cost the base app for {@link #createFurtherApps}. On the cost-reuse fast path (taclet
-     * classified cost-local by {@link CostReuse}, non-initial container, numeric stored cost) the
-     * full {@link de.uka.ilkd.key.strategy.Strategy#computeCost} is replaced by arithmetic: carry
-     * the stored cost forward and refresh only its age term ({@code AgeFeature == goal.getTime()}).
-     * The {@code NonDuplicateApp}-family vetoes that contribute are re-evaluated first; if one
-     * fires
-     * the full cost would be {@link TopRuleAppCost}, so {@code null} is returned (drop the app).
+     * classified cost-local by {@link CostReuse}, numeric age-free cost) the full
+     * {@link de.uka.ilkd.key.strategy.Strategy#computeCost} is skipped: the stored age-free cost is
+     * carried forward verbatim and {@link RuleAppContainer#withAge} re-adds the current goal age
+     * when the new container is built -- no reconstruction arithmetic, and initial containers
+     * (age {@code -1}) reuse soundly too, since age is no longer part of the stored cost. The
+     * {@code NonDuplicateApp}-family vetoes that contribute are re-evaluated first; if one fires
+     * the
+     * full cost would be {@link TopRuleAppCost}, so {@code null} is returned (drop the app).
      * Otherwise, and whenever reuse is disabled/inapplicable, falls back to the normal recompute.
      */
     private @Nullable TacletAppContainer costLocalReusedContainerOr(Goal p_goal) {
-        if (getAge() >= 0
-                && getCost() instanceof NumberRuleAppCost storedCost) {
+        if (getAgeFreeCost() instanceof NumberRuleAppCost base) {
             final Feature[] vetoes =
                 CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(), getTacletApp().taclet());
             if (vetoes != null) {
@@ -216,15 +237,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                         return null;
                     }
                 }
-                final RuleAppCost reused =
-                    storedCost.add(NumberRuleAppCost.create(p_goal.getTime() - getAge()));
                 if (CostReuse.VERIFY) {
-                    final RuleAppCost fresh = createContainer(p_goal).getCost();
-                    if (!reused.equals(fresh)) {
-                        CostReuse.warnMismatch(getTacletApp().taclet(), reused, fresh);
+                    final RuleAppCost freshBase =
+                        p_goal.getGoalStrategy().computeCost(getTacletApp(), pos, p_goal);
+                    if (!base.equals(freshBase)) {
+                        CostReuse.warnMismatch(getTacletApp().taclet(), base, freshBase);
                     }
                 }
-                return createContainer(getTacletApp(), pos, p_goal, reused, false);
+                // carry the age-free base forward; createContainer re-adds the current age
+                return createContainer(getTacletApp(), pos, p_goal, base, false);
             }
         }
         return createContainer(p_goal);
