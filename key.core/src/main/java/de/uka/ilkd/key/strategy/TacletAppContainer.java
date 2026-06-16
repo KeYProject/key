@@ -18,11 +18,16 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Instances of this class are immutable
@@ -88,7 +93,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return ImmutableSLList.nil();
         }
 
-        final TacletAppContainer newCont = createContainer(p_goal);
+        final TacletAppContainer newCont = costLocalReusedContainerOr(p_goal);
+        if (newCont == null) {
+            // a veto fired on the cost-local fast path: the re-costed base would be infinite
+            return ImmutableSLList.nil();
+        }
         if (newCont.getCost() instanceof TopRuleAppCost) {
             return ImmutableSLList.nil();
         }
@@ -181,6 +190,44 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     private TacletAppContainer createContainer(Goal p_goal) {
         return createContainer(getTacletApp(), getPosInOccurrence(p_goal), p_goal, false);
+    }
+
+    /**
+     * Re-cost the base app for {@link #createFurtherApps}. On the cost-reuse fast path (taclet
+     * classified cost-local by {@link CostReuse}, non-initial container, numeric stored cost) the
+     * full {@link de.uka.ilkd.key.strategy.Strategy#computeCost} is replaced by arithmetic: carry
+     * the stored cost forward and refresh only its age term ({@code AgeFeature == goal.getTime()}).
+     * The {@code NonDuplicateApp}-family vetoes that contribute are re-evaluated first; if one
+     * fires
+     * the full cost would be {@link TopRuleAppCost}, so {@code null} is returned (drop the app).
+     * Otherwise, and whenever reuse is disabled/inapplicable, falls back to the normal recompute.
+     */
+    private @Nullable TacletAppContainer costLocalReusedContainerOr(Goal p_goal) {
+        if (getAge() >= 0
+                && getCost() instanceof NumberRuleAppCost storedCost) {
+            final Feature[] vetoes =
+                CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(), getTacletApp().taclet());
+            if (vetoes != null) {
+                final PosInOccurrence pos = getPosInOccurrence(p_goal);
+                final MutableState mState = new MutableState();
+                for (Feature veto : vetoes) {
+                    if (veto.computeCost(getTacletApp(), pos, p_goal,
+                        mState) instanceof TopRuleAppCost) {
+                        return null;
+                    }
+                }
+                final RuleAppCost reused =
+                    storedCost.add(NumberRuleAppCost.create(p_goal.getTime() - getAge()));
+                if (CostReuse.VERIFY) {
+                    final RuleAppCost fresh = createContainer(p_goal).getCost();
+                    if (!reused.equals(fresh)) {
+                        CostReuse.warnMismatch(getTacletApp().taclet(), reused, fresh);
+                    }
+                }
+                return createContainer(getTacletApp(), pos, p_goal, reused, false);
+            }
+        }
+        return createContainer(p_goal);
     }
 
     /**

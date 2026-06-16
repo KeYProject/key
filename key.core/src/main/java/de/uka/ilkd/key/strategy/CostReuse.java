@@ -1,0 +1,236 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.strategy;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import de.uka.ilkd.key.strategy.feature.AbstractNonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.strategy.costbased.feature.CostLocal;
+import org.key_project.prover.strategy.costbased.feature.CostNonLocal;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
+
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Phase-2 cost reuse (perf round 3): decide whether a taclet's strategy cost is a pure function of
+ * the rule app and its find-position subterm (plus the always-recomputed age term and
+ * {@code NonDuplicateApp}-family vetoes). For such "cost-local" taclets the base re-cost performed
+ * by {@link TacletAppContainer#createFurtherApps} on every peek round can be replaced by arithmetic
+ * (carry the stored cost forward, refresh only the age term), avoiding the dominant
+ * {@code Strategy.computeCost} work.
+ *
+ * <h2>Classification (sound-by-construction, default-impure)</h2>
+ * A taclet is eligible iff every {@link Feature} reachable in its per-taclet cost bindings resolves
+ * to local. Per feature, in order:
+ * <ol>
+ * <li><b>veto</b> ({@link AbstractNonDuplicateAppFeature}): a 0/Top guard. Collected and re-checked
+ * at reuse time (an app that became a duplicate must still be dropped); not descended into.</li>
+ * <li><b>explicit override</b>: {@link CostNonLocal} forces non-local (the author wins).</li>
+ * <li><b>{@link CostLocal}</b>: local. For a leaf that is the whole story; for a composite it means
+ * "transparent" -- the walk still recurses into its child features, so it stays local only if they
+ * all are. There is NO automatic "any feature with children is transparent" guess: a composite is
+ * trusted only because its author annotated it after checking that its own computation (including
+ * any non-Feature inputs such as projections/term-generators) is find-local. The transparent
+ * combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
+ * <li><b>otherwise</b> (unannotated): non-local (the SAFE default). A new feature -- leaf or
+ * composite -- is non-local until someone reviews it and adds {@link CostLocal}; forgetting costs
+ * only performance, never soundness.</li>
+ * </ol>
+ * A {@link CostLocal} composite is local only if, in addition to its child features, every child
+ * {@link TermGenerator} it holds is also {@link CostLocal} -- a generator is a non-Feature input
+ * that decides locality (e.g. {@code SuperTermGenerator} is find-local, {@code
+ * SequentFormulasGenerator} reads the whole sequent and is not). The walk descends only through
+ * {@link Feature}- and {@link TermGenerator}-typed references (never arbitrary objects): the live
+ * feature tree holds mutable scratch state (e.g. TermBuffers) that must not be traversed.
+ *
+ * <p>
+ * Optional verification (<code>-Dkey.strategy.costReuse.verify</code>): when reuse is applied also
+ * recompute the cost and log a warning on any mismatch -- a development aid to catch a feature that
+ * is mis-classified local (it should then get {@link CostNonLocal}).
+ */
+public final class CostReuse {
+
+    public static final boolean VERIFY = Boolean.getBoolean("key.strategy.costReuse.verify");
+
+    private static final org.slf4j.Logger LOGGER =
+        org.slf4j.LoggerFactory.getLogger(CostReuse.class);
+
+    private CostReuse() {}
+
+    private static volatile @Nullable List<RuleSetDispatchFeature> dispatchers;
+    /**
+     * taclet -> collected veto features. An ELIGIBLE taclet always has at least the top-level
+     * NonDuplicateApp veto, so an empty array is used as the INELIGIBLE sentinel (ConcurrentHashMap
+     * forbids null values).
+     */
+    private static final Map<Taclet, Feature[]> classification = new ConcurrentHashMap<>();
+    /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
+    private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
+
+    private enum Kind {
+        VETO, NON_LOCAL, LOCAL
+    }
+
+    /**
+     * @return the {@link AbstractNonDuplicateAppFeature} vetoes to re-check for a cost-local
+     *         taclet,
+     *         or {@code null} if the taclet is not eligible for cost reuse.
+     */
+    public static Feature @Nullable [] vetoesIfEligible(Object strategy, Taclet taclet) {
+        final Feature[] r = classification.computeIfAbsent(taclet, t -> {
+            final Feature[] res = classify(strategy, t);
+            return res == null ? new Feature[0] : res;
+        });
+        return r.length == 0 ? null : r;
+    }
+
+    private static Feature @Nullable [] classify(Object strategy, Taclet taclet) {
+        final Set<Feature> vetoes = Collections.newSetFromMap(new IdentityHashMap<>());
+        vetoes.add(NonDuplicateAppFeature.INSTANCE); // top-level veto, applies to every taclet
+        final boolean[] local = { true };
+        final Set<Feature> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (RuleSetDispatchFeature d : dispatchers(strategy)) {
+            var rs = taclet.getRuleSets();
+            while (!rs.isEmpty()) {
+                final Feature f = d.get(rs.head());
+                if (f != null) {
+                    walk(f, vetoes, local, seen);
+                }
+                rs = rs.tail();
+            }
+        }
+        return local[0] ? vetoes.toArray(new Feature[0]) : null;
+    }
+
+    /**
+     * Classify a feature; for a transparent composite, recurse into its child features and require
+     * its child term-generators to be local too (see the class comment).
+     */
+    private static void walk(Feature f, Set<Feature> vetoes, boolean[] local, Set<Feature> seen) {
+        if (!local[0] || !seen.add(f)) {
+            return;
+        }
+        switch (kind(f)) {
+            case VETO -> vetoes.add(f);
+            case NON_LOCAL -> local[0] = false;
+            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are local
+            // AND all its child TERM-GENERATORS are local. The generator matters because e.g.
+            // ComprehendedSumFeature sums its body over a generator: SuperTermGenerator (find
+            // ancestors) is local, but SequentFormulasGenerator (whole sequent) is not -- and a
+            // generator is a non-Feature input the feature recursion would otherwise miss.
+            case LOCAL -> forEachChild(f, child -> {
+                if (child instanceof Feature cf) {
+                    walk(cf, vetoes, local, seen);
+                } else if (!isLocal(child.getClass())) { // a TermGenerator (or similar input)
+                    local[0] = false;
+                }
+            });
+        }
+    }
+
+    /**
+     * A non-Feature classifying input (e.g. a TermGenerator) is local only if {@link CostLocal}.
+     */
+    private static boolean isLocal(Class<?> c) {
+        return !c.isAnnotationPresent(CostNonLocal.class) && c.isAnnotationPresent(CostLocal.class);
+    }
+
+    /**
+     * Classify a feature's class (cached). SOUND-by-construction: a feature is treated as local
+     * ONLY if it is explicitly {@link CostLocal}-annotated (its author asserts it depends only on
+     * the app + find subterm, modulo its child features) -- there is no structural "any composite
+     * is transparent" guess. {@link CostNonLocal} forces non-local; everything unannotated is
+     * non-local (the safe default).
+     */
+    private static Kind kind(Feature f) {
+        return kindCache.computeIfAbsent(f.getClass(), c -> {
+            if (c.isAnnotationPresent(CostNonLocal.class)) {
+                return Kind.NON_LOCAL; // explicit author override wins
+            }
+            if (f instanceof AbstractNonDuplicateAppFeature) {
+                return Kind.VETO;
+            }
+            return c.isAnnotationPresent(CostLocal.class) ? Kind.LOCAL : Kind.NON_LOCAL;
+        });
+    }
+
+    /**
+     * Apply {@code action} to each {@link Feature} and {@link TermGenerator} held one structural
+     * step inside {@code f}.
+     */
+    private static void forEachChild(Feature f, java.util.function.Consumer<Object> action) {
+        for (Field fld : allFields(f.getClass())) {
+            if (Modifier.isStatic(fld.getModifiers()) || fld.getType().isPrimitive()) {
+                continue;
+            }
+            try {
+                fld.setAccessible(true);
+                follow(fld.get(f), action);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    private static void follow(@Nullable Object o, java.util.function.Consumer<Object> action) {
+        if (o == null) {
+            return;
+        }
+        if (o instanceof Feature || o instanceof TermGenerator) {
+            action.accept(o);
+            return;
+        }
+        Class<?> c = o.getClass();
+        if (c.isArray()) {
+            if (!c.getComponentType().isPrimitive()) {
+                int n = Array.getLength(o);
+                for (int i = 0; i < n; i++) {
+                    follow(Array.get(o, i), action);
+                }
+            }
+            return;
+        }
+        if (o instanceof Iterable<?> it) {
+            for (Object e : it) {
+                follow(e, action);
+            }
+        }
+        // other object types (TermBuffer, ProjectionToTerm, Name, ...) are NOT traversed
+    }
+
+    /**
+     * Verification aid (only when {@link #VERIFY}): warn if a reused cost differs from the freshly
+     * recomputed one, i.e. some feature is mis-classified local and should be {@link CostNonLocal}.
+     */
+    static void warnMismatch(Taclet taclet, Object reused, Object fresh) {
+        LOGGER.warn("cost-reuse mismatch for taclet {}: a feature is mis-classified local; "
+            + "annotate it @CostNonLocal (reused={}, fresh={})", taclet.name(), reused, fresh);
+    }
+
+    private static List<RuleSetDispatchFeature> dispatchers(Object strategy) {
+        List<RuleSetDispatchFeature> d = dispatchers;
+        if (d == null) {
+            d = strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers()
+                    : List.of();
+            dispatchers = d;
+        }
+        return d;
+    }
+
+    private static List<Field> allFields(Class<?> c) {
+        List<Field> fs = new ArrayList<>();
+        for (Class<?> k = c; k != null && k != Object.class; k = k.getSuperclass()) {
+            fs.addAll(Arrays.asList(k.getDeclaredFields()));
+        }
+        return fs;
+    }
+}
