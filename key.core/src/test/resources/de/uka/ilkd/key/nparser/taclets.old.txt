@@ -12185,7 +12185,6 @@ lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(find_term_not_in_assumes, simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
