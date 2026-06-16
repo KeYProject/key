@@ -55,7 +55,10 @@ public class Pair<T1, T2> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second);
+        // Same value as Objects.hash(first, second) but without allocating the varargs Object[]
+        // on every call (Pair is heavily used as a hash-map key during proof search).
+        int result = 31 + (first == null ? 0 : first.hashCode());
+        return 31 * result + (second == null ? 0 : second.hashCode());
     }
 
     ///////////////////////////////////////////////////////////
