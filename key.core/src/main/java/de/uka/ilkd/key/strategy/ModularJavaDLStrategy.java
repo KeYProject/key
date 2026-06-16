@@ -10,7 +10,6 @@ import java.util.function.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
@@ -83,10 +82,12 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             (rule) -> responsibleStrategyCache.getResponsibleStrategies(rule, strategies,
                 StrategyAspect.Instantiation));
 
-        // the feature for the cost computation
+        // the feature for the cost computation. Age (goal time) is NOT part of the strategy cost:
+        // it is a first-class container-level term added once by RuleAppContainer.withAge, so the
+        // cost here is age-free (this lets cost reuse carry the age-free base forward verbatim).
         totalCost =
             add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
-                reduceCostTillMaxF, conflictCostDispatcher, AgeFeature.INSTANCE);
+                reduceCostTillMaxF, conflictCostDispatcher);
 
         // The feature for instantiateApp, built once instead of on every call.
         // Note that no conflict dispatcher takes part in this sum: resolveConflicts()
@@ -96,7 +97,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         enableInstantiate();
         totalInstCost =
             add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
-                reduceInstTillMaxF, AgeFeature.INSTANCE);
+                reduceInstTillMaxF);
         disableInstantiate();
     }
 

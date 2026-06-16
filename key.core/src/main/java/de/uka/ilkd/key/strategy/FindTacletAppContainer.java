@@ -49,14 +49,15 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *
      * @param app the taclet application
      * @param pio the position in occurrence
-     * @param cost the rule application cost
+     * @param ageFreeCost the rule application cost without the goal-age term
+     * @param cost the rule application cost (age-free cost plus the goal-age term)
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
     FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
-            RuleAppCost cost, Goal goal,
+            RuleAppCost ageFreeCost, RuleAppCost cost, Goal goal,
             long age) {
-        super(app, cost, age);
+        super(app, ageFreeCost, cost, age);
         applicationPosition = pio;
 
         final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());

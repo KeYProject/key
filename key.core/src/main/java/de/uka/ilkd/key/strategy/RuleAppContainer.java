@@ -10,6 +10,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,6 +60,18 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
     public final RuleAppCost getCost() {
         return cost;
+    }
+
+    /**
+     * Add the goal-age term to a strategy-computed cost. Age (the goal time, i.e. number of rules
+     * applied so far) is a single first-class component of every container's cost, contributed here
+     * rather than inside any {@link de.uka.ilkd.key.strategy.Strategy#computeCost} -- so a strategy
+     * (and each of its components) computes only its age-free cost, and age is added exactly once
+     * per queued container regardless of how strategies are composed. {@code Top} stays
+     * {@code Top}.
+     */
+    protected static RuleAppCost withAge(RuleAppCost ageFreeCost, Goal goal) {
+        return ageFreeCost.add(NumberRuleAppCost.create(goal.getTime()));
     }
 
     /**
