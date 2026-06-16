@@ -326,7 +326,7 @@ public class TacletGenerator {
          * tacletBuilder.addTacletGoalTemplate (tgc); }
          */
         if (ifSeq != null) {
-            tacletBuilder.setIfSequent(ifSeq);
+            tacletBuilder.setAssumesSequent(ifSeq);
         }
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
@@ -733,14 +733,14 @@ public class TacletGenerator {
             final var succ =
                 ImmutableSLList.singleton(eqNullSF);
             final Sequent ifSeq = JavaDLSequentKit.createSequent(antec, succ);
-            tacletBuilder.setIfSequent(ifSeq);
+            tacletBuilder.setAssumesSequent(ifSeq);
         } else if (!isStatic) {
             // \assumes( ==> self = null )
             final JTerm selfNull = TB.equals(TB.var(selfSV), TB.NULL());
             final SequentFormula selfNullSF = new SequentFormula(selfNull);
             final Sequent ifSeq =
                 JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(selfNullSF));
-            tacletBuilder.setIfSequent(ifSeq);
+            tacletBuilder.setAssumesSequent(ifSeq);
         }
 
         result = result.add(tacletBuilder.getTaclet());

@@ -15,11 +15,7 @@ file
    ;
 
 problem
-   : (PROBLEM LBRACE (t = termorseq) RBRACE | CHOOSECONTRACT (chooseContract = string_value SEMI)? | PROOFOBLIGATION (proofObligation = cvalue)? SEMI?) proofScript?
-   ;
-
-arrayopid
-   : EMPTYBRACKETS LPAREN componentType = typemapping RPAREN
+   : (PROBLEM LBRACE (t = termorseq) RBRACE | CHOOSECONTRACT (chooseContract = string_value SEMI)? | PROOFOBLIGATION (proofObligation = cvalue)? SEMI?) proofScriptEntry?
    ;
 
 /**
@@ -88,14 +84,36 @@ term
 
 preferences
    : KEYSETTINGS (LBRACE s = string_value? RBRACE | c = cvalue) // LBRACE, RBRACE included in cvalue#table
-   
    ;
 
-proofScript
-   : PROOFSCRIPT ps = STRING_LITERAL
-   ;
-   // PROOF
-   
+proofScriptEntry
+:
+  PROOFSCRIPT
+    ( STRING_LITERAL SEMI?
+    | LBRACE proofScript RBRACE
+    )
+;
+
+proofScriptEOF: proofScript EOF;
+proofScript: proofScriptCommand*;
+proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
+
+proofScriptParameters: proofScriptParameter*;
+proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
+proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
+proofScriptExpression:
+    boolean_literal
+  | integer
+  | floatnum
+  | string_literal
+  | LPAREN (term | seq) RPAREN
+  | simple_ident
+  | abbreviation
+  | literals
+  | proofScriptCodeBlock
+  ;
+proofScriptCodeBlock: LBRACE proofScript RBRACE;
+
 proof
    : PROOF EOF
    ;

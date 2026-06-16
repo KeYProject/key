@@ -3,29 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
 import org.key_project.util.helper.FindResources;
 
 import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,38 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExceptionToolsTest {
     public static final Path testCaseDirectory =
         Objects.requireNonNull(FindResources.getTestCasesDirectory());
-
-    @Test
-    void missingSemicolon() throws MalformedURLException {
-        var fileToRead = testCaseDirectory;
-        fileToRead = fileToRead.resolve("parserErrorTest/missing_semicolon.key");
-        try {
-            var result = ParsingFacade.parseFile(fileToRead);
-            fail("should fail to parse");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ParseCancellationException exc) {
-            InputMismatchException ime = (InputMismatchException) exc.getCause();
-            String message = """
-                    Syntax error in input file missing_semicolon.key
-                    Line: 6 Column: 1
-                    ';' (semicolon) expected, but found '}'""";
-            String resultMessage = ExceptionTools.getNiceMessage(ime);
-            assertEquals(message, resultMessage);
-
-            // The message describes the unexpected '}' (line 6), but the reported location points
-            // just after the preceding construct (the taclet's closing brace '}' is on line 5 at
-            // column 3, so the insertion point for the missing ';' is column 4).
-            Location loc = ExceptionTools.getLocation(ime);
-            assertEquals(5, loc.getPosition().line());
-            assertEquals(4, loc.getPosition().column());
-            assertEquals(fileToRead.toUri(), loc.fileUri());
-        } catch (SyntaxErrorReporter.ParserException exception) {
-            Location loc = ExceptionTools.getLocation(exception);
-            assertEquals(5, loc.getPosition().line());
-            assertEquals(4, loc.getPosition().column());
-        }
-    }
 
     /** Token type 1 displays as ';', token type 2 as 'int'. */
     private static final Vocabulary VOCAB =

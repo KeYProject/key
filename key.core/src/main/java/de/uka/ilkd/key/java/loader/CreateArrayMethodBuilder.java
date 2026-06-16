@@ -266,30 +266,30 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * {@code <prepare>()} setting the arrays fields on their default value.
      *
      * @param length
-     *        the final public ProgramVariable {@code length} of the array
+     * the final public ProgramVariable {@code length} of the array
      * @param fields
-     *        the ImmutableList with fields of the current array
+     * the ImmutableList with fields of the current array
      * @param createTransient
-     *        a boolean indicating if a transient array has
-     *        to be created (this is special to JavaCard)
+     * a boolean indicating if a transient array has
+     * to be created (this is special to JavaCard)
      * @param transientType
-     *        a ProgramVariable identifying the kind of transient
+     * a ProgramVariable identifying the kind of transient
      * @return the StatementBlock which is the method's body <br>
-     *         </br>
+     * </br>
      *
-     *         <pre>
-     *  {@code
-     *  {
-     *    this.<nextToCreate> = this.<nextToCreate>.;
-     *    this.$initialized = false;
-     *    this.$created     = true;
-     *    this.$prepare();
-     *    this.$transient = transientType;
-     *    this.$initialized = true;
-     *    return this;
-     *   }
-     *   }
-     *         </pre>
+     * <pre>
+     * {@code
+     * {
+     * this.<nextToCreate> = this.<nextToCreate>.;
+     * this.$initialized = false;
+     * this.$created = true;
+     * this.$prepare();
+     * this.$transient = transientType;
+     * this.$initialized = true;
+     * return this;
+     * }
+     * }
+     * </pre>
      */
     private StatementBlock getCreateArrayHelperBody(
             ProgramVariable length,
