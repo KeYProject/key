@@ -14,6 +14,7 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.JavaKeYLexer;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -339,6 +341,11 @@ public abstract class AbstractProblemLoader {
             }
         } finally {
             control.loadingFinished(this, poContainer, proofList, result);
+            // parsing is done; release the ANTLR DFA caches so they are not retained during the
+            // (long) proof search. They are a pure cache and rebuild transparently on the next
+            // parse.
+            ParsingFacade.clearParserCaches();
+            JmlFacade.clearCaches();
         }
     }
 
