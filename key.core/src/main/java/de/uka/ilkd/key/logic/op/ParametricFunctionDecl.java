@@ -41,6 +41,12 @@ public final class ParametricFunctionDecl implements Named, Sorted {
         this.unique = unique;
         this.isRigid = isRigid;
         this.isSkolemConstant = isSkolemConstant;
+        for (var p : parameters) {
+            if (!p.variance().equals(GenericParameter.Variance.INVARIANT)) {
+                throw new IllegalArgumentException(
+                    "Co-/contravariance is not yet supported for parametric functions or predicates");
+            }
+        }
     }
 
     @Override

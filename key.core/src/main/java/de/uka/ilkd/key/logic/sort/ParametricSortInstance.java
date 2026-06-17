@@ -75,9 +75,7 @@ public final class ParametricSortInstance extends AbstractSort {
         ImmutableSet<Sort> baseExt = base.getExtendedSorts();
         if (!baseExt.isEmpty()) {
             for (Sort s : baseExt) {
-                result =
-                    result.add(instantiate(s, getInstMap(base, args),
-                        services));
+                result = result.add(instantiate(s, getInstMap(base, args), services));
             }
         }
 
@@ -139,7 +137,35 @@ public final class ParametricSortInstance extends AbstractSort {
 
     @Override
     public boolean extendsTrans(@NonNull Sort sort) {
-        return sort == this || extendsSorts()
+        if (sort == this)
+            return true;
+
+        if (sort instanceof ParametricSortInstance psi && psi.getBase().equals(base)) {
+            assert psi.getArgs().size() == args.size();
+            var baseParams = psi.getBase().getParameters();
+            var matches = true;
+            for (int i = 0; i < psi.getArgs().size(); i++) {
+                var oa = psi.getArgs().get(i);
+                var ta = args.get(i);
+                var variance = baseParams.get(i).variance();
+                switch (variance) {
+                    case COVARIANT -> {
+                        matches &= ta.sort().extendsTrans(oa.sort());
+                    }
+                    case CONTRAVARIANT -> {
+                        matches &= oa.sort().extendsTrans(ta.sort());
+                    }
+                    case INVARIANT -> {
+                        // Nothing to do
+                    }
+                }
+            }
+            if (matches) {
+                return true;
+            }
+        }
+
+        return extendsSorts()
                 .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
     }
 
