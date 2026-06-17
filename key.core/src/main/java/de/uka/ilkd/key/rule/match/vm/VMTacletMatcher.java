@@ -59,26 +59,28 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 public class VMTacletMatcher implements TacletMatcher {
 
     /**
-     * System property ({@code -Dkey.matcher.compiled=true}) selecting the cursor-free compiled find
-     * matcher (direct term navigation where the pattern allows, interpreter otherwise). Default
-     * {@code false} keeps the pure interpreter. Mainly for headless / CI runs; in the GUI use the
-     * {@link #COMPILED_MATCHER_FEATURE} feature flag instead.
+     * System property ({@code -Dkey.matcher.interpreter=true}) forcing the legacy cursor-based
+     * interpreter find-matcher. The cursor-free compiled matcher is the default; this is mainly for
+     * headless / CI A/B comparison. In the GUI use the {@link #INTERPRETER_MATCHER_FEATURE} feature
+     * flag instead.
      * <p>
      * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches matchers.
      */
-    public static final String COMPILE_MATCHERS_PROPERTY = "key.matcher.compiled";
+    public static final String INTERPRETER_MATCHER_PROPERTY = "key.matcher.interpreter";
 
     /**
-     * Feature flag (Settings &rarr; Feature Flags, persistent) selecting the cursor-free compiled
-     * find matcher, the GUI-friendly equivalent of {@link #COMPILE_MATCHERS_PROPERTY}. Like the
+     * Feature flag (Settings &rarr; Feature Flags, persistent) forcing the legacy interpreter
+     * find-matcher, the GUI-friendly equivalent of {@link #INTERPRETER_MATCHER_PROPERTY}. The
+     * compiled matcher is the default; activate this to fall back to the interpreter. Like the
      * property it is read per taclet at construction time, so it takes effect for newly loaded
-     * proofs
-     * (or after reloading the current one) -- hence {@code restartRequired = true}.
+     * proofs (or after reloading the current one) -- hence {@code restartRequired = true}.
      */
-    public static final FeatureSettings.Feature COMPILED_MATCHER_FEATURE =
-        FeatureSettings.createFeature("MATCHER_COMPILED",
-            "Use the cursor-free compiled taclet find-matcher (reload the proof to apply).", true);
+    public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
+        FeatureSettings.createFeature("MATCHER_INTERPRETER",
+            "Use the legacy interpreter taclet find-matcher instead of the compiled one "
+                + "(reload the proof to apply).",
+            true);
 
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
@@ -124,16 +126,17 @@ public class VMTacletMatcher implements TacletMatcher {
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             // both back-ends are derived from the unified match-plan framework (one dispatch per
-            // construct, see JavaMatchPlanBuilder); the compiled matcher is selected by the system
-            // property or the feature flag, otherwise the interpreter is used
+            // construct, see JavaMatchPlanBuilder); the compiled matcher is the default, the
+            // interpreter is used only when explicitly selected (property/feature flag) or as the
+            // automatic fallback for a pattern the compiler does not handle
             final VMProgramInterpreter interpreter =
                 new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(findExp));
-            if (Boolean.getBoolean(COMPILE_MATCHERS_PROPERTY)
-                    || FeatureSettings.isFeatureActivated(COMPILED_MATCHER_FEATURE)) {
+            if (Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY)
+                    || FeatureSettings.isFeatureActivated(INTERPRETER_MATCHER_FEATURE)) {
+                findMatchProgram = interpreter;
+            } else {
                 final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgram(findExp);
                 findMatchProgram = compiled != null ? compiled : interpreter;
-            } else {
-                findMatchProgram = interpreter;
             }
 
         } else {

@@ -43,12 +43,12 @@ public class SettingsManager {
 
     /**
      * Registration anchor: referencing a feature flag declared in a lazily-loaded core class (here
-     * the compiled-matcher flag in {@link VMTacletMatcher}) forces its registration so it shows in
-     * the {@link FeatureSettingsPanel} on a fresh start, before any proof is loaded.
+     * the interpreter-matcher fallback flag in {@link VMTacletMatcher}) forces its registration so
+     * it shows in the {@link FeatureSettingsPanel} on a fresh start, before any proof is loaded.
      */
     @SuppressWarnings("unused")
-    public static final FeatureSettings.Feature COMPILED_MATCHER_FEATURE =
-        VMTacletMatcher.COMPILED_MATCHER_FEATURE;
+    public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
+        VMTacletMatcher.INTERPRETER_MATCHER_FEATURE;
 
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
