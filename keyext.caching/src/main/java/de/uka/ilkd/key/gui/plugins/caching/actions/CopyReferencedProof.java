@@ -11,6 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -28,6 +29,11 @@ public final class CopyReferencedProof extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyReferencedProof.class);
 
     /**
+     * The caching extension.
+     */
+    private final CachingExtension cachingExtension;
+
+    /**
      * The mediator.
      */
     private final KeYMediator mediator;
@@ -39,10 +45,12 @@ public final class CopyReferencedProof extends KeyAction {
     /**
      * Construct a new action.
      *
+     * @param cachingExtension the caching extension this action belongs to, for UI updates
      * @param mediator the mediator
      * @param node the node to apply the action on
      */
-    public CopyReferencedProof(KeYMediator mediator, Node node) {
+    public CopyReferencedProof(CachingExtension cachingExtension, KeYMediator mediator, Node node) {
+        this.cachingExtension = cachingExtension;
         this.mediator = mediator;
         this.nodes = new ArrayList<>();
         setName("Copy referenced proof steps here");
@@ -72,5 +80,7 @@ public final class CopyReferencedProof extends KeyAction {
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
             }
         }
+        // notify the UI to make sure the task bar button has correct number and enabled state
+        cachingExtension.updateGUIState(mediator.getSelectedProof());
     }
 }
