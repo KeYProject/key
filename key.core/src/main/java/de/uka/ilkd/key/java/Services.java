@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.prover.impl.ParallelNameAllocator;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.LogicServices;
@@ -88,6 +90,15 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     private NameRecorder nameRecorder;
 
+    /**
+     * Per-proof allocator of fresh names that are globally unique across worker threads (shared
+     * across this proof's overlay/copy {@link Services}). Used by {@link VariableNameProposer}
+     * while
+     * a multi-threaded run is active so that names stay disjoint without consulting the shared
+     * namespace. See the multithreading effort (branch {@code bubel/mt-goals}).
+     */
+    private final ParallelNameAllocator nameAllocator;
+
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
@@ -135,6 +146,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
             this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
         }
         nameRecorder = new NameRecorder();
+        this.nameAllocator = new ParallelNameAllocator();
     }
 
     private Services(Services s) {
@@ -154,6 +166,16 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.originFactory = s.originFactory;
+        // Share the allocator across all overlay/copy Services of the same proof so that
+        // per-(worker,base) counters stay coherent.
+        this.nameAllocator = s.nameAllocator;
+    }
+
+    /**
+     * @return this proof's fresh-name allocator (shared across overlay/copy {@link Services})
+     */
+    public ParallelNameAllocator getNameAllocator() {
+        return nameAllocator;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -195,19 +217,49 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
+    /**
+     * Per-worker name recorder, used while a goal is being applied off the calling thread (parallel
+     * prover, branch {@code bubel/mt-goals}). The rule executor records fresh-name proposals during
+     * the compute phase, which runs concurrently outside the commit lock; routing those through a
+     * thread-local recorder keeps them off the shared {@link #nameRecorder} field. Bound per worker
+     * by {@link #bindWorkerNameRecorder()} and consulted only while a multi-threaded run is active.
+     */
+    private static final ThreadLocal<NameRecorder> WORKER_NAME_RECORDER = new ThreadLocal<>();
+
+    /** Binds a fresh per-worker name recorder to the calling thread. */
+    public static void bindWorkerNameRecorder() {
+        WORKER_NAME_RECORDER.set(new NameRecorder());
+    }
+
+    /** Removes the per-worker name recorder from the calling thread. */
+    public static void unbindWorkerNameRecorder() {
+        WORKER_NAME_RECORDER.remove();
+    }
+
+    private @Nullable NameRecorder activeWorkerNameRecorder() {
+        return ParallelProver.isMultiThreadedRunActive() ? WORKER_NAME_RECORDER.get() : null;
+    }
+
     public NameRecorder getNameRecorder() {
-        return nameRecorder;
+        NameRecorder worker = activeWorkerNameRecorder();
+        return worker != null ? worker : nameRecorder;
     }
 
 
     public void saveNameRecorder(Node n) {
-        n.setNameRecorder(nameRecorder);
-        nameRecorder = new NameRecorder();
+        NameRecorder worker = activeWorkerNameRecorder();
+        if (worker != null) {
+            n.setNameRecorder(worker);
+            WORKER_NAME_RECORDER.set(new NameRecorder());
+        } else {
+            n.setNameRecorder(nameRecorder);
+            nameRecorder = new NameRecorder();
+        }
     }
 
 
     public void addNameProposal(Name proposal) {
-        nameRecorder.addProposal(proposal);
+        getNameRecorder().addProposal(proposal);
     }
 
 
@@ -307,8 +359,12 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     /*
      * returns an existing named counter, creates a new one otherwise
+     *
+     * Synchronized so that concurrent workers (multithreading effort) cannot lose a counter
+     * through a racing check-then-put on the shared counters map. The per-counter increment is
+     * atomic (see Counter); this only guards lookup/creation.
      */
-    public Counter getCounter(String name) {
+    public synchronized Counter getCounter(String name) {
         Counter c = counters.get(name);
         if (c != null) {
             return c;

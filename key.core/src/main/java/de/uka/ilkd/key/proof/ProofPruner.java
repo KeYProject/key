@@ -140,10 +140,15 @@ class ProofPruner {
 
             firstGoal.pruneToParent();
 
+            // Replay a node's strategy-info undos in REVERSE (LIFO) order. They are absolute
+            // restore-previous operations, so several registered at the same node (e.g. QueryExpand
+            // recording more than one first-seen query while scanning the subterms of one sequent)
+            // must unwind last-in-first-out to reach the pre-node state; forward replay would leave
+            // the map at the second-registered value instead of the original.
             final List<StrategyInfoUndoMethod> undoMethods =
                 visitedNode.getStrategyInfoUndoMethods();
-            for (StrategyInfoUndoMethod undoMethod : undoMethods) {
-                firstGoal.undoStrategyInfoAdd(undoMethod);
+            for (int i = undoMethods.size() - 1; i >= 0; i--) {
+                firstGoal.undoStrategyInfoAdd(undoMethods.get(i));
             }
         });
 
