@@ -15,7 +15,7 @@ import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.Taclet;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -81,10 +81,19 @@ public class TermTacletAppIndexCacheSet {
     /**
      * caches for locations that are not below updates or programs, but in the scope of binders.
      * this is a mapping from <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
+     *
+     * <p>
+     * One cache set is shared across the sibling goals of a proof branch (TacletAppIndex.copyWith
+     * hands on the same instance), so these prefix caches are read and written concurrently on the
+     * parallel matching path -- hence ConcurrentLruCache. The exact (not striped) flavour is used
+     * to
+     * preserve the original global LRU eviction: re-creating an evicted sub-cache orphans its
+     * instance-specific entries in the shared backend, and the number of distinct quantifier
+     * prefixes is small (eviction rarely fires), so exact eviction avoids extra backend churn at
+     * negligible lock cost.
      */
-    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
-        new LRUCache<>(
-            MAX_CACHE_ENTRIES);
+    private final ConcurrentLruCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
+        new ConcurrentLruCache<>(MAX_CACHE_ENTRIES);
 
     /**
      * cache for locations that are below updates, but not below programs or in the scope of binders
@@ -101,9 +110,8 @@ public class TermTacletAppIndexCacheSet {
      * caches for locations that are both below programs and in the scope of binders. this is a
      * mapping from <code>IList<QuantifiedVariable></code> to <code>BelowProgCache</code>
      */
-    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
-        new LRUCache<>(
-            MAX_CACHE_ENTRIES);
+    private final ConcurrentLruCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
+        new ConcurrentLruCache<>(MAX_CACHE_ENTRIES);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
