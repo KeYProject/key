@@ -10,7 +10,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.ProverCore;
@@ -68,7 +68,10 @@ public class DefaultAutoMacro extends AbstractProofMacro {
 
         final GoalChooser goalChooser =
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
-        final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
+        // Route through AutoProvers: this macro is the toolbar/context-menu equivalent of plain
+        // automode, so it has to honour the selected prover mode (single- or multi-core).
+        final ProverCore applyStrategy =
+            AutoProvers.create(goalChooser, proof.getInitConfig().getProfile());
 
         final ProofMacroListener pml =
             new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
