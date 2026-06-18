@@ -233,6 +233,18 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     /**
+     * Returns a snapshot of the goal listeners currently registered on this goal. Used by
+     * {@link Proof#suspendNonEssentialListeners()} to detach non-essential (e.g. GUI) goal
+     * listeners
+     * for the duration of a parallel run, so they do not fire on worker threads.
+     *
+     * @return a copy of this goal's registered {@link GoalListener}s
+     */
+    public List<GoalListener> getGoalListeners() {
+        return new ArrayList<>(listeners);
+    }
+
+    /**
      * informs all goal listeners about a change of the sequent to reduce unnecessary object
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
