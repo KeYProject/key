@@ -20,7 +20,7 @@ public class TextualJMLAssertStatementTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '#',
+    @CsvSource(delimiter = '#', commentCharacter = '´',
         textBlock = """
                 //@ assert true; # true;
                 //@ assert 1 + 2 == 3 && 2 != 3; # 1 + 2 == 3 && 2 != 3;

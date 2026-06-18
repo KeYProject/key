@@ -82,7 +82,7 @@ public final class PathConfig {
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = Paths.get(keyConfigDir);
 
-        recentFileStorage = getKeyConfigDir().resolve("recentFiles.json");
+        recentFileStorage = getKeyConfigDir().resolve("recentFiles_v2.json");
         proofIndependentSettings = getKeyConfigDir().resolve("proofIndependentSettings.props");
         logDirectory = getKeyConfigDir().resolve("logs");
     }

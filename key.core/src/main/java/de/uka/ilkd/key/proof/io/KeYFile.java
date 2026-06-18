@@ -20,10 +20,7 @@ import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -60,7 +57,7 @@ public class KeYFile implements EnvInput {
      */
     protected final @Nullable ProgressMonitor monitor;
     private final String name;
-    private final Profile profile;
+    protected @Nullable Profile profile;
     protected InitConfig initConfig;
     private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
@@ -72,16 +69,18 @@ public class KeYFile implements EnvInput {
      */
     private FileRepo fileRepo;
 
-    /**
-     * creates a new representation for a given file by indicating a name and a RuleSource
-     * representing the physical source of the .key file.
-     */
+    /// creates a new representation for a given file by indicating a name and a RuleSource
+    /// representing the physical source of the .key file.
+    ///
+    /// @param profile if non-null, enforces to use the given profile. Use `null` if the profile
+    /// from the {@link KeYUserProblemFile} or {@link AbstractProfile#getDefaultProfile()} shoudl be
+    /// used.
     public KeYFile(String name, RuleSource file, @Nullable ProgressMonitor monitor,
-            Profile profile) {
+            @Nullable Profile profile) {
         this.name = Objects.requireNonNull(name);
         this.file = Objects.requireNonNull(file);
         this.monitor = monitor;
-        this.profile = Objects.requireNonNull(profile);
+        this.profile = profile;
     }
 
 
@@ -95,8 +94,8 @@ public class KeYFile implements EnvInput {
      * @param profile the profile
      * @param fileRepo the FileRepo which will store the file
      */
-    public KeYFile(String name, RuleSource file, ProgressMonitor monitor, Profile profile,
-            FileRepo fileRepo) {
+    public KeYFile(String name, RuleSource file, @Nullable ProgressMonitor monitor,
+            @Nullable Profile profile, FileRepo fileRepo) {
         this(name, file, monitor, profile);
         this.fileRepo = fileRepo;
     }
@@ -105,7 +104,8 @@ public class KeYFile implements EnvInput {
      * creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      */
-    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
+    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            @Nullable Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -179,10 +179,11 @@ public class KeYFile implements EnvInput {
 
     protected ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
-            return readPreferences();
-        } else {
-            return initConfig.getSettings();
+            var settings = readPreferences();
+            initConfig.setSettings(settings);
+            return settings;
         }
+        return initConfig.getSettings();
     }
 
     public ProofSettings readPreferences() {
@@ -284,8 +285,11 @@ public class KeYFile implements EnvInput {
                 absFile = parent.resolve(javaPath);
             }
             if (!Files.exists(absFile)) {
-                throw new ProofInputException(
-                    String.format("Declared Java source %s not found.", javaPath));
+                throw new ProofInputException(String.format(
+                    "The \\javaSource declared in %s could not be found.%n"
+                        + "    declared:    \"%s\"%n"
+                        + "    expected at: %s",
+                    file.file().getFileName(), javaPath, absFile.toAbsolutePath()));
             }
             return absFile.toAbsolutePath();
         }
@@ -462,7 +466,12 @@ public class KeYFile implements EnvInput {
 
     @Override
     public Profile getProfile() {
-        return profile;
+        return profile == null ? getDefaultProfile() : profile;
+    }
+
+    /// Returns the default profile.
+    public Profile getDefaultProfile() {
+        return AbstractProfile.getDefaultProfile();
     }
 
     @Override

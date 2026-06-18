@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.IdDeclaration;
@@ -192,7 +192,7 @@ public class TacletFindModel extends AbstractTableModel {
      * function)
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
-        KeYParser.Id_declarationContext ctx =
+        JavaKeYParser.Id_declarationContext ctx =
             ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
         Sort sort =
             ctx.s != null ? services.getNamespaces().lookupSortOrAlias(ctx.s.getText()) : null;

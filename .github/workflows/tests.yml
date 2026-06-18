@@ -59,7 +59,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
+        run: ./gradlew --continue :${{ matrix.modules }}:test
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -70,9 +70,6 @@ jobs:
             **/build/test-results/*/*.xml
             **/build/reports/
             !**/jacocoTestReport.xml
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v6
 
   integration-tests:
     env:

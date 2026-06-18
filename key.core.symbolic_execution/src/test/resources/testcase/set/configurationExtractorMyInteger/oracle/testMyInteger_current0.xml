@@ -8,6 +8,6 @@
    <object xml:id="o1" name="summand" type="MyInteger">
    </object>
    <object xml:id="o2" name="self" type="MyInteger">
-      <value name="value" programVariable="value" isArrayIndex="false" value="add(int::select(heap,self,MyInteger::$value),int::select(heap,summand,MyInteger::$value))" type="int" condition="true"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="add(select<[int]>(heap,self,MyInteger::$value),select<[int]>(heap,summand,MyInteger::$value))" type="int" condition="true"/>
    </object>
 </model>

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
@@ -64,6 +64,7 @@ public abstract class AbstractProblemLoader {
      * @see EnvInput#isIgnoreOtherJavaFiles()
      */
     private boolean loadSingleJavaFile = false;
+    private @Nullable Configuration additionalProfileOptions;
 
     public static class ReplayResult {
 
@@ -128,7 +129,7 @@ public abstract class AbstractProblemLoader {
     /**
      * The {@link Profile} to use for new {@link Proof}s.
      */
-    private Profile profileOfNewProofs;
+    private @Nullable Profile profileOfNewProofs;
 
     /**
      * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
@@ -141,12 +142,6 @@ public abstract class AbstractProblemLoader {
      * Some optional additional {@link Properties} for the PO.
      */
     private final Properties poPropertiesToForce;
-
-    /**
-     * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs,
-     * {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     */
-    private final boolean forceNewProfileOfNewProofs;
 
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
@@ -190,12 +185,12 @@ public abstract class AbstractProblemLoader {
     private static final Map<Integer, String> missedErrors = new HashMap<>();
 
     static {
-        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors.put(new Pair<>(JavaKeYLexer.SEMI, JavaKeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
-        missedErrors.put(KeYLexer.RBRACE, "closing brace");
-        missedErrors.put(KeYLexer.SEMI, "semicolon");
+        missedErrors.put(JavaKeYLexer.RPAREN, "closing parenthesis");
+        missedErrors.put(JavaKeYLexer.RBRACE, "closing brace");
+        missedErrors.put(JavaKeYLexer.SEMI, "semicolon");
     }
 
     /**
@@ -216,7 +211,8 @@ public abstract class AbstractProblemLoader {
      *        the loaded {@link InitConfig}.
      */
     protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            List<Path> includes, @Nullable Profile profileOfNewProofs,
+            boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {
@@ -224,9 +220,7 @@ public abstract class AbstractProblemLoader {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
-        setProfileOfNewProofs(
-            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
-        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
+        setProfileOfNewProofs(profileOfNewProofs);
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
@@ -281,11 +275,11 @@ public abstract class AbstractProblemLoader {
         return control;
     }
 
-    public Profile getProfileOfNewProofs() {
+    public @Nullable Profile getProfileOfNewProofs() {
         return profileOfNewProofs;
     }
 
-    public void setProfileOfNewProofs(Profile profileOfNewProofs) {
+    public void setProfileOfNewProofs(@Nullable Profile profileOfNewProofs) {
         this.profileOfNewProofs = profileOfNewProofs;
     }
 
@@ -295,10 +289,6 @@ public abstract class AbstractProblemLoader {
 
     public Properties getPoPropertiesToForce() {
         return poPropertiesToForce;
-    }
-
-    public boolean isForceNewProfileOfNewProofs() {
-        return forceNewProfileOfNewProofs;
     }
 
     public boolean isIgnoreWarnings() {
@@ -550,8 +540,9 @@ public abstract class AbstractProblemLoader {
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
-        Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
+        Profile profile = profileOfNewProofs != null ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
         return pi;
     }
@@ -859,4 +850,15 @@ public abstract class AbstractProblemLoader {
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
     }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object representing additional options for the given profile.
+    /// @see ProblemInitializer
+    public Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
 }

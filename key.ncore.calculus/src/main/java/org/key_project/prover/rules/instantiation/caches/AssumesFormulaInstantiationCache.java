@@ -3,48 +3,43 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation.caches;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Semisequent;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
 
-// a simple cache for the results of the method <code>createList</code>
+/// A simple cache for the results of the method `createList`.
+///
+/// Implemented as two small direct-mapped tables indexed by the identity hash of the
+/// semisequent. Entries are immutable [Pair]s with final fields, so the table can be
+/// read and written without locking: a racy read at worst observes an older entry,
+/// which only causes a cache miss. (The previous implementation used access-ordered
+/// LRU maps whose `get` mutates the map, guarded only by a read lock.)
 public final class AssumesFormulaInstantiationCache {
 
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>> antecCache =
-        new LRUCache<>(50);
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>> succCache =
-        new LRUCache<>(50);
+    private static final int SIZE = 64; // power of two
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReadLock readLock = lock.readLock();
-    private final WriteLock writeLock = lock.writeLock();
+    @SuppressWarnings("unchecked")
+    private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] antecCache =
+        new Pair[SIZE];
+    @SuppressWarnings("unchecked")
+    private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] succCache =
+        new Pair[SIZE];
+
+    private static int indexFor(Semisequent s) {
+        return System.identityHashCode(s) & (SIZE - 1);
+    }
 
     public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
-        try {
-            readLock.lock();
-            final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =
-                (antec ? antecCache : succCache).get(System.identityHashCode(s));
-            return p != null && p.first == s ? p.second : null;
-        } finally {
-            readLock.unlock();
-        }
+        final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =
+            (antec ? antecCache : succCache)[indexFor(s)];
+        return p != null && p.first == s ? p.second : null;
     }
 
     public void put(boolean antec, Semisequent s,
             ImmutableArray<AssumesFormulaInstantiation> value) {
-        try {
-            writeLock.lock();
-            (antec ? antecCache : succCache).put(System.identityHashCode(s), new Pair<>(s, value));
-        } finally {
-            writeLock.unlock();
-        }
+        (antec ? antecCache : succCache)[indexFor(s)] = new Pair<>(s, value);
     }
 }

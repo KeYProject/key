@@ -43,6 +43,12 @@ public interface ImmutableSet<T extends @Nullable Object>
         return DefaultImmutableSet.nil();
     }
 
+    /// Creates an immutable set populated with the given values.
+    static <T> ImmutableSet<T> from(Collection<T> values) {
+        var set = ImmutableSet.<T>empty();
+        return set.add(values);
+    }
+
     /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
      */

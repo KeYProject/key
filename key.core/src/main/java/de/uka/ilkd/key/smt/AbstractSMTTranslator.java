@@ -2510,9 +2510,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         for (Operator op : usedFunctionNames.keySet()) {
 
-            if (op instanceof SortDependingFunction) {
-                Sort s = ((SortDependingFunction) op).getSortDependingOn();
-                tempSorts.add(s);
+            if (op instanceof ParametricFunctionInstance pfi) {
+                for (GenericArgument a : pfi.getArgs()) {
+                    tempSorts.add(a.sort());
+                }
             }
             if (op instanceof LocationVariable lv) {
                 if (lv.getContainerType() != null) {

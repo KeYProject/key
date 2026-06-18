@@ -669,15 +669,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
             if (target.asField().toAst().isEmpty()) {
                 throw new ConvertException("Field " + target.asField().getName() +
-                    " cannot be converted into an AST node. Note: Bytecode parsing" +
-                    "is not supported.");
+                    " cannot be converted into an AST node. Note: Bytecode parsing " +
+                    "is not supported.", n);
             }
 
             Node fieldNode = target.asField().toAst().get();
 
             if (!(fieldNode instanceof FieldDeclaration fldDecl)) {
                 throw new ConvertException(
-                    "Unexpected node type: " + fieldNode.getClass() + "of node " + fieldNode);
+                    "Unexpected node type: " + fieldNode.getClass() + " of node " + fieldNode, n);
             }
 
             List<VariableDeclarator> variableCandidates = fldDecl.getVariables().stream()
@@ -685,7 +685,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     .collect(Collectors.toList());
 
             if (variableCandidates.size() != 1) {
-                throw new ConvertException("Name of field not unique: " + n.getNameAsString());
+                throw new ConvertException("Name of field not unique: " + n.getNameAsString(), n);
             }
 
             final VariableDeclarator varDecl = variableCandidates.getFirst();
@@ -711,7 +711,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 var keyType = getKeYJavaType(type);
                 return new TypeRef(keyType);
             } catch (UnsolvedSymbolException e1) {
-                throw new ParserException("Name could not be resolved '" + n + "'",
+                throw new ParserException("Cannot resolve '" + n + "'. No variable, field, or type "
+                    + "with this name is in scope here (check for typos).",
                     Location.fromNode(n));
             }
         }
@@ -1012,7 +1013,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 var keyType = getKeYJavaType(type);
                 return new TypeRef(keyType);
             } catch (UnsolvedSymbolException e1) {
-                throw new ParserException("Name could not be resolved '" + n + "'",
+                throw new ParserException("Cannot resolve '" + n + "'. No variable, field, or type "
+                    + "with this name is in scope here (check for typos).",
                     Location.fromNode(n));
             }
         }
@@ -2158,7 +2160,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VarType n, Void arg) {
-        return getKeYJavaType(n.resolve());
+        var kjt = getKeYJavaType(n.resolve());
+        return new TypeRef(kjt);
     }
 
     @Override

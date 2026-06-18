@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.varexp.ArgumentType;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderCommand;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderManipulators;
@@ -86,7 +86,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapOf(ctx.schema_var_decls());
         mapOf(ctx.rulesOrAxioms());
         mapOf(ctx.datatype_decls());
@@ -94,7 +94,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
+    public Object visitRulesOrAxioms(JavaKeYParser.RulesOrAxiomsContext ctx) {
         enableJavaSchemaMode();
         if (ctx.RULES() != null) {
             axiomMode = false;
@@ -111,7 +111,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
+    public Object visitOne_schema_modal_op_decl(JavaKeYParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<JModality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
         Sort sort = accept(ctx.sort);
         if (sort != null && sort != JavaDLTheory.FORMULA) {
@@ -130,7 +130,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public TacletBuilder<?> visitTriggers(KeYParser.TriggersContext ctx) {
+    public TacletBuilder<?> visitTriggers(JavaKeYParser.TriggersContext ctx) {
         String id = (String) ctx.id.accept(this);
         JOperatorSV triggerVar = (JOperatorSV) schemaVariables().lookup(new Name(id));
         if (triggerVar == null) {
@@ -144,8 +144,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Taclet visitTaclet(KeYParser.TacletContext ctx) {
-        Sequent ifSeq = JavaDLSequentKit.getInstance().getEmptySequent();
+    public Taclet visitTaclet(JavaKeYParser.TacletContext ctx) {
+        Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
@@ -183,8 +183,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         setSchemaVariables(new Namespace<>(schemaVariables()));
         mapOf(ctx.one_schema_var_decl());
 
-        if (ctx.ifSeq != null) {
-            ifSeq = accept(ctx.ifSeq);
+        if (ctx.assumesSeq != null) {
+            assumesSeq = accept(ctx.assumesSeq);
         }
 
         @Nullable
@@ -211,7 +211,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
-        b.setIfSequent(ifSeq);
+        b.setAssumesSequent(assumesSeq);
         b.setName(new Name(name));
         accept(ctx.goalspecs());
         mapOf(ctx.varexplist());
@@ -230,7 +230,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
-    private void registerTaclet(KeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
+    private void registerTaclet(JavaKeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
         var taclet = tb.getTaclet();
         taclet2Builder.put(taclet, peekTBuilder());
         topLevelTaclets.add(taclet);
@@ -250,7 +250,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
 
     @Override
-    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         var genParams = ctx.formal_sort_param_decls() == null ? null
                 : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
         final Sort sort;
@@ -291,7 +291,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<? extends Taclet> createDeconstructorTaclet(
-            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
+            JavaKeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
             Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder
@@ -330,7 +330,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<? extends Taclet> createDeconstructorEQTaclet(
-            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
+            JavaKeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
             Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(
@@ -362,7 +362,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var res = schemaVariables[argIndex];
 
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
-        tacletBuilder.setIfSequent(JavaDLSequentKit.createAnteSequent(
+        tacletBuilder.setAssumesSequent(JavaDLSequentKit.createAnteSequent(
             ImmutableSLList
                     .singleton(new SequentFormula(tb.equals(tb.func(consFn, args), tb.var(x))))));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
@@ -394,7 +394,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<? extends Taclet> createInductionTaclet(
-            KeYParser.Datatype_declContext ctx, Sort sort) {
+            JavaKeYParser.Datatype_declContext ctx, Sort sort) {
         var tacletBuilder = new NoFindTacletBuilder();
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
@@ -429,7 +429,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return tacletBuilder;
     }
 
-    private GoalTemplAndVars createGoalDtConstructor(KeYParser.Datatype_constructorContext it,
+    private GoalTemplAndVars createGoalDtConstructor(JavaKeYParser.Datatype_constructorContext it,
             VariableSV qvar, JTerm var, Sort sort) {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
@@ -445,7 +445,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<NoFindTaclet> createAxiomTaclet(
-            KeYParser.Datatype_declContext ctx, Sort sort) {
+            JavaKeYParser.Datatype_declContext ctx, Sort sort) {
         var tacletBuilder = new NoFindTacletBuilder();
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
@@ -480,7 +480,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return tacletBuilder;
     }
 
-    private TermAndVars createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
+    private TermAndVars createQuantifiedFormula(JavaKeYParser.Datatype_constructorContext context,
             QuantifiableVariable qvX, JTerm phi, Sort dt) {
         var tb = services.getTermBuilder();
         var fn = getPossiblyParametricFunction(context.name.getText(), dt);
@@ -524,13 +524,13 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private RewriteTacletBuilder<RewriteTaclet> createConstructorSplit(
-            KeYParser.Datatype_declContext ctx, Sort sort) {
+            JavaKeYParser.Datatype_declContext ctx, Sort sort) {
         final var tb = services.getTermBuilder();
 
         final String prefix = ctx.name.getText() + "_";
 
         Map<String, JTerm> variables = new HashMap<>();
-        for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
+        for (JavaKeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             for (int i = 0; i < context.argName.size(); i++) {
                 var name = context.argName.get(i).getText();
                 var argSort = getPossiblyParametricSort(
@@ -553,7 +553,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             false, false, false,
             new SchemaVariableModifierSet.TermSV());
         b.setFind(tb.var(phi));
-        for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
+        for (JavaKeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             var func = getPossiblyParametricFunction(context.name.getText(), sort);
             JTerm[] args = new JTerm[context.argName.size()];
             for (int i = 0; i < args.length; i++) {
@@ -569,7 +569,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitModifiers(KeYParser.ModifiersContext ctx) {
+    public Object visitModifiers(JavaKeYParser.ModifiersContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         List<RuleSet> rs = accept(ctx.rs);
         if (!ctx.NONINTERACTIVE().isEmpty()) {
@@ -593,15 +593,15 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitVarexplist(KeYParser.VarexplistContext ctx) {
+    public Object visitVarexplist(JavaKeYParser.VarexplistContext ctx) {
         return mapOf(ctx.varexp());
     }
 
     @Override
-    public Object visitVarexp(KeYParser.VarexpContext ctx) {
+    public Object visitVarexp(JavaKeYParser.VarexpContext ctx) {
         boolean negated = ctx.NOT_() != null;
         String name = ctx.varexpId().getText();
-        List<KeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
+        List<JavaKeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
         List<TacletBuilderCommand> suitableManipulators =
             TacletBuilderManipulators.getConditionBuildersFor(name);
         List<String> parameters =
@@ -624,7 +624,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private boolean applyManipulator(boolean negated, Object[] args,
-            TacletBuilderCommand manipulator, List<KeYParser.Varexp_argumentContext> arguments,
+            TacletBuilderCommand manipulator, List<JavaKeYParser.Varexp_argumentContext> arguments,
             List<String> parameters) {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
@@ -644,7 +644,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
-            KeYParser.Varexp_argumentContext ctx) {
+            JavaKeYParser.Varexp_argumentContext ctx) {
         if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
             return prevValue; // previous value is of suitable type, we do not re-evaluate
         }
@@ -702,7 +702,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
 
-    public Object buildTypeResolver(KeYParser.Varexp_argumentContext ctx) {
+    public Object buildTypeResolver(JavaKeYParser.Varexp_argumentContext ctx) {
         SchemaVariable y = accept(ctx.varId());
         if (ctx.TYPEOF() != null) {
             return TypeResolver.createElementTypeResolver(y);
@@ -725,12 +725,12 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitGoalspecs(KeYParser.GoalspecsContext ctx) {
+    public Object visitGoalspecs(JavaKeYParser.GoalspecsContext ctx) {
         return mapOf(ctx.goalspecwithoption());
     }
 
     @Override
-    public Object visitGoalspecwithoption(KeYParser.GoalspecwithoptionContext ctx) {
+    public Object visitGoalspecwithoption(JavaKeYParser.GoalspecwithoptionContext ctx) {
         ChoiceExpr expr = accept(ctx.option_list());
         goalChoice = expr == null ? ChoiceExpr.TRUE : expr;
         accept(ctx.goalspec());
@@ -738,7 +738,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Choice visitOption(KeYParser.OptionContext ctx) {
+    public Choice visitOption(JavaKeYParser.OptionContext ctx) {
         String choice = ctx.getText();
         Choice c = choices().lookup(choice);
         if (c == null) {
@@ -748,7 +748,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public ChoiceExpr visitOption_list(KeYParser.Option_listContext ctx) {
+    public ChoiceExpr visitOption_list(JavaKeYParser.Option_listContext ctx) {
         return ctx.option_expr().stream()
                 .map(it -> (ChoiceExpr) accept(it))
                 .reduce(ChoiceExpr::and)
@@ -756,17 +756,17 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public ChoiceExpr visitOption_expr_or(KeYParser.Option_expr_orContext ctx) {
+    public ChoiceExpr visitOption_expr_or(JavaKeYParser.Option_expr_orContext ctx) {
         return ChoiceExpr.or(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
     }
 
     @Override
-    public ChoiceExpr visitOption_expr_paren(KeYParser.Option_expr_parenContext ctx) {
+    public ChoiceExpr visitOption_expr_paren(JavaKeYParser.Option_expr_parenContext ctx) {
         return accept(ctx.option_expr());
     }
 
     @Override
-    public ChoiceExpr visitOption_expr_prop(KeYParser.Option_expr_propContext ctx) {
+    public ChoiceExpr visitOption_expr_prop(JavaKeYParser.Option_expr_propContext ctx) {
         String category = ctx.option().cat.getText();
         String value = ctx.option().value.getText();
         String choiceStr = category + ":" + value;
@@ -783,17 +783,17 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public ChoiceExpr visitOption_expr_not(KeYParser.Option_expr_notContext ctx) {
+    public ChoiceExpr visitOption_expr_not(JavaKeYParser.Option_expr_notContext ctx) {
         return ChoiceExpr.not(accept(ctx.option_expr()));
     }
 
     @Override
-    public ChoiceExpr visitOption_expr_and(KeYParser.Option_expr_andContext ctx) {
+    public ChoiceExpr visitOption_expr_and(JavaKeYParser.Option_expr_andContext ctx) {
         return ChoiceExpr.and(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
     }
 
     @Override
-    public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
+    public Object visitGoalspec(JavaKeYParser.GoalspecContext ctx) {
         var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
@@ -821,28 +821,28 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitReplacewith(KeYParser.ReplacewithContext ctx) {
+    public Object visitReplacewith(JavaKeYParser.ReplacewithContext ctx) {
         return accept(ctx.o);
     }
 
     @Override
-    public Object visitAdd(KeYParser.AddContext ctx) {
+    public Object visitAdd(JavaKeYParser.AddContext ctx) {
         return accept(ctx.s);
     }
 
     @Override
-    public Object visitAddrules(KeYParser.AddrulesContext ctx) {
+    public Object visitAddrules(JavaKeYParser.AddrulesContext ctx) {
         return accept(ctx.lor);
     }
 
     @Override
-    public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
+    public ImmutableSet<SchemaVariable> visitAddprogvar(JavaKeYParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
         return Immutables.createSetFrom(Objects.requireNonNull(accept));
     }
 
     @Override
-    public ImmutableList<Taclet> visitTacletlist(KeYParser.TacletlistContext ctx) {
+    public ImmutableList<Taclet> visitTacletlist(JavaKeYParser.TacletlistContext ctx) {
         List<Taclet> taclets = mapOf(ctx.taclet());
         return ImmutableList.fromList(taclets);
     }
@@ -921,7 +921,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public SchemaVariable visitVarId(KeYParser.VarIdContext ctx) {
+    public SchemaVariable visitVarId(JavaKeYParser.VarIdContext ctx) {
         String id = ctx.id.getText();
         return varId(ctx, id);
     }
@@ -936,7 +936,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
+    public Object visitOne_schema_var_decl(JavaKeYParser.One_schema_var_declContext ctx) {
         boolean makeVariableSV = false;
         boolean makeSkolemTermSV = false;
         boolean makeTermLabelSV = false;
@@ -1012,7 +1012,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitSchema_modifiers(KeYParser.Schema_modifiersContext ctx) {
+    public Object visitSchema_modifiers(JavaKeYParser.Schema_modifiersContext ctx) {
         SchemaVariableModifierSet mods = pop();
         List<String> ids = visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
         for (String id : ids) {
@@ -1025,7 +1025,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
+    public Object visitSchema_var_decls(JavaKeYParser.Schema_var_declsContext ctx) {
         return this.<SchemaVariable>mapOf(ctx.one_schema_var_decl());
     }
 

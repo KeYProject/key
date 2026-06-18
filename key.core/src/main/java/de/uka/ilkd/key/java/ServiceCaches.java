@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -157,6 +159,13 @@ public class ServiceCaches implements SessionCaches {
     private final LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> mvCache =
         new LRUCache<>(2000);
 
+    /**
+     * Cache used by {@link de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring}: the
+     * origins of a term and all its subterms. Terms are immutable, so the set never
+     * changes for a given term.
+     */
+    private final Map<JTerm, Set<Origin>> subtermOriginsCache = new LRUCache<>(20000);
+
 
     /**
      * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -165,6 +174,16 @@ public class ServiceCaches implements SessionCaches {
      */
     public final Map<CacheKey, TermTacletAppIndex> getTermTacletAppIndexCache() {
         return termTacletAppIndexCache;
+    }
+
+    /**
+     * Returns the cache used by
+     * {@link de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring}.
+     *
+     * @return map from a term to the origins of the term and all its subterms
+     */
+    public final Map<JTerm, Set<Origin>> getSubtermOriginsCache() {
+        return subtermOriginsCache;
     }
 
     public final LRUCache<JTerm, TermInfo> getBetaCandidates() {

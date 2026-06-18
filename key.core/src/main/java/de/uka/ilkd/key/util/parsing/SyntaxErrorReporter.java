@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.java.StringUtil;
@@ -63,6 +64,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         if (tok == null) {
             throw new IllegalArgumentException(
                 "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
+        }
+        // Replace ANTLR's terse default messages (e.g. "mismatched input ';' expecting ...") with a
+        // concise, human-readable description that names the expected token(s) and what was found.
+        if (e instanceof InputMismatchException) {
+            msg = ExceptionTools.describeSyntaxError(parser.getVocabulary(), tok,
+                e.getExpectedTokens());
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
             MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);

@@ -89,7 +89,7 @@ public class TestTacletBuild {
             JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
         JTerm t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
-        sb.setIfSequent(seq);
+        sb.setAssumesSequent(seq);
         sb.setFind(t2);
         try {
             sb.getTaclet();
@@ -112,7 +112,7 @@ public class TestTacletBuild {
                 .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t2))
                         .prepend(new SequentFormula(t1)));
         SuccTacletBuilder sb = new SuccTacletBuilder();
-        sb.setIfSequent(seq);
+        sb.setAssumesSequent(seq);
         sb.setFind(A);
         try {
             sb.getTaclet();

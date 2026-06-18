@@ -9,15 +9,18 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The JavaDL theory class provides access to function symvols, sorts that are part of the core
@@ -27,16 +30,16 @@ import org.key_project.util.ExtList;
 public class JavaDLTheory extends LDT {
 
     /**
-     * Name of {@link #getExactInstanceofSymbol(Sort,TermServices)}.
+     * Name of {@link #getExactInstanceofSymbol(Services)}.
      */
     public static final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
     /**
-     * Name of {@link #getCastSymbol(Sort,TermServices)}.
+     * Name of {@link #getCastSymbol(Sort,Services)}.
      */
     public static final Name CAST_NAME = new Name("cast");
 
     /**
-     * Name of {@link #getInstanceofSymbol(Sort,TermServices)}.
+     * Name of {@link #getInstanceofSymbol(Sort,Services)}.
      */
     public static final Name INSTANCE_NAME = new Name("instance");
 
@@ -98,6 +101,10 @@ public class JavaDLTheory extends LDT {
      * }
      */
 
+    public final ParametricFunctionDecl getCastSymbol(Services services) {
+        return services.getNamespaces().parametricFunctions().lookup(CAST_NAME);
+    }
+
     /**
      * retrieves the cast function for the given sort
      *
@@ -105,15 +112,18 @@ public class JavaDLTheory extends LDT {
      * @param services the TermServices for lookup
      * @return the found cast function
      */
-    public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
-        SortDependingFunction castFunction =
-            SortDependingFunction.getFirstInstance(CAST_NAME, services);
+    public final ParametricFunctionInstance getCastSymbol(Sort sort, Services services) {
+        ParametricFunctionDecl castFunction =
+            services.getNamespaces().parametricFunctions().lookup(CAST_NAME);
         if (castFunction == null) {
             throw new IllegalStateException("No 'cast' function found for any type.");
         }
-        SortDependingFunction result = castFunction.getInstanceFor(sort, services);
-        assert result.getSortDependingOn() == sort && result.sort() == sort;
-        return result;
+        return ParametricFunctionInstance.get(castFunction,
+            ImmutableList.of(new GenericArgument(sort)), services);
+    }
+
+    public final ParametricFunctionDecl getInstanceofSymbol(Services services) {
+        return services.getNamespaces().parametricFunctions().lookup(INSTANCE_NAME);
     }
 
     /**
@@ -123,14 +133,19 @@ public class JavaDLTheory extends LDT {
      * @param services the TermServices for lookup
      * @return the found instanceof function
      */
-    public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(INSTANCE_NAME, services)
-                .getInstanceFor(sort, services);
-        assert result.getSortDependingOn() == sort;
-        return result;
+    public final ParametricFunctionInstance getInstanceofSymbol(Sort sort, Services services) {
+        ParametricFunctionDecl instanceOfFunction =
+            services.getNamespaces().parametricFunctions().lookup(INSTANCE_NAME);
+        if (instanceOfFunction == null) {
+            throw new IllegalStateException("No 'instance' function found for any type.");
+        }
+        return ParametricFunctionInstance.get(instanceOfFunction,
+            ImmutableList.of(new GenericArgument(sort)), services);
     }
 
+    public final ParametricFunctionDecl getExactInstanceofSymbol(Services services) {
+        return services.getNamespaces().parametricFunctions().lookup(EXACT_INSTANCE_NAME);
+    }
 
     /**
      * retrieves the exactInstance function for the given sort
@@ -139,12 +154,14 @@ public class JavaDLTheory extends LDT {
      * @param services the TermServices for lookup
      * @return the found exactInstance function
      */
-    public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(EXACT_INSTANCE_NAME, services)
-                .getInstanceFor(sort, services);
-        assert result.getSortDependingOn() == sort;
-        return result;
+    public final ParametricFunctionInstance getExactInstanceofSymbol(Sort sort, Services services) {
+        ParametricFunctionDecl exactInstanceFn =
+            services.getNamespaces().parametricFunctions().lookup(EXACT_INSTANCE_NAME);
+        if (exactInstanceFn == null) {
+            throw new IllegalStateException("No 'exactInstance' function found for any type.");
+        }
+        return ParametricFunctionInstance.get(exactInstanceFn,
+            ImmutableList.of(new GenericArgument(sort)), services);
     }
 
 

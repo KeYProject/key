@@ -19,17 +19,17 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.nparser.KeYLexer;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
-import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
-import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser.DoubleLiteralContext;
+import de.uka.ilkd.key.nparser.JavaKeYParser.FloatLiteralContext;
+import de.uka.ilkd.key.nparser.JavaKeYParser.RealLiteralContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -176,11 +176,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private static boolean isSelectTerm(JTerm term) {
-        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+        return term.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().toString().equals("select") && term.arity() == 3;
     }
 
     @Override
-    public JTerm visitParallel_term(KeYParser.Parallel_termContext ctx) {
+    public JTerm visitParallel_term(JavaKeYParser.Parallel_termContext ctx) {
         List<JTerm> t = mapOf(ctx.elementary_update_term());
         JTerm a = t.get(0);
         for (int i = 1; i < t.size(); i++) {
@@ -190,12 +191,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitTermEOF(KeYParser.TermEOFContext ctx) {
+    public JTerm visitTermEOF(JavaKeYParser.TermEOFContext ctx) {
         return accept(ctx.term());
     }
 
     @Override
-    public JTerm visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
+    public JTerm visitElementary_update_term(JavaKeYParser.Elementary_update_termContext ctx) {
         JTerm a = accept(ctx.a);
         JTerm b = accept(ctx.b);
         if (b != null) {
@@ -205,14 +206,14 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
+    public JTerm visitEquivalence_term(JavaKeYParser.Equivalence_termContext ctx) {
         JTerm a = accept(ctx.a);
         if (ctx.b.isEmpty()) {
             return a;
         }
 
         JTerm cur = a;
-        for (KeYParser.Implication_termContext context : ctx.b) {
+        for (JavaKeYParser.Implication_termContext context : ctx.b) {
             JTerm b = accept(context);
             cur = binaryTerm(ctx, Equality.EQV, cur, b);
 
@@ -222,34 +223,44 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private JTerm binaryTerm(ParserRuleContext ctx, Operator operator,
             JTerm left, JTerm right) {
+        return binaryTerm(ctx, ctx, operator, left, right);
+    }
+
+    /**
+     * Like {@link #binaryTerm(ParserRuleContext, Operator, JTerm, JTerm)}, but reports a failure
+     * (e.g. a sort mismatch) at {@code errorCtx} - typically the operand that does not fit - while
+     * still attaching the origin of the whole expression {@code ctx}.
+     */
+    private JTerm binaryTerm(ParserRuleContext ctx, ParserRuleContext errorCtx, Operator operator,
+            JTerm left, JTerm right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }
-        return capsulateTf(ctx,
+        return capsulateTf(ctx, errorCtx,
             () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx,
                 services));
     }
 
     @Override
-    public JTerm visitImplication_term(KeYParser.Implication_termContext ctx) {
+    public JTerm visitImplication_term(JavaKeYParser.Implication_termContext ctx) {
         JTerm termL = accept(ctx.a);
         JTerm termR = accept(ctx.b);
         return binaryTerm(ctx, Junctor.IMP, termL, termR);
     }
 
     @Override
-    public JTerm visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
+    public JTerm visitDisjunction_term(JavaKeYParser.Disjunction_termContext ctx) {
         JTerm t = accept(ctx.a);
-        for (KeYParser.Conjunction_termContext c : ctx.b) {
+        for (JavaKeYParser.Conjunction_termContext c : ctx.b) {
             t = binaryTerm(ctx, Junctor.OR, t, accept(c));
         }
         return t;
     }
 
     @Override
-    public JTerm visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
+    public JTerm visitConjunction_term(JavaKeYParser.Conjunction_termContext ctx) {
         JTerm t = accept(ctx.a);
-        for (KeYParser.Term60Context c : ctx.b) {
+        for (JavaKeYParser.Term60Context c : ctx.b) {
             t = binaryTerm(ctx, Junctor.AND, t, accept(c));
         }
         return t;
@@ -258,14 +269,14 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
+    public Object visitUnary_minus_term(JavaKeYParser.Unary_minus_termContext ctx) {
         JTerm result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {
             Function Z = functions().lookup("Z");
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
-                // This mimics the old KeyParser behaviour. Unknown if necessary.
+                // This mimics the old JavaKeYParser behaviour. Unknown if necessary.
                 final Function neglit = functions().lookup("neglit");
                 final JTerm num = result.sub(0);
                 return capsulateTf(ctx,
@@ -293,7 +304,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitNegation_term(KeYParser.Negation_termContext ctx) {
+    public JTerm visitNegation_term(JavaKeYParser.Negation_termContext ctx) {
         JTerm termL = accept(ctx.sub);
         if (ctx.NOT() != null) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
@@ -303,7 +314,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitEquality_term(KeYParser.Equality_termContext ctx) {
+    public JTerm visitEquality_term(JavaKeYParser.Equality_termContext ctx) {
         JTerm termL = accept(ctx.a);
         JTerm termR = accept(ctx.b);
         JTerm eq = binaryTerm(ctx, Equality.EQUALS, termL, termR);
@@ -314,7 +325,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitComparison_term(KeYParser.Comparison_termContext ctx) {
+    public Object visitComparison_term(JavaKeYParser.Comparison_termContext ctx) {
         JTerm termL = accept(ctx.a);
         JTerm termR = accept(ctx.b);
 
@@ -335,12 +346,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.GREATEREQUAL() != null) {
             op_name = "geq";
         }
-        return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
+        return binaryLDTSpecificTerm(ctx, ctx.b, op_name, termL, termR);
 
     }
 
     @Override
-    public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
+    public Object visitWeak_arith_term(JavaKeYParser.Weak_arith_termContext ctx) {
         JTerm termL = Objects.requireNonNull(accept(ctx.a));
         if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx, services);
@@ -351,21 +362,21 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             String opname = "";
             switch (ctx.op.get(i).getType()) {
-                case KeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
-                case KeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
-                case KeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
-                case KeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
-                case KeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
+                case JavaKeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
+                case JavaKeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
+                case JavaKeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
+                case JavaKeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
+                case JavaKeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
                 default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             JTerm cur = terms.get(i);
-            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
+            last = binaryLDTSpecificTerm(ctx, ctx.b.get(i), opname, last, cur);
         }
         return last;
     }
 
-    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, JTerm last,
-            JTerm cur) {
+    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, ParserRuleContext errorCtx,
+            String opname, JTerm last, JTerm cur) {
         Sort sort = last.sort();
         if (sort == null) {
             semanticError(ctx, "No sort for %s", last);
@@ -379,38 +390,41 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (op == null) {
             semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
         }
-        return binaryTerm(ctx, op, last, cur);
+        // point a sort mismatch at the operand (errorCtx), not the whole expression
+        return binaryTerm(ctx, errorCtx, op, last, cur);
     }
 
 
     @Override
-    public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
+    public Object visitStrong_arith_term_1(JavaKeYParser.Strong_arith_term_1Context ctx) {
         JTerm termL = accept(ctx.a);
         if (ctx.b.isEmpty()) {
             return updateOrigin(termL, ctx, services);
         }
         List<JTerm> terms = mapOf(ctx.b);
         JTerm last = termL;
-        for (JTerm cur : terms) {
-            last = binaryLDTSpecificTerm(ctx, IntegerLDT.MUL_STRING, last, cur);
+        for (int i = 0; i < terms.size(); i++) {
+            last = binaryLDTSpecificTerm(ctx, ctx.b.get(i), IntegerLDT.MUL_STRING, last,
+                terms.get(i));
         }
         return last;
     }
 
     @Override
-    public Object visitEmptyset(KeYParser.EmptysetContext ctx) {
+    public Object visitEmptyset(JavaKeYParser.EmptysetContext ctx) {
         var op = services.getTypeConverter().getLocSetLDT().getEmpty();
         return updateOrigin(getTermFactory().createTerm(op), ctx, services);
     }
 
     @Override
-    public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
+    public Object visitStrong_arith_term_2(JavaKeYParser.Strong_arith_term_2Context ctx) {
         if (ctx.b.isEmpty()) { // fast path
             return accept(ctx.a);
         }
 
         List<JTerm> termL = mapOf(ctx.b);
-        // List<String> opName = ctx.op.stream().map(it -> it.getType()== KeYLexer.PERCENT ? "mod" :
+        // List<String> opName = ctx.op.stream().map(it -> it.getType()== JavaKeYLexer.PERCENT ?
+        // "mod" :
         // "div").collect(Collectors.toList());
 
         JTerm term = accept(ctx.a);
@@ -429,31 +443,48 @@ public class ExpressionBuilder extends DefaultBuilder {
         assert ctx.op.size() == ctx.b.size();
 
         for (int i = 0; i < termL.size(); i++) {
-            var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
+            var opName = ctx.op.get(i).getType() == JavaKeYLexer.PERCENT ? "mod" : "div";
             Function op = ldt.getFunctionFor(opName, services);
             if (op == null) {
                 semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
                     sort);
             }
-            term = binaryTerm(ctx, op, term, termL.get(i));
+            term = binaryTerm(ctx, ctx.b.get(i), op, term, termL.get(i));
         }
         return term;
     }
 
     protected JTerm capsulateTf(ParserRuleContext ctx, Supplier<JTerm> termSupplier) {
+        return capsulateTf(ctx, ctx, termSupplier);
+    }
+
+    /**
+     * Builds a term and, on failure, raises a {@link BuildingException} that <em>describes</em> the
+     * whole term {@code ctx} but is <em>located</em> at {@code locationCtx} (e.g. the offending
+     * operand of a binary operation rather than the whole expression).
+     */
+    protected JTerm capsulateTf(ParserRuleContext ctx, ParserRuleContext locationCtx,
+            Supplier<JTerm> termSupplier) {
         try {
             return termSupplier.get();
         } catch (TermCreationException e) {
-            throw new BuildingException(ctx,
-                String.format("Could not build term on: %s", ctx.getText()), e);
+            // Surface the actual reason (usually an arity or sort/type mismatch) instead of the
+            // generic "Could not build term". The TermCreationException message lists the expected
+            // and actual argument sorts, including the sort hashes - these are kept on purpose:
+            // they let one distinguish two different sort objects that share the same name.
+            String reason = e.getMessage() == null ? "" : "\n" + e.getMessage();
+            String msg = String.format("Could not type-check term '%s'.%s", ctx.getText(), reason);
+            Token at = locationCtx != null ? locationCtx.start : (ctx != null ? ctx.start : null);
+            throw new BuildingException(at, null, msg, e);
         }
     }
 
     @Override
-    public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
+    public Object visitBracket_term(JavaKeYParser.Bracket_termContext ctx) {
         JTerm t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
-            KeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
+            JavaKeYParser.Brace_suffixContext brace_suffix =
+                ctx.bracket_suffix_heap(i).brace_suffix();
             ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
             if (heap != null) {
@@ -468,7 +499,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /*
      * @Override public String
-     * visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
+     * visitStaticAttributeOrQueryReference(JavaKeYParser.StaticAttributeOrQueryReferenceContext
+     * ctx) {
      * //TODO weigl: this rule is a total grammar blower. String attrReference = ctx.id.getText();
      * for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) { attrReference += "[]"; }
      *
@@ -482,7 +514,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     // }
 
     /*
-     * @Override public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext
+     * @Override public Term
+     * visitStatic_attribute_suffix(JavaKeYParser.Static_attribute_suffixContext
      * ctx) { Operator v = null; String attributeName =
      * accept(ctx.staticAttributeOrQueryReference()); String className; if
      * (attributeName.indexOf(':') != -1) { className = attributeName.substring(0,
@@ -548,19 +581,19 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Sequent visitSeq(KeYParser.SeqContext ctx) {
+    public Sequent visitSeq(JavaKeYParser.SeqContext ctx) {
         ImmutableList<SequentFormula> ant = accept(ctx.ant);
         ImmutableList<SequentFormula> suc = accept(ctx.suc);
         return JavaDLSequentKit.createSequent(ant, suc);
     }
 
     @Override
-    public Sequent visitSeqEOF(KeYParser.SeqEOFContext ctx) {
+    public Sequent visitSeqEOF(JavaKeYParser.SeqEOFContext ctx) {
         return accept(ctx.seq());
     }
 
     @Override
-    public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
+    public Object visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
         JTerm head = accept(ctx.head);
         Sequent s = accept(ctx.s);
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
@@ -585,7 +618,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public ImmutableList<SequentFormula> visitSemisequent(KeYParser.SemisequentContext ctx) {
+    public ImmutableList<SequentFormula> visitSemisequent(JavaKeYParser.SemisequentContext ctx) {
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
             ss = ImmutableSLList.nil();
@@ -618,16 +651,141 @@ public class ExpressionBuilder extends DefaultBuilder {
                 jr.readBlockWithProgramVariables(programVariables(), cleanJava, schemaVariables());
         } catch (Exception e) {
             try {
+                // Retry with an empty context: the first attempt may have failed only
+                // because the surrounding program variables were not needed/visible.
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
-            } catch (BuildingExceptions e1) {
-                throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e1);
+            } catch (Exception e1) {
+                // Both attempts failed. Report the failure from the first attempt
+                // (the one with the surrounding program variables in scope); it
+                // usually carries the most meaningful reason. Crucially, embed that
+                // reason into the message and attach a location so that the actual
+                // cause is no longer hidden behind a generic "Could not parse java"
+                // message (see ExceptionTools#getMessage). The inner exception
+                // reports a position relative to the Java block; map it back to the
+                // absolute position in the .key file so that the error points at the
+                // offending Java code rather than at the modality token.
+                Position pos = mapBlockPositionToFile(t, cleanJava, e);
+                // Report the underlying reason(s) directly, without the bundling exception's
+                // "Error occurred: <memory:/>:..." header noise.
+                String reason = ExceptionTools.getMessages(e).stream()
+                        .map(de.uka.ilkd.key.speclang.PositionedString::getText)
+                        .collect(Collectors.joining("\n"));
+                throw new BuildingException(t, pos,
+                    "Could not parse Java block '" + cleanJava + "':\n" + reason,
+                    e);
             }
         }
         return sjb;
     }
 
+    /**
+     * Maps a position reported relative to a Java block back to the absolute position in the
+     * surrounding .key file. The Java block is contained in a single modality token {@code t};
+     * the inner exception {@code inner} reports a position relative to the cleaned Java code.
+     *
+     * @param t the modality token containing the Java block
+     * @param cleanJava the Java code (without modality markers) as handed to the Java parser
+     * @param inner the exception thrown while parsing the Java block
+     * @return the absolute position in the .key file, or {@code null} if it cannot be determined
+     *         (in which case the caller falls back to the token position)
+     */
+    private static @Nullable Position mapBlockPositionToFile(Token t, String cleanJava,
+            Throwable inner) {
+        Position blockPos = blockRelativePosition(inner, cleanJava);
+        if (blockPos == null) {
+            return null;
+        }
+
+        String raw = t.getText();
+        int idx = raw.indexOf(cleanJava);
+        if (idx < 0) {
+            return null;
+        }
+        // Walk from the start of the token to the start of the Java code, tracking the position.
+        int line = t.getLine(); // 1-based
+        int col = t.getCharPositionInLine() + 1; // 1-based
+        for (int i = 0; i < idx; i++) {
+            if (raw.charAt(i) == '\n') {
+                line++;
+                col = 1;
+            } else {
+                col++;
+            }
+        }
+        // Add the block-relative position (1-based line/column inside cleanJava).
+        if (blockPos.line() == 1) {
+            return Position.newOneBased(line, col + (blockPos.column() - 1));
+        }
+        return Position.newOneBased(line + (blockPos.line() - 1), blockPos.column());
+    }
+
+    /**
+     * Determines the position of an error <em>relative to the Java block</em> {@code cleanJava}
+     * (1-based line/column). It first asks the exception for a location; if there is none (e.g. an
+     * unresolved-type error from the symbol solver, which carries no source range), it falls back
+     * to locating the offending identifier name in the block so the error can still point at it.
+     */
+    private static @Nullable Position blockRelativePosition(Throwable inner, String cleanJava) {
+        try {
+            var loc = ExceptionTools.getLocation(inner);
+            if (loc != null && !loc.getPosition().isNegative()) {
+                return loc.getPosition();
+            }
+        } catch (Exception ignore) {
+            // fall through to the symbol-name heuristic
+        }
+        String symbol = unresolvedSymbolName(inner);
+        if (symbol != null) {
+            int idx = indexOfIdentifier(cleanJava, symbol);
+            if (idx >= 0) {
+                int line = 1;
+                int col = 1;
+                for (int i = 0; i < idx; i++) {
+                    if (cleanJava.charAt(i) == '\n') {
+                        line++;
+                        col = 1;
+                    } else {
+                        col++;
+                    }
+                }
+                return Position.newOneBased(line, col);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts the offending name from an "Unsolved symbol : X" message, or null.
+     * <p>
+     * Version-sensitive: this matches the JavaParser symbol solver's message format. If that ever
+     * changes, the match simply fails and we return null, so the caller falls back to the modality
+     * token position - no functionality is lost.
+     */
+    private static @Nullable String unresolvedSymbolName(Throwable inner) {
+        var m = java.util.regex.Pattern.compile("Unsolved symbol\\s*:\\s*([A-Za-z_$][\\w$.]*)")
+                .matcher(ExceptionTools.getMessage(inner));
+        return m.find() ? m.group(1) : null;
+    }
+
+    /** Index of {@code name} in {@code s} as a whole identifier (not a substring), or -1. */
+    private static int indexOfIdentifier(String s, String name) {
+        int from = 0;
+        int i;
+        while ((i = s.indexOf(name, from)) >= 0) {
+            boolean leftOk = i == 0 || !Character.isJavaIdentifierPart(s.charAt(i - 1));
+            int after = i + name.length();
+            boolean rightOk =
+                after >= s.length() || !Character.isJavaIdentifierPart(s.charAt(after));
+            if (leftOk && rightOk) {
+                return i;
+            }
+            from = i + 1;
+        }
+        return -1;
+    }
+
     @Override
-    public Object visitMetaId(KeYParser.MetaIdContext ctx) {
+    public Object visitMetaId(JavaKeYParser.MetaIdContext ctx) {
         String id = visitSimple_ident(ctx.simple_ident());
         TermTransformer v = AbstractTermTransformer.name2metaop(id);
         if (v == null) {
@@ -637,7 +795,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitMetaTerm(KeYParser.MetaTermContext ctx) {
+    public JTerm visitMetaTerm(JavaKeYParser.MetaTermContext ctx) {
         Operator metaId = accept(ctx.metaId());
         List<JTerm> t = mapOf(ctx.term());
         return capsulateTf(ctx, () -> getTermFactory().createTerm(metaId, t));
@@ -732,7 +890,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * @Override public String visitAttrid(KeYParser.AttridContext ctx) { return ctx.getText(); }
+     * @Override public String visitAttrid(JavaKeYParser.AttridContext ctx) { return ctx.getText();
+     * }
      */
 
     private String unescapeString(String string) {
@@ -759,13 +918,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitString_literal(KeYParser.String_literalContext ctx) {
+    public JTerm visitString_literal(JavaKeYParser.String_literalContext ctx) {
         String s = unescapeString(ctx.id.getText());
         return getServices().getTypeConverter().convertToLogicElement(new StringLiteral(s));
     }
 
     @Override
-    public Object visitCast_term(KeYParser.Cast_termContext ctx) {
+    public Object visitCast_term(JavaKeYParser.Cast_termContext ctx) {
         JTerm result = accept(ctx.sub);
         if (ctx.sortId() == null) {
             return result;
@@ -783,7 +942,7 @@ public class ExpressionBuilder extends DefaultBuilder {
            * }
            */
         assert s != null;
-        SortDependingFunction castSymbol =
+        ParametricFunctionInstance castSymbol =
             getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);
     }
@@ -794,7 +953,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * private Term createStaticAttributeOrMethod(JavaQuery jq, KeYParser.AccesstermContext ctx) {
+     * private Term createStaticAttributeOrMethod(JavaQuery jq, JavaKeYParser.AccesstermContext ctx)
+     * {
      * final var kjt = jq.kjt; String mn = jq.attributeNames; if (jq.maybeAttr != null) {
      * ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt); if (maybeAttr != null) { var
      * op = getAttributeInPrefixSort(kjt.getSort(), mn); return createAttributeTerm(null, op, ctx);
@@ -807,7 +967,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
 
     @Override
-    public Object visitBracket_access_heap_update(KeYParser.Bracket_access_heap_updateContext ctx) {
+    public Object visitBracket_access_heap_update(
+            JavaKeYParser.Bracket_access_heap_updateContext ctx) {
         JTerm heap = pop();
         JTerm target = accept(ctx.target);
         JTerm val = accept(ctx.val);
@@ -818,7 +979,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitBracket_access_heap_term(KeYParser.Bracket_access_heap_termContext ctx) {
+    public Object visitBracket_access_heap_term(JavaKeYParser.Bracket_access_heap_termContext ctx) {
         JTerm heap = pop();
 
         String id = accept(ctx.simple_ident());
@@ -839,7 +1000,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBracket_access_star(KeYParser.Bracket_access_starContext ctx) {
+    public Object visitBracket_access_star(JavaKeYParser.Bracket_access_starContext ctx) {
         JTerm reference = pop();
         JTerm rangeFrom = toZNotation("0", functions());
         JTerm lt = getServices().getTermBuilder().dotLength(reference);
@@ -851,7 +1012,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBracket_access_indexrange(KeYParser.Bracket_access_indexrangeContext ctx) {
+    public Object visitBracket_access_indexrange(
+            JavaKeYParser.Bracket_access_indexrangeContext ctx) {
         // | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET
         // #bracket_access_indexrange
         JTerm term = pop();
@@ -901,7 +1063,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBoolean_literal(KeYParser.Boolean_literalContext ctx) {
+    public Object visitBoolean_literal(JavaKeYParser.Boolean_literalContext ctx) {
         if (ctx.TRUE() != null) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.TRUE));
         } else {
@@ -910,7 +1072,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitPrimitive_labeled_term(KeYParser.Primitive_labeled_termContext ctx) {
+    public Object visitPrimitive_labeled_term(JavaKeYParser.Primitive_labeled_termContext ctx) {
         JTerm t = accept(ctx.primitive_term());
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
@@ -922,13 +1084,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public ImmutableArray<TermLabel> visitLabel(KeYParser.LabelContext ctx) {
+    public ImmutableArray<TermLabel> visitLabel(JavaKeYParser.LabelContext ctx) {
         List<TermLabel> labels = mapOf(ctx.single_label());
         return new ImmutableArray<>(labels);
     }
 
     @Override
-    public TermLabel visitSingle_label(KeYParser.Single_labelContext ctx) {
+    public TermLabel visitSingle_label(JavaKeYParser.Single_labelContext ctx) {
         String labelName = "";
         TermLabel left = null;
         TermLabel right = null;
@@ -958,7 +1120,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitAbbreviation(KeYParser.AbbreviationContext ctx) {
+    public Object visitAbbreviation(JavaKeYParser.AbbreviationContext ctx) {
         String sc = accept(ctx.name);
         JTerm a = abbrevMap.getTerm(sc);
         if (a == null) {
@@ -968,7 +1130,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitIfThenElseTerm(KeYParser.IfThenElseTermContext ctx) {
+    public JTerm visitIfThenElseTerm(JavaKeYParser.IfThenElseTermContext ctx) {
         JTerm condF = (JTerm) ctx.condF.accept(this);
         if (condF.sort() != JavaDLTheory.FORMULA) {
             semanticError(ctx, "Condition of an \\if-then-else term has to be a formula.");
@@ -981,7 +1143,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitIfExThenElseTerm(KeYParser.IfExThenElseTermContext ctx) {
+    public Object visitIfExThenElseTerm(JavaKeYParser.IfExThenElseTermContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
         List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
         JTerm condF = accept(ctx.condF);
@@ -999,7 +1161,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitQuantifierterm(KeYParser.QuantifiertermContext ctx) {
+    public JTerm visitQuantifierterm(JavaKeYParser.QuantifiertermContext ctx) {
         Operator op = null;
         Namespace<QuantifiableVariable> orig = variables();
         if (ctx.FORALL() != null) {
@@ -1017,20 +1179,20 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitLocset_term(KeYParser.Locset_termContext ctx) {
+    public JTerm visitLocset_term(JavaKeYParser.Locset_termContext ctx) {
         List<JTerm> terms = mapOf(ctx.location_term());
         return getServices().getTermBuilder().union(terms);
     }
 
     @Override
-    public Object visitLocation_term(KeYParser.Location_termContext ctx) {
+    public Object visitLocation_term(JavaKeYParser.Location_termContext ctx) {
         JTerm obj = accept(ctx.obj);
         JTerm field = accept(ctx.field);
         return getServices().getTermBuilder().singleton(obj, field);
     }
 
     @Override
-    public Object visitSubstitution_term(KeYParser.Substitution_termContext ctx) {
+    public Object visitSubstitution_term(JavaKeYParser.Substitution_termContext ctx) {
         SubstOp op = WarySubstOp.SUBST;
         Namespace<QuantifiableVariable> orig = variables();
         JAbstractSortedOperator v = accept(ctx.bv);
@@ -1055,7 +1217,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
+    public Object visitUpdate_term(JavaKeYParser.Update_termContext ctx) {
         JTerm t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
         if (ctx.u.isEmpty()) {
             return t;
@@ -1064,12 +1226,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
-    public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
+    public List<QuantifiableVariable> visitBound_variables(
+            JavaKeYParser.Bound_variablesContext ctx) {
         return mapOf(ctx.one_bound_variable());
     }
 
     @Override
-    public QuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
+    public QuantifiableVariable visitOne_bound_variable(
+            JavaKeYParser.One_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
         Sort sort = accept(ctx.sortId());
 
@@ -1102,7 +1266,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitModality_term(KeYParser.Modality_termContext ctx) {
+    public Object visitModality_term(JavaKeYParser.Modality_termContext ctx) {
         JTerm a1 = accept(ctx.sub);
         if (ctx.MODALITY() == null) {
             return a1;
@@ -1131,12 +1295,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public List<JTerm> visitArgument_list(KeYParser.Argument_listContext ctx) {
+    public List<JTerm> visitArgument_list(JavaKeYParser.Argument_listContext ctx) {
         return mapOf(ctx.term());
     }
 
     @Override
-    public Object visitChar_literal(KeYParser.Char_literalContext ctx) {
+    public Object visitChar_literal(JavaKeYParser.Char_literalContext ctx) {
         String s = ctx.CHAR_LITERAL().getText();
         int intVal = 0;
         if (s.length() == 3) {
@@ -1163,8 +1327,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * @return a Term or an operator, depending on the referenced object.
      */
     @Override
-    public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
-        Sort sortId = accept(ctx.sortId());
+    public Object visitFuncpred_name(JavaKeYParser.Funcpred_nameContext ctx) {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
@@ -1189,7 +1352,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1201,9 +1364,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+                null);
             if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
-                List<KeYParser.Simple_identContext> otherParts =
+                List<JavaKeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
                 JTerm tv = getServices().getTermFactory().createTerm(v);
                 String memberName = otherParts.get(0).getText();
@@ -1223,7 +1386,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return op;
     }
 
-    private JTerm visitAccesstermAsJava(KeYParser.AccesstermContext ctx) {
+    private JTerm visitAccesstermAsJava(JavaKeYParser.AccesstermContext ctx) {
         String firstName = accept(ctx.firstName);
         if (isPackage(firstName) || isClass(firstName)) {
             // consume suffix as long as it is part of a java class or package
@@ -1236,7 +1399,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             // region split up package and class name
             while (startWithPackage
                     && ctx.attribute(
-                        currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
+                        currentSuffix) instanceof JavaKeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java package allowed
                 }
@@ -1250,7 +1413,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             }
 
-            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
+            while (ctx
+                    .attribute(currentSuffix) instanceof JavaKeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java Class name allowed
                 }
@@ -1274,10 +1438,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             JTerm current = null;
             for (int i = currentSuffix; i < ctx.attribute().size(); i++) {
-                KeYParser.AttributeContext attrib = ctx.attribute(i);
+                JavaKeYParser.AttributeContext attrib = ctx.attribute(i);
                 boolean isLast = i == ctx.attribute().size() - 1;
 
-                if (attrib instanceof KeYParser.Attribute_simpleContext simpleContext) {
+                if (attrib instanceof JavaKeYParser.Attribute_simpleContext simpleContext) {
                     boolean isCall = simpleContext.call() != null;
                     ParserRuleContext heap = simpleContext.heap; // TODO?
                     String attributeName = accept(simpleContext.id);
@@ -1298,7 +1462,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         addWarning("");
                         return current;
                     }
-                } else if (attrib instanceof KeYParser.Attribute_complexContext attrid) {
+                } else if (attrib instanceof JavaKeYParser.Attribute_complexContext attrid) {
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
                     JTerm[] args = visitArguments(attrid.call().argument_list());
@@ -1316,7 +1480,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         }
                     }
                     return current;
-                } else if (attrib instanceof KeYParser.Attribute_starContext) {
+                } else if (attrib instanceof JavaKeYParser.Attribute_starContext) {
                     // TODO
                 }
             }
@@ -1326,7 +1490,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitTermParen(KeYParser.TermParenContext ctx) {
+    public Object visitTermParen(JavaKeYParser.TermParenContext ctx) {
         JTerm base = accept(ctx.term());
         if (ctx.attribute().isEmpty()) {
             return base;
@@ -1334,18 +1498,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         return handleAttributes(base, ctx.attribute());
     }
 
-    private JTerm handleAttributes(JTerm current, List<KeYParser.AttributeContext> attribute) {
+    private JTerm handleAttributes(JTerm current, List<JavaKeYParser.AttributeContext> attribute) {
         for (int i = 0; i < attribute.size(); i++) {
-            KeYParser.AttributeContext ctxSuffix = attribute.get(i);
+            JavaKeYParser.AttributeContext ctxSuffix = attribute.get(i);
             boolean isLast = i == attribute.size() - 1;
 
-            if (ctxSuffix instanceof KeYParser.Attribute_starContext) {
+            if (ctxSuffix instanceof JavaKeYParser.Attribute_starContext) {
                 current = services.getTermBuilder().allFields(current);
                 if (!isLast) {
                     addWarning("");
                 }
                 return current;
-            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext attrid) {
+            } else if (ctxSuffix instanceof JavaKeYParser.Attribute_simpleContext attrid) {
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
@@ -1379,7 +1543,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                     }
                 }
-            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext attrid) {
+            } else if (ctxSuffix instanceof JavaKeYParser.Attribute_complexContext attrid) {
                 JTerm heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
@@ -1428,7 +1592,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public JTerm visitAccessterm(KeYParser.AccesstermContext ctx) {
+    public JTerm visitAccessterm(JavaKeYParser.AccesstermContext ctx) {
         JTerm t = visitAccesstermAsJava(ctx);
         if (t != null) {
             return t;
@@ -1440,7 +1604,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         ImmutableArray<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;
-        KeYParser.Formal_sort_argsContext genericArgsCtxt = null;
+        JavaKeYParser.Formal_sort_argsContext genericArgsCtxt = null;
         if (ctx.formal_sort_args() != null) {
             genericArgsCtxt = ctx.formal_sort_args();
         }
@@ -1463,8 +1627,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
+            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
+                null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1472,8 +1636,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
+            if (ctx.sortId() != null) {
+                firstName = ctx.sortId().getText() + "::" + firstName;
+            }
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, genericArgsCtxt);
+                genericArgsCtxt);
         }
 
         JTerm current;
@@ -1516,7 +1683,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    private @Nullable JTerm[] visitArguments(KeYParser.@Nullable Argument_listContext call) {
+    private @Nullable JTerm[] visitArguments(JavaKeYParser.@Nullable Argument_listContext call) {
         List<JTerm> arguments = accept(call);
         return arguments == null ? null : arguments.toArray(new JTerm[0]);
     }
@@ -1545,7 +1712,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitInteger(KeYParser.IntegerContext ctx) {
+    public Object visitInteger(JavaKeYParser.IntegerContext ctx) {
         return toZNotation(ctx.getText());
     }
 
@@ -1823,7 +1990,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitProofScript(KeYParser.ProofScriptContext ctx) {
+    public Object visitProofScript(JavaKeYParser.ProofScriptContext ctx) {
         return null;// Do not traverse into proof scripts.
     }
 

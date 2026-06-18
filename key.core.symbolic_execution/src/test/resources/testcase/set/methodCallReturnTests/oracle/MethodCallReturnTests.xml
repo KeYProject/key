@@ -13,7 +13,7 @@
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="value" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="select<[int]>(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -27,7 +27,7 @@
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="value" isArrayIndex="false">
-                     <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="value {true}" typeString="int" valueString="select<[int]>(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -41,7 +41,7 @@
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" isArrayIndex="false">
-                        <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="value {true}" typeString="int" valueString="select<[int]>(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -698,7 +698,7 @@
                                                                                                                               <callStateVariable name="self" isArrayIndex="false">
                                                                                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                                     <variable name="value" isArrayIndex="false">
-                                                                                                                                       <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                       <value name="value {true}" typeString="int" valueString="select<[int]>(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                                        </value>
                                                                                                                                     </variable>
                                                                                                                                  </value>
@@ -897,7 +897,7 @@
                   <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="value" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="value {true}" typeString="int" valueString="select<[int]>(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
