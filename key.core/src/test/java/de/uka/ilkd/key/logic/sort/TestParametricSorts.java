@@ -73,7 +73,7 @@ class TestParametricSorts {
         Sort intSort = nss.sorts().lookup("int");
 
         var someConst = new ParametricFunctionDecl(new Name("someConst"),
-            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.COVARIANT)),
+            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.INVARIANT)),
             new ImmutableArray<>(), g1, null, false, true, false);
         nss.parametricFunctions().add(someConst);
 
@@ -84,7 +84,7 @@ class TestParametricSorts {
             ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
 
         var head = new ParametricFunctionDecl(new Name("head"),
-            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.COVARIANT)),
+            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.INVARIANT)),
             new ImmutableArray<>(listOfG1), g1, null, false, true, false);
         nss.parametricFunctions().add(head);
 
