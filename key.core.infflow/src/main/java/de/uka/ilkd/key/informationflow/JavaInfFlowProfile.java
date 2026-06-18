@@ -19,6 +19,13 @@ public class JavaInfFlowProfile extends JavaProfile {
     public static final String PROFILE_ID = "java-infflow";
 
     @Override
+    public boolean supportsParallelAutomode() {
+        // Information-flow proofs use side-proof machinery that is not thread-safe: keep
+        // single-core.
+        return false;
+    }
+
+    @Override
     public String ident() {
         return PROFILE_ID;
     }
