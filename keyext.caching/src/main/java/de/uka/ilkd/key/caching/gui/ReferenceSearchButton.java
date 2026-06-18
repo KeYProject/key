@@ -1,13 +1,14 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.caching.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import de.uka.ilkd.key.caching.ReferenceSearcher;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
 /**
  * Status line button to indicate whether cached goals are present.

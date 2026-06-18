@@ -1,13 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.caching.gui;
 
+import de.uka.ilkd.key.caching.gui.settings.CachingSettingsProvider;
+import de.uka.ilkd.key.caching.gui.settings.ProofCachingSettings;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
-import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;

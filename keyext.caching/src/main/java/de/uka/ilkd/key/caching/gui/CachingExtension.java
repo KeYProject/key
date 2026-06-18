@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.caching.gui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,6 +9,15 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
+import de.uka.ilkd.key.caching.ReferenceSearcher;
+import de.uka.ilkd.key.caching.gui.actions.CloseAllByReference;
+import de.uka.ilkd.key.caching.gui.actions.CloseByReference;
+import de.uka.ilkd.key.caching.gui.actions.CopyReferencedProof;
+import de.uka.ilkd.key.caching.gui.actions.GotoReferenceAction;
+import de.uka.ilkd.key.caching.gui.actions.RemoveCachingInformationAction;
+import de.uka.ilkd.key.caching.gui.settings.CachingSettingsProvider;
+import de.uka.ilkd.key.caching.gui.settings.ProofCachingSettings;
+import de.uka.ilkd.key.caching.gui.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -16,14 +25,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
-import de.uka.ilkd.key.gui.plugins.caching.actions.CloseAllByReference;
-import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
-import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
-import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
-import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
-import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
-import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
-import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
@@ -36,7 +37,6 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 

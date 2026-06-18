@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof.reference;
+package de.uka.ilkd.key.caching;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
