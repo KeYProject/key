@@ -15,6 +15,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -649,6 +650,48 @@ public final class Goal implements ProofGoal<Goal> {
      */
     @Override
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+        final PendingRuleApp pending = computeRuleApp(ruleApp);
+        if (pending == null) {
+            return null;
+        }
+        return commitRuleApp(pending);
+    }
+
+    /**
+     * The result of {@link #computeRuleApp(RuleApp)}: everything a rule application produced that
+     * has
+     * not yet been committed to the (shared) proof. Created on the worker thread, consumed by
+     * {@link #commitRuleApp(PendingRuleApp)}.
+     */
+    public static final class PendingRuleApp {
+        private final RuleApp ruleApp;
+        private final NodeChangeJournal journal;
+        private final Node originalNode;
+        private final ImmutableList<Goal> goalList;
+
+        private PendingRuleApp(RuleApp ruleApp, NodeChangeJournal journal, Node originalNode,
+                ImmutableList<Goal> goalList) {
+            this.ruleApp = ruleApp;
+            this.journal = journal;
+            this.originalNode = originalNode;
+            this.goalList = goalList;
+        }
+    }
+
+    /**
+     * Compute phase of a rule application: run the rule executor (term construction, node
+     * splitting)
+     * without touching shared proof state. Safe to run concurrently for distinct goals &mdash; it
+     * mutates only this goal's own node subtree, the atomic node counter, the thread-safe strategy
+     * caches, the worker-disjoint name allocator and a per-worker name recorder. The
+     * {@link #commitRuleApp(PendingRuleApp)} step then performs the shared mutation under the
+     * prover's commit lock. The plain {@link #apply(RuleApp)} runs the two back to back, so the
+     * single-threaded behaviour is unchanged.
+     *
+     * @param ruleApp the rule application to perform
+     * @return the pending application to be committed, or {@code null} if the rule aborted
+     */
+    public @Nullable PendingRuleApp computeRuleApp(final RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
@@ -656,10 +699,6 @@ public final class Goal implements ProofGoal<Goal> {
 
         final Node n = node;
 
-        /*
-         * wrap the services object into an overlay such that any addition to local symbols is
-         * caught.
-         */
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         ruleApp.checkApplicability();
@@ -679,21 +718,37 @@ public final class Goal implements ProofGoal<Goal> {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
 
-        proof.getServices().saveNameRecorder(n);
+        return new PendingRuleApp(ruleApp, journal, n, goalList);
+    }
+
+    /**
+     * Commit phase of a rule application: the shared-state mutation (proof-tree update,
+     * name-recorder
+     * stashing and the {@code ruleApplied} event). The parallel prover runs this under its commit
+     * lock; the order of operations is identical to the original monolithic {@code apply}.
+     *
+     * @param pending the result of {@link #computeRuleApp(RuleApp)}
+     * @return the new goals
+     */
+    public ImmutableList<Goal> commitRuleApp(final PendingRuleApp pending) {
+        final Proof proof = proof();
+        final ImmutableList<Goal> goalList = pending.goalList;
+
+        proof.getServices().saveNameRecorder(pending.originalNode);
 
         if (goalList.isEmpty()) {
             proof.closeGoal(this);
         } else {
             proof.replace(this, goalList);
-            if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
-                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
+            if (pending.ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
+                    || pending.ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }
         }
 
         adaptNamespacesNewGoals(goalList);
-        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
+        final RuleAppInfo ruleAppInfo = pending.journal.getRuleAppInfo(pending.ruleApp);
         proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
     }
@@ -713,6 +768,25 @@ public final class Goal implements ProofGoal<Goal> {
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
         Collection<Function> newFunctions = localNamespaces.functions().elements();
+
+        if (ParallelProver.isMultiThreadedRunActive()) {
+            // Multithreaded run: do NOT flush new symbols into the shared proof namespace, so it
+            // stays immutable and concurrent matching can read it lock-free. The symbols live in
+            // node-local storage (which accumulates down the branch, see Node), and each goal's
+            // local namespaces are rebuilt from the immutable shared base plus that node-local
+            // storage -- exactly the reconstruction resetLocalSymbols already performs on pruning.
+            // No global reconciliation is needed afterwards: single-threaded proving also keeps
+            // these symbols in the local namespace layers (the flush targets a local copy, not the
+            // global Services namespace), so deferral leaves the global namespace identical. Fresh
+            // names are kept globally unique by ParallelNameAllocator, so no flush is needed for
+            // uniqueness either.
+            for (Goal goal : goalList) {
+                goal.node().addLocalProgVars(newProgVars);
+                goal.node().addLocalFunctions(newFunctions);
+                goal.resetLocalSymbols();
+            }
+            return;
+        }
 
         localNamespaces.flushToParent();
 
