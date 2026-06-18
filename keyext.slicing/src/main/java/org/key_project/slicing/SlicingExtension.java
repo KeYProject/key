@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.GraphNode;
@@ -129,6 +130,15 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     private void createTrackerForProof(Proof newProof) {
+        // Proof slicing is a single-core-only feature. Its DependencyTracker is a per-rule listener
+        // that the parallel prover suspends for the duration of each run; it would therefore miss
+        // every rule the multi-core prover applies and end up inconsistent (walking the tree later
+        // throws "found formula that was not produced by any rule"). Do not attach it while the
+        // multi-core prover is enabled.
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .isParallelProverEnabled()) {
+            return;
+        }
         trackers.computeIfAbsent(newProof, proof -> {
             if (proof == null) {
                 return null;

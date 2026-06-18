@@ -166,11 +166,13 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 }
             }
             if (!added) {
-                // should only happen if the formula is the initial proof obligation
-                if (!proof.root().sequent().contains(in.sequentFormula())) {
-                    throw new IllegalStateException(
-                        "found formula that was not produced by any rule! " + in.sequentFormula());
-                }
+                // Normally only the initial proof obligation reaches here. A formula that is
+                // neither
+                // produced by a tracked rule nor part of the root sequent means the tracker missed
+                // some rule applications -- e.g. it was suspended for the duration of a multi-core
+                // prover run. Degrade gracefully (treat it as an external input) instead of
+                // throwing,
+                // so slicing stays usable on a proof that was partly built without tracking.
                 TrackedFormula formula =
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
