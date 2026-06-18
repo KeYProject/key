@@ -242,11 +242,17 @@ public interface ProofMacro {
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            // assert size == numberSteps;
             String suffix = getMessageSuffix();
+            // info.size() <= 0 means the inner prover reports an unknown workload: the
+            // parallel prover commits concurrently and emits no per-step progress. Propagate
+            // it so the bar goes indeterminate ("busy") instead of a determinate one frozen
+            // at 0%. A positive inner size keeps the normal determinate bar (single-core).
+            int size = info.size() <= 0 ? 0 : numberGoals * numberSteps;
             super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, info.message() + suffix,
-                numberGoals * numberSteps));
-            super.taskProgress(completedGoals * numberSteps);
+                size));
+            if (size > 0) {
+                super.taskProgress(completedGoals * numberSteps);
+            }
         }
 
         protected String getMessageSuffix() {

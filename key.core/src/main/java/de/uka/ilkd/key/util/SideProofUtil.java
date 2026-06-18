@@ -123,6 +123,10 @@ public final class SideProofUtil {
         // Make sure that valid parameters are given
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);
+        // Side proofs run under a tight step/timeout budget; pin them to the single-threaded
+        // prover so their pass/fail outcome (and remaining open goals for term simplification)
+        // is deterministic regardless of the worker schedule.
+        starter.setAllowParallel(false);
         // Configure ProofStarter
         // TODO: Avoid proof environment use only InitConfig
         starter.init(sequentToProve, sideProofEnvironment, proofName);
