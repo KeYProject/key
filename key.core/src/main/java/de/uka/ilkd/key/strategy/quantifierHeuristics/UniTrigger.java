@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -27,8 +27,16 @@ class UniTrigger implements Trigger {
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
 
-    private final LRUCache<Term, ImmutableSet<Substitution>> matchResults =
-        new LRUCache<>(1000);
+    // A TriggersSet is cached per proof (ServiceCaches.triggerSetCache) and thus shared across the
+    // parallel-prover workers, so this match-result cache is hit concurrently on the cost path. The
+    // exact ConcurrentLruCache is used (not the striped one): the cached substitutions are
+    // expensive
+    // to recompute, so the better hit rate of exact LRU eviction outweighs the trivial contention
+    // on
+    // get/put. The get-then-put below stays non-atomic on purpose (the expensive matching runs
+    // outside the lock); at worst two workers redundantly compute the same (pure) result.
+    private final ConcurrentLruCache<Term, ImmutableSet<Substitution>> matchResults =
+        new ConcurrentLruCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> uqvs, boolean isUnify,
             boolean isElementOfMultitrigger, TriggersSet triggerSetThisBelongsTo) {
