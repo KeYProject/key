@@ -1,0 +1,64 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.ui.gui.actions;
+
+import java.awt.event.ActionEvent;
+
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.gui.HeatmapOptionsDialog;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.fonticons.IconFactory;
+
+/**
+ * Action for invoking the heatmap options dialog.
+ *
+ * @author jschiffl
+ */
+public class HeatmapSettingsAction extends MainWindowAction {
+    private static final long serialVersionUID = -6165100588113899099L;
+
+    private HeatmapOptionsDialog dialog;
+
+    /**
+     * constructor
+     *
+     * @param mainWindow the main window of the options dialog
+     */
+    public HeatmapSettingsAction(MainWindow mainWindow) {
+        super(mainWindow);
+        setName("Heatmap Options");
+        setMenuPath("View.Heatmap");
+        setEnabled(getMediator().getSelectedProof() != null);
+        setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
+
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
+                final Proof proof = getMediator().getSelectedProof();
+                setEnabled(proof != null);
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                selectedNodeChanged(null);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        getDialog().setVisible(true);
+    }
+
+    private HeatmapOptionsDialog getDialog() {
+        if (dialog == null) {
+            dialog = new HeatmapOptionsDialog();
+        }
+        return dialog;
+    }
+}

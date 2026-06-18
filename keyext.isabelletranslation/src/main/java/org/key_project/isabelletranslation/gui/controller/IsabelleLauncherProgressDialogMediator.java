@@ -11,10 +11,10 @@ import java.util.*;
 import java.util.Timer;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.colors.ColorSettings;
 
 import org.key_project.isabelletranslation.automation.IsabelleLauncher;
 import org.key_project.isabelletranslation.automation.IsabelleLauncherListener;

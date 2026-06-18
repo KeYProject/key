@@ -6,9 +6,9 @@ package de.uka.ilkd.key.caching.gui.toolbar;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.ui.gui.fonticons.IconFactory;
 
 /**
  * Action to enable/disable Proof Caching.

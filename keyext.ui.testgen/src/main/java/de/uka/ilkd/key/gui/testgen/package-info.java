@@ -1,7 +1,7 @@
 /**
  * This package contains the graphical user interface of the test generation backend.
  *
- * It uses the {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension} api.
+ * It uses the {@link de.uka.ilkd.key.ui.gui.extension.api.KeYGuiExtension} api.
  *
  * @author Alexander Weigl
  * @author Mihai Herda

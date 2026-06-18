@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui;
 import java.nio.file.Paths;
 import java.util.*;
 
+import de.uka.ilkd.key.ui.gui.ShortUniqueFileNames;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

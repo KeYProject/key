@@ -5,9 +5,9 @@ package org.key_project.slicing.ui;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
 
 /**
  * Context menu action to select the proof step that created a formula.

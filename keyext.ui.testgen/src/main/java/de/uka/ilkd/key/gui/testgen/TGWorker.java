@@ -7,9 +7,6 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -19,6 +16,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.MainWindow;
 
 import org.key_project.prover.sequent.Sequent;
 

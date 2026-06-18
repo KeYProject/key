@@ -5,10 +5,10 @@ package de.uka.ilkd.key.caching.gui.settings;
 
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.ui.gui.settings.SettingsProvider;
 
 import net.miginfocom.layout.CC;
 

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.tacletmatch;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.ui.gui.tacletmatch.AssumesInput;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 

@@ -14,11 +14,11 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.settings.InvalidSettingsInputException;
+import de.uka.ilkd.key.ui.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.ui.gui.settings.SettingsProvider;
 
 /**
  * {@link SettingsProvider} for Isabelle translation extension

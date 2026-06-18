@@ -10,7 +10,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
-import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.ui.gui.configuration.Config;
 
 import org.key_project.util.java.StringUtil;
 
@@ -21,7 +21,7 @@ import org.key_project.util.java.StringUtil;
  * solver - the translation of the taclets - the messages that were sent between KeY and the
  * external solvers.
  * <p>
- * Adaptation of {@link de.uka.ilkd.key.gui.smt.InformationWindow} for Isabelle solvers
+ * Adaptation of {@link de.uka.ilkd.key.ui.gui.smt.InformationWindow} for Isabelle solvers
  */
 public class InformationWindow extends JDialog {
     public record Information(String title, String content, String solver) {

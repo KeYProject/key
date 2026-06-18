@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.proofdiff;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.ui.gui.proofdiff.ProofDifference;
+
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.util.Levensthein.calculate;

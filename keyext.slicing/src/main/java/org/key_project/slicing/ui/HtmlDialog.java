@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.MainWindow;
 
 /**
  * Dialog that displays an HTML document.

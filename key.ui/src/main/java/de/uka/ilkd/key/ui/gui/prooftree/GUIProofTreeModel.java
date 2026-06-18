@@ -1,0 +1,564 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.ui.gui.prooftree;
+
+import java.util.*;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.ui.gui.prooftree.ProofTreeViewFilter.NodeFilter;
+
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.util.collection.ImmutableList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * An implementation of TreeModel that can be displayed using the JTree class framework and reflects
+ * the state of a {@link de.uka.ilkd.key.proof.Proof} object.
+ *
+ * <p>
+ * The tree structure of the proof is transformed, so that nodes following each other on a long
+ * branch are represented as kin, while new subtrees are displayed for branching points.
+ *
+ * <p>
+ * There are thus two kinds of node in this TreeModel,
+ * {@link GUIProofTreeNode}s, representing nodes of the displayed
+ * proof, and {@link GUIBranchNode}s representing branching points.
+ * (There is also one at the root.)
+ */
+
+public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
+
+    private static final long serialVersionUID = 4253914848471158358L;
+    private final Proof proof;
+    private final ProofTreeListener proofTreeListener;
+    private NodeFilter activeNodeFilter = null;
+
+    private final EventListenerList listenerList = new EventListenerList();
+
+    private boolean attentive = true;
+
+    private boolean batchGoalStateChange = false;
+    private boolean linearizedMode = false;
+
+    /**
+     * construct a GUIProofTreeModel that mirrors the given Proof.
+     */
+    public GUIProofTreeModel(Proof p) {
+        if (p == null) {
+            throw new IllegalArgumentException("null proof in " + "GUIProofTreeModel().");
+        }
+        this.proof = p;
+        proofTreeListener = new ProofTreeListener();
+
+        // set initial active node filter
+        for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
+            if (f instanceof NodeFilter && f.isActive()) {
+                activeNodeFilter = (NodeFilter) f;
+            }
+        }
+
+        GoalListener goalListener = new GoalListener() {
+
+            @Override
+            public void sequentChanged(Goal source, SequentChangeInfo sci) {}
+
+            @Override
+            public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {}
+
+            @Override
+            public void automaticStateChanged(Goal source, boolean oldAutomatic,
+                    boolean newAutomatic) {
+                if (!batchGoalStateChange
+                        && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
+                    updateTree((GUIAbstractTreeNode) null);
+                }
+            }
+        };
+
+        proof.openGoals().forEach(g -> g.addGoalListener(goalListener));
+    }
+
+    class ProofTreeListener extends ProofTreeAdapter {
+
+        private Node pruningInProcess;
+
+        @Override
+        public void proofStructureChanged(ProofTreeEvent e) {
+            if (pruningInProcess != null) {
+                return;
+            }
+            Node n = e.getNode();
+            // we assume that there already is a "node" event for every other
+            // type of event
+            if (n != null) {
+                updateTree(getProofTreeNode(n));
+                return;
+            }
+
+            Goal g = e.getGoal();
+            if (g != null) {
+                updateTree(getProofTreeNode(g.node()));
+            }
+
+        }
+
+        @Override
+        public void proofIsBeingPruned(ProofTreeEvent e) {
+            pruningInProcess = e.getNode();
+        }
+
+        /**
+         * The proof tree under the node mentioned in the ProofTreeEvent is in pruning phase. The
+         * subtree of node will be removed after this call but at this point the subtree can still
+         * be traversed (e.g. in order to free the nodes in caches). The method proofPruned is
+         * called, when the nodes are disconnect from node.
+         */
+        @Override
+        public void proofPruned(ProofTreeEvent e) {
+            updateTree(getProofTreeNode(pruningInProcess));
+            pruningInProcess = null;
+        }
+
+        @Override
+        public void proofGoalRemoved(ProofTreeEvent e) {
+            if (pruningInProcess != null) {
+                return;
+            }
+            if (globalFilterActive()) {
+                updateTree((GUIAbstractTreeNode) null);
+            } else {
+                proofStructureChanged(e);
+            }
+        }
+
+    }
+
+    /**
+     * This can be used to pause tree updates when many goals get their state changed at once. The
+     * tree is updated automatically after this is set to false.
+     */
+    public synchronized void setBatchGoalStateChange(boolean value,
+            Collection<Node> nodesToUpdate) {
+        if (!value && batchGoalStateChange) {
+            if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
+                updateTree((GUIAbstractTreeNode) null);
+            } else {
+                for (Node n : nodesToUpdate) {
+                    updateTree(n);
+                }
+            }
+        }
+        batchGoalStateChange = value;
+    }
+
+    /**
+     * Call this when the GUIProofTreeModel is no longer needed. GUIProofTreeModel registers a
+     * Listener with its associated Proof object. This method unregisters that listener, which is a
+     * good thing, as the proof maintains a reference to the listener, and the listener to the
+     * GUIProofTreeModel, so it would never become GCed unless you call this method.
+     *
+     * <p>
+     * Note that after calling <code>unregister</code>, this GUIProofTreeModel does not respond to
+     * changes in the proof tree anymore.
+     */
+    public void unregister() {
+        proof.removeProofTreeListener(proofTreeListener);
+    }
+
+    public void register() {
+        proof.addProofTreeListener(proofTreeListener);
+    }
+
+
+    /**
+     * Sets whether this object should respond to changes in the proof immediately.
+     */
+    public synchronized void setAttentive(boolean b) {
+        LOGGER.debug("setAttentive: {}", b);
+        if (b != attentive && !proof.isDisposed()) {
+            if (b) {
+                proof.addProofTreeListener(proofTreeListener);
+                // updateTree(null);
+                if (globalFilterActive()) {
+                    updateTree((GUIAbstractTreeNode) null);
+                }
+            } else {
+                proof.removeProofTreeListener(proofTreeListener);
+            }
+            attentive = b;
+        }
+    }
+
+    /**
+     * returns true if the model responds to changes in the proof immediately
+     */
+    public boolean isAttentive() {
+        return attentive;
+    }
+
+    /**
+     * Adds a listener for the TreeModelEvent posted after the tree changes. Such events are
+     * generated whenever the underlying Proof changes.
+     *
+     * @see #removeTreeModelListener
+     * @param l the listener to add
+     */
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+        listenerList.add(TreeModelListener.class, l);
+    }
+
+    /**
+     * Removes a listener previously added with <B>addTreeModelListener()</B>.
+     *
+     * @see #addTreeModelListener
+     * @param l the listener to remove
+     */
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
+        listenerList.remove(TreeModelListener.class, l);
+    }
+
+    /**
+     *
+     * @return whether {@link ProofTreeViewFilter#HIDE_CLOSED_SUBTREES} is active.
+     */
+    public boolean hideClosedSubtrees() {
+        return ProofTreeViewFilter.HIDE_CLOSED_SUBTREES.isActive();
+    }
+
+
+    /**
+     *
+     * @return whether {@link ProofTreeViewFilter#HIDE_INTERACTIVE_GOALS} is active.
+     */
+    public boolean hideInteractiveGoals() {
+        return ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive();
+    }
+
+    /**
+     *
+     * @return whether or nor one of {@link ProofTreeViewFilter#ALL_GLOBAL_FILTERS} is active.
+     */
+    public boolean globalFilterActive() {
+        return Arrays.stream(ProofTreeViewFilter.ALL_GLOBAL_FILTERS)
+                .anyMatch(ProofTreeViewFilter::isActive);
+    }
+
+    public boolean linearizedModeActive() {
+        return linearizedMode;
+    }
+
+    public void setLinearizedMode(boolean active) {
+        this.linearizedMode = active;
+    }
+
+    /**
+     * Set filters active or inactive and update tree if necessary.
+     * Always updates the filter and the tree.
+     *
+     * @param filter the filter
+     * @param active whether to activate the filter
+     */
+    public synchronized void setFilter(ProofTreeViewFilter filter, boolean active) {
+        if (filter == null) {
+            if (activeNodeFilter != null) {
+                activeNodeFilter.setActive(false);
+                activeNodeFilter = null;
+            }
+            updateTree((GUIAbstractTreeNode) null);
+            return;
+        }
+        if (!filter.global()) {
+            if (activeNodeFilter != null) {
+                activeNodeFilter.setActive(false);
+            }
+            activeNodeFilter = active ? (NodeFilter) filter : null;
+        }
+        filter.setActive(active);
+        updateTree((GUIAbstractTreeNode) null);
+    }
+
+    /**
+     * Returns the child of {@code parent} at index {@code index} in the parent's child array.
+     * {@code parent} must be a node previously obtained from this data source. This should not
+     * return null if {@code index} is a valid index for {@code parent} (that is
+     * {@code index >= 0 &&
+     *  index  < getChildCount(parent)}).
+     *
+     * @param parent a node in the tree, obtained from this data source
+     * @return the child of {@code parent} at index {@code index}
+     */
+    @Override
+    public synchronized Object getChild(Object parent, int index) {
+        if (bypassNodeFilter()) {
+            TreeNode guiParent = (TreeNode) parent;
+            if (guiParent.getChildCount() > index) {
+                return guiParent.getChildAt(index);
+            }
+        } else {
+            return activeNodeFilter.getChild(parent, index);
+        }
+        return null;
+    }
+
+    /**
+     * @return whether the children should be read directly from the tree (whose branch nodes are
+     *         already search-filtered) instead of through the active {@link NodeFilter}. While the
+     *         collapsing search is active it takes precedence over an intermediate-step filter, so
+     *         that the latter does not additionally hide (or surface) nodes among the matches.
+     */
+    private boolean bypassNodeFilter() {
+        return activeNodeFilter == null || ProofTreeViewFilter.SEARCH.isActive();
+    }
+
+    /**
+     * Returns the number of children of {@code parent}. Returns 0 if the node is a leaf or if it
+     * has
+     * no children. {@code parent} must be a node previously obtained from this data source.
+     *
+     * @param parent a node in the tree, obtained from this data source
+     * @return the number of children of the node {@code parent}
+     */
+    @Override
+    public synchronized int getChildCount(Object parent) {
+        if (bypassNodeFilter()) {
+            return ((TreeNode) parent).getChildCount();
+        } else {
+            return activeNodeFilter.getChildCount(parent);
+        }
+    }
+
+    /**
+     * Returns the index of child in parent.
+     *
+     * @param parent a node in the tree, obtained from this data source
+     * @param child a child of parent, obtained from this data source
+     * @return The index of child in parent
+     *
+     */
+    @Override
+    public synchronized int getIndexOfChild(Object parent, Object child) {
+        TreeNode guiParent = (TreeNode) parent;
+        if (bypassNodeFilter()) {
+            for (int i = 0; i < guiParent.getChildCount(); i++) {
+                if (guiParent.getChildAt(i) == child) {
+                    return i;
+                }
+            }
+        } else {
+            return activeNodeFilter.getIndexOfChild(parent, child);
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the root of the tree. Returns null only if the tree has no nodes.
+     *
+     * @return the root of the tree
+     */
+    @Override
+    public synchronized Object getRoot() {
+        return getBranchNode(proof.root(), "Proof Tree");
+    }
+
+    /**
+     * Returns true if <I>node</I> is a leaf. It is possible for this method to return false even if
+     * <I>node</I> has no children. A directory in a filesystem, for example, may contain no files;
+     * the node representing the directory is not a leaf, but it also has no children.
+     *
+     * @param guiNode a node in the tree, obtained from this data source
+     * @return true if <I>node</I> is a leaf
+     */
+    @Override
+    public synchronized boolean isLeaf(Object guiNode) {
+        return ((TreeNode) guiNode).isLeaf();
+    }
+
+    /**
+     * Messaged when the user has altered the value for the item identified by <I>path</I> to
+     * <I>newValue</I>. We throw an exception, as proofs are not meant to be changed via the JTree
+     * editing facility.
+     *
+     * @param path path to the node that the user has altered.
+     * @param newValue the new value from the TreeCellEditor.
+     */
+    @Override
+    public synchronized void valueForPathChanged(TreePath path, Object newValue) {
+        if (path.getLastPathComponent() instanceof GUIBranchNode) {
+            ((GUIBranchNode) path.getLastPathComponent()).setLabel((String) newValue);
+        }
+    }
+
+
+    /**
+     * Take the appropriate actions after a change in the Proof. Currently, this means throwing all
+     * cached Information away and fire an indiscriminating TreeStructureChanged event. This should
+     * probably be made more efficient.
+     *
+     * @param trn tree node to update.
+     */
+    private synchronized void updateTree(GUIAbstractTreeNode trn) {
+
+        // The proof may have changed; drop the search filter's memoized match information so the
+        // collapsing search reflects the new proof state. A changed match anywhere can also change
+        // which ancestor branches are shown (a branch that had no match may now contain one), so a
+        // partial update does not suffice: force a full rebuild.
+        if (ProofTreeViewFilter.SEARCH.isActive()) {
+            ProofTreeViewFilter.SEARCH.invalidateCache();
+            trn = null;
+        }
+
+        // If possible, redraw only a certain subtree
+        // starting from the lowermost parent of trn that is not hidden
+        while (trn != null && trn != getRoot()
+                && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
+            trn = (GUIAbstractTreeNode) trn.getParent();
+        }
+
+        // bigger change, redraw whole tree
+        if (trn == null || trn == getRoot()) {
+            proofTreeNodes.clear();
+            branchNodes.clear();
+            fireTreeStructureChanged(new Object[] { getRoot() });
+            return;
+        }
+
+        flushCaches(trn);
+        // also flush the current node, it might be an OSS conceiving children in this step
+        trn.flushCache();
+        TreeNode[] path = ((GUIAbstractTreeNode) trn.getParent()).getPath();
+        fireTreeStructureChanged(path);
+    }
+
+    public synchronized void updateTree(Node p_node) {
+        if (p_node == null) {
+            updateTree((GUIAbstractTreeNode) null);
+        } else {
+            updateTree(getProofTreeNode(p_node));
+        }
+    }
+
+    private void flushCaches(TreeNode trn) {
+        Node n = ((GUIAbstractTreeNode) trn).getNode();
+        while (true) {
+            final Node p = n.parent();
+            if (p == null || ((GUIAbstractTreeNode) trn).findChild(p) == null) {
+                break;
+            }
+            n = p;
+        }
+
+        flushCaches(n);
+    }
+
+    private void flushCaches(Node n) {
+        final ArrayDeque<Node> workingList = new ArrayDeque<>();
+        workingList.push(n);
+        while (!workingList.isEmpty()) {
+            Node node = workingList.pop();
+            GUIAbstractTreeNode treeNode = findBranch(node);
+            if (treeNode == null) {
+                // in linearized mode, the main branch does not have a BranchNode
+                treeNode = linearizedModeActive() ? find(node) : null;
+                if (treeNode == null) {
+                    continue;
+                }
+            }
+            treeNode.flushCache();
+            while (true) {
+                List<Node> nextList = treeNode.findChild(node);
+                Node nextN = nextList.size() == 1 ? nextList.get(0) : null;
+                if (nextN == null) {
+                    break;
+                }
+                node = nextN;
+            }
+
+            for (int i = 0; i != node.childrenCount(); ++i) {
+                if (!ProofTreeViewFilter.hiddenByGlobalFilters(node.child(i))) {
+                    workingList.push(node.child(i));
+                }
+            }
+        }
+    }
+
+    /**
+     * Notify all listeners that have registered interest for notification on treeStructureChanged
+     * events.
+     */
+    protected void fireTreeStructureChanged(Object[] path) {
+        final TreeModelEvent event = new TreeModelEvent(this, path);
+        // Guaranteed to return a non-null array
+        final TreeModelListener[] listeners = listenerList.getListeners(TreeModelListener.class);
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length - 1; i >= 0; i -= 1) {
+            listeners[i].treeStructureChanged(event);
+        }
+    }
+
+    // caches for the GUIProofTreeNode and GUIBranchNode objects
+    // generated to represent the nodes and subtrees of the proof.
+
+    private final WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes = new WeakHashMap<>();
+    private final WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
+
+    /**
+     * Return the GUIProofTreeNode corresponding to node n, if one has already been generated, and
+     * null otherwise.
+     */
+    public GUIAbstractTreeNode find(Node n) {
+        return proofTreeNodes.get(n);
+    }
+
+    /**
+     * Return the GUIProofTreeNode corresponding to node n. Generate one if necessary.
+     */
+    public synchronized GUIAbstractTreeNode getProofTreeNode(Node n) {
+        GUIAbstractTreeNode res = find(n);
+        if (res == null) {
+            res = new GUIProofTreeNode(this, n);
+            proofTreeNodes.put(n, res);
+        }
+        return res;
+    }
+
+    /**
+     * Return the GUIBranchNode corresponding to the subtree rooted at n, if one has already been
+     * generated, and null otherwise.
+     */
+    public GUIBranchNode findBranch(Node n) {
+        return branchNodes.get(n);
+    }
+
+    /**
+     * Return the GUIBranchNode corresponding to the subtree rooted at n. Generate one if necessary,
+     * using label as the subtree label.
+     */
+    public GUIBranchNode getBranchNode(Node n, Object label) {
+        synchronized (branchNodes) {
+            GUIBranchNode res = findBranch(n);
+            if (res == null) {
+                res = new GUIBranchNode(this, n, label);
+                branchNodes.put(n, res);
+            }
+            return res;
+        }
+    }
+
+    public NodeFilter getActiveNodeFilter() {
+        return activeNodeFilter;
+    }
+
+}

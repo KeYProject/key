@@ -10,15 +10,15 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.help.HelpFacade;
-import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.KeyAction;
+import de.uka.ilkd.key.ui.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.ui.gui.help.HelpFacade;
+import de.uka.ilkd.key.ui.gui.help.HelpInfo;
 
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;

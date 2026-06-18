@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.tools.ToolProvider;
 
-import de.uka.ilkd.key.gui.PositionedIssueString;
+import de.uka.ilkd.key.ui.gui.PositionedIssueString;
+import de.uka.ilkd.key.ui.gui.plugins.javac.JavaCompilerCheckFacade;
+import de.uka.ilkd.key.ui.gui.plugins.javac.JavacSettings;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;

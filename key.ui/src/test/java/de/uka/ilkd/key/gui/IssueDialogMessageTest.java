@@ -11,6 +11,8 @@ import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.ui.gui.IssueDialog;
+import de.uka.ilkd.key.ui.gui.PositionedIssueString;
 
 import org.junit.jupiter.api.Test;
 
