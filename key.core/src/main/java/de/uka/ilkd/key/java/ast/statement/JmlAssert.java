@@ -32,7 +32,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * the condition in parse tree form
      */
-    private KeyAst.Expression condition;
+    private final KeyAst.Expression condition;
 
     /**
      * @param kind
