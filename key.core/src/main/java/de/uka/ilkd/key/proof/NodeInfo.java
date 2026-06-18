@@ -114,9 +114,22 @@ public class NodeInfo {
 
 
     /**
-     * determines the first and active statement if the applied taclet worked on a modality
+     * Determines the first and active statement if the applied taclet worked on a modality.
+     *
+     * <p>
+     * Computed lazily on demand and cached. The first/active statement is a <em>display</em>
+     * concern
+     * (GUI, proof-reference and symbolic-execution analyses); it is intentionally not needed for,
+     * and
+     * not computed during, proof search &mdash; see {@link #updateNoteInfo()}. {@code synchronized}
+     * because the lazy computation mutates the cache fields and may be triggered concurrently after
+     * a
+     * (parallel) run, e.g. by the GUI. The pure, stateless variants
+     * {@link #computeActiveStatement(RuleApp)} / {@link #computeFirstStatement(RuleApp)} derive the
+     * same information from a rule app alone and are the thread-safe choice for any proving-time
+     * use.
      */
-    private void determineFirstAndActiveStatement() {
+    private synchronized void determineFirstAndActiveStatement() {
         if (determinedFstAndActiveStatement) {
             return;
         }
@@ -201,12 +214,18 @@ public class NodeInfo {
         return activeStatement;
     }
 
-    void updateNoteInfo() {
+    synchronized void updateNoteInfo() {
+        // Only invalidate the cached first/active statement; do NOT recompute eagerly.
+        // Recomputation
+        // happens lazily on demand (display / post-run analyses). Computing it here would (a) pull
+        // this display computation onto the proof-search path -- a thread-safety hazard for the
+        // parallel prover, NodeInfo must not be used for proving -- and (b) be wrong anyway, since
+        // this runs from Node#setAppliedRuleApp *before* the new applied rule app is stored, so an
+        // eager compute would use the stale (previous) rule app.
         determinedFstAndActiveStatement = false;
         firstStatement = null;
         firstStatementString = null;
         activeStatement = null;
-        determineFirstAndActiveStatement();
     }
 
     /**
@@ -256,7 +275,7 @@ public class NodeInfo {
      *
      * @return active statement as described above
      */
-    public SourceElement getActiveStatement() {
+    public synchronized SourceElement getActiveStatement() {
         determineFirstAndActiveStatement();
         return activeStatement;
     }
@@ -275,7 +294,7 @@ public class NodeInfo {
      *
      * @return statement position as described above
      */
-    public Position getExecStatementPosition() {
+    public synchronized Position getExecStatementPosition() {
         determineFirstAndActiveStatement();
         return (activeStatement == null) ? Position.UNDEFINED : activeStatement.getStartPosition();
     }
@@ -285,7 +304,7 @@ public class NodeInfo {
      *
      * @return string representation of first statement as described above
      */
-    public String getFirstStatementString() {
+    public synchronized String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
@@ -304,7 +323,12 @@ public class NodeInfo {
      * @param s the String to be set
      */
     public void setBranchLabel(String s) {
-        determineFirstAndActiveStatement();
+        // NB: deliberately does NOT compute the first/active statement -- this method only sets the
+        // (display) branch label and never reads those fields. The previous eager computation here
+        // pulled NodeInfo's lazy statement computation onto the proof-search path (setBranchLabel
+        // is
+        // called during rule application for named branches), which is both wasteful and a
+        // thread-safety hazard for the parallel prover. It is computed lazily on demand instead.
         if (s == null) {
             return;
         }
