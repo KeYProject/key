@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -16,13 +17,14 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.indexing.FormulaTag;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -42,8 +44,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return RefactoringScope.NONE;
@@ -56,8 +59,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -80,7 +83,14 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             return;
         }
 
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new LinkedHashSet<>());
+        // cache origins per term to avoid a quadratic recursive collection per rule
+        // application
+        final Map<JTerm, Set<Origin>> originsCache =
+            services.getCaches().getSubtermOriginsCache();
+        Set<Origin> subtermOrigins = new LinkedHashSet<>();
+        for (JTerm sub : term.subs()) {
+            subtermOrigins.addAll(collectSubtermOrigins(sub, originsCache));
+        }
         OriginTermLabelFactory factory = services.getTermBuilder().getOriginFactory();
         OriginTermLabel newLabel = null;
         if (oldLabel != null) {
@@ -102,13 +112,6 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
     }
 
-    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms, Set<Origin> result) {
-        for (Term term : terms) {
-            collectSubtermOrigins(term, result);
-        }
-
-        return result;
-    }
 
     /**
      * Determines whether any refactorings should be applied on an application of the given taclet.
@@ -124,8 +127,21 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 && taclet.goalTemplates().size() <= 1;
     }
 
+    /**
+     * @param term a term
+     * @param originsCache memoization of the result per term, see
+     *        {@link de.uka.ilkd.key.java.ServiceCaches#getSubtermOriginsCache()}
+     * @return the origins of {@code term} (including its own label) and of all its
+     *         subterms; the returned set is unmodifiable and shared, do not mutate
+     */
     @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(Term term, Set<Origin> result) {
+    private Set<Origin> collectSubtermOrigins(JTerm term, Map<JTerm, Set<Origin>> originsCache) {
+        Set<Origin> cached = originsCache.get(term);
+        if (cached != null) {
+            return cached;
+        }
+
+        Set<Origin> result = new LinkedHashSet<>();
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {
@@ -133,14 +149,15 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             result.addAll((Set<Origin>) label.getTLChild(1));
         }
 
-        ImmutableArray<Term> subterms = term.subs();
-
+        ImmutableArray<JTerm> subterms = term.subs();
         for (int i = 0; i < subterms.size(); ++i) {
-            Term subterm = subterms.get(i);
-            collectSubtermOrigins(subterm, result);
+            result.addAll(collectSubtermOrigins(subterms.get(i), originsCache));
         }
 
-        return result;
+        Set<Origin> stored =
+            result.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(result);
+        originsCache.put(term, stored);
+        return stored;
     }
 
 }

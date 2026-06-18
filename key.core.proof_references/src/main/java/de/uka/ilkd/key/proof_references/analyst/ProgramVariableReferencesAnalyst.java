@@ -5,14 +5,14 @@ package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.ast.ExpressionContainer;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -62,8 +62,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
      */
     protected void listReferences(Node node, ProgramElement pe, ProgramVariable arrayLength,
             LinkedHashSet<IProofReference<?>> toFill, boolean includeExpressionContainer) {
-        if (pe instanceof ProgramVariable) {
-            ProgramVariable pv = (ProgramVariable) pe;
+        if (pe instanceof ProgramVariable pv) {
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
                     new DefaultProofReference<>(IProofReference.ACCESS, node,

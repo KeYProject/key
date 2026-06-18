@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser.messages;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
@@ -17,7 +19,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,42 +41,42 @@ public class ParserMessageTest {
     private final List<String> lines;
     private final ProblemLoaderException exception;
     private final Location location;
-    private File javaFile;
+    private Path javaFile;
 
     /**
      * Method for creating parameters for a parameterized test run. Returned collection is a set of
      * constructor parameters.
      */
-    public static Collection<Arguments> data() {
-        File testDataDir = new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserMessageTest");
+    public static Collection<Arguments> data() throws IOException {
+        Path testDataDir = HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserMessageTest");
         var data = new LinkedList<Arguments>();
-        final var files = testDataDir.listFiles();
-        Assertions.assertNotNull(files);
-        for (File file : files) {
-            if (file.isDirectory()) {
-                if (!new File(file, "IGNORE").exists()) {
-                    data.add(Arguments.of(file));
-                }
+        final var files = Files.list(testDataDir).filter(Files::isDirectory).toList();
+        for (Path file : files) {
+            if (!Files.exists(file.resolve("IGNORE"))) {
+                data.add(Arguments.of(file));
             }
         }
         return data;
     }
 
-    public ParserMessageTest(File sourceDir) throws Exception {
+    public ParserMessageTest(Path sourceDir) throws Exception {
         // retrieve the Java file contained in the given source directory:
-        for (File file : sourceDir.listFiles()) {
-            if (file.getName().endsWith(".java")) {
-                assertNull(javaFile, "Found multiple Java files in directory " + sourceDir
+
+        try (var stream = Files.newDirectoryStream(sourceDir, "*.java")) {
+            var javaFiles = StreamSupport.stream(stream.spliterator(), false)
+                    .toList();
+            if (javaFiles.size() >= 2) {
+                fail("Found multiple Java files in directory " + sourceDir
                     + "\nCannot unambiguously determine Java source file.");
-                javaFile = file;
             }
+            javaFile = javaFiles.getFirst();
         }
         assertNotEquals(null, javaFile, "No Java file found in directory " + sourceDir);
 
         /*
          * Retrieve information about expected parser message from given Java source file.
          */
-        lines = Files.readAllLines(javaFile.toPath(), Charset.defaultCharset());
+        lines = Files.readAllLines(javaFile, Charset.defaultCharset());
         assertTrue(lines.size() >= 3,
             "Number of lines in file " + javaFile
                 + " is less than required minimal number of lines."
@@ -99,7 +100,7 @@ public class ParserMessageTest {
         assertNotNull(location.getFileURI().orElse(null),
             "Couldn't recreate file URL from received exception.");
 
-        assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURI().get()),
+        assertEquals(javaFile.toAbsolutePath(), Paths.get(location.getFileUri()),
             "Filename retrieved from parser message "
                 + "doesn't match filename of originally parsed file.");
     }

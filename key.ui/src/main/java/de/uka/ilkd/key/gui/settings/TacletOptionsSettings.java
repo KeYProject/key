@@ -289,7 +289,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             b.add(lbl);
         }
         if (c.information != null) {
-            JLabel lbl = SettingsPanel.createHelpTextLabel(c.information);
+            JLabel lbl = createHelpTextLabel(c.information);
             b.add(lbl);
         }
         return button;

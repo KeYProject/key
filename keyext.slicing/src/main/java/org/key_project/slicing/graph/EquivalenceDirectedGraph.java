@@ -9,30 +9,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.DirectedGraph;
 
 /**
  * A directed graph, extended to store equivalence groups of vertices.
- * Equivalence groups are identified using {@link EqualsModProofIrrelevancy}.
+ * Equivalence groups are identified using equality modulo proof irrelevancy.
  * These groups are used to find multiple instances of the same formula in the graph.
  *
  * @author Arne Keller
  */
 public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, AnnotatedEdge> {
     /**
-     * Vertices in this graph, grouped using {@link org.key_project.util.EqualsModProofIrrelevancy}.
+     * Vertices in this graph, grouped using equality modulo proof irrelevancy.
      */
-    private final Map<EqualsModProofIrrelevancyWrapper<?>, Collection<GraphNode>> verticesModProof =
+    private final Map<EqualsAndHashCodeDelegator<?>, Collection<GraphNode>> verticesModProof =
         new HashMap<>();
 
     @Override
     public boolean addVertex(GraphNode v) {
         if (super.addVertex(v)) {
-            if (v instanceof EqualsModProofIrrelevancy) {
+            if (v instanceof TrackedFormula tf) {
                 verticesModProof.computeIfAbsent(
-                    new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v),
+                    new EqualsAndHashCodeDelegator<>(tf,
+                        TrackedFormula::equalsModProofIrrelevancy,
+                        TrackedFormula::hashCodeModProofIrrelevancy),
                     _v -> new ArrayList<>()).add(v);
             }
             return true;
@@ -43,9 +44,11 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     @Override
     public void removeVertex(GraphNode v) {
         super.removeVertex(v);
-        if (v instanceof EqualsModProofIrrelevancy) {
-            EqualsModProofIrrelevancyWrapper<?> wrapper =
-                new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v);
+        if (v instanceof TrackedFormula tf) {
+            EqualsAndHashCodeDelegator<?> wrapper =
+                new EqualsAndHashCodeDelegator<>(tf,
+                    (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
+                    t -> t.hashCodeModProofIrrelevancy());
             Collection<GraphNode> group = verticesModProof.get(wrapper);
             group.remove(v);
             if (group.isEmpty()) {
@@ -56,13 +59,14 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
 
     /**
      * @param v vertex to search for
-     * @return all vertices in the graph equal to the parameter
-     *         (according to {@link org.key_project.util.EqualsModProofIrrelevancy})
+     * @return all vertices in the graph equal to the parameter modulo proof irrelevancy.
      */
     public Collection<GraphNode> getVerticesModProofIrrelevancy(GraphNode v) {
-        if (v instanceof EqualsModProofIrrelevancy) {
+        if (v instanceof TrackedFormula tf) {
             return verticesModProof
-                    .get(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
+                    .get(new EqualsAndHashCodeDelegator<>(tf,
+                        TrackedFormula::equalsModProofIrrelevancy,
+                        TrackedFormula::hashCodeModProofIrrelevancy));
         } else {
             return List.of(v);
         }

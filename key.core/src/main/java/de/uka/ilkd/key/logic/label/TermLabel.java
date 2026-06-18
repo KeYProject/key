@@ -4,11 +4,9 @@
 package de.uka.ilkd.key.logic.label;
 
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
@@ -20,25 +18,26 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**
  * <p>
- * The interface for term labels. Term labels are annotations that can be attached to {@link Term}s
+ * The interface for term labels. Term labels are annotations that can be attached to {@link JTerm}s
  * and carry additional information. <b>They must not be soundness relevant</b>. But they may be
  * used in strategies to compute the order in which rules are applied.
  * </p>
  * <p>
- * {@link Term}s with or without term labels are still unmodifiable. It is recommended to implement
+ * {@link JTerm}s with or without term labels are still unmodifiable. It is recommended to implement
  * {@link TermLabel}s including their parameters also unmodifiable. For new {@link TermLabel}s
  * without parameters class {@link ParameterlessTermLabel} can be used.
  * </p>
  * <p>
  * A term label can have parameters accessible via {@link #getTLChild(int)} and
  * {@link #getTLChildCount()}. Such parameters can be any {@link Object}. But keep in mind that it is
- * required to parse {@link String}s into {@link Term}s, e.g. if it is used in a Taclet definition
+ * required to parse {@link String}s into {@link JTerm}s, e.g. if it is used in a Taclet definition
  * or if a cut rule is applied. For convenience parameters are always printed as {@link String}s
  * and have to be parsed individually into the required {@link Object} instances via a
  * {@link TermLabelFactory}.
@@ -50,9 +49,9 @@ import org.key_project.logic.TerminalSyntaxElement;
  * </p>
  * <p>
  * The {@link TermLabelManager} is responsible during prove to maintain term labels.
- * This means that labels of new {@link Term}s created during rule application are computed
+ * This means that labels of new {@link JTerm}s created during rule application are computed
  * via {@link TermLabelManager#instantiateLabels}
- * and of existing {@link Term}s are refactored (added or removed) via
+ * and of existing {@link JTerm}s are refactored (added or removed) via
  * {@link TermLabelManager#instantiateLabels}.
  * </p>
  * <p>
@@ -94,37 +93,37 @@ import org.key_project.logic.TerminalSyntaxElement;
  *       the solution with the less performance impact!</b>
  *       <ul>
  *          <li>{@code a(b<<l>>) ~~> c(b<<l>>)}: {@code b} is a constant which is never rewritten by
- *              rules. The label stays on the {@link Term} and will be dropped when the {@link Term}
+ *              rules. The label stays on the {@link JTerm} and will be dropped when the {@link JTerm}
  *              is dropped. Nothing to be done.</li>
  *          <li>{@code a ~~> b<<l>>}: The taclet rewrites {@code a} into {@code b<<l>>}.
  *              {@link TermLabel}s defined by taclets are automatically considered during rule
  *              application. Nothing to be done.</li>
- *          <li>{@code a<<l>> ~~> b<<l>>} The application {@link Term} {@code a} contains the label
+ *          <li>{@code a<<l>> ~~> b<<l>>} The application {@link JTerm} {@code a} contains the label
  *              before. Use an application {@link TermLabelPolicy} to ensure that it is maintained.
  *              </li>
- *          <li>{@code Update[...]<<l>> ~~> Update[...new...]<<l>>} The application {@link Term}
- *              {@code Update} contains a {@link Modality}. Use a modality {@link TermLabelPolicy}
+ *          <li>{@code Update[...]<<l>> ~~> Update[...new...]<<l>>} The application {@link JTerm}
+ *              {@code Update} contains a {@link JModality}. Use a modality {@link TermLabelPolicy}
  *              to ensure that it is maintained.</li>
  *          <li>{@code 2 + 3 ~~> 5<>a>>}: A new label has to be added which is not provided by the
  *              rule. Implement a {@link TermLabelUpdate} which adds, sorts or removes
- *              {@link TermLabel} before a new {@link Term} is created.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: A direct child of the application {@link Term}
+ *              {@link TermLabel} before a new {@link JTerm} is created.</li>
+ *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: A direct child of the application {@link JTerm}
  *              {@code a} contains the label before. Use a direct {@link ChildTermLabelPolicy} to
  *              ensure that it is added also to the new term.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 4<<a>>}: A child or grandchild of the application
- *              {@link Term} {@code a} contains the label before. Use a direct
+ *              {@link JTerm} {@code a} contains the label before. Use a direct
  *              {@link ChildTermLabelPolicy} to ensure that it is added also to the new term.</li>
  *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: Implement a {@link TermLabelRefactoring}
  *              which works on {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN} to freely add or
- *              remove {@link TermLabel}s on direct children of the application {@link Term}.</li>
+ *              remove {@link TermLabel}s on direct children of the application {@link JTerm}.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 2 * (3<<a>> - 1)}: Implement a
  *              {@link TermLabelRefactoring} which works on
  *              {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE} to freely
  *              add or remove {@link TermLabel}s on children and grandchildren of the application
- *              {@link Term}.</li>
+ *              {@link JTerm}.</li>
  *          <li>Change labels on the whole {@link Sequent}: Implement a {@link TermLabelRefactoring}
  *              which works on {@link RefactoringScope#SEQUENT} to freely add or remove
- *              {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
+ *              {@link TermLabel}s on any {@link JTerm} of the {@link Sequent}.</li>
  *          <li>Implement a {@link TermLabelMerger} to ensure that {@link TermLabel}s are maintained
  *              in case of rejected {@link SequentFormula}s.</li>
  *       </ul>
@@ -138,9 +137,9 @@ import org.key_project.logic.TerminalSyntaxElement;
  *    <li>
  *       During rule application, especially for {@link BuiltInRule}, the
  *       functionality of {@link TermLabelManager} to maintain {@link TermLabel}s
- *       is only called for newly created {@link Term}s labeled up to now. If
+ *       is only called for newly created {@link JTerm}s labeled up to now. If
  *       your {@link TermLabelPolicy}, {@link TermLabelUpdate} or {@link TermLabelRefactoring}
- *       is not called on the right {@link Term}, it is your task to call
+ *       is not called on the right {@link JTerm}, it is your task to call
  *       {@link TermLabelManager#instantiateLabels}
  *       and
  *       {@link TermLabelManager#refactorLabelsRecursive}  (
@@ -152,7 +151,7 @@ import org.key_project.logic.TerminalSyntaxElement;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove */ TerminalSyntaxElement {
+public interface TermLabel extends Named, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.

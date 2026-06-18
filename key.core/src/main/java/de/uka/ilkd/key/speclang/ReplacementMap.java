@@ -5,8 +5,8 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -31,7 +31,7 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      *
      * @param tf a term factory
      */
-    public ReplacementMap(TermFactory tf) {
+    protected ReplacementMap(TermFactory tf) {
         super(tf);
     }
 

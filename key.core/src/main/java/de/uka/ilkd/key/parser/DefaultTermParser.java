@@ -7,20 +7,24 @@ import java.io.IOException;
 import java.io.Reader;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
+import de.uka.ilkd.key.logic.sort.SortAlias;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -42,13 +46,16 @@ public final class DefaultTermParser {
      * @throws ParserException The method throws a ParserException, if the input could not be parsed
      *         correctly or the term has an invalid sort.
      */
-    public Term parse(Reader in, Sort sort, Services services,
-            Namespace<QuantifiableVariable> var_ns,
-            Namespace<JFunction> func_ns,
-            Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
+    public JTerm parse(Reader in, Sort sort, Services services,
+            Namespace<@NonNull QuantifiableVariable> var_ns,
+            Namespace<@NonNull Function> func_ns,
+            Namespace<@NonNull Sort> sort_ns, Namespace<@NonNull SortAlias> sortAlias_ns,
+            Namespace<@NonNull ParametricSortDecl> paraSort_ns,
+            Namespace<@NonNull ParametricFunctionDecl> paraFunc_ns,
+            Namespace<@NonNull IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
-        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
-            new Namespace<>(), new Namespace<>(), progVar_ns), scm);
+        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns, sortAlias_ns,
+            new Namespace<>(), paraSort_ns, paraFunc_ns, new Namespace<>(), progVar_ns), scm);
     }
 
 
@@ -61,12 +68,12 @@ public final class DefaultTermParser {
      * @throws ParserException The method throws a ParserException, if the input could not be parsed
      *         correctly or the term has an invalid sort.
      */
-    public Term parse(Reader in, Sort sort, Services services, NamespaceSet nss, AbbrevMap scm)
+    public JTerm parse(Reader in, Sort sort, Services services, NamespaceSet nss, AbbrevMap scm)
             throws ParserException {
         KeyIO keyIO = new KeyIO(services, nss);
         keyIO.setAbbrevMap(scm);
         try {
-            Term result = keyIO.parseExpression(CharStreams.fromReader(in));
+            JTerm result = keyIO.parseExpression(CharStreams.fromReader(in));
             if (sort != null && !result.sort().extendsTrans(sort)) {
                 throw new ParserException(
                     "Expected sort " + sort + ", but parser returns sort " + result.sort() + ".",

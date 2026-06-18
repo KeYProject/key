@@ -11,6 +11,7 @@ import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -23,6 +24,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +70,19 @@ public class SendFeedbackAction extends AbstractAction {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    /**
+     * Extracts java source directory from {@link Proof#header()}, if it exists.
+     *
+     * @param proof the Proof
+     * @return the location of the java source code or null if no such exists
+     */
+    public static @Nullable File getJavaSourceLocation(Proof proof) {
+        KeyAst.@Nullable Declarations header = proof.header();
+        if (header == null)
+            return null;
+        return header.getJavaSourceLocation();
     }
 
     private static abstract class SendFeedbackItem implements ActionListener {
@@ -213,7 +229,7 @@ public class SendFeedbackAction extends AbstractAction {
             Proof proof = mediator.getSelectedProof();
             OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            saver.save(stream);
+            saver.save(Paths.get(".").toAbsolutePath(), stream);
             return stream.toByteArray();
         }
 
@@ -302,7 +318,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+                File javaSourceLocation = getJavaSourceLocation(proof);
                 return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
@@ -322,7 +338,7 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-            File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+            File javaSourceLocation = getJavaSourceLocation(proof);
             List<File> javaFiles = new LinkedList<>();
             getJavaFilesRecursively(javaSourceLocation, javaFiles);
             for (File f : javaFiles) {

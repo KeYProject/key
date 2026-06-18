@@ -6,8 +6,8 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 import java.util.Locale;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import java.util.Objects;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -95,15 +95,13 @@ public final class KeYFileChooser extends JFileChooser {
 
     private static KeYFileChooser INSTANCE;
 
-    private static final long serialVersionUID = -7598570660247063980L;
-
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
     /** this is used to reset the path if the user presses the cancel button */
     private File resetFile = null;
 
-    private KeYFileChooser(File initDir) {
+    public KeYFileChooser(File initDir) {
         super(initDir);
 
         // for simplicity, we always show all filters
@@ -116,6 +114,20 @@ public final class KeYFileChooser extends JFileChooser {
         addChoosableFileFilter(ZIP_FILTER);
         addChoosableFileFilter(PROOF_BUNDLE_FILTER);
         setFileFilter(DEFAULT_FILTER);
+
+        setAccessory(new Box(BoxLayout.Y_AXIS));
+    }
+
+    public KeYFileChooserLoadingOptions addLoadingOptions() {
+        var p = new KeYFileChooserLoadingOptions(this);
+        getAccessory().add(p, 0);
+        return p;
+    }
+
+    public KeYFileChooserBookmarkPanel addBookmarkPanel() {
+        var p = new KeYFileChooserBookmarkPanel(this);
+        getAccessory().add(p);
+        return p;
     }
 
     public boolean useCompression() {
@@ -150,16 +162,12 @@ public final class KeYFileChooser extends JFileChooser {
 
     @Override
     public void setDialogTitle(String title) {
-        if (title != null) {
-            super.setDialogTitle(title);
-        } else {
-            super.setDialogTitle("Select file to load");
-        }
+        super.setDialogTitle(Objects.requireNonNullElse(title, "Select file to load"));
     }
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        setFileSelectionMode(b ? JFileChooser.FILES_ONLY : JFileChooser.FILES_AND_DIRECTORIES);
+        setFileSelectionMode(b ? FILES_ONLY : FILES_AND_DIRECTORIES);
     }
 
     @Override
@@ -275,7 +283,7 @@ public final class KeYFileChooser extends JFileChooser {
         updateUI();
 
         int result = super.showOpenDialog(component);
-        if (result != JFileChooser.APPROVE_OPTION) {
+        if (result != APPROVE_OPTION) {
             resetPath();
         } else {
             resetFile = null;
@@ -301,11 +309,12 @@ public final class KeYFileChooser extends JFileChooser {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir();
+            File initDir = Main.getWorkingDir().toFile();
             INSTANCE = new KeYFileChooser(initDir);
+
             // not the best design probably: this constructor has the side effect of connecting
             // the new bookmark panel to the file chooser.
-            new KeYFileChooserBookmarkPanel(INSTANCE);
+            INSTANCE.addBookmarkPanel();
         }
 
         INSTANCE.setDialogTitle(title);

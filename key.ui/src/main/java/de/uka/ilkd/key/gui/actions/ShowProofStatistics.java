@@ -249,7 +249,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
             this.proof = proof;
 
-            String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
+            String stats = getHTMLStatisticsMessage(proof);
             init(mainWindow, stats);
         }
 
@@ -263,7 +263,7 @@ public class ShowProofStatistics extends MainWindowAction {
             super(mainWindow, "Proof Statistics");
             this.proof = node.proof();
 
-            String stats = ShowProofStatistics.getHTMLStatisticsMessage(node);
+            String stats = getHTMLStatisticsMessage(node);
             init(mainWindow, stats);
         }
 
@@ -296,12 +296,12 @@ public class ShowProofStatistics extends MainWindowAction {
             JButton csvButton = new JButton("Export as CSV");
             csvButton.addActionListener(
                 event -> export("csv", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getCSVStatisticsMessage(proof)));
+                    getCSVStatisticsMessage(proof)));
 
             JButton htmlButton = new JButton("Export as HTML");
             htmlButton.addActionListener(
                 event -> export("html", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getHTMLStatisticsMessage(proof)));
+                    getHTMLStatisticsMessage(proof)));
 
             JButton saveButton = new JButton("Save proof");
             saveButton.addActionListener(

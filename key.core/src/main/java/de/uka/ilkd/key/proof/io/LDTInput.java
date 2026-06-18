@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +16,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Represents the LDT .key files as a whole. Special treatment of these files is necessary because
@@ -23,6 +26,7 @@ import org.key_project.util.collection.ImmutableSet;
  * function and predicate declarations and third the rules. This procedure makes it possible to use
  * all declared sorts in all rules.
  */
+@NullMarked
 public class LDTInput implements EnvInput {
     public interface LDTInputListener {
         void reportStatus(String status, int progress);
@@ -87,21 +91,21 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() {
-        return "";
+    public @Nullable Path readJavaPath() {
+        return null;
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() {
+    public List<Path> readClassPath() {
         return new ArrayList<>();
     }
 
 
     // no class path elements here
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         return null;
     }
 
@@ -190,7 +194,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

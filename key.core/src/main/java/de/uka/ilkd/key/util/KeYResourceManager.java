@@ -4,11 +4,18 @@
 package de.uka.ilkd.key.util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +40,7 @@ public class KeYResourceManager {
     private String sha1 = null;
     private String branch = null;
 
-    private KeYResourceManager() {
-    }
+    private KeYResourceManager() {}
 
     /**
      * Return an instance of the ResourceManager
@@ -191,12 +197,10 @@ public class KeYResourceManager {
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Class<?> cl, String resourcename) {
+    public @Nullable URL getResourceFile(Class<?> cl, String resourcename) {
         URL resourceURL = cl.getResource(resourcename);
         if (resourceURL == null && cl.getSuperclass() != null) {
             return getResourceFile(cl.getSuperclass(), resourcename);
-        } else if (resourceURL == null && cl.getSuperclass() == null) {
-            return null;
         }
         return resourceURL;
     }
@@ -208,7 +212,7 @@ public class KeYResourceManager {
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Object o, String resourcename) {
+    public @Nullable URL getResourceFile(Object o, String resourcename) {
         return getResourceFile(o.getClass(), resourcename);
     }
 
@@ -221,5 +225,24 @@ public class KeYResourceManager {
     public String getUserInterfaceTitle() {
         return String.format("KeY %s%s", this.getVersion(),
             visibleBranch() ? " [" + getBranch() + "]" : "");
+    }
+
+    static {
+        // Needed to be able to use Path.of(jar:jarFile/bla)
+        // see
+        // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
+        try {
+            var jar = KeYResourceManager.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI();
+            if (Files.isRegularFile(Path.of(jar))) {
+                var uri = new URI("jar:" + jar.toString());
+                FileSystems.newFileSystem(uri, Map.of("create", "true"));
+            }
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -34,13 +34,13 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.statement.Else;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
@@ -76,8 +76,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class SourceView extends JComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
-
-    private static final long serialVersionUID = -94424677425561025L;
 
     /**
      * the only instance of this singleton
@@ -234,7 +232,7 @@ public final class SourceView extends JComponent {
             proof.register(sources, ProofJavaSourceCollection.class);
             proof.root().sequent().forEach(formula -> {
                 OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                    (OriginTermLabel) ((JTerm) formula.formula()).getLabel(OriginTermLabel.NAME);
                 if (originLabel != null) {
                     if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
                         ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
@@ -735,21 +733,21 @@ public final class SourceView extends JComponent {
             // proof obligation belongs to is always loaded.
 
             node.sequent().forEach(
-                formula -> formula.formula().execPostOrder(new Visitor<Term>() {
+                formula -> formula.formula().execPostOrder(new Visitor<JTerm>() {
 
                     @Override
-                    public boolean visitSubtree(Term visited) {
+                    public boolean visitSubtree(JTerm visited) {
                         return visited.containsJavaBlockRecursive();
                     }
 
                     @Override
-                    public void visit(Term visited) {}
+                    public void visit(JTerm visited) {}
 
                     @Override
-                    public void subtreeLeft(Term subtreeRoot) {}
+                    public void subtreeLeft(JTerm subtreeRoot) {}
 
                     @Override
-                    public void subtreeEntered(Term subtreeRoot) {
+                    public void subtreeEntered(JTerm subtreeRoot) {
                         if (subtreeRoot.javaBlock() != null) {
                             JavaASTVisitor visitor =
                                 new JavaASTVisitor(subtreeRoot.javaBlock().program(),
@@ -801,7 +799,8 @@ public final class SourceView extends JComponent {
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      *
-     * @param se the given SourceElement
+     * @param se
+     *        the given SourceElement
      * @return a new PositionInfo starting at the minimum of all the contained positions and ending
      *         at the maximum position
      */
@@ -961,8 +960,8 @@ public final class SourceView extends JComponent {
             JPanel nowrap = new JPanel(new BorderLayout());
             nowrap.add(textPane);
             setViewportView(nowrap);
-            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
 
             // increase unit increment (for faster scrolling)
             getVerticalScrollBar().setUnitIncrement(30);

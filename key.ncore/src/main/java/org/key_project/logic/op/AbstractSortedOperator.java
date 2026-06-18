@@ -9,9 +9,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * Abstract sorted operator class offering some common functionality.
- */
+/// Abstract sorted operator class offering some common functionality.
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator {
     private final Sort sort;

@@ -8,8 +8,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
 import org.jspecify.annotations.Nullable;
@@ -171,7 +171,7 @@ public class IntegerHandler extends LDTHandler {
     @Override
     protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (specMathMode == SpecMathMode.JAVA) {
-            return LDTHandler.getOperatorFromMap(opCategories.get(promotedType), op);
+            return getOperatorFromMap(opCategories.get(promotedType), op);
         }
 
         var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)

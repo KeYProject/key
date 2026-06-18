@@ -11,17 +11,18 @@ options { tokenVocab=JmlLexer; }
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
+modifiersEOF: modifiers EOF;
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: classlevel_element | modifiers | set_statement;
+classlevel_comment: classlevel_element | modifiers;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
+  : class_invariant     | accessible_clause  | method_specification
   | method_declaration  | field_declaration  | represents_clause
   | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+  | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -152,8 +153,14 @@ name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
 
 field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
-method_declaration: typespec IDENT param_list (method_body|SEMI_TOPLEVEL);
-method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
+method_declaration: typespec IDENT param_list (method_body=mbody_block | SEMI_TOPLEVEL);
+mbody_block: LBRACE mbody_var* mbody_statement RBRACE;
+mbody_statement:
+    RETURN expression SEMI_TOPLEVEL #mbody_return
+  | IF LPAREN expression RPAREN (mbody_statement | mbody_block) ELSE (mbody_statement | mbody_block) #mbody_if
+  ;
+mbody_var: VAR? IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
+
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
 history_constraint: CONSTRAINT expression;
@@ -369,6 +376,7 @@ jmlprimary
   | SUBSET LPAREN storeref COMMA storeref RPAREN                                     #primarySubset
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
+  | KEY_TERM                                                                         #keyTerm
   ;
 
 sequence
@@ -402,4 +410,3 @@ referencetype: name;
 builtintype: BYTE | SHORT | INT | LONG | BOOLEAN | VOID | BIGINT | REAL | LOCSET | SEQ | FREE;
 name: ident (DOT ident)*;
 quantifiedvariabledeclarator: IDENT dims?;
-

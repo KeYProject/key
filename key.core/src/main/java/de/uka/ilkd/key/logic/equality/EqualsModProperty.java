@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import org.key_project.logic.Property;
+
 /**
  * Interface to check for equality ignoring given properties and to compute according hash codes.
  * <p>
@@ -47,7 +49,7 @@ public interface EqualsModProperty<T> {
      * @param <V> the type of the additional parameters needed by {@code property} for the
      *        comparison
      */
-    <V> boolean equalsModProperty(Object o, Property<T> property, V... v);
+    <V> boolean equalsModProperty(Object o, Property<? super T> property, V... v);
 
     /**
      * Computes the hash code according to the given ignored {@code property}.
@@ -55,5 +57,5 @@ public interface EqualsModProperty<T> {
      * @param property the ignored property according to which the hash code is computed
      * @return the hash code of this object
      */
-    int hashCodeModProperty(Property<T> property);
+    int hashCodeModProperty(Property<? super T> property);
 }

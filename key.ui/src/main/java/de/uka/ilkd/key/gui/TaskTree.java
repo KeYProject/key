@@ -22,7 +22,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
@@ -43,11 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6084969108377936099L;
 
     private final JTree delegateView;
 
@@ -160,6 +155,10 @@ public class TaskTree extends JPanel {
             setFont(myFont);
         } else {
             LOGGER.debug(Config.KEY_FONT_PROOF_LIST_VIEW + " not available, use standard font.");
+        }
+
+        if (delegateView != null) {
+            delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
         }
     }
 
@@ -304,7 +303,7 @@ public class TaskTree extends JPanel {
                     Proof p = task.proof();
                     delegateView.setSelectionPath(selPath);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        DefaultContextMenuKind.PROOF_LIST, p, mediator);
+                        ContextMenuKind.PROOF_LIST, p, mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -320,6 +319,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if all goals of the proof are closed
          */
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -327,6 +327,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if a proof has been pruned, potentially reopening branches
          */
+        @Override
         public void proofPruned(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -336,15 +337,14 @@ public class TaskTree extends JPanel {
          * proof
          * tree.
          */
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             delegateView.repaint();
         }
     } // end of prooftreelistener
 
 
-    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
-            implements java.io.Serializable {
-        private static final long serialVersionUID = 2423935787625012908L;
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
         private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
         private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
         private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
@@ -395,14 +395,14 @@ public class TaskTree extends JPanel {
 
     class TaskTreeSelectionListener implements KeYSelectionListener {
         /** focused node has changed */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             // empty
         }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             if (e.getSource().getSelectedProof() == null) {
                 return;
             }

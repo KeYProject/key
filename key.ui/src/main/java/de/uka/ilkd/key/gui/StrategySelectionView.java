@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +97,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      */
     private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
 
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             refresh(e.getSource().getSelectedProof());
         }
     };
@@ -152,7 +154,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         JPanel goPanel = new JPanel();
         GridBagLayout goLayout = new GridBagLayout();
         goPanel.setLayout(goLayout);
-        goPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        goPanel.setAlignmentX(LEFT_ALIGNMENT);
 
         gbcpanel5.gridx = 1;
         gbcpanel5.gridy = 0;
@@ -203,12 +205,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 predefChanged = true;
                 refreshDefaultButton();
             });
-            maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+            maxSlider.setAlignmentX(LEFT_ALIGNMENT);
             box.add(maxSlider);
             box.add(Box.createVerticalStrut(8));
         }
 
-        javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);
 
         // //////////////////////////////////////////////////////////////////////
@@ -219,7 +221,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             javaDLOptionsPanel.setLayout(javaDLOptionsLayout);
 
             javaDLOptionsScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-            javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
             box.add(javaDLOptionsScrollPane);
 
             int yCoord = 0;
@@ -512,7 +514,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         }
     }
 
-    public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
+    public Strategy<@NonNull Goal> getStrategy(String strategyName, Proof proof,
+            StrategyProperties properties) {
         if (mediator != null) {
             for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
@@ -549,7 +552,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     private void updateStrategySettings(String strategyName, StrategyProperties p) {
         final Proof proof = mediator.getSelectedProof();
-        final Strategy strategy = getStrategy(strategyName, proof, p);
+        final Strategy<@NonNull Goal> strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);

@@ -20,6 +20,11 @@ firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
+# Java Features
+Java/Records/README.txt
+Java/TextBlockLiterals/README.txt
+
+
 # The KeY Book (note: the comments here are only for maintainability, if you want to move an entry to a different section, look into the individual txt file!)
 ## Chapter 15 - Using the KeY Prover
 newBook/Using_KeY/Building_Propositional_Proofs/README.txt

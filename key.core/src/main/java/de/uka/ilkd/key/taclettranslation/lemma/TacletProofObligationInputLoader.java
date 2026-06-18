@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.awt.GraphicsEnvironment;
+
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
@@ -21,7 +23,7 @@ public class TacletProofObligationInputLoader implements ProofObligationLoader {
             Configuration properties) {
         String tacletName = properties.getString(IPersistablePO.PROPERTY_NAME);
         // This string is parsed by "proveRules.pl"
-        if (java.awt.GraphicsEnvironment.isHeadless()) {
+        if (GraphicsEnvironment.isHeadless()) {
             TacletProofObligationInput.LOGGER.info("Proof obligation for taclet: {}", tacletName);
         }
         TacletProofObligationInput proofOblInput =

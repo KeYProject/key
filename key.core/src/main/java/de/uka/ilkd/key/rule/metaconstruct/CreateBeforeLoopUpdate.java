@@ -5,13 +5,15 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.UpdateableOperator;
 
 
 /**
@@ -37,12 +39,12 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term loopTerm = term.sub(0);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm loopTerm = term.sub(0);
 
-        final Term anonHeapTerm = term.sub(1);
-        final Term anonSavedHeapTerm = term.sub(2);
-        final Term anonPermissionsHeapTerm = term.sub(3);
+        final JTerm anonHeapTerm = term.sub(1);
+        final JTerm anonSavedHeapTerm = term.sub(2);
+        final JTerm anonPermissionsHeapTerm = term.sub(3);
 
         return createBeforeLoopUpdate(MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
@@ -62,14 +64,14 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
-    private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm,
+    private static JTerm createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
+            JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
+            JTerm anonPermissionsHeapTerm,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term beforeLoopUpdate =
+        JTerm beforeLoopUpdate =
             tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
 
         if (isTransaction) {

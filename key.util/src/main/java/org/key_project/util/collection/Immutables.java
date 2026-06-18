@@ -163,7 +163,8 @@ public final class Immutables {
      *
      * @return the view onto the iterable as an immutable list
      */
-    public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
+    public static <T extends @Nullable Object> ImmutableList<T> createListFrom(
+            Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
@@ -181,7 +182,7 @@ public final class Immutables {
      *        predicate to apply to each element to determine if it
      *        should be included
      *
-     * @returns the filtered list
+     * @return the filtered list
      */
     public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts,
             Predicate<? super T> predicate) {

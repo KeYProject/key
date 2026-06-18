@@ -21,9 +21,9 @@
 \problem {
      wellFormed(heap)
    & (  inInt(pos)
-      & (    boolean::select(heap,
+      & (    select<[boolean]>(heap,
                              board,
-                             java.lang.Object::<created>)
+                             java.lang.Object::#$created)
            = TRUE
          | board = null))
    & mbyAtPre = javaSubInt(length(board), pos)
@@ -34,8 +34,8 @@
               & lt(x, length(board))
               & inInt(x)
            ->   leq(Z(0(#)),
-                    int::select(heap, board, arr(x)))
-              & lt(int::select(heap, board, arr(x)),
+                    select<[int]>(heap, board, arr(x)))
+              & lt(select<[int]>(heap, board, arr(x)),
                    length(board)))
       & \forall int p;
           \forall int x;
@@ -43,19 +43,19 @@
                 & (lt(x, p) & lt(p, pos))
                 & inInt(p)
                 & inInt(x)
-             ->   !  int::select(heap, board, arr(x))
-                   = int::select(heap, board, arr(p))
-                & (  !  javaSubInt(int::select(heap,
+             ->   !  select<[int]>(heap, board, arr(x))
+                   = select<[int]>(heap, board, arr(p))
+                & (  !  javaSubInt(select<[int]>(heap,
                                                board,
                                                arr(x)),
-                                   int::select(heap,
+                                   select<[int]>(heap,
                                                board,
                                                arr(p)))
                       = javaSubInt(p, x)
-                   & !  javaSubInt(int::select(heap,
+                   & !  javaSubInt(select<[int]>(heap,
                                                board,
                                                arr(p)),
-                                   int::select(heap,
+                                   select<[int]>(heap,
                                                board,
                                                arr(x)))
                       = javaSubInt(p, x)))
@@ -72,10 +72,10 @@
                     & lt(x, length(board))
                     & inInt(x)
                  ->   leq(Z(0(#)),
-                          int::select(heap,
+                          select<[int]>(heap,
                                       board,
                                       arr(x)))
-                    & lt(int::select(heap,
+                    & lt(select<[int]>(heap,
                                      board,
                                      arr(x)),
                          length(board)))
@@ -87,23 +87,23 @@
                              & lt(p, length(board)))
                           & inInt(p)
                           & inInt(x)
-                       ->   !  int::select(heap,
+                       ->   !  select<[int]>(heap,
                                            board,
                                            arr(x))
-                             = int::select(heap,
+                             = select<[int]>(heap,
                                            board,
                                            arr(p))
-                          & (  !  javaSubInt(int::select(heap,
+                          & (  !  javaSubInt(select<[int]>(heap,
                                                          board,
                                                          arr(x)),
-                                             int::select(heap,
+                                             select<[int]>(heap,
                                                          board,
                                                          arr(p)))
                                 = javaSubInt(p, x)
-                             & !  javaSubInt(int::select(heap,
+                             & !  javaSubInt(select<[int]>(heap,
                                                          board,
                                                          arr(p)),
-                                             int::select(heap,
+                                             select<[int]>(heap,
                                                          board,
                                                          arr(x)))
                                 = javaSubInt(p, x))))
@@ -150,7 +150,7 @@
                                     & inInt(x)
                                  ->   (int)(any::seqGet(s,
                                                         x))
-                                    = int::select(heapAtPre,
+                                    = select<[int]>(heapAtPre,
                                                   board,
                                                   arr(x)))))))
             & exc = null
@@ -163,9 +163,9 @@
                                           javaSubInt(length(board),
                                                      Z(1(#)))))
                    | !o = null
-                   & !  boolean::select(heapAtPre,
+                   & !  select<[boolean]>(heapAtPre,
                                         o,
-                                        java.lang.Object::<created>)
+                                        java.lang.Object::#$created)
                       = TRUE
                    |   any::select(heap, o, f)
                      = any::select(heapAtPre, o, f)))
@@ -1030,7 +1030,7 @@
                (rule "tryEmpty" (formula "16") (term "1,1,0,1,0,1"))
                (rule "emptyModality" (formula "16") (term "1,1,0,1,0,1"))
                (builtin "One Step Simplification" (formula "16"))
-               (builtin "Use Operation Contract" (formula "16") (contract "pre: and(and(leq(Z(0(#)),pos),lt(pos,length(board))),not(equals(board,null))); mby: null; post: and(equiv(equals(result,TRUE),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,pos)),inInt(x)),and(not(equals(int::select(heap,board,arr(x)),int::select(heap,board,arr(pos)))),and(not(equals(javaSubInt(int::select(heap,board,arr(x)),int::select(heap,board,arr(pos))),javaSubInt(pos,x))),not(equals(javaSubInt(int::select(heap,board,arr(pos)),int::select(heap,board,arr(x))),javaSubInt(pos,x)))))))),equals(exc,null)); mod: empty; termination: diamond"))
+               (builtin "Use Operation Contract" (formula "16") (contract "pre: and(and(leq(Z(0(#)),pos),lt(pos,length(board))),not(equals(board,null))); mby: null; post: and(equiv(equals(result,TRUE),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,pos)),inInt(x)),and(not(equals(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(pos)))),and(not(equals(javaSubInt(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(pos))),javaSubInt(pos,x))),not(equals(javaSubInt(select<[int]>(heap,board,arr(pos)),select<[int]>(heap,board,arr(x))),javaSubInt(pos,x)))))))),equals(exc,null)); mod: empty; termination: diamond"))
                (branch " Post"
                   (builtin "One Step Simplification" (formula "16"))
                   (builtin "One Step Simplification" (formula "18"))
@@ -1070,7 +1070,7 @@
                            (rule "variableDeclaration" (formula "20") (term "1,1,1") (newnames "var_1") (userinteraction))
                            (rule "assignment" (formula "20") (term "1,1,1") (userinteraction))
                            (builtin "One Step Simplification" (formula "20"))
-                           (builtin "Use Operation Contract" (formula "20") (contract "pre: and(and(and(and(leq(Z(0(#)),pos),lt(pos,length(board))),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,length(board))),inInt(x)),and(leq(Z(0(#)),int::select(heap,board,arr(x))),lt(int::select(heap,board,arr(x)),length(board)))))),all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,pos))),inInt(p)),inInt(x)),and(not(equals(int::select(heap,board,arr(x)),int::select(heap,board,arr(p)))),and(not(equals(javaSubInt(int::select(heap,board,arr(x)),int::select(heap,board,arr(p))),javaSubInt(p,x))),not(equals(javaSubInt(int::select(heap,board,arr(p)),int::select(heap,board,arr(x))),javaSubInt(p,x))))))))),not(equals(board,null))); mby: javaSubInt(length(board),pos); post: and(and(and(all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,length(board))),inInt(x)),and(leq(Z(0(#)),int::select(heap,board,arr(x))),lt(int::select(heap,board,arr(x)),length(board))))),imp(equals(result,TRUE),all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,length(board)))),inInt(p)),inInt(x)),and(not(equals(int::select(heap,board,arr(x)),int::select(heap,board,arr(p)))),and(not(equals(javaSubInt(int::select(heap,board,arr(x)),int::select(heap,board,arr(p))),javaSubInt(p,x))),not(equals(javaSubInt(int::select(heap,board,arr(p)),int::select(heap,board,arr(x))),javaSubInt(p,x)))))))))),imp(not(equals(result,TRUE)),not(exist{s:Seq}(and(equals(seqLen(s),length(board)),and(all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,seqLen(s))),inInt(x)),and(leq(Z(0(#)),int::cast(any::seqGet(s,x))),lt(int::cast(any::seqGet(s,x)),seqLen(s))))),and(all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,seqLen(s)))),inInt(p)),inInt(x)),and(not(equals(int::cast(any::seqGet(s,x)),int::cast(any::seqGet(s,p)))),and(not(equals(javaSubInt(int::cast(any::seqGet(s,x)),int::cast(any::seqGet(s,p))),javaSubInt(p,x))),not(equals(javaSubInt(int::cast(any::seqGet(s,p)),int::cast(any::seqGet(s,x))),javaSubInt(p,x)))))))),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,pos)),inInt(x)),equals(int::cast(any::seqGet(s,x)),int::select(heapAtPre,board,arr(x)))))))))))),equals(exc,null)); mod: arrayRange(board,pos,javaSubInt(length(board),Z(1(#)))); termination: diamond"))
+                           (builtin "Use Operation Contract" (formula "20") (contract "pre: and(and(and(and(leq(Z(0(#)),pos),lt(pos,length(board))),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,length(board))),inInt(x)),and(leq(Z(0(#)),select<[int]>(heap,board,arr(x))),lt(select<[int]>(heap,board,arr(x)),length(board)))))),all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,pos))),inInt(p)),inInt(x)),and(not(equals(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(p)))),and(not(equals(javaSubInt(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(p))),javaSubInt(p,x))),not(equals(javaSubInt(select<[int]>(heap,board,arr(p)),select<[int]>(heap,board,arr(x))),javaSubInt(p,x))))))))),not(equals(board,null))); mby: javaSubInt(length(board),pos); post: and(and(and(all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,length(board))),inInt(x)),and(leq(Z(0(#)),select<[int]>(heap,board,arr(x))),lt(select<[int]>(heap,board,arr(x)),length(board))))),imp(equals(result,TRUE),all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,length(board)))),inInt(p)),inInt(x)),and(not(equals(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(p)))),and(not(equals(javaSubInt(select<[int]>(heap,board,arr(x)),select<[int]>(heap,board,arr(p))),javaSubInt(p,x))),not(equals(javaSubInt(select<[int]>(heap,board,arr(p)),select<[int]>(heap,board,arr(x))),javaSubInt(p,x)))))))))),imp(not(equals(result,TRUE)),not(exist{s:Seq}(and(equals(seqLen(s),length(board)),and(all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,seqLen(s))),inInt(x)),and(leq(Z(0(#)),int::cast(any::seqGet(s,x))),lt(int::cast(any::seqGet(s,x)),seqLen(s))))),and(all{p:int}(all{x:int}(imp(and(and(and(leq(Z(0(#)),x),and(lt(x,p),lt(p,seqLen(s)))),inInt(p)),inInt(x)),and(not(equals(int::cast(any::seqGet(s,x)),int::cast(any::seqGet(s,p)))),and(not(equals(javaSubInt(int::cast(any::seqGet(s,x)),int::cast(any::seqGet(s,p))),javaSubInt(p,x))),not(equals(javaSubInt(int::cast(any::seqGet(s,p)),int::cast(any::seqGet(s,x))),javaSubInt(p,x)))))))),all{x:int}(imp(and(and(leq(Z(0(#)),x),lt(x,pos)),inInt(x)),equals(int::cast(any::seqGet(s,x)),select<[int]>(heapAtPre,board,arr(x)))))))))))),equals(exc,null)); mod: arrayRange(board,pos,javaSubInt(length(board),Z(1(#)))); termination: diamond"))
                            (branch " Post"
                               (builtin "One Step Simplification" (formula "22"))
                               (rule "assignment" (formula "22") (term "1") (userinteraction))
@@ -1488,7 +1488,7 @@
                                        (rule "nnf_notAnd" (formula "18") (term "1,1,0,0,0,1,1,0,1,0"))
                                        (builtin "One Step Simplification" (formula "18"))
                                        (rule "cut_direct" (formula "29") (term "0"))
-                                       (branch " CUT: int::select(heapAfter_search, board, arr(x_14)) >= 0 TRUE"
+                                       (branch " CUT: select<[int]>(heapAfter_search, board, arr(x_14)) >= 0 TRUE"
                                           (builtin "One Step Simplification" (formula "30"))
                                           (rule "inEqSimp_leqRight" (formula "30"))
                                           (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
@@ -2967,7 +2967,7 @@
                                              )
                                           )
                                        )
-                                       (branch " CUT: int::select(heapAfter_search, board, arr(x_14)) >= 0 FALSE"
+                                       (branch " CUT: select<[int]>(heapAfter_search, board, arr(x_14)) >= 0 FALSE"
                                           (builtin "One Step Simplification" (formula "30"))
                                           (rule "false_right" (formula "30"))
                                           (rule "inEqSimp_geqRight" (formula "29"))
@@ -5348,7 +5348,7 @@
     (  _var61 >= 1 + pos
      & _var61 <= -1 + mbyAtPre + pos
      & arr(_var61) = f_4)
-& !f_4 = <created> TRUE"
+& !f_4 = $created TRUE"
                                           (rule "andLeft" (formula "1"))
                                           (rule "notLeft" (formula "2"))
                                           (rule "exLeft" (formula "1") (inst "sk=_var61_0"))
@@ -5425,7 +5425,7 @@
     (  _var61 >= 1 + pos
      & _var61 <= -1 + mbyAtPre + pos
      & arr(_var61) = f_4)
-& !f_4 = <created> FALSE"
+& !f_4 = $created FALSE"
                                           (rule "cnf_rightDist" (formula "37") (term "1,1,0,0"))
                                           (rule "commute_or" (formula "37") (term "0,1,1,0,0"))
                                           (rule "cnf_rightDist" (formula "35") (term "0,0"))
@@ -5776,14 +5776,14 @@
                                           (rule "inEqSimp_exactShadow3" (formula "39") (ifseqformula "41"))
                                           (builtin "One Step Simplification" (formula "39"))
                                           (rule "cut_direct" (formula "53") (term "0,1"))
-                                          (branch " CUT: f_4 = <created> TRUE"
+                                          (branch " CUT: f_4 = $created TRUE"
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "false_right" (formula "54"))
                                              (rule "replace_known_left" (formula "54") (term "0,1,0,0") (ifseqformula "1"))
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "closeTrue" (formula "54"))
                                           )
-                                          (branch " CUT: f_4 = <created> FALSE"
+                                          (branch " CUT: f_4 = $created FALSE"
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "replace_known_right" (formula "55") (term "0,1,0,0") (ifseqformula "53"))
                                              (builtin "One Step Simplification" (formula "55"))
@@ -7469,7 +7469,7 @@
                                                 (rule "nnf_notAnd" (formula "18") (term "1,1,0,0,0,1,1,0,1,0"))
                                                 (builtin "One Step Simplification" (formula "18"))
                                                 (rule "cut_direct" (formula "29") (term "0"))
-                                                (branch " CUT: int::select(heapAfter_search, board, arr(x_16)) >= 0 TRUE"
+                                                (branch " CUT: select<[int]>(heapAfter_search, board, arr(x_16)) >= 0 TRUE"
                                                    (builtin "One Step Simplification" (formula "30"))
                                                    (rule "inEqSimp_leqRight" (formula "30"))
                                                    (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
@@ -8584,7 +8584,7 @@
                                                       )
                                                    )
                                                 )
-                                                (branch " CUT: int::select(heapAfter_search, board, arr(x_16)) >= 0 FALSE"
+                                                (branch " CUT: select<[int]>(heapAfter_search, board, arr(x_16)) >= 0 FALSE"
                                                    (builtin "One Step Simplification" (formula "30"))
                                                    (rule "false_right" (formula "30"))
                                                    (rule "inEqSimp_geqRight" (formula "29"))
@@ -11503,7 +11503,7 @@
     (  _var120 >= 1 + pos
      & _var120 <= -1 + mbyAtPre + pos
      & arr(_var120) = f_5)
-& !f_5 = <created> TRUE"
+& !f_5 = $created TRUE"
                                              (rule "andLeft" (formula "1"))
                                              (rule "notLeft" (formula "2"))
                                              (rule "exLeft" (formula "1") (inst "sk=_var120_0"))
@@ -11580,7 +11580,7 @@
     (  _var120 >= 1 + pos
      & _var120 <= -1 + mbyAtPre + pos
      & arr(_var120) = f_5)
-& !f_5 = <created> FALSE"
+& !f_5 = $created FALSE"
                                              (rule "shift_paren_or" (formula "26") (term "0,0"))
                                              (rule "inEqSimp_or_tautInEq3" (formula "26") (term "0,0,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "26") (term "1,0,0,0"))
@@ -11800,14 +11800,14 @@
                                              (rule "inEqSimp_contradInEq1" (formula "41") (term "0") (ifseqformula "10"))
                                              (builtin "One Step Simplification" (formula "41"))
                                              (rule "cut_direct" (formula "47") (term "0,1"))
-                                             (branch " CUT: f_5 = <created> TRUE"
+                                             (branch " CUT: f_5 = $created TRUE"
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "false_right" (formula "48"))
                                                 (rule "replace_known_left" (formula "48") (term "0,1,0,0") (ifseqformula "1"))
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "closeTrue" (formula "48"))
                                              )
-                                             (branch " CUT: f_5 = <created> FALSE"
+                                             (branch " CUT: f_5 = $created FALSE"
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "replace_known_right" (formula "49") (term "0,1,0,0") (ifseqformula "47"))
                                                 (builtin "One Step Simplification" (formula "49"))

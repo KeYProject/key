@@ -8,12 +8,13 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * Abstract class factoring out commonalities of typical term transformer implementations. The
  * available singletons of term transformers are kept here.
  */
-public abstract class AbstractTermTransformer extends AbstractSortedOperator
+public abstract class AbstractTermTransformer extends JAbstractSortedOperator
         implements TermTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(AbstractTermTransformer.class);
 
@@ -124,15 +125,16 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /**
      * @return String representing a logical integer literal in decimal representation
      */
-    public static String convertToDecimalString(Term term, Services services) {
+    public static String convertToDecimalString(Term term,
+            Services services) {
         StringBuilder result = new StringBuilder();
         boolean neg = false;
 
-        Operator top = term.op();
+        var top = term.op();
         IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();
         final Operator numbers = intModel.getNumberSymbol();
-        final Operator base = intModel.getNumberTerminator();
-        final Operator minus = intModel.getNegativeNumberSign();
+        final var base = intModel.getNumberTerminator();
+        final var minus = intModel.getNegativeNumberSign();
         // check whether term is really a "literal"
 
         // skip any updates that have snuck in (int lits are rigid)

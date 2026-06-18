@@ -76,7 +76,7 @@
                         <variable name="value" isArrayIndex="false">
                            <value name="value {equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self)}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self)">
                            </value>
-                           <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="int::select(heap,self,VariablesConditionalCycle::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
+                           <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="select<[int]>(heap,self,VariablesConditionalCycle::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
                            </value>
                         </variable>
                      </value>
@@ -101,7 +101,7 @@
                            <variable name="value" isArrayIndex="false">
                               <value name="value {equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self)}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self)">
                               </value>
-                              <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="int::select(heap,self,VariablesConditionalCycle::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
+                              <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="select<[int]>(heap,self,VariablesConditionalCycle::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
                               </value>
                            </variable>
                         </value>

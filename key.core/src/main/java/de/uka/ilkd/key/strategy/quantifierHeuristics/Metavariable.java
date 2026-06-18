@@ -4,16 +4,16 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.Named;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 @Deprecated
-public final class Metavariable extends AbstractSortedOperator
-        implements ParsableVariable, Comparable<Metavariable>, TerminalSyntaxElement {
+public final class Metavariable extends JAbstractSortedOperator
+        implements Comparable<Metavariable>, TerminalSyntaxElement, Named {
 
     // Used to define an alternative order of all existing
     // metavariables

@@ -15,7 +15,7 @@ import org.key_project.logic.sort.Sort;
  * another formula. There are six such operators: true, false, conjunction, disjunction, negation,
  * and implication.
  */
-public final class Junctor extends AbstractSortedOperator {
+public final class Junctor extends JAbstractSortedOperator {
 
     /**
      * the true constant

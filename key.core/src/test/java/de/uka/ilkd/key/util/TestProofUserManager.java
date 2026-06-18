@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 
 import org.key_project.util.java.ArrayUtil;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -250,7 +249,7 @@ public class TestProofUserManager {
         // Test dispose of not registered proof
         Proof fourthProof = new Proof("TestProofUserManager 4",
             new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-        Assertions.assertFalse(fourthProof.isDisposed());
+        assertFalse(fourthProof.isDisposed());
         assertEquals(0, ProofUserManager.getInstance().getProofs().length);
         ProofUserManager.getInstance().removeUserAndDispose(fourthProof, new Object());
         assertTrue(fourthProof.isDisposed());

@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.io.File;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.api.KeYApi;
-import de.uka.ilkd.key.api.ProofApi;
-import de.uka.ilkd.key.api.ProofManagementApi;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
@@ -25,8 +23,8 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author Wolfram Pfeifer
  */
 class IntSemanticsTest {
-    private static final File TEST_DIR = new File(FindResources.getTestResourcesDirectory(),
-        "/de/uka/ilkd/key/rule/intSemantics/");
+    private static final Path TEST_DIR = FindResources.getTestResourcesDirectory()
+            .resolve("de/uka/ilkd/key/rule/intSemantics/");
 
     /**
      * This test checks that certain proofs containing integer corner cases are reloadable.
@@ -40,9 +38,9 @@ class IntSemanticsTest {
         "uncheckedOF/mBigint.proof",
         "checkedOF/mOFCheck.proof" })
     void testSemanticsProvable(String filename) throws ProblemLoaderException {
-        File proofFile = new File(TEST_DIR, filename);
-        ProofManagementApi pmapi = KeYApi.loadProof(proofFile);
-        Proof proof = pmapi.getLoadedProof().getProof();
+        Path proofFile = TEST_DIR.resolve(filename);
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(proofFile);
+        Proof proof = pmapi.getLoadedProof();
         // Proof should be reloaded completely now. If not, the int semantics are probably broken.
         Assertions.assertTrue(proof.closed());
     }
@@ -59,11 +57,10 @@ class IntSemanticsTest {
         "uncheckedOF/mBigintWrong.key",
         "checkedOF/mOFCheckWrong.key", })
     void testSemanticsUnprovable(String filename) throws ProblemLoaderException {
-        File keyFile = new File(TEST_DIR, filename);
-        ProofManagementApi pmapi = KeYApi.loadFromKeyFile(keyFile);
-        ProofApi proofApi = pmapi.getLoadedProof();
-        Proof proof = proofApi.getProof();
-        proofApi.getEnv().getProofControl().startAndWaitForAutoMode(proof);
+        Path keyFile = TEST_DIR.resolve(filename);
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile);
+        Proof proof = pmapi.getLoadedProof();
+        pmapi.getProofControl().startAndWaitForAutoMode(proof);
         // we expect that exactly one branch (the overflow check) is open now:
         Assertions.assertEquals(1, proof.openGoals().size());
     }

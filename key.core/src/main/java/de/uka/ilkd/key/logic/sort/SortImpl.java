@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.sort;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -15,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Abstract base class for implementations of the Sort interface.
  */
-public class SortImpl extends org.key_project.logic.sort.AbstractSort {
+public class SortImpl extends AbstractSort {
     /**
      * Documentation for this sort given by the associated documentation comment.
      *
@@ -98,11 +99,7 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof SortImpl) {
-            return ((SortImpl) o).name().equals(name());
-        } else {
-            return false;
-        }
+    public boolean containsGenericSort() {
+        return false;
     }
 }

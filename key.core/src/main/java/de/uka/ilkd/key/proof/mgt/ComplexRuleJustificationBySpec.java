@@ -6,22 +6,22 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.rule.RuleApp;
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.RuleApp;
 
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
-    private final Map<RuleApp, RuleJustificationBySpec> app2Just =
-        new LinkedHashMap<>();
+    private final Map<RuleApp, RuleJustificationBySpec> app2Just = new LinkedHashMap<>();
 
-
+    @Override
     public boolean isAxiomJustification() {
         return false;
     }
 
 
-    public RuleJustification getSpecificJustification(RuleApp app, TermServices services) {
+    @Override
+    public RuleJustification getSpecificJustification(RuleApp app, LogicServices services) {
         RuleJustification result = app2Just.get(app);
         return result == null ? this : result;
     }

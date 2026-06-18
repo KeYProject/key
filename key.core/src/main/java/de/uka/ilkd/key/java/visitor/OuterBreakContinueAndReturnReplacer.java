@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -131,7 +133,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             assert flag != null : "a label flag must not be null";
             final Statement assign =
                 KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
-            final Statement[] statements = new Statement[] { assign, breakOut };
+            final Statement[] statements = { assign, breakOut };
             addChild(new StatementBlock(statements));
             changed();
         } else {

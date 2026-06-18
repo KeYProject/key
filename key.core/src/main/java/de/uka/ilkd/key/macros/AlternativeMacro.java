@@ -6,13 +6,13 @@ package de.uka.ilkd.key.macros;
 import java.util.List;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -48,7 +48,8 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      * there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         final List<ProofMacro> macros = getProofMacros();
         for (ProofMacro macro : macros) {
             if (macro.canApplyTo(proof, goals, posInOcc)) {

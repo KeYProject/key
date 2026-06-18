@@ -370,7 +370,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         /** @return boolean true iff. obj in list */
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(@Nullable Object obj) {
             ImmutableList<S> list = this;
             S t;
             while (!list.isEmpty()) {
@@ -585,7 +585,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(@Nullable Object obj) {
             return false;
         }
 
@@ -643,8 +643,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             /**
              * creates the NIL list iterator
              */
-            public SLNilListIterator() {
-            }
+            public SLNilListIterator() {}
 
             /** @return next element in list */
             @Override

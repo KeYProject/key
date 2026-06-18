@@ -4,33 +4,38 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -38,8 +43,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TacletForTests {
 
-    private TacletForTests() {
-    }
+    private TacletForTests() {}
 
     public static final String testRules =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
@@ -51,7 +55,7 @@ public class TacletForTests {
     public static TacletIndex rules = null;
     public static Services services;
     public static InitConfig initConfig;
-    public static File lastFile = null;
+    public static Path lastFile = null;
 
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
@@ -59,8 +63,10 @@ public class TacletForTests {
     public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
+        @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
+            return new RuleCollection(
+                ImmutableList.of(RuleSourceFactory.fromDefaultLocation(ldtFile)),
                 ImmutableSLList.nil());
         }
     };
@@ -75,7 +81,7 @@ public class TacletForTests {
         nss = new NamespaceSet();
     }
 
-    public static void parse(File file) {
+    public static void parse(Path file) {
         try {
             if (!file.equals(lastFile)) {
                 KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);
@@ -104,7 +110,7 @@ public class TacletForTests {
         if (services == null) {
             parse();
         }
-        return services;
+        return services.copy(false);
     }
 
 
@@ -125,7 +131,7 @@ public class TacletForTests {
     }
 
     public static void parse(String filename) {
-        parse(new File(filename));
+        parse(Paths.get(filename));
     }
 
     public static void parse() {
@@ -148,12 +154,18 @@ public class TacletForTests {
         return rules;
     }
 
+    @NonNull
+    public static NoPosTacletApp lookupTaclet(String name) {
+        var result = getRules().lookup(name);
+        assertNotNull(result, "Failed to find taclet " + name);
+        return result;
+    }
 
     public static Namespace<RuleSet> getHeuristics() {
         return nss.ruleSets();
     }
 
-    public static Namespace<JFunction> getFunctions() {
+    public static Namespace<? extends Function> getFunctions() {
         return nss.functions();
     }
 
@@ -186,7 +198,7 @@ public class TacletForTests {
         return getSorts().lookup(new Name(name));
     }
 
-    public static Term parseTerm(String termstr, Services services) {
+    public static JTerm parseTerm(String termstr, Services services, NamespaceSet nss) {
         if (termstr.isEmpty()) {
             return null;
         }
@@ -202,19 +214,41 @@ public class TacletForTests {
 
     }
 
-    public static Term parseTerm(String termstr, NamespaceSet set) {
+    public static JTerm parseTerm(String termstr, Services services) {
+        if (termstr.isEmpty()) {
+            return null;
+        }
+
+        try {
+            KeyIO io = new KeyIO(services, nss);
+            // TacletForTests.getAbbrevs()
+            return io.parseExpression(termstr);
+        } catch (Exception e) {
+            fail("Exception occurred while parsing of " + termstr, e);
+            return null;
+        }
+
+    }
+
+    public static JTerm parseTerm(String termstr, NamespaceSet set) {
         if (termstr.isEmpty()) {
             return null;
         }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 
-    public static Term parseTerm(String termstr) {
+    public static JTerm parseTerm(String termstr) {
         return parseTerm(termstr, services());
     }
 
     public static ProgramElement parsePrg(String prgString) {
-        Recoder2KeY r2k = new Recoder2KeY(services(), new NamespaceSet());
-        return r2k.readBlockWithEmptyContext(prgString).program();
+        JavaService r2k = services().getJavaService();
+        return r2k.readBlockWithEmptyContext(prgString, null).program();
+    }
+
+    public static Goal createGoal() {
+        return new Goal(new Node(new Proof("Some name", initConfig())),
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), services());
     }
 }

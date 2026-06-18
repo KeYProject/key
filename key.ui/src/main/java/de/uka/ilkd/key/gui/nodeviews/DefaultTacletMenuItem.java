@@ -13,9 +13,9 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -112,11 +112,11 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
-            case '<' -> nsb.append("&lt;");
-            case '>' -> nsb.append("&gt;");
-            case '&' -> nsb.append("&amp;");
-            case '\n' -> nsb.append("<br>");
-            default -> nsb.append(asb.charAt(i));
+                case '<' -> nsb.append("&lt;");
+                case '>' -> nsb.append("&gt;");
+                case '&' -> nsb.append("&amp;");
+                case '\n' -> nsb.append("<br>");
+                default -> nsb.append(asb.charAt(i));
             }
         }
         return nsb;

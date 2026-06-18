@@ -6,11 +6,12 @@ package de.uka.ilkd.key.logic.equality;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.logic.Property;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -25,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Tobias Reinhold
  */
-public class ProofIrrelevancyProperty implements Property<Term> {
+public class ProofIrrelevancyProperty implements Property<JTerm> {
     /**
      * The single instance of this property.
      */
@@ -44,7 +45,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
      * that are not relevant for the purpose of these terms in the proof.
      * <p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
+     * Combines the prior implementations of {@code EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      * </p>
      *
@@ -56,16 +57,19 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * @param <V> is not needed for this equality check
      */
     @Override
-    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
+    public <V> boolean equalsModThisProperty(JTerm term1, JTerm term2, V... v) {
         if (term2 == term1) {
             return true;
         }
 
-        final boolean opResult = term1.op().equalsModProofIrrelevancy(term2.op());
+        final boolean opResult =
+            EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(term1.op(), term2.op());
         if (!(opResult
                 && EqualsModProofIrrelevancyUtil.compareImmutableArrays(term1.boundVars(),
-                    term2.boundVars())
-                && term1.javaBlock().equalsModProofIrrelevancy(term2.javaBlock()))) {
+                    term2.boundVars(),
+                    EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)
+                && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(term1.javaBlock(),
+                    term2.javaBlock()))) {
             return false;
         }
 
@@ -82,8 +86,8 @@ public class ProofIrrelevancyProperty implements Property<Term> {
             }
         }
 
-        final ImmutableArray<Term> term1Subs = term1.subs();
-        final ImmutableArray<Term> term2Subs = term2.subs();
+        final ImmutableArray<JTerm> term1Subs = term1.subs();
+        final ImmutableArray<JTerm> term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), PROOF_IRRELEVANCY_PROPERTY)) {
@@ -98,17 +102,17 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * <p>
      * Computes a hashcode that represents the proof-relevant fields of {@code term}.
      * </p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
-     * LabeledTermImpl.
      *
      * @param term the term to compute the hashcode for
      * @return the hashcode
      */
     @Override
-    public int hashCodeModThisProperty(Term term) {
+    public int hashCodeModThisProperty(JTerm term) {
         int hashcode = Objects.hash(term.op(),
-            EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY, term.subs()),
-            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+            EqualityUtils.hashCodeModPropertyOfIterable(term.subs(), this::hashCodeModThisProperty),
+            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars(),
+                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
+            term.javaBlock());
 
         // part from LabeledTermImpl
         final ImmutableArray<TermLabel> labels = term.getLabels();

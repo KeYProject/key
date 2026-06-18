@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import de.uka.ilkd.key.logic.PosInTerm;
-
+import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.Pair;
 
 public class SMTAppIntermediate extends BuiltInAppIntermediate {

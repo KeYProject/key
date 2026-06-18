@@ -6,9 +6,9 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.jspecify.annotations.Nullable;
 
@@ -49,5 +49,5 @@ public interface SpecificationElement {
      * @param services services.
      * @return this specification element with the operator applied.
      */
-    SpecificationElement map(UnaryOperator<Term> op, Services services);
+    SpecificationElement map(UnaryOperator<JTerm> op, Services services);
 }

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,11 +12,13 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.*;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         if (tok == null) {
             throw new IllegalArgumentException(
                 "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
+        }
+        // Replace ANTLR's terse default messages (e.g. "mismatched input ';' expecting ...") with a
+        // concise, human-readable description that names the expected token(s) and what was found.
+        if (e instanceof InputMismatchException) {
+            msg = ExceptionTools.describeSyntaxError(parser.getVocabulary(), tok,
+                e.getExpectedTokens());
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
             MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
@@ -157,7 +164,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         public String showInInput(String[] lines) {
-            String line = lines[this.line];
+            String line;
+            try {
+                line = lines[this.line];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                line = "";
+            }
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
                 + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
@@ -169,10 +181,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
     public static class ParserException extends RuntimeException implements HasLocation {
         private final List<SyntaxError> errors;
+        private final Location location;
 
         public ParserException(String msg, List<SyntaxError> errors) {
             super(msg);
             this.errors = errors;
+            if (errors.isEmpty()) {
+                location = Location.UNDEFINED;
+            } else {
+                SyntaxError e = errors.get(0);
+                // e.charPositionInLine is 0 based!
+                location =
+                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+            }
         }
 
         public String print(String[] lines, CharSequence delimter) {
@@ -192,14 +213,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public Location getLocation() throws MalformedURLException {
-            if (!errors.isEmpty()) {
-                SyntaxError e = errors.get(0);
-                // e.charPositionInLine is 0 based!
-                return new Location(e.source,
-                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
-            }
-            return null;
+        public @NonNull Location getLocation() {
+            return location;
         }
     }
 }

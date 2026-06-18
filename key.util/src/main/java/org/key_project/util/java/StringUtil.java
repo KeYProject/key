@@ -490,4 +490,86 @@ public final class StringUtil {
         return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
                 .filter(ch -> ch == x).count();
     }
+
+    /**
+     *
+     * @param text
+     * @param line
+     * @param charPositionInLine
+     * @return
+     */
+    public static String move(@NonNull String text, int line, int charPositionInLine) {
+        return repeat("\n", line) + repeat(" ", charPositionInLine) + text;
+    }
+
+    /// Returns the string until the first match of the given regex.
+    public static String takeUntil(String content, String regex) {
+        var array = content.split(regex, 2);
+        return array[0];
+    }
+
+    /// Returns the string after the first match of the given regex.
+    public static String takeAfter(String content, String regex) {
+        var array = content.split(regex, 2);
+        return array[1];
+    }
+
+
+    /**
+     * Replaces {@literal <},{@literal >},{@literal &} and new lines with their HTML masks.
+     *
+     * @param sb The StringBuffer with forbidden HTML characters
+     * @return A new StringBuffer with the masked characters.
+     */
+    public static StringBuilder ascii2html(String sb) {
+        StringBuilder nsb = new StringBuilder();
+        String asb = removeEmptyLines(sb);
+        int sbl = asb.length();
+        for (int i = 0; i < sbl; i++) {
+            switch (asb.charAt(i)) {
+                case '<':
+                    nsb.append("&lt;");
+                    break;
+                case '>':
+                    nsb.append("&gt;");
+                    break;
+                case '&':
+                    nsb.append("&amp;");
+                    break;
+                case '\n':
+                    nsb.append("<br>");
+                    break;
+                default:
+                    nsb.append(asb.charAt(i));
+            }
+        }
+        return nsb;
+    }
+
+    public static String removeEmptyLines(String string) {
+        // This regular expression matches against lines that only have spaces
+        // (' ' or '\t') in them and against trailing new line characters and
+        // replaces them with "".
+        // This fixes bug #1435, MU
+        return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
+    }
+
+
+    /**
+     * Efficient way to append repeated characters to a StringBuilder instead of String::repeat.
+     * Allocates only once instead of twice and does half the work
+     *
+     * @param b
+     *        the builder to append to
+     * @param value
+     *        the character
+     * @param count
+     *        the times to repeat the character
+     */
+    public static void appendRepeated(StringBuilder b, char value, int count) {
+        b.ensureCapacity(b.length() + count);
+        for (int i = 0; i < count; i++) {
+            b.append(value);
+        }
+    }
 }

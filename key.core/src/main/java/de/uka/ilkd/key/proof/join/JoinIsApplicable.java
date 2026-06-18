@@ -6,12 +6,14 @@ package de.uka.ilkd.key.proof.join;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -35,7 +37,8 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then, the join is not
      *         applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
+    public List<ProspectivePartner> isApplicable(Goal goal,
+            PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<>();
         }
@@ -49,7 +52,8 @@ public class JoinIsApplicable {
      * @param pio Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partners.
      */
-    public List<ProspectivePartner> computeProspecitvePartner(Goal goal, PosInOccurrence pio) {
+    public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
+            PosInOccurrence pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<>();
 
@@ -75,12 +79,12 @@ public class JoinIsApplicable {
      * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {
-        Term referenceFormula = pio.subTerm();
+        JTerm referenceFormula = (JTerm) pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
 
-        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0)
+        JTerm update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0)
                 : tb.skip();
 
         referenceFormula =
@@ -88,18 +92,19 @@ public class JoinIsApplicable {
                     : referenceFormula;
 
         for (SequentFormula sf : g2.sequent().succedent()) {
-            Term formula = sf.formula();
+            var formula = sf.formula();
             Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
-                    && !formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
+                    && !RENAMING_TERM_PROPERTY.equalsModThisProperty(formula, referenceFormula)) {
                 update2 = formula.sub(0);// don't change the order of this and
                                          // the following line.
                 formula = formula.sub(1);
 
             }
-            if (formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
-                return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
-                    update1, g2.node(), sf, update2);
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(formula, referenceFormula)) {
+                return new ProspectivePartner(referenceFormula, g1.node(),
+                    pio.sequentFormula(),
+                    update1, g2.node(), sf, (JTerm) update2);
             }
         }
         return null;

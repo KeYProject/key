@@ -7,15 +7,16 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -85,14 +86,14 @@ public abstract class SLResolverManager {
         for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
             var logicVar = ns.lookup(n);
             if (logicVar != null) {
-                Term varTerm = tb.var(logicVar);
+                JTerm varTerm = tb.var(logicVar);
                 return new SLExpression(varTerm, kjts.get(logicVar));
             }
         }
         for (Namespace<LocationVariable> ns : localVariablesNamespaces) {
             var localVar = ns.lookup(n);
             if (localVar != null) {
-                Term varTerm = tb.var(localVar);
+                JTerm varTerm = tb.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));
             }
         }

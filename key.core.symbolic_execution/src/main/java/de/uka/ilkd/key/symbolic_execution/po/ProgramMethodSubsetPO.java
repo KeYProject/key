@@ -7,16 +7,18 @@ import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.BranchStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -224,7 +227,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         ImmutableList<LocationVariable> paramVarsList =
@@ -236,7 +239,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+    protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
             ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
@@ -248,7 +251,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+    protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
@@ -372,9 +375,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the end position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined end {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the end position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the end position.
      */
     protected static Position getEndPosition(Configuration properties) throws IOException {
         String line = properties.getString(END_LINE);

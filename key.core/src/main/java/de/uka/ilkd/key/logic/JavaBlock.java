@@ -3,28 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import java.util.Objects;
+
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
+public final class JavaBlock implements Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
      * Attention using the JavaBlock below means no program not the empty program. It is used as a
      * realization of the sentinel design pattern to mark terms with operators that are incapable of
      * containing a program like predicate symbols.
-     *
+     * <p>
      * If you want to have an empty program, create a new JavaBlock instance with an empty statement
      * block.
-     *
      */
     public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
 
@@ -48,11 +48,7 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
      *        being indeed a StatementBlock.
      */
     public static JavaBlock createJavaBlock(StatementBlock prg) {
-        assert prg != null;
-        /*
-         * if (prg.isEmpty() && ! ) { return EMPTY_JAVABLOCK; }
-         */
-        return new JavaBlock(prg);
+        return new JavaBlock(Objects.requireNonNull(prg));
     }
 
 
@@ -64,8 +60,8 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     public int size() {
-        if ((program() instanceof StatementBlock)) {
-            return ((StatementBlock) program()).getChildCount();
+        if (program() instanceof StatementBlock) {
+            return program().getChildCount();
         }
         return 0;
     }
@@ -105,29 +101,6 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
         printer.print(prg);
         return printer.result();
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof JavaBlock other)) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        // quite inefficient, but sufficient
-        return toString().equals(other.toString());
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        if (hashCode == -1) {
-            hashCode = toString().hashCode();
-            if (hashCode == -1) {
-                hashCode = 0;
-            }
-        }
-        return hashCode;
     }
 
     @Override

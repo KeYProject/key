@@ -6,9 +6,8 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Named;
@@ -26,13 +25,13 @@ public class TestDeclarationProgramVariableCollector {
         LoggerFactory.getLogger(TestDeclarationProgramVariableCollector.class);
 
     // some nonsense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] { "{ int j1 = 0; int j2, j3, j4 = 0;}",
+    private static final String[] jblocks = { "{ int j1 = 0; int j2, j3, j4 = 0;}",
         "{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
         "{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }" };
 
     // names of variables expected to be collected in jblocks
     private static final String[][] expectedVars =
-        new String[][] { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
+        { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
 
 
     private static JavaBlock[] test_block = new JavaBlock[jblocks.length];
@@ -50,9 +49,9 @@ public class TestDeclarationProgramVariableCollector {
         if (down != 0) {
             return;
         }
-        final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
+        final JavaService r2k = TacletForTests.services().getJavaService();
         for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
+            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
         }
     }
 

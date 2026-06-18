@@ -29,23 +29,21 @@ import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.ErrorMarkPainter;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,7 +236,7 @@ public final class IssueDialog extends JDialog {
         this.throwable = throwable;
         this.critical = critical;
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.warnings = decorateHTML(warnings);
         this.warnings.sort(Comparator.comparing(o -> o.location));
 
@@ -561,7 +559,11 @@ public final class IssueDialog extends JDialog {
         // make sure UI is usable after any exception
         MainWindow.getInstance().getMediator().startInterface(true);
 
-        Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
+        Set<PositionedIssueString> msg = extractMessage(exception);
+        if (exception instanceof BuildingExceptions) {
+            ((BuildingExceptions) exception).getErrors().forEach(
+                it -> LOGGER.info("Error", it));
+        }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
@@ -593,57 +595,41 @@ public final class IssueDialog extends JDialog {
     }
 
     /**
-     * Extracts message, position, and stracktrace from the given exception. To be successful, the
-     * exception must have a location (see {@link ExceptionTools#getLocation(Throwable)}).
+     * Turns a thrown exception into the set of issues shown by this dialog (message, source
+     * location and the full stack trace as detail).
+     * <p>
+     * The actual message/location extraction is delegated to {@link ExceptionTools#getMessages} -
+     * the single, GUI-independent source of truth that the command line uses as well. It digs into
+     * the exceptions that bundle several problems (e.g. {@code BuildingExceptions}) and produces a
+     * friendly message + {@link Location} per problem.
      *
      * @param exception the exception to extract the data from
-     * @return a new PositionedIssueString created from the data
+     * @return one {@link PositionedIssueString} per contained problem
      */
-    private static PositionedIssueString extractMessage(Throwable exception) {
+    // package-private (instead of private) so the extraction can be tested without constructing the
+    // Swing dialog (see IssueDialogMessageTest).
+    static Set<PositionedIssueString> extractMessage(Throwable exception) {
+        // The full stack trace is offered in the dialog's "details" pane; it is the same for every
+        // problem extracted from this exception.
+        String stackTrace;
         try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
-            String message = exception.getMessage();
-            String info = sw.toString();
-
-            if (exception instanceof ParseCancellationException) {
-                exception = exception.getCause();
-            }
-
-            if (exception instanceof InputMismatchException ime) {
-                message = ExceptionTools.getNiceMessage(ime);
-            }
-            if (exception instanceof NoViableAltException nvae) {
-                message = ExceptionTools.getNiceMessage(nvae);
-            }
-
-            // also add message of the cause to the string if available
-            if (exception.getCause() != null) {
-                String causeMessage = exception.getCause().getMessage();
-                message = message == null ? causeMessage
-                        : String.format("%s%n%nCaused by: %s", message,
-                            exception.getCause().toString());
-            }
-
-            URI resourceLocation = null;
-            Position pos = Position.UNDEFINED;
-            Location location = ExceptionTools.getLocation(exception);
-            if (location != null) {
-                var loc = location;
-                if (!loc.getPosition().isNegative()) {
-                    pos = loc.getPosition();
-                }
-                if (loc.getFileURI().isPresent()) {
-                    resourceLocation = loc.getFileURI().get();
-                }
-            }
-            return new PositionedIssueString(message == null ? exception.toString() : message,
-                new Location(resourceLocation, pos), info);
+            stackTrace = sw.toString();
         } catch (IOException e) {
-            // We must not suppress the dialog here -> catch and print only to debug stream
-            LOGGER.debug("Creating a Location failed for {}", exception, e);
+            stackTrace = "";
         }
-        return new PositionedIssueString("Constructing the error message failed!");
+
+        Set<PositionedIssueString> result = new LinkedHashSet<>();
+        for (PositionedString ps : ExceptionTools.getMessages(exception)) {
+            result.add(new PositionedIssueString(ps.getText(), ps.getLocation(), stackTrace,
+                PositionedIssueString.Kind.ERROR));
+        }
+        if (result.isEmpty()) {
+            result.add(new PositionedIssueString("Constructing the error message failed!"));
+        }
+        return result;
     }
+
 
     private void accept() {
         if (!critical && chkIgnoreWarnings.isSelected()) {
@@ -700,8 +686,23 @@ public final class IssueDialog extends JDialog {
                 addHighlights(dh, uri);
 
                 // ensure that the currently selected problem is shown in view
-                int offset = pos.isNegative() ? 0 : getOffsetFromLineColumn(source, pos);
+                int offset =
+                    pos.isNegative() ? 0 : getOffsetFromLineColumn(txtSource.getDocument(), pos);
                 txtSource.setCaretPosition(offset);
+                // setCaretPosition does not scroll the viewport while the dialog is not yet laid
+                // out; scroll to the error explicitly once the layout has settled, so the offending
+                // line is visible (and not left at the top of the file).
+                final int errorOffset = offset;
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        var rect = txtSource.modelToView2D(errorOffset);
+                        if (rect != null) {
+                            txtSource.scrollRectToVisible(rect.getBounds());
+                        }
+                    } catch (BadLocationException ignore) {
+                        // best effort: leave the view where it is
+                    }
+                });
             } catch (Exception e) {
                 LOGGER.warn("Failed to update preview", e);
             }
@@ -735,17 +736,25 @@ public final class IssueDialog extends JDialog {
             return;
         }
         String source = txtSource.getText();
-        int offset = getOffsetFromLineColumn(source, pos);
-        int end = offset;
-        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
-            end++;
-        }
-        try {
-            if (critical) {
-                dh.addHighlight(offset, end, new SquigglyUnderlinePainter(Color.RED, 2, 1f));
-            } else {
-                dh.addHighlight(offset, end, new SquigglyUnderlinePainter(Color.ORANGE, 2, 1f));
+        int start = getOffsetFromLineColumn(txtSource.getDocument(), pos);
+        // Determine the extent to mark:
+        // - an identifier (e.g. 'TRUE', 'footprnt'): the whole word, so trailing punctuation
+        // like ')' or ';' is NOT included;
+        // - a single operator/punctuation character (e.g. '=');
+        // - otherwise (the position sits at whitespace/end-of-line, i.e. the insertion point of a
+        // missing ')' or ';'): a zero-width mark, which the painter renders one char wide.
+        int end = start;
+        if (start < source.length() && Character.isJavaIdentifierPart(source.charAt(start))) {
+            while (end < source.length() && Character.isJavaIdentifierPart(source.charAt(end))) {
+                end++;
             }
+        } else if (start < source.length() && !Character.isWhitespace(source.charAt(start))) {
+            end = start + 1;
+        }
+        Color color = critical ? Color.RED : Color.ORANGE;
+        try {
+            // light translucent background fill + squiggly underline, in one painter
+            dh.addHighlight(start, end, new ErrorMarkPainter(color, 30));
         } catch (BadLocationException ignore) {
             // ignore
         }
@@ -760,31 +769,30 @@ public final class IssueDialog extends JDialog {
         return fileName != null && (fileName.endsWith(".key") || fileName.endsWith(".proof"));
     }
 
-    public static int getOffsetFromLineColumn(String source, Position pos) {
-        // Position has 1-based line and column, we need them 0-based
-        return getOffsetFromLineColumn(source, pos.line() - 1, pos.column() - 1);
-    }
-
-    private static int getOffsetFromLineColumn(String source, int line, int column) {
-        if (line < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (column < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        int pos = 0;
-        for (; pos < source.length() && line > 0; ++pos) {
-            if (source.charAt(pos) == '\n') {
-                --line;
-            }
-        }
-        if (line == 0) {
-            return Math.min(pos + column, source.length());
-        }
-
-        // Best effort, don't throw here
-        return 0;
+    /**
+     * Maps a 1-based {@link Position} to a character offset in {@code doc} using the document's own
+     * line model ({@link Element#getStartOffset()}). Unlike counting {@code '\n'} in a separate
+     * copy
+     * of the text, this is:
+     * <ul>
+     * <li>consistent with what the component renders - the same line model backs the caret,
+     * {@code modelToView} and the highlighter, so the offset cannot drift from the text;</li>
+     * <li>line-ending robust - a Swing document stores normalized {@code '\n'} regardless of the
+     * file's LF/CRLF style;</li>
+     * <li>naturally bounded - a line/column past the end clamps to the document.</li>
+     * </ul>
+     *
+     * @param doc the source document shown in the preview
+     * @param pos a 1-based position
+     * @return the character offset of that position within {@code doc}
+     */
+    static int getOffsetFromLineColumn(Document doc, Position pos) {
+        Element root = doc.getDefaultRootElement();
+        int line = Math.max(0, Math.min(pos.line() - 1, root.getElementCount() - 1));
+        Element el = root.getElement(line);
+        int column = Math.max(0, pos.column() - 1);
+        // getEndOffset() points just past the line's trailing '\n'; clamp to the last in-line char.
+        return Math.min(el.getStartOffset() + column, el.getEndOffset() - 1);
     }
 
     private static class PositionedStringListRenderer

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
@@ -72,14 +74,15 @@ public abstract class MainWindowAction extends KeyAction {
         }
 
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             var enable = e.getSource().getSelectedProof() != null;
             actions.forEach(a -> a.setEnabled(enable));
         }
 
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
-            selectedNodeChanged(e);
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            var enable = e.getSource().getSelectedProof() != null;
+            actions.forEach(a -> a.setEnabled(enable));
         }
     }
 }

@@ -3,21 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.analysis;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -25,6 +24,8 @@ import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Results of the dependency analysis algorithm.
@@ -159,20 +160,21 @@ public final class AnalysisResults {
      */
     public Sequent reduceSequent(Node node) {
         final Sequent seq = node.sequent();
-        return Sequent.createSequent(reduce(seq.antecedent(), node, true),
-            reduce(seq.succedent(), node, false));
+        return JavaDLSequentKit.createSequent(reduce(seq.antecedent().asList(), node, true),
+            reduce(seq.succedent().asList(), node, false));
     }
 
-    private Semisequent reduce(Semisequent semi, Node node, boolean antec) {
-        var semiList = new ArrayList<SequentFormula>();
+    private ImmutableList<SequentFormula> reduce(ImmutableList<SequentFormula> semi, Node node,
+            boolean antec) {
+        ImmutableList<SequentFormula> semiList = ImmutableSLList.nil();
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
             if (usefulNodes.contains(graphNode)) {
-                semiList.add(sf);
+                semiList = semiList.prepend(sf);
             }
         }
-        return Semisequent.create(semiList);
+        return semiList.size() == semi.size() ? semi : semiList.reverse();
     }
 
     @Override

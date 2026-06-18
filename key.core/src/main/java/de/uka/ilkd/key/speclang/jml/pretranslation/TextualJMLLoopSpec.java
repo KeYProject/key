@@ -13,6 +13,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,6 +22,10 @@ import org.jspecify.annotations.Nullable;
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
     private final ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    public Set<ParserRuleContext> getClauses() {
+        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toSet());
+    }
 
     /**
      * Heap-dependent clauses

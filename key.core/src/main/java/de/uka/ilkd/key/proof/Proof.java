@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -12,7 +13,9 @@ import java.util.function.Predicate;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -32,11 +35,13 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -51,12 +56,12 @@ import org.jspecify.annotations.Nullable;
  * goals, namespaces and several other information about the current state of the proof.
  */
 @NullMarked
-public class Proof implements Named {
+public class Proof implements ProofObject<Goal>, Named {
 
     /**
      * The time when the {@link Proof} instance was created.
      */
-    final long creationTime = System.currentTimeMillis();
+    private final long creationTime = System.currentTimeMillis();
 
     /**
      * name of the proof
@@ -89,7 +94,7 @@ public class Proof implements Named {
     /**
      * declarations &c, read from a problem file or otherwise
      */
-    private String problemHeader = "";
+    private KeyAst.@Nullable Declarations problemHeader = null;
 
     /**
      * the proof environment (optional)
@@ -119,7 +124,7 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public List<String> userLog;
+    public @Nullable List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
@@ -129,7 +134,7 @@ public class Proof implements Named {
 
     private long autoModeTime = 0;
 
-    private @Nullable Strategy activeStrategy;
+    private @Nullable Strategy<Goal> activeStrategy;
 
     private PropertyChangeListener settingsListener;
 
@@ -150,10 +155,10 @@ public class Proof implements Named {
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<>();
 
     /**
-     * The {@link File} under which this {@link Proof} was saved the last time if available or
+     * The {@link Path} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private @Nullable File proofFile;
+    private @Nullable Path proofFile;
 
     private @Nullable Lookup userData;
 
@@ -231,24 +236,28 @@ public class Proof implements Named {
         }
     }
 
-    public Proof(String name, Sequent problem, String header, InitConfig initConfig,
-            File proofFile) {
+    @Deprecated
+    public Proof(String name, Sequent problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig,
+            @Nullable Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
         this.proofFile = proofFile;
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig) {
+    public Proof(String name, JTerm problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig) {
         this(name,
-            Sequent.createSuccSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            JavaDLSequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
 
 
-    public Proof(String name, Sequent sequent, String header, TacletIndex rules,
+    public Proof(String name, Sequent sequent, KeyAst.@Nullable Declarations header,
+            TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
         this(name, sequent, rules, builtInRules, initConfig);
         problemHeader = header;
@@ -318,7 +327,7 @@ public class Proof implements Named {
     }
 
 
-    public String header() {
+    public KeyAst.@Nullable Declarations header() {
         return problemHeader;
     }
 
@@ -382,7 +391,7 @@ public class Proof implements Named {
     }
 
 
-    public Strategy getActiveStrategy() {
+    public Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -390,7 +399,7 @@ public class Proof implements Named {
     }
 
 
-    public void setActiveStrategy(Strategy activeStrategy) {
+    public void setActiveStrategy(Strategy<Goal> activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
@@ -402,7 +411,7 @@ public class Proof implements Named {
 
 
     private void updateStrategyOnGoals() {
-        Strategy ourStrategy = getActiveStrategy();
+        Strategy<Goal> ourStrategy = getActiveStrategy();
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);
@@ -453,6 +462,7 @@ public class Proof implements Named {
      *
      * @return list with the open goals
      */
+    @Override
     public ImmutableList<Goal> openGoals() {
         return openGoals;
     }
@@ -490,7 +500,6 @@ public class Proof implements Named {
         return filterEnabledGoals(openGoals);
     }
 
-
     /**
      * filter those goals from a list which are enabled
      *
@@ -509,15 +518,15 @@ public class Proof implements Named {
         return enabledGoals;
     }
 
-
     /**
      * removes the given goal and adds the new goals in list
      *
      * @param oldGoal the old goal that has to be removed from list
-     * @param newGoals the IList<Goal> with the new goals that were result of a rule application on
-     *        goal
+     * @param newGoals the Iterable<Goal> with the new goals that were result of a rule application
+     *        on goal
      */
-    public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
+    @Override
+    public void replace(Goal oldGoal, Iterable<Goal> newGoals) {
         openGoals = openGoals.removeAll(oldGoal);
 
         if (closed()) {
@@ -534,6 +543,7 @@ public class Proof implements Named {
      *
      * @param goalToClose the goal to close.
      */
+    @Override
     public void closeGoal(Goal goalToClose) {
 
         Node closedSubtree = goalToClose.node().close();
@@ -603,7 +613,6 @@ public class Proof implements Named {
      * adds a new goal to the list of goals
      *
      * @param goal the Goal to be added
-     *
      * @deprecated use {@link #reOpenGoal(Goal)} when re-opening a goal
      */
     @Deprecated // eventually, this method should be made private
@@ -632,10 +641,27 @@ public class Proof implements Named {
         fireProofGoalsAdded(goals);
     }
 
+    /**
+     * adds a list with new goals to the list of open goals
+     *
+     * @param goals the Iterable<Goal> to be prepended
+     */
+    @Override
+    public void add(Iterable<Goal> goals) {
+        ImmutableList<Goal> addGoals;
+        if (goals instanceof ImmutableList<Goal> asList) {
+            addGoals = asList;
+        } else {
+            addGoals = ImmutableList.fromList(goals);
+        }
+        add(addGoals);
+    }
+
 
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
+    @Override
     public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
     }
@@ -751,7 +777,7 @@ public class Proof implements Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@NonNull Predicate<Node> pred) {
+    public @Nullable Node findAny(Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -1104,7 +1130,7 @@ public class Proof implements Named {
         }
         result.append("\nProoftree:\n");
         if (countNodes() < 50) {
-            result.append(root.toString());
+            result.append(root);
         } else {
             result.append("<too large to include>");
         }
@@ -1202,7 +1228,7 @@ public class Proof implements Named {
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) {
+        for (final ProofDisposedListener l : listener) {
             l.proofDisposing(e);
         }
     }
@@ -1212,21 +1238,21 @@ public class Proof implements Named {
     }
 
     /**
-     * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
+     * Returns the {@link Path} under which the {@link Proof} was saved the last time if available.
      *
-     * @return The {@link File} under which the {@link Proof} was saved the last time or
+     * @return The {@link Path} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
-    public File getProofFile() {
+    public @Nullable Path getProofFile() {
         return proofFile;
     }
 
     /**
-     * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     * Sets the {@link Path} under which the {@link Proof} was saved the last time.
      *
-     * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
+     * @param proofFile The {@link Path} under which the {@link Proof} was saved the last time.
      */
-    public void setProofFile(File proofFile) {
+    public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;
     }
 
@@ -1292,7 +1318,7 @@ public class Proof implements Named {
      *
      * @return the associated lookup
      */
-    public @NonNull Lookup getUserData() {
+    public Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
@@ -1311,8 +1337,9 @@ public class Proof implements Named {
      * @param callbackTotal callback that gets the total number of branches to complete
      * @param callbackBranch callback notified every time a branch has been copied
      */
-    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
-            Runnable callbackBranch) {
+    public void copyCachedGoals(Proof referencedFrom,
+            @Nullable Consumer<Integer> callbackTotal,
+            @Nullable Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();
@@ -1343,5 +1370,15 @@ public class Proof implements Named {
                 callbackBranch.run();
             }
         }
+    }
+
+    /// Persist symbols (sorts, functions, ...) to the given `ps`.
+    /// There should be no need to write of [#header()].
+    public void printSymbols(PrintWriter ps) {
+    }
+
+    /// The time when the {@link Proof} instance was created.
+    public long getCreationTime() {
+        return creationTime;
     }
 }

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.rule.RuleApp;
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.RuleApp;
 
 public interface ComplexRuleJustification extends RuleJustification {
 
-    RuleJustification getSpecificJustification(RuleApp app, TermServices services);
+    RuleJustification getSpecificJustification(RuleApp app, LogicServices services);
 
 }

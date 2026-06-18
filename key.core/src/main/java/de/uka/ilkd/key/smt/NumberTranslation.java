@@ -6,9 +6,10 @@ package de.uka.ilkd.key.smt;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 
 /**
  * Translates a number into a string representation.

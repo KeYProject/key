@@ -14,9 +14,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -65,7 +65,7 @@ public final class GoalBackAction extends MainWindowAction {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
 
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 if (proof == null) {
                     // no proof loaded
@@ -79,8 +79,8 @@ public final class GoalBackAction extends MainWindowAction {
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                selectedNodeChanged(null);
             }
         };
 
@@ -103,7 +103,7 @@ public final class GoalBackAction extends MainWindowAction {
                 selListener.selectedNodeChanged(null);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
     }
 
     /**

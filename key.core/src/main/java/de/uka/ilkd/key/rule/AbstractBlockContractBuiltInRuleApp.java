@@ -6,30 +6,33 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Application of {@link AbstractBlockContractRule}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockContractBuiltInRuleApp
-        extends AbstractAuxiliaryContractBuiltInRuleApp {
+public abstract class AbstractBlockContractBuiltInRuleApp<T extends BuiltInRule>
+        extends AbstractAuxiliaryContractBuiltInRuleApp<T> {
 
     /**
      * @see #getContract()
      */
-    protected BlockContract contract;
+    protected @Nullable BlockContract contract;
 
     /**
      *
@@ -37,13 +40,13 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
      */
-    public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+    protected AbstractBlockContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
+            @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
     @Override
-    public BlockContract getContract() {
+    public @Nullable BlockContract getContract() {
         return contract;
     }
 
@@ -53,14 +56,14 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      * @param rule the rule being applied.
      * @return this.
      */
-    public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal,
+    public AbstractBlockContractBuiltInRuleApp<T> tryToInstantiate(final Goal goal,
             final AbstractBlockContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
         final Services services = goal.proof().getServices();
         final AbstractBlockContractRule.Instantiation instantiation =
-            rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate((JTerm) posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement());

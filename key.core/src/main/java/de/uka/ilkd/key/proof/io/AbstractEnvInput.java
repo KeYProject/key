@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.*;
 
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -19,32 +17,38 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
-    protected final String javaPath;
-    protected final List<File> classPath;
-    protected final File bootClassPath;
+    protected final @Nullable Path javaPath;
+    protected final List<Path> classPath;
+    protected final @Nullable Path bootClassPath;
     protected final Includes includes;
-    protected final Profile profile;
+    protected final @Nullable Profile profile;
 
     protected InitConfig initConfig;
     private boolean ignoreOtherJavaFiles;
-    private String javaFile;
+    private Path javaFile;
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, String javaPath, List<File> classPath, File bootClassPath,
-            Profile profile, List<File> includes) {
-        assert profile != null;
+    protected AbstractEnvInput(String name, @Nullable Path javaPath,
+            List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable Profile profile,
+            List<Path> includes) {
         this.name = name;
         this.javaPath = javaPath;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
-        this.profile = profile;
+        if (profile != null) {
+            this.profile = profile;
+        } else {
+            this.profile = JavaProfile.getDefaultProfile();
+        }
         this.includes = new Includes();
         if (includes != null) {
-            for (File path : includes) {
+            for (Path path : includes) {
                 this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
             }
         }
@@ -81,19 +85,19 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final String readJavaPath() throws ProofInputException {
+    public final Path readJavaPath() throws ProofInputException {
         return javaPath;
     }
 
 
     @Override
-    public final List<File> readClassPath() throws ProofInputException {
+    public final List<Path> readClassPath() {
         return classPath;
     }
 
 
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         return bootClassPath;
     }
 
@@ -112,11 +116,11 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
     @Override
-    public String getJavaFile() {
+    public Path getJavaFile() {
         return javaFile;
     }
 
-    public void setJavaFile(String javaFile) {
+    public void setJavaFile(Path javaFile) {
         this.javaFile = javaFile;
     }
 }

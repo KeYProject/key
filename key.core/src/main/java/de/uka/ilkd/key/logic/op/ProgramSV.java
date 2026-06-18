@@ -3,26 +3,29 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -33,12 +36,12 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends OperatorSV
-        implements ProgramConstruct, UpdateableOperator, SyntaxElement {
+public final class ProgramSV extends JOperatorSV
+        implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
-    private static final ProgramList EMPTY_LIST_INSTANTIATION =
-        new ProgramList(new ImmutableArray<>(new ProgramElement[0]));
+    private static final ImmutableArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        new ImmutableArray<>(new ProgramElement[0]);
 
     private final boolean isListSV;
 
@@ -65,6 +68,7 @@ public final class ProgramSV extends OperatorSV
         return new Comment[0];
     }
 
+
     @Override
     public SourceElement getFirstElement() {
         return this;
@@ -88,11 +92,6 @@ public final class ProgramSV extends OperatorSV
     @Override
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override
@@ -228,7 +227,7 @@ public final class ProgramSV extends OperatorSV
 
         if (foundInst != null) {
             final Object newInst;
-            if (foundInst instanceof Term) {
+            if (foundInst instanceof JTerm) {
                 newInst = services.getTypeConverter().convertToLogicElement(pe,
                     insts.getExecutionContext());
             } else {
@@ -257,14 +256,15 @@ public final class ProgramSV extends OperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(ProgramList list, MatchConditions matchCond,
+    private MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
+            MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
             return null;
         }
 
         SVInstantiations insts = matchCond.getInstantiations();
-        final ProgramList pl = (ProgramList) insts.getInstantiation(this);
+        final var pl = (ImmutableArray<ProgramElement>) insts.getInstantiation(this);
         if (pl != null) {
             if (pl.equals(list)) {
                 return matchCond;
@@ -273,7 +273,7 @@ public final class ProgramSV extends OperatorSV
             }
         }
 
-        insts = insts.add(this, list, services);
+        insts = insts.add(this, list, ProgramElement.class, services);
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
 
@@ -289,8 +289,8 @@ public final class ProgramSV extends OperatorSV
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
-        final java.util.ArrayList<ProgramElement> matchedElements =
-            new java.util.ArrayList<>();
+        final ArrayList<ProgramElement> matchedElements =
+            new ArrayList<>();
 
         while (src != null) {
             if (!check(src, ec, services)) {
@@ -301,9 +301,7 @@ public final class ProgramSV extends OperatorSV
             src = source.getSource();
         }
 
-        return addProgramInstantiation(
-            new ProgramList(new ImmutableArray<>(matchedElements)), matchCond,
-            services);
+        return addProgramInstantiation(new ImmutableArray<>(matchedElements), matchCond, services);
     }
 
     /**
@@ -340,7 +338,7 @@ public final class ProgramSV extends OperatorSV
 
         final Object instant = instantiations.getInstantiation(this);
         if (instant == null || instant.equals(src)
-                || (instant instanceof Term && ((Term) instant).op().equals(src))) {
+                || (instant instanceof JTerm && ((JTerm) instant).op().equals(src))) {
 
             matchCond = addProgramInstantiation(src, matchCond, services);
 
@@ -361,12 +359,6 @@ public final class ProgramSV extends OperatorSV
     @Override
     public String toString() {
         return toString("program " + sort().name());
-    }
-
-    @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
-                .print(name().toString());
     }
 
     @Override

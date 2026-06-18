@@ -6,7 +6,6 @@ package org.key_project.proofmanagement.check;
 import java.nio.file.Path;
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
@@ -49,7 +49,7 @@ public class SettingsChecker implements Checker {
         // create a new KeYUserProblemFile for each path
         List<KeYUserProblemFile> problemFiles = new ArrayList<>();
         for (Path p : pbh.getProofFiles()) {
-            problemFiles.add(new KeYUserProblemFile(p.toString(), p.toFile(),
+            problemFiles.add(new KeYUserProblemFile(p.toString(), p,
                 new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(),
                 AbstractProfile.getDefaultProfile(), false));
         }

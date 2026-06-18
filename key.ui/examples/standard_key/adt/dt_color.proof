@@ -56,7 +56,7 @@
 
 (branch "dummy ID"
 (rule "allRight" (formula "1") (inst "sk=l_0") (userinteraction))
-(rule "Color_ctor_split" (formula "1") (term "0,0,0") (userinteraction))
+(rule "DT_Color_ctor_split" (formula "1") (term "0,0,0") (userinteraction))
 (branch "l_0 = Red"
    (rule "orRight" (formula "2"))
    (rule "orRight" (formula "2"))

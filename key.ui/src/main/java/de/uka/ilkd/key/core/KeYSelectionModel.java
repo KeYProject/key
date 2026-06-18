@@ -5,11 +5,12 @@ package de.uka.ilkd.key.core;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,34 +214,34 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START -> {
-                    currentPos = POS_LEAVES;
-                    if (selectedNode != null) {
-                        nodeIt = selectedNode.leavesIterator();
-                    } else {
-                        nodeIt = null;
-                    }
-                }
-                case POS_LEAVES -> {
-                    if (nodeIt == null || !nodeIt.hasNext()) {
-                        currentPos = POS_GOAL_LIST;
-                        if (!proof.openGoals().isEmpty()) {
-                            goalIt = proof.openGoals().iterator();
+                    case POS_START -> {
+                        currentPos = POS_LEAVES;
+                        if (selectedNode != null) {
+                            nodeIt = selectedNode.leavesIterator();
                         } else {
-                            goalIt = null;
+                            nodeIt = null;
                         }
-                    } else {
-                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                }
-                case POS_GOAL_LIST -> {
-                    if (goalIt == null || !goalIt.hasNext()) {
-                        // no more items
-                        return;
-                    } else {
-                        nextOne = goalIt.next();
+                    case POS_LEAVES -> {
+                        if (nodeIt == null || !nodeIt.hasNext()) {
+                            currentPos = POS_GOAL_LIST;
+                            if (!proof.openGoals().isEmpty()) {
+                                goalIt = proof.openGoals().iterator();
+                            } else {
+                                goalIt = null;
+                            }
+                        } else {
+                            nextOne = proof.getOpenGoal(nodeIt.next());
+                        }
                     }
-                }
+                    case POS_GOAL_LIST -> {
+                        if (goalIt == null || !goalIt.hasNext()) {
+                            // no more items
+                            return;
+                        } else {
+                            nextOne = goalIt.next();
+                        }
+                    }
                 }
             }
         }

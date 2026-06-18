@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.utilities;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 
 /**
@@ -28,9 +28,9 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
     @Override
     public String check(String toBeChecked) {
         if (toBeChecked.isEmpty()) {
-            return CheckedUserInputInspector.NO_USER_INPUT;
+            return NO_USER_INPUT;
         }
-        Term term = translate(services, toBeChecked);
+        JTerm term = translate(services, toBeChecked);
 
         if (term == null) {
             return NO_USER_INPUT;
@@ -43,7 +43,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
     }
 
-    public static Term translate(Services services, String toBeChecked) {
+    public static JTerm translate(Services services, String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

@@ -72,7 +72,7 @@
                            </value>
                         </variable>
                         <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                           <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="int::select(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="select<[int]>(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="[Z(0(2(#)))]" arrayIndex="Z(0(2(#)))" isArrayIndex="true">

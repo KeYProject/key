@@ -1,4 +1,4 @@
-description "API for using KeY for maintaining references between objects in proofs"
+description = "API for using KeY for maintaining references between objects in proofs"
 
 dependencies {
     implementation project(":key.core")

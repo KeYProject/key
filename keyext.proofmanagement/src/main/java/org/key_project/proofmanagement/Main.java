@@ -5,20 +5,20 @@ package org.key_project.proofmanagement;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
-
-import de.uka.ilkd.key.util.CommandLine;
-import de.uka.ilkd.key.util.CommandLineException;
+import java.util.concurrent.Callable;
 
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
+
+import org.jspecify.annotations.Nullable;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 /**
  * This is the starting class for ProofManagement.
@@ -49,66 +49,181 @@ import org.key_project.proofmanagement.merge.ProofBundleMerger;
  *
  * @author Wolfram Pfeifer
  */
+@Command(subcommands = { Main.BundleCommand.class, Main.CheckCommand.class,
+    Main.MergeCommand.class })
 public final class Main {
-    /** resource bundle where the description strings for the CLI are stored */
-    private static final ResourceBundle STRINGS = ResourceBundle.getBundle("strings");
+    private static final String check_missing_desc = "enables check for unproven contracts";
+    private static final String check_settings_desc = "enables check for consistent proof settings";
+    private static final String check_replay_desc =
+        "enables check whether all saved proofs can be replayed successfully";
+    private static final String check_dependency_desc = "enables check for cyclic dependencies";
+    private static final String check_report_desc =
+        "writes the report to an HTML file at the given path";
+    private static final String usage_merge =
+        "pm merge [--force] [--no-check] <bundle1> <bundle2> ... <output>";
+    private static final String merge_force_desc =
+        "Tries to merge the proof bundles even if the files check fails (may rename some files). Use only if you know what you are doing!";
+    private static final String merge_check_desc =
+        "Merges and performs a check if successful. The arguments are passed to check command.";
 
-    /** usage string for general pm command */
-    private static final String USAGE = STRINGS.getString("usage");
 
-    /** usage string for check subcommand */
-    private static final String USAGE_CHECK = STRINGS.getString("usage_check");
+    /**
+     * The check subcommand applies the selected checks to the proof bundle and generates an HTML
+     * report if desired.
+     */
+    @Command(name = "check", description = "Checks a single proof bundle for consistency")
+    public static class CheckCommand implements Callable<Integer> {
+        /**
+         * checks if the settings for the proofs are compatible
+         */
+        @Option(names = "--settings", description = "enables check for consistent proof settings")
+        public boolean settings;
+        /**
+         * checks for unsound dependencies between contracts and proofs
+         */
+        @Option(names = "--dependency", description = "enables check for cyclic dependencies")
+        public boolean dependency;
 
-    /** usage string for merge subcommand */
-    private static final String USAGE_MERGE = STRINGS.getString("usage_merge");
+        /**
+         * checks if there are any unproven contracts in the bundle
+         */
+        @Option(names = "--missing", description = "enables check for unproven contracts")
+        public boolean missing;
 
-    /** main command line of proof management */
-    private static final CommandLine CL;
+        /**
+         * checks whether the proofs in the bundle are replayable
+         */
+        @Option(names = "--replay", description = check_replay_desc)
+        public boolean replay;
+        // check.addOption("--auto", description = check_auto_desc"));
+        // check.addOption("--explicit", description = check_explicit_desc"));
 
-    /** subcommandline for the check commmand */
-    private static final CommandLine CL_MERGE;
+        /**
+         * reportPath the output path for the HTML report (if selected)
+         */
+        @Option(names = "--report", paramLabel = "FOLDER", description = check_report_desc)
+        public @Nullable Path reportPath;
 
-    /** subcommandline for the merge commmand */
-    private static final CommandLine CL_CHECK;
+        /**
+         * bundlePath the path of the bundle (directory or zip file)
+         */
+        @Parameters(paramLabel = "FILE")
+        public Path bundlePath;
 
-    /** subcommandline of merge (used as a hack for forwarding check options) */
-    private static final CommandLine CL_MERGE_CHECK;
+        @Override
+        public Integer call() throws Exception {
+            // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>]
+            // <bundle_path>
+            // we accumulate results in this variable
+            CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
+            try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
+                globalResult.setPbh(pbh);
+                // add file tree to result
+                globalResult.setFileTree(pbh.getFileTree());
 
-    static {
-        // TODO: check todos in CommandLine class
-        CL = new CommandLine();
-        CL.setLineLength(Integer.MAX_VALUE);
-        CL.addText(USAGE, false);
-        CL_CHECK = CL.addSubCommand("check");
-        CL_CHECK.addText(USAGE_CHECK, false);
-        CL_CHECK.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
-        CL_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
-        CL_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
-        CL_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
-        // check.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
-        // check.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
-        CL_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
+                if (missing) {
+                    new MissingProofsChecker().check(pbh, globalResult);
+                }
+                if (settings) {
+                    new SettingsChecker().check(pbh, globalResult);
+                }
+                if (replay) {
+                    new ReplayChecker().check(pbh, globalResult);
+                }
+                if (dependency) {
+                    new DependencyChecker().check(pbh, globalResult);
+                }
 
-        CL_MERGE = CL.addSubCommand("merge");
-        CL_MERGE.addText(USAGE_MERGE, false);
-        CL_MERGE.addOption("--force", null, STRINGS.getString("merge_force_desc"));
-        CL_MERGE.addOption("--check", "check_arguments", STRINGS.getString("merge_check_desc"));
+                globalResult.print("All checks done!");
+                globalResult.print("Global result: " + globalResult.getGlobalState());
 
-        // enable check option forwarding for merge command
-        CL_MERGE_CHECK = CL_MERGE.addSubCommand("check");
-        CL_MERGE_CHECK.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
-        CL_MERGE_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
-        CL_MERGE_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
-        CL_MERGE_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
-        // CL_MERGE_CHECK.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
-        // CL_MERGE_CHECK.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
-        CL_MERGE_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
-
-        // TODO: bundle subcommand
-        // CL.addSubCommand("bundle");
+                // generate report
+                if (reportPath != null) {
+                    generateReport(globalResult, reportPath);
+                }
+            } catch (IOException e) {
+                globalResult.print(LogLevel.ERROR, e.getMessage());
+                globalResult.print("Error while accessing the proof bundle!");
+                globalResult.print("ProofManagement interrupted due to critical error.");
+                e.printStackTrace();
+                return -1;
+            } catch (ProofManagementException e) {
+                globalResult.print(LogLevel.ERROR, e.getMessage());
+                globalResult.print("ProofManagement interrupted due to critical error.");
+                e.printStackTrace();
+                return -1;
+            } catch (Throwable e) {
+                System.err.println("Error creating the report: ");
+                e.printStackTrace();
+                return -1;
+            }
+            return 0;
+        }
     }
 
-    private Main() {
+    @Command(name = "merge", description = "Merges multiple proof bundles")
+    public static class MergeCommand implements Callable<Integer> {
+        // Usually, the merging process is cancelled if there are conflicting files in both bundles.
+        // This option forces merging. For the conflicting files, their versions from the first
+        // bundle are taken.
+        @Option(names = "--force", description = merge_force_desc)
+        public boolean force;
+
+        @Option(names = "--check", paramLabel = "STRING", description = merge_check_desc)
+        public @Nullable String checkParams;
+
+        @Option(names = { "--output", "-o" }, required = true, description = "Output file",
+            paramLabel = "FILE")
+        public Path output;
+
+        // at least three files!
+        @Parameters(arity = "2..*", paramLabel = "FILE")
+        public List<Path> arguments = List.of();
+
+        @Override
+        public Integer call() throws Exception {
+            // merge [--force] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
+
+            // at the moment only used for logging
+            CheckerData logger = new CheckerData(LogLevel.DEBUG);
+
+            try {
+                ProofBundleMerger.merge(arguments, output, force, logger);
+            } catch (ProofManagementException e) {
+                System.err.println("Error when trying to merge the bundles: ");
+                e.printStackTrace();
+                return -1;
+            }
+
+            // perform a check on the newly created bundle with given commands
+            if (checkParams != null) {
+                // remove quotation marks
+                checkParams = checkParams.substring(1, checkParams.length() - 1);
+                String[] temp = checkParams.trim().split(" ");
+                return new CommandLine(new CheckCommand()).execute(temp);
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * TODO: bundle subcommand, which zips a directory into a proof bundle (and may perform checks)
+     * // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
+     */
+    @Command(name = "bundle",
+        description = "Creates a zipped proof bundle (file extension \"zproof\") from a directory following the proof bundle path rules.")
+    static class BundleCommand implements Callable<Integer> {
+        @Parameters(arity = "2..*")
+        public List<Path> arguments = List.of();
+
+        @Override
+        public Integer call() throws Exception {
+            System.out.println("todo not implemented yet");
+            return 0;
+        }
+    }
+
+    Main() {
     }
 
     /**
@@ -117,93 +232,7 @@ public final class Main {
      * @param args the commandline arguments. See class JavaDoc for a detailed description.
      */
     public static void main(String[] args) {
-        try {
-            CL.parse(args);
-            if (CL.subCommandUsed("check")) {
-                check(CL_CHECK);
-            } else if (CL.subCommandUsed("merge")) {
-                merge();
-            } else {
-                CL.printUsage(System.out);
-            }
-        } catch (CommandLineException e) {
-            if (CL.subCommandUsed("check")) {
-                CL_CHECK.printUsage(System.out);
-            } else if (CL.subCommandUsed("merge")) {
-                CL_MERGE.printUsage(System.out);
-            } else {
-                CL.printUsage(System.out);
-            }
-        }
-    }
-
-    // TODO: bundle subcommand, which zips a directory into a proof bundle (and may perform checks)
-    // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
-    /*
-     * private static void bundle(CommandLine commandLine) {
-     *
-     * List<String> arguments = commandLine.getArguments();
-     * if (arguments.size() != 2) {
-     * commandLine.printUsage(System.out);
-     * }
-     * }
-     */
-
-    /**
-     * The check subcommand applies the selected checks to the proof bundle and generates an HTML
-     * report if desired.
-     *
-     * @param missing checks if there are any unproven contracts in the bundle
-     * @param settings checks if the settings for the proofs are compatible
-     * @param replay checks whether the proofs in the bundle are replayable
-     * @param dependency checks for unsound dependencies between contracts and proofs
-     * @param bundlePath the path of the bundle (directory or zip file)
-     * @param reportPath the output path for the HTML report (if selected)
-     */
-    public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
-            Path bundlePath, Path reportPath) {
-
-        // we accumulate results in this variable
-        CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
-        try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
-
-            globalResult.setPbh(pbh);
-
-            // add file tree to result
-            globalResult.setFileTree(pbh.getFileTree());
-
-            if (missing) {
-                new MissingProofsChecker().check(pbh, globalResult);
-            }
-            if (settings) {
-                new SettingsChecker().check(pbh, globalResult);
-            }
-            if (replay) {
-                new ReplayChecker().check(pbh, globalResult);
-            }
-            if (dependency) {
-                new DependencyChecker().check(pbh, globalResult);
-            }
-            globalResult.print("All checks done!");
-            globalResult.print("Global result: " + globalResult.getGlobalState());
-
-            // generate report
-            if (reportPath != null) {
-                generateReport(globalResult, reportPath);
-            }
-        } catch (IOException e) {
-            globalResult.print(LogLevel.ERROR, e.getMessage());
-            globalResult.print("Error while accessing the proof bundle!");
-            globalResult.print("ProofManagement interrupted due to critical error.");
-            e.printStackTrace();
-        } catch (ProofManagementException e) {
-            globalResult.print(LogLevel.ERROR, e.getMessage());
-            globalResult.print("ProofManagement interrupted due to critical error.");
-            e.printStackTrace();
-        } catch (Throwable e) {
-            System.err.println("Error creating the report: ");
-            e.printStackTrace();
-        }
+        new CommandLine(new Main()).execute(args);
     }
 
     private static void generateReport(CheckerData globalResult, Path reportPath) {
@@ -213,79 +242,5 @@ public final class Main {
             System.err.println("Error creating the report: ");
             e.printStackTrace();
         }
-    }
-
-    // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
-    private static void check(CommandLine commandLine) {
-        List<String> arguments = commandLine.getArguments();
-        if (arguments.size() != 1) {
-            commandLine.printUsage(System.out);
-            return;
-        }
-
-        Path reportPath = null;
-        if (commandLine.isSet("--report")) {
-            String outFileName = commandLine.getString("--report", "");
-            reportPath = Paths.get(outFileName).toAbsolutePath();
-        }
-
-        String pathStr = arguments.get(0);
-        Path bundlePath = Paths.get(pathStr);
-        check(commandLine.isSet("--missing"), commandLine.isSet("--settings"),
-            commandLine.isSet("--replay"), commandLine.isSet("--dependency"),
-            bundlePath, reportPath);
-    }
-
-    // merge [--force] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
-    private static void merge() {
-        List<String> arguments = CL_MERGE.getArguments();
-
-        // at least three files!
-        if (arguments.size() < 3) {
-            CL_MERGE.printUsage(System.out);
-            return;
-        }
-
-        // at the moment only used for logging
-        CheckerData logger = new CheckerData(LogLevel.DEBUG);
-
-        // convert Strings to Paths (for input and output)
-        List<Path> inputs = new ArrayList<>();
-        for (int i = 0; i < arguments.size() - 1; i++) {
-            inputs.add(Paths.get(arguments.get(i)));
-        }
-        Path output = Paths.get(arguments.get(arguments.size() - 1));
-
-        // Usually, the merging process is cancelled if there are conflicting files in both bundles.
-        // This option forces merging. For the conflicting files, their versions from the first
-        // bundle are taken.
-        boolean force = CL_MERGE.isSet("--force");
-
-        try {
-            ProofBundleMerger.merge(inputs, output, force, logger);
-        } catch (ProofManagementException e) {
-            System.err.println("Error when trying to merge the bundles: ");
-            e.printStackTrace();
-            return;
-        }
-
-        // perform a check on the newly created bundle with given commands
-        if (CL_MERGE.isSet("--check")) {
-            String checkParams = CL_MERGE.getString("--check", "");
-
-            // remove quotation marks
-            checkParams = checkParams.substring(1, checkParams.length() - 1);
-            String[] temp = checkParams.trim().split(" ");
-
-            String[] newArgs = Arrays.copyOfRange(temp, 0, temp.length + 1);
-            newArgs[newArgs.length - 1] = output.toString();
-            try {
-                CL_MERGE_CHECK.parse(newArgs);
-                check(CL_MERGE_CHECK);
-            } catch (CommandLineException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 }

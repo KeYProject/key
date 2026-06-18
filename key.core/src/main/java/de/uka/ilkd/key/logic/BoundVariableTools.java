@@ -7,9 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -32,13 +32,13 @@ public class BoundVariableTools {
      *
      * @param services the Services
      */
-    public Term renameVariables(Term originalTerm,
+    public JTerm renameVariables(JTerm originalTerm,
             ImmutableArray<QuantifiableVariable> oldBoundVars,
             ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
-        Term res = originalTerm;
+        JTerm res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if (oldBoundVars.get(i) != newBoundVars.get(i)) {
-                final Term newVarTerm = services.getTermFactory().createTerm(newBoundVars.get(i));
+                final JTerm newVarTerm = services.getTermFactory().createTerm(newBoundVars.get(i));
                 final ClashFreeSubst subst =
                     new ClashFreeSubst(oldBoundVars.get(i), newVarTerm, services.getTermBuilder());
                 res = subst.apply(res);
@@ -48,10 +48,10 @@ public class BoundVariableTools {
         return res;
     }
 
-    public Term[] renameVariables(Term[] originalTerms,
+    public JTerm[] renameVariables(JTerm[] originalTerms,
             ImmutableArray<QuantifiableVariable> oldBoundVars,
             ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
-        final Term[] res = new Term[originalTerms.length];
+        final JTerm[] res = new JTerm[originalTerms.length];
         for (int i = 0; i != res.length; ++i) {
             res[i] = renameVariables(originalTerms[i], oldBoundVars, newBoundVars, services);
         }
@@ -114,9 +114,9 @@ public class BoundVariableTools {
      * @return <code>true</code> if it was necessary to rename a variable, i.e. to changed anything
      *         in the term <code>originalTerm</code>
      */
-    public boolean resolveCollisions(Term originalTerm,
+    public boolean resolveCollisions(JTerm originalTerm,
             ImmutableSet<QuantifiableVariable> criticalVars,
-            ImmutableArray<QuantifiableVariable>[] newBoundVars, Term[] newSubs,
+            ImmutableArray<QuantifiableVariable>[] newBoundVars, JTerm[] newSubs,
             TermServices services) {
         boolean changed = false;
 
@@ -153,7 +153,8 @@ public class BoundVariableTools {
      * @param services TODO
      */
     public ImmutableArray<QuantifiableVariable> unifyBoundVariables(
-            ImmutableArray<QuantifiableVariable>[] boundVarsPerSub, Term[] subs, int subtermsBegin,
+            ImmutableArray<QuantifiableVariable>[] boundVarsPerSub, JTerm[] subs,
+            int subtermsBegin,
             int subtermsEnd, TermServices services) {
         // at least one subterms belongs to the entry (value)
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
@@ -202,22 +203,22 @@ public class BoundVariableTools {
      *         renaming after unification of the two arrays (of variables occurring free in the
      *         terms)
      */
-    public boolean equalsModRenaming(ImmutableArray<QuantifiableVariable> vars0, Term term0,
-            ImmutableArray<QuantifiableVariable> vars1, Term term1, TermServices services) {
+    public boolean equalsModRenaming(ImmutableArray<QuantifiableVariable> vars0, JTerm term0,
+            ImmutableArray<QuantifiableVariable> vars1, JTerm term1, TermServices services) {
         if (!consistentVariableArrays(vars0, vars1)) {
             return false;
         }
         if (vars0.size() == 0) {
-            return term0.equalsModProperty(term1, RENAMING_TERM_PROPERTY);
+            return RENAMING_TERM_PROPERTY.equalsModThisProperty(term0, term1);
         }
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
             new LinkedHashMap<>());
 
-        final Term renamedTerm0 = renameVariables(term0, vars0, unifiedVars, services);
-        final Term renamedTerm1 = renameVariables(term1, vars1, unifiedVars, services);
+        final JTerm renamedTerm0 = renameVariables(term0, vars0, unifiedVars, services);
+        final JTerm renamedTerm1 = renameVariables(term1, vars1, unifiedVars, services);
 
-        return renamedTerm0.equalsModProperty(renamedTerm1, RENAMING_TERM_PROPERTY);
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(renamedTerm0, renamedTerm1);
     }
 
     /**

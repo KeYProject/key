@@ -57,19 +57,23 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent pos) {
-            if (model.isExplorationModeSelected()) {
-                return Arrays.asList(new AddFormulaToAntecedentAction(),
-                    new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
-                    new DeleteFormulaAction(pos));
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                T object) {
+            if (!model.isExplorationModeSelected() ||
+                    kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
             }
-            return super.getContextActions(mediator, kind, pos);
+
+            var pos = (PosInSequent) object;
+            return Arrays.asList(new AddFormulaToAntecedentAction(),
+                new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
+                new DeleteFormulaAction(pos));
         }
     };
 
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
+        @Override
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
                 ExplorationNodeData.class);
@@ -99,12 +103,12 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 // ignored
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 Proof oldProof = leftPanel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {

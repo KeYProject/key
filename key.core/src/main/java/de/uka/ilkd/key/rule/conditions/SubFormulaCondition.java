@@ -5,13 +5,13 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This variable condition checks if an instantiation for a formula has sub formulas which are
@@ -38,11 +38,11 @@ public class SubFormulaCondition extends VariableConditionAdapter {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
-        Term tInst = (Term) instMap.getInstantiation(a);
+        JTerm tInst = (JTerm) instMap.getInstantiation(a);
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            for (Term sub : tInst.subs()) {
+            for (JTerm sub : tInst.subs()) {
                 if (sub.sort() == JavaDLTheory.FORMULA) {
                     return !negated;
                 }

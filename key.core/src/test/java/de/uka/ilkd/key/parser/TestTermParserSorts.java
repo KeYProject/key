@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,24 +32,24 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseSequencePrettySyntax() throws Exception {
         /*
-         * Test any::seqGet(s,i)
+         * Test seqGet<[any]>(s,i)
          */
         String pp = "s[i]";
-        Term expected = parseTerm("any::seqGet(s,i)");
-        Term actual = parseTerm(pp);
+        JTerm expected = parseTerm("seqGet<[any]>(s,i)");
+        JTerm actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
-        assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
+        assertEqualsIgnoreWhitespaces(pp, printTerm(expected)); // test pretty-printing
 
         /*
-         * Test int::seqGet(s,i) Notice that pretty-printing of int::seqGet(s,i) results in:
-         * (int)s[i] But parsing of (int)s[i] results in: int::cast(any::seqGet(s,i)
+         * Test seqGet<[int]>(s,i) Notice that pretty-printing of seqGet<[int]>(s,i) results in:
+         * (int)s[i] But parsing of (int)s[i] results in: cast<[int]>(seqGet<[any]>(s,i)
          */
         pp = "(int)s[i]";
-        expected = parseTerm("int::cast(any::seqGet(s,i))");
+        expected = parseTerm("cast<[int]>(seqGet<[any]>(s,i))");
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         // test pretty-printing
-        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp);
+        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("seqGet<[int]>(s,i)")), pp);
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");
@@ -72,7 +72,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseIntegerArgs() throws Exception {
         String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
-        Term t = parseTerm("a.queryByte(0)");
+        JTerm t = parseTerm("a.queryByte(0)");
         assertEquals(s, t.toString());
 
         s = "testTermParserSorts.IntegerMethods::queryByteArray(heap,a,ba)";

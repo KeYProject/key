@@ -4,11 +4,13 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
-public interface IObserverFunction extends org.key_project.logic.op.SortedOperator, Operator {
+public interface IObserverFunction extends SortedOperator, Operator {
 
     /**
      * Returns the result type of this symbol.

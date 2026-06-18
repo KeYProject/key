@@ -21,7 +21,7 @@ public class Config {
     public static final String KEY_FONT_PROOF_LIST_VIEW = "KEY_FONT_PROOF_LIST_VIEW";
 
     /** An array of font sizes for the goal view */
-    public static final int[] SIZES = new int[] { 10, 12, 14, 17, 20, 24 };
+    public static final int[] SIZES = { 10, 12, 14, 17, 20, 24 };
 
     public static final Config DEFAULT = new Config();
 

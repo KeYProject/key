@@ -7,10 +7,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.Objects;
 
 @SuppressWarnings("nullness")
 public class HelperClassForUtilityTests {
-    public static final File RESOURCE_DIRECTORY = FindResources.getTestResourcesDirectory();
+    public static final Path RESOURCE_DIRECTORY =
+        Objects.requireNonNull(FindResources.getTestResourcesDirectory());
 
     /**
      * Creates a folder.

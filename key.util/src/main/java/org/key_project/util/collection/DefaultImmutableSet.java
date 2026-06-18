@@ -163,7 +163,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.nil();
+            return nil();
         } else {
             return new DefaultImmutableSet<>(intersectElements);
         }
@@ -182,14 +182,14 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
     /** @return true iff obj in set */
     @Override
-    public boolean contains(T obj) {
+    public boolean contains(@Nullable Object obj) {
         complainAboutSize();
         return elementList.contains(obj);
     }
 
     /** @return true iff this set is subset of set s */
     @Override
-    public boolean subset(ImmutableSet<T> s) {
+    public boolean subset(ImmutableSet<? extends @Nullable Object> s) {
         if (size() > s.size()) {
             return false;
         } else {
@@ -228,7 +228,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<>(list);
+        return list.isEmpty() ? nil() : new DefaultImmutableSet<>(list);
     }
 
     /**
@@ -346,7 +346,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
         /** @return true iff obj in set */
         @Override
-        public boolean contains(T obj) {
+        public boolean contains(@Nullable Object obj) {
             return false;
         }
 
@@ -358,7 +358,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
         /** @return true iff this set is subset of set s */
         @Override
-        public boolean subset(ImmutableSet<T> s) {
+        public boolean subset(ImmutableSet<? extends @Nullable Object> s) {
             return true;
         }
 

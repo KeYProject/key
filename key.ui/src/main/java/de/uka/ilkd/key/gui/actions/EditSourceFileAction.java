@@ -6,10 +6,10 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import javax.swing.*;
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.CurrentLineHighlighter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -135,6 +136,7 @@ public class EditSourceFileAction extends KeyAction {
                 textAreaGoto(this, location.getPosition());
             }
         };
+        textPane.setHighlighter(new CurrentLineHighlighter(textPane.getHighlighter()));
         Optional<URI> fileOpt = location.getFileURI();
         if (fileOpt.isEmpty()) {
             JTextPane jTextPane = new JTextPane();
@@ -174,10 +176,10 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static @Nullable File tryGetFile(@Nullable URI sourceURL) {
-        File sourceFile = null;
+    private static Path tryGetFile(@Nullable URI sourceURL) {
+        Path sourceFile = null;
         if (sourceURL != null && sourceURL.getScheme().equals("file")) {
-            sourceFile = Paths.get(sourceURL).toFile();
+            sourceFile = Paths.get(sourceURL);
         }
         return sourceFile;
     }
@@ -192,7 +194,7 @@ public class EditSourceFileAction extends KeyAction {
         ActionListener closeAction = event -> dialog.dispose();
         cancelButton.addActionListener(closeAction);
 
-        final File sourceFile = tryGetFile(sourceURI);
+        final Path sourceFile = tryGetFile(sourceURI);
         if (sourceFile == null) {
             // make content read-only and show tooltips
             saveButton.setEnabled(false);
@@ -207,7 +209,7 @@ public class EditSourceFileAction extends KeyAction {
                     // workaround for #1641: replace "\n" with system dependent line separators when
                     // saving
                     String text = textPane.getText().replace("\n", System.lineSeparator());
-                    Files.writeString(sourceFile.toPath(), text);
+                    Files.writeString(sourceFile, text);
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);

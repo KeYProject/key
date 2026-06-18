@@ -4,13 +4,15 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
 /**
@@ -19,10 +21,10 @@ import org.key_project.logic.op.Function;
  */
 public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final Function Z;
 
-    private AtomsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private AtomsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         super(numbers);
         this.left = left;
@@ -31,12 +33,14 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     }
 
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
             collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
     }

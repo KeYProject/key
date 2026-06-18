@@ -1,4 +1,4 @@
-description "Caching of provable nodes to make proving with KeY faster."
+description = "Caching of provable nodes to make proving with KeY faster."
 
 dependencies {
     implementation project(":key.core")

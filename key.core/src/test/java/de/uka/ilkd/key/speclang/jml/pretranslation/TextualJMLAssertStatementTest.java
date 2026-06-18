@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
-        return new PreParser(true).parseMethodLevel(ms, null, Position.newOneBased(1, 1));
+        return new PreParser().parseMethodLevel(ms, null, Position.newOneBased(1, 1));
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '#',
+    @CsvSource(delimiter = '#', commentCharacter = '´',
         textBlock = """
                 //@ assert true; # true;
                 //@ assert 1 + 2 == 3 && 2 != 3; # 1 + 2 == 3 && 2 != 3;

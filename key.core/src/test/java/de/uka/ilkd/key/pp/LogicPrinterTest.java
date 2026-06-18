@@ -6,8 +6,9 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -47,9 +48,46 @@ class LogicPrinterTest {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, false);
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
-            ((Modality) taclet.find().op()).kind(),
-            Modality.JavaModalityKind.DIA, services);
+            ((JModality) taclet.find().op()).kind(),
+            JModality.JavaModalityKind.DIA, services);
         lp.printTaclet(taclet, inst, true, false);
         assertTrue(true);
     }
+
+    @Test
+    void printAnonUpdateTerm1() {
+        Services services = TacletForTests.services().copy(false);
+        KeyIO io = new KeyIO(services, services.getNamespaces());
+        JTerm problem = null;
+        try {
+            problem = (JTerm) io
+                    .load(
+                        """
+                                 \\functions {
+                                    Heap h1;
+                                    Heap h2;
+                                    Heap h3;
+                                    Field fld;
+                                 }
+
+                                 \\programVariables { Object o; }
+
+                                 \\problem {
+                                      anon(store(h1, o, fld, null), union(union(allFields(o), singleton(o,fld)), allObjects(fld)), h2) = h3
+                                 }
+                                """)
+                    .loadCompleteProblem().getProblem().succedent().getFirst().formula();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            LogicPrinter.quickPrintTerm(problem, services);
+        } catch (Exception e) {
+            fail(e.getMessage());
+            return;
+        }
+        assertTrue(true);
+    }
+
+
 }

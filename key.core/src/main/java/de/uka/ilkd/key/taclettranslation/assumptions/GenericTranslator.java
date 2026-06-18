@@ -10,15 +10,17 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.GenericArgument;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -37,15 +39,15 @@ class GenericTranslator {
     /**
      * Translates generic variables.
      */
-    public Collection<Term> translate(Term term, ImmutableSet<Sort> sorts, Taclet t,
+    public Collection<JTerm> translate(JTerm term, ImmutableSet<Sort> sorts, Taclet t,
             TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;
 
         Set<GenericSort> generics = AssumptionGenerator.collectGenerics(term);
-        ImmutableList<Term> list =
+        ImmutableList<JTerm> list =
             instantiateGeneric(term, generics, sorts, t, conditions, maxGeneric);
-        Collection<Term> result = new LinkedList<>();
+        Collection<JTerm> result = new LinkedList<>();
         if (list == null) {
             result.add(term);
             return result;
@@ -56,8 +58,8 @@ class GenericTranslator {
                 + " because there are not enough different sorts. " + generics + " " + sorts);
         }
 
-        if (list.size() > 0) {
-            for (Term gt : list) {
+        if (!list.isEmpty()) {
+            for (JTerm gt : list) {
                 result.add(AssumptionGenerator.quantifyTerm(gt, services));
 
             }
@@ -80,13 +82,12 @@ class GenericTranslator {
      * @param instantiation the instantiation sort.
      * @return returns the new term with instantiated variables. If <code>term</code> can not be
      *         instantiated the method returns <code>null</code>, e.g. this can occur, when
-     *         <code>term</code> is of type {@link SortDependingFunction} and
+     *         <code>term</code> is of type {@link ParametricFunctionInstance} and
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
-
-    private Term instantiateGeneric(Term term, GenericSort generic, Sort instantiation, Taclet t)
+    private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
-        Term[] subTerms = new Term[term.arity()];
+        JTerm[] subTerms = new JTerm[term.arity()];
         ImmutableArray<QuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
             subTerms[i] = instantiateGeneric(term.sub(i), generic, instantiation, t);
@@ -115,24 +116,23 @@ class GenericTranslator {
 
         }
 
-        if (term.op() instanceof SortDependingFunction func) {
-
+        if (term.op() instanceof ParametricFunctionInstance func) {
             try { // Try block is necessary because there are some
                   // taclets
                   // that should have isReference-Condition, but
                   // they don't
                   // have the condition.
-
-                if (func.getSortDependingOn().equals(generic)) {
+                if (func.getArgs().size() == 1 && func.getArgs().head().sort().equals(generic)) {
                     if (instantiation.extendsTrans(services.getJavaInfo().nullSort())) {
                         return null;
                     }
-                    func = func.getInstanceFor(instantiation, services);
+                    func = ParametricFunctionInstance.get(func.getBase(),
+                        ImmutableList.of(new GenericArgument(instantiation)), services);
 
-                    if (func.getKind().equals(JavaDLTheory.CAST_NAME)) {
+                    if (func.getBase() == services.getJavaDLTheory().getCastSymbol(services)) {
                         for (int i = 0; i < term.arity(); i++) {
 
-                            if (!sameHierachyBranch(func.getSortDependingOn(),
+                            if (!sameHierachyBranch(func.getArgs().head().sort(),
                                 subTerms[i].sort())) {
                                 // don't
                                 // instantiate
@@ -145,7 +145,6 @@ class GenericTranslator {
                     }
 
                     term = services.getTermFactory().createTerm(func, subTerms);
-
                 }
             } catch (IllegalArgumentException e) {
                 for (TranslationListener l : listener) {
@@ -215,10 +214,10 @@ class GenericTranslator {
      *         generic variable the original term is returned.
      * @throws IllegalTacletException
      */
-    private ImmutableList<Term> instantiateGeneric(Term term, Set<GenericSort> genericSorts,
+    private ImmutableList<JTerm> instantiateGeneric(JTerm term, Set<GenericSort> genericSorts,
             ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
             throws IllegalTacletException {
-        ImmutableList<Term> instantiatedTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> instantiatedTerms = ImmutableSLList.nil();
         if (maxGeneric < genericSorts.size()) {
             throw new IllegalTacletException("To many different generic sorts. Found: "
                 + genericSorts.size() + " Allowed: " + maxGeneric);
@@ -246,7 +245,7 @@ class GenericTranslator {
             services);
 
         for (byte[] bytes : referenceTable) {
-            Term temp = null;
+            JTerm temp = null;
             for (int c = 0; c < bytes.length; c++) {
                 int index = bytes[c];
 

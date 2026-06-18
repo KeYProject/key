@@ -6,11 +6,11 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.Nullable;
 
@@ -28,7 +28,7 @@ public class RuleJustificationInfo {
             for (RuleKey key : rule2Justification.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
                     throw new IllegalArgumentException(
-                        "A rule named " + r.name() + "has already been registered.");
+                        "A rule named " + r.name() + " has already been registered.");
                 }
             }
         } else {
@@ -40,7 +40,7 @@ public class RuleJustificationInfo {
         return rule2Justification.get(new RuleKey(r));
     }
 
-    public @Nullable RuleJustification getJustification(RuleApp r, TermServices services) {
+    public @Nullable RuleJustification getJustification(RuleApp r, LogicServices services) {
         RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);
@@ -50,9 +50,6 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
-        if (InfFlowContractAppTaclet.hasType(rule)) {
-            InfFlowContractAppTaclet.unregister(rule.name());
-        }
         rule2Justification.remove(new RuleKey(rule));
     }
 

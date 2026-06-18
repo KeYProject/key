@@ -10,7 +10,7 @@ remain since they will be invisible when showing the PR.
 
 <!-- Please remove if this PR is not related to an issue. -->
 <!-- Please add number if it is in answer to an issue. -->
-This pull request addresses #.
+This pull request resolves #.
 
 ## Intended Change
 
@@ -59,6 +59,8 @@ This pull request addresses #.
 - I added new test case(s) for new functionality.
 - I have tested the feature as follows: ...
 - I have checked that runtime performance has not deteriorated.
+- For new Gradle modules: I added the Gradle module to the test matrix in
+  `.github/workflows/tests.yml`
 
 ## Additional information and contact(s)
 

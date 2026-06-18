@@ -12,9 +12,9 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.*;
 
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -48,6 +48,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     private boolean attentive = true;
 
     private boolean batchGoalStateChange = false;
+    private boolean linearizedMode = false;
 
     /**
      * construct a GUIProofTreeModel that mirrors the given Proof.
@@ -79,7 +80,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                     boolean newAutomatic) {
                 if (!batchGoalStateChange
                         && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
-                    updateTree((TreeNode) null);
+                    updateTree((GUIAbstractTreeNode) null);
                 }
             }
         };
@@ -134,7 +135,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 return;
             }
             if (globalFilterActive()) {
-                updateTree((TreeNode) null);
+                updateTree((GUIAbstractTreeNode) null);
             } else {
                 proofStructureChanged(e);
             }
@@ -150,7 +151,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
             if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
-                updateTree((TreeNode) null);
+                updateTree((GUIAbstractTreeNode) null);
             } else {
                 for (Node n : nodesToUpdate) {
                     updateTree(n);
@@ -189,7 +190,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 proof.addProofTreeListener(proofTreeListener);
                 // updateTree(null);
                 if (globalFilterActive()) {
-                    updateTree((TreeNode) null);
+                    updateTree((GUIAbstractTreeNode) null);
                 }
             } else {
                 proof.removeProofTreeListener(proofTreeListener);
@@ -254,6 +255,14 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 .anyMatch(ProofTreeViewFilter::isActive);
     }
 
+    public boolean linearizedModeActive() {
+        return linearizedMode;
+    }
+
+    public void setLinearizedMode(boolean active) {
+        this.linearizedMode = active;
+    }
+
     /**
      * Set filters active or inactive and update tree if necessary.
      * Always updates the filter and the tree.
@@ -267,7 +276,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 activeNodeFilter.setActive(false);
                 activeNodeFilter = null;
             }
-            updateTree((TreeNode) null);
+            updateTree((GUIAbstractTreeNode) null);
             return;
         }
         if (!filter.global()) {
@@ -277,7 +286,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             activeNodeFilter = active ? (NodeFilter) filter : null;
         }
         filter.setActive(active);
-        updateTree((TreeNode) null);
+        updateTree((GUIAbstractTreeNode) null);
     }
 
     /**
@@ -292,7 +301,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     @Override
     public synchronized Object getChild(Object parent, int index) {
-        if (activeNodeFilter == null) {
+        if (bypassNodeFilter()) {
             TreeNode guiParent = (TreeNode) parent;
             if (guiParent.getChildCount() > index) {
                 return guiParent.getChildAt(index);
@@ -301,6 +310,16 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             return activeNodeFilter.getChild(parent, index);
         }
         return null;
+    }
+
+    /**
+     * @return whether the children should be read directly from the tree (whose branch nodes are
+     *         already search-filtered) instead of through the active {@link NodeFilter}. While the
+     *         collapsing search is active it takes precedence over an intermediate-step filter, so
+     *         that the latter does not additionally hide (or surface) nodes among the matches.
+     */
+    private boolean bypassNodeFilter() {
+        return activeNodeFilter == null || ProofTreeViewFilter.SEARCH.isActive();
     }
 
     /**
@@ -313,7 +332,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     @Override
     public synchronized int getChildCount(Object parent) {
-        if (activeNodeFilter == null) {
+        if (bypassNodeFilter()) {
             return ((TreeNode) parent).getChildCount();
         } else {
             return activeNodeFilter.getChildCount(parent);
@@ -331,7 +350,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     @Override
     public synchronized int getIndexOfChild(Object parent, Object child) {
         TreeNode guiParent = (TreeNode) parent;
-        if (activeNodeFilter == null) {
+        if (bypassNodeFilter()) {
             for (int i = 0; i < guiParent.getChildCount(); i++) {
                 if (guiParent.getChildAt(i) == child) {
                     return i;
@@ -389,25 +408,42 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *
      * @param trn tree node to update.
      */
-    private synchronized void updateTree(TreeNode trn) {
-        if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
+    private synchronized void updateTree(GUIAbstractTreeNode trn) {
+
+        // The proof may have changed; drop the search filter's memoized match information so the
+        // collapsing search reflects the new proof state. A changed match anywhere can also change
+        // which ancestor branches are shown (a branch that had no match may now contain one), so a
+        // partial update does not suffice: force a full rebuild.
+        if (ProofTreeViewFilter.SEARCH.isActive()) {
+            ProofTreeViewFilter.SEARCH.invalidateCache();
+            trn = null;
+        }
+
+        // If possible, redraw only a certain subtree
+        // starting from the lowermost parent of trn that is not hidden
+        while (trn != null && trn != getRoot()
+                && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
+            trn = (GUIAbstractTreeNode) trn.getParent();
+        }
+
+        // bigger change, redraw whole tree
+        if (trn == null || trn == getRoot()) {
             proofTreeNodes.clear();
             branchNodes.clear();
             fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
-        // otherwise redraw only a certain subtree
-        // starting from the parent of trn
+
         flushCaches(trn);
         // also flush the current node, it might be an OSS conceiving children in this step
-        ((GUIAbstractTreeNode) trn).flushCache();
+        trn.flushCache();
         TreeNode[] path = ((GUIAbstractTreeNode) trn.getParent()).getPath();
         fireTreeStructureChanged(path);
     }
 
     public synchronized void updateTree(Node p_node) {
         if (p_node == null) {
-            updateTree((TreeNode) null);
+            updateTree((GUIAbstractTreeNode) null);
         } else {
             updateTree(getProofTreeNode(p_node));
         }
@@ -431,13 +467,18 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         workingList.push(n);
         while (!workingList.isEmpty()) {
             Node node = workingList.pop();
-            final GUIBranchNode treeNode = findBranch(node);
+            GUIAbstractTreeNode treeNode = findBranch(node);
             if (treeNode == null) {
-                continue;
+                // in linearized mode, the main branch does not have a BranchNode
+                treeNode = linearizedModeActive() ? find(node) : null;
+                if (treeNode == null) {
+                    continue;
+                }
             }
             treeNode.flushCache();
             while (true) {
-                final Node nextN = treeNode.findChild(node);
+                List<Node> nextList = treeNode.findChild(node);
+                Node nextN = nextList.size() == 1 ? nextList.get(0) : null;
                 if (nextN == null) {
                     break;
                 }

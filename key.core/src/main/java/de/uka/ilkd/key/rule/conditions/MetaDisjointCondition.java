@@ -5,13 +5,15 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -28,30 +30,30 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     }
 
 
-    private static boolean clearlyDisjoint(Term t1, Term t2, Services services) {
+    private static boolean clearlyDisjoint(JTerm t1, JTerm t2, Services services) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if (t1.op() instanceof JFunction && ((Function) t1.op()).isUnique()
-                && t2.op() instanceof JFunction && ((Function) t2.op()).isUnique()
+        if (t1.op() instanceof Function func1 && func1.isUnique()
+                && t2.op() instanceof Function func2 && func2.isUnique()
                 && !t1.equals(t2)) {
             return true;
         } else if (t1.sort().equals(setLDT.targetSort()) && t2.sort().equals(setLDT.targetSort())) {
-            final ImmutableSet<Term> t1set = services.getTermBuilder().unionToSet(t1);
-            final ImmutableSet<Term> t2set = services.getTermBuilder().unionToSet(t2);
+            final ImmutableSet<JTerm> t1set = services.getTermBuilder().unionToSet(t1);
+            final ImmutableSet<JTerm> t2set = services.getTermBuilder().unionToSet(t2);
 
             ImmutableSet<Operator> t1Ops = DefaultImmutableSet.nil();
             ImmutableSet<Operator> t2Ops = DefaultImmutableSet.nil();
-            for (Term t : t1set) {
-                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JFunction
-                        && ((Function) t.sub(0).op()).isUnique()) {
+            for (JTerm t : t1set) {
+                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof Function func
+                        && func.isUnique()) {
                     t1Ops = t1Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
                 } else {
                     return false;
                 }
             }
-            for (Term t : t2set) {
-                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JFunction
-                        && ((Function) t.sub(0).op()).isUnique()) {
+            for (JTerm t : t2set) {
+                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof Function func
+                        && func.isUnique()) {
                     t2Ops = t2Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
                 } else {
@@ -69,8 +71,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
-        final Term s1Inst = (Term) svInst.getInstantiation(var1);
-        final Term s2Inst = (Term) svInst.getInstantiation(var2);
+        final JTerm s1Inst = svInst.getInstantiation(var1);
+        final JTerm s2Inst = svInst.getInstantiation(var2);
         if (s1Inst == null || s2Inst == null) {
             return true;
         } else {

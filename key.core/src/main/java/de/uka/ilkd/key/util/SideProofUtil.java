@@ -5,8 +5,6 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -18,9 +16,10 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Choice;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableSet;
 
 public final class SideProofUtil {
@@ -64,8 +63,7 @@ public final class SideProofUtil {
                 : null;
         initConfig.setSettings(clonedSettings);
         initConfig.setTaclet2Builder(
-            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder()
-                    .clone());
+            new HashMap<>(sourceInitConfig.getTaclet2Builder()));
         initConfig.setTaclets(sourceInitConfig.getTaclets());
         // Create new ProofEnvironment and initialize it with values from initial one.
         ProofEnvironment env = new ProofEnvironment(initConfig);

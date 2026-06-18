@@ -9,12 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -25,7 +20,13 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -47,9 +48,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created constant.
      */
-    protected JFunction createResultConstant(Services services, Sort sort) {
+    protected Function createResultConstant(Services services, Sort sort) {
         String functionName = services.getTermBuilder().newName("QueryResult");
-        JFunction function = new JFunction(new Name(functionName), sort);
+        Function function = new JFunction(new Name(functionName), sort);
         services.getNamespaces().functions().addSafely(function);
         return function;
     }
@@ -63,31 +64,31 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
-    protected JFunction createResultFunction(Services services, Sort sort) {
+    protected Function createResultFunction(Services services, Sort sort) {
         return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
 
     /**
      * <p>
-     * Starts the side proof and extracts the result {@link Term} and conditions.
+     * Starts the side proof and extracts the result {@link JTerm} and conditions.
      * </p>
      * <p>
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param services The {@link Services} to use.
      * @param goal The {@link Goal} on which this {@link BuiltInRule} should be applied on.
      * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
      * @param sequentToProve The {@link Sequent} to prove in a side proof.
      * @param newPredicate The {@link JFunction} which is used to compute the result.
-     * @return The found result {@link Term} and the conditions.
+     * @return The found result {@link JTerm} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
-            Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
-            JFunction newPredicate) throws ProofInputException {
-        return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
+    protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal,
+            ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
+            Function newPredicate) throws ProofInputException {
+        return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
+            goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,
             "Side proof rule on node " + goal.node().serialNr() + ".",
             StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
@@ -95,17 +96,18 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     }
 
     /**
-     * Replaces the {@link Term} defined by the given {@link PosInOccurrence} with the given new
-     * {@link Term}.
+     * Replaces the {@link JTerm} defined by the given {@link PosInOccurrence} with the given new
+     * {@link JTerm}.
      *
-     * @param pio The {@link PosInOccurrence} which defines the {@link Term} to replace.
-     * @param newTerm The new {@link Term}.
-     * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
+     * @param pio The {@link PosInOccurrence} which defines the {@link JTerm} to replace.
+     * @param newTerm The new {@link JTerm}.
+     * @return The created {@link SequentFormula} in which the {@link JTerm} is replaced.
      */
-    protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
+    protected static SequentFormula replace(PosInOccurrence pio,
+            JTerm newTerm, Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
-        Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
-        Term root = pio.sequentFormula().formula();
+        Deque<Pair<Integer, JTerm>> indexAndParents = new LinkedList<>();
+        JTerm root = (JTerm) pio.sequentFormula().formula();
         final PosInTerm pit = pio.posInTerm();
         for (int i = 0, sz = pit.depth(); i < sz; i++) {
             int next = pit.getIndexAt(i);
@@ -114,9 +116,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
         }
         // Iterate over the collected parents and replace terms
         root = newTerm;
-        for (Pair<Integer, Term> pair : indexAndParents) {
-            Term parent = pair.second;
-            Term[] newSubs = parent.subs().toArray(new Term[parent.arity()]);
+        for (Pair<Integer, JTerm> pair : indexAndParents) {
+            JTerm parent = pair.second;
+            JTerm[] newSubs = parent.subs().toArray(new JTerm[parent.arity()]);
             newSubs[pair.first] = root;
             root = services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(),
                 parent.getLabels());

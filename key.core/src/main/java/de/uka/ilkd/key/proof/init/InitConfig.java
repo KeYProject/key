@@ -6,12 +6,10 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.nparser.ChoiceInformation;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -22,16 +20,23 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -47,14 +52,24 @@ public class InitConfig {
 
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
-
+    /// List of all known taclets.
     private ImmutableList<Taclet> taclets = ImmutableSLList.nil();
 
     /**
-     * maps categories to their default choice (both represented as Strings), which is used if no
-     * other choice is specified in the problemfile
+     * Map of categories to their default choice. The choices are overridden in activateChoice
+     * by settings given in the {@link KeYUserProblemFile} or
+     * {@link Profile#prepareInitConfig(InitConfig, Configuration)}.
      */
-    private Map<String, String> category2DefaultChoice = new LinkedHashMap<>();
+    private final Map<String, Choice> category2DefaultChoice;
+
+
+    /**
+     * Set of the rule options activated for the current proof. The rule options ({@link Choice}s)
+     * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
+     * checks when resolving references)
+     */
+    private final Map<String, Choice> activatedChoices = new TreeMap<>();
+
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -62,14 +77,7 @@ public class InitConfig {
      * created containing only those GoalTemplates whose options are activated and those who don't
      * belong to any specific option.
      */
-    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
-
-    /**
-     * Set of the rule options activated for the current proof. The rule options ({@link Choice}s)
-     * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
-     * checks when resolving references)
-     */
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
+    private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -77,10 +85,12 @@ public class InitConfig {
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
+    // weigl this field is never set
     private String originalKeYFileName;
 
     private ProofSettings settings;
 
+    private KeyAst.@Nullable Declarations header;
 
 
     // -------------------------------------------------------------------------
@@ -89,21 +99,54 @@ public class InitConfig {
 
     public InitConfig(Services services) {
         this.services = services;
-
-        category2DefaultChoice = new HashMap<>(
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices());
+        category2DefaultChoice = new TreeMap<>();
     }
 
+    /// combines the found choices in KeY files, together with the current settings.
+    /// The namespace of choices has to be filled.
+    public void computeDefaults(ChoiceInformation ci) {
+        var currentDefaultChoices =
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
+        // defined file choices
+        this.category2DefaultChoice.putAll(ci.getDefaultOptions());
 
+        // then current user settings.
+        for (final String s : currentDefaultChoices.values()) {
+            final Choice c = choiceNS().lookup(new Name(s));
+            if (c != null) {
+                category2DefaultChoice.put(c.category(), c);
+            }
+        }
 
+        if (currentDefaultChoices.isEmpty()) { // no choices have been read.
+            currentDefaultChoices = new TreeMap<>();
+            for (var entry : category2DefaultChoice.entrySet()) {
+                currentDefaultChoices.put(entry.getKey(), entry.getValue().name().toString());
+            }
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings()
+                    .setDefaultChoices(currentDefaultChoices);
+        }
 
-    // -------------------------------------------------------------------------
-    // public interface
-    // -------------------------------------------------------------------------
+        // activate by \settings {} in file KeYUserProblemFile
+        if (settings != null) {
+            for (var choice : settings.getChoiceSettings().getDefaultChoicesAsSet()) {
+                activatedChoices.put(choice.category(), choice);
+            }
+
+            if (!ci.getActivatedChoices().isEmpty()) {
+                for (var ac : ci.getActivatedChoices()) {
+                    activatedChoices.put(ac.category(), ac);
+                }
+            }
+
+            Map<String, String> defaults = new TreeMap<>();
+            for (var ac : getActivatedChoices()) {
+                defaults.put(ac.category(), ac.name().toString());
+            }
+            settings.getChoiceSettings().setDefaultChoices(defaults);
+        }
+    }
 
     /**
      * returns the Services of this initial configuration providing access to the used program model
@@ -121,39 +164,30 @@ public class InitConfig {
 
 
     /**
-     * Adds a default option for a category. It does override previous default choices.
-     *
-     * @return true if the default was successfully set
-     */
-    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
-        if (!category2DefaultChoice.containsKey(category)) {
-            category2DefaultChoice.put(category, choice);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
-        boolean changed = false;
-        for (final Map.Entry<String, String> entry : init.entrySet()) {
-            changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
+    public void addCategory2DefaultChoices(@NonNull Map<String, Choice> init) {
+        if (init.isEmpty()) {
+            return;
         }
-        if (changed) {
-            // FIXME weigl: I do not understand why the default choices are back progragated!
-            // For me this is a design flaw.
-            Map<String, String> clone =
-                new HashMap<>(category2DefaultChoice);
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-            // invalidate active taclet cache
-            activatedTacletCache = null;
-        }
+        category2DefaultChoice.putAll(init);
+        // FIXME weigl: I do not understand why the default choices are back progragated!
+        // For me this is a design flaw.
+        // weigl(2026): This is the way, how the settings are getting updated by the current
+        // known choices. This is not good!
+        /*
+         * Map<String, String> clone = new HashMap<>();
+         * for (Map.Entry<String, Choice> entry : category2DefaultChoice.entrySet()) {
+         * clone.put(entry.getKey(), entry.getValue().name().toString());
+         * }
+         * ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+         */
+        // invalidate active taclet cache
+        activatedTacletCache = null;
     }
 
 
-    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
+    public void setTaclet2Builder(Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
         this.taclet2Builder = taclet2Builder;
     }
 
@@ -165,7 +199,7 @@ public class InitConfig {
      *
      * @return the map from a taclet to its builder
      */
-    public HashMap<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder() {
+    public Map<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder() {
         return taclet2Builder;
     }
 
@@ -175,37 +209,22 @@ public class InitConfig {
      * specified choice the default choice contained in category2DefaultChoice is added.
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
-        category2DefaultChoice =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-
-        HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
-        for (final Choice c : activatedChoices) {
-            c2DC.remove(c.category());
+        this.activatedChoices.clear();
+        for (Choice choice : activatedChoices) {
+            this.activatedChoices.put(choice.category(), choice);
         }
-
-        ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
-        for (final String s : c2DC.values()) {
-            final Choice c = choiceNS().lookup(new Name(s));
-            if (c != null) {
-                category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
-            }
-        }
-        this.activatedChoices = activatedChoices
-                .union(
-                    DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
     }
 
-
     /**
-     * Returns the choices which are currently active. For getting the active choices for a specific
-     * proof, <code>getChoices</code> in <code>de.uka.ilkd.key.proof.Proof
-     * </code> has to be used.
+     * Returns the effective activated choices.
      */
     public ImmutableSet<Choice> getActivatedChoices() {
-        return activatedChoices;
+        var effectiveMap = new TreeMap<>(category2DefaultChoice);
+        effectiveMap.putAll(activatedChoices);
+        return ImmutableSet.from(effectiveMap.values());
     }
 
 
@@ -216,13 +235,6 @@ public class InitConfig {
 
     public void setTaclets(ImmutableList<Taclet> tacs) {
         taclets = tacs;
-        // invalidate active taclet cache
-        this.activatedTacletCache = null;
-    }
-
-    public void setTaclets(Collection<Taclet> tacs) {
-        taclets = ImmutableSLList.nil();
-        addTaclets(tacs);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
@@ -257,7 +269,8 @@ public class InitConfig {
             return;
         }
         final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
-        var choices = Collections.unmodifiableSet(activatedChoices.toSet());
+        var choices = Collections.unmodifiableSet(getActivatedChoices().toSet());
+
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
@@ -293,7 +306,8 @@ public class InitConfig {
         justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, Node node, boolean isAxiom) {
+    public void registerRuleIntroducedAtNode(RuleApp r, Node node,
+            boolean isAxiom) {
         justifInfo.addJustification(r.rule(), new RuleJustificationByAddRules(node, isAxiom));
     }
 
@@ -346,7 +360,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<JFunction> funcNS() {
+    public Namespace<@NonNull Function> funcNS() {
         return namespaces().functions();
     }
 
@@ -354,7 +368,7 @@ public class InitConfig {
     /**
      * returns the sort namespace of this initial configuration
      */
-    public Namespace<Sort> sortNS() {
+    public Namespace<@NonNull Sort> sortNS() {
         return namespaces().sorts();
     }
 
@@ -362,7 +376,7 @@ public class InitConfig {
     /**
      * returns the heuristics namespace of this initial configuration
      */
-    public Namespace<RuleSet> ruleSetNS() {
+    public Namespace<@NonNull RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
@@ -370,7 +384,7 @@ public class InitConfig {
     /**
      * returns the variable namespace of this initial configuration
      */
-    public Namespace<QuantifiableVariable> varNS() {
+    public Namespace<@NonNull QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 
@@ -378,7 +392,7 @@ public class InitConfig {
     /**
      * returns the program variable namespace of this initial configuration
      */
-    public Namespace<IProgramVariable> progVarNS() {
+    public Namespace<@NonNull IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
@@ -386,7 +400,7 @@ public class InitConfig {
     /**
      * returns the choice namespace of this initial configuration
      */
-    public Namespace<Choice> choiceNS() {
+    public Namespace<@NonNull Choice> choiceNS() {
         return namespaces().choices();
     }
 
@@ -422,18 +436,17 @@ public class InitConfig {
      * returns a copy of this initial configuration copying the namespaces, the contained JavaInfo
      * while using the immutable set of taclets in the copy
      */
-    @SuppressWarnings("unchecked")
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
         if (settings != null) {
             ic.setSettings(new ProofSettings(settings));
         }
-        ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = new HashMap<>(category2DefaultChoice);
-        ic.setTaclet2Builder(
-            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
+        ic.category2DefaultChoice.putAll(category2DefaultChoice);
+        ic.activatedChoices.putAll(activatedChoices);
+        ic.setTaclet2Builder(new HashMap<>(taclet2Builder));
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
+        ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
@@ -453,5 +466,46 @@ public class InitConfig {
 
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
+    }
+
+    /// Enforce the given choice. Remove choices of the same category from the current set.
+    public void activateChoice(Choice choice) {
+        activatedChoices.put(choice.category(), choice);
+        // invalidate active taclet cache
+        activatedTacletCache = null;
+    }
+
+    public boolean isChoiceActive(String choice) {
+        var c = choiceNS().lookup(choice);
+        return isChoiceActive(c);
+    }
+
+    public boolean isChoiceActive(@Nullable Choice c) {
+        if (c == null) {
+            return false;
+        }
+
+        if (activatedChoices.containsValue(c)) {
+            return true;
+        }
+
+        return !activatedChoices.containsKey(c.category())
+                && category2DefaultChoice.containsValue(c);
+    }
+
+    /// returns the user-given declarations used during loading
+    public KeyAst.@Nullable Declarations getProblemHeader() {
+        return header;
+    }
+
+    /// sets the user-given declarations that are used during saving proofs
+    public void setHeader(KeyAst.@Nullable Declarations header) {
+        this.header = header;
+    }
+
+    /// Returns true, if the given category was actively set, e.g., by loading settings or a
+    /// profile.
+    public boolean isChoiceCategorySet(String category) {
+        return activatedChoices.containsKey(category);
     }
 }

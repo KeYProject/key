@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.Property;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
 
 /**
  * A property that can be used in
@@ -48,16 +49,20 @@ public class TermLabelsProperty implements Property<Term> {
             return true;
         }
 
-        if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
-                && term1.javaBlock().equals(term2.javaBlock()))) {
+        if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars()))) {
             return false;
         }
 
-        final ImmutableArray<Term> term1Subs = term1.subs();
-        final ImmutableArray<Term> term2Subs = term2.subs();
+        if (term1.op() instanceof Modality mod1
+                && !(mod1.programBlock().equals(((Modality) (term2.op())).programBlock()))) {
+            return false;
+        }
+
+        final var term1Subs = term1.subs();
+        final var term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), TERM_LABELS_PROPERTY)) {
+            if (!this.equalsModThisProperty(term1Subs.get(i), term2Subs.get(i))) {
                 return false;
             }
         }
@@ -79,9 +84,11 @@ public class TermLabelsProperty implements Property<Term> {
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
         hashcode = hashcode * 17
-                + EqualityUtils.hashCodeModPropertyOfIterable(TERM_LABELS_PROPERTY, term.subs());
+                + EqualityUtils.hashCodeModPropertyOfIterable(term.subs(),
+                    this::hashCodeModThisProperty);
         hashcode = hashcode * 17 + term.boundVars().hashCode();
-        hashcode = hashcode * 17 + term.javaBlock().hashCode();
+        hashcode =
+            hashcode * 17 + (term.op() instanceof Modality mod ? mod.programBlock().hashCode() : 3);
 
         return hashcode;
     }

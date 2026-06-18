@@ -10,8 +10,8 @@ import org.key_project.logic.sort.Sort;
 
 /**
  * Special assert statements intended for use with KeY. Raises
- * {@link de.uka.ilkd.key.util.AssertionFailure} (which is a subtype of {@link java.lang.Exception})
- * instead of {@link java.lang.AssertionError}.
+ * {@link AssertionFailure} (which is a subtype of {@link Exception})
+ * instead of {@link AssertionError}.
  *
  * @author daniel
  *

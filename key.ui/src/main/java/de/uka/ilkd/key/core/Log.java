@@ -59,19 +59,19 @@ public class Log {
             var filter = new ThresholdFilter();
             consoleAppender.addFilter(filter);
             switch (verbosity.byteValue()) {
-            case Verbosity.TRACE -> filter.setLevel("TRACE");
-            case Verbosity.DEBUG -> filter.setLevel("DEBUG");
-            case Verbosity.INFO -> filter.setLevel("INFO");
-            case Verbosity.NORMAL -> filter.setLevel("ERROR");
-            case Verbosity.SILENT -> filter.setLevel("OFF");
-            default -> filter.setLevel("WARN");
+                case Verbosity.TRACE -> filter.setLevel("TRACE");
+                case Verbosity.DEBUG -> filter.setLevel("DEBUG");
+                case Verbosity.INFO -> filter.setLevel("INFO");
+                case Verbosity.NORMAL -> filter.setLevel("ERROR");
+                case Verbosity.SILENT -> filter.setLevel("OFF");
+                default -> filter.setLevel("WARN");
             }
             filter.start();
         }
     }
 
     private static void cleanOldLogFiles() {
-        var logDir = PathConfig.getLogDirectory().toPath();
+        var logDir = PathConfig.getLogDirectory();
         try (var files = Files.list(logDir)) {
             var duration = Duration.of(14, ChronoUnit.DAYS);
             var refDate = Instant.now().minus(duration);

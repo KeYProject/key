@@ -34,8 +34,8 @@ import recoder.abstraction.TypeArgument.WildcardMode;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
@@ -156,7 +156,7 @@ public class SchemaJavaParser {
 
     private static void testLeftHandSide(Expression expr) throws ParseException{
 	if (expr instanceof ExpressionSVWrapper) {
-	    OperatorSV sv=((ExpressionSVWrapper) expr).getSV();
+	    JOperatorSV sv=((ExpressionSVWrapper) expr).getSV();
 	    if ( !isLeftHandSide(sv.sort()) ) {
 		throw new ParseException
 		    ("Schema variable "+sv+" should be one of lefthandside"
@@ -236,7 +236,7 @@ public class SchemaJavaParser {
     private static void checkExpressionSVWrapper(ProgramSVSort notOfSort,
 						 ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof ExpressionSVWrapper) {
-	    OperatorSV sv=((ExpressionSVWrapper)exp).getSV();
+	    JOperatorSV sv=((ExpressionSVWrapper)exp).getSV();
 	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
@@ -248,7 +248,7 @@ public class SchemaJavaParser {
     private static void checkLabelSVWrapper(ProgramSVSort notOfSort,
 					    ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof LabelSVWrapper) {
-	    OperatorSV sv=((LabelSVWrapper)exp).getSV();
+	    JOperatorSV sv=((LabelSVWrapper)exp).getSV();
 	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
