@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
@@ -71,12 +72,18 @@ public class VariableNameProposer implements InstantiationProposer {
 
         Name name = services.getNameRecorder().getProposal();
         if (name == null || namespaces.lookup(name) != null) {
-            int i = 0;
-
-            do {
-                name = new Name(baseName + "_" + i++);
-            } while (namespaces.lookup(name) != null);
-
+            if (ParallelProver.isMultiThreadedRunActive()) {
+                // Mint via the per-proof allocator: globally unique across workers without a
+                // namespace-search race. Re-mint on the rare clash with a pre-existing symbol.
+                do {
+                    name = new Name(services.getNameAllocator().freshName(baseName.toString()));
+                } while (namespaces.lookup(name) != null);
+            } else {
+                int i = 0;
+                do {
+                    name = new Name(baseName + "_" + i++);
+                } while (namespaces.lookup(name) != null);
+            }
         }
 
         return name;
@@ -133,13 +140,21 @@ public class VariableNameProposer implements InstantiationProposer {
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
-        int cnt = 0;
-        do {
-            name = basename + cnt;
-            l_name = new Name(name);
-            cnt++;
-        } while (nss.lookup(l_name) != null || previousProposals.contains(name));
-
+        if (ParallelProver.isMultiThreadedRunActive()) {
+            // Allocator-minted skolem names are globally unique across workers without searching
+            // the shared namespace; still honour pre-existing symbols and recorded proposals.
+            do {
+                name = services.getNameAllocator().freshName(basename);
+                l_name = new Name(name);
+            } while (nss.lookup(l_name) != null || previousProposals.contains(name));
+        } else {
+            int cnt = 0;
+            do {
+                name = basename + cnt;
+                l_name = new Name(name);
+                cnt++;
+            } while (nss.lookup(l_name) != null || previousProposals.contains(name));
+        }
 
         return name;
     }
