@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 
@@ -15,16 +17,13 @@ import org.key_project.logic.sort.Sort;
 public final class Metavariable extends JAbstractSortedOperator
         implements Comparable<Metavariable>, TerminalSyntaxElement, Named {
 
-    // Used to define an alternative order of all existing
-    // metavariables
-    private static int maxSerial = 0;
-    private int serial;
+    // Used to define an alternative order of all existing metavariables. Atomic so that serials
+    // stay unique when metavariables are created concurrently (the previous `synchronized` method
+    // guarded only the per-instance monitor, not this shared static counter).
+    private static final AtomicInteger maxSerial = new AtomicInteger(0);
+    private final int serial;
 
     private final boolean isTemporaryVariable;
-
-    private synchronized void setSerial() {
-        serial = maxSerial++;
-    }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
         super(name, sort, true);
@@ -32,7 +31,7 @@ public final class Metavariable extends JAbstractSortedOperator
             throw new RuntimeException("Attempt to create metavariable of type formula");
         }
         this.isTemporaryVariable = isTemporaryVariable;
-        setSerial();
+        this.serial = maxSerial.getAndIncrement();
         // assert false : "metavariables are disabled";
     }
 

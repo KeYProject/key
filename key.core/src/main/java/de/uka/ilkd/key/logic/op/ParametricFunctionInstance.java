@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -18,13 +17,21 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NonNull;
 
 /// A concrete instance of a [ParametricFunctionDecl].
 public class ParametricFunctionInstance extends JFunction {
-    private static final Map<ParametricFunctionInstance, ParametricFunctionInstance> CACHE =
-        new WeakHashMap<>();
+    /**
+     * Interns parametric function instances so that equal instances are the same object.
+     * Thread-safe
+     * (the previous {@code WeakHashMap} + check-then-put could hand two distinct-but-equal
+     * instances
+     * to concurrent workers, breaking that identity).
+     */
+    private static final WeakValueInterner<ParametricFunctionInstance, ParametricFunctionInstance> CACHE =
+        new WeakValueInterner<>();
 
     private final ImmutableList<GenericArgument> args;
     private final ParametricFunctionDecl base;
@@ -38,12 +45,7 @@ public class ParametricFunctionInstance extends JFunction {
         var argSorts = instantiate(decl, instMap, services);
         var sort = ParametricSortInstance.instantiate(decl.sort(), instMap, services);
         var fn = new ParametricFunctionInstance(decl, args, argSorts, sort);
-        var cached = CACHE.get(fn);
-        if (cached != null) {
-            return cached;
-        }
-        CACHE.put(fn, fn);
-        return fn;
+        return CACHE.intern(fn, candidate -> candidate);
     }
 
     private ParametricFunctionInstance(ParametricFunctionDecl base,

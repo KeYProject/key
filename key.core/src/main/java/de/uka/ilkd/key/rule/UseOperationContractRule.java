@@ -61,8 +61,16 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
     private static final Name NAME = new Name("Use Operation Contract");
 
-    private static JTerm lastFocusTerm;
-    private static Instantiation lastInstantiation;
+    /**
+     * Single-entry memo to avoid recomputing the instantiation between the applicability check and
+     * the application of the same focus term. Thread-local because {@code instantiate} is called
+     * from
+     * {@code isApplicable} (which has no rule app to attach to) and the rule INSTANCE lives in the
+     * shared taclet base: a plain static cache raced across concurrent workers. Confined to the
+     * worker thread it preserves the optimization (applicability + apply run on the same worker).
+     */
+    private static final ThreadLocal<JTerm> lastFocusTerm = new ThreadLocal<>();
+    private static final ThreadLocal<Instantiation> lastInstantiation = new ThreadLocal<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -358,17 +366,17 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     private static Instantiation instantiate(JTerm focusTerm, Services services) {
-        // result cached?
-        if (focusTerm == lastFocusTerm) {
-            return lastInstantiation;
+        // result cached (per worker thread)?
+        if (focusTerm == lastFocusTerm.get()) {
+            return lastInstantiation.get();
         }
 
         // compute
         final Instantiation result = computeInstantiation(focusTerm, services);
 
         // cache and return
-        lastFocusTerm = focusTerm;
-        lastInstantiation = result;
+        lastFocusTerm.set(focusTerm);
+        lastInstantiation.set(result);
         return result;
     }
 
