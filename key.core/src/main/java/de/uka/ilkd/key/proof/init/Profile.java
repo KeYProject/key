@@ -106,6 +106,22 @@ public interface Profile {
     boolean supportsStrategyFactory(Name strategyName);
 
     /**
+     * Whether automatic proof search for this profile may run on the multi-core (parallel) prover.
+     *
+     * <p>
+     * Conservatively {@code false} by default: a profile opts in only once its rules, strategy and
+     * any side-proof machinery have been confirmed thread-safe under concurrent goal processing.
+     * The
+     * standard {@code JavaProfile} opts in; the specialised profiles (well-definedness, information
+     * flow, symbolic-execution debugger) keep the safe single-core fallback for now.
+     *
+     * @return {@code true} if the parallel prover may be used for this profile
+     */
+    default boolean supportsParallelAutomode() {
+        return false;
+    }
+
+    /**
      * returns the StrategyFactory for strategy <code>strategyName</code>
      *
      * @param strategyName the Name of the strategy
