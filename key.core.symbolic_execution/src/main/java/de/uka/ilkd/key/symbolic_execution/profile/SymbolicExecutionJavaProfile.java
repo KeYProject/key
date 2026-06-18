@@ -110,6 +110,13 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                 .add(new SymbolicExecutionGoalChooserFactory());
     }
 
+    @Override
+    public boolean supportsParallelAutomode() {
+        // The symbolic-execution debugger profile builds a shared SE tree during search and is not
+        // audited for thread-safety: keep single-core.
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
