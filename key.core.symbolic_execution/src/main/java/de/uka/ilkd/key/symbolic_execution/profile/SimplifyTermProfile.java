@@ -57,6 +57,12 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
+    public boolean supportsParallelAutomode() {
+        // Symbolic-execution term-simplification profile: keep single-core (not audited).
+        return false;
+    }
+
+    @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         ImmutableList<TermLabelPolicy> symExcPolicies =

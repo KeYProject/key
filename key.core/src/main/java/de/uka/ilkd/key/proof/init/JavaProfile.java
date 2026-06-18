@@ -45,6 +45,15 @@ public class JavaProfile extends AbstractProfile {
         return permissions ? NAME_WITH_PERMISSIONS : PROFILE_ID;
     }
 
+    /**
+     * The standard Java DL profile is the one validated for concurrent goal processing, so it opts
+     * into the multi-core prover. Specialised subprofiles override this back to {@code false}.
+     */
+    @Override
+    public boolean supportsParallelAutomode() {
+        return true;
+    }
+
     @Override
     public String displayName() {
         return permissions ? NAME_WITH_PERMISSIONS : (PROFILE_ID + " (Default)");
