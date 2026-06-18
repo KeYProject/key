@@ -1201,6 +1201,137 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * Detaches every registered {@link ProofTreeListener} and {@link RuleAppListener} that is not
+     * tagged {@link EssentialProofListener}, and returns a handle that re-attaches them when
+     * closed.
+     *
+     * <p>
+     * This is the foundation for safe automatic (and, later, multithreaded) proof search: pure
+     * observers &mdash; caching, slicing, origin labels, GUI tree models, &hellip; &mdash; are
+     * suspended for the duration of a run so that nothing unrelated to proving fires on a worker
+     * thread or mutates shared state concurrently. Essential bookkeeping listeners keep running.
+     * {@link ProofDisposedListener}s are untouched, as disposal is not part of a run.
+     *
+     * <p>
+     * Intended use is a try-with-resources scope around the prover's run:
+     *
+     * <pre>
+     * try (var ignored = proof.suspendNonEssentialListeners()) {
+     *     prover.start(proof, goals, ...);
+     * } // observers re-attached here; the caller then refreshes them from the final state
+     * </pre>
+     *
+     * Suspended listeners are re-attached on {@link ListenerSuspension#close()}; their relative
+     * firing order is not guaranteed to be preserved, which is sound because proof listeners are
+     * mutually independent.
+     *
+     * @return a handle whose {@link ListenerSuspension#close()} restores the suspended listeners;
+     *         restoration is idempotent
+     */
+    public ListenerSuspension suspendNonEssentialListeners() {
+        return new ListenerSuspension();
+    }
+
+    /**
+     * Handle returned by {@link Proof#suspendNonEssentialListeners()}. Closing it (idempotently)
+     * re-attaches the listeners that were suspended.
+     */
+    public final class ListenerSuspension implements AutoCloseable {
+        private final List<ProofTreeListener> suspendedTreeListeners = new ArrayList<>();
+        private final List<RuleAppListener> suspendedRuleAppListeners = new ArrayList<>();
+        /**
+         * Distinct non-essential per-goal listeners (e.g. the GUI proof-tree model's goal listener,
+         * which is attached to every open goal). Unlike the proof-level listener lists, these are
+         * registered per goal and would otherwise fire on the worker threads during a parallel run
+         * -- and touch EDT-only state. They are detached for the run's duration and re-attached on
+         * {@link #close()}, to the <em>current</em> open goals (the goal set changes during the
+         * run).
+         */
+        private final Set<GoalListener> suspendedGoalListeners =
+            Collections.newSetFromMap(new IdentityHashMap<>());
+        private boolean restored = false;
+        /**
+         * Whether the proof was already closed when the listeners were suspended. Used to decide on
+         * {@link #close()} whether a {@code proofClosed} event was missed by the suspended
+         * listeners.
+         */
+        private final boolean closedAtSuspension = closed();
+
+        private ListenerSuspension() {
+            synchronized (listenerList) {
+                for (ProofTreeListener l : listenerList) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedTreeListeners.add(l);
+                    }
+                }
+                listenerList.removeAll(suspendedTreeListeners);
+            }
+            synchronized (ruleAppListenerList) {
+                for (RuleAppListener l : ruleAppListenerList) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedRuleAppListeners.add(l);
+                    }
+                }
+                ruleAppListenerList.removeAll(suspendedRuleAppListeners);
+            }
+            // Detach non-essential goal listeners from every open goal. (Construction runs before
+            // any
+            // worker starts, so the open-goal set and the goals' listener lists are stable here.)
+            for (Goal g : openGoals()) {
+                for (GoalListener l : g.getGoalListeners()) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedGoalListeners.add(l);
+                    }
+                }
+            }
+            for (Goal g : openGoals()) {
+                for (GoalListener l : suspendedGoalListeners) {
+                    g.removeGoalListener(l);
+                }
+            }
+        }
+
+        /** Re-attaches the suspended listeners. Idempotent: a second call does nothing. */
+        @Override
+        public void close() {
+            if (restored) {
+                return;
+            }
+            restored = true;
+            synchronized (listenerList) {
+                listenerList.addAll(suspendedTreeListeners);
+            }
+            synchronized (ruleAppListenerList) {
+                ruleAppListenerList.addAll(suspendedRuleAppListeners);
+            }
+            // Re-attach to the goals that are open now (the run may have closed some and created
+            // others); remove-then-add keeps it idempotent and avoids duplicates. The view itself
+            // is
+            // refreshed from the final state by the caller (the GUI's autoModeStopped handler
+            // rebuilds
+            // the modified subtrees on the EDT).
+            for (Goal g : openGoals()) {
+                for (GoalListener l : suspendedGoalListeners) {
+                    g.removeGoalListener(l);
+                    g.addGoalListener(l);
+                }
+            }
+            // If the proof closed while its non-essential listeners were suspended, the proofClosed
+            // event reached only the essential listeners; the suspended ones (e.g. the GUI's
+            // "proof closed" notification, the task and goal views) missed it. Re-deliver it to
+            // them now. This runs after the parallel run has joined all workers, so it is a single
+            // delivery on one thread -- the same context in which proofClosed fires for the
+            // single-threaded prover.
+            if (!closedAtSuspension && !mutedProofCloseEvents && closed()) {
+                ProofTreeEvent event = new ProofTreeEvent(Proof.this);
+                for (ProofTreeListener l : suspendedTreeListeners) {
+                    l.proofClosed(event);
+                }
+            }
+        }
+    }
+
+    /**
      * Registers the given {@link ProofDisposedListener}.
      *
      * @param l The {@link ProofDisposedListener} to register.
