@@ -1909,6 +1909,11 @@ public final class MainWindow extends JFrame {
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             getMediator().addKeYSelectionListenerChecked(proofListener);
+            // Refresh the sequent view from the final state explicitly. The selection listener was
+            // detached for the duration of the run, so the view would otherwise only update if a
+            // selectedNodeChanged event happens to fire afterwards -- which is not guaranteed (the
+            // run may end with the selection unchanged), leaving the displayed sequent stale.
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         @Override
