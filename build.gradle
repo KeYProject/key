@@ -123,6 +123,11 @@ subprojects {
         systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("report/runallproves").get().toString()
 
         systemProperty "key.disregardSettings", "true"
+        // Pin the whole test suite to the single-threaded prover, so no test silently runs on the
+        // multi-core prover (e.g. merge-rule, slicing and symbolic-execution tests rely on single
+        // core). Opt-in parallel tests (equivalence, stress, benchmark) set this property at runtime,
+        // which overrides the baseline within their fork.
+        systemProperty "key.prover.parallel", "false"
         maxHeapSize = "4g"
 
         forkEvery = 0 //default
