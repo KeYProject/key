@@ -11,12 +11,15 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.SingleCoreFeatureGate;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Status line button to indicate whether cached goals are present.
@@ -47,6 +50,11 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
         mediator.addKeYSelectionListener(this);
         addActionListener(this);
         setEnabled(false);
+        // Reflect the prover mode live: when the user switches to the multi-core prover the button
+        // greys out (proof caching is single-core only), and back when they return to single-core.
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addPropertyChangeListener(
+            GeneralSettings.PARALLEL_PROVER_ENABLED,
+            evt -> updateState(mediator.getSelectedProof()));
     }
 
 
@@ -82,6 +90,14 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      * @param p the currently selected proof
      */
     public void updateState(Proof p) {
+        if (SingleCoreFeatureGate.isActive()) {
+            setText("Proof Caching");
+            setForeground(null);
+            setEnabled(false);
+            setToolTipText(SingleCoreFeatureGate.DISABLED_TOOLTIP);
+            return;
+        }
+        setToolTipText(null);
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);
