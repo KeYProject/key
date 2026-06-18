@@ -88,6 +88,18 @@ public final class Main implements Callable<Integer> {
     private int autoSaveSteps = 0;
 
     /**
+     * Number of worker threads for the multi-core prover. A value &gt;= 1 enables the multi-core
+     * prover (capped at the available processors); 0 leaves the persisted prover-mode setting
+     * untouched (single-core by default).
+     */
+    @Option(names = "--threads", paramLabel = "INT",
+        description = "run automatic proof search on the multi-core prover with INT worker threads "
+            + "(>= 1, capped at the available processors). Omit for the single-core prover. "
+            + "The single-core-only features (proof caching, slicing, merge rule) are off under "
+            + "the multi-core prover, including with one thread.")
+    private int proverThreads = 0;
+
+    /**
      * Lists all features currently marked as experimental. Unless invoked with
      * command line option --experimental , those will be deactivated.
      */
@@ -247,6 +259,12 @@ public final class Main implements Callable<Integer> {
 
         GeneralSettings.noPruningClosed = isNoPruningClosed;
         GeneralSettings.keepFileRepos = isKeepFileRepos;
+
+        if (proverThreads >= 1) {
+            GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs.setParallelProverThreadCount(proverThreads);
+            gs.setParallelProverEnabled(true);
+        }
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
