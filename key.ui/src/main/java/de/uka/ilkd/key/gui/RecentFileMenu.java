@@ -263,7 +263,11 @@ public class RecentFileMenu {
         public Configuration asConfiguration() {
             Configuration config = new Configuration();
             config.set(KEY_PATH, path);
-            config.set(KEY_PROFILE, (Object) profile);
+            // Only store a real profile name; writing a null serializes to the string "null", which
+            // then fails to resolve on reload.
+            if (profile != null) {
+                config.set(KEY_PROFILE, profile);
+            }
             config.set(KEY_LOAD_SINGLE_JAVA, singleJava);
             config.set(KEY_OPTIONS, additionalOption);
             return config;
@@ -305,15 +309,18 @@ public class RecentFileMenu {
                 }
             } else {
                 String profileName = fileEntry.profile;
-                var selectedProfile =
-                    ServiceLoader.load(DefaultProfileResolver.class)
-                            .stream()
-                            .filter(it -> it.get().getProfileName().equals(profileName))
-                            .findFirst()
-                            .map(it -> it.get().getDefaultProfile());
+                // A missing profile -- null, or the literal string "null" that older recent-file
+                // entries stored for it -- means "use the default profile", not an error.
+                boolean hasProfile = profileName != null && !profileName.equals("null");
+                var selectedProfile = hasProfile
+                        ? ServiceLoader.load(DefaultProfileResolver.class)
+                                .stream()
+                                .filter(it -> it.get().getProfileName().equals(profileName))
+                                .findFirst()
+                                .map(it -> it.get().getDefaultProfile())
+                        : Optional.<Profile>empty();
 
-
-                if (profileName != null && selectedProfile.isEmpty()) {
+                if (hasProfile && selectedProfile.isEmpty()) {
                     JOptionPane.showMessageDialog(mainWindow,
                         "Could not find previous selected profile %s.".formatted(profileName));
                     return;
