@@ -1726,7 +1726,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printCaseBody(@Nullable ImmutableArray<Statement> body) {
+    private void printCaseBody(@Nullable ImmutableArray<? extends Statement> body) {
         if (body != null && !body.isEmpty()) {
             for (int i = 0; i < body.size(); i++) {
                 Statement statement = body.get(i);

@@ -298,12 +298,13 @@ public class Switch extends BranchStatement
 
     @Override
     public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements();
+        return StatementBlock.computePrefixElements(this);
     }
 
     /**
      * The method checks whether the expression in the synchronized prefix is either a local
-     * variable or a meta class reference (as local variables of this type are not supported by KeY,
+     * variable or a meta class reference (as local variables of this type are not supported by
+     * KeY),
      * see return value for {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
      *
      * @return true iff the above stated condition holds.

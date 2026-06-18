@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -38,11 +39,10 @@ public class IsLabeledCondition implements VariableCondition {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
 
-        final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
+        final JavaStatement stmt = svInst.getInstantiation(stmtSV);
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
-        PossibleProgramPrefix prefix = //
-            (PossibleProgramPrefix) svInst.getContextInstantiation().program();
+        var prefix = (PossibleProgramPrefix) svInst.getContextInstantiation().program();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {
