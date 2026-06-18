@@ -13,6 +13,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.SingleCoreFeatureGate;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
@@ -39,6 +40,7 @@ import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
@@ -86,6 +88,9 @@ public class CachingExtension
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {
             toggleAction = new CachingToggleAction(mainWindow);
+            // Proof caching is single-core only: greying the action covers every toolbar button and
+            // menu item bound to it while the multi-core prover is active.
+            SingleCoreFeatureGate.registerAutoDisabled(toggleAction);
         }
     }
 
@@ -115,7 +120,11 @@ public class CachingExtension
     }
 
     public boolean getProofCachingEnabled() {
-        return toggleAction.isSelected();
+        // Proof caching is a single-core-only feature: the multi-core prover closes goals on worker
+        // threads, which does not mix with caching's reference search and goal disabling. It is
+        // forced off (and reported as such in the UI) while the multi-core prover is active.
+        return toggleAction.isSelected() && !ProofIndependentSettings.DEFAULT_INSTANCE
+                .getGeneralSettings().isParallelProverEnabled();
     }
 
     @Override

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.SingleCoreFeatureGate;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
@@ -35,6 +36,8 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
@@ -193,6 +196,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
         this.mediator = mediator;
         this.extension = extension;
+
+        // Keep the slice buttons in sync with the prover mode (slicing is single-core only).
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addPropertyChangeListener(
+            GeneralSettings.PARALLEL_PROVER_ENABLED, evt -> updateUIState());
 
         updateGraphLabelsTimer = new Timer(100, e -> {
             if (updateGraphLabels) {
@@ -571,6 +578,16 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void updateUIState() {
+        // Proof slicing is single-core only: its dependency tracker does not record while the
+        // multi-core prover is active (its listeners are suspended during parallel runs). Grey out
+        // the whole panel -- buttons and options -- through the single source of truth, rather than
+        // tracking individual widgets.
+        if (SingleCoreFeatureGate.isActive()) {
+            SingleCoreFeatureGate.setEnabledRecursively(this, false);
+            return;
+        }
+        // Restore everything that the multi-core disable may have greyed, then refine below.
+        SingleCoreFeatureGate.setEnabledRecursively(this, true);
         boolean noProofLoaded = currentProof == null;
         if (noProofLoaded) {
             String noProof = "No proof selected";
