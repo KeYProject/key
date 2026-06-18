@@ -15,7 +15,7 @@ file
    ;
 
 problem
-   : (PROBLEM LBRACE (t = termorseq) RBRACE | CHOOSECONTRACT (chooseContract = string_value SEMI)? | PROOFOBLIGATION (proofObligation = cvalue)? SEMI?) proofScriptEntry?
+   : (PROBLEM LBRACE (t = termorseq) RBRACE | PROOFOBLIGATION (proofObligation = cvalue)? SEMI?) proofScriptEntry?
    ;
 
 /**
