@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
-
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.WeakValueInterner;
 
 
 /**
@@ -21,8 +19,14 @@ import org.key_project.logic.sort.Sort;
  */
 public final class ElementaryUpdate extends JAbstractSortedOperator {
 
-    private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
-        new WeakHashMap<>();
+    /**
+     * Interns elementary updates so that the same left-hand side yields the same operator object
+     * (the rest of the system relies on this identity). Thread-safe: two concurrent workers must
+     * not
+     * end up with two distinct operators for the same left-hand side.
+     */
+    private static final WeakValueInterner<UpdateableOperator, ElementaryUpdate> instances =
+        new WeakValueInterner<>();
 
 
     private final UpdateableOperator lhs;
@@ -40,17 +44,7 @@ public final class ElementaryUpdate extends JAbstractSortedOperator {
      * Returns the elementary update operator for the passed left hand side.
      */
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
-        WeakReference<ElementaryUpdate> ref = instances.get(lhs);
-        ElementaryUpdate result = null;
-        if (ref != null) {
-            result = ref.get();
-        }
-        if (result == null) {
-            result = new ElementaryUpdate(lhs);
-            ref = new WeakReference<>(result);
-            instances.put(lhs, ref);
-        }
-        return result;
+        return instances.intern(lhs, ElementaryUpdate::new);
     }
 
 
