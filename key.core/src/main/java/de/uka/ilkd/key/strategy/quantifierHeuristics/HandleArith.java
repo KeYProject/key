@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -13,7 +15,6 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -58,7 +59,7 @@ public class HandleArith {
             // provedArithEqual returns the problem unchanged -- bail before locking the cache.
             return problem;
         }
-        final LRUCache<JTerm, JTerm> provedByArithCache =
+        final Map<JTerm, JTerm> provedByArithCache =
             services.getCaches().getProvedByArithFstCache();
         JTerm result;
         synchronized (provedByArithCache) {
@@ -96,7 +97,7 @@ public class HandleArith {
 
 
 
-    private static void putInTermCache(final LRUCache<JTerm, JTerm> provedByArithCache,
+    private static void putInTermCache(final Map<JTerm, JTerm> provedByArithCache,
             final JTerm key, final JTerm value) {
         synchronized (provedByArithCache) {
             provedByArithCache.put(key, value);
@@ -156,7 +157,7 @@ public class HandleArith {
             return problem;
         }
         final Pair<JTerm, JTerm> key = new Pair<>(problem, axiom);
-        final LRUCache<Pair<JTerm, JTerm>, JTerm> provedByArithCache =
+        final Map<Pair<JTerm, JTerm>, JTerm> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
         JTerm result;
         synchronized (provedByArithCache) {
@@ -216,7 +217,7 @@ public class HandleArith {
      */
     private static JTerm formatArithTerm(final JTerm problem, TermBuilder tb, IntegerLDT ig,
             ServiceCaches caches) {
-        final LRUCache<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();
+        final Map<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();
         JTerm pro;
         synchronized (formattedTermCache) {
             pro = formattedTermCache.get(problem);
