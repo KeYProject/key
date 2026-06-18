@@ -62,6 +62,12 @@ public class WdProfile extends JavaProfile {
     }
 
     @Override
+    public boolean supportsParallelAutomode() {
+        // Well-definedness checks are not yet audited for thread-safety: keep single-core.
+        return false;
+    }
+
+    @Override
     public String ident() {
         return PROFILE_ID;
     }
