@@ -17,8 +17,8 @@ import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
@@ -83,7 +83,7 @@ public class SchemaJavaRegressionTest {
         }
     }
 
-    private void findModalities(KeYParser.FileContext ctx) {
+    private void findModalities(JavaKeYParser.FileContext ctx) {
         var nss = services.getNamespaces();
         Namespace<SchemaVariable> schemaVariables = new Namespace<>();
         Namespace<IProgramVariable> programVariables = new Namespace<>();
@@ -91,9 +91,9 @@ public class SchemaJavaRegressionTest {
         TacletPBuilder tpb = new TacletPBuilder(services, nss);
         tpb.setSchemaVariables(schemaVariables);
 
-        class FindMods extends KeYParserBaseVisitor<Void> {
+        class FindMods extends JavaKeYParserBaseVisitor<Void> {
             @Override
-            public Void visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
+            public Void visitOne_schema_var_decl(JavaKeYParser.One_schema_var_declContext ctx) {
                 if (ctx.PROGRAM() != null)
                     try {
                         ctx.accept(tpb);
@@ -103,7 +103,7 @@ public class SchemaJavaRegressionTest {
             }
 
             @Override
-            public Void visitModality_term(KeYParser.Modality_termContext ctx) {
+            public Void visitModality_term(JavaKeYParser.Modality_termContext ctx) {
                 final var e = ExpressionBuilder.trimJavaBlock(ctx.MODALITY().getText());
                 final var cleaned = e.trim().replace('\n', ' ')
                         .replaceAll(" {2,}", " ");

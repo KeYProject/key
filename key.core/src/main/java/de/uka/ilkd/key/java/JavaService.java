@@ -190,9 +190,39 @@ public class JavaService {
                 .flatMap(TokenRange::toRange)
                 .map(b -> b.begin)
                 .orElse(new Position(-1, -1));
-        return new BuildingIssue(problem.getVerboseMessage(),
+        return new BuildingIssue(simplifyJavaParserMessage(problem.getVerboseMessage()),
             problem.getCause().orElse(null), false,
             de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
+    }
+
+    /**
+     * JavaParser reports pure syntax errors as
+     * {@code "Parse error. Found \"X\", expected one of <very long token list>"}. The generic
+     * "Parse error" lead-in and the exhaustive token list are hard to read. This method rewrites
+     * such messages into a clearer "Java syntax error: unexpected X" form and shortens an
+     * over-long list of expected alternatives. Messages that do not follow this pattern (e.g.
+     * semantic problems) are returned unchanged.
+     *
+     * @param message the original (verbose) JavaParser problem message
+     * @return a more readable message
+     */
+    static String simplifyJavaParserMessage(@Nullable String message) {
+        if (message == null) {
+            return "";
+        }
+        String result = message.replace("Parse error. Found", "Java syntax error: unexpected");
+        int idx = result.indexOf("expected one of");
+        if (idx >= 0) {
+            String head = result.substring(0, idx);
+            String[] items =
+                result.substring(idx + "expected one of".length()).trim().split("\\s+");
+            final int limit = 6;
+            if (items.length > limit) {
+                result = head + "expected one of "
+                    + String.join(" ", Arrays.copyOf(items, limit)) + " ...";
+            }
+        }
+        return result;
     }
 
     // region parsing of compilation units
@@ -323,6 +353,11 @@ public class JavaService {
      * @return the compilation units
      */
     private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
+        if (!Files.isDirectory(bootClassPath)) {
+            throw new FileNotFoundException(String.format(
+                "The \\bootclasspath \"%s\" does not exist or is not a directory.",
+                bootClassPath));
+        }
         List<Path> paths;
         try (var stream = Files.walk(bootClassPath)) {
             paths = stream.filter(it -> {
@@ -351,8 +386,11 @@ public class JavaService {
                     .collect(Collectors.toList());
         }
 
+        // Collect the problems from the compilation units that failed to parse.
+        // (Previously this filtered for successful units, so the actual boot-class
+        // parse errors were silently dropped and an empty exception was thrown.)
         var errors = compilationUnits.stream()
-                .filter(c -> c.second.isSuccessful()) // FIXME weigl: should be negated
+                .filter(c -> !c.second.isSuccessful())
                 .flatMap(c -> c.second.getProblems().stream()
                         .map(problem -> buildingIssueFromProblem(c.first.toString(), problem)))
                 .collect(Collectors.toList());
@@ -382,6 +420,13 @@ public class JavaService {
     private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
         List<FileCollection> sources = new ArrayList<>();
         for (var cp : libraryPath) {
+            if (cp == null) {
+                continue;
+            }
+            if (!Files.exists(cp)) {
+                throw new FileNotFoundException(String.format(
+                    "The \\classpath entry \"%s\" does not exist.", cp));
+            }
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp));
             } else {

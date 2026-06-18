@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.JavaKeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  */
 @SuppressWarnings("unchecked")
-abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
+abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBuilder.class);
     private @Nullable List<BuildingIssue> buildingIssues = null;
     private @Nullable Stack<Object> parameters = null;

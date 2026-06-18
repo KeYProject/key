@@ -132,11 +132,11 @@
    (rule "exRightHide" (formula "12") (inst "t=seqDef{int u;}(Z(0(#)),
                seqLen(s_1),
                \\if (u = v_iv_1)
-                   \\then (any::seqGet(s_1, v_jv_1))
+                   \\then (seqGet<[any]>(s_1, v_jv_1))
                    \\else (\\if (u = v_jv_1)
-                              \\then (any::seqGet(s_1,
+                              \\then (seqGet<[any]>(s_1,
                                                  v_iv_1))
-                              \\else (any::seqGet(s_1,
+                              \\else (seqGet<[any]>(s_1,
                                                  u))))") (userinteraction))
    (rule "andRight" (formula "12") (userinteraction))
    (branch

@@ -296,7 +296,7 @@
                   (builtin "One Step Simplification" (formula "1"))
                   (rule "notLeft" (formula "1"))
                   (rule "cut_direct" (formula "15") (term "1,0"))
-                  (branch " CUT:   int::select(anonHeap, self.transactions, total)
+                  (branch " CUT:   select<[int]>(anonHeap, self.transactions, total)
 = self.balance TRUE"
                      (builtin "One Step Simplification" (formula "16"))
                      (rule "cut_direct" (formula "16") (term "1"))
@@ -569,7 +569,7 @@
                         (rule "closeTrue" (formula "14"))
                      )
                   )
-                  (branch " CUT:   int::select(anonHeap, self.transactions, total)
+                  (branch " CUT:   select<[int]>(anonHeap, self.transactions, total)
 = self.balance FALSE"
                      (builtin "One Step Simplification" (formula "16"))
                      (rule "false_right" (formula "16"))
@@ -853,7 +853,7 @@
             )
             (branch " (self.transactions, total) in self.transactions.footprint FALSE"
                (rule "cut_direct" (formula "15") (term "1"))
-               (branch " CUT:   int::select(anonHeap, self.transactions, total)
+               (branch " CUT:   select<[int]>(anonHeap, self.transactions, total)
 = self.balance TRUE"
                   (builtin "One Step Simplification" (formula "16"))
                   (rule "cut_direct" (formula "16") (term "0"))
@@ -917,7 +917,7 @@
                      )
                   )
                )
-               (branch " CUT:   int::select(anonHeap, self.transactions, total)
+               (branch " CUT:   select<[int]>(anonHeap, self.transactions, total)
 = self.balance FALSE"
                   (builtin "One Step Simplification" (formula "16"))
                   (rule "false_right" (formula "16"))

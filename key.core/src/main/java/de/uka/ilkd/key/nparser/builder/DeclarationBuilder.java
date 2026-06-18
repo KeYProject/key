@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
 import org.key_project.logic.Choice;
@@ -54,7 +54,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
             ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
@@ -62,7 +62,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         // boolean freeAdt = ctx.FREE() != null;
         var name = ctx.name.getText();
         var doc = ctx.DOC_COMMENT() != null
@@ -88,10 +88,10 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
+    public Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
             List<String> varNames = accept(ctx.simple_ident_comma_list(i));
-            KeYJavaType kjt = accept(ctx.keyjavatype(i));
+            KeYJavaType kjt = accept(ctx.typemapping(i));
             assert varNames != null;
             for (String varName : varNames) {
                 if (varName.equals("null")) {
@@ -118,9 +118,9 @@ public class DeclarationBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitChoice(KeYParser.ChoiceContext ctx) {
+    public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
-        for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
+        for (JavaKeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
             String name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));
@@ -139,15 +139,15 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
-        for (KeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
+    public Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
+        for (JavaKeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
             c.accept(this);
         }
         return null;
     }
 
     @Override
-    public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
+    public Object visitOne_sort_decl(JavaKeYParser.One_sort_declContext ctx) {
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
@@ -251,23 +251,23 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitOption_decls(KeYParser.Option_declsContext ctx) {
+    public Object visitOption_decls(JavaKeYParser.Option_declsContext ctx) {
         return mapOf(ctx.choice());
     }
 
     @Override
-    public List<Sort> visitExtends_sorts(KeYParser.Extends_sortsContext ctx) {
+    public List<Sort> visitExtends_sorts(JavaKeYParser.Extends_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
 
     @Override
-    public List<Sort> visitOneof_sorts(KeYParser.Oneof_sortsContext ctx) {
+    public List<Sort> visitOneof_sorts(JavaKeYParser.Oneof_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
 
 
     @Override
-    public Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
+    public Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
         for (String id : this.<String>mapOf(ctx.simple_ident())) {
             RuleSet h = new RuleSet(new Name(id));
             if (ruleSets().lookup(new Name(id)) == null) {
@@ -279,7 +279,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
+    public Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
         return null;
     }
 

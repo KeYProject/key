@@ -274,7 +274,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY));
-        tacletBuilder.setIfSequent(assumesSeq);
+        tacletBuilder.setAssumesSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
             ImmutableSLList.nil(), schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
@@ -311,7 +311,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
             prefixBuilder.build();
             return new InfFlowContractAppTaclet(name,
-                new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                new TacletApplPart(assumesSeq, applicationRestriction, varsNew, varsNotFreeIn,
                     varsNewDependingOn,
                     variableConditions),
                 goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),

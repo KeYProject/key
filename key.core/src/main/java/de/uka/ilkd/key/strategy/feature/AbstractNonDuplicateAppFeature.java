@@ -125,9 +125,17 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
-        List<RuleApp> apps = cache.get(node, app.rule().name());
+        // A duplicate must agree on the focus term up to term labels (every comparePio variant,
+        // including the modulo-position one, implies this), so it shares the candidate's focus-term
+        // fingerprint and can only be in that bucket. A find-less application (pos == null) lands
+        // in
+        // bucket 0, where all find-less applications of this name live (a taclet name is either
+        // find
+        // or find-less, never both).
+        final int fingerprint = pos == null ? 0 : pos.subTerm().hashCode();
+        List<RuleApp> apps = cache.get(node, app.rule().name(), fingerprint);
 
-        // Check all rules with this name
+        // Check all rules with this name in the same fingerprint bucket
         for (RuleApp a : apps) {
             if (sameApplication(a, app, pos)) {
                 return false;

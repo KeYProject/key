@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
@@ -21,14 +23,44 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private int startRow = 0;
     private int currentRow = 0;
 
+    /**
+     * When selected, searching collapses the proof tree to the matches (and the branch structure
+     * needed to reach them); when deselected, the search only highlights matches without hiding
+     * anything. Created in {@link #createUI()}.
+     */
+    private JToggleButton collapseToggle;
+
+    /** whether the {@link ProofTreeViewFilter#SEARCH} filter is currently applied to the model */
+    private boolean filterApplied = false;
+
+    /** whether a deferred re-expansion of the filtered tree is already pending */
+    private boolean reexpandScheduled = false;
+
     public ProofTreeSearchBar(ProofTreeView proofTreeView) {
         this.proofTreeView = proofTreeView;
     }
 
     @Override
+    public void createUI() {
+        super.createUI();
+        collapseToggle = new JToggleButton("Collapse", true);
+        collapseToggle.setToolTipText(
+            "Collapse the proof tree to the search matches (otherwise only highlight them)");
+        collapseToggle.setMargin(new java.awt.Insets(2, 4, 2, 4));
+        collapseToggle.addActionListener(e -> search());
+        add(collapseToggle);
+    }
+
+    @Override
     public void setVisible(boolean vis) {
         super.setVisible(vis);
-        if (!vis && proofTreeView != null) {
+        if (vis) {
+            // re-apply the collapsing filter for a search term kept from a previous opening
+            if (!searchField.getText().isEmpty()) {
+                search();
+            }
+        } else if (proofTreeView != null) {
+            updateCollapsingFilter("");
             proofTreeView.delegateView.requestFocusInWindow();
         }
     }
@@ -54,8 +86,44 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     }
 
     public boolean search(@NonNull String searchString) {
+        updateCollapsingFilter(searchString);
         fillCache();
         return search(searchString, Position.Bias.Forward);
+    }
+
+    /**
+     * Updates the {@link ProofTreeViewFilter#SEARCH} filter with the given query, hiding subtrees
+     * (and intermediate steps) that contain no match so that the proof tree collapses to the
+     * relevant branches while searching. Does nothing but deactivate the filter when the
+     * {@link #collapseToggle} is off, so the search merely highlights matches.
+     *
+     * @param searchString the current content of the search field.
+     */
+    private void updateCollapsingFilter(@NonNull String searchString) {
+        GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+        if (delegateModel == null) {
+            return;
+        }
+        boolean collapse = collapseToggle != null && collapseToggle.isSelected()
+                && !searchString.isEmpty();
+        if (collapse) {
+            ProofTreeViewFilter.SEARCH.setQuery(searchString);
+            delegateModel.setFilter(ProofTreeViewFilter.SEARCH, true);
+            filterApplied = true;
+            // The filter just reset the tree structure (collapsing it); expand the now-small
+            // filtered tree so that all surviving matches are revealed without manual expansion.
+            proofTreeView.expandFilteredTree();
+        } else if (filterApplied) {
+            // Only remove the filter (rebuilding the tree) when it was actually applied, so the
+            // highlight-only mode does not rebuild on every keystroke. Clear the flag first so the
+            // structure change from removing the filter does not trigger a re-expansion (see
+            // reset()).
+            filterApplied = false;
+            ProofTreeViewFilter.SEARCH.setQuery("");
+            delegateModel.setFilter(ProofTreeViewFilter.SEARCH, false);
+            // The rebuild dropped the selection; restore it so e.g. the view filters stay usable.
+            proofTreeView.selectCurrentNodeInTree();
+        }
     }
 
     private synchronized boolean search(String searchString, Position.Bias direction) {
@@ -99,6 +167,18 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     public synchronized void reset() {
         cache = null;
+        // The proof tree changed (e.g. a strategy run added nodes). If the collapsing search is
+        // active, the rebuilt tree is collapsed again; re-expand it so newly matching nodes become
+        // visible. Deferred to run after the current tree-change event has been processed.
+        if (filterApplied && !reexpandScheduled) {
+            reexpandScheduled = true;
+            SwingUtilities.invokeLater(() -> {
+                reexpandScheduled = false;
+                if (filterApplied) {
+                    proofTreeView.expandFilteredTree();
+                }
+            });
+        }
     }
 
     private void addNodeToCache(GUIAbstractTreeNode node) {

@@ -20,7 +20,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -160,10 +159,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
-        if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
-            instantiatedOp =
-                handleSortDependingSymbol(sortDependingFunction);
-        } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
+        if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
             instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
         } else if (p_operatorToBeInstantiated instanceof JModality mod) {
             instantiatedOp = instantiateModality(mod, jb);
@@ -252,18 +248,6 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
                 }
             }
         }
-    }
-
-    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
-        final Sort depSort = depOp.getSortDependingOn();
-
-        final Sort realDepSort =
-            svInst.getGenericSortInstantiations().getRealSort(depSort, services);
-
-        final Operator res = depOp.getInstanceFor(realDepSort, services);
-        assert res != null
-                : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
-        return res;
     }
 
     private JTerm resolveSubst(JTerm t) {

@@ -86,17 +86,6 @@ public class SyntaxElementMatchProgramGenerator {
                         program.add(gotoNextInstruction());
                     }
                 }
-                case final SortDependingFunction sortDependingFunction -> {
-                    program.add(getCheckNodeKindInstruction(SortDependingFunction.class));
-                    program.add(getSimilarSortDependingFunctionInstruction(sortDependingFunction));
-                    program.add(gotoNextInstruction());
-                    if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
-                        program.add(getMatchGenericSortInstruction(gs));
-                    } else {
-                        program.add(getMatchIdentityInstruction(sortDependingFunction.getChild(0)));
-                    }
-                    program.add(gotoNextInstruction());
-                }
                 case ElementaryUpdate elUp -> {
                     program.add(getCheckNodeKindInstruction(ElementaryUpdate.class));
                     program.add(gotoNextInstruction());

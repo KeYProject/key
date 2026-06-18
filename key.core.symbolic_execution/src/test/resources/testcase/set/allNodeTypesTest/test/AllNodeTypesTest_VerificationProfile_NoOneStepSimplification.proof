@@ -753,7 +753,7 @@
             (rule "applyOnRigidFormula" (formula "7"))
             (rule "applyOnPV" (formula "7") (term "0"))
             (rule "simplifyUpdate1" (formula "7") (term "1"))
-             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (  boolean::select(heap,                     n_3,                     java.lang.Object::<created>)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
+             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (  select<[boolean]>(heap,                     n_3,                     java.lang.Object::#$created)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
          )
          (branch "if n instanceof java.lang.Throwable false"
             (rule "instanceof_static_type" (formula "1") (term "2,0,1"))

@@ -424,7 +424,7 @@
             (rule "emptyModality" (formula "7") (term "1"))
              (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "5")))
             (rule "false_right" (formula "7"))
-             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (  boolean::select(heap,                     n_3,                     java.lang.Object::<created>)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
+             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (  select<[boolean]>(heap,                     n_3,                     java.lang.Object::#$created)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
          )
          (branch "if n instanceof java.lang.Throwable false"
              (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))

@@ -7,24 +7,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.GoalList;
-import de.uka.ilkd.key.gui.InfoView;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A marker interface for extension of the KeY GUI. Every extension should implement this interface
@@ -38,6 +39,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
+@NullMarked
 public interface KeYGuiExtension {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Info {
@@ -73,8 +75,6 @@ public interface KeYGuiExtension {
 
         /**
          * Loading priority of this extension. Baseline is zero
-         *
-         * @return
          */
         int priority() default 0;
 
@@ -102,8 +102,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NonNull
-        List<Action> getMainMenuActions(@NonNull MainWindow mainWindow);
+        List<Action> getMainMenuActions(MainWindow mainWindow);
     }
 
     /**
@@ -139,8 +138,7 @@ public interface KeYGuiExtension {
          * @param window parent of this extension
          * @param mediator the current mediator
          */
-        @NonNull
-        Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator);
+        Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator);
     }
 
     /**
@@ -163,10 +161,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NonNull
-        <T> List<Action> getContextActions(@NonNull KeYMediator mediator,
-                @NonNull ContextMenuKind<T> kind,
-                @NonNull T underlyingObject);
+        <T> List<Action> getContextActions(KeYMediator mediator,
+                ContextMenuKind<T> kind,
+                T underlyingObject);
     }
 
     /**
@@ -181,7 +178,6 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @NonNull
         JToolBar getToolbar(MainWindow mainWindow);
     }
 
@@ -244,9 +240,6 @@ public interface KeYGuiExtension {
         String SOURCE_VIEW = SourceView.class.getName();
 
         /**
-         * @param
-         * @param mediator
-         * @param component
          * @return non-null settings provider
          */
         Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
@@ -266,11 +259,50 @@ public interface KeYGuiExtension {
          * @param pos the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @NonNull
-        List<String> getTermInfoStrings(@NonNull MainWindow mainWindow, @NonNull PosInSequent pos);
+        List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;
         }
+    }
+
+    /// A {@link LoadOptionPanel} provides additional UI components in the file selection dialog
+    /// dependent on the selected profile.
+    ///
+    /// Implementing this interface requires to provide an {@link OptionPanel}, and associated
+    /// {@link Profile}.
+    ///
+    /// @author weigl
+    interface LoadOptionPanel extends Supplier<OptionPanel> {
+        Profile getProfile();
+    }
+
+    /// A provider of UI components for additional options w.r.t. specific profiles.
+    /// **Lifecycle:** For each {@link Profile} an {@link OptionPanel} is constructed, when the
+    /// {@link KeYFileChooser}
+    /// is instantiated. *On selected of a profile*, the current {@link OptionPanel} is
+    /// `deinstall`ed, and the
+    /// {@link OptionPanel} for the selected profile is `install`ed.
+    ///
+    /// @author weigl
+    /// @see KeYFileChooserLoadingOptions
+    interface OptionPanel {
+        /// Installs the UI components in the given {@link KeYFileChooserLoadingOptions} instance.
+        /// UI components
+        /// can be reused, to keep the temporary state.
+        /// {@link KeYFileChooserLoadingOptions} uses the {@link net.miginfocom.swing.MigLayout} to
+        /// manage the layout.
+        void install(KeYFileChooserLoadingOptions panel);
+
+        /// Removes all *installed* UI components from the panel.
+        void deinstall(KeYFileChooserLoadingOptions panel);
+
+        /// Returning an arbitrary object, representing the selected option in the UI components.
+        /// The object needs to compatible with the assigned profile in {@link LoadOptionPanel}.
+        ///
+        /// @see Profile#prepareInitConfig(InitConfig, Object)
+        @SuppressWarnings("JavadocReference")
+        @Nullable
+        Configuration getResult();
     }
 }
