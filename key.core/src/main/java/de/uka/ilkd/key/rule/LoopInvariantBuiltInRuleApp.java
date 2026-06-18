@@ -53,6 +53,24 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
 
     protected final TermServices services;
 
+    /**
+     * Cached instantiation of the loop-invariant rule for this application. Stored here (on the
+     * thread-confined rule app) rather than in a static field on the rule, so that the cache is
+     * safe
+     * under the parallel prover and properly scoped to the application it belongs to.
+     */
+    private AbstractLoopInvariantRule.@Nullable Instantiation instantiation;
+
+    /** @return the cached {@link AbstractLoopInvariantRule.Instantiation}, or {@code null} */
+    AbstractLoopInvariantRule.@Nullable Instantiation getInstantiation() {
+        return instantiation;
+    }
+
+    /** Caches the {@link AbstractLoopInvariantRule.Instantiation} for this application. */
+    void setInstantiation(AbstractLoopInvariantRule.Instantiation instantiation) {
+        this.instantiation = instantiation;
+    }
+
     public LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pos, TermServices services) {
         this(rule, pos, null, null, null, services);
     }
