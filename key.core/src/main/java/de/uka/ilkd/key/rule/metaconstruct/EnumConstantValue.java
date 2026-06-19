@@ -4,16 +4,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.conditions.EnumConstantCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
-import org.key_project.util.collection.Pair;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * resolve a program variable to an integer literal.
@@ -40,14 +37,13 @@ public final class EnumConstantValue extends AbstractTermTransformer {
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
 
-        @Nullable
-        Pair<Integer, IProgramVariable> enConst =
+        EnumClassDeclaration.EnumEntry enConst =
             EnumConstantCondition.resolveEnumFieldConstant(term, services);
         if (enConst == null) {
             return term;
         }
 
-        int ordinal = enConst.first;
+        int ordinal = enConst.ordinal();
         return services.getTermBuilder().zTerm(ordinal);
     }
 
