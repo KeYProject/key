@@ -210,6 +210,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
+                // Show the macro's aggregate result (total rules applied / goals closed). Without
+                // this the status line keeps whatever the macro's last internal strategy run left
+                // there -- a tiny partial count rather than the whole macro's work.
+                mainWindow.displayResults(info.toString());
                 final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
                         && mainWindow.getMediator().getSelectedProof() == proof) {
