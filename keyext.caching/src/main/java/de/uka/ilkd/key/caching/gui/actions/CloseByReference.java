@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
+import de.uka.ilkd.key.caching.ReferenceSearcher;
 import de.uka.ilkd.key.caching.gui.CachingExtension;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;

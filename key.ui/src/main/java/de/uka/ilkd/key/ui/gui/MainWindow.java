@@ -30,7 +30,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.*;

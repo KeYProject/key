@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
+import de.uka.ilkd.key.caching.gui.CachingExtension;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;

@@ -1,12 +1,10 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.ui.gui;
 
 import java.nio.file.Paths;
 import java.util.*;
-
-import de.uka.ilkd.key.ui.gui.ShortUniqueFileNames;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

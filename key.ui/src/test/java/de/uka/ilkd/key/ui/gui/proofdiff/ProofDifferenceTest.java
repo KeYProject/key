@@ -1,12 +1,10 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.proofdiff;
+package de.uka.ilkd.key.ui.gui.proofdiff;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.uka.ilkd.key.ui.gui.proofdiff.ProofDifference;
 
 import org.junit.jupiter.api.Test;
 

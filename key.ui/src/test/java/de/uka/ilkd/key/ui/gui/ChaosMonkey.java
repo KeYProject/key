@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.ui.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -16,8 +16,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.ui.core.Main;
-import de.uka.ilkd.key.ui.gui.LogView;
-import de.uka.ilkd.key.ui.gui.MainWindow;
 import de.uka.ilkd.key.ui.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.ui.gui.actions.KeYProjectHomepageAction;
 import de.uka.ilkd.key.ui.gui.actions.LemmaGenerationAction;

@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.javac;
+package de.uka.ilkd.key.ui.gui.plugins.javac;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -12,8 +12,6 @@ import java.util.concurrent.ExecutionException;
 import javax.tools.ToolProvider;
 
 import de.uka.ilkd.key.ui.gui.PositionedIssueString;
-import de.uka.ilkd.key.ui.gui.plugins.javac.JavaCompilerCheckFacade;
-import de.uka.ilkd.key.ui.gui.plugins.javac.JavacSettings;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
