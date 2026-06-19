@@ -3,20 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,15 +33,16 @@ import org.jspecify.annotations.Nullable;
  * @author mulbrich
  * @since 2006-12-10, updated 2025-10-24 by MU
  */
-
+@NullMarked
 public class EnumClassDeclaration extends ClassDeclaration {
+    public record EnumEntry(String name, int ordinal, IProgramVariable variable) {
+    }
 
     /**
      * store the program variables which represent the enum constants
      * in a lookup map from name to (ordinal index, program variable)
      */
-    private final Map<String, Pair<@NonNull Integer, @NonNull IProgramVariable>> constants =
-        new HashMap<>();
+    private final ImmutableList<EnumEntry> constants;
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
@@ -51,18 +53,20 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @param isLibrary see class constructor
      * @param enumConstantDeclarations the declarations for the enum constants
      */
-    // TODO javaparser
     public EnumClassDeclaration(
-            ExtList children, ProgramElementName fullName, boolean isLibrary
-    /* , List<EnumConstantDeclaration> enumConstantDeclarations */) {
+            ExtList children, ProgramElementName fullName, boolean isLibrary,
+            List<EnumConstantDeclaration> enumConstantDeclarations) {
         super(children, fullName, isLibrary);
 
+        ImmutableList<EnumEntry> seq = ImmutableSLList.nil();
         int ordinal = 0;
         for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-            String constName = ecd.getEnumConstantSpecification().getName();
-            constants.put(constName, new Pair<>(ordinal, findAttr(constName)));
+            String constName = ecd.getNameAsString();
+            seq = seq.prepend(new EnumEntry(constName, ordinal, findAttr(constName)));
             ordinal++;
         }
+
+        constants = seq;
     }
 
     /*
@@ -73,11 +77,12 @@ public class EnumClassDeclaration extends ClassDeclaration {
      *
      */
     private IProgramVariable findAttr(String fieldName) {
-        String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
+        // TODO String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
+        String completeName = getFullName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
-                if (fs.getName().equals(completeName)) {
+                if (Objects.equals(fs.getName(), completeName)) {
                     return fs.getProgramVariable();
                 }
             }
@@ -90,12 +95,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * is pv a enum constant of THIS enum?
      */
     private boolean isLocalEnumConstant(IProgramVariable pv) {
-        for (IProgramVariable cnst : constants) {
-            if (cnst.equals(pv)) {
-                return true;
-            }
-        }
-        return false;
+        return constants.stream().anyMatch(it -> it.variable.equals(pv));
     }
 
     /**
@@ -107,7 +107,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private int localIndexOf(ProgramVariable pv) {
         for (int i = 0; i < constants.size(); i++) {
-            if (constants.get(i).equals(pv)) {
+            if (constants.get(i).variable.equals(pv)) {
                 return i;
             }
         }
@@ -159,8 +159,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @return a pair of (index, program variable) of the enum constant with the given name or null
      *         if there is no such constant
      */
-    public @Nullable Pair<@NonNull Integer, @NonNull IProgramVariable> getConstant(
-            String fieldName) {
-        return constants.get(fieldName);
+    public @Nullable EnumEntry getConstant(String fieldName) {
+        return constants.stream().filter(it -> it.name == fieldName).findAny().orElse(null);
     }
 }
