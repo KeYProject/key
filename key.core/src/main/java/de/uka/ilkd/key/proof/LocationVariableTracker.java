@@ -1,16 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.proof;
+package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.OpCollectorJavaBlock;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
 
 import org.key_project.prover.rules.RuleApp;
 

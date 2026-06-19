@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.LocationVariableTracker;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.ui.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.ui.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
-import org.key_project.proof.LocationVariableTracker;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
