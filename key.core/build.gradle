@@ -106,6 +106,8 @@ tasks.withType(Test) {
     // or toggle the parallel prover for any test via -Dkey.prover.parallel(.threads).
     ["key.mt.benchmark", "key.mt.benchmark.threads", "key.mt.benchmark.proofs",
      "key.mt.benchmark.maxsteps",
+     "key.mt.stresstest", "key.mt.stresstest.proofs", "key.mt.stresstest.workers",
+     "key.mt.stresstest.reps", "key.mt.stresstest.timeout", "key.mt.stresstest.out",
      "key.mt.synth.splits", "key.mt.synth.worksplits", "key.mt.synth.work",
      "key.mt.synth.linear", "key.mt.synth.loop",
      "key.mt.jfr.probe", "key.mt.jfr.proof", "key.mt.jfr.workers", "key.mt.jfr.reps",
@@ -175,6 +177,22 @@ tasks.register('testMtStress', Test) {
         includeTestsMatching "MtStressTest"
         includeTestsMatching "MtMacroStressTest"
         includeTestsMatching "MtScriptStressTest"
+    }
+}
+
+// One-shot high-core stress battery for the parallel prover (MtStressMatrix). Gated; meant to be run
+// manually on a many-core machine. Assertions are on (root config); heap is large and overridable
+// with -PstressHeap=<size>. Diagnostics land in key.core/build/mt-stress/ (or -Dkey.mt.stresstest.out).
+// Add a Flight Recording with -Dkey.mt.jfr=<file>. See the MtStressMatrix javadoc for the knobs.
+tasks.register('testMtStressMatrix', Test) {
+    description = 'High-core stress battery for the parallel prover, with full failure diagnostics'
+    group = 'verification'
+    systemProperty("key.mt.stresstest", "true")
+    maxParallelForks = 1
+    forkEvery = 0
+    maxHeapSize = (project.findProperty('stressHeap') ?: '8g')
+    filter {
+        includeTestsMatching "MtStressMatrix"
     }
 }
 
