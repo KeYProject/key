@@ -161,7 +161,7 @@ public class MtSyntheticBenchmark {
     // ---- problem generators -------------------------------------------------
 
     /** N independent ifs on symbolic booleans -> 2^N balanced, cheap leaves. */
-    private static String splitIfs(int n) {
+    static String splitIfs(int n) {
         StringBuilder vars = new StringBuilder("int x;");
         StringBuilder prog = new StringBuilder();
         for (int i = 0; i < n; i++) {
@@ -172,7 +172,7 @@ public class MtSyntheticBenchmark {
     }
 
     /** 2^N fan-out, then a straight-line block of work executed in every leaf. */
-    private static String splitWork(int n, int work) {
+    static String splitWork(int n, int work) {
         StringBuilder vars = new StringBuilder("int x;");
         StringBuilder prog = new StringBuilder();
         for (int i = 0; i < n; i++) {
