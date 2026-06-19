@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
@@ -19,10 +21,11 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     /**
      * new textual representation.
      *
-     * @param mods modifiers (are currently ignored)
+     * @param modifiers modifiers (are currently ignored)
      * @param inv the expression in this clause
      */
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
+            LabeledParserRuleContext inv) {
         super(ImmutableSLList.nil()); // no modifiers allowed in axiom clause (see
                                       // Sect. 8 of reference manual)
         assert inv != null;
@@ -30,9 +33,9 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv,
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers, LabeledParserRuleContext inv,
             String name) {
-        this(mods, inv);
+        this(modifiers, inv);
         this.name = name;
     }
 
@@ -53,13 +56,13 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         if (!(o instanceof TextualJMLClassAxiom ci)) {
             return false;
         }
-        return mods.equals(ci.mods) && inv.equals(ci.inv);
+        return modifiers.equals(ci.modifiers) && inv.equals(ci.inv);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + inv.hashCode();
+        return Objects.hash(modifiers, inv);
     }
 
     public String getName() {

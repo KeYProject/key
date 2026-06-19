@@ -5,11 +5,12 @@ package de.uka.ilkd.key.core;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,25 +51,6 @@ public class KeYSelectionModel {
     }
 
     /**
-     * Does not take care of GUI effects
-     */
-    public synchronized void setProof(Proof p) {
-        proof = Objects.requireNonNull(p);
-        Goal g = proof.openGoals().iterator().next();
-        if (g == null) {
-            selectedNode = proof.root().leavesIterator().next();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-        } else {
-            goalIsValid = true;
-            selectedNode = g.node();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-            selectedGoal = g;
-        }
-    }
-
-    /**
      * Sets the selected proof.
      *
      * @param p the proof to select.
@@ -81,12 +63,12 @@ public class KeYSelectionModel {
         proof = p;
         primary.setProof(p, previousProof);
         if (proof != null) {
-            Goal g = proof.openGoals().iterator().next();
-            if (g == null) {
+            if (proof.openGoals().isEmpty()) {
                 selectedNode = proof.root().leavesIterator().next();
                 selectedSequent = selectedNode.sequent();
                 selectedRuleApp = selectedNode.getAppliedRuleApp();
             } else {
+                final Goal g = proof.openGoals().iterator().next();
                 goalIsValid = true;
                 selectedNode = g.node();
                 selectedSequent = selectedNode.sequent();
@@ -99,7 +81,6 @@ public class KeYSelectionModel {
             selectedRuleApp = null;
             selectedGoal = null;
         }
-
 
         fireSelectedProofChanged(previousProof);
     }
@@ -233,34 +214,34 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START -> {
-                    currentPos = POS_LEAVES;
-                    if (selectedNode != null) {
-                        nodeIt = selectedNode.leavesIterator();
-                    } else {
-                        nodeIt = null;
-                    }
-                }
-                case POS_LEAVES -> {
-                    if (nodeIt == null || !nodeIt.hasNext()) {
-                        currentPos = POS_GOAL_LIST;
-                        if (!proof.openGoals().isEmpty()) {
-                            goalIt = proof.openGoals().iterator();
+                    case POS_START -> {
+                        currentPos = POS_LEAVES;
+                        if (selectedNode != null) {
+                            nodeIt = selectedNode.leavesIterator();
                         } else {
-                            goalIt = null;
+                            nodeIt = null;
                         }
-                    } else {
-                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                }
-                case POS_GOAL_LIST -> {
-                    if (goalIt == null || !goalIt.hasNext()) {
-                        // no more items
-                        return;
-                    } else {
-                        nextOne = goalIt.next();
+                    case POS_LEAVES -> {
+                        if (nodeIt == null || !nodeIt.hasNext()) {
+                            currentPos = POS_GOAL_LIST;
+                            if (!proof.openGoals().isEmpty()) {
+                                goalIt = proof.openGoals().iterator();
+                            } else {
+                                goalIt = null;
+                            }
+                        } else {
+                            nextOne = proof.getOpenGoal(nodeIt.next());
+                        }
                     }
-                }
+                    case POS_GOAL_LIST -> {
+                        if (goalIt == null || !goalIt.hasNext()) {
+                            // no more items
+                            return;
+                        } else {
+                            nextOne = goalIt.next();
+                        }
+                    }
                 }
             }
         }

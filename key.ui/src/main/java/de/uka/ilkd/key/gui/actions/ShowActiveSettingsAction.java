@@ -22,9 +22,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
  */
 public class ShowActiveSettingsAction extends MainWindowAction {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -3038735283059371442L;
 
     public ShowActiveSettingsAction(MainWindow mainWindow) {
@@ -35,8 +32,12 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        showDialog();
+    }
+
+    private ViewSettingsDialog showDialog() {
         ProofSettings settings =
-            (getMediator().getSelectedProof() == null) ? ProofSettings.DEFAULT_SETTINGS
+            (getMediator().getSelectedProof() == null) ? null
                     : getMediator().getSelectedProof().getSettings();
         SettingsTreeModel model =
             new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
@@ -44,6 +45,14 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(mainWindow);
         dialog.setVisible(true);
+        return dialog;
+    }
+
+    public void showAndFocusTacletOptions() {
+        ViewSettingsDialog dialog = showDialog();
+        SettingsTreeModel model = (SettingsTreeModel) dialog.optionTree.getModel();
+        OptionContentNode item = model.getTacletOptionsItem();
+        dialog.getOptionTree().setSelectionPath(new TreePath(item.getPath()));
     }
 
     /**
@@ -57,30 +66,32 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
         public ViewSettingsDialog(TreeModel model, JComponent startComponent) {
             super(mainWindow);
-            this.getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-            Box box = Box.createHorizontalBox();
-            box.add(getSplitPane());
-            this.getContentPane().add(box);
-            this.getContentPane().add(Box.createVerticalStrut(5));
-            box = Box.createHorizontalBox();
-            box.add(Box.createHorizontalStrut(5));
+            Container cp = this.getContentPane();
+            cp.setLayout(new BorderLayout());
+            cp.add(getSplitPane(), BorderLayout.CENTER);
+
             JButton okButton = new JButton("OK");
             okButton.addActionListener(e -> dispose());
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-            box.add(okButton);
-            box.add(Box.createHorizontalStrut(5));
-            this.getContentPane().add(box);
+            JPanel buttons = new JPanel(new FlowLayout());
+            buttons.add(okButton);
+            cp.add(buttons, BorderLayout.SOUTH);
+
+            JLabel announce =
+                new JLabel("<html>This shows the active settings for the current proof.<br>" +
+                    "To change settings for future proofs, use Options > Show Settings.");
+            announce.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            cp.add(announce, BorderLayout.NORTH);
+
             this.getOptionTree().setModel(model);
             getSplitPane().setRightComponent(startComponent);
 
             this.getOptionTree().getParent().setMinimumSize(getOptionTree().getPreferredSize());
-            this.getContentPane().setPreferredSize(computePreferredSize(model));
+            cp.setPreferredSize(computePreferredSize(model));
             this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setIconImage(IconFactory.keyLogo());
             this.pack();
             this.setLocationRelativeTo(MainWindow.getInstance());
-
-
 
             getRootPane().registerKeyboardAction((e) -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -127,15 +138,14 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                         }
                     }
                 });
+                optionTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             }
             return optionTree;
         }
 
         private JSplitPane getSplitPane() {
             if (splitPane == null) {
-
                 splitPane = new JSplitPane();
-                splitPane.setAlignmentX(LEFT_ALIGNMENT);
                 splitPane.setLeftComponent(new JScrollPane(getOptionTree()));
                 splitPane.setRightComponent(getOptionPanel());
                 // splitPane.setResizeWeight(0.2);

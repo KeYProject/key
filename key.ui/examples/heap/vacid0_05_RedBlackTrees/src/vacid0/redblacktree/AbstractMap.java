@@ -36,7 +36,7 @@ public interface AbstractMap{
     /** Set the value of key; add it if it is not in the map yet */
     /*@ public normal_behavior
       @ requires 0 <= key && key < contents.length;
-      @ ensures contents == \seq_put(\old(contents),key,value);
+      @ ensures contents == \seq_upd(\old(contents),key,value);
       @ ensures \new_elems_fresh(footprint);
       @ assignable footprint;
       @*/
@@ -45,7 +45,7 @@ public interface AbstractMap{
     /** Remove key from the map */
     /*@ public normal_behavior
       @ requires 0 <= key && key < contents.length;
-      @ ensures contents == \seq_put(\old(contents),key,defaultValue);
+      @ ensures contents == \seq_upd(\old(contents),key,defaultValue);
       @ ensures \new_elems_fresh(footprint);
       @ assignable footprint;
       @*/

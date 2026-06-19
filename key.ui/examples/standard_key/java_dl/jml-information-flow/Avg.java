@@ -5,34 +5,34 @@
  */
 
  public class Avg {
- 
+
      //@ public invariant TAG_ATTR_IDX == 0;
      public static final int TAG_ATTR_IDX = 0;
- 
+
      //@ public invariant VALUE_ATTR_IDX == 1;
      public static final int VALUE_ATTR_IDX = 1;
- 
+
      public int [][] m_Tab;
      public int [][] m_Tab2;
- 
+
      // public ghost int [] m_Sum;
      //@ public invariant m_Sum != null;
      private int [] m_Sum;
- 
+
      //@ public invariant num_Instances >= 1;
      public int num_Instances;
- 
+
      //@ public invariant num_Attributes >= 2;
      public int num_Attributes;
- 
+
      public int res1, res2;
- 
- 
+
+
     // Original code
      public int average_ori() {
        int result = 0;
        int total = 0;
- 
+
        for (int i = 0 ; i < num_Instances ; i++) {
            if (m_Tab[i][TAG_ATTR_IDX] != 0) {
                result += m_Tab[i][VALUE_ATTR_IDX];
@@ -41,10 +41,10 @@
        }
        if (total != 0)
            result /= total;
- 
+
        return result;
      }
- 
+
      // Code modified for self-composition
      /*@
        @ public normal_behavior
@@ -68,12 +68,12 @@
        @ modifiable res1, res2, m_Sum[*];
        @ ensures res1 == res2;
        @*/
- 
+
      public void average() {
        int total1 = 0, total2 = 0;
- 
+
        m_Sum[0] = 0;
- 
+
        res1 = 0;
        { int i = 0;
        /*@ loop_invariant
@@ -84,7 +84,7 @@
        @      (m_Sum[j] == m_Sum[j-1] + m_Tab[j-1][VALUE_ATTR_IDX]))) &&
        @  res1 == m_Sum[i];
        @ decreases num_Instances - i;
-       @ modifies m_Sum[*], res1;
+       @ assignable m_Sum[*], res1;
        @*/
        while ( i < num_Instances ) {
            if (m_Tab[i][TAG_ATTR_IDX] != 0) {
@@ -103,14 +103,14 @@
        }
        //      if (total1 != 0)
        //          res1 /= total1;
- 
+
        res2 = 0;
        { int i = 0;
        /*@ loop_invariant
        @ 0 <= i && i <= num_Instances &&
        @  res2 == m_Sum[i];
        @ decreases num_Instances - i;
-       @ modifies res2;
+       @ assignable res2;
        @*/
        while ( i < num_Instances ) {
            if (m_Tab2[i][TAG_ATTR_IDX] != 0) {
@@ -124,4 +124,4 @@
        //          res2 /= total2;
      }
  }
- 
+

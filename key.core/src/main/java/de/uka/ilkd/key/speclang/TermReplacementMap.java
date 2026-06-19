@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author lanzinger
  */
-public class TermReplacementMap extends ReplacementMap<Term> {
+public class TermReplacementMap extends ReplacementMap<JTerm> {
 
     /**
      * constructs a replacement map with the given term factory
@@ -31,7 +31,7 @@ public class TermReplacementMap extends ReplacementMap<Term> {
      * @param newHeap the heap that should be used
      * @param services services
      */
-    public void replaceHeap(final Term newHeap, final Services services) {
+    public void replaceHeap(final JTerm newHeap, final Services services) {
         if (newHeap == null) {
             throw new IllegalArgumentException("newHeap can't be null");
         }
@@ -42,7 +42,7 @@ public class TermReplacementMap extends ReplacementMap<Term> {
     }
 
     @Override
-    protected Term convert(ProgramVariable variable, TermServices services) {
+    protected JTerm convert(ProgramVariable variable, TermServices services) {
         return services.getTermBuilder().var(variable);
     }
 

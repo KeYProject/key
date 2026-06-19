@@ -196,8 +196,7 @@ final class ChaosMonkey {
                         });
                         foundButton = true;
                         break;
-                    } else if (action instanceof JMenuItem) {
-                        var menuItem = (JMenuItem) action;
+                    } else if (action instanceof JMenuItem menuItem) {
                         LOGGER.info("performing menu item {}", menuItem.getText());
                         SwingUtilities.invokeLater(() -> {
                             try {

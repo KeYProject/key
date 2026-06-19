@@ -3,29 +3,33 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,15 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dominic Scheurer
  */
 public class MergeRuleTests {
-
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleTests.class);
 
     /**
-     * Simple regression test case loading an existing closed proof (standard Gcd example) including
-     * two merges with ITE antecedent merges and trying to replay it.
-     *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * Simple regression test case loading an existing closed proof (standard Gcd example)
+     * including two merges with ITE antecedent merges and trying to replay it.
      */
     @Test
     public void testLoadGcdProof() {
@@ -55,7 +57,6 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with predicate abstraction and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
@@ -68,7 +69,6 @@ public class MergeRuleTests {
      * two merges with predicate abstraction (with lattice elements manually chosen by the user) and
      * trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
@@ -171,10 +171,9 @@ public class MergeRuleTests {
      * <p>
      * At the end, the proof should be closed.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
-    public void testDoManualGcdProof() throws Exception {
+    public void testDoManualGcdProof() {
         final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.key");
 
         for (int i = 0; i < 2; i++) {
@@ -201,7 +200,7 @@ public class MergeRuleTests {
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             Assertions.fail("The merge operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException ignored) {
         }
     }
 
@@ -216,7 +215,7 @@ public class MergeRuleTests {
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             Assertions.fail("The merge operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException ignored) {
         }
     }
 
@@ -301,34 +300,37 @@ public class MergeRuleTests {
     }
 
     public static Proof loadProof(String directory, String proofFileName) {
-        return loadProof(new File(directory), proofFileName);
+        return loadProof(Paths.get(directory), proofFileName);
     }
 
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
      *
-     * @param directory
+     * @param directory directory in which the {@code proofFileName} exists
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @NonNull
-    public static Proof loadProof(File directory, String proofFileName) {
-        File proofFile = new File(directory, proofFileName);
-        assertTrue(proofFile.exists(),
-            "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
+    public static @NonNull Proof loadProof(Path directory, String proofFileName) {
+        Path proofFile = directory.resolve(proofFileName);
+        assertTrue(Files.exists(proofFile),
+            "Proof file: " + proofFile.toAbsolutePath() + " could not be found!");
 
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof);
-
-            return proof;
-        } catch (ProblemLoaderException e) {
-            Assertions.fail("Proof could not be loaded", e);
-            return null;
+        var environment = Assertions
+                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile, null, null, null, true));
+        Proof proof = environment.getLoadedProof();
+        Assertions.assertNotNull(proof, "Loaded proof should not be null");
+        var errors = environment.getReplayResult().getErrorList();
+        if (!errors.isEmpty()) {
+            LOGGER.warn("There were errors during load");
+            for (int i = 0; i < errors.size(); i++) {
+                var error = errors.get(i);
+                LOGGER.warn("Error " + i + ": ", error);
+            }
+            Assertions.fail("There were errors during load");
         }
+        return proof;
     }
 
     private static class IncompleteRuleAppException extends RuntimeException {

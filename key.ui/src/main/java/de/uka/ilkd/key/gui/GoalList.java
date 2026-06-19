@@ -29,9 +29,8 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -48,15 +48,13 @@ import org.slf4j.LoggerFactory;
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
-    public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
-
-    @Serial
-    private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
     private final static Icon linkedGoalIcon = IconFactory.keyHoleLinked(20, 20);
+
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
+    private static final IconFontProvider GOAL_LIST_ICON =
+        new IconFontProvider(FontAwesomeSolid.FLAG_CHECKERED);
     /**
      * the model used by this view
      */
@@ -111,20 +109,18 @@ public class GoalList extends JList<Goal> implements TabPanel {
         setMediator(mediator);
     }
 
-    @NonNull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Goals";
     }
 
     @Override
     public Icon getIcon() {
-        return GOAL_LIST_ICON;
+        return GOAL_LIST_ICON.get(MainWindow.TAB_ICON_SIZE);
     }
 
-    @NonNull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return new JScrollPane(this);
     }
 
@@ -232,11 +228,15 @@ public class GoalList extends JList<Goal> implements TabPanel {
                             return false;
                         }
                     }); // do not print term labels
-            sp.printSequent(seq);
-            res = sp.result().replace('\n', ' ');
-            res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
-
-            seqToString.put(seq, res);
+            try {
+                sp.printSequent(seq);
+            } catch (Exception ex) {
+                LOGGER.warn("GoalList: Problem printing sequent.", ex);
+            } finally {
+                res = sp.result().replace('\n', ' ');
+                res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
+                seqToString.put(seq, res);
+            }
         }
         return res;
     }
@@ -343,6 +343,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * @see de.uka.ilkd.key.proof.ProofTreeListener#proofExpanded(de.uka.
              * ilkd.key.proof.ProofTreeEvent)
              */
+            @Override
             public void proofExpanded(ProofTreeEvent e) {
                 // nothing, this is not important for the list of goals
             }
@@ -350,11 +351,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if all goals of the proof are closed
              */
+            @Override
             public void proofClosed(ProofTreeEvent e) {
                 setAttentive(true);
                 clear();
             }
 
+            @Override
             public void proofIsBeingPruned(ProofTreeEvent e) {
                 pruningInProcess = true;
             }
@@ -364,6 +367,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * other words, that node should no longer have any children now. Any nodes that were
              * not descendants of that node are unaffected.
              */
+            @Override
             public void proofPruned(ProofTreeEvent e) {
                 clear();
                 add(e.getSource().openGoals());
@@ -373,6 +377,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the list of goals changed (goals were added, removed etc.)
              */
+            @Override
             public void proofGoalRemoved(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -383,6 +388,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the current goal of the proof changed
              */
+            @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -393,6 +399,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the current goal of the proof changed
              */
+            @Override
             public void proofGoalsChanged(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -401,6 +408,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 add(e.getGoals());
             }
 
+            @Override
             public void proofStructureChanged(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -555,14 +563,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * focused node has changed
          */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             selectSelectedGoal();
         }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("GoalList: initialize with new proof");
             selectingListModel.setProof(e.getSource().getSelectedProof());
             validate();
@@ -592,8 +600,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * used to prevent the display of goals that appear closed for the present user constraint.
      */
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
-        @Serial
-        private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
          * List of <code>Integer</code> objects that determine the (strictly monotonic) mapping of
@@ -783,7 +789,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     }
 
-    private class IconCellRenderer extends DefaultListCellRenderer implements java.io.Serializable {
+    private class IconCellRenderer extends DefaultListCellRenderer {
         @Serial
         private static final long serialVersionUID = -8178991338906184819L;
 
@@ -808,7 +814,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // (DS) Also add the serial of the corresponding node to the
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
+
+                // FIXME weigl: disable for UnbalancedParenIssue
                 valueStr = "(#" + ((Goal) value).node().serialNr() + ") " + seqToString(seq);
+                // valueStr = "";
 
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;

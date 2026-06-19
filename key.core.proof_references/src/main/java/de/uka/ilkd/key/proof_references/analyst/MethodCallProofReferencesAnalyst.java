@@ -6,29 +6,30 @@ package de.uka.ilkd.key.proof_references.analyst;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -89,17 +90,21 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     protected ExecutionContext extractContext(Node node, Services services) {
         RuleApp app = node.getAppliedRuleApp();
         PosInOccurrence pio = app.posInOccurrence();
-        JavaBlock jb = TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock();
+        JavaBlock jb = TermBuilder.goBelowUpdates((JTerm) pio.subTerm()).javaBlock();
         return JavaTools.getInnermostExecutionContext(jb, services);
     }
 
     /**
      * Creates an {@link IProofReference} to the called {@link IProgramMethod}.
      *
-     * @param node The {@link Node} which caused the reference.
-     * @param services The {@link Services} to use.
-     * @param context The {@link ExecutionContext} to use.
-     * @param mr The {@link MethodReference}.
+     * @param node
+     *        The {@link Node} which caused the reference.
+     * @param services
+     *        The {@link Services} to use.
+     * @param context
+     *        The {@link ExecutionContext} to use.
+     * @param mr
+     *        The {@link MethodReference}.
      * @return The created {@link IProofReference}.
      */
     protected IProofReference<IProgramMethod> createReference(Node node, Services services,

@@ -115,46 +115,46 @@ public abstract class SMTBeautifier {
     private static Element parse(String s, MutableInt pos) {
         while (pos.val < s.length()) {
             switch (s.charAt(pos.val)) {
-            case ' ':
-            case '\t':
-            case '\r':
-            case '\n':
-                break;
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    break;
 
-            case '(':
-                return parseParen(s, pos);
+                case '(':
+                    return parseParen(s, pos);
 
-            case '|':
-                int start = pos.val;
-                pos.val++;
-                while (s.charAt(pos.val) != '|') {
+                case '|':
+                    int start = pos.val;
                     pos.val++;
-                }
-                Element result = new Element();
-                pos.val++;
-                result.head = s.substring(start, pos.val);
-                return result;
-
-            case ';':
-                start = pos.val;
-                pos.val++;
-                while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
+                    while (s.charAt(pos.val) != '|') {
+                        pos.val++;
+                    }
+                    Element result = new Element();
                     pos.val++;
-                }
-                result = new Element();
-                result.head = s.substring(start, pos.val);
-                pos.val++;
-                return result;
+                    result.head = s.substring(start, pos.val);
+                    return result;
 
-            default:
-                start = pos.val;
-                pos.val++;
-                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
+                case ';':
+                    start = pos.val;
                     pos.val++;
-                }
-                result = new Element();
-                result.head = s.substring(start, pos.val);
-                return result;
+                    while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
+                        pos.val++;
+                    }
+                    result = new Element();
+                    result.head = s.substring(start, pos.val);
+                    pos.val++;
+                    return result;
+
+                default:
+                    start = pos.val;
+                    pos.val++;
+                    while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
+                        pos.val++;
+                    }
+                    result = new Element();
+                    result.head = s.substring(start, pos.val);
+                    return result;
             }
             pos.val++;
         }

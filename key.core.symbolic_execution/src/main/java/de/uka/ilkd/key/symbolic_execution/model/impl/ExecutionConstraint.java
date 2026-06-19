@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionConstraint}.
@@ -18,9 +19,9 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
  */
 public class ExecutionConstraint extends AbstractExecutionElement implements IExecutionConstraint {
     /**
-     * The {@link Term} representing the constraint.
+     * The {@link JTerm} representing the constraint.
      */
-    private final Term term;
+    private final JTerm term;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
@@ -33,10 +34,11 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * @param settings The {@link ITreeSettings} to use.
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param term The {@link Term} representing the constraint.
+     * @param term The {@link JTerm} representing the constraint.
      */
-    public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
-            Term term) {
+    public ExecutionConstraint(ITreeSettings settings, Node proofNode,
+            PosInOccurrence modalityPIO,
+            JTerm term) {
         super(settings, proofNode);
         assert term != null;
         assert modalityPIO != null;
@@ -64,7 +66,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * {@inheritDoc}
      */
     @Override
-    public Term getTerm() {
+    public JTerm getTerm() {
         return term;
     }
 

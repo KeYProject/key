@@ -4,15 +4,14 @@
 package de.uka.ilkd.key.taclettranslation;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 
 public abstract class TacletVisitor implements DefaultVisitor {
@@ -31,7 +30,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     }
 
     public String visit(Taclet taclet, boolean visitAddrules) {
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
         return failureDescription;
@@ -52,8 +51,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     }
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
+        for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
                 ((RewriteTacletGoalTemplate) gt).replaceWith().execPostOrder(this);
@@ -63,8 +61,8 @@ public abstract class TacletVisitor implements DefaultVisitor {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : gt.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

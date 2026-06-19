@@ -38,11 +38,11 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -119,7 +119,7 @@ public class CachingExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         if (p == null || trackedProofs.contains(p)) {
             return;
@@ -200,20 +200,17 @@ public class CachingExtension
 
     }
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
-        if (kind.getType() == Node.class) {
-            Node node = (Node) underlyingObject;
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind, @NonNull T underlyingObject) {
+        if (underlyingObject instanceof Node node) {
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseByReference(this, mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
-        } else if (kind.getType() == Proof.class) {
-            Proof proof = (Proof) underlyingObject;
+        } else if (underlyingObject instanceof Proof proof) {
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseAllByReference(this, mediator, proof));
             return actions;
@@ -246,7 +243,7 @@ public class CachingExtension
         if (tryToClose) {
             return; // try close macro was running, no need to do anything here
         }
-        Proof p = info.getProof();
+        Proof p = (Proof) info.getProof();
         if (p == null || p.isDisposed() || p.closed() || !(info.getSource() instanceof ApplyStrategy
                 || info.getSource() instanceof ProofMacro)) {
             return;

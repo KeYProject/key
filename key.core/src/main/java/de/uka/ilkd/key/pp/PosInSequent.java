@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * describes a position in a sequent including the bounds within a string representation of the
@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  * constraint.
  */
 public class PosInSequent {
-
     private Range bounds;
     private final boolean sequent;
     private PosInOccurrence posInOcc = null;

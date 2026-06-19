@@ -17,6 +17,7 @@ import java.util.zip.ZipFile;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,7 +225,7 @@ public final class ProofSelectionDialog extends JDialog {
      *         means the returned path will only contains the filename of the proof file) or null if
      *         the given path does not denote a bundle
      */
-    public static Path chooseProofToLoad(Path bundlePath) {
+    public static @Nullable Path chooseProofToLoad(Path bundlePath) {
         if (isProofBundle(bundlePath)) {
             return showDialog(bundlePath);
         }

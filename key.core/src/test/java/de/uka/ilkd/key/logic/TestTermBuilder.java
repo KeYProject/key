@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -20,15 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestTermBuilder {
-
+    private static Proof PROOF = null;
     private Services services;
     private TermBuilder tb;
 
     @BeforeEach
     public void setUp() {
-        HelperClassForTests helper = new HelperClassForTests();
-        final ProofAggregate agg = helper.parse(new File(TestJavaInfo.testfile));
-        services = agg.getFirstProof().getServices();
+        if (PROOF == null) {
+            final ProofAggregate agg = HelperClassForTests.parse(Paths.get(TestJavaInfo.testfile));
+            PROOF = agg.getFirstProof();
+        }
+
+        services = PROOF.getServices().copy(false);
         tb = services.getTermBuilder();
     }
 
@@ -36,7 +40,7 @@ public class TestTermBuilder {
     /**
      * Test number conversion
      */
-    private void checkDigits(Term number, int[] expected, IntegerLDT intLDT,
+    private void checkDigits(JTerm number, int[] expected, IntegerLDT intLDT,
             boolean isNonNegative) {
         assertSame(intLDT.getNumberSymbol(), number.op());
         number = number.sub(0);
@@ -57,8 +61,8 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsNegativeInt() {
         String[] numbers =
-            new String[] { "-4096", "-1", "" + Integer.MIN_VALUE, "" + Long.MIN_VALUE };
-        int[][] expected = new int[][] { { 4, 0, 9, 6 }, { 1 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 8 },
+            { "-4096", "-1", "" + Integer.MIN_VALUE, "" + Long.MIN_VALUE };
+        int[][] expected = { { 4, 0, 9, 6 }, { 1 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 8 },
             { 9, 2, 2, 3, 3, 7, 2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 8 } };
         for (int i = 0; i < numbers.length; i++) {
             checkDigits(tb.zTerm(numbers[i]), expected[i],
@@ -69,9 +73,9 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsPositiveInt() {
         String[] numbers =
-            new String[] { "4096", "1", "0", "" + Integer.MAX_VALUE, "" + Long.MAX_VALUE };
+            { "4096", "1", "0", "" + Integer.MAX_VALUE, "" + Long.MAX_VALUE };
         int[][] expected =
-            new int[][] { { 4, 0, 9, 6 }, { 1 }, { 0 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 7 },
+            { { 4, 0, 9, 6 }, { 1 }, { 0 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 7 },
                 { 9, 2, 2, 3, 3, 7, 2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 7 } };
         for (int i = 0; i < numbers.length; i++) {
             checkDigits(tb.zTerm(numbers[i]), expected[i],
@@ -82,7 +86,7 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsVeryBigPositiveInteger() {
         String number = "16576152376524231864936749621436926134961274698712643261489762897364";
-        int[] expected = new int[] { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
+        int[] expected = { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
             3, 6, 7, 4, 9, 6, 2, 1, 4, 3, 6, 9, 2, 6, 1, 3, 4, 9, 6, 1, 2, 7, 4, 6, 9, 8, 7, 1, 2,
             6, 4, 3, 2, 6, 1, 4, 8, 9, 7, 6, 2, 8, 9, 7, 3, 6, 4 };
 
@@ -93,7 +97,7 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsVerySmallNegativeInteger() {
         String number = "-16576152376524231864936749621436926134961274698712643261489762897364";
-        int[] expected = new int[] { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
+        int[] expected = { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
             3, 6, 7, 4, 9, 6, 2, 1, 4, 3, 6, 9, 2, 6, 1, 3, 4, 9, 6, 1, 2, 7, 4, 6, 9, 8, 7, 1, 2,
             6, 4, 3, 2, 6, 1, 4, 8, 9, 7, 6, 2, 8, 9, 7, 3, 6, 4 };
         checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);
@@ -101,7 +105,7 @@ public class TestTermBuilder {
 
     private void testDoubleLongPatterns(String number) {
         double doubleVal = Double.parseDouble(number);
-        Term doubleTerm = tb.dfpTerm(doubleVal);
+        JTerm doubleTerm = tb.dfpTerm(doubleVal);
         DoubleLiteral literal =
             services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
         assertEquals(doubleVal, Double.parseDouble(literal.getValue()),
@@ -122,7 +126,7 @@ public class TestTermBuilder {
 
     private void testFloatPatterns(String number) {
         float floatval = Float.parseFloat(number);
-        Term floatTerm = tb.fpTerm(floatval);
+        JTerm floatTerm = tb.fpTerm(floatval);
         FloatLiteral literal =
             services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
         assertEquals(floatval, Float.parseFloat(literal.getValue()), "for double value " + number);

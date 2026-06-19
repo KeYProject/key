@@ -3,24 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -29,10 +26,19 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleExecutor;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Martin Hentschel
  */
 public class TestTermLabelManager {
+    private static InitConfig CONFIG = null;
+
     @Test
     public void testrefactorGoal_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
         doRefactoringTestLogging(true, true,
@@ -113,17 +121,20 @@ public class TestTermLabelManager {
         // Create sequent
         PosInOccurrence pos = createTestPosInOccurrence(services);
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
-        Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
+        JTerm one = integerLDT.translateLiteral(new IntLiteral(1), services);
+        JTerm two = integerLDT.translateLiteral(new IntLiteral(2), services);
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
-        Sequent sequent = Sequent.EMPTY_SEQUENT;
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+        Sequent sequent = JavaDLSequentKit.getInstance().getEmptySequent();
+        sequent =
+            sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
+        sequent = sequent.addFormula(pos.sequentFormula(), true, false)
+                .sequent();
+        sequent =
+            sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
-        Term taclet = TB.tt();
+        JTerm taclet = TB.tt();
         Goal goal = createGoal(initConfig, sequent);
         TermLabelManager.refactorGoal(new TermLabelState(), services, pos, rule, goal, null,
             taclet);
@@ -151,13 +162,13 @@ public class TestTermLabelManager {
         while (expectedIter.hasNext() && currentIter.hasNext()) {
             SequentFormula expectedSF = expectedIter.next();
             SequentFormula currentSF = currentIter.next();
-            compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
+            compareTerms((JTerm) expectedSF.formula(), (JTerm) currentSF.formula(), changed, scope);
         }
         assertFalse(expectedIter.hasNext());
         assertFalse(currentIter.hasNext());
     }
 
-    protected void compareTerms(Term expected, Term current, boolean changed,
+    protected void compareTerms(JTerm expected, JTerm current, boolean changed,
             RefactoringScope scope) {
         assertEquals(expected.arity(), current.arity());
         for (int i = 0; i < expected.arity(); i++) {
@@ -170,7 +181,7 @@ public class TestTermLabelManager {
         if (changed) {
             for (int i = 0; i < expected.getLabels().size(); i++) {
                 if (RefactoringScope.SEQUENT.equals(scope)) {
-                    assertEquals(expected.getLabels().get(i).name().toString() + "-CHANGED",
+                    assertEquals(expected.getLabels().get(i).name() + "-CHANGED",
                         current.getLabels().get(i).name().toString());
                 } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                         .equals(scope)) {
@@ -206,15 +217,11 @@ public class TestTermLabelManager {
     public void testInstantiateLabels_updates_allRules() {
         LoggingTermLabelUpdate update =
             new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")));
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, update, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, update, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -237,15 +244,11 @@ public class TestTermLabelManager {
     public void testInstantiateLabels_updates_ruleSpecific() {
         LoggingTermLabelUpdate update =
             new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")), "rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, update, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, update, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -266,15 +269,11 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_childAndGrandchildPolicies_allRules() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, policy, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, policy, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -318,15 +317,11 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_childAndGrandchildPolicies_ruleSpecific() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, policy, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, policy, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -354,7 +349,8 @@ public class TestTermLabelManager {
 
     /**
      *
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     @Test
     public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
@@ -362,7 +358,7 @@ public class TestTermLabelManager {
         Services services = createTestServices(null, null, policy, null, null, null).getServices();
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -396,15 +392,11 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_directChildPolicies_ruleSpecific() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, policy, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, policy, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -432,25 +424,21 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_modalityTermPolicies() {
         LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(null, policy, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, policy, null, null, null, null).getServices());
         TermBuilder TB = services.getTermBuilder();
-        Term modality = TB.label(
+        JTerm modality = TB.label(
             TB.box(JavaBlock.EMPTY_JAVABLOCK,
                 TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))),
             new ParameterlessTermLabel(new Name("ONE")));
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-        Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)),
+        JTerm update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)),
             new ParameterlessTermLabel(new Name("UPDATE")));
-        Term updateApp = TB.apply(update, modality,
+        JTerm updateApp = TB.apply(update, modality,
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
-        Term taclet = TB.tt();
+        JTerm taclet = TB.tt();
         Rule rule = new DummyRule("rule");
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
@@ -469,14 +457,10 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_applicationTermPolicies() {
         LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(policy, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(policy, null, null, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
-        Term taclet = services.getTermBuilder().tt();
+        JTerm taclet = services.getTermBuilder().tt();
         Rule rule = new DummyRule("rule");
         // Create labels
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
@@ -494,15 +478,11 @@ public class TestTermLabelManager {
     */
     @Test
     public void testInstantiateLabels_taclet() {
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
-        Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(),
+        JTerm taclet = services.getTermBuilder().label(services.getTermBuilder().tt(),
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("TACLET"))));
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             services, pos, rule, null, null, null, taclet, null);
@@ -522,52 +502,49 @@ public class TestTermLabelManager {
         assertTrue(labels.isEmpty());
     }
 
-    protected PosInOccurrence createTestPosInOccurrence(Services services) {
-        Term testTerm = createTestTerm(services);
-        Term inInt = services.getTermBuilder().inInt(testTerm);
+    protected PosInOccurrence createTestPosInOccurrence(
+            Services services) {
+        JTerm testTerm = createTestTerm(services);
+        JTerm inInt = services.getTermBuilder().inInt(testTerm);
         return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"),
             true);
     }
 
-    protected Term createTestTerm(Services services) {
+    protected JTerm createTestTerm(Services services) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
-        Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
-        Term three = integerLDT.translateLiteral(new IntLiteral(3), services);
+        JTerm one = integerLDT.translateLiteral(new IntLiteral(1), services);
+        JTerm two = integerLDT.translateLiteral(new IntLiteral(2), services);
+        JTerm three = integerLDT.translateLiteral(new IntLiteral(3), services);
         TermBuilder TB = services.getTermBuilder();
         one = TB.label(one, new ParameterlessTermLabel(new Name("ONE")));
         two = TB.label(one, new ParameterlessTermLabel(new Name("TWO")));
         three = TB.label(one, new ParameterlessTermLabel(new Name("THREE")));
-        Term innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
+        JTerm innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
         return TB.label(TB.add(one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
     }
 
 
     @Test
     public void testParseLabel() throws TermLabelException {
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e1) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         // Test null parameter
         TermLabel label = manager.parseLabel("ONE", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("ONE", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test empty parameter
         label = manager.parseLabel("TWO", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("TWO", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test with parameter
         label = manager.parseLabel("THREE", Collections.singletonList("Param"), services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("THREE", label.name().toString());
-        assertEquals(1, label.getChildCount());
-        assertEquals("Param", label.getChild(0));
+        assertEquals(1, label.getTLChildCount());
+        assertEquals("Param", label.getTLChild(0));
         // Test unsupported
         try {
             manager.parseLabel("UNKNOWN", null, services);
@@ -587,12 +564,8 @@ public class TestTermLabelManager {
         assertNotNull(names);
         assertTrue(names.isEmpty());
         // Test services
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         names = TermLabelManager.getSupportedTermLabelNames(services);
         assertNotNull(names);
         assertEquals(5, names.size());
@@ -608,7 +581,7 @@ public class TestTermLabelManager {
      */
     @Test
     public void testGetTermLabelManager() {
-        Assertions.assertNull(TermLabelManager.getTermLabelManager(null));
+        assertNull(TermLabelManager.getTermLabelManager(null));
         Services services = new Services(JavaProfile.getDefaultProfile());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         assertSame(services.getProfile().getTermLabelManager(), manager);
@@ -621,80 +594,85 @@ public class TestTermLabelManager {
             final TermLabelPolicy modalityTermPolicy, final ChildTermLabelPolicy directChildPolicy,
             final ChildTermLabelPolicy childAndGrandchildPolicy, final TermLabelUpdate update,
             final TermLabelRefactoring refactoring) throws ProblemLoaderException {
-        KeYEnvironment<?> env = null;
-        try {
-            env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
-                "termLabels/flatSteps/FlatSteps.java"), null, null, null);
-            Profile profile = new JavaProfile() {
-                @Override
-                protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-                    ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
-                    if (applicationTermPolicy != null) {
-                        applicationTermPolicies =
-                            applicationTermPolicies.prepend(applicationTermPolicy);
-                    }
-                    ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
-                    if (modalityTermPolicy != null) {
-                        modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
-                    }
-                    ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies =
-                        ImmutableSLList.nil();
-                    if (directChildPolicy != null) {
-                        directChildTermLabelPolicies =
-                            directChildTermLabelPolicies.prepend(directChildPolicy);
-                    }
-                    ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies =
-                        ImmutableSLList.nil();
-                    if (childAndGrandchildPolicy != null) {
-                        childAndGrandchildTermLabelPolicies =
-                            childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
-                    }
-                    ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
-                    if (update != null) {
-                        termLabelUpdates = termLabelUpdates.prepend(update);
-                    }
-                    ImmutableList<TermLabelRefactoring> termLabelRefactorings =
-                        ImmutableSLList.nil();
-                    if (refactoring != null) {
-                        termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
-                    }
-
-                    ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-                    result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
-                        new LoggingFactory(new Name("ONE")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("TWO"),
-                        new LoggingFactory(new Name("TWO")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("THREE"),
-                        new LoggingFactory(new Name("THREE")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("ADD"),
-                        new LoggingFactory(new Name("ADD")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"),
-                        new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    return result;
+        if (CONFIG == null) {
+            KeYEnvironment<?> env = null;
+            try {
+                env =
+                    KeYEnvironment.load(HelperClassForTests.TESTCASE_DIRECTORY.resolve("termLabels")
+                            .resolve("flatSteps")
+                            .resolve("FlatSteps.java"),
+                        null, null, null);
+            } finally {
+                if (env != null) {
+                    env.dispose();
                 }
-            };
-            return env.getInitConfig()
-                    .copyWithServices(env.getInitConfig().getServices().copy(profile, false));
-        } finally {
-            if (env != null) {
-                env.dispose();
             }
+            CONFIG = env.getInitConfig();
         }
+        Profile profile = new JavaProfile() {
+            @Override
+            protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+                ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
+                if (applicationTermPolicy != null) {
+                    applicationTermPolicies =
+                        applicationTermPolicies.prepend(applicationTermPolicy);
+                }
+                ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
+                if (modalityTermPolicy != null) {
+                    modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
+                }
+                ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies =
+                    ImmutableSLList.nil();
+                if (directChildPolicy != null) {
+                    directChildTermLabelPolicies =
+                        directChildTermLabelPolicies.prepend(directChildPolicy);
+                }
+                ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies =
+                    ImmutableSLList.nil();
+                if (childAndGrandchildPolicy != null) {
+                    childAndGrandchildTermLabelPolicies =
+                        childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
+                }
+                ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
+                if (update != null) {
+                    termLabelUpdates = termLabelUpdates.prepend(update);
+                }
+                ImmutableList<TermLabelRefactoring> termLabelRefactorings =
+                    ImmutableSLList.nil();
+                if (refactoring != null) {
+                    termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
+                }
+
+                ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+                result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
+                    new LoggingFactory(new Name("ONE")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("TWO"),
+                    new LoggingFactory(new Name("TWO")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("THREE"),
+                    new LoggingFactory(new Name("THREE")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("ADD"),
+                    new LoggingFactory(new Name("ADD")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"),
+                    new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                return result;
+            }
+        };
+        return CONFIG.copyWithServices(CONFIG.getServices().copy(profile, false));
     }
 
     private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {
@@ -716,15 +694,17 @@ public class TestTermLabelManager {
 
         @Override
         public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                Goal goal, Object hint, Term tacletTerm) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm) {
             return scope;
         }
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.isModified();
             for (TermLabel label : labels.getLabels()) {
@@ -732,7 +712,7 @@ public class TestTermLabelManager {
                     changedLabels.add(label);
                 } else {
                     changed |= changedLabels.add(
-                        new ParameterlessTermLabel(new Name(label.name().toString() + "-CHANGED")));
+                        new ParameterlessTermLabel(new Name(label.name() + "-CHANGED")));
                 }
             }
             labels.replaceWith(changedLabels, changed);
@@ -759,8 +739,10 @@ public class TestTermLabelManager {
 
         @Override
         public void updateLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-                Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, JTerm modalityTerm,
+                org.key_project.prover.rules.Rule rule,
+                RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);
         }
@@ -784,15 +766,17 @@ public class TestTermLabelManager {
 
         @Override
         public boolean isRuleApplicationSupported(TermServices services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm, JTerm newTerm) {
             return true;
         }
 
         @Override
-        public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
-                Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
-                Term newTerm, Term childTerm, TermLabel label) {
+        public boolean addLabel(TermServices services,
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+                JTerm newTerm, JTerm childTerm, TermLabel label) {
             log.add(label);
             return true;
         }
@@ -807,9 +791,10 @@ public class TestTermLabelManager {
 
         @Override
         public TermLabel keepLabel(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                Goal goal, Object hint, Term tacletTerm,
-                Term newTerm, TermLabel label) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm,
+                JTerm newTerm, TermLabel label) {
             log.add(label);
             return label;
         }
@@ -849,12 +834,12 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public Object getChild(int i) {
+        public Object getTLChild(int i) {
             return arguments.get(i);
         }
 
         @Override
-        public int getChildCount() {
+        public int getTLChildCount() {
             return arguments != null ? arguments.size() : 0;
         }
     }
@@ -867,13 +852,13 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+        public @NonNull RuleExecutor<Goal> getExecutor()
                 throws RuleAbortException {
-            return null;
+            throw new RuleAbortException("no implementation");
         }
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return new Name(name);
         }
 

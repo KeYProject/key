@@ -45,7 +45,7 @@ int _old11(int);
    LPS
 -> \forall int[] p_a_lv; 
      {p_a:=p_a_lv}
-       (     p_a.<created>@(java.lang.Object) = TRUE
+       (     p_a.$created@(java.lang.Object) = TRUE
            & !p_a = null
          | p_a = null
         -> \forall ReverseArray self_ReverseArray_lv; 
@@ -60,7 +60,7 @@ int _old11(int);
                                             - (j + 1)])
                   -> {_old10:=_old9_p_a.length}
                        (     !self_ReverseArray = null
-                           &   self_ReverseArray.<created>@(java.lang.Object)
+                           &   self_ReverseArray.$created@(java.lang.Object)
                              = TRUE
                            & (  !p_a = null
                               & p_a.length >= 0)
@@ -265,7 +265,7 @@ int _old11(int);
          (rule "eliminate_variable_declaration" (formula "8") (term "18"))
          (rule "assignment_normalassign" (formula "8") (term "18"))
          (builtin "Update Simplification" (formula "8"))
-         (rule "while_inv_box" (formula "8") (inst "#modifies={i,b[0..b.length - 1]}") (inst "#v1=b_1") (inst "inv=  \\<{
+         (rule "while_inv_box" (formula "8") (inst "#modifiable={i,b[0..b.length - 1]}") (inst "#v1=b_1") (inst "inv=  \\<{
       int j;
     }\\> \\forall int j_11; 
           {j:=j_11}

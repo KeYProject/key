@@ -7,21 +7,25 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.GenericArgument;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -46,7 +50,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private static final String EMPTY_CONSTANT = "empty";
     public static final String ELEMENTOF = "elementOf";
     private static final String SELECT = "select";
-    private static final String CREATED_FIELD_NAME = "java.lang.Object::<created>";
+    private static final String CREATED_FIELD_NAME = "java.lang.Object::#$created";
     private static final String ARR_FUNCTION_NAME = "arr";
     private static final String SEQ_EMPTY = "seqEmpty";
     private static final String SEQ_OUTSIDE = "seqGetOutside";
@@ -673,19 +677,19 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
-            case "int", "char", "byte" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
-            case "java.lang.Object" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
-            default -> {
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
-                addTypePredicate(singleSort);
-                SMTFunction tps = getTypePredicate(singleSort.name().toString());
-                SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
-                typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
-            }
+                case "int", "char", "byte" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+                case "java.lang.Object" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+                default -> {
+                    typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                    Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+                    addTypePredicate(singleSort);
+                    SMTFunction tps = getTypePredicate(singleSort.name().toString());
+                    SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
+                    typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
+                }
             }
             assertion4 = assertion4.and(premise.implies(typeReq));
         }
@@ -900,15 +904,12 @@ public class SMTObjTranslator implements SMTTranslator {
      * @param term the term where we look for the sorts
      */
     private void findSorts(Set<Sort> sorts, Term term) {
-        Sort s = term.sort();
-
-
-        addSingleSort(sorts, s);
-        if (term.op() instanceof SortDependingFunction sdf) {
-            Sort d = sdf.getSortDependingOn();
-            addSingleSort(sorts, d);
+        addSingleSort(sorts, term.sort());
+        if (term.op() instanceof ParametricFunctionInstance pfi) {
+            for (GenericArgument a : pfi.getArgs()) {
+                addSingleSort(sorts, a.sort());
+            }
         }
-
         for (Term sub : term.subs()) {
             findSorts(sorts, sub);
         }
@@ -1059,8 +1060,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 falseCase = castTermIfNecessary(falseCase, sorts.get(ANY_SORT));
             }
             return SMTTerm.ite(condition, trueCase, falseCase);
-        } else if (op == Quantifier.ALL) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+        } else if (op == Quantifier.ALL || op == Quantifier.EX) {
+            var vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
             SMTTermVariable var = translateVariable(vars.get(0));
             List<SMTTermVariable> variables = new LinkedList<>();
@@ -1074,25 +1075,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
                 sub = call.implies(sub);
             }
-            SMTTerm result = SMTTerm.forall(variables, sub, null);
-            quantifiedVariables.remove(quantifiedVariables.size() - 1);
-            return result;
-        } else if (op == Quantifier.EX) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
-            Debug.assertTrue(vars.size() == 1);
-            SMTTermVariable var = translateVariable(vars.get(0));
-            List<SMTTermVariable> variables = new LinkedList<>();
-            quantifiedVariables.add(var);
-            variables.add(var);
-            Sort sort = vars.get(0).sort();
-            String sortName = sort.name().toString();
-            String id = getTypePredicateName(sortName);
-            SMTTerm sub = translateTerm(term.sub(0));
-            if (typePredicates.containsKey(id) && !sort.equals(objectSort)) {
-                SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
-                sub = call.and(sub);
-            }
-            SMTTerm result = SMTTerm.exists(variables, sub, null);
+            SMTTerm result = op == Quantifier.ALL ? SMTTerm.forall(variables, sub, null)
+                    : SMTTerm.exists(variables, sub, null);
             quantifiedVariables.remove(quantifiedVariables.size() - 1);
             return result;
         } else if (op == Junctor.TRUE) {
@@ -1103,7 +1087,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return nullConstant;
         } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
-            SMTTermVariable var = translateVariable((QuantifiableVariable) op);
+            SMTTermVariable var = translateVariable(qop);
             if (quantifiedVariables.contains(var)) {
                 return var;
             } else {
@@ -1127,7 +1111,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof JFunction fun) {
+        } else if (op instanceof Function fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {
@@ -1427,12 +1411,12 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a function call of function f with argument subs.
      */
-    private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs)
+    private SMTTerm translateCall(Function fun, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
-            name = name.replace("$", "");
+            name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
             Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
             fieldSorts.put(name, sort);
@@ -1472,20 +1456,22 @@ public class SMTObjTranslator implements SMTTranslator {
             function = wellformedFunction;
         } else if (name.equals(ELEMENTOF)) {
             function = elementOfFunction;
-        } else if (name.endsWith("::exactInstance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getExactInstanceofSymbol(services)) {
+            Sort depSort = pfi.getArgs().head().sort();
             function = getExactInstanceFunction(depSort);
-        } else if (name.endsWith("::instance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getInstanceofSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            Sort depSort = sort;
             addTypePredicate(depSort);
-            function = getTypePredicate(sdf.getSortDependingOn().name().toString());
-        } else if (name.endsWith("::cast")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            SMTSort target = translateSort(sdf.getSortDependingOn());
+            function = getTypePredicate(sort.name().toString());
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getCastSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            SMTSort target = translateSort(sort);
             if (target.getId().equals(OBJECT_SORT)) {
-                function = getCastFunction(sdf.getSortDependingOn());
+                function = getCastFunction(sort);
             } else {
                 Sort s = subs.get(0).sort();
                 SMTSort source = translateSort(s);
@@ -1495,7 +1481,11 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
                 function = getCastFunction(source, target);
             }
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) { // is the
+                                                                                        // static
+            // invariant
+            // supposed to
+            // be here?
             if (functions.containsKey(CLASS_INVARIANT)) {
                 function = functions.get(CLASS_INVARIANT);
             } else {
@@ -1727,7 +1717,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Creates an SMTTermCall using the given function and arguments.
      */
-    private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs)
+    private SMTTerm call(SMTFunction function, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         List<SMTTerm> subTerms = new LinkedList<>();
         int i = 0;

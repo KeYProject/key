@@ -17,9 +17,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.LoadOptionPanel;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.OptionPanel;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -64,7 +69,7 @@ public final class KeYGuiExtensionFacade {
             }
         };
 
-        return KeYGuiExtensionFacade.getMainMenuExtensions().stream()
+        return getMainMenuExtensions().stream()
                 .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
                 .sorted(Comparator.comparingInt(func));
     }
@@ -249,24 +254,20 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
-    public static void addContextMenuItems(ContextMenuKind kind, JPopupMenu menu,
-            Object underlyingObject, KeYMediator mediator) {
+    public static <T> void addContextMenuItems(ContextMenuKind<T> kind, JPopupMenu menu,
+            T underlyingObject, KeYMediator mediator) {
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
     }
 
-    public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
-            KeYMediator mediator) {
-        if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
-            throw new IllegalArgumentException();
-        }
-
+    public static <T> List<Action> getContextMenuItems(ContextMenuKind<T> kind,
+            @Nullable T underlyingObject, KeYMediator mediator) {
         return getContextMenuExtensions().stream()
                 .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
                 .collect(Collectors.toList());
     }
 
-    public static JMenu createTermMenu(ContextMenuKind kind, Object underlyingObject,
+    public static <T> JMenu createTermMenu(ContextMenuKind<T> kind, T underlyingObject,
             KeYMediator mediator) {
         JMenu menu = new JMenu("Extensions");
         getContextMenuItems(kind, underlyingObject, mediator)
@@ -309,7 +310,7 @@ public final class KeYGuiExtensionFacade {
             return false;
         }
         String sys = System.getProperty(a.getName());
-        return sys == null || !sys.equalsIgnoreCase("false");
+        return !"false".equalsIgnoreCase(sys);
     }
     // endregion
 
@@ -401,6 +402,19 @@ public final class KeYGuiExtensionFacade {
     public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()
                 .flatMap(it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
+    }
+
+    /**
+     * Helper methods that finds matches {@link Profile} and {@link OptionPanel} together.
+     * This information are provided by {@link LoadOptionPanel} interface.
+     */
+    public static Map<Profile, OptionPanel> createAdditionalOptionPanels() {
+        List<LoadOptionPanel> items = getExtensionInstances(LoadOptionPanel.class);
+        HashMap<Profile, OptionPanel> map = HashMap.newHashMap(4);
+        for (LoadOptionPanel item : items) {
+            map.put(item.getProfile(), item.get());
+        }
+        return map;
     }
 
     /**

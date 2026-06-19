@@ -13,16 +13,17 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,12 +140,13 @@ public class RegroupExtension implements KeYGuiExtension,
 
     @Override
     public void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule,
-            PosInOccurrence pos, boolean forced) {
+                               PosInOccurrence pos, boolean forced) {
 
     }
 
     @Override
-    public void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) {
+    public void runAutoMode(List<Node> initialGoals, Proof proof,
+                            ProofSearchInformation<Proof, Goal> info) {
 
     }
 

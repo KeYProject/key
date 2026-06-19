@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -33,7 +33,7 @@ public class ExprTest {
         Assumptions.assumeFalse(expr.startsWith("#"));
         KeyIO io = getIo();
         try {
-            Term actual = io.parseExpression(expr);
+            JTerm actual = io.parseExpression(expr);
             assertNotNull(actual);
             LOGGER.info("Term: {}", actual);
         } catch (BuildingException e) {
@@ -43,6 +43,7 @@ public class ExprTest {
 
     private KeyIO getIo() throws IOException {
         Services services = new Services(new JavaProfile());
+        services.activateJava(null);
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);

@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 
-import java.net.MalformedURLException;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
@@ -23,7 +21,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     private final Position position;
     private final boolean inIfSequent;
 
-    public SVInstantiationExceptionWithPosition(String description, Position position,
+    protected SVInstantiationExceptionWithPosition(String description, Position position,
             boolean inIfSequent) {
         super(description);
         this.position = position;
@@ -60,9 +58,8 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
         return getMessage();
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() {
         return new Location(null, position);
     }
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.StringWriter;
 import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
@@ -58,11 +59,21 @@ public interface Settings {
     void writeSettings(@NonNull Configuration props);
 
 
+    /// Returns the JSON representation of this settings in a string.
+    default String writeSettingsToString() {
+        var config = new Configuration();
+        var out = new StringWriter();
+        writeSettings(config);
+        config.save(out, null);
+        return out.toString();
+    }
+
+
     /**
      * Register a new listener which is triggered for changes on properties.
      *
      * @param listener a non-null reference
-     * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
+     * @see PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
      */
     void addPropertyChangeListener(@NonNull PropertyChangeListener listener);
 
@@ -70,7 +81,7 @@ public interface Settings {
      * Removes the given listener.
      *
      * @param listener a non-null reference
-     * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
+     * @see PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
      */
     void removePropertyChangeListener(PropertyChangeListener listener);
 

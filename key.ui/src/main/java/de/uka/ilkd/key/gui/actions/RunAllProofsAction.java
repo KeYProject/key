@@ -6,10 +6,11 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -19,7 +20,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,7 @@ public class RunAllProofsAction extends MainWindowAction {
     /**
      * Filename of the user-defined input files.
      */
-    @Nullable
-    private static final String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
+    private static final @Nullable String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
 
     /**
      * Default file name for lookup in the classpath.
@@ -57,12 +56,12 @@ public class RunAllProofsAction extends MainWindowAction {
     /**
      * Path to the directory of built-in examples.
      */
-    private final File exampleDir;
+    private final Path exampleDir;
 
     /**
      * Files to loaded
      */
-    private List<File> files;
+    private List<Path> files;
 
 
     /**
@@ -70,8 +69,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
      * {@link #DEFAULT_FILE} is used.
      */
-    @NonNull
-    private List<File> loadFiles() throws IOException {
+    private List<Path> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
             getClass().getSimpleName());
 
@@ -88,10 +86,13 @@ public class RunAllProofsAction extends MainWindowAction {
 
         try (BufferedReader in =
             new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
-                    .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
-                            .getAbsoluteFile())
-                    .collect(Collectors.toList());
+            return in.lines()
+                    .filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
+                    .map(it -> (it.startsWith("/")
+                            ? Paths.get(it)
+                            : exampleDir.resolve(it))
+                            .toAbsolutePath())
+                    .toList();
         }
     }
 
@@ -99,7 +100,7 @@ public class RunAllProofsAction extends MainWindowAction {
         super(mainWindow);
 
         Main.ensureExamplesAvailable();
-        exampleDir = new File(Main.getExamplesDir());
+        exampleDir = Paths.get(Main.getExamplesDir());
 
         try {
             files = loadFiles();
@@ -122,7 +123,7 @@ public class RunAllProofsAction extends MainWindowAction {
         }
 
         Runnable runnable = () -> {
-            for (File absFile : files) {
+            for (Path absFile : files) {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
                 ProblemLoader problemLoader =

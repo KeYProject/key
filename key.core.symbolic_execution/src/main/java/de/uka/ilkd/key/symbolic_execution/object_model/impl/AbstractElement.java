@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -25,7 +25,7 @@ public abstract class AbstractElement implements ISymbolicElement {
      *
      * @param settings The {@link IModelSettings} to use.
      */
-    public AbstractElement(IModelSettings settings) {
+    protected AbstractElement(IModelSettings settings) {
         this.settings = settings;
     }
 
@@ -38,14 +38,14 @@ public abstract class AbstractElement implements ISymbolicElement {
     }
 
     /**
-     * Converts the given {@link Term} into a {@link String} respecting
+     * Converts the given {@link JTerm} into a {@link String} respecting
      * {@link IModelSettings#isUsePrettyPrinting()}.
      *
-     * @param term The {@link Term} to convert.
+     * @param term The {@link JTerm} to convert.
      * @param services The {@link Services} to use.
-     * @return The {@link String} representation of the given {@link Term}.
+     * @return The {@link String} representation of the given {@link JTerm}.
      */
-    protected String formatTerm(Term term, Services services) {
+    protected String formatTerm(JTerm term, Services services) {
         return SymbolicExecutionUtil.formatTerm(term, services, settings.isUseUnicode(),
             settings.isUsePrettyPrinting());
     }

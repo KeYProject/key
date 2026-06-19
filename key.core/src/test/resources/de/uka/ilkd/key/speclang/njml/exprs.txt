@@ -11,4 +11,13 @@ this
 1.f < 2.f < 3.f
 1.f + 2.f
 1. + 2
-1f + 2d
+1.f + 2.d
+\seq()
+\locset()
+\seq_upd(\seq(), 2, true) // There were issues with true in expressions ... #3660
+\seq(true)
+\seq(true, true)
+(\seq_def int i; 0; 10; true)
+\seq_indexOf(\seq(true), true)
+true == true
+(\exists int i; true)

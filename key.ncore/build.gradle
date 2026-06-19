@@ -1,15 +1,60 @@
 plugins {
 }
 
-description "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
+description = "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
 
-configurations { }
+configurations { antlr4 }
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     api project(':key.util')
-    implementation 'org.jspecify:jspecify:0.3.0'
+    implementation('org.jspecify:jspecify:1.0.0')
+    antlr4 "org.antlr:antlr4:4.13.2"
+    api "org.antlr:antlr4-runtime:4.13.2"
 }
 
-tasks.withType(Test) {
+def antlr4OutputKey = String.valueOf(projectDir) + '/build/generated-src/antlr/main/org/key_project/parser'
+
+tasks.register('runAntlr4Key', JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/antlr/KeYLexer.g4", "src/main/antlr/KeYParser.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    mainClass.set("org.antlr.v4.Tool")
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            //"-package", "org.key_project.rusty.parser",
+            "src/main/antlr/KeYLexer.g4",
+            "src/main/antlr/KeYParser.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
+    }
+}
+compileJava.dependsOn runAntlr4Key
+
+sourceSets.main.java.srcDirs(String.valueOf(projectDir) + '/build/generated-src/antlr/main/')
+
+tasks.withType(Test).configureEach {
     enableAssertions = true
+}
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.logic",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
 }

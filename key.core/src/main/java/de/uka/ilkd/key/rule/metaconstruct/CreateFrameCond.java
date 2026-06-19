@@ -6,25 +6,24 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
- * Creates the frame condition (aka "assignable clause") for the given loop. Also accepts the
+ * Creates the frame condition (aka "modifiable clause") for the given loop. Also accepts the
  * pre-state update and extracts the symbols from there. New symbols in the pre-state update (like
  * "heap_BeforeLOOP") are added to the namespaces. This is because the update is, for the loop scope
  * invariant taclet, created by a variable condition; new symbols created there are not
@@ -39,8 +38,8 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term loopFormula = term.sub(0);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm loopFormula = term.sub(0);
         final ProgramVariable heapBeforePV = //
             (ProgramVariable) term.sub(1).op();
         final ProgramVariable savedHeapBeforePV = //
@@ -48,18 +47,19 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final ProgramVariable permissionsHeapBeforePV = //
             (ProgramVariable) term.sub(3).op();
 
-        final Optional<LoopSpecification> loopSpec = //
+        final LoopSpecification loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
-        final boolean isTransaction = MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
+        final boolean isTransaction =
+            MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
-        final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //
+        final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap = //
             createHeapToBeforeLoopMap(isTransaction, isPermissions, heapBeforePV, savedHeapBeforePV,
                 permissionsHeapBeforePV, services);
 
-        final Term frameCondition =
-            createFrameCondition(loopSpec.get(), isTransaction, heapToBeforeLoopMap, services);
+        final JTerm frameCondition =
+            createFrameCondition(loopSpec, isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
     }
@@ -67,40 +67,40 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     /**
      * Creates the frame condition.
      *
-     * @param loopSpec The {@link LoopSpecification}, for the modifies clause.
+     * @param loopSpec The {@link LoopSpecification}, for the modifiable clause.
      * @param isTransaction A flag set to true iff the current modality is a transaction modality.
      * @param heapToBeforeLoopMap The map from heap variables to a map from original to pre-state
      *        terms.
      * @param services The {@link Services} object.
      * @return The frame condition.
      */
-    private static Term createFrameCondition(final LoopSpecification loopSpec,
+    private static JTerm createFrameCondition(final LoopSpecification loopSpec,
             final boolean isTransaction,
-            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap,
+            final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap,
             final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
+        final Map<LocationVariable, JTerm> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-            HeapContext.getModHeaps(services, isTransaction);
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        heapContext.forEach(heap -> mods.put(heap,
-            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            HeapContext.getModifiableHeaps(services, isTransaction);
+        final Map<LocationVariable, JTerm> modifiables = new LinkedHashMap<>();
+        heapContext.forEach(heap -> modifiables.put(heap,
+            loopSpec.getModifiable(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
-        Term frameCondition = null;
+        JTerm frameCondition = null;
         for (LocationVariable heap : heapContext) {
-            final Term mod = mods.get(heap);
-            final Term fc;
+            final JTerm modifiable = modifiables.get(heap);
+            final JTerm fc;
 
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+            if (tb.strictlyNothing().equalsModProperty(modifiable,
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);
+                fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), modifiable);
             }
 
             frameCondition = frameCondition == null ? fc : tb.and(frameCondition, fc);
         }
-
         return frameCondition;
     }
 
@@ -117,10 +117,11 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      *
      * @return A map from heap variables to a map from original terms to the pre-state terms.
      */
-    private Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(boolean isTransaction,
+    private Map<LocationVariable, Map<JTerm, JTerm>> createHeapToBeforeLoopMap(
+            boolean isTransaction,
             boolean isPermissions, ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
             ProgramVariable permissionsHeapBeforePV, Services services) {
-        final Map<LocationVariable, Map<Term, Term>> result = //
+        final Map<LocationVariable, Map<JTerm, JTerm>> result = //
             new LinkedHashMap<>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
@@ -140,8 +141,8 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         return result;
     }
 
-    private static void put(Map<LocationVariable, Map<Term, Term>> map, LocationVariable key,
-            Term t1, Term t2) {
+    private static void put(Map<LocationVariable, Map<JTerm, JTerm>> map, LocationVariable key,
+            JTerm t1, JTerm t2) {
         map.computeIfAbsent(key, k -> new LinkedHashMap<>());
         map.get(key).put(t1, t2);
     }

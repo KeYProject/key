@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+
 /**
  * this exception is thrown from an "SVInstantiations"-Object if the sorts of a schema variable and
  * its instantiation are not compatible (and not generic)

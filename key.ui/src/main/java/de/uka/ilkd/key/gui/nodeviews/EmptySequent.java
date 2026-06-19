@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.MainWindow;
  * @author Kai Wallisch
  */
 public class EmptySequent extends SequentView {
-
-    private static final long serialVersionUID = 7572244482555772604L;
-
     public EmptySequent(MainWindow mainWindow) {
         super(mainWindow);
+        setBackground(INACTIVE_BACKGROUND_COLOR);
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
         setBackground(INACTIVE_BACKGROUND_COLOR);
     }
 

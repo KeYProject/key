@@ -15,8 +15,14 @@ import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -57,9 +63,9 @@ public class TermLabelMenu extends JMenu {
              * Change font style for TermLabelCheckBox instances when the selected node changes.
              */
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 Set<Name> labelNames =
-                    mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
+                    getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
                     /*
@@ -75,10 +81,40 @@ public class TermLabelMenu extends JMenu {
             }
 
             /*
+             * Returns names of TermLabels, that occur in this sequent.
+             */
+            public Set<Name> getOccuringTermLabels(Sequent seq) {
+                final Set<Name> result = new HashSet<>();
+                for (final SequentFormula sf : seq) {
+                    result.addAll(getLabelsForTermRecursively((JTerm) sf.formula()));
+                }
+                return result;
+            }
+
+            /*
+             * Returns names of TermLabels, that occur in term or one of its subterms.
+             */
+            private static Set<Name> getLabelsForTermRecursively(JTerm term) {
+                Set<Name> result = new HashSet<>();
+
+                if (term.hasLabels()) {
+                    for (TermLabel label : term.getLabels()) {
+                        result.add(label.name());
+                    }
+                }
+
+                for (final JTerm subTerm : term.subs()) {
+                    result.addAll(getLabelsForTermRecursively(subTerm));
+                }
+
+                return result;
+            }
+
+            /*
              * This function only has effect if the Profile gets changed.
              */
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 rebuildMenu();
             }
         });

@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project;
 
-import java.io.File;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -38,7 +40,8 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
-        File location = args.length == 1 ? new File(args[0]) : new File("example");
+        LOGGER.info("Starting KeY example application.");
+        Path location = Paths.get(args.length == 1 ? args[0] : "example");
         // Path to the source code folder/file or to a *.proof file
         try {
             // Ensure that Taclets are parsed
@@ -52,15 +55,16 @@ public class Main {
     /**
      * sets up the environment with the Java project described by its location
      *
-     * @param location the File with the path to the source directory of the Java project
+     * @param location the Path with the path to the source directory of the Java project
      *        to be verified
-     * @return the {@KeYEnvironment} that provides the context for all following verification tasks
+     * @return the {@link KeYEnvironment} that provides the context for all following verification
+     *         tasks
      * @throws ProblemLoaderException if the setup fails
      */
-    private static KeYEnvironment<?> setupEnvironment(File location) throws ProblemLoaderException {
-        List<File> classPaths = null; // Optionally: Additional specifications for API classes
-        File bootClassPath = null; // Optionally: Different default specifications for Java API
-        List<File> includes = null; // Optionally: Additional includes to consider
+    private static KeYEnvironment<?> setupEnvironment(Path location) throws ProblemLoaderException {
+        List<Path> classPaths = null; // Optionally: Additional specifications for API classes
+        Path bootClassPath = null; // Optionally: Different default specifications for Java API
+        List<Path> includes = null; // Optionally: Additional includes to consider
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> env =
@@ -90,6 +94,7 @@ public class Main {
             final List<Contract> proofContracts = getContracts(env);
 
             for (Contract contract : proofContracts) {
+                LOGGER.info("Found contract '" + contract.getDisplayName());
                 proveContract(env, contract);
             }
         } finally {
@@ -107,7 +112,7 @@ public class Main {
         // List all specifications of all types in the source location (not classPaths and
         // bootClassPath)
         final List<Contract> proofContracts = new LinkedList<>();
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =

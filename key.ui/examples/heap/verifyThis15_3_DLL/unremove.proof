@@ -49,12 +49,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Wed Nov 30 16:18:22 CET 2022
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-contract=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)].JML normal_behavior operation contract.0
-name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)].JML normal_behavior operation contract.0
-";
+\proofObligation {
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+	"contract": "DoubleLinkedList[DoubleLinkedList::unremove(DoubleLinkedList.Node,int)].JML normal_behavior operation contract.0",
+	"name": "DoubleLinkedList[DoubleLinkedList::unremove(DoubleLinkedList.Node,int)].JML normal_behavior operation contract.0",
+ }
 
 \proof {
 (keyLog "0" (keyUser "kirsten" ) (keyVersion "c2a4d52c2ad58a473b8d4f6ce4c8d074ffe247f6"))
@@ -4108,7 +4107,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                              (builtin "One Step Simplification" (formula "5"))
                                                             (rule "true_left" (formula "5"))
                                                             (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "14") (term "1,0"))
                                                             (rule "polySimp_mulComm0" (formula "14") (term "1,0,1,0"))
                                                             (rule "polySimp_rightDist" (formula "14") (term "1,0,1,0"))
@@ -4214,7 +4213,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                              (builtin "One Step Simplification" (formula "22"))
                                                             (rule "notLeft" (formula "22"))
                                                             (rule "allLeft" (formula "28") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                             (rule "eqSymm" (formula "28") (term "0,0,0,0,0"))
                                                             (rule "inEqSimp_commuteLeq" (formula "28") (term "1,0"))
                                                             (rule "inEqSimp_homoInEq1" (formula "28") (term "1,0,0"))
@@ -4956,7 +4955,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                       (rule "commute_or_2" (formula "28") (term "0,0,0"))
                                                       (rule "commute_or_2" (formula "28") (term "0,0"))
                                                       (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "16") (term "1,0"))
                                                       (rule "polySimp_mulComm0" (formula "16") (term "1,0,1,0"))
                                                       (rule "polySimp_rightDist" (formula "16") (term "1,0,1,0"))
@@ -6301,7 +6300,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                     (builtin "One Step Simplification" (formula "26"))
                                                    (rule "true_left" (formula "26"))
                                                    (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "16") (term "1"))
                                                    (rule "polySimp_mulComm0" (formula "16") (term "1,0,1"))
                                                    (rule "polySimp_rightDist" (formula "16") (term "1,0,1"))
@@ -6380,7 +6379,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                    (rule "leq_literals" (formula "29") (term "0,1,0,0"))
                                                     (builtin "One Step Simplification" (formula "29"))
                                                    (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "eqSymm" (formula "30") (term "0,0,0,0,0"))
                                                    (rule "inEqSimp_commuteLeq" (formula "30") (term "1,0"))
                                                    (rule "inEqSimp_homoInEq1" (formula "30") (term "1,0,0"))
@@ -6878,7 +6877,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                       (rule "true_left" (formula "8"))
                                                       (rule "commute_and" (formula "35") (term "0,0"))
                                                       (rule "allLeft" (formula "29") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                       (rule "eqSymm" (formula "29") (term "0,0,0,0,0"))
                                                       (rule "inEqSimp_commuteLeq" (formula "29") (term "1,0"))
                                                       (rule "inEqSimp_homoInEq1" (formula "29") (term "1,0,0"))
@@ -8257,7 +8256,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "hideAuxiliaryEq" (formula "2"))
                                              (rule "applyEq" (formula "21") (term "1,0") (ifseqformula "1"))
                                              (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq0" (formula "12") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "12") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "12") (term "1,0,1,0"))
@@ -9397,7 +9396,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "replace_known_right" (formula "12") (term "0") (ifseqformula "32"))
                                               (builtin "One Step Simplification" (formula "12"))
                                              (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "17") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "17") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "17") (term "1,0,1"))
@@ -9445,7 +9444,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "leq_literals" (formula "31") (term "0,1,0,0"))
                                               (builtin "One Step Simplification" (formula "31"))
                                              (rule "allLeft" (formula "32") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "eqSymm" (formula "32") (term "0,0,0,0,0"))
                                              (rule "inEqSimp_commuteLeq" (formula "32") (term "1,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "32") (term "1,0,0"))
@@ -9656,7 +9655,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "qeq_literals" (formula "38") (term "0,1,0"))
                                               (builtin "One Step Simplification" (formula "38"))
                                              (rule "allLeft" (formula "33") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "polySimp_addAssoc" (formula "33") (term "1,1,0,0"))
                                              (rule "add_literals" (formula "33") (term "0,1,1,0,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "33") (term "1"))
@@ -9691,7 +9690,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "leq_literals" (formula "22") (term "0,1"))
                                               (builtin "One Step Simplification" (formula "22"))
                                              (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "23") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "23") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "23") (term "1,0,1"))
@@ -9842,7 +9841,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "replace_known_right" (formula "11") (term "0") (ifseqformula "30"))
                                               (builtin "One Step Simplification" (formula "11"))
                                              (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq0" (formula "16") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "16") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "16") (term "1,0,1,0"))
@@ -10007,7 +10006,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                               (builtin "One Step Simplification" (formula "16"))
                                              (rule "true_left" (formula "16"))
                                              (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "eqSymm" (formula "30") (term "0,0,0,0,0"))
                                              (rule "inEqSimp_commuteLeq" (formula "30") (term "1,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "30") (term "1,0,0"))
@@ -10576,7 +10575,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                     (builtin "One Step Simplification" (formula "22"))
                                                    (rule "true_left" (formula "22"))
                                                    (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "17") (term "1,0"))
                                                    (rule "polySimp_mulComm0" (formula "17") (term "1,0,1,0"))
                                                    (rule "polySimp_rightDist" (formula "17") (term "1,0,1,0"))
@@ -10697,7 +10696,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                    (rule "leq_literals" (formula "34") (term "0,1,0,0"))
                                                     (builtin "One Step Simplification" (formula "34"))
                                                    (rule "allLeft" (formula "35") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "eqSymm" (formula "35") (term "0,0,0,0,0"))
                                                    (rule "inEqSimp_commuteLeq" (formula "35") (term "1,0"))
                                                    (rule "inEqSimp_homoInEq1" (formula "35") (term "1,0,0"))
@@ -10741,7 +10740,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                     (builtin "One Step Simplification" (formula "2"))
                                                    (rule "true_left" (formula "2"))
                                                    (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "polySimp_addAssoc" (formula "30") (term "1,1,0,0"))
                                                    (rule "add_literals" (formula "30") (term "0,1,1,0,0"))
                                                    (rule "inEqSimp_homoInEq1" (formula "30") (term "1"))
@@ -10881,7 +10880,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                    (rule "leq_literals" (formula "33") (term "0,1"))
                                                     (builtin "One Step Simplification" (formula "33"))
                                                    (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "22") (term "1"))
                                                    (rule "polySimp_mulComm0" (formula "22") (term "1,0,1"))
                                                    (rule "polySimp_rightDist" (formula "22") (term "1,0,1"))
@@ -11011,7 +11010,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                    (rule "hideAuxiliaryEq" (formula "2"))
                                                    (rule "eqSymm" (formula "36"))
                                                    (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "16") (term "1"))
                                                    (rule "polySimp_mulComm0" (formula "16") (term "1,0,1"))
                                                    (rule "polySimp_rightDist" (formula "16") (term "1,0,1"))
@@ -11963,7 +11962,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                               (builtin "One Step Simplification" (formula "15"))
                                              (rule "notLeft" (formula "15"))
                                              (rule "allLeft" (formula "15") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "15") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "15") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "15") (term "1,0,1"))
@@ -12121,7 +12120,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                               (builtin "One Step Simplification" (formula "26"))
                                              (rule "applyEq" (formula "29") (term "0") (ifseqformula "26"))
                                              (rule "allLeft" (formula "28") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "eqSymm" (formula "28") (term "0,0,0,0,0"))
                                              (rule "inEqSimp_commuteLeq" (formula "28") (term "1,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "28") (term "1,0,0"))
@@ -12284,7 +12283,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "qeq_literals" (formula "24") (term "0,1,0"))
                                               (builtin "One Step Simplification" (formula "24"))
                                              (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "22") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "22") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "22") (term "1,0,1"))
@@ -12355,7 +12354,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                               (builtin "One Step Simplification" (formula "38") (ifInst ""  (formula "36")))
                                              (rule "true_left" (formula "38"))
                                              (rule "allLeft" (formula "33") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "polySimp_addAssoc" (formula "33") (term "1,1,0,0"))
                                              (rule "add_literals" (formula "33") (term "0,1,1,0,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "33") (term "1"))
@@ -12603,7 +12602,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                               (builtin "One Step Simplification" (formula "24"))
                                              (rule "true_left" (formula "24"))
                                              (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "14") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "14") (term "1,0,1"))
@@ -12687,7 +12686,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "leq_literals" (formula "27") (term "0,1,0,0"))
                                               (builtin "One Step Simplification" (formula "27"))
                                              (rule "allLeft" (formula "28") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "eqSymm" (formula "28") (term "0,0,0,0,0"))
                                              (rule "inEqSimp_commuteLeq" (formula "28") (term "1,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "28") (term "1,0,0"))
@@ -13100,7 +13099,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                            (builtin "One Step Simplification" (formula "15"))
                                           (rule "notLeft" (formula "15"))
                                           (rule "allLeft" (formula "15") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "inEqSimp_homoInEq1" (formula "15") (term "1"))
                                           (rule "polySimp_mulComm0" (formula "15") (term "1,0,1"))
                                           (rule "polySimp_rightDist" (formula "15") (term "1,0,1"))
@@ -13327,7 +13326,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "leq_literals" (formula "34") (term "0,1,0,0"))
                                            (builtin "One Step Simplification" (formula "34"))
                                           (rule "allLeft" (formula "35") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "eqSymm" (formula "35") (term "0,0,0,0,0"))
                                           (rule "inEqSimp_commuteLeq" (formula "35") (term "1,0"))
                                           (rule "inEqSimp_homoInEq1" (formula "35") (term "1,0,0"))
@@ -13463,7 +13462,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "qeq_literals" (formula "25") (term "0,1,0"))
                                               (builtin "One Step Simplification" (formula "25"))
                                              (rule "allLeft" (formula "31") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "polySimp_addAssoc" (formula "31") (term "1,1,0,0"))
                                              (rule "add_literals" (formula "31") (term "0,1,1,0,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "31") (term "1"))
@@ -13538,7 +13537,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                              (rule "inEqSimp_sepPosMonomial0" (formula "26") (term "1"))
                                              (rule "mul_literals" (formula "26") (term "1,1"))
                                              (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                              (rule "inEqSimp_homoInEq1" (formula "23") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "23") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "23") (term "1,0,1"))
@@ -14514,7 +14513,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                      (builtin "One Step Simplification" (formula "26"))
                                     (rule "true_left" (formula "26"))
                                     (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                     (rule "inEqSimp_homoInEq1" (formula "16") (term "1"))
                                     (rule "polySimp_mulComm0" (formula "16") (term "1,0,1"))
                                     (rule "polySimp_rightDist" (formula "16") (term "1,0,1"))
@@ -14580,7 +14579,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                      (builtin "One Step Simplification" (formula "16"))
                                     (rule "notLeft" (formula "16"))
                                     (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                     (rule "eqSymm" (formula "30") (term "0,0,0,0,0"))
                                     (rule "inEqSimp_commuteLeq" (formula "30") (term "1,0"))
                                     (rule "inEqSimp_homoInEq1" (formula "30") (term "1,0,0"))
@@ -14774,7 +14773,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "qeq_literals" (formula "20") (term "0,1,0"))
                                            (builtin "One Step Simplification" (formula "20"))
                                           (rule "allLeft" (formula "33") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "polySimp_addAssoc" (formula "33") (term "1,1,0,0"))
                                           (rule "add_literals" (formula "33") (term "0,1,1,0,0"))
                                           (rule "inEqSimp_homoInEq1" (formula "33") (term "1"))
@@ -14792,7 +14791,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "inEqSimp_sepPosMonomial0" (formula "33") (term "1"))
                                           (rule "mul_literals" (formula "33") (term "1,1"))
                                           (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "inEqSimp_homoInEq1" (formula "26") (term "1"))
                                           (rule "polySimp_mulComm0" (formula "26") (term "1,0,1"))
                                           (rule "polySimp_rightDist" (formula "26") (term "1,0,1"))
@@ -16790,7 +16789,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                            (builtin "One Step Simplification" (formula "7"))
                                           (rule "true_left" (formula "7"))
                                           (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "inEqSimp_homoInEq1" (formula "23") (term "1"))
                                           (rule "polySimp_mulComm0" (formula "23") (term "1,0,1"))
                                           (rule "polySimp_rightDist" (formula "23") (term "1,0,1"))
@@ -16865,7 +16864,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                            (builtin "One Step Simplification" (formula "25"))
                                           (rule "true_left" (formula "25"))
                                           (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "polySimp_addAssoc" (formula "30") (term "1,1,0,0"))
                                           (rule "add_literals" (formula "30") (term "0,1,1,0,0"))
                                           (rule "inEqSimp_homoInEq1" (formula "30") (term "1"))
@@ -17014,7 +17013,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "inEqSimp_sepPosMonomial0" (formula "28") (term "1"))
                                           (rule "mul_literals" (formula "28") (term "1,1"))
                                           (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "inEqSimp_homoInEq1" (formula "26") (term "1"))
                                           (rule "polySimp_mulComm0" (formula "26") (term "1,0,1"))
                                           (rule "polySimp_rightDist" (formula "26") (term "1,0,1"))
@@ -17094,7 +17093,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "leq_literals" (formula "36") (term "0,1"))
                                            (builtin "One Step Simplification" (formula "36"))
                                           (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "polySimp_addAssoc" (formula "37") (term "1,1,0,0"))
                                           (rule "add_literals" (formula "37") (term "0,1,1,0,0"))
                                           (rule "inEqSimp_homoInEq1" (formula "37") (term "1"))
@@ -18479,7 +18478,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                            (builtin "One Step Simplification" (formula "24"))
                                           (rule "notLeft" (formula "24"))
                                           (rule "allLeft" (formula "30") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "eqSymm" (formula "30") (term "0,0,0,0,0"))
                                           (rule "inEqSimp_commuteLeq" (formula "30") (term "1,0"))
                                           (rule "inEqSimp_homoInEq1" (formula "30") (term "1,0,0"))
@@ -18495,7 +18494,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                           (rule "leq_literals" (formula "30") (term "1,0,0"))
                                            (builtin "One Step Simplification" (formula "30"))
                                           (rule "allLeft" (formula "18") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                           (rule "inEqSimp_homoInEq1" (formula "18") (term "1"))
                                           (rule "polySimp_mulComm0" (formula "18") (term "1,0,1"))
                                           (rule "polySimp_rightDist" (formula "18") (term "1,0,1"))
@@ -18798,7 +18797,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                  (builtin "One Step Simplification" (formula "12"))
                                                 (rule "true_left" (formula "12"))
                                                 (rule "allLeft" (formula "32") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                 (rule "polySimp_addAssoc" (formula "32") (term "1,1,0,0"))
                                                 (rule "add_literals" (formula "32") (term "0,1,1,0,0"))
                                                 (rule "inEqSimp_homoInEq1" (formula "32") (term "1"))
@@ -19040,7 +19039,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
                                                 (rule "leq_literals" (formula "38") (term "0,1"))
                                                  (builtin "One Step Simplification" (formula "38"))
                                                 (rule "allLeft" (formula "27") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "27") (term "1"))
                                                 (rule "polySimp_mulComm0" (formula "27") (term "1,0,1"))
                                                 (rule "polySimp_rightDist" (formula "27") (term "1,0,1"))
@@ -20107,7 +20106,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
             (rule "commute_or_2" (formula "24") (term "0,0,0"))
             (rule "commute_or_2" (formula "24") (term "0,0"))
             (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
             (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
             (rule "polySimp_mulComm0" (formula "12") (term "1,0,1"))
             (rule "polySimp_rightDist" (formula "12") (term "1,0,1"))
@@ -20136,7 +20135,7 @@ name=DoubleLinkedList[DoubleLinkedList\\:\\:unremove(DoubleLinkedList.Node,int)]
              (builtin "One Step Simplification" (formula "12"))
             (rule "notLeft" (formula "12"))
             (rule "allLeft" (formula "24") (inst "t=add(Z(neglit(1(#))),
-    int::select(heap, self, DoubleLinkedList::$len))"))
+    select<[int]>(heap, self, DoubleLinkedList::$len))"))
             (rule "eqSymm" (formula "24") (term "0,0,0,0,0"))
             (rule "inEqSimp_commuteLeq" (formula "24") (term "1,0"))
             (rule "inEqSimp_homoInEq1" (formula "24") (term "1,0,0"))

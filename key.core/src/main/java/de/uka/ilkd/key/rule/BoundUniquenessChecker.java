@@ -6,11 +6,12 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,14 +27,22 @@ public class BoundUniquenessChecker {
 
     private final HashSet<QuantifiableVariable> boundVars =
         new LinkedHashSet<>();
-    private ImmutableList<Term> terms = ImmutableSLList.nil();
+    private ImmutableList<JTerm> terms = ImmutableSLList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
     }
 
-    public BoundUniquenessChecker(Term t, Sequent seq) {
+    public BoundUniquenessChecker(JTerm t, Sequent seq) {
         addTerm(t);
+        addAll(seq);
+    }
+
+    public BoundUniquenessChecker(SyntaxElement find, Sequent seq) {
+        if (find instanceof JTerm t)
+            addTerm(t);
+        else if (find instanceof Sequent s)
+            addAll(s);
         addAll(seq);
     }
 
@@ -42,7 +51,7 @@ public class BoundUniquenessChecker {
      *
      * @param term a Term
      */
-    public void addTerm(Term term) {
+    public void addTerm(JTerm term) {
         terms = terms.prepend(term);
     }
 
@@ -53,12 +62,12 @@ public class BoundUniquenessChecker {
      */
     public void addAll(Sequent seq) {
         for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
+            terms = terms.prepend((JTerm) cf.formula());
         }
     }
 
     // recursive helper
-    private boolean correct(Term t) {
+    private boolean correct(JTerm t) {
         /*
          * Note that a term can bound a variable in several subterms.
          */
@@ -90,7 +99,7 @@ public class BoundUniquenessChecker {
      * returns true if any variable is bound at most once in the given set of terms
      */
     public boolean correct() {
-        for (final Term term : terms) {
+        for (final JTerm term : terms) {
             if (!correct(term)) {
                 return false;
             }

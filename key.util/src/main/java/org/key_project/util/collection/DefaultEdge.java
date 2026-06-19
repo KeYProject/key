@@ -9,6 +9,7 @@ package org.key_project.util.collection;
  *
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public class DefaultEdge<V> implements GraphEdge<V> {
     /**
      * Source node of this edge.

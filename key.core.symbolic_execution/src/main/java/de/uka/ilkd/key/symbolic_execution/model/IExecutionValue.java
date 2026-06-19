@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionValue;
 
@@ -28,7 +28,7 @@ public interface IExecutionValue extends IExecutionElement {
      * @return The condition.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getCondition() throws ProofInputException;
+    JTerm getCondition() throws ProofInputException;
 
     /**
      * Returns the condition under which the variable ({@link #getVariable()}) has this value as
@@ -77,7 +77,7 @@ public interface IExecutionValue extends IExecutionElement {
      *
      * @return The value of the variable.
      */
-    Term getValue() throws ProofInputException;
+    JTerm getValue() throws ProofInputException;
 
     /**
      * Returns the value of the variable as human readable string representation.

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -26,9 +26,9 @@ public final class MetaPow extends AbstractTermTransformer {
     }
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term arg1 = term.sub(0);
-        final Term arg2 = term.sub(1);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm arg1 = term.sub(0);
+        final JTerm arg2 = term.sub(1);
 
         final BigInteger bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
         final BigInteger bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));

@@ -16,11 +16,9 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (10/3/21)
  */
 public class TeeWriter extends Writer {
-    @NonNull
-    private final Writer source;
 
-    @NonNull
-    private final Writer sink;
+    private final @NonNull Writer source;
+    private final @NonNull Writer sink;
 
     public TeeWriter(@NonNull Writer source, @NonNull Writer sink) {
         this.source = source;

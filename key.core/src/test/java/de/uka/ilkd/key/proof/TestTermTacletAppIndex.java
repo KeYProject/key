@@ -3,23 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
-import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -50,9 +51,9 @@ public class TestTermTacletAppIndex {
 
     @BeforeEach
     public void setUp() {
-        File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
-        assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
+        Path tacletFile = HelperClassForTests.TESTCASE_DIRECTORY.resolve(
+            "../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+        assertTrue(Files.exists(tacletFile), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         ruleRewriteNonH1H2 =
@@ -91,10 +92,12 @@ public class TestTermTacletAppIndex {
 
     private TermTacletAppIndexCacheSet noCache =
         new TermTacletAppIndexCacheSet(termTacletAppIndexCache) {
+            @Override
             public ITermTacletAppIndexCache getAntecCache() {
                 return getNoCache();
             }
 
+            @Override
             public ITermTacletAppIndexCache getSuccCache() {
                 return getNoCache();
             }
@@ -120,10 +123,11 @@ public class TestTermTacletAppIndex {
         ruleIdx.add(remove_f);
         ruleIdx.add(remove_zero);
 
-        Term term = TacletForTests.parseTerm("f(f(f(zero)))=one");
+        JTerm term = TacletForTests.parseTerm("f(f(f(zero)))=one");
         SequentFormula cfma = new SequentFormula(term);
 
-        PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
+        PosInOccurrence pio =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
 
         TermTacletAppIndex termIdx = TermTacletAppIndex.create(pio, serv, ruleIdx,
             NullNewRuleListener.INSTANCE, TacletFilter.TRUE, cache);
@@ -137,9 +141,10 @@ public class TestTermTacletAppIndex {
         checkTermIndex(pio, termIdx);
 
         // now a real change
-        Term term2 = TacletForTests.parseTerm("f(f(zero))=one");
+        JTerm term2 = TacletForTests.parseTerm("f(f(zero))=one");
         SequentFormula cfma2 = new SequentFormula(term2);
-        PosInOccurrence pio2 = new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);
+        PosInOccurrence pio2 =
+            new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);
 
         termIdx = termIdx.update(pio2.down(0).down(0).down(0), serv, ruleIdx,
             NullNewRuleListener.INSTANCE, cache);
@@ -153,16 +158,19 @@ public class TestTermTacletAppIndex {
         checkTermIndex3(pio2, termIdx);
     }
 
-    private void checkAtPos(PosInOccurrence pio, TermTacletAppIndex termIdx,
+    private void checkAtPos(PosInOccurrence pio,
+            TermTacletAppIndex termIdx,
             ImmutableList<Taclet> list) {
         checkTacletList(termIdx.getTacletAppAt(pio, TacletFilter.TRUE), list);
     }
 
-    private PosInOccurrence down(PosInOccurrence pio, int i) {
+    private PosInOccurrence down(
+            PosInOccurrence pio, int i) {
         return pio.down(i);
     }
 
-    private void checkTermIndex(PosInOccurrence pio, TermTacletAppIndex termIdx) {
+    private void checkTermIndex(PosInOccurrence pio,
+            TermTacletAppIndex termIdx) {
         ImmutableList<Taclet> listA = ImmutableSLList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
@@ -175,7 +183,8 @@ public class TestTermTacletAppIndex {
         checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex2(PosInOccurrence pio, TermTacletAppIndex termIdx) {
+    private void checkTermIndex2(PosInOccurrence pio,
+            TermTacletAppIndex termIdx) {
         ImmutableList<Taclet> listA = ImmutableSLList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
@@ -187,7 +196,8 @@ public class TestTermTacletAppIndex {
         checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex3(PosInOccurrence pio, TermTacletAppIndex termIdx) {
+    private void checkTermIndex3(PosInOccurrence pio,
+            TermTacletAppIndex termIdx) {
         ImmutableList<Taclet> listA = ImmutableSLList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());

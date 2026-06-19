@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -27,9 +24,9 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 /**
- * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
+ * A class axiom which is essentially of the form "o.$inv -> phi": it demands that the invariants
  * of the objects of a particular class imply a particular formula. These axioms are logically
- * weaker than the full definitions of <inv> expressed as RepresentsAxioms, but they may have higher
+ * weaker than the full definitions of $inv expressed as RepresentsAxioms, but they may have higher
  * visibility, making them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {
@@ -72,7 +69,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     }
 
     @Override
-    public SpecificationElement map(UnaryOperator<Term> op, Services services) {
+    public SpecificationElement map(UnaryOperator<JTerm> op, Services services) {
         PartialInvAxiom result = new PartialInvAxiom(inv.map(op, services), isStatic, services);
         result.displayName = displayName;
         return result;
@@ -134,14 +131,14 @@ public final class PartialInvAxiom extends ClassAxiom {
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            final List<SchemaVariable> heapSVs = new LinkedList<>();
-            for (int j = 0; j < HeapContext.getModHeaps(services, false).size(); j++) {
+            final List<TermSV> heapSVs = new LinkedList<>();
+            for (int j = 0; j < HeapContext.getModifiableHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
                     heapLDT.targetSort(), false, false));
             }
-            final SchemaVariable selfSV = target.isStatic() ? null
+            final var selfSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
-            final SchemaVariable eqSV = target.isStatic() ? null
+            final var eqSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("EQ"),
                         services.getJavaInfo().objectSort());
 
@@ -163,7 +160,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        final ProgramVariable dummySelfVar = services.getTermBuilder().selfVar(inv.getKJT(), false);
+        final LocationVariable dummySelfVar =
+            services.getTermBuilder().selfVar(inv.getKJT(), false);
         return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
 

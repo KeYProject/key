@@ -6,13 +6,14 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 /**
  * The two objects of this class represent the universal and the existential quantifier,
  * respectively.
  */
-public final class Quantifier extends AbstractSortedOperator {
+public final class Quantifier extends JAbstractSortedOperator {
     public static final Name ALL_NAME = new Name("all");
     public static final Name EX_NAME = new Name("exists");
 
@@ -35,5 +36,15 @@ public final class Quantifier extends AbstractSortedOperator {
     private Quantifier(Name name) {
         super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA,
             new Boolean[] { true }, true);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

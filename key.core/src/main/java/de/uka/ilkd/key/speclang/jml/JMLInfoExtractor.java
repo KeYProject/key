@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
+
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -62,47 +65,36 @@ public final class JMLInfoExtractor {
     /**
      * Checks the passed comments for the spec math mode.
      */
-    private static SpecMathMode checkForSpecMathMode(ImmutableList<Comment> comments) {
+    private static SpecMathMode checkForSpecMathMode(JavaDeclaration methodDeclaration) {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
-        var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
-        var specSafeMath = checkForNotContaining("spec_safe_math", "behaviour", comments);
-        var specJavaMath = checkForNotContaining("spec_java_math", "behaviour", comments);
+        var specBigintMath =
+            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
+        var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
+        var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
         // Consistency: bigint > safe > java
-        return specBigintMath ? SpecMathMode.BIGINT
+        var specMathMode = specBigintMath ? SpecMathMode.BIGINT
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
+
+        return specMathMode;
     }
 
-    private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {
-        ImmutableList<Comment> coms = ImmutableSLList.nil();
-
-        // Either mod is attached to the declaration itself ...
-        coms = coms.prepend(td.getComments());
-
-        // ... or to a modifier ...
-        for (Modifier m : td.getModifiers()) {
-            coms = coms.prepend(m.getComments());
-        }
-
-        // ... or to the name
-        if (td.getProgramElementName() != null) {
-            coms = coms.prepend(td.getProgramElementName().getComments());
-        }
-        return coms;
+    private static ImmutableList<TextualJMLConstruct> getJMLComments(TypeDeclaration decl) {
+        return decl.getAttachedJml();
     }
 
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the method itself ...
+        // Either method is attached to the method itself ...
         Comment[] methodComments = method.getComments();
         if (methodComments.length > 0) {
             coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
 
         // ... or to a modifier ...
-        for (Modifier m : method.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : method.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the return type ...
@@ -127,77 +119,45 @@ public final class JMLInfoExtractor {
      * @return modifiers
      */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
-        var comments = getJMLComments(methodDeclaration);
+        var pure = methodDeclaration.containsModifier(Modifiers.JML_PURE.class);
+        var strictlyPure = methodDeclaration.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
+        var helper = methodDeclaration.containsModifier(Modifiers.JML_HELPER.class);
 
-        var pure = checkFor("pure", comments);
-        var strictlyPure = checkFor("strictly_pure", comments);
-        var helper = checkFor("helper", comments);
-        var specMathMode = checkForSpecMathMode(comments);
+        var specBigintMath =
+            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
+        var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
+        var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
+        // Consistency: bigint > safe > java
+        var specMathMode = specBigintMath ? SpecMathMode.BIGINT
+                : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
 
         return new MethodDeclaration.JMLModifiers(pure, strictlyPure, helper, specMathMode);
     }
 
-
     /**
      * Extracts the list of comments for a given field. The comments should usually be modifiers.
-     *
-     * @param fieldName
-     * @param td
-     * @return
      */
-    private static ImmutableList<Comment> extractFieldModifiers(String fieldName,
+    private static ImmutableArray<Modifier> extractFieldModifiers(String fieldName,
             TypeDeclaration td) {
-        ImmutableList<Comment> comments = ImmutableSLList.nil();
-        FieldDeclaration fd = null;
-        int position = 0;
-
-        for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration tmp) {
+        for (final MemberDeclaration decl : td.getMembers()) {
+            if (decl instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
-                for (int j = 0; j < aofs.size(); j++) {
-                    if (aofs.get(j).getProgramName().equals(fieldName)) {
-                        fd = tmp;
-                        position = j;
+                for (var aof : aofs) {
+                    if (aof.getProgramName().equals(fieldName)) {
+                        return tmp.getModifiers();
                     }
                 }
             }
         }
-
-        if (fd == null) {
-            // Field not found
-            return comments;
-        }
-
-        comments = comments.prepend(fd.getComments());
-        comments = comments.prepend(fd.getTypeReference().getComments());
-        comments = comments.prepend(fd.getFieldSpecifications().get(position).getComments());
-
-        for (Modifier mod : fd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
-        }
-        return comments;
+        return new ImmutableArray<>();
     }
-
 
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.nil();
-
-        // Either mod is attached to the declaration itself ...
-        coms = coms.prepend(fd.getComments());
-
-        // ... or to a modifier ...
-        for (Modifier m : fd.getModifiers()) {
-            coms = coms.prepend(m.getComments());
-        }
-
-        // ... or to the type
-        coms = coms.prepend(fd.getTypeReference().getComments());
-
-        return checkFor(mod, coms);
+    public static boolean hasJMLModifier(FieldDeclaration fd, Class<? extends Modifier> modifier) {
+        return fd.containsModifier(modifier);
     }
 
 
@@ -253,10 +213,11 @@ public final class JMLInfoExtractor {
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
         var comments = getJMLComments(td);
 
-        var strictlyPure = checkFor("strictly_pure", comments);
-        var pure = checkFor("pure", comments);
-        var nullableByDefault = checkFor("nullable_by_default", comments);
-        var specMathMode = checkForSpecMathMode(comments);
+        var pure = td.containsModifier(Modifiers.JML_PURE.class);
+        var strictlyPure = td.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
+        var nullableByDefault = td.containsModifier(Modifiers.JML_NULLABLE_BY_DEFAULT.class);
+
+        var specMathMode = checkForSpecMathMode(td);
 
         return new TypeDeclaration.JMLModifiers(strictlyPure, pure, nullableByDefault,
             specMathMode);
@@ -266,15 +227,10 @@ public final class JMLInfoExtractor {
      * Returns true, if <tt>containingClass</tt> is a reference Type and has a field declaration
      * with name <tt>fieldName</tt>, which is explicitly or implicitly declared "nullable"
      */
-    public static boolean isNullable(String fieldName, TypeDeclaration td) {
+    public static boolean isNullable(FieldDeclaration decl, TypeDeclaration td) {
 
-        ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
-        if (comments.isEmpty()) {
-            return false;
-        }
-
-        boolean non_null = checkFor("non_null", comments);
-        boolean nullable = checkFor("nullable", comments);
+        boolean non_null = decl.containsModifier(Modifiers.JML_NON_NULL.class);
+        boolean nullable = decl.containsModifier(Modifiers.JML_NULLABLE.class);
 
         if (!non_null && !nullable) {
             return td.getJmlModifiers().nullableByDefault();
@@ -289,8 +245,8 @@ public final class JMLInfoExtractor {
      * (implicitly or explicitly).
      */
     public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
-        MethodDeclaration md = pm.getMethodDeclaration();
-        ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
+        MethodDeclaration decl = pm.getMethodDeclaration();
+        ParameterDeclaration pd = decl.getParameterDeclarationAt(pos);
 
         return parameterIsNullable(pm, pd);
     }
@@ -301,18 +257,10 @@ public final class JMLInfoExtractor {
      * explicitly). Warning: weird things may happen if the parameter doesn't belong to the method.
      */
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
-        assert pm.getMethodDeclaration().getParameters().contains(pd)
-                : "parameter " + pd + " does not belong to method declaration " + pm;
-        ImmutableList<Comment> comments = ImmutableSLList.nil();
-        comments = comments.prepend(pd.getComments());
-        comments = comments.prepend(pd.getTypeReference().getComments());
-        comments = comments.prepend(pd.getVariableSpecification().getComments());
-        for (Modifier mod : pd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
-        }
-
-        boolean non_null = checkFor("non_null", comments);
-        boolean nullable = checkFor("nullable", comments);
+        assert pm.getMethodDeclaration().getParameters().contains(pd) : "parameter " + pd
+            + " does not belong to method declaration " + pm;
+        boolean non_null = pd.containsModifier(Modifiers.JML_NON_NULL.class);
+        boolean nullable = pd.containsModifier(Modifiers.JML_NULLABLE.class);
 
         if (!non_null && !nullable) {
             return isNullableByDefault(pm.getContainerType());
@@ -323,22 +271,9 @@ public final class JMLInfoExtractor {
 
 
     public static boolean resultIsNullable(IProgramMethod pm) {
-        MethodDeclaration md = pm.getMethodDeclaration();
-
-        ImmutableList<Comment> comments = ImmutableSLList.nil();
-        for (Modifier mod : md.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
-        }
-        if (!pm.isVoid() && !pm.isConstructor()) {
-            comments = comments.prepend(md.getTypeReference().getComments());
-        }
-        Comment[] methodComments = md.getComments();
-        if (methodComments.length > 0) {
-            comments = comments.prepend(methodComments[methodComments.length - 1]);
-        }
-
-        boolean non_null = checkFor("non_null", comments);
-        boolean nullable = checkFor("nullable", comments);
+        MethodDeclaration decl = pm.getMethodDeclaration();
+        boolean non_null = decl.containsModifier(Modifiers.JML_NON_NULL.class);
+        boolean nullable = decl.containsModifier(Modifiers.JML_NULLABLE.class);
 
         if (!non_null && !nullable) {
             return isNullableByDefault(pm.getContainerType());
@@ -376,33 +311,29 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type
      */
-    @Nullable
-    public static SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
-        if (!(t.getJavaType() instanceof TypeDeclaration)) {
+    public static @Nullable SpecMathMode getSpecMathMode(KeYJavaType t) {
+        if (t == null || !(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
             return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
         }
     }
 
-    @NonNull
-    private static SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
+    private static @NonNull SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
         return mode == null ? SpecMathMode.defaultMode() : mode;
     }
 
     /**
      * Returns the spec math mode of this type or the default
      */
-    @NonNull
-    public static SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
         return modeOrDefault(getSpecMathMode(t));
     }
 
     /**
      * Returns the spec math mode of this method
      */
-    @Nullable
-    public static SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
+    public static @Nullable SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
         var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
@@ -410,8 +341,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this method
      */
-    @NonNull
-    public static SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
         return modeOrDefault(getSpecMathMode(pm));
     }
 }

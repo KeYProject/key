@@ -5,23 +5,27 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The rule application for {@link JmlAssertRule}
  *
  * @author Benjamin Takacs
  */
-public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp<JmlAssertRule> {
 
     /**
      * @param rule the rule being applied
      * @param occurrence the position at which the rule is applied
      */
-    public JmlAssertBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence) {
+    public JmlAssertBuiltInRuleApp(JmlAssertRule rule, PosInOccurrence occurrence) {
         this(rule, occurrence, null);
     }
 
@@ -30,13 +34,9 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * @param pio the position at which the rule is applied
      * @param ifInsts information flow related information
      */
-    public JmlAssertBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public JmlAssertBuiltInRuleApp(JmlAssertRule rule, PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, Objects.requireNonNull(pio, "rule application needs a position"), ifInsts);
-        if (!(rule instanceof JmlAssertRule)) {
-            throw new IllegalArgumentException(String
-                    .format("can only create an application for JmlAssertRule, not for %s", rule));
-        }
     }
 
     @Override
@@ -45,7 +45,8 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         // XXX: This is overridden in all subclasses to allow making ifInsts final
         // when all usages of setIfInsts are corrected to use the result.
         // Then a new instance has to be returned here.
@@ -54,7 +55,7 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public JmlAssertBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 }

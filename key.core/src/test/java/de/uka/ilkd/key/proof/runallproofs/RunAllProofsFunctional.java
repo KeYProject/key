@@ -6,7 +6,9 @@ package de.uka.ilkd.key.proof.runallproofs;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
@@ -28,6 +30,7 @@ public final class RunAllProofsFunctional {
         var proofCollection = ProofCollections.automaticJavaDL();
         var statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
+
         return RunAllProofsTest.data(proofCollection);
     }
 }

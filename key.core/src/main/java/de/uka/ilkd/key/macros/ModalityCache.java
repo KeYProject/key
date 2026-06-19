@@ -5,12 +5,13 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 
 /**
@@ -48,10 +49,11 @@ public class ModalityCache {
 
         boolean hasModality;
 
-        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
+        if (((JTerm) term)
+                .containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             hasModality = false;
-        } else if (term.op() instanceof Modality) {
+        } else if (term.op() instanceof JModality) {
             hasModality = true;
         } else {
             hasModality = false;

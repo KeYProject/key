@@ -4,16 +4,22 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.Taclet;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * this class implements a TreeModel that can be displayed using the JTree class framework
+ * Branch node indicating the start of a new proof branch.
+ *
+ * @author early KeY team
+ * @see ProofTreeView
  */
-class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
+class GUIBranchNode extends GUIAbstractTreeNode {
 
     private final Object label;
 
@@ -25,44 +31,98 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         this.label = label;
     }
 
+    private void createChildrenCache() {
+        childrenCache = new ArrayList<>();
+    }
+
     @Override
     public TreeNode getChildAt(int childIndex) {
-        ensureChildrenCacheExists();
+        fillChildrenCache(false);
         return childrenCache.get(childIndex);
     }
 
-    private void ensureChildrenCacheExists() {
-        if (childrenCache == null) {
-            childrenCache = new ArrayList<>();
-        } else {
-            return;
+    /**
+     * Fill the {@link #childrenCache}.
+     *
+     * @param dryRun if true, only count the number of children that would be added
+     * @return number of children
+     */
+    private int fillChildrenCache(boolean dryRun) {
+        if (childrenCache == null && !dryRun) {
+            createChildrenCache();
         }
 
+        if (childrenCache != null && !childrenCache.isEmpty()) {
+            return childrenCache.size();
+        }
+
+        int count = 0;
         Node n = getNode();
 
         if (n == null) {
-            return;
+            return 0;
         }
 
         while (true) {
-            childrenCache.add(getProofTreeModel().getProofTreeNode(n));
-            Node nextN = findChild(n);
-            // skip nodes that are hidden in the proof tree
-            while (nextN != null && nextN.isHideInProofTree()) {
-                nextN = findChild(nextN);
+            // While searching, hide intermediate proof steps that do not match the query
+            // (the subtree is still shown because it contains a match somewhere); this
+            // collapses the branch down to the matching steps. Branch nodes added below are
+            // always kept, as they are filtered by the global "contains match" check.
+            if (showStep(n)) {
+                count++;
+                if (!dryRun) {
+                    var newNode = getProofTreeModel().getProofTreeNode(n);
+                    newNode.setParent(this);
+                    childrenCache.add(newNode);
+                }
             }
-            if (nextN == null) {
+            List<Node> nextN = findChild(n);
+            if (nextN.isEmpty()) {
                 break;
             }
-            n = nextN;
+            if (nextN.size() > 1) {
+                // linearized mode: the main branch will be continued without a new BranchNode
+                if (getProofTreeModel().linearizedModeActive()
+                        && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                                .equals(taclet.goalTemplates().last().tag(), "main"))) {
+                    n = nextN.get(0);
+                    nextN.remove(0);
+                    for (var node : nextN) {
+                        count++;
+                        if (!dryRun) {
+                            var branchNode = findBranch(node);
+                            branchNode.setParent(this);
+                            childrenCache.add(branchNode);
+                        }
+                    }
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            n = nextN.get(0);
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
-                    && !n.child(i).isHideInProofTree()) {
-                childrenCache.add(findBranch(n.child(i)));
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
+                count++;
+                if (!dryRun) {
+                    var branchNode = findBranch(n.child(i));
+                    branchNode.setParent(this);
+                    childrenCache.add(branchNode);
+                }
             }
         }
+        return count;
+    }
+
+    /**
+     * @param n a proof node on this branch's linear chain.
+     * @return whether the corresponding proof step should be shown. While the collapsing search
+     *         is active, only steps matching the query are shown; otherwise all steps are shown.
+     */
+    private static boolean showStep(Node n) {
+        return !ProofTreeViewFilter.SEARCH.isActive() || ProofTreeViewFilter.SEARCH.matches(n);
     }
 
     @Override
@@ -70,37 +130,22 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = null;
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 
+    @Override
     public int getChildCount() {
-        if (childrenCache == null) {
-            ensureChildrenCacheExists();
-        }
-        return childrenCache.size();
+        return fillChildrenCache(true);
     }
 
-
-    public TreeNode getParent() {
-        Node self = getNode();
-        if (self == null) {
-            return null;
-        }
-        Node n = self.parent();
-        if (n == null) {
-            return null;
-        } else {
-            while (n.parent() != null && findChild(n.parent()) != null) {
-                n = n.parent();
-            }
-            return findBranch(n);
-        }
-    }
-
-    // signalled by GUIProofTreeModel when the user has altered the value
+    /**
+     * Set the label of this branch node.
+     * Signalled by GUIProofTreeModel when the user has altered the value.
+     *
+     * @param s new label
+     */
     public void setLabel(String s) {
         Node n = getNode();
         if (n != null) {
@@ -108,10 +153,12 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }
 
+    @Override
     public String toString() {
         Node n = getNode();
         String res;
@@ -126,6 +173,10 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         return res;
     }
 
+    /**
+     * @return whether this branch is closed
+     * @see Node#isClosed()
+     */
     public boolean isClosed() {
         Node node = getNode();
         return node != null && node.isClosed();

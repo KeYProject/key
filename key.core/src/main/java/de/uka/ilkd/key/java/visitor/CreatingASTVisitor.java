@@ -7,18 +7,19 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.ClassInitializer;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.ClassInitializer;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -40,11 +41,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * create the CreatingASTVisitor
      *
-     * @param root the ProgramElement where to begin
-     * @param preservesPos whether the position should be preserved
-     * @param services the services instance
+     * @param root
+     *        the ProgramElement where to begin
+     * @param preservesPos
+     *        whether the position should be preserved
+     * @param services
+     *        the services instance
      */
-    public CreatingASTVisitor(ProgramElement root, boolean preservesPos, Services services) {
+    protected CreatingASTVisitor(ProgramElement root, boolean preservesPos, Services services) {
         super(root, services);
         this.preservesPositionInfo = preservesPos;
     }
@@ -69,7 +73,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * called if the program element x is unchanged
      *
-     * @param x The {@link SourceElement}.
+     * @param x
+     *        The {@link SourceElement}.
      */
     @Override
     protected void doDefaultAction(SourceElement x) {
@@ -599,6 +604,19 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return new CopyAssignment(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                // there are no AST elements below the set statement, so we can use the copy
+                // constructor.
+                return new SetStatement(x);
             }
         };
         def.doAction(x);
@@ -1451,6 +1469,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqPut(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -1489,25 +1518,20 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 changeList.add(x.getKind());
-                changeList.add(x.getVars());
-                return new JmlAssert(changeList, services);
+                changeList.add(x.getCondition());
+                return new JmlAssert(changeList);
             }
         };
         def.doAction(x);
     }
 
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // should only be called by walk(), which puts an ExtList on the stack
-        assert stack.peek() != null;
-        stack.peek().add(cond);
-    }
-
     /**
      * returns the position of pe2 in the virtual child array of pe1
      *
-     * @param pe1 A {@link NonTerminalProgramElement}
-     * @param pe2 A {@link ProgramElement}
+     * @param pe1
+     *        A {@link NonTerminalProgramElement}
+     * @param pe2
+     *        A {@link ProgramElement}
      * @return pe2's position in pe1
      */
     protected static int getPosition(NonTerminalProgramElement pe1, ProgramElement pe2) {

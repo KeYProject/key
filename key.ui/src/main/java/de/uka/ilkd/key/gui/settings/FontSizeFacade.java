@@ -15,7 +15,7 @@ import javax.swing.plaf.FontUIResource;
  * @version 1 (10.05.19)
  */
 public final class FontSizeFacade {
-    private static final String[] KEYS = new String[] { "Button.font", "CheckBox.font",
+    private static final String[] KEYS = { "Button.font", "CheckBox.font",
         "CheckBoxMenuItem.acceleratorFont", "CheckBoxMenuItem.font", "ColorChooser.font",
         "ComboBox.font", "EditorPane.font", "FormattedTextField.font", "IconButton.font",
         "InternalFrame.optionDialogTitleFont", "InternalFrame.paletteTitleFont",
@@ -30,8 +30,7 @@ public final class FontSizeFacade {
     private static final Map<String, Float> ORIGINAL_FONT_SIZES = new HashMap<>();
     private static double currentFactor = 1;
 
-    private FontSizeFacade() {
-    }
+    private FontSizeFacade() {}
 
     private static void saveCurrentFontSizes() {
         for (String k : KEYS) {
@@ -45,7 +44,8 @@ public final class FontSizeFacade {
     /**
      * Scale all managed fonts by the provided factor. Then attempts to redraw all components.
      *
-     * @param factor the factor
+     * @param factor
+     *        the factor
      * @see SwingUtilities#updateComponentTreeUI(Component)
      */
     public static void resizeFonts(double factor) {

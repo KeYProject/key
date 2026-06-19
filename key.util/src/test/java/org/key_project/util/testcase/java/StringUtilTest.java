@@ -7,6 +7,7 @@ import java.util.Comparator;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -163,7 +164,6 @@ public class StringUtilTest {
     public void testReplaceAll() {
         String text = "ABCDABCDABCDABCD";
         assertNull(StringUtil.replaceAll(null, new char[] {}, 'X'));
-        assertEquals(text, StringUtil.replaceAll(text, null, 'X'));
         assertEquals(text, StringUtil.replaceAll(text, new char[] {}, 'X'));
         assertEquals("XBCDXBCDXBCDXBCD", StringUtil.replaceAll(text, new char[] { 'A' }, 'X'));
         assertEquals("AXCDAXCDAXCDAXCD", StringUtil.replaceAll(text, new char[] { 'B' }, 'X'));
@@ -209,13 +209,6 @@ public class StringUtilTest {
         assertEquals("#####", StringUtil.repeat("#", 5));
         // Test line with multiple characters
         assertEquals("ABABAB", StringUtil.repeat("AB", 3));
-
-        // Test null text
-        try {
-            assertEquals("nullnullnullnull", StringUtil.repeat(null, 4));
-            fail();
-        } catch (NullPointerException expected) {
-        }
     }
 
     /**
@@ -223,7 +216,7 @@ public class StringUtilTest {
      */
     @Test
     public void testCreateIgnoreCaseComparator() {
-        Comparator<String> c = StringUtil.createIgnoreCaseComparator();
+        Comparator<@Nullable String> c = StringUtil.createIgnoreCaseComparator();
         assertNotNull(c);
         assertSame("A".compareToIgnoreCase("A"), c.compare("A", "A"));
         assertSame("A".compareToIgnoreCase("a"), c.compare("A", "a"));

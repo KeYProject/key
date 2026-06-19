@@ -27,7 +27,7 @@ class LabelCollectionTest {
         } catch (TermLabelException e) {
             throw new RuntimeException(e);
         }
-        final TermLabel[] labels = new TermLabel[] {
+        final TermLabel[] labels = {
             paramA,
             formulaLabel,
             paramB,

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.java.IOUtil;
 
@@ -37,7 +37,7 @@ public class DesignTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(DesignTests.class);
 
     static {
-        File projectRoot = IOUtil.getClassLocation(Term.class);
+        File projectRoot = IOUtil.getClassLocation(JTerm.class);
         if ("org.key_project.core".equals(projectRoot.getName())) {
             projectRoot = new File(projectRoot, "bin");
         } else if (projectRoot.isFile()) {
@@ -82,10 +82,10 @@ public class DesignTests {
                     return;
                 }
 
-                var name = relative.toString().substring(0, index).replace(File.separatorChar, '.');
+                var name = relative.substring(0, index).replace(File.separatorChar, '.');
 
                 try {
-                    acc.add(Term.class.getClassLoader().loadClass(name));
+                    acc.add(JTerm.class.getClassLoader().loadClass(name));
                 } catch (ClassNotFoundException cnfe) {
                     LOGGER.error("That's weird. Cannot find class {} ", name, cnfe);
                 } catch (NoClassDefFoundError ncdfe) {
@@ -121,7 +121,7 @@ public class DesignTests {
     public void xtestTermSubclassVisibility() {
         LinkedList<Class<?>> badClasses = new LinkedList<>();
         for (Class<?> allClass : allClasses) {
-            if (allClass != Term.class && (Term.class).isAssignableFrom(allClass)) {
+            if (allClass != JTerm.class && (JTerm.class).isAssignableFrom(allClass)) {
                 int mods = allClass.getModifiers();
                 if (Modifier.isProtected(mods) || Modifier.isPublic(mods)) {
                     badClasses.add(allClass);

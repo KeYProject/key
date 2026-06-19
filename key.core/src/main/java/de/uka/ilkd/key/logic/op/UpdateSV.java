@@ -4,15 +4,15 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 
 
 /**
  * A schema variable that is used as placeholder for updates.
  */
-public final class UpdateSV extends AbstractSV {
+public final class UpdateSV extends JOperatorSV implements TerminalSyntaxElement {
 
 
     UpdateSV(Name name) {
@@ -25,8 +25,4 @@ public final class UpdateSV extends AbstractSV {
         return toString("update");
     }
 
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\update ").print(name().toString());
-    }
 }

@@ -22,7 +22,7 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
      * @param triggerName the name of this command.
      * @param argumentsTypes the argument type of this command.
      */
-    public AbstractTacletBuilderCommand(@NonNull String triggerName,
+    protected AbstractTacletBuilderCommand(@NonNull String triggerName,
             @NonNull ArgumentType... argumentsTypes) {
         this.triggerName = triggerName;
         this.argumentsTypes = argumentsTypes;

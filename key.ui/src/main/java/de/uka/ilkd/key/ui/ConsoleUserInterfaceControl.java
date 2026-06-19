@@ -3,8 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
+
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -19,7 +23,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -32,19 +35,20 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +79,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private File keyProblemFile = null;
+    private Path keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
-     * System.exit() after all files have been loaded with {@link #loadProblem(java.io.File)}.
+     * System.exit() after all files have been loaded with
+     * {@link AbstractMediatorUserInterfaceControl#loadProblem(Path)}.
      * Program return value depends on whether there has been a proof attempt that was not
      * successful.
      */
@@ -95,7 +100,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
-            final Statistics stat = info.getProof().getStatistics();
+            final Statistics stat = ((Proof) info.getProof()).getStatistics();
             LOGGER.debug("Proof steps: {}", stat.nodes);
             LOGGER.debug("Branches: {}", stat.branches);
             LOGGER.debug("Automode Time: {} ms", stat.autoModeTimeInMillis);
@@ -116,7 +121,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
             + " save a proof but no corresponding key problem file is " + "available.";
-        allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
+        allProofsSuccessful &= saveProof(result2, (Proof) info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
          * we prevent KeY from saving another proof (that belongs to another key problem file) for a
@@ -131,49 +136,60 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
-        final Proof proof = info.getProof();
+        final Proof proof = (Proof) info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
-            final Object error = info.getResult();
             LOGGER.info("Proof loading failed");
-            if (error instanceof Throwable) {
-                LOGGER.info("Proof loading failed", (Throwable) error);
+            if (result instanceof Throwable thrown) {
+                LOGGER.info("Proof loading failed", thrown);
             } else {
                 LOGGER.info("Proof loading failed");
             }
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
+                printResults(openGoals, info, result);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            LOGGER.debug("{}", result2);
-            System.exit(-1);
-        }
-        if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
-        }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
-            try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                pse.execute(this, proof);
-                // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
-                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-            } catch (Exception e) {
-                LOGGER.debug("", e);
+            if (result != null) {
+                if (result instanceof Throwable thrown) {
+                    LOGGER.error("Loading {} failed:\n{}", keyProblemFile,
+                        formatLoadError(thrown));
+                    LOGGER.debug("Exception: ", thrown);
+                } else {
+                    LOGGER.error("Loading {} failed: {}", keyProblemFile, result);
+                }
                 System.exit(-1);
             }
-        } else if (macroChosen()) {
-            applyMacro();
-        } else {
-            finish(proof);
+            if (loadOnly || openGoals == 0) {
+                LOGGER.info("Number of open goals after loading: {}", openGoals);
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    var script = problemLoader.getProofScript();
+                    if (script != null) {
+                        ProofScriptEngine pse =
+                            new ProofScriptEngine(script);
+                        this.taskStarted(
+                            new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("", e);
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
         }
     }
 
@@ -190,7 +206,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         /*
          * Current file is stored in a private field. It will be used in method printResults() to
          * determine file names, in which proofs will be written.
@@ -207,15 +223,15 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param bootClassPath the boot class path to use.
      * @param includes the included files to use
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+    public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -249,7 +265,60 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public final void reportException(Object sender, ProofOblInput input, Exception e) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
+        LOGGER.error("Error while processing {}:\n{}", input, formatLoadError(e));
+        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{})", sender, input, e);
+    }
+
+    /**
+     * Renders a load/parse error in a human-readable, multi-line form for the command line: every
+     * contained problem with its message, its source location and - when the source is available -
+     * the offending line with a caret pointing at the column.
+     * <p>
+     * This reuses {@link ExceptionTools#getMessages(Throwable)} (the same extraction the GUI relies
+     * on) so the console reports the same concrete messages and positions as the dialog, without
+     * any dependency on the GUI.
+     *
+     * @param error the throwable describing the failure
+     * @return a formatted, possibly multi-line description
+     */
+    public static String formatLoadError(Throwable error) {
+        StringBuilder sb = new StringBuilder();
+        List<PositionedString> messages = ExceptionTools.getMessages(error);
+        for (PositionedString ps : messages) {
+            if (sb.length() > 0) {
+                sb.append(System.lineSeparator());
+            }
+            Location loc = ps.getLocation();
+            sb.append(ps.getText());
+            URI fileUri = loc.getFileUri();
+            if (fileUri != null && !loc.getPosition().isNegative()) {
+                sb.append(System.lineSeparator())
+                        .append("  at ").append(fileUri).append(':')
+                        .append(loc.getPosition().line()).append(':')
+                        .append(loc.getPosition().column());
+                appendSourceExcerpt(sb, fileUri, loc.getPosition());
+            } else if (fileUri != null) {
+                sb.append(System.lineSeparator()).append("  at ").append(fileUri);
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Appends the offending source line and a caret under the error column, if readable. */
+    private static void appendSourceExcerpt(StringBuilder sb, URI fileUri,
+            de.uka.ilkd.key.java.Position pos) {
+        try {
+            List<String> lines = Files.readAllLines(Path.of(fileUri));
+            int lineNo = pos.line();
+            if (lineNo >= 1 && lineNo <= lines.size()) {
+                String line = lines.get(lineNo - 1);
+                sb.append(System.lineSeparator()).append("    ").append(line);
+                sb.append(System.lineSeparator()).append("    ")
+                        .append(" ".repeat(Math.max(0, pos.column() - 1))).append('^');
+            }
+        } catch (Exception ignore) {
+            // best effort: no excerpt if the source cannot be read
+        }
     }
 
     @Override
@@ -361,13 +430,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
+    public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }
 
         // Save the proof before exit.
-        String baseName = keyProblemFile.getAbsolutePath();
+        String baseName = keyProblemFile.toAbsolutePath().toString();
         int idx = baseName.indexOf(".key");
         if (idx == -1) {
             idx = baseName.indexOf(".proof");
@@ -400,7 +469,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof
-        return proof.openGoals().size() == 0;
+        return proof.openGoals().isEmpty();
     }
 
     @Override

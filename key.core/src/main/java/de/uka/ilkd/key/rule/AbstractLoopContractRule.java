@@ -5,25 +5,28 @@ package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
-import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -45,7 +48,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param services services.
      * @return all applicable loop contracts for the instantiation.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public ImmutableSet<LoopContract> getApplicableContracts(
             final Instantiation instantiation, final Goal goal, final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
@@ -61,35 +64,35 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality.JavaModalityKind modalityKind, final Goal goal) {
+            final JModality.JavaModalityKind modalityKind, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
         if (statement instanceof StatementBlock block) {
 
             collectedContracts = specifications.getLoopContracts(block, modalityKind);
-            if (modalityKind == Modality.JavaModalityKind.BOX) {
+            if (modalityKind == JModality.JavaModalityKind.BOX) {
                 collectedContracts =
                     collectedContracts.union(
-                        specifications.getLoopContracts(block, Modality.JavaModalityKind.DIA));
-            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
+                        specifications.getLoopContracts(block, JModality.JavaModalityKind.DIA));
+            } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(block,
-                            Modality.JavaModalityKind.DIA_TRANSACTION));
+                            JModality.JavaModalityKind.DIA_TRANSACTION));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
             collectedContracts = specifications.getLoopContracts(loop, modalityKind);
-            if (modalityKind == Modality.JavaModalityKind.BOX) {
+            if (modalityKind == JModality.JavaModalityKind.BOX) {
                 collectedContracts =
                     collectedContracts.union(
-                        specifications.getLoopContracts(loop, Modality.JavaModalityKind.DIA));
-            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
+                        specifications.getLoopContracts(loop, JModality.JavaModalityKind.DIA));
+            } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(loop,
-                            Modality.JavaModalityKind.DIA_TRANSACTION));
+                            JModality.JavaModalityKind.DIA_TRANSACTION));
             }
         }
 
@@ -102,7 +105,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
-    protected static ImmutableSet<LoopContract> filterAppliedContracts(
+    protected ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
@@ -119,19 +122,20 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return {@code true} if the contract has already been applied.
      */
-    protected static boolean contractApplied(final LoopContract contract, final Goal goal) {
+    protected boolean contractApplied(final LoopContract contract, final Goal goal) {
         Node selfOrParentNode = goal.node();
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof LoopContractInternalBuiltInRuleApp blockRuleApp) {
-                if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
+            if (app instanceof LoopContractInternalBuiltInRuleApp<?> blockRuleApp) {
+                if ((contract.isOnBlock()
+                        && Objects.equals(blockRuleApp.getStatement(), contract.getBlock())
                         || !contract.isOnBlock()
-                                && blockRuleApp.getStatement().equals(contract.getLoop()))
+                                && Objects.equals(blockRuleApp.getStatement(), contract.getLoop()))
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
-                    // but not in other branches, e.g., do-while
-                    // loops might need to apply the same contract
+                    // but not in other branches, e.g., do-while loops might need to apply the same
+                    // contract
                     // twice in its usage branch
                     return true;
                 }
@@ -140,15 +144,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             selfOrParentNode = selfOrParentNode.parent();
         }
 
-        Services services = goal.proof().getServices();
-        Proof proof = goal.proof();
-        ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
-        if (po instanceof SymbolicExecutionPO) {
-            Goal initiatingGoal = ((SymbolicExecutionPO) po).getInitiatingGoal();
-            return contractApplied(contract, initiatingGoal);
-        } else {
-            return false;
-        }
+        return false;
     }
 
     @Override
@@ -163,7 +159,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         }
 
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate((JTerm) occurrence.subTerm(), goal);
 
         if (instantiation == null) {
             return false;
@@ -185,17 +181,15 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     }
 
     /**
-     *
      * @param formula the formula on which the rule is to be applied.
      * @param goal the current goal.
-     * @param services services.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public Instantiation instantiate(final JTerm formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
+            final Instantiation result = new Instantiator(formula, goal).instantiate();
             setLastFocusTerm(formula);
             setLastInstantiation(result);
             return result;
@@ -209,16 +203,16 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
+    protected Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
-            if (contract.hasModifiesClause(variable)) {
+            if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
@@ -230,21 +224,18 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     /**
      * A builder for {@link Instantiation}s.
      */
-    protected static final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
-
+    public final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
         /**
-         *
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
-         * @param services services.
          */
-        public Instantiator(final Term formula, final Goal goal, final Services services) {
-            super(formula, goal, services);
+        public Instantiator(final JTerm formula, final Goal goal) {
+            super(formula, goal);
         }
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                final JavaStatement statement, final JModality.JavaModalityKind modalityKind,
                 Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
                 services.getSpecificationRepository(), statement, modalityKind, goal);

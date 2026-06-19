@@ -4,10 +4,14 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.Configuration;
+
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * <p>
@@ -16,7 +20,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  * files.
  * </p>
  * <p>
- * During save process the {@link ProofSaver} calls method {@link #fillSaveProperties(Properties)}.
+ * During save process the {@link ProofSaver} calls method {@link #createLoaderConfig()}.
  * This proof obligation has to store all information in the given {@link Properties} which are
  * required to reconstruct it. The class ({@link Object#getClass()}) of this class must be stored in
  * the
@@ -68,10 +72,24 @@ public interface IPersistablePO extends ProofOblInput {
      * instantiate the proof obligation again and this instance should create the same
      * {@link Sequent} (if code and specifications are unchanged).
      *
-     * @param properties The {@link Properties} to fill with the proof obligation specific settings.
+     * @return
      * @throws IOException Occurred Exception.
      */
-    void fillSaveProperties(Properties properties) throws IOException;
+    Configuration createLoaderConfig() throws IOException;
+
+    /// Called to manifest the proof manifest the proof obligation configuration
+    /// into the given {@link PrintWriter}
+    /// If the method returns `true`, a `\proofObligation` statement was successfully written
+    /// to the `ps`. Therefore, no `\problem` statement is printed.
+    ///
+    /// @return true if a `\proofObligation` was written successfully.
+    default boolean printProofObligation(PrintWriter ps, Proof proof) throws IOException {
+        var loadingConfig = createLoaderConfig();
+        ps.println("\\proofObligation ");
+        loadingConfig.save(ps, "");
+        ps.println("\n");
+        return true;
+    }
 
     /**
      * The class stored in a {@link Properties} instance via key must provide the static method with

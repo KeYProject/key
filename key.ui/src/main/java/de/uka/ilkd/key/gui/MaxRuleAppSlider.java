@@ -21,7 +21,7 @@ public class MaxRuleAppSlider extends JSlider {
     private KeYMediator mediator;
 
     public MaxRuleAppSlider(KeYMediator mediator, String text) {
-        super(SwingConstants.HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);
+        super(HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);
         this.text = text;
 
         this.mediator = mediator;

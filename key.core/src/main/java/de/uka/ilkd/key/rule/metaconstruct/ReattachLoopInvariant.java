@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -31,12 +31,12 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         final ProgramElement context = //
-            svInst.getContextInstantiation().contextProgram();
+            svInst.getContextInstantiation().program();
 
         if (context != null) {
             final Statement activeStmt =
                 (Statement) JavaTools.getActiveStatement(JavaBlock.createJavaBlock(
-                    (StatementBlock) svInst.getContextInstantiation().contextProgram()));
+                    (StatementBlock) svInst.getContextInstantiation().program()));
             assert activeStmt instanceof LoopStatement;
 
             final LoopStatement loop = (LoopStatement) activeStmt;

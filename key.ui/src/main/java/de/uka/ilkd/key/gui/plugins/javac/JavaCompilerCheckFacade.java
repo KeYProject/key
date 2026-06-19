@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.javac;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -20,8 +18,11 @@ import javax.tools.*;
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.settings.Configuration;
 
+import org.key_project.util.Streams;
+
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * For setting up <code>javac</code> it uses the KeY project information about the bootpath and
  * classpath.
- * Any issues found in the compilation are reported to a provided listener of type
- * {@link ProblemInitializer.ProblemInitializerListener}.
  * <p>
  * Checking the target Java code can be enabled / disabled by providing the property
  * <code>-PKEY_JAVAC_DISABLE=true</code> / <code>-PKEY_JAVAC_DISABLE=false</code> on startup of KeY.
@@ -43,25 +42,146 @@ import org.slf4j.LoggerFactory;
  * @version 1 (14.10.22)
  */
 public class JavaCompilerCheckFacade {
+    private JavaCompilerCheckFacade() {
+        /* This utility class should not be instantiated */
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCompilerCheckFacade.class);
 
     /**
+     * This main method be exclusively used by `checkExternally` to perform javac checks
+     */
+    public static void main(String[] args) {
+        try (var input = new InputStreamReader(System.in)) {
+            Configuration params = Configuration.load(CharStreams.fromReader(input));
+
+            var settings = new JavacSettings();
+            settings.readSettings(params);
+
+            List<PositionedIssueString> result = check(
+                Paths.get(params.getString("bootClassPath")),
+                params.getStringList("classPath").stream().map(Paths::get).toList(),
+                Paths.get(params.getString("javaPath")), settings).get();
+
+            var out = new Configuration();
+            out.set("messages",
+                result.stream().map(it -> {
+                    var map = Map.of(
+                        "message", it.text,
+                        "kind", it.getKind().toString(),
+                        "line", it.location.getPosition().line(),
+                        "column", it.location.getPosition().column(),
+                        "additionalInfo", it.getAdditionalInfo());
+                    if (it.location.fileUri() != null) {
+                        map = new TreeMap<>(map);
+                        map.put("fileUri", it.location.fileUri().toString());
+                    }
+                    return map;
+                }).toList());
+
+            // send the data over stderr to not interfere with the log messages
+            Writer writer = new OutputStreamWriter(System.err);
+            out.save(writer, null);
+            writer.close();
+        } catch (Exception e) {
+            LOGGER.error("Error during execution.", e);
+        }
+    }
+
+    /**
      * initiates the compilation check on the target Java source (the Java program to be verified)
-     * and
-     * reports any issues to the provided <code>listener</code>
+     * in a separate process (with another java runtime)
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *        about any issues found in the target Java program
-     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
-     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param javaPath the {@link Path} to the source of the target Java program
+     * @param settings the {@link JavacSettings} that describe what other options the compiler
+     *        should be called with
      * @return future providing the list of diagnostics
      */
-    @NonNull
-    public static CompletableFuture<List<PositionedIssueString>> check(
-            ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+    public static @NonNull CompletableFuture<List<PositionedIssueString>> checkExternally(
+            Path bootClassPath, List<Path> classPath, Path javaPath,
+            JavacSettings settings) {
+        if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
+            LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
+            return CompletableFuture.completedFuture(Collections.emptyList());
+        }
+        LOGGER.info(
+            "External Javac check is triggered. To disable use property -PKEY_JAVAC_DISABLE=true");
+        var params = new Configuration();
+        params.set("bootClassPath", Objects.toString(bootClassPath));
+        params.set("classPath",
+            classPath.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
+        params.set("javaPath", Objects.toString(javaPath));
+        settings.writeSettings(params);
+
+        String classpath = System.getProperty("java.class.path");
+        String path =
+            Paths.get(System.getProperty("java.home"), "bin", "java").toAbsolutePath().toString();
+        ProcessBuilder processBuilder =
+            new ProcessBuilder(path,
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+                "-cp",
+                classpath,
+                JavaCompilerCheckFacade.class.getCanonicalName());
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                var process = processBuilder.start();
+                params.save(process.outputWriter(), null);
+                process.outputWriter().close();
+
+                // the KeY logging messages from `process` (currently not used)
+                String logs = Streams.toString(process.getInputStream());
+                Configuration messages =
+                    Configuration.load(CharStreams.fromStream(process.getErrorStream()));
+                process.waitFor();
+
+                return messages.getList("messages").stream()
+                        .map(msgObj -> {
+                            Configuration msg = (Configuration) msgObj;
+                            return new PositionedIssueString(
+                                msg.getString("message"),
+                                new Location(
+                                    msg.exists("fileUri")
+                                            ? URI.create(msg.getString("fileUri"))
+                                            : null,
+                                    msg.getInt("line") == -1 || msg.getInt("column") == -1
+                                            ? Position.UNDEFINED
+                                            : Position.newOneBased(
+                                                msg.getInt("line"),
+                                                msg.getInt("column"))),
+                                msg.getString("additionalInfo"),
+                                PositionedIssueString.Kind.valueOf(msg.getString("kind")));
+                        }).toList();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * initiates the compilation check on the target Java source (the Java program to be verified)
+     *
+     * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
+     *        the target Java programs classpath
+     * @param javaPath the {@link Path} to the source of the target Java program
+     * @param settings the {@link JavacSettings} that describe what other options the compiler
+     *        should be called with
+     * @return future providing the list of diagnostics
+     */
+    public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
+            Path bootClassPath, List<Path> classPath, Path javaPath,
+            JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -73,7 +193,6 @@ public class JavaCompilerCheckFacade {
 
         if (compiler == null) {
             LOGGER.info("Javac is not available in current java runtime. Javac check skipped");
-            listener.reportStatus(null, "No javac compiler found. Java check disabled.");
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
@@ -86,32 +205,70 @@ public class JavaCompilerCheckFacade {
         List<String> classes = new ArrayList<>();
 
         // gather configured bootstrap classpath and regular classpath
-        List<File> paths = new ArrayList<>();
-        if (bootClassPath != null) {
-            paths.add(bootClassPath);
-        }
-        if (classPath != null && !classPath.isEmpty()) {
-            paths.addAll(classPath);
-        }
-        paths.add(javaPath);
-        ArrayList<Path> files = new ArrayList<>();
-        for (File path : paths) {
-            if (!path.isDirectory()) {
-                continue;
+        List<String> options = new ArrayList<>();
+
+        if (settings.getUseProcessors()) {
+            String newlineClassPath = settings.getClassPaths();
+            List<Path> processorClassPath =
+                Arrays.asList(newlineClassPath.split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .map(Paths::get)
+                        .toList();
+
+            if (!processorClassPath.isEmpty()) {
+                classPath = new ArrayList<>(classPath);
+                classPath.addAll(processorClassPath);
             }
-            try (var s = Files.walk(path.toPath())) {
+
+            List<String> processors =
+                Arrays.asList(settings.getProcessors().split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .toList();
+
+            if (!processors.isEmpty()) {
+                options.add("-processor");
+                options.add(processors.stream().collect(Collectors.joining(",")));
+            }
+        }
+
+        if (bootClassPath != null) {
+            // options.add("-bootclasspath");
+            // options.add(bootClassPath.toAbsolutePath().toString());
+            LOGGER.info("The \"bootclasspath\" Option is set but not supported.");
+        }
+
+        if (classPath != null && !classPath.isEmpty()) {
+            options.add("-classpath");
+            options.add(
+                classPath.stream().map(Path::toAbsolutePath)
+                        .map(Objects::toString)
+                        .collect(Collectors.joining(":")));
+        }
+
+        ArrayList<Path> files = new ArrayList<>();
+        if (Files.isDirectory(javaPath)) {
+            try (var s = Files.walk(javaPath)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
             } catch (IOException e) {
                 LOGGER.info("", e);
             }
+        } else {
+            files.add(javaPath);
         }
+
         Iterable<? extends JavaFileObject> compilationUnits =
             fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
+        LOGGER.info(
+            "running Javac check with following\n\toptions: {},\n\tclasses: {},\n\tcompilation units: {},",
+            options, classes, compilationUnits);
+
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
-            new ArrayList<>(), classes, compilationUnits);
+            options, classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
@@ -124,9 +281,13 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     new Location(
-                        fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                        Position.newOneBased((int) it.getLineNumber(),
-                            (int) it.getColumnNumber())),
+                        it.getSource() == null
+                                ? null
+                                : fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

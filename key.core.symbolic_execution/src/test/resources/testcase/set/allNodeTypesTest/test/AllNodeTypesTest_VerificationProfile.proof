@@ -44,13 +44,12 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Tue Jul 25 22:57:42 CEST 2023
-addSymbolicExecutionLabel=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-contract=AllNodeTypesTest[AllNodeTypesTest\\:\\:main(AllNodeTypesTest)].JML normal_behavior operation contract.0
-name=AllNodeTypesTest[AllNodeTypesTest\\:\\:main(AllNodeTypesTest)].JML normal_behavior operation contract.0
-";
+\proofObligation {
+	"addSymbolicExecutionLabel": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+	"contract": "AllNodeTypesTest[AllNodeTypesTest::main(AllNodeTypesTest)].JML normal_behavior operation contract.0",
+	"name": "AllNodeTypesTest[AllNodeTypesTest::main(AllNodeTypesTest)].JML normal_behavior operation contract.0",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
@@ -425,7 +424,7 @@ name=AllNodeTypesTest[AllNodeTypesTest\\:\\:main(AllNodeTypesTest)].JML normal_b
             (rule "emptyModality" (formula "7") (term "1"))
              (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "5")))
             (rule "false_right" (formula "7"))
-             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (  boolean::select(heap,                     n_3,                     java.lang.Object::<created>)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
+             (opengoal " (  java.lang.NullPointerException::exactInstance(n_3)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (obj = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  wellFormed(heap)<<origin(\"requires (implicit)\", \"[]\")>>,  measuredByEmpty<<origin(\"requires (implicit)\", \"[]\")>> ==>  (n_3 = null)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>,  (  select<[boolean]>(heap,                     n_3,                     java.lang.Object::#$created)   = TRUE)<<origin(\"<none> (implicit)\",\"[ensures (implicit), assignable (implicit)]\")>>")
          )
          (branch "if n instanceof java.lang.Throwable false"
              (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))

@@ -1,0 +1,11 @@
+---
+contains:
+  - (assert (not (let ((u_p (i2u 0))) (let ((u_p (i2u (let ((u_p (i2u (+ (u2i u_p)
+    1)))) (+ (u2i u_p) 1))))) (= u_p (i2u 2))))))
+expected: VALID
+keySrc: |-
+  \programVariables { int p; }
+
+  \problem {
+     {p:=0} { p := { p:= p+1 } (p + 1) } (p = 2)
+  }

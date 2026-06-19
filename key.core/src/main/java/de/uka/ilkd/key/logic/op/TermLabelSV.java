@@ -5,22 +5,16 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 
 /**
  * A schema variable which matches term labels
  */
-public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
+public final class TermLabelSV extends JOperatorSV implements TermLabel {
 
     TermLabelSV(Name name) {
         super(name, JavaDLTheory.TERMLABEL, true, false);
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\termlabel ").print(name().toString());
     }
 
     @Override
@@ -29,12 +23,12 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
     }
 
     @Override
-    public Object getChild(int i) {
-        throw new IndexOutOfBoundsException();
+    public int getTLChildCount() {
+        return 0;
     }
 
     @Override
-    public int getChildCount() {
-        return 0;
+    public Object getTLChild(int i) {
+        throw new IndexOutOfBoundsException();
     }
 }

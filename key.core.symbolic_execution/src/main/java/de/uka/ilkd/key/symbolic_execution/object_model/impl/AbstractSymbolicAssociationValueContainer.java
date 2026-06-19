@@ -5,7 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -38,7 +38,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      *
      * @param settings The {@link IModelSettings} to use.
      */
-    public AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
+    protected AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
         super(settings);
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      */
     @Override
     public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
-            final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(associations,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex
@@ -94,7 +94,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      */
     @Override
     public ISymbolicValue getValue(final IProgramVariable programVariable,
-            final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(values,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex

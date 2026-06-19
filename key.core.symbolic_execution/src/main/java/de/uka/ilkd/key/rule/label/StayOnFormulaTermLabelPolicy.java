@@ -8,18 +8,18 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
@@ -34,9 +34,9 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      */
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm,
-            Term newTerm, TermLabel label) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm,
+            JTerm newTerm, TermLabel label) {
         // Maintain label if new Term is a predicate
         if (TruthValueTracingUtil.isPredicate(newTerm.op())
                 || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
@@ -107,11 +107,11 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 }
             }
         } else if (UpdateApplication.UPDATE_APPLICATION.equals(newTerm.op())) {
-            Term target = newTerm.subs().get(UpdateApplication.targetPos());
+            JTerm target = newTerm.subs().get(UpdateApplication.targetPos());
             TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
             if (targetLabel instanceof FormulaTermLabel) {
                 if (applicationPosInOccurrence != null) {
-                    Term appliationTerm = applicationPosInOccurrence.subTerm();
+                    JTerm appliationTerm = (JTerm) applicationPosInOccurrence.subTerm();
                     TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
@@ -130,12 +130,12 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     }
 
     /**
-     * Checks if the currently treated taclet {@link Term} is a child of an if-then-else operation.
+     * Checks if the currently treated taclet {@link JTerm} is a child of an if-then-else operation.
      *
-     * @param visitStack The taclet {@link Term} stack.
+     * @param visitStack The taclet {@link JTerm} stack.
      * @return {@code true} is below if-then-else, {@code false} otherwise.
      */
-    protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
+    protected boolean isBelowIfThenElse(Deque<JTerm> visitStack) {
         if (visitStack != null) {
             return CollectionUtil.search(visitStack,
                 element -> element.op() == IfThenElse.IF_THEN_ELSE) != null;
@@ -157,13 +157,13 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     }
 
     /**
-     * Checks if the given taclet {@link Term} is top level.
+     * Checks if the given taclet {@link JTerm} is top level.
      *
      * @param tacletHint The {@link TacletLabelHint} to use.
-     * @param tacletTerm The taclet {@link Term} to check.
+     * @param tacletTerm The taclet {@link JTerm} to check.
      * @return {@code true} is top level, {@code false} is not top level.
      */
-    protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {
+    protected boolean isTopLevel(TacletLabelHint tacletHint, JTerm tacletTerm) {
         if (TacletOperation.REPLACE_TERM.equals(tacletHint.getTacletOperation())) {
             return tacletHint.getTerm() == tacletTerm;
         } else {

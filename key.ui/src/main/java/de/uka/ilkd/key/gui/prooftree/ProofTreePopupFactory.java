@@ -19,28 +19,32 @@ import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.prover.engine.TaskStartedInfo;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
-public class ProofTreePopupFactory {
+/**
+ * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
+ */
+public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
         createFeature("DELAY_CUT", "Activates the delayed cut rule.");
@@ -56,9 +60,7 @@ public class ProofTreePopupFactory {
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
         if (o instanceof GUIProofTreeNode n) {
-            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                return false;
-            }
+            return !(n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
         }
         return true;
     }
@@ -146,7 +148,7 @@ public class ProofTreePopupFactory {
         initMenu(menu, context);
 
         menu.addSeparator();
-        KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
+        KeYGuiExtensionFacade.addContextMenuItems(ContextMenuKind.PROOF_TREE, menu,
             context.invokedNode, context.mediator);
 
         if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
@@ -180,8 +182,6 @@ public class ProofTreePopupFactory {
     }
 
     static class SubtreeStatistics extends ProofTreeAction {
-        private static final long serialVersionUID = -8452239418108180349L;
-
         protected SubtreeStatistics(ProofTreeContext context) {
             super(context);
             setName("Show Subtree Statistics");
@@ -203,8 +203,6 @@ public class ProofTreePopupFactory {
     }
 
     static class CollapseOtherBranches extends ProofTreeAction {
-        private static final long serialVersionUID = -6461403850298323327L;
-
         protected CollapseOtherBranches(ProofTreeContext context) {
             super(context);
             setName("Collapse Other Branches");
@@ -217,8 +215,6 @@ public class ProofTreePopupFactory {
     }
 
     static class ExpandGoalsBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -500754845710844009L;
-
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
@@ -250,8 +246,6 @@ public class ProofTreePopupFactory {
     }
 
     static class ExpandAllBelow extends ProofTreeAction {
-        private static final long serialVersionUID = 850060084128297700L;
-
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
             setName("Expand All Below");
@@ -267,8 +261,6 @@ public class ProofTreePopupFactory {
     }
 
     static class CollapseBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -7283113335781286556L;
-
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
@@ -282,8 +274,6 @@ public class ProofTreePopupFactory {
     }
 
     static class PrevSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 8705344500396898345L;
-
         public PrevSibling(ProofTreeContext context) {
             super(context);
             setName("Previous Sibling");
@@ -319,8 +309,6 @@ public class ProofTreePopupFactory {
     }
 
     static class NextSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 2337297147243419973L;
-
         public NextSibling(ProofTreeContext context) {
             super(context);
             setName("Next Sibling");
@@ -356,8 +344,6 @@ public class ProofTreePopupFactory {
     }
 
     static class Notes extends ProofTreeAction {
-        private static final long serialVersionUID = -6871120844080468856L;
-
         public Notes(ProofTreeContext context) {
             super(context);
             setName("Edit Notes...");
@@ -383,8 +369,6 @@ public class ProofTreePopupFactory {
     }
 
     static class Prune extends ProofTreeAction {
-        private static final long serialVersionUID = -1744963704210861370L;
-
         public Prune(ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
@@ -455,7 +439,7 @@ public class ProofTreePopupFactory {
                     return false;
                 }
 
-                Term formula =
+                JTerm formula =
                     InspectorForDecisionPredicates.translate(proof.getServices(), result);
 
                 DelayedCutProcessor processor = new DelayedCutProcessor(proof, invokedNode,
@@ -603,7 +587,6 @@ public class ProofTreePopupFactory {
     }
 
     public static abstract class ProofTreeAction extends KeyAction {
-        private static final long serialVersionUID = 2686349019163064481L;
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {

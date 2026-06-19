@@ -3,18 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -25,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * The objects of this class represent program variables and program constants (resulting from
  * static final declarations in programs; TODO: it is weird that constants are a special case of
  * variables).
- *
+ * <br>
  * Additionally, as a legacy of the past, the RecodeR front end of KeY still creates objects of this
  * class also for fields (aka. attributes, member variables), even though theoretically, these are
  * *not* program variables (not any more)! Such fake "program variables" can be recognized by the
@@ -33,8 +39,8 @@ import org.slf4j.LoggerFactory;
  * The method HeapLDT.getFieldSymbolForPV() serves to convert such fake program variables to the
  * appropriate constant symbols.
  */
-public abstract class ProgramVariable extends AbstractSortedOperator
-        implements SourceElement, ProgramElement, Expression, ReferencePrefix, IProgramVariable,
+public abstract class ProgramVariable extends JAbstractSortedOperator
+        implements Expression, ReferencePrefix, IProgramVariable,
         ParsableVariable, ReferenceSuffix, ProgramInLogic {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 
@@ -165,12 +171,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
-
-    @Override
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
     }
@@ -204,20 +204,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         return null;
     }
 
-
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. In
-     * this case two programvariables are considered to be equal if they are assigned to the same
-     * abstract name or if they are the same object.
-     */
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return nat.sameAbstractName(this, se);
-    }
-
-
-    @Override
-    public Expression convertToProgram(Term t, ExtList l) {
+    public Expression convertToProgram(JTerm t, ExtList l) {
         if (isStatic()) {
             return new FieldReference(this, new TypeRef(getContainerType()));
         } else {
@@ -241,7 +229,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     public boolean isImplicit() {
-        return getProgramElementName().getProgramName().startsWith("<");
+        return JavaDLFieldNames.isImplicit(getProgramElementName());
     }
 
 
@@ -254,5 +242,16 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         } else {
             return null;
         }
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(
+            "Program variable " + name() + " does not have children");
     }
 }

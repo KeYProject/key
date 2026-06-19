@@ -3,28 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
+import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -40,12 +35,14 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
-
-    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
-    public static final File DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY, "dummyTrue.key");
+    public static final Path TESTCASE_DIRECTORY =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
+    public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
     private static final Profile profile = new JavaProfile() {
@@ -53,49 +50,34 @@ public class HelperClassForTests {
         // library (HACK)
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.nil());
+            final var ruleSource = RuleSourceFactory.fromDefaultLocation(ldtFile);
+            return new RuleCollection(ImmutableList.of(ruleSource), ImmutableSLList.nil());
         }
     };
 
-    public HelperClassForTests() {
-
-    }
-
-    public ProofAggregate parse(File file) {
+    public static ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
-    public ProofAggregate parse(File file, Profile profile) {
-        ProblemInitializer pi = null;
-        ProofAggregate result = null;
-
+    public static ProofAggregate parse(Path file, Profile profile) {
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
-            pi = new ProblemInitializer(profile);
-
-            result = pi.startProver(po, po);
-
-        } catch (Exception e) {
+            return parseThrowException(file, profile);
+        } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
-        return result;
     }
 
-    public ProofAggregate parseThrowException(File file) throws ProofInputException {
+    public static ProofAggregate parseThrowException(Path file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(File file, Profile profile)
+    public static ProofAggregate parseThrowException(Path file, Profile profile)
             throws ProofInputException {
-        KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+        KeYUserProblemFile po =
+            new KeYUserProblemFile("Test", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
-    }
-
-    public Term extractProblemTerm(Proof p) {
-        return p.root().sequent().succedent().iterator().next().formula();
     }
 
     /**
@@ -105,7 +87,7 @@ public class HelperClassForTests {
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
-    public static boolean isOneStepSimplificationEnabled(Proof proof) {
+    public static boolean isOneStepSimplificationEnabled(@Nullable Proof proof) {
         StrategyProperties props;
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -124,7 +106,7 @@ public class HelperClassForTests {
      * @param enabled {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
-    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+    public static void setOneStepSimplificationEnabled(@Nullable Proof proof, boolean enabled) {
         final String newVal = enabled ? StrategyProperties.OSS_ON : StrategyProperties.OSS_OFF;
 
         {
@@ -154,12 +136,13 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+    public static Map<String, String> setDefaultTacletOptions(Path baseDir,
             String javaPathInBaseDir)
             throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
-            File javaFile = new File(baseDir, javaPathInBaseDir);
+            Path javaFile = baseDir.resolve(javaPathInBaseDir);
+
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
@@ -188,12 +171,10 @@ public class HelperClassForTests {
      * @param containerTypeName The type name which provides the target.
      * @param targetName The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+    public static Map<String, String> setDefaultTacletOptionsForTarget(Path javaFile,
             String containerTypeName,
-            final String targetName) throws ProblemLoaderException, ProofInputException {
+            final String targetName) {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
@@ -285,7 +266,7 @@ public class HelperClassForTests {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
-        ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+        Iterable<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
         IProgramMethod pm =
             CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {
@@ -297,9 +278,8 @@ public class HelperClassForTests {
         return pm;
     }
 
-    public static Services createServices(File keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
+    public static Services createServices(Path keyFile) {
+        return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
     }
 
     public static Services createServices() {
@@ -309,6 +289,18 @@ public class HelperClassForTests {
     public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment()
             throws ProblemLoaderException {
         return KeYEnvironment.load(DUMMY_KEY_FILE);
+    }
+
+    public static Field field(Object o, String fieldName) throws NoSuchFieldException {
+        final Field field = o.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field;
+    }
+
+    public static <T> T get(Object o, String fieldName)
+            throws NoSuchFieldException, IllegalAccessException {
+        final Field field = field(o, fieldName);
+        return (T) field.get(o);
     }
 
 }

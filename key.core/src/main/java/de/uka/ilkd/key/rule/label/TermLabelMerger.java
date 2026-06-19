@@ -6,11 +6,12 @@ package de.uka.ilkd.key.rule.label;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * <p>
@@ -33,17 +34,18 @@ public interface TermLabelMerger {
      * Merges the existing and the rejected {@link TermLabel} by updating the merged {@link List}.
      *
      * @param existingSF The existing {@link SequentFormula}.
-     * @param existingTerm The {@link Term} of the existing {@link SequentFormula}.
+     * @param existingTerm The {@link JTerm} of the existing {@link SequentFormula}.
      * @param existingLabel The existing {@link TermLabel} if available or {@code null} otherwise.
      * @param rejectedSF The rejected {@link SequentFormula}.
-     * @param rejectedTerm The {@link Term} of the rejected {@link SequentFormula}.
+     * @param rejectedTerm The {@link JTerm} of the rejected {@link SequentFormula}.
      * @param rejectedLabel The rejected {@link TermLabel}.
      * @param mergedLabels The {@link List} with new {@link TermLabel}s which will be visible in the
      *        resulting {@link Sequent}.
      * @return {@code true} if the {@link List} of {@link TermLabel} was modified and {@code false}
      *         otherwise.
      */
-    boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
-            TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
+    boolean mergeLabels(SequentFormula existingSF, JTerm existingTerm,
+            TermLabel existingLabel, SequentFormula rejectedSF,
+            JTerm rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels);
 }

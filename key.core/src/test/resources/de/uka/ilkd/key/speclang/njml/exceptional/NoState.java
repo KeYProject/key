@@ -1,5 +1,5 @@
 // noException: true
-
+// broken: true
 class NoState {
 
     /*@ public model_behaviour
@@ -7,3 +7,5 @@ class NoState {
       @ model no_state int modelFct() { return 1; }
       @*/
 }
+
+// Strange error message: 'Lexical error at line 11, column 38.  Encountered: <EOF> after : ""'

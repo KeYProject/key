@@ -4,16 +4,17 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
-import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.proof.rulefilter.AnyRuleSetTacletFilter;
+import org.key_project.prover.proof.rulefilter.NotRuleFilter;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -53,7 +54,8 @@ public final class RuleAppIndex {
         }
 
         @Override
-        public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+        public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+                PosInOccurrence pos) {
             informNewRuleListener(rules, pos);
         }
     };
@@ -141,7 +143,8 @@ public final class RuleAppIndex {
      * @param services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      */
-    public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter, PosInOccurrence pos,
+    public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter,
+            PosInOccurrence pos,
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
@@ -163,7 +166,8 @@ public final class RuleAppIndex {
      *        like (static)types etc.
      * @return the possible rule applications
      */
-    public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter filter, PosInOccurrence pos,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter filter,
+            PosInOccurrence pos,
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
@@ -183,7 +187,8 @@ public final class RuleAppIndex {
      * @param pos the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter, PosInOccurrence pos) {
+    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter,
+            PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter));
@@ -354,7 +359,8 @@ public final class RuleAppIndex {
     /**
      * informs all observers, if a formula has been added, changed or removed
      */
-    private void informNewRuleListener(RuleApp p_app, PosInOccurrence p_pos) {
+    private void informNewRuleListener(RuleApp p_app,
+            PosInOccurrence p_pos) {
         if (ruleListener != null) {
             ruleListener.ruleAdded(p_app, p_pos);
         }

@@ -41,12 +41,11 @@
 
 \javaSource "../paycard";
 
-\proofObligation "#Proof Obligation Settings
-#Wed Nov 19 16:17:22 CET 2014
-name=paycard.LogRecord[paycard.LogRecord\\:\\:getBalance()].JML normal_behavior operation contract.0
-contract=paycard.LogRecord[paycard.LogRecord\\:\\:getBalance()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "paycard.LogRecord[paycard.LogRecord::getBalance()].JML normal_behavior operation contract.0",
+	"contract": "paycard.LogRecord[paycard.LogRecord::getBalance()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

@@ -57,35 +57,37 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent pos) {
-            if (model.isExplorationModeSelected()) {
-                return Arrays.asList(new AddFormulaToAntecedentAction(),
-                    new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
-                    new DeleteFormulaAction(pos));
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                T object) {
+            if (!model.isExplorationModeSelected() ||
+                    kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
             }
-            return super.getContextActions(mediator, kind, pos);
+
+            var pos = (PosInSequent) object;
+            return Arrays.asList(new AddFormulaToAntecedentAction(),
+                new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
+                new DeleteFormulaAction(pos));
         }
     };
 
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
+        @Override
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
                 ExplorationNodeData.class);
         }
     };
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
-    @NonNull
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
@@ -101,12 +103,12 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 // ignored
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 Proof oldProof = leftPanel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {
@@ -132,9 +134,8 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
             e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             initLeftPanel(window);

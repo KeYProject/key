@@ -8,16 +8,18 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * A JML field declaration (ghost or model) in textual form.
+ * A JML field or local variable (!) declaration (ghost or model) in textual form. For simiplicity,
+ * at the moment this class is also used for local variable declarations, which has the caveat that
+ * visibility modifiers are also allowed there.
  */
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
     private final JmlParser.Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<JMLModifier> mods,
+    public TextualJMLFieldDecl(ImmutableList<JMLModifier> modifiers,
             JmlParser.Field_declarationContext decl) {
-        super(mods);
+        super(modifiers);
         assert decl != null;
         this.decl = decl;
         setPosition(decl);
@@ -40,12 +42,12 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
         if (!(o instanceof TextualJMLFieldDecl fd)) {
             return false;
         }
-        return mods.equals(fd.mods) && decl.equals(fd.decl);
+        return modifiers.equals(fd.modifiers) && decl.equals(fd.decl);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode();
+        return modifiers.hashCode() + decl.hashCode();
     }
 }

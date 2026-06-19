@@ -10,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
 /**

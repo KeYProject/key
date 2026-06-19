@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.Nullable;
@@ -14,7 +13,7 @@ import org.jspecify.annotations.Nullable;
  * @author Hubert Schmid
  */
 
-public final class ParserException extends Exception implements HasLocation {
+public final class ParserException extends RuntimeException implements HasLocation {
     /* --- constructors --- */
     /**
      * @param message The error message. The message may be shown to the user and should be
@@ -23,7 +22,7 @@ public final class ParserException extends Exception implements HasLocation {
      *        location is unknown or the error is independent of a location.
      */
     public ParserException(String message, Location location) {
-        super(message);
+        super(message + " at " + location);
         this.location = location;
     }
 
@@ -33,9 +32,8 @@ public final class ParserException extends Exception implements HasLocation {
     /**
      * @return The location may be null.
      */
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 

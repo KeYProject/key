@@ -14,17 +14,40 @@ public class NameRecorder {
     private ImmutableList<Name> post = ImmutableSLList.nil();
 
     public void setProposals(ImmutableList<Name> proposals) {
-        pre = proposals;
+        if (proposals == null) {
+            pre = ImmutableSLList.nil();
+        } else {
+            pre = proposals;
+        }
     }
 
+    /**
+     * Get the name proposals added using {@link #addProposal(Name)}.
+     *
+     * @return the name proposals
+     */
     public ImmutableList<Name> getProposals() {
         return post;
+    }
+
+    /**
+     * Get the name proposals previously set using {@link #setProposals(ImmutableList)}.
+     *
+     * @return the name proposals
+     */
+    public ImmutableList<Name> getSetProposals() {
+        return pre;
     }
 
     public void addProposal(Name proposal) {
         post = post.append(proposal);
     }
 
+    /**
+     * Get a proposal and remove it from this recorder.
+     *
+     * @return the first proposal
+     */
     public Name getProposal() {
         Name proposal = null;
 

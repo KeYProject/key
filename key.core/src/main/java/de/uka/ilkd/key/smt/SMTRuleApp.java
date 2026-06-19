@@ -6,25 +6,23 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 
-import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
- * The rule application that is used when a goal is closed by means of an external solver. So far it
+ * The rule application that is used when a goal is closed by means of an SMT solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
-public class SMTRuleApp extends AbstractBuiltInRuleApp {
-
-    public static final SMTRule RULE = new SMTRule();
-    private final String title;
-    private final String successfulSolverName;
+@NullMarked
+public class SMTRuleApp extends AbstractExternalSolverRuleApp<SMTRule> {
 
     /**
      * Create a new rule app without ifInsts (will be null).
@@ -37,111 +35,24 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         this(rule, pio, null, successfulSolverName);
     }
 
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> unsatCore,
+    SMTRuleApp(SMTRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> unsatCore,
             String successfulSolverName) {
-        super(rule, pio, unsatCore);
-        this.title = "SMT: " + successfulSolverName;
-        this.successfulSolverName = successfulSolverName;
+        super(rule, pio, unsatCore, successfulSolverName, "SMT: " + successfulSolverName);
     }
 
     @Override
     public SMTRuleApp replacePos(PosInOccurrence newPos) {
-        return new SMTRuleApp(RULE, newPos, ifInsts, successfulSolverName);
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getSuccessfulSolverName() {
-        return successfulSolverName;
+        return new SMTRuleApp(SMTRule.INSTANCE, newPos, ifInsts, successfulSolverName);
     }
 
     @Override
-    public BuiltInRule rule() {
-        return RULE;
-    }
-
-    @Override
-    public String displayName() {
-        return title;
-    }
-
-    public static class SMTRule implements BuiltInRule {
-        public static final Name name = new Name("SMTRule");
-
-        public SMTRuleApp createApp(String successfulSolverName) {
-            return new SMTRuleApp(this, null, successfulSolverName);
-        }
-
-        /**
-         * Create a new rule application with the given solver name and unsat core.
-         *
-         * @param successfulSolverName solver that produced this result
-         * @param unsatCore formulas required to prove the result
-         * @return rule application instance
-         */
-        public SMTRuleApp createApp(String successfulSolverName,
-                ImmutableList<PosInOccurrence> unsatCore) {
-            return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
-        }
-
-        @Override
-        public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
-            return new SMTRuleApp(this, null, "");
-        }
-
-
-        @Override
-        public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-            return false;
-        }
-
-
-        /**
-         * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
-         * with the same sequent as the given one.
-         *
-         * @param goal the Goal on which to apply <tt>ruleApp</tt>
-         * @param services the Services with the necessary information about the java programs
-         * @param ruleApp the rule application to be executed
-         * @return a list with an identical goal as the given <tt>goal</tt>
-         */
-        @Override
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
-            if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
-                goal.proof().getInitConfig().registerRule(RULE, () -> false);
-            }
-            return goal.split(1);
-        }
-
-        @Override
-        public boolean isApplicableOnSubTerms() {
-            return false;
-        }
-
-        @Override
-        public String displayName() {
-            return "SMT";
-        }
-
-        public String toString() {
-            return displayName();
-        }
-
-        @Override
-        public Name name() {
-            return name;
-        }
-
-    }
-
     public SMTRuleApp setTitle(String title) {
-        return new SMTRuleApp(RULE, pio, ifInsts, title);
+        return new SMTRuleApp(SMTRule.INSTANCE, pio, ifInsts, title);
     }
 
     @Override
-    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -157,7 +68,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
      */
     @Override
     public SMTRuleApp tryToInstantiate(Goal goal) {
-        SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
+        SMTRuleApp app = SMTRule.INSTANCE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {
@@ -166,7 +77,6 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         for (SequentFormula succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
-        return app.setIfInsts(ImmutableList.fromList(ifInsts));
+        return app.setAssumesInsts(ImmutableList.fromList(ifInsts));
     }
-
 }

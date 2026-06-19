@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
@@ -36,9 +36,7 @@ public final class ProofReorder {
 
     }
 
-    public static void reorderProof(Proof proof, DependencyGraph depGraph)
-            throws IOException, ProofInputException, ProblemLoaderException,
-            IntermediateProofReplayer.BuiltInConstructionException {
+    public static void reorderProof(Proof proof, DependencyGraph depGraph) throws Exception {
         depGraph.ensureProofIsTracked(proof);
         MainWindow.getInstance().getMediator().stopInterface(true);
 
@@ -157,13 +155,13 @@ public final class ProofReorder {
 
         ProblemLoaderControl control = new DefaultUserInterfaceControl();
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), proof);
+        ProofSaver.saveProofObligationToFile(tmpFile, proof);
 
-        String bootClassPath = proof.getEnv().getJavaModel().getBootClassPath();
+        Path bootClassPath = proof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
-            tmpFile.toFile(),
-            proof.getEnv().getJavaModel().getClassPathEntries(),
-            bootClassPath != null ? new File(bootClassPath) : null,
+            tmpFile,
+            proof.getEnv().getJavaModel().getClassPath(),
+            bootClassPath,
             null,
             proof.getEnv().getInitConfigForEnvironment().getProfile(),
             false,
@@ -177,7 +175,7 @@ public final class ProofReorder {
         mediator.startInterface(true);
 
         ProblemLoader problemLoader2 =
-            mediator.getUI().getProblemLoader(tmpFile.toFile(), null, null, null, mediator);
+            mediator.getUI().getProblemLoader(tmpFile, null, null, null, mediator);
         // user already knows about any warnings
         problemLoader2.setIgnoreWarnings(true);
         problemLoader2.runAsynchronously();

@@ -92,8 +92,8 @@ public class FeatureSettings extends AbstractSettings {
      */
     private boolean isTrue(Object value) {
         return switch (value.toString().toLowerCase()) {
-        case "true", "yes", "on" -> true;
-        default -> false;
+            case "true", "yes", "on" -> true;
+            default -> false;
         };
     }
 
@@ -197,6 +197,7 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     public record Feature(String id, String documentation, boolean restartRequired) {
+
         public static final List<Feature> FEATURES = new ArrayList<>();
 
         public Feature {

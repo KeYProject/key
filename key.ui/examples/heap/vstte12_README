@@ -30,11 +30,11 @@ The sorting algorithm has been implemented in class TwoWaySwap. The class contai
 
 Subtask 1 + 2 + 3 : The twoWaySort method is specified using JML* using a public normal_behavior. The provided method specification already encodes all three subtasks. A normal_behavior contract requires a method to terminate normally, i.e., without throwing an exception. The post condition encodes that the array is sorted afterwards in increasing order and that it is a permutation of the original one. Note: JML has non-null by default semantics, i.e., if not explicitly specified otherwise it requires the parameters, fields (and array components) to be non null.
 
-KeY generates a dynamic logic formula from the provided JML specification which is valid iff the method implementation satisfies the JML method specification. In particular that if the method is called in a state satisfying the precondition then the method terminates normally and satisfies the postcondition as well as respecting the assignable/modifies clause. 
+KeY generates a dynamic logic formula from the provided JML specification which is valid iff the method implementation satisfies the JML method specification. In particular that if the method is called in a state satisfying the precondition then the method terminates normally and satisfies the postcondition as well as respecting the frame condition. 
 
 To prove permutation, we use a model field "seq" which represents the boolean array. The permutation property is then proven with help of the permutation predicate provided by the sequent datatype. The loop is annotated with a loop invariant and variant term (for termination). The loop invariant and variant term are used by the loop invariant (Use Branch), which also proves that the loop invariant is an invariant, that the variant term is always non-negative and decreases strictly monotone.
 
-In addition to the required subtasks, KeY also verifies that assignable/modifies clauses of the contract and loop invariant are correct, i.e., no other locations accept those mentioned are changed.
+In addition to the required subtasks, KeY also verifies that frame conditions of the contract and loop invariant are correct, i.e., no other locations accept those mentioned are changed.
 
 The problem1 directory contains the proofs for all three methods of the class. No interactions were required.
 

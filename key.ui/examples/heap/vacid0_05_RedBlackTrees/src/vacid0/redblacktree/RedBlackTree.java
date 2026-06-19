@@ -80,7 +80,7 @@ public class RedBlackTree implements AbstractMap {
         //TODO set height
         /*@ ghost int idx;
           @ set idx = \indexOf(theNodes,z);
-          @ set theNodes = \seq_concat(\seq_sub(theNodes, 0, idx-1),\seq_sub(theNodes, idx+1, \seq_length(theNodes)-1));
+          @ set theNodes = \seq_concat(\seq_sub(theNodes, 0, idx-1),\seq_sub(theNodes, idx+1, theNodes.length-1));
           @*/
         if (!y.isRed){
             deleteFix(x);

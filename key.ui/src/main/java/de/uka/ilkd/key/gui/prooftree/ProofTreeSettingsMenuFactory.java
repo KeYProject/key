@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
@@ -18,9 +19,18 @@ import bibliothek.gui.dock.common.action.CMenu;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
-public class ProofTreeSettingsMenuFactory {
+/**
+ * Factory for the settings menu of the {@link ProofTreeView}.
+ */
+public final class ProofTreeSettingsMenuFactory {
     private ProofTreeSettingsMenuFactory() {}
 
+    /**
+     * Create the settings menu for the provided view.
+     *
+     * @param view the view
+     * @return the constructed menu
+     */
     public static CAction create(ProofTreeView view) {
         Supplier<CMenu> supplier = () -> {
             CMenu menu = new CMenu();
@@ -38,7 +48,9 @@ public class ProofTreeSettingsMenuFactory {
             }
             menu.addSeparator();
 
+            menu.add(createLinearizedModeToggle(view));
             menu.add(createExpandOSSToggle(view));
+            menu.add(createTooltipToggle());
             menu.add(createTacletInfoToggle());
             return menu;
         };
@@ -108,6 +120,27 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
+    private static CCheckBox createLinearizedModeToggle(ProofTreeView view) {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                final boolean selected = isSelected();
+                view.setLinearizedMode(selected);
+            }
+        };
+        check.setText("Linearize Proof Tree");
+        check.setTooltip("""
+                <html>
+                Show the proof tree in a more linear fashion.<br>
+                When a goal is split, the "main" branch is continued
+                on the same indentation level.<br>
+                This includes e.g. the "Normal Execution" of symbolic execution rules
+                and the "TRUE" branch of cuts.
+                </html>""");
+        check.setSelected(view.isLinearizedMode());
+        return check;
+    }
+
     private static CCheckBox createExpandOSSToggle(ProofTreeView view) {
         CCheckBox check = new CCheckBox() {
             @Override
@@ -131,6 +164,27 @@ public class ProofTreeSettingsMenuFactory {
         };
         check.setText("Show taclet info (inner nodes only)");
         check.setSelected(MainWindow.getInstance().isShowTacletInfo());
+        return check;
+    }
+
+    private static CCheckBox createTooltipToggle() {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                /*
+                 * The ToogleProofTreeTooltipAction (in the View menu) is updated via
+                 * PropertyChangeListener, no manual update needed!
+                 */
+                final boolean selected = isSelected();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .setShowProofTreeTooltips(selected);
+            }
+        };
+        check.setText("Show Tooltips");
+        // No PropertyChangeListener needed, since the menu is always freshly generated.
+        final boolean setting =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isShowProofTreeTooltips();
+        check.setSelected(setting);
         return check;
     }
 

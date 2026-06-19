@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.parser.Location;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * A simple checked exception which holds an location.
@@ -43,9 +41,8 @@ public class LocatableException extends RuntimeException implements HasLocation 
         this.location = location;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         return location;
     }
 }

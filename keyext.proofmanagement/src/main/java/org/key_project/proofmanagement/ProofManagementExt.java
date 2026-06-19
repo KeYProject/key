@@ -28,9 +28,8 @@ public class ProofManagementExt implements
 
     private static final String MENU_PM = "Proof Management";
 
-    @NonNull
     @Override
-    public List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
 
         return List.of(new CheckAction());
     }

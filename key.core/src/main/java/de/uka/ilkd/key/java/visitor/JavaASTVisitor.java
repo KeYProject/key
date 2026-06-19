@@ -4,24 +4,25 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -44,10 +46,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root the ProgramElement where to begin
-     * @param services the Services object
+     * @param root
+     *        the ProgramElement where to begin
+     * @param services
+     *        the Services object
      */
-    public JavaASTVisitor(ProgramElement root, Services services) {
+    protected JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
         this.services = services;
     }
@@ -55,10 +59,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     protected void walk(ProgramElement node) {
-        if (node instanceof JmlAssert) {
-            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
-        }
         super.walk(node);
+        if (done()) {
+            return;
+        }
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
                 services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
@@ -96,7 +100,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node the node described above
+     * @param node
+     *        the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
 
@@ -231,6 +236,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         doDefaultAction(x);
     }
@@ -318,6 +328,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
         doDefaultAction(x);
     }
 
@@ -438,11 +453,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnImplements(Implements x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         doDefaultAction(x);
     }
 
@@ -738,6 +748,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSubtype(Subtype x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
         doDefaultAction(x);
     }
@@ -960,10 +975,5 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     public void performActionOnJmlAssert(JmlAssert x) {
         doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // empty
     }
 }

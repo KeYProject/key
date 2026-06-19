@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  *
  * @author lanzinger
  */
+@SuppressWarnings("nullness")
 public final class MapUtil {
 
     private MapUtil() {}

@@ -11,7 +11,7 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class AbstractConditionBuilder extends AbstractTacletBuilderCommand
         implements ConditionBuilder {
-    public AbstractConditionBuilder(@NonNull String triggerName,
+    protected AbstractConditionBuilder(@NonNull String triggerName,
             @NonNull ArgumentType... argumentsTypes) {
         super(triggerName, argumentsTypes);
     }

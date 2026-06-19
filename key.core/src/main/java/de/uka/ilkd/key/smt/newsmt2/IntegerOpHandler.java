@@ -7,12 +7,13 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 
 /**
  * This SMT translation handler takes care of integer expressions.
@@ -33,7 +34,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
-    private JFunction mul;
+    private Function mul;
     private boolean limitedToPresbuger;
     private IntegerLDT integerLDT;
 
@@ -98,7 +99,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), IntegerOpHandler.INT);
+        List<SExpr> children = trans.translate(term.subs(), INT);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
@@ -107,7 +108,7 @@ public class IntegerOpHandler implements SMTHandler {
         if (predicateOperators.contains(op)) {
             resultType = Type.BOOL;
         } else {
-            resultType = IntegerOpHandler.INT;
+            resultType = INT;
         }
 
         return new SExpr(smtOp, resultType, children);
