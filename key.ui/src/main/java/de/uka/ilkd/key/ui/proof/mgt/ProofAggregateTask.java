@@ -9,6 +9,8 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTreeNode {
 

@@ -8,6 +8,8 @@ import javax.swing.tree.MutableTreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 
 /**
