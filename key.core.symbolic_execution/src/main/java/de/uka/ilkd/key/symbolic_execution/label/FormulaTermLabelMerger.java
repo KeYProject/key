@@ -10,6 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.rule.label.TermLabelMerger;
 
 import org.key_project.prover.sequent.SequentFormula;
 

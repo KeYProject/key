@@ -6,7 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.label;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
@@ -40,7 +41,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         "innerMostParentRefactoredAtGoal_";
 
     /**
-     * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy} to indicate
+     * Key used in {@link TermLabelState} by the
+     * {@link de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy} to indicate
      * that a refactoring below an update ({@link RefactoringScope#APPLICATION_BELOW_UPDATES}) is
      * required, which will be performed by
      * {@link #refactorBelowUpdates(PosInOccurrence, JTerm, LabelCollection)}.
