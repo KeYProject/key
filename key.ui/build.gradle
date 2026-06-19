@@ -69,7 +69,7 @@ distZip {
 }
 
 application {
-    mainClass.set("de.uka.ilkd.key.core.Main")
+    mainClass.set("de.uka.ilkd.key.ui.core.Main")
 }
 
 run {
@@ -103,7 +103,7 @@ tasks.register('runWithProfiler', JavaExec) {
                    See https://www.baeldung.com/java-flight-recorder-monitoring for a how to."""
 
     classpath = sourceSets.main.runtimeClasspath
-    mainClass.set("de.uka.ilkd.key.core.Main")
+    mainClass.set("de.uka.ilkd.key.ui.core.Main")
     jvmArgs = ["-XX:+FlightRecorder",
                "-XX:StartFlightRecording=duration=30s,filename=key_profile.jfr",
                "-XX:FlightRecorderOptions=stackdepth=256"]
@@ -116,7 +116,7 @@ tasks.register('runWithProfiler', JavaExec) {
 tasks.register('runInExperimentalMode', JavaExec) {
     group = "application"
     classpath = sourceSets.main.runtimeClasspath
-    mainClass.set("de.uka.ilkd.key.core.Main")
+    mainClass.set("de.uka.ilkd.key.ui.core.Main")
     args("--experimental")
 }
 
