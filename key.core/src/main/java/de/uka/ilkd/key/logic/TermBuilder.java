@@ -157,14 +157,38 @@ public class TermBuilder {
             return savedName.toString();
         }
 
-        int i = 0;
-        String result = baseName;
-        while (localNamespace.lookup(new Name(result)) != null) {
-            result = baseName + "_" + i++;
-        }
+        final String result = freeName(baseName, localNamespace, null);
 
         services.getNameRecorder().addProposal(new Name(result));
 
+        return result;
+    }
+
+    /**
+     * Returns the first name out of {@code baseName, baseName_0, baseName_1, ...} that is neither
+     * present in {@code localNamespace} nor contained in {@code taken}.
+     * <p>
+     * This is the side-effect-free core of the "find a fresh name" loop: it neither touches the
+     * name recorder nor advances any counter,
+     * so the result depends only on the supplied namespaces and the {@code taken} set. That makes
+     * it safe to call from contexts that run during (speculative) taclet matching, where a
+     * mutable side effect would render the result non-deterministic across proof reloads (see
+     * {@link de.uka.ilkd.key.rule.conditions.NewLocalVarsCondition} / issue #3834).
+     *
+     * @param baseName the base name (prefix)
+     * @param localNamespace the namespaces to check for collisions
+     * @param taken additional names to avoid (may be {@code null}); useful when several fresh
+     *        names are generated before any of them is registered in the namespaces
+     * @return a name not occurring in {@code localNamespace} or {@code taken}
+     */
+    public static String freeName(String baseName, NamespaceSet localNamespace,
+            java.util.Set<String> taken) {
+        int i = 0;
+        String result = baseName;
+        while (localNamespace.lookup(new Name(result)) != null
+                || (taken != null && taken.contains(result))) {
+            result = baseName + "_" + i++;
+        }
         return result;
     }
 
