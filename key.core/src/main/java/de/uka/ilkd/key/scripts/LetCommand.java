@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
@@ -68,11 +69,13 @@ public class LetCommand extends AbstractCommand {
         var args = state().getValueInjector().inject(new Parameters(), ast);
 
         AbbrevMap abbrMap = state().getAbbreviations();
-
         boolean force = "letf".equals(ast.commandName());
 
         for (Map.Entry<String, JTerm> entry : args.namedArgs.entrySet()) {
             String key = entry.getKey();
+            if (key.startsWith("#") || key.equals("force")) {
+                continue;
+            }
 
             if (key.startsWith("@")) {
                 // get rid of @
@@ -84,7 +87,10 @@ public class LetCommand extends AbstractCommand {
             }
 
             try {
-                abbrMap.put(entry.getValue(), key, true);
+                final var termCtx = (JavaKeYParser.ProofScriptExpressionContext) entry.getValue();
+                final var value = termCtx.accept(state().getEvaluator());
+                final var term = state().getValueInjector().convert(value, JTerm.class);
+                abbrMap.put(term, key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
@@ -95,6 +101,11 @@ public class LetCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "let";
+    }
+
+    @Override
+    public String getDocumentation() {
+        return "";
     }
 
     @Override

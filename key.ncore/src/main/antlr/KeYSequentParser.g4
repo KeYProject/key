@@ -19,7 +19,7 @@ termorseq
 semisequent
    :
 /* empty */
-   
+
    | head = term (COMMA ss = semisequent)?
    ;
 

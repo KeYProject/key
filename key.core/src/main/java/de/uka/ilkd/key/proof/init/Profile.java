@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
+import java.util.Collections;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
@@ -22,6 +26,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -180,8 +185,14 @@ public interface Profile {
     /// Taclet base has been loaded, but before Java sources are loaded or the environment is
     /// established.
     ///
+    /// @param baseConfig a initial configuration which can be modified, e.g., forcing Taclet
+    /// options.
+    /// @param additionalProfileOptions a nullable object representing selected options in the UI or
+    /// command line.
+    /// @return warnings as a list of Strings
     /// @see ProblemInitializer
-    default void prepareInitConfig(InitConfig baseConfig) {
-
+    default List<String> prepareInitConfig(InitConfig baseConfig,
+            @Nullable Configuration additionalProfileOptions) {
+        return Collections.emptyList();
     }
 }

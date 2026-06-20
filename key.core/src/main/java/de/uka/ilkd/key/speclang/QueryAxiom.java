@@ -229,7 +229,7 @@ public final class QueryAxiom extends ClassAxiom {
         }
         if (!target.isStatic()) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
-            tacletBuilder.setIfSequent(ifSeq);
+            tacletBuilder.setAssumesSequent(ifSeq);
             tacletBuilder.addVarsNew(selfProgSV, kjt);
         }
         for (int i = 0; i < paramSVs.length; i++) {

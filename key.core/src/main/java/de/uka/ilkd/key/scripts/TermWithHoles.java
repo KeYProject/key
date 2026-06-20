@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.scripts.meta.*;
@@ -91,15 +91,15 @@ public class TermWithHoles {
     }
 
     public static TermWithHoles fromString(EngineState engineState, String str) {
-        KeYParser p = ParsingFacade.createParser(CharStreams.fromString(str));
+        JavaKeYParser p = ParsingFacade.createParser(CharStreams.fromString(str));
         p.allowMatchId = true;
-        KeYParser.TermContext term = p.termEOF().term();
+        JavaKeYParser.TermContext term = p.termEOF().term();
         p.getErrorReporter().throwException();
         return fromParserContext(engineState, term);
     }
 
     public static TermWithHoles fromProofScriptExpression(EngineState engineState,
-            KeYParser.ProofScriptExpressionContext ctx) throws ConversionException {
+            JavaKeYParser.ProofScriptExpressionContext ctx) throws ConversionException {
         if (ctx.string_literal() != null) {
             String text = StringUtil.stripQuotes(ctx.string_literal().getText());
             return fromString(engineState, text);

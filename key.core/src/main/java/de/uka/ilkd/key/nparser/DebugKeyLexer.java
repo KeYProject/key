@@ -30,9 +30,9 @@ public class DebugKeyLexer {
     private static final String DEFAULT_FORMAT = "%02d %20s %d:%-50s\n";
     private final PrintStream stream;
     private final String format;
-    private final Collection<KeYLexer> lexer;
+    private final Collection<JavaKeYLexer> lexer;
 
-    public DebugKeyLexer(PrintStream stream, String format, Collection<KeYLexer> lexer) {
+    public DebugKeyLexer(PrintStream stream, String format, Collection<JavaKeYLexer> lexer) {
         this.stream = stream;
         this.format = format;
         this.lexer = lexer;
@@ -78,25 +78,25 @@ public class DebugKeyLexer {
         debug(ParsingFacade.createLexer(CharStreams.fromString(content)));
     }
 
-    public static void debug(KeYLexer lexer) {
+    public static void debug(JavaKeYLexer lexer) {
         DebugKeyLexer dkl =
             new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
     public void run() {
-        for (KeYLexer l : lexer) {
+        for (JavaKeYLexer l : lexer) {
             run(l);
         }
     }
 
-    private void run(KeYLexer toks) {
+    private void run(JavaKeYLexer toks) {
         Token t;
         do {
             t = toks.nextToken();
             stream.format(format, toks.getLine(), toks.getVocabulary().getSymbolicName(t.getType()),
                 toks._mode, t.getText().replace("\n", "\\n"));
-            if (t.getType() == KeYLexer.ERROR_CHAR) {
+            if (t.getType() == JavaKeYLexer.ERROR_CHAR) {
                 stream.println("!!ERROR!!");
             }
         } while (t.getType() != CommonToken.EOF);

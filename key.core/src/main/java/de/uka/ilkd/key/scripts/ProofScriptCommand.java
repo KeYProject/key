@@ -10,6 +10,7 @@ import de.uka.ilkd.key.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// A [ProofScriptCommand] is an executable mutation on the given proof. It abstracts complex
 /// operations, and made them accessible for an API.
@@ -73,7 +74,7 @@ public interface ProofScriptCommand {
     }
 
     /// A category name for this command. This is used to group commands in the UI or documentation.
-    default String getCategory() {
+    default @Nullable String getCategory() {
         return ArgumentsLifter.extractCategory(getClass(), null);
     }
 }

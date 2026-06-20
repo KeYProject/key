@@ -63,11 +63,17 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         }
 
         while (true) {
-            count++;
-            if (!dryRun) {
-                var newNode = getProofTreeModel().getProofTreeNode(n);
-                newNode.setParent(this);
-                childrenCache.add(newNode);
+            // While searching, hide intermediate proof steps that do not match the query
+            // (the subtree is still shown because it contains a match somewhere); this
+            // collapses the branch down to the matching steps. Branch nodes added below are
+            // always kept, as they are filtered by the global "contains match" check.
+            if (showStep(n)) {
+                count++;
+                if (!dryRun) {
+                    var newNode = getProofTreeModel().getProofTreeNode(n);
+                    newNode.setParent(this);
+                    childrenCache.add(newNode);
+                }
             }
             List<Node> nextN = findChild(n);
             if (nextN.isEmpty()) {
@@ -107,6 +113,15 @@ class GUIBranchNode extends GUIAbstractTreeNode {
             }
         }
         return count;
+    }
+
+    /**
+     * @param n a proof node on this branch's linear chain.
+     * @return whether the corresponding proof step should be shown. While the collapsing search
+     *         is active, only steps matching the query are shown; otherwise all steps are shown.
+     */
+    private static boolean showStep(Node n) {
+        return !ProofTreeViewFilter.SEARCH.isActive() || ProofTreeViewFilter.SEARCH.matches(n);
     }
 
     @Override

@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +41,16 @@ public class ProofScriptEngine {
     /**
      * The engine state map.
      */
-    private final EngineState stateMap;
+    private EngineState stateMap;
+
 
     public ProofScriptEngine(Proof proof) {
         super();
         this.stateMap = new EngineState(proof, this);
     }
 
-    static Map<String, ProofScriptCommand> loadCommands() {
+
+    public static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
@@ -67,7 +71,6 @@ public class ProofScriptEngine {
             throws ScriptException, InterruptedException {
         execute(uiControl, block.commands());
     }
-
 
     public void execute(AbstractUserInterfaceControl uiControl, Path file)
             throws ScriptException, InterruptedException, IOException {
@@ -91,11 +94,9 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         try {
-            if (start != null) {
-                URI url = start.fileUri();
-                stateMap.setBaseFileName(Paths.get(url));
-            }
-        } catch (InvalidPathException ignored) {
+            URI url = commands.getFirst().location().fileUri();
+            stateMap.setBaseFileName(Paths.get(url));
+        } catch (NullPointerException | InvalidPathException ignored) {
             // weigl: occurs on windows platforms, due to the fact
             // that the URI contains "<unknown>" from ANTLR4 when read by string
             // "<" is illegal on windows
@@ -165,6 +166,18 @@ public class ProofScriptEngine {
             }
         }
     }
+
+
+    public static String prettyPrintCommand(JavaKeYParser.ProofScriptCommandContext ctx) {
+        return ctx.cmd.getText() +
+            (ctx.proofScriptParameters() != null
+                    ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
+                            .map(RuleContext::getText)
+                            .collect(Collectors.joining(" "))
+                    : "")
+            + ";";
+    }
+
 
     public EngineState getStateMap() {
         return stateMap;

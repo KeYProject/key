@@ -5,7 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.List;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
@@ -40,13 +40,13 @@ public class SequentWithHoles {
 
     public static SequentWithHoles fromParserContext(EngineState state, ParserRuleContext ctx) {
 
-        if (ctx instanceof KeYParser.ProofScriptExpressionContext psctx) {
+        if (ctx instanceof JavaKeYParser.ProofScriptExpressionContext psctx) {
             ctx = psctx.seq();
         }
 
-        if (ctx instanceof KeYParser.SeqContext seqCtx) {
+        if (ctx instanceof JavaKeYParser.SeqContext seqCtx) {
             List<TermWithHoles> antecedent = new java.util.ArrayList<>();
-            KeYParser.SemisequentContext semseq = seqCtx.ant;
+            JavaKeYParser.SemisequentContext semseq = seqCtx.ant;
             while (semseq != null && semseq.term() != null) {
                 antecedent.add(TermWithHoles.fromParserContext(state, semseq.term()));
                 semseq = semseq.semisequent();

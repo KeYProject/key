@@ -29,7 +29,7 @@ dependencies {
     testImplementation(project(":key.core"))
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3'
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4'
 
     // test fixtures
     testFixturesApi(testFixtures(project(":key.util")))
@@ -179,14 +179,15 @@ processResources.dependsOn generateVersionFiles, generateSolverPropsList, genera
 def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
 tasks.register('runAntlr4Key', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
-    inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
+    inputs.files "src/main/antlr4/JavaKeYLexer.g4", "src/main/antlr4/JavaKeYParser.g4"
     outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
     mainClass.set("org.antlr.v4.Tool")
     args = ["-visitor",
+            "-lib", "../key.ncore/src/main/antlr/",
             "-Xexact-output-dir", "-o", antlr4OutputKey,
             "-package", "de.uka.ilkd.key.nparser",
-            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+            "src/main/antlr4/JavaKeYLexer.g4", "src/main/antlr4/JavaKeYParser.g4"]
     doFirst {
         file(antlr4OutputKey).mkdirs()
         println("create $antlr4OutputKey")

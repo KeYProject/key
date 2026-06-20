@@ -187,7 +187,7 @@ public class TestTacletParser {
         // if (b=>) find(=>b)
         SuccTacletBuilder builder = new SuccTacletBuilder();
         builder.setFind(parseFma("b"));
-        builder.setIfSequent(sequent("b", null));
+        builder.setAssumesSequent(sequent("b", null));
         builder.setName(new Name("close_goal"));
         Taclet close = builder.getSuccTaclet();
         String closeString = "close_goal{\\assumes (b==>) \\find(==>b) \\closegoal}";

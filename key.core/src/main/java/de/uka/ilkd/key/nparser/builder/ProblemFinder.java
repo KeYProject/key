@@ -10,7 +10,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.settings.Configuration;
@@ -40,14 +40,14 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Override
-    public @Nullable Object visitFile(KeYParser.FileContext ctx) {
+    public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         each(ctx.problem());
         return null;
     }
 
     @Override
-    public @Nullable KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
-        return accept(ctx.keyjavatype());
+    public @Nullable KeYJavaType visitArrayopid(JavaKeYParser.ArrayopidContext ctx) {
+        return accept(ctx.typemapping());
     }
 
     /**
@@ -66,7 +66,7 @@ public class ProblemFinder extends ExpressionBuilder {
      *         if the
      */
     @Override
-    public @Nullable JTerm visitProblem(KeYParser.ProblemContext ctx) {
+    public @Nullable JTerm visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
                 chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
@@ -78,7 +78,7 @@ public class ProblemFinder extends ExpressionBuilder {
         }
         if (ctx.PROOFOBLIGATION() != null) {
             var obl = ctx.proofObligation;
-            if (obl instanceof KeYParser.CstringContext stringContext) {
+            if (obl instanceof JavaKeYParser.CstringContext stringContext) {
                 try {
                     Properties p = new Properties();
                     var value = stringContext.STRING_LITERAL().getText();
@@ -92,7 +92,7 @@ public class ProblemFinder extends ExpressionBuilder {
                             "as a property file due to an error in the properties format",
                         e);
                 }
-            } else if (obl instanceof KeYParser.TableContext tbl) {
+            } else if (obl instanceof JavaKeYParser.TableContext tbl) {
                 proofObligation = ParsingFacade.getConfiguration(tbl);
             } else {
                 throw new BuildingException(ctx,
@@ -106,7 +106,7 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Override
-    public @Nullable Sequent visitTermorseq(KeYParser.TermorseqContext ctx) {
+    public @Nullable Sequent visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
         var obj = super.visitTermorseq(ctx);
         if (obj instanceof Sequent s)
             return s;

@@ -20,6 +20,22 @@ import org.jspecify.annotations.Nullable;
 public class BuildingException extends RuntimeException implements HasLocation {
     private final @Nullable Token offendingSymbol;
 
+    /**
+     * An optional position that overrides the position derived from {@link #offendingSymbol}. This
+     * is used when the real error location is not the offending token itself but a more precise
+     * spot, e.g. a position <em>inside</em> a Java block that is represented by a single token
+     * (the modality), but whose URI is still the one of that token.
+     */
+    private final @Nullable Position overridePosition;
+
+    /**
+     * The message as passed in, <em>without</em> the " at &lt;file&gt;:&lt;line&gt;:&lt;col&gt;"
+     * suffix that {@link #getMessage()} appends. Consumers that render the {@link #getLocation()}
+     * separately (the GUI dialog, the console formatter) should use this to avoid printing the
+     * position twice.
+     */
+    private final @Nullable String rawMessage;
+
     public BuildingException(ParserRuleContext ctx, String format) {
         this(ctx, format, null);
     }
@@ -27,6 +43,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
     public BuildingException(Throwable e) {
         super(e);
         offendingSymbol = null;
+        overridePosition = null;
+        rawMessage = e == null ? null : e.getMessage();
     }
 
     public BuildingException(ParserRuleContext ctx, String message, Throwable e) {
@@ -34,13 +52,42 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     public BuildingException(@Nullable Token t, String message, Throwable e) {
-        super(message + " at " + getPosition(t), e);
-        offendingSymbol = t;
+        this(t, null, message, e);
     }
 
-    private static String getPosition(Token t) {
+    /**
+     * Creates an exception whose location uses the URI of the given token but the explicitly
+     * provided position instead of the token's own position.
+     *
+     * @param t the token providing the source (file) of the error, may be null
+     * @param overridePosition the precise position of the error, or null to use the token's
+     *        position
+     * @param message the error message
+     * @param e the causing throwable, may be null
+     */
+    public BuildingException(@Nullable Token t, @Nullable Position overridePosition, String message,
+            Throwable e) {
+        super(message + " at " + getPosition(t, overridePosition), e);
+        offendingSymbol = t;
+        this.overridePosition = overridePosition;
+        this.rawMessage = message;
+    }
+
+    /**
+     * The error message without the trailing " at &lt;position&gt;" suffix. Use this together with
+     * {@link #getLocation()} to avoid reporting the position twice.
+     */
+    public String getRawMessage() {
+        return rawMessage != null ? rawMessage : getMessage();
+    }
+
+    private static String getPosition(@Nullable Token t) {
+        return getPosition(t, null);
+    }
+
+    private static String getPosition(@Nullable Token t, @Nullable Position override) {
         if (t != null) {
-            var p = Position.fromToken(t);
+            var p = override != null ? override : Position.fromToken(t);
             return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
         } else {
             return "";
@@ -53,14 +100,16 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     @Override
     public String toString() {
-        return getMessage() + " (" + getPosition(offendingSymbol) + ")";
+        return getMessage() + " (" + getPosition(offendingSymbol, overridePosition) + ")";
     }
 
     @Override
     public Location getLocation() {
         if (offendingSymbol != null) {
             URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
-            return new Location(uri, Position.fromToken(offendingSymbol));
+            Position p = overridePosition != null ? overridePosition
+                    : Position.fromToken(offendingSymbol);
+            return new Location(uri, p);
         }
         return Location.UNDEFINED;
     }

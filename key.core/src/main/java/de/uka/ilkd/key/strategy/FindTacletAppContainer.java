@@ -37,6 +37,14 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final PosInOccurrence applicationPosition;
 
     /**
+     * Cache for {@link #getPosInOccurrence(Goal)}: the position re-targeted to the current
+     * version of the formula. Rebuilding it on every query forces a fresh walk to the
+     * (possibly deep) find position each time the subterm is accessed. The cache is only
+     * an optimization, the container stays observably immutable.
+     */
+    private PosInOccurrence currentPositionCache;
+
+    /**
      * Creates a FindTacletAppContainer for applying a find taclet.
      *
      * @param app the taclet application
@@ -176,7 +184,12 @@ public class FindTacletAppContainer extends TacletAppContainer {
         final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;
-        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+        PosInOccurrence cached = currentPositionCache;
+        if (cached == null || cached.sequentFormula() != topPos.sequentFormula()) {
+            cached = applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+            currentPositionCache = cached;
+        }
+        return cached;
     }
 
 }

@@ -6,10 +6,7 @@ package de.uka.ilkd.key.proof.io;
 import java.nio.file.Path;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.*;
 
 import org.jspecify.annotations.Nullable;
 
@@ -24,7 +21,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final List<Path> classPath;
     protected final @Nullable Path bootClassPath;
     protected final Includes includes;
-    protected final Profile profile;
+    protected final @Nullable Profile profile;
 
     protected InitConfig initConfig;
     private boolean ignoreOtherJavaFiles;
@@ -38,14 +35,17 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected AbstractEnvInput(String name, @Nullable Path javaPath,
             List<Path> classPath,
             @Nullable Path bootClassPath,
-            Profile profile,
+            @Nullable Profile profile,
             List<Path> includes) {
-        assert profile != null;
         this.name = name;
         this.javaPath = javaPath;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
-        this.profile = profile;
+        if (profile != null) {
+            this.profile = profile;
+        } else {
+            this.profile = JavaProfile.getDefaultProfile();
+        }
         this.includes = new Includes();
         if (includes != null) {
             for (Path path : includes) {
