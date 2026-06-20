@@ -321,7 +321,7 @@ public class ValueInjector {
      * @param <T> an arbitrary type
      */
     public <R, T> void addConverter(Class<R> ret, Class<T> arg, Converter<R, T> conv) {
-        converters.put(new ConverterKey<>(ret, arg), conv);
+        converters.put(new ConverterKey<>(arg, ret), conv);
     }
 
     public <R, T> void addConverter(Converter<R, T> conv) {
@@ -345,7 +345,7 @@ public class ValueInjector {
         if (ret.isAssignableFrom(arg)) {
             return (T it) -> (R) it;
         }
-        Converter<R, T> result = (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
+        Converter<R, T> result = (Converter<R, T>) converters.get(new ConverterKey<>(arg, ret));
         if (result == null) {
             throw new NoSpecifiedConverterException(
                 "No converter registered for class: " + ret.getName() + " from " + arg.getName());

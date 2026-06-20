@@ -87,6 +87,8 @@ public class EngineState {
         v.addConverter(Sort.class, String.class, this::toSort);
         v.addConverter(TermWithHoles.class, ProofScriptExpressionContext.class,
             it -> TermWithHoles.fromProofScriptExpression(this, it));
+        v.addConverter(TermWithHoles.class, String.class,
+            it -> new TermWithHoles(this.toTerm(it, null)));
 
         v.addConverter(SequentWithHoles.class, ProofScriptExpressionContext.class,
             it -> SequentWithHoles.fromParserContext(this, it));

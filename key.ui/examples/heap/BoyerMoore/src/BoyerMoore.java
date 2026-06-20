@@ -62,6 +62,7 @@ class BoyerMoore {
                 /*@ assert count(a, k+1, a[k]) <= count(a, k, a[k]) + 1 \by {
                   @  oss;
                   @  expand on: "self.count(a, k_0 + 1, a[k_0])";
+                  @  macro "nosplit-prop";
                   @  auto classAxioms:false;
                   @ }*/
             } else if(mx == a[k]) {
@@ -73,6 +74,7 @@ class BoyerMoore {
               @  oss;
               @  obtain int x \from_goal;
               @  expand on: "self.count(a, k_0 + 1, x)";
+              @  macro "nosplit-prop";
               @  instantiate var:"x" with: x;
               @  auto classAxioms:false;
               @ }*/

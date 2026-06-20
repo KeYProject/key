@@ -89,8 +89,8 @@ public class ObtainCommand extends AbstractCommand {
     private JTerm executeFromGoal(LocationVariable var) throws ScriptException {
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        // This works under the assumption that the first succedent formula is the "goal" formula.
-        SequentFormula sequentFormula = identifySequentFormula(goal.node());
+        // This works under the assumption that the last succedent formula is the "goal" formula.
+        SequentFormula sequentFormula = goal.node().sequent().succedent().getLast();
         JTerm formula = (JTerm) sequentFormula.formula();
         while (formula.op() instanceof UpdateApplication) {
             formula = formula.sub(1);
