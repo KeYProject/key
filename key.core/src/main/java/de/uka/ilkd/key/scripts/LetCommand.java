@@ -87,10 +87,7 @@ public class LetCommand extends AbstractCommand {
             }
 
             try {
-                final var termCtx = (JavaKeYParser.ProofScriptExpressionContext) entry.getValue();
-                final var value = termCtx.accept(state().getEvaluator());
-                final var term = state().getValueInjector().convert(value, JTerm.class);
-                abbrMap.put(term, key, true);
+                abbrMap.put(entry.getValue(), key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
