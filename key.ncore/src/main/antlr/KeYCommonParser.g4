@@ -1,7 +1,5 @@
 parser grammar KeYCommonParser;
 
-options { tokenVocab = KeYLexer; }
-
 simple_ident
    : id = IDENT
    ;

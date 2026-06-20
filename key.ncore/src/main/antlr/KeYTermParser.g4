@@ -1,7 +1,6 @@
 parser grammar KeYTermParser;
 
 
-options { tokenVocab = KeYLexer; }
 import KeYCommonParser;
 term
    : parallel_term
