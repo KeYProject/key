@@ -322,6 +322,6 @@ programSource: JAVASOURCE result=oneProgramSource SEMI;
 simple_ident
    :
      id = IDENT
-   | {allowMatchId}? id=MATCH_IDENT
+   | /*{allowMatchId}?*/ id=MATCH_IDENT
    ;
 
