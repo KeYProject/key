@@ -23,17 +23,28 @@ public class PoolSyntaxElementCursor {
     private static final int INITIAL_STACK_SIZE = 64;
 
     /**
-     * A pool of {@link PoolSyntaxElementCursor} as these are created very often and short-living we
-     * reuse them as far as possible
-     * <br>
-     * The used PoolSyntaxElementCursor have to be explicitly released by the user via
-     * {@link #release()}
+     * A pool of {@link PoolSyntaxElementCursor}: as these are created very often and are
+     * short-living, we reuse them as far as possible. The used cursors have to be explicitly
+     * released by the user via {@link #release()}.
+     *
+     * <p>
+     * The pool is <em>per thread</em>. A cursor is acquired and released within a single matching
+     * step on one thread, so a thread-local free list gives the same reuse without any
+     * synchronization. A single shared, lock-guarded pool was a severe contention point under the
+     * multi-core prover: every worker's innermost matching loop serialized on it, which at high
+     * worker counts degraded into an effective livelock. The list fills lazily (capped at
+     * {@link #POOL_SIZE} per thread) and is discarded when the thread ends.
      */
-    private static final ArrayDeque<PoolSyntaxElementCursor> CURSOR_POOL = new ArrayDeque<>();
-    static {
-        for (int i = 0; i < POOL_SIZE; i++) {
-            CURSOR_POOL.push(new PoolSyntaxElementCursor());
-        }
+    // The nullness checker rejects the ThreadLocal type argument here (a known limitation of its
+    // ThreadLocal model); the per-thread pool is always non-null via withInitial.
+    @SuppressWarnings("nullness")
+    private static final ThreadLocal<ArrayDeque<PoolSyntaxElementCursor>> CURSOR_POOL =
+        ThreadLocal.withInitial(ArrayDeque::new);
+
+    /** The calling thread's pool, lazily created (never {@code null}: see {@link #CURSOR_POOL}). */
+    @SuppressWarnings("nullness") // get() is non-null because withInitial always supplies a deque
+    private static ArrayDeque<PoolSyntaxElementCursor> pool() {
+        return CURSOR_POOL.get();
     }
 
     /**
@@ -45,15 +56,9 @@ public class PoolSyntaxElementCursor {
      *         currently empty
      */
     public static PoolSyntaxElementCursor get(SyntaxElement se) {
-        PoolSyntaxElementCursor c = null;
-        synchronized (CURSOR_POOL) {
-            if (!CURSOR_POOL.isEmpty()) {
-                c = CURSOR_POOL.pop();
-            }
-        }
-        if (c == null) {
-            c = new PoolSyntaxElementCursor();
-        }
+        final ArrayDeque<PoolSyntaxElementCursor> pool = pool();
+        final PoolSyntaxElementCursor c =
+            pool.isEmpty() ? new PoolSyntaxElementCursor() : pool.pop();
         c.push(se);
         return c;
     }
@@ -142,10 +147,9 @@ public class PoolSyntaxElementCursor {
             elements[top] = null;
             top--;
         }
-        synchronized (CURSOR_POOL) {
-            if (CURSOR_POOL.size() < POOL_SIZE) {
-                CURSOR_POOL.push(this);
-            }
+        final ArrayDeque<PoolSyntaxElementCursor> pool = pool();
+        if (pool.size() < POOL_SIZE) {
+            pool.push(this);
         }
     }
 }
