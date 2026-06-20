@@ -113,6 +113,8 @@ tasks.withType(Test) {
      "key.mt.synth.splits", "key.mt.synth.worksplits", "key.mt.synth.work",
      "key.mt.synth.linear", "key.mt.synth.loop",
      "key.mt.jfr.probe", "key.mt.jfr.proof", "key.mt.jfr.workers", "key.mt.jfr.reps",
+     "key.mt.retention", "key.mt.retention.proof", "key.mt.retention.reps",
+     "key.mt.retention.histo",
      "key.prover.parallel", "key.prover.parallel.threads"].each { p ->
         if (System.getProperty(p) != null) {
             systemProperty(p, System.getProperty(p))
