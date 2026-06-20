@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.ui.gui.KeYFileChooser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

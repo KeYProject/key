@@ -15,11 +15,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.ui.core.Log;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
@@ -53,7 +53,7 @@ public final class Main implements Callable<Integer> {
      */
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
-        int exitCode = new CommandLine(new de.uka.ilkd.key.core.Main())
+        int exitCode = new CommandLine(new de.uka.ilkd.key.ui.core.Main())
                 .execute(args);
         System.exit(exitCode);
     }

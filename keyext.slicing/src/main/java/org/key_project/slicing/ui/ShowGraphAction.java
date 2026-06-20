@@ -5,8 +5,8 @@ package org.key_project.slicing.ui;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.GraphNode;

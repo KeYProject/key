@@ -6,12 +6,12 @@ package org.key_project.isabelletranslation.gui;
 import java.util.Collection;
 import java.util.HashSet;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.actions.useractions.UserAction;
 
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.automation.IsabelleRule;

@@ -5,12 +5,12 @@ package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.ui.gui.MainWindow;
 
 import org.key_project.exploration.ProofExplorationService;
 import org.key_project.prover.sequent.PosInOccurrence;

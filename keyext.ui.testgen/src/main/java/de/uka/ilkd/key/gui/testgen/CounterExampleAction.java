@@ -9,14 +9,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -25,6 +17,14 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampleGenerator;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.gui.IssueDialog;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.ui.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.ui.gui.smt.SolverListener;
 
 import org.key_project.prover.sequent.Sequent;
 

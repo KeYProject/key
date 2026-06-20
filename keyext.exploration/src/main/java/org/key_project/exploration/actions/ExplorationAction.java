@@ -7,11 +7,11 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.exploration.ExplorationModeModel;

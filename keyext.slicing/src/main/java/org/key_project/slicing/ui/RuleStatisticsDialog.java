@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.configuration.Config;
 
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;

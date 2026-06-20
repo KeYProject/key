@@ -6,9 +6,9 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.KeyAction;
 
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;

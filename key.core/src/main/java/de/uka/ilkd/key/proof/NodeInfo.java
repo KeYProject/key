@@ -27,7 +27,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
-import org.key_project.proof.LocationVariableTracker;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.SequentChangeInfo;

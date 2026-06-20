@@ -11,17 +11,17 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProofMacroWorker;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.IssueDialog;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.ProofMacroWorker;
+import de.uka.ilkd.key.ui.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.ui.gui.notification.events.GeneralInformationEvent;
 
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverTaskListener;

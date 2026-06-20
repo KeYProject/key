@@ -7,10 +7,10 @@ import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.help.HelpInfo;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.KeyAction;
+import de.uka.ilkd.key.ui.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.ui.gui.help.HelpInfo;
 
 import org.jspecify.annotations.NonNull;
 

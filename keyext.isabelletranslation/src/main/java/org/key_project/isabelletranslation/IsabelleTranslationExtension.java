@@ -8,13 +8,13 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.extension.api.ContextMenuAdapter;
+import de.uka.ilkd.key.ui.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.ui.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.ui.gui.settings.SettingsProvider;
 
 import org.key_project.isabelletranslation.gui.controller.IsabelleTranslateAllAction;
 import org.key_project.isabelletranslation.gui.controller.IsabelleTranslationAction;

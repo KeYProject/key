@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.replay.AbstractProofReplayer;
+import de.uka.ilkd.key.ui.gui.MainWindow;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 

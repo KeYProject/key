@@ -6,9 +6,9 @@ package org.key_project.isabelletranslation.gui.controller;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.actions.MainWindowAction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,11 +12,12 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.IssueDialog;
+import de.uka.ilkd.key.ui.gui.MainWindow;
+import de.uka.ilkd.key.ui.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel.ProcessColumn.ProcessData;
-import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Dialog showing launched Isabelle processes and results.
  * <p>
- * Adapted version of {@link de.uka.ilkd.key.gui.smt.ProgressDialog} used for SMT.
+ * Adapted version of {@link ProgressDialog} used for SMT.
  */
 public class IsabelleProgressDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProgressDialog.class);

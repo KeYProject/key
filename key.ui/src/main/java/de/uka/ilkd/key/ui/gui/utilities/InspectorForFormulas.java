@@ -1,0 +1,54 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.ui.gui.utilities;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.ui.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
+
+/**
+ * Inspects whether a given string can be translated into a formula.
+ */
+public class InspectorForFormulas implements CheckedUserInputInspector {
+
+    private final Services services;
+
+
+
+    public InspectorForFormulas(Services services) {
+        super();
+        this.services = services;
+    }
+
+
+
+    @Override
+    public String check(String toBeChecked) {
+        if (toBeChecked.isEmpty()) {
+            return NO_USER_INPUT;
+        }
+        JTerm term = translate(services, toBeChecked);
+
+        if (term == null) {
+            return NO_USER_INPUT;
+        }
+
+        if (term.sort() != JavaDLTheory.FORMULA) {
+            return "Not a formula.";
+        }
+        return null;
+
+    }
+
+    public static JTerm translate(Services services, String toBeChecked) {
+        try {
+            return new KeyIO(services).parseExpression(toBeChecked);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+}
