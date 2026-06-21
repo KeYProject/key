@@ -48,6 +48,9 @@ public class MatchInfoPanel extends JPanel {
     /** label-column width so the value columns line up across the Rule/Find/Matched rows */
     private static final int LABEL_WIDTH = 92;
 
+    /** a matched term taller than this many lines is collapsed behind a toggle */
+    private static final int MATCHED_PREVIEW_LINES = 2;
+
     private final KeYMediator mediator;
 
     /**
@@ -202,18 +205,25 @@ public class MatchInfoPanel extends JPanel {
     }
 
     /**
-     * renders the matched term, colouring each sub-term a bound schema variable matched in that
-     * variable's palette colour. Falls back to plain text if the positions cannot be determined.
+     * renders the matched term, colouring each sub-term a bound schema variable matched in its
+     * variable's palette colour. A term taller than {@link #MATCHED_PREVIEW_LINES} lines is instead
+     * shown collapsed behind a toggle via {@link ExpandableText} (the same component the bindings
+     * use), so a big matched term does not dominate the panel; the in-term highlight is kept for
+     * shorter terms, where the whole term is visible at once anyway. Falls back to plain text if
+     * the
+     * positions cannot be determined.
      */
     private JComponent matchedTerm(Term find, Term matched) {
         try {
             List<SvSpan> spans = new ArrayList<>();
             collectSvSpans(find, matched, new ArrayDeque<>(), spans);
             TmPrint.Positioned printed = TmPrint.termWithPositions(mediator, matched);
-            if (printed.positions() == null || spans.isEmpty()) {
+            if (printed.positions() == null || spans.isEmpty()
+                    || TmText.lineCount(printed.text()) > MATCHED_PREVIEW_LINES) {
                 return new ExpandableText(printed.text());
             }
-            return highlighted(printed.text(), printed.positions(), spans);
+            return styledTerm(printed.text(),
+                resolveRanges(printed.text(), printed.positions(), spans));
         } catch (RuntimeException ex) {
             return new ExpandableText(TmPrint.term(mediator, matched));
         }
@@ -240,21 +250,12 @@ public class MatchInfoPanel extends JPanel {
         }
     }
 
-    private JComponent highlighted(String text, InitialPositionTable positions,
+    /**
+     * the sub-term ranges to highlight, resolved to character offsets {@code [start, end, colour]}.
+     */
+    private List<int[]> resolveRanges(String text, InitialPositionTable positions,
             List<SvSpan> spans) {
-        JTextPane pane = new JTextPane();
-        pane.setEditable(false);
-        pane.setOpaque(false);
-        pane.setBorder(null);
-        pane.setText(text);
-
-        StyledDocument doc = pane.getStyledDocument();
-        Font mono = TmStyle.mono(pane);
-        SimpleAttributeSet base = new SimpleAttributeSet();
-        StyleConstants.setFontFamily(base, mono.getFamily());
-        StyleConstants.setFontSize(base, mono.getSize());
-        doc.setCharacterAttributes(0, text.length(), base, true);
-
+        List<int[]> ranges = new ArrayList<>();
         int len = text.length();
         for (SvSpan span : spans) {
             // the initial position table roots the printed term at path [0]; the sub-term path
@@ -269,9 +270,38 @@ public class MatchInfoPanel extends JPanel {
             }
             int start = Math.max(0, Math.min(r.start(), len));
             int end = Math.max(start, Math.min(r.end(), len));
+            if (end > start) {
+                ranges.add(new int[] { start, end, span.color() });
+            }
+        }
+        return ranges;
+    }
+
+    /** a read-only monospaced pane showing {@code text} with the given coloured sub-term ranges. */
+    private JTextPane styledTerm(String text, List<int[]> ranges) {
+        JTextPane pane = new JTextPane();
+        pane.setEditable(false);
+        pane.setOpaque(false);
+        pane.setBorder(null);
+        pane.setText(text);
+
+        StyledDocument doc = pane.getStyledDocument();
+        Font mono = TmStyle.mono(pane);
+        SimpleAttributeSet base = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(base, mono.getFamily());
+        StyleConstants.setFontSize(base, mono.getSize());
+        doc.setCharacterAttributes(0, text.length(), base, true);
+
+        int len = text.length();
+        for (int[] r : ranges) {
+            int start = Math.min(r[0], len);
+            int end = Math.min(r[1], len);
+            if (end <= start) {
+                continue;
+            }
             SimpleAttributeSet a = new SimpleAttributeSet();
-            StyleConstants.setBackground(a, SvPalette.background(span.color()));
-            StyleConstants.setForeground(a, SvPalette.foreground(span.color()));
+            StyleConstants.setBackground(a, SvPalette.background(r[2]));
+            StyleConstants.setForeground(a, SvPalette.foreground(r[2]));
             doc.setCharacterAttributes(start, end - start, a, false);
         }
         // never stretch vertically beyond the content (BoxLayout would otherwise inflate it)
