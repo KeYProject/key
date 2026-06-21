@@ -28,6 +28,7 @@ import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -116,6 +117,38 @@ public class JavaParserFactory {
 
     public TypeSolver getTypeSolver() {
         return typeSolver;
+    }
+
+    /**
+     * Drops the global {@link JavaParserFacade} resolution cache so that this factory's
+     * {@link #typeSolver} (and through it the owning {@link Services} and its whole proof tree) can
+     * be garbage-collected once the proof is disposed.
+     *
+     * <p>
+     * {@link JavaParserFacade} keeps a {@code static WeakHashMap<TypeSolver, JavaParserFacade>}
+     * ({@code JavaParserFacade.instances}) whose <em>value</em> strongly references its own
+     * <em>key</em>: each value is created as {@code new JavaParserFacade(typeSolver)} and stores
+     * that very type solver. A weak key that stays strongly reachable from its own value can never
+     * become weakly reachable, so the entry is never evicted. Since our type solvers transitively
+     * reference the owning {@link Services}, every disposed proof would otherwise be retained
+     * forever through this cache — a long-standing, proof-sized memory leak.
+     *
+     * <p>
+     * A single proof registers several short-lived type-solver keys (the {@code DynamicTypeSolver}
+     * wrapper plus every {@code CombinedTypeSolver} produced by {@code rebuild()}), and the fork
+     * exposes no per-key removal, so the only complete remedy is to drop the cache wholesale via
+     * the
+     * public {@link JavaParserFacade#clearInstances()}. This is safe: the facade is a pure
+     * resolution cache that is only populated while parsing Java during loading and is rebuilt
+     * lazily on the next {@code get}. We synchronize on the same monitor
+     * {@code JavaParserFacade.get}
+     * uses, because the backing map is a plain {@link java.util.WeakHashMap} and
+     * {@code clearInstances()} is itself unsynchronized.
+     */
+    public void dispose() {
+        synchronized (JavaParserFacade.class) {
+            JavaParserFacade.clearInstances();
+        }
     }
 
     public JavaSymbolSolver getSymbolSolver() {

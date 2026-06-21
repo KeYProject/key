@@ -97,6 +97,21 @@ classes.dependsOn << generateSolverPropsList
 
 tasks.withType(Test) {
     enableAssertions = true
+    // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
+    systemProperties += System.properties.findAll { it.key.toString().startsWith("key.mt.retention") }
+    if (project.hasProperty("stressHeap")) {
+        maxHeapSize = project.property("stressHeap")
+    }
+    if (System.getProperty("key.mt.retention.root") == "true") {
+        jvmArgs += [
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
+            "--add-opens", "java.base/java.util=ALL-UNNAMED",
+            "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+            "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
+            "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED"
+        ]
+    }
 }
 
 
