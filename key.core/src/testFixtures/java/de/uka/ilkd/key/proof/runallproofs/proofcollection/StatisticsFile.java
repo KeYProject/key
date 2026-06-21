@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -33,7 +34,7 @@ public class StatisticsFile implements Serializable {
     @SuppressWarnings("rawtypes")
     private static final Column[] columns = { new Column<String>("Name") {
         @Override
-        String addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+        String addEntry(Statistics statistics, Proof proof, File keyFile, boolean proofClosed) {
             String name = keyFile.getAbsolutePath();
             final int slashIndex = name.lastIndexOf("examples/");
             return slashIndex >= 0 ? name.substring(slashIndex) : name;
@@ -82,7 +83,7 @@ public class StatisticsFile implements Serializable {
     }, new Column<Integer>("Closed") {
 
         @Override
-        Integer addEntry(Statistics statistics, File keyFile, boolean closed) {
+        Integer addEntry(Statistics statistics, Proof proof, File keyFile, boolean closed) {
             return closed ? 1 : 0;
         }
 
@@ -99,7 +100,7 @@ public class StatisticsFile implements Serializable {
     }, new Column<Double>("Time per step (ms)") {
 
         @Override
-        Double addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+        Double addEntry(Statistics statistics, Proof proof, File keyFile, boolean proofClosed) {
             return (double) statistics.timePerStepInMillis;
         }
 
@@ -120,6 +121,38 @@ public class StatisticsFile implements Serializable {
             // get current memory consumption (after GC) in kB
             Runtime.getRuntime().gc();
             return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024;
+        }
+
+    }, new Column<String>("Open reason") {
+
+        /**
+         * For a proof that did not close, why its goals remain open: {@code step budget reached} if
+         * some open goal still has an automatic rule to apply (the strategy stopped because the
+         * maximal number of rule applications / the timeout was hit, so more steps could help), or
+         * {@code not closeable} if no open goal has any applicable rule left (the strategy
+         * exhausted
+         * all rules and the goal(s) are genuinely not closeable automatically). {@code closed} for
+         * a
+         * closed proof.
+         */
+        @Override
+        String addEntry(Statistics statistics, Proof proof, File keyFile, boolean proofClosed) {
+            if (proofClosed) {
+                return "closed";
+            }
+            boolean someGoalHasApplicableRule = false;
+            for (Goal goal : proof.openGoals()) {
+                if (Goal.hasApplicableRules(goal)) {
+                    someGoalHasApplicableRule = true;
+                    break;
+                }
+            }
+            return someGoalHasApplicableRule ? "step budget reached" : "not closeable";
+        }
+
+        @Override
+        String[] computeSumAndAverage(List<String> list) {
+            return new String[] { "", "" };
         }
 
     } };
@@ -197,7 +230,8 @@ public class StatisticsFile implements Serializable {
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
         for (Column<?> column : columns) {
-            entries.add(column.addEntry(statistics, keyFile.toFile(), proofClosed).toString());
+            entries.add(
+                column.addEntry(statistics, proof, keyFile.toFile(), proofClosed).toString());
         }
         writeLine(entries);
     }
@@ -312,7 +346,7 @@ public class StatisticsFile implements Serializable {
         }
 
         @Override
-        Long addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+        Long addEntry(Statistics statistics, Proof proof, File keyFile, boolean proofClosed) {
             return getLongValueFromStatistics(statistics);
         }
 
@@ -342,7 +376,7 @@ public class StatisticsFile implements Serializable {
 
         abstract String[] computeSumAndAverage(List<String> list);
 
-        abstract T addEntry(Statistics statistics, File keyFile, boolean proofClosed);
+        abstract T addEntry(Statistics statistics, Proof proof, File keyFile, boolean proofClosed);
     }
 
     public File getStatisticsFile() {
