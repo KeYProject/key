@@ -106,6 +106,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <li>{@code -Dkey.mt.stresstest.jfrdir} — if set, every child records its own
  * {@code <tag>.jfr} Flight Recording there (per-proof recordings, instead of one rolling file).
  * <li>{@code -Dkey.mt.stresstest.fork} — {@code false} to run in-process in a single JVM.
+ * <li>{@code -Dkey.mt.stresstest.forkpercell} — {@code true} to fork a fresh JVM per
+ * <em>(proof, worker-count)</em> cell instead of per proof. Each child then does only a reference
+ * run plus {@code reps} runs, which bounds the cross-run memory growth (a pre-existing KeY
+ * proof-retention leak) that otherwise accumulates over a proof's hundreds of runs and tips a heavy
+ * proof's child into a GC death-spiral at high worker counts. Costs extra JVM starts and one
+ * reference run per cell; recommended for long, high-rep or high-worker runs.
  * </ul>
  * Run under {@code -ea} (assertions on). To force the legacy cursor-based find-matcher (instead of
  * the default compiled one), pass {@code -Dkey.matcher.interpreter=true} (forwarded to the
@@ -165,13 +171,21 @@ public class MtStressMatrix {
     void stress() throws Exception {
         String[] corpus = System.getProperty("key.mt.stresstest.proofs", DEFAULT_CORPUS).split(",");
         boolean fork = Boolean.parseBoolean(System.getProperty("key.mt.stresstest.fork", "true"));
+        // Per-cell mode forks a fresh JVM per (proof, worker-count) instead of per proof, so each
+        // child only does REF + reps runs. This bounds the cross-run memory accumulation (a
+        // pre-existing KeY proof-retention leak) that otherwise builds up over a proof's hundreds
+        // of
+        // runs and tips a heavy proof's child into a GC death-spiral at high worker counts. Costs
+        // extra JVM starts and one reference run per cell.
+        boolean forkPerCell =
+            Boolean.parseBoolean(System.getProperty("key.mt.stresstest.forkpercell", "false"));
         long procTimeoutMs = Long.getLong("key.mt.stresstest.proctimeout", 7200L) * 1000L;
         Path outDir = Path.of(System.getProperty("key.mt.stresstest.out", "build/mt-stress"));
         Files.createDirectories(outDir);
 
         int cores = Runtime.getRuntime().availableProcessors();
-        log("[mt-stress] orchestrator: cores=%d proofs=%d fork=%s procTimeout=%ds out=%s", cores,
-            corpus.length, fork, procTimeoutMs / 1000, outDir.toAbsolutePath());
+        log("[mt-stress] orchestrator: cores=%d proofs=%d fork=%s perCell=%s procTimeout=%ds out=%s",
+            cores, corpus.length, fork, forkPerCell, procTimeoutMs / 1000, outDir.toAbsolutePath());
         log("[mt-stress] corpus: %s", String.join(" | ", corpus));
 
         List<String> anomalies = new ArrayList<>();
@@ -179,9 +193,25 @@ public class MtStressMatrix {
 
         for (String spec : corpus) {
             spec = spec.trim();
-            if (fork) {
+            if (fork && forkPerCell) {
+                int[] workers =
+                    parseInts(System.getProperty("key.mt.stresstest.workers", DEFAULT_WORKERS));
+                for (int w : workers) {
+                    log("[mt-stress] === %s @ %d workers : forking child JVM ===", shortName(spec),
+                        w);
+                    ForkOutcome o = forkChild(spec, outDir, procTimeoutMs, w);
+                    String cell = shortName(spec) + "@" + w;
+                    if (o.timedOut) {
+                        anomalies.add("PROCESS-HANG " + cell + " (killed after " + procTimeoutMs
+                                / 1000
+                            + "s; child JVM wedged)");
+                    } else if (o.exit != 0) {
+                        anomalies.add("CHILD-ANOMALY " + cell + " (child exit=" + o.exit + ")");
+                    }
+                }
+            } else if (fork) {
                 log("[mt-stress] === %s : forking child JVM ===", shortName(spec));
-                ForkOutcome o = forkChild(spec, outDir, procTimeoutMs);
+                ForkOutcome o = forkChild(spec, outDir, procTimeoutMs, -1);
                 if (o.timedOut) {
                     anomalies.add("PROCESS-HANG " + shortName(spec) + " (killed after "
                         + procTimeoutMs / 1000 + "s; child JVM wedged)");
@@ -193,7 +223,7 @@ public class MtStressMatrix {
                 int rc = runOneProof(spec, FindResources.getExampleDirectory(),
                     parseInts(System.getProperty("key.mt.stresstest.workers", DEFAULT_WORKERS)),
                     Integer.getInteger("key.mt.stresstest.reps", 20),
-                    Long.getLong("key.mt.stresstest.timeout", 600L) * 1000L, outDir);
+                    Long.getLong("key.mt.stresstest.timeout", 600L) * 1000L, outDir, tagOf(spec));
                 if (rc != 0) {
                     anomalies.add("ANOMALY " + shortName(spec) + " (see summary-" + tagOf(spec)
                         + ".txt)");
@@ -202,7 +232,7 @@ public class MtStressMatrix {
         }
 
         long wallSecs = (System.currentTimeMillis() - wall0) / 1000;
-        aggregate(outDir, corpus, anomalies, wallSecs);
+        aggregate(outDir, anomalies, wallSecs);
 
         assertTrue(anomalies.isEmpty(),
             () -> "multi-core stress found " + anomalies.size() + " proof(s) with anomalies; see "
@@ -218,9 +248,13 @@ public class MtStressMatrix {
         long timeoutMs = Long.getLong("key.mt.stresstest.timeout", 600L) * 1000L;
         Path outDir = Path.of(System.getProperty("key.mt.stresstest.out", "build/mt-stress"));
         Files.createDirectories(outDir);
+        // In per-cell mode the orchestrator gives each child a distinct output tag so the
+        // runs-<tag>.csv / summary-<tag>.txt of different worker counts of the same proof do not
+        // clobber each other; otherwise it is just the proof tag.
+        String outTag = System.getProperty("key.mt.stresstest.outtag", tagOf(spec));
         int rc =
             new MtStressMatrix().runOneProof(spec, FindResources.getExampleDirectory(), workers,
-                reps, timeoutMs, outDir);
+                reps, timeoutMs, outDir, outTag);
         System.out.flush();
         System.exit(rc);
     }
@@ -229,8 +263,17 @@ public class MtStressMatrix {
     private record ForkOutcome(int exit, boolean timedOut) {
     }
 
-    /** Launches a child JVM for one proof and waits for it (force-killing it past the timeout). */
-    private ForkOutcome forkChild(String spec, Path outDir, long procTimeoutMs) throws Exception {
+    /**
+     * Launches a child JVM and waits for it (force-killing it past the timeout). When
+     * {@code singleWorker > 0} the child runs only that one worker count (per-cell mode) and writes
+     * to a worker-count-tagged output file; otherwise it runs the whole worker-count list.
+     */
+    private ForkOutcome forkChild(String spec, Path outDir, long procTimeoutMs, int singleWorker)
+            throws Exception {
+        boolean perCell = singleWorker > 0;
+        String cellTag = perCell ? tagOf(spec) + "_w" + singleWorker : tagOf(spec);
+        String label = perCell ? shortName(spec) + "@" + singleWorker : shortName(spec);
+
         List<String> cmd = new ArrayList<>();
         cmd.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
         cmd.add("-cp");
@@ -243,7 +286,7 @@ public class MtStressMatrix {
         String jfrDir = System.getProperty("key.mt.stresstest.jfrdir");
         if (jfrDir != null) {
             Files.createDirectories(Path.of(jfrDir));
-            Path jf = Path.of(jfrDir, tagOf(spec) + ".jfr");
+            Path jf = Path.of(jfrDir, cellTag + ".jfr");
             cmd.add("-XX:StartFlightRecording=filename=" + jf
                 + ",settings=profile,dumponexit=true,disk=true");
             cmd.add("-XX:FlightRecorderOptions=stackdepth=128");
@@ -266,6 +309,12 @@ public class MtStressMatrix {
                 cmd.add("-D" + p + "=" + v);
             }
         }
+        if (perCell) {
+            // Override the worker list with the single cell and give the child a distinct output
+            // tag.
+            cmd.add("-Dkey.mt.stresstest.workers=" + singleWorker);
+            cmd.add("-Dkey.mt.stresstest.outtag=" + cellTag);
+        }
         cmd.add(MtStressMatrix.class.getName());
         cmd.add(spec);
 
@@ -278,12 +327,12 @@ public class MtStressMatrix {
             p.descendants().forEach(ProcessHandle::destroyForcibly);
             p.destroyForcibly();
             p.waitFor(60, TimeUnit.SECONDS);
-            log("[mt-stress]   !! %s exceeded the %ds process timeout -> killed", shortName(spec),
+            log("[mt-stress]   !! %s exceeded the %ds process timeout -> killed", label,
                 procTimeoutMs / 1000);
             return new ForkOutcome(-1, true);
         }
         int exit = p.exitValue();
-        log("[mt-stress]   %s child exit=%d (%ds)", shortName(spec), exit,
+        log("[mt-stress]   %s child exit=%d (%ds)", label, exit,
             (System.currentTimeMillis() - t0) / 1000);
         return new ForkOutcome(exit, false);
     }
@@ -294,8 +343,8 @@ public class MtStressMatrix {
      * seen.
      */
     private int runOneProof(String spec, Path examples, int[] workers, int reps, long timeoutMs,
-            Path outDir) throws Exception {
-        String tag = tagOf(spec);
+            Path outDir, String outTag) throws Exception {
+        String tag = outTag;
         int cores = Runtime.getRuntime().availableProcessors();
         long maxHeap = Runtime.getRuntime().maxMemory() / (1024 * 1024);
         log("[mt-stress:%s] cores=%d maxHeap=%dMB workers=%s reps=%d timeout=%ds", tag, cores,
@@ -377,36 +426,32 @@ public class MtStressMatrix {
         return (anomalies.isEmpty() && !hangAbort) ? 0 : 1;
     }
 
-    /** Concatenates the per-proof {@code runs-*.csv} / {@code summary-*.txt} into the top files. */
-    private void aggregate(Path outDir, String[] corpus, List<String> parentAnomalies,
-            long wallSecs) throws Exception {
+    /**
+     * Concatenates every per-proof / per-cell {@code runs-*.csv} and {@code summary-*.txt} the
+     * children wrote into the top-level {@code runs.csv} / {@code summary.txt}. Globbing (rather
+     * than
+     * walking the corpus) makes it agnostic to per-proof vs per-cell forking.
+     */
+    private void aggregate(Path outDir, List<String> parentAnomalies, long wallSecs)
+            throws Exception {
+        List<Path> runFiles = sortedMatches(outDir, "runs-", ".csv");
         try (BufferedWriter csv = Files.newBufferedWriter(outDir.resolve("runs.csv"))) {
             csv.write(CSV_HEADER);
-            for (String spec : corpus) {
-                Path pf = outDir.resolve("runs-" + tagOf(spec.trim()) + ".csv");
-                if (Files.exists(pf)) {
-                    List<String> lines = Files.readAllLines(pf);
-                    for (int i = 1; i < lines.size(); i++) { // skip the per-file header
-                        csv.write(lines.get(i));
-                        csv.write("\n");
-                    }
+            for (Path pf : runFiles) {
+                List<String> lines = Files.readAllLines(pf);
+                for (int i = 1; i < lines.size(); i++) { // skip the per-file header
+                    csv.write(lines.get(i));
+                    csv.write("\n");
                 }
             }
         }
 
         StringBuilder sum = new StringBuilder();
-        sum.append("[mt-stress] SUMMARY (one forked JVM per proof)\n");
-        sum.append(String.format("proofs=%d  proofsWithAnomaly=%d  wall=%ds%n", corpus.length,
+        sum.append("[mt-stress] SUMMARY (forked JVMs)\n");
+        sum.append(String.format("cells=%d  cellsWithAnomaly=%d  wall=%ds%n", runFiles.size(),
             parentAnomalies.size(), wallSecs));
-        for (String spec : corpus) {
-            Path sf = outDir.resolve("summary-" + tagOf(spec.trim()) + ".txt");
-            if (Files.exists(sf)) {
-                sum.append(Files.readString(sf));
-            } else {
-                sum.append(
-                    String.format("  %-52s NO SUMMARY (child crashed/killed before writing)%n",
-                        shortName(spec.trim())));
-            }
+        for (Path sf : sortedMatches(outDir, "summary-", ".txt")) {
+            sum.append(Files.readString(sf));
         }
         if (!parentAnomalies.isEmpty()) {
             sum.append("ANOMALIES:\n");
@@ -416,6 +461,19 @@ public class MtStressMatrix {
         }
         Files.writeString(outDir.resolve("summary.txt"), sum);
         System.out.println(sum);
+    }
+
+    /**
+     * Sorted list of files in {@code dir} whose name starts with {@code prefix} and ends suffix.
+     */
+    private static List<Path> sortedMatches(Path dir, String prefix, String suffix)
+            throws Exception {
+        try (var s = Files.list(dir)) {
+            return s.filter(p -> {
+                String n = p.getFileName().toString();
+                return n.startsWith(prefix) && n.endsWith(suffix);
+            }).sorted().collect(java.util.stream.Collectors.toList());
+        }
     }
 
     /** Runs one configuration on its own thread, guarded by a hang timeout. */
