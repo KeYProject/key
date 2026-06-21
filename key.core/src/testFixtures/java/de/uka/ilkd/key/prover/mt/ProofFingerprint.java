@@ -78,10 +78,40 @@ public final class ProofFingerprint {
     public static ProofFingerprint of(Proof proof) {
         Objects.requireNonNull(proof, "proof");
         StringBuilder ordered = new StringBuilder();
-        String canonical = digest(proof.root(), false, ordered);
+        String canonical = digestOnLargeStack(proof.root(), ordered);
         return new ProofFingerprint(proof.closed(), proof.openGoals().size(),
             proof.closedGoals().size(), proof.countNodes(), proof.countBranches(),
             sha256(ordered.toString()), canonical);
+    }
+
+    /**
+     * Runs the recursive {@link #digest} on a thread with a large stack. The digest recurses once
+     * per tree level, and symbolic-execution proofs produce very deep (tens of thousands of nodes),
+     * largely linear trees that overflow the default stack -- which previously turned the
+     * single-threaded reference run for such proofs (e.g. Saddleback, SimplifiedLinkedList.remove)
+     * into a {@code StackOverflowError} and excluded them from the stress matrix entirely.
+     */
+    private static String digestOnLargeStack(Node root, StringBuilder orderedOut) {
+        final String[] result = new String[1];
+        final Throwable[] error = new Throwable[1];
+        Thread t = new Thread(null, () -> {
+            try {
+                result[0] = digest(root, false, orderedOut);
+            } catch (Throwable e) {
+                error[0] = e;
+            }
+        }, "proof-fingerprint", 512L * 1024 * 1024); // 512 MiB stack
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("proof fingerprint interrupted", e);
+        }
+        if (error[0] != null) {
+            throw new RuntimeException("failed to compute proof fingerprint", error[0]);
+        }
+        return result[0];
     }
 
     /**
