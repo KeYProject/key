@@ -82,10 +82,18 @@ public class VMTacletMatcher implements TacletMatcher {
                 + "(reload the proof to apply).",
             true);
 
+    /**
+     * System property ({@code -Dkey.matcher.interpreterAssumes=true}) forcing the interpreter for
+     * {@code \assumes} formula matching even when the compiled find-matcher is selected. The
+     * compiled matcher (incl. the Java program of a modality) is used for assumes by default; this
+     * is mainly for headless A/B comparison of the compiled-assumes extension.
+     */
+    public static final String INTERPRETER_ASSUMES_PROPERTY = "key.matcher.interpreterAssumes";
+
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
     /** the matcher for the taclet's assumes formulas */
-    private final HashMap<Term, @NonNull VMProgramInterpreter> assumesMatchPrograms =
+    private final HashMap<Term, @NonNull MatchProgram> assumesMatchPrograms =
         new HashMap<>();
 
     /**
@@ -121,35 +129,48 @@ public class VMTacletMatcher implements TacletMatcher {
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
 
+        // both back-ends are derived from the unified match-plan framework (one dispatch per
+        // construct, see JavaMatchPlanBuilder); the compiled matcher is the default, the
+        // interpreter is used only when explicitly selected (property/feature flag) or as the
+        // automatic fallback for a pattern the compiler does not handle
+        final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY)
+                || FeatureSettings.isFeatureActivated(INTERPRETER_MATCHER_FEATURE);
+
         if (taclet instanceof final FindTaclet findTaclet) {
             findExp = findTaclet.find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
-            // both back-ends are derived from the unified match-plan framework (one dispatch per
-            // construct, see JavaMatchPlanBuilder); the compiled matcher is the default, the
-            // interpreter is used only when explicitly selected (property/feature flag) or as the
-            // automatic fallback for a pattern the compiler does not handle
-            final VMProgramInterpreter interpreter =
-                new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(findExp));
-            if (Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY)
-                    || FeatureSettings.isFeatureActivated(INTERPRETER_MATCHER_FEATURE)) {
-                findMatchProgram = interpreter;
-            } else {
-                final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgram(findExp);
-                findMatchProgram = compiled != null ? compiled : interpreter;
-            }
-
+            findMatchProgram = matchProgramFor(findExp, useInterpreter);
         } else {
             ignoreTopLevelUpdates = false;
             findExp = null;
             findMatchProgram = null;
         }
 
+        // The taclet's \assumes formulas use the same back-end as the find: when the compiled
+        // matcher is selected they are compiled too (cursor-free, including the Java program of a
+        // modality), unless -Dkey.matcher.interpreterAssumes forces the interpreter for them.
+        final boolean assumesInterpreter =
+            useInterpreter || Boolean.getBoolean(INTERPRETER_ASSUMES_PROPERTY);
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
-                new VMProgramInterpreter(
-                    JavaMatchPlanBuilder.interpreterProgram((JTerm) sf.formula())));
+                matchProgramFor((JTerm) sf.formula(), assumesInterpreter));
         }
+    }
+
+    /**
+     * Builds the matcher for a find / assumes {@code pattern}: the cursor-free compiled matcher
+     * unless the interpreter is requested or the compiler has no head for the pattern (then the
+     * interpreter is used as a fallback).
+     */
+    private static MatchProgram matchProgramFor(JTerm pattern, boolean interpreter) {
+        if (!interpreter) {
+            final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgramOrNull(pattern);
+            if (compiled != null) {
+                return compiled;
+            }
+        }
+        return new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(pattern));
     }
 
     /**
@@ -164,7 +185,7 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull Term p_template,
             @NonNull MatchResultInfo p_matchCond,
             @NonNull LogicServices p_services) {
-        VMProgramInterpreter interpreter = assumesMatchPrograms.get(p_template);
+        MatchProgram program = assumesMatchPrograms.get(p_template);
         final var mc = (MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
@@ -186,7 +207,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchResultInfo newMC =
-                    checkConditions(interpreter.match(formula, mc, p_services), p_services);
+                    checkConditions(program.match(formula, mc, p_services), p_services);
 
                 if (newMC != null) {
                     resFormulas = resFormulas.prepend(cf);
