@@ -31,6 +31,7 @@ import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantia
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.ConcurrentLruCache;
+import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -94,11 +95,13 @@ public class ServiceCaches implements SessionCaches {
      * NOTE (multithreading effort, branch bubel/mt-goals): the LRU caches below use
      * ConcurrentLruCache (exact, single-lock) so they are safe under concurrent matching while
      * preserving EXACT LRU eviction -- behaviour-preserving. The exact flavour is mandatory here
-     * because some of these caches are eviction/history-sensitive (e.g. introductionTimeCache,
-     * whose
-     * value reflects the goal history at first-cache time, and the term interning cache):
-     * approximate/striped eviction was shown to change proofs. The Weak caches stay wrapped in
-     * Collections.synchronizedMap.
+     * because these caches are eviction/history-sensitive (e.g. introductionTimeCache, whose value
+     * reflects the goal history at first-cache time): approximate/striped eviction changes their
+     * value and so was shown to change proofs. This does NOT apply to the term interning cache (see
+     * {@link #termCache}): it is a pure cache whose value is just the term itself, so eviction
+     * order
+     * cannot change a proof, and it is therefore striped for less contention -- this is verified by
+     * TermCacheProofInvarianceTest. The Weak caches stay wrapped in Collections.synchronizedMap.
      */
     private final Map<JTerm, TermInfo> betaCandidates =
         new ConcurrentLruCache<>(1000);
@@ -129,9 +132,25 @@ public class ServiceCaches implements SessionCaches {
         new ConcurrentLruCache<>(1000);
 
     /**
-     * Cache used by the TermFactory to avoid unnecessary creation of terms
+     * Cache used by the TermFactory to avoid unnecessary creation of terms. This is the term
+     * interner: it is hit on essentially every term creation, so under the multi-core prover all of
+     * a proof's workers funnel through it. A {@link StripedLruCache} (independently locked
+     * segments)
+     * instead of a single-lock cache removes that contention. The interner is a <em>pure</em> cache
+     * -- the stored value for a term is just that term's {@code checked()} canonicalisation, a
+     * function of the key alone -- so per-segment (rather than global) LRU eviction only ever
+     * forces
+     * an identical recomputation and is sound (see {@link StripedLruCache}); that this does not
+     * change any proof is checked by {@code TermCacheProofInvarianceTest}.
+     *
+     * <p>
+     * Total size and stripe count are overridable for tuning/benchmarking via
+     * {@code -Dkey.term.cache.size} (default 20000) and {@code -Dkey.term.cache.stripes} (default
+     * 64). One stripe degenerates to a single global LRU (the pre-striping eviction behaviour).
      */
-    private final Map<JTerm, JTerm> termCache = new ConcurrentLruCache<>(20000);
+    private final StripedLruCache<JTerm, JTerm> termCache =
+        new StripedLruCache<>(Integer.getInteger("key.term.cache.size", 20000),
+            Integer.getInteger("key.term.cache.stripes", 64));
 
     /**
      * Cache used by TypeComparisonCondition
@@ -229,7 +248,7 @@ public class ServiceCaches implements SessionCaches {
         return graphCache;
     }
 
-    public final Map<JTerm, JTerm> getTermFactoryCache() {
+    public final StripedLruCache<JTerm, JTerm> getTermFactoryCache() {
         return termCache;
     }
 

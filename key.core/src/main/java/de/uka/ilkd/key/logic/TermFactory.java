@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -12,9 +11,11 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -29,7 +30,13 @@ public final class TermFactory {
 
 
     private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
-    private final Map<JTerm, JTerm> cache;
+
+    /**
+     * The term interner, or {@code null} for an uncached factory. A {@link StripedLruCache} so that
+     * the multi-core prover's workers, which all create terms through the shared per-proof factory,
+     * contend only per segment instead of on one lock.
+     */
+    private final @Nullable StripedLruCache<JTerm, JTerm> cache;
 
 
     // -------------------------------------------------------------------------
@@ -41,7 +48,7 @@ public final class TermFactory {
         this.cache = null;
     }
 
-    public TermFactory(Map<JTerm, JTerm> cache) {
+    public TermFactory(StripedLruCache<JTerm, JTerm> cache) {
         this.cache = cache;
     }
 
@@ -127,15 +134,15 @@ public final class TermFactory {
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-            JTerm term;
-            synchronized (cache) {
-                term = cache.get(newTerm);
-            }
+            // The striped cache locks only the key's segment internally, so no extra
+            // synchronization
+            // is needed here. The get/put are still separate (as before): two workers may briefly
+            // create equal-but-distinct instances of the same term -- harmless, terms are immutable
+            // and compared by value, never by identity.
+            JTerm term = cache.get(newTerm);
             if (term == null) {
                 term = newTerm.checked();
-                synchronized (cache) {
-                    cache.put(term, term);
-                }
+                cache.put(term, term);
             }
             return term;
         } else {
