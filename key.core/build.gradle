@@ -110,6 +110,7 @@ tasks.withType(Test) {
      "key.mt.stresstest.reps", "key.mt.stresstest.timeout", "key.mt.stresstest.out",
      "key.mt.stresstest.fork", "key.mt.stresstest.forkpercell", "key.mt.stresstest.proctimeout",
      "key.mt.stresstest.childheap", "key.mt.stresstest.jfrdir", "key.matcher.interpreter",
+     "key.mt.stresstest.maxsteps", "key.mt.pipeline",
      "key.mt.synth.splits", "key.mt.synth.worksplits", "key.mt.synth.work",
      "key.mt.synth.linear", "key.mt.synth.loop",
      "key.mt.jfr.probe", "key.mt.jfr.proof", "key.mt.jfr.workers", "key.mt.jfr.reps",
@@ -182,6 +183,35 @@ tasks.register('testMtStress', Test) {
         includeTestsMatching "MtMacroStressTest"
         includeTestsMatching "MtScriptStressTest"
     }
+}
+
+// One-command pipeline profiler: runs the stress matrix (MtStressMatrix) in profiling mode across a
+// worker sweep and emits per-stage match/apply/evaluate timings + commit-lock contention into
+// build/mt-pipeline/runs.csv (and a per-(proof,workers) summary on the console). Every default below
+// is overridable with -D, e.g.:
+//   ./gradlew :key.core:mtPipelineProfile \
+//       -Dkey.mt.stresstest.proofs=heap/list/ArrayList_concatenate.key \
+//       -Dkey.mt.stresstest.workers=1,2,4,8,16 -Dkey.mt.stresstest.reps=10
+tasks.register('mtPipelineProfile', Test) {
+    description = 'Profile the parallel prover match-apply-evaluate pipeline across a worker sweep'
+    group = 'verification'
+    useJUnitPlatform()
+    outputs.upToDateWhen { false } // always re-run; it is a measurement, not a correctness gate
+    systemProperty("key.mt.stresstest", "true")
+    systemProperty("key.mt.pipeline", "true")
+    // Profiling defaults (override any with -D...): a small corpus, a worker sweep, a few reps.
+    systemProperty("key.mt.stresstest.proofs", System.getProperty("key.mt.stresstest.proofs",
+        "heap/list_seq/SimplifiedLinkedList.remove.key,standard_key/java_dl/symmArray.key,"
+            + "standard_key/arith/median.key"))
+    systemProperty("key.mt.stresstest.workers",
+        System.getProperty("key.mt.stresstest.workers", "1,2,4,8"))
+    systemProperty("key.mt.stresstest.reps", System.getProperty("key.mt.stresstest.reps", "5"))
+    systemProperty("key.mt.stresstest.out",
+        System.getProperty("key.mt.stresstest.out", "build/mt-pipeline"))
+    maxParallelForks = 1
+    forkEvery = 1
+    filter { includeTestsMatching "MtStressMatrix" }
+    testLogging { showStandardStreams = true }
 }
 
 // One-shot high-core stress battery for the parallel prover (MtStressMatrix). Gated; meant to be run

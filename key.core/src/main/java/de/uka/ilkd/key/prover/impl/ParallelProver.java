@@ -403,8 +403,12 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 return;
             }
 
+            final long selStart = PipelineStats.ENABLED ? System.nanoTime() : 0L;
             RuleApp app = goal.getRuleAppManager().next();
             app = updateBuiltInRuleIndex(goal, app);
+            if (PipelineStats.ENABLED) {
+                PipelineStats.GLOBAL.addSelect(System.nanoTime() - selStart);
+            }
 
             if (app == null) {
                 // The strategy currently offers no rule for this goal. With STOPMODE_NONCLOSE that
@@ -418,6 +422,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                     requestStop("Could not close goal.", goal);
                 } else {
                     scheduler.stall(goal);
+                    if (PipelineStats.ENABLED) {
+                        PipelineStats.GLOBAL.incStalls();
+                    }
                     handled = true;
                 }
                 return;
@@ -428,7 +435,11 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             // shared structures it reaches through the Services were made thread-safe by the
             // shared-state audit. Only commitRuleApp -- the proof-tree mutation -- needs the commit
             // lock; the scheduler hand-off, the atomic counters and the stop check stay outside it.
+            final long compStart = PipelineStats.ENABLED ? System.nanoTime() : 0L;
             Goal.PendingRuleApp pending = goal.computeRuleApp(app);
+            if (PipelineStats.ENABLED) {
+                PipelineStats.GLOBAL.addCompute(System.nanoTime() - compStart);
+            }
             if (pending == null) {
                 // The rule application aborted. The candidate rule was already removed from the
                 // goal's queue by next() above, so re-offer the goal to retry with its next
@@ -436,16 +447,34 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 // proof open. This mirrors the single-threaded prover, which retries the goal after
                 // an aborted application rather than discarding it.
                 scheduler.reoffer(goal);
+                if (PipelineStats.ENABLED) {
+                    PipelineStats.GLOBAL.incAborts();
+                }
                 handled = true;
                 return;
             }
 
+            // Commit under the lock; when profiling, split the time blocked acquiring the lock
+            // (contention) from the time holding it (the serialized proof-tree mutation).
             final ImmutableList<Goal> goalList;
-            synchronized (commitLock) {
-                goalList = goal.commitRuleApp(pending);
+            if (PipelineStats.ENABLED) {
+                final long lockReq = System.nanoTime();
+                synchronized (commitLock) {
+                    final long lockGot = System.nanoTime();
+                    PipelineStats.GLOBAL.addLockWait(lockGot - lockReq);
+                    goalList = goal.commitRuleApp(pending);
+                    PipelineStats.GLOBAL.addLockHeld(System.nanoTime() - lockGot);
+                }
+            } else {
+                synchronized (commitLock) {
+                    goalList = goal.commitRuleApp(pending);
+                }
             }
 
             final int applied = appliedSteps.incrementAndGet();
+            if (PipelineStats.ENABLED) {
+                PipelineStats.GLOBAL.incApplied();
+            }
             fireTaskProgress();
 
             // Partition the successors into closed (just counted) and open (to be rescheduled).

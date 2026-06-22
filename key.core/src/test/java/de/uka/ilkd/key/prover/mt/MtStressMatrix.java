@@ -26,6 +26,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.prover.impl.PipelineStats;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
@@ -138,7 +139,7 @@ public class MtStressMatrix {
 
     private static final String CSV_HEADER =
         "proof,workers,rep,status,closed,refClosed,nodes,branches,openGoals,timeMs,"
-            + "reason,canonicalDigest,refCanonicalDigest\n";
+            + "reason,canonicalDigest,refCanonicalDigest," + PipelineStats.CSV_HEADER + "\n";
 
     /** Outcome classification of one run. */
     private enum Status {
@@ -159,6 +160,12 @@ public class MtStressMatrix {
         String openGoalDetails = ""; // serialNr : hasApplicableRule per open goal
         Throwable exception;
         String threadDump = "";
+        // Pipeline profiler totals for this run (0 unless -Dkey.mt.pipeline=true). See PipelineStats.
+        long selectMs;
+        long computeMs;
+        long lockWaitMs;
+        long lockHeldMs;
+        String pipelineCsv = PipelineStats.ZERO_ROW;
     }
 
     /**
@@ -303,7 +310,7 @@ public class MtStressMatrix {
         cmd.add("-Dkey.mt.stresstest=true");
         cmd.add("-Dkey.mt.stresstest.out=" + outDir);
         for (String p : new String[] { "key.mt.stresstest.workers", "key.mt.stresstest.reps",
-            "key.mt.stresstest.timeout" }) {
+            "key.mt.stresstest.timeout", "key.mt.stresstest.maxsteps", "key.mt.pipeline" }) {
             String v = System.getProperty(p);
             if (v != null) {
                 cmd.add("-D" + p + "=" + v);
@@ -371,16 +378,26 @@ public class MtStressMatrix {
             } else {
                 runs: for (int w : workers) {
                     int[] counts = new int[Status.values().length];
+                    long pSel = 0;
+                    long pComp = 0;
+                    long pWait = 0;
+                    long pHeld = 0;
+                    int pRuns = 0;
                     for (int rep = 0; rep < reps; rep++) {
                         Run r = runWithWatchdog(spec, examples, w, timeoutMs);
                         r.status = classify(r, ref);
                         counts[r.status.ordinal()]++;
                         totalRuns++;
-                        csv.write(String.format("%s,%d,%d,%s,%s,%s,%d,%d,%d,%d,%s,%s,%s%n",
+                        csv.write(String.format("%s,%d,%d,%s,%s,%s,%d,%d,%d,%d,%s,%s,%s,%s%n",
                             shortName(spec), w, rep, r.status, r.closed, ref.closed, r.nodes,
                             r.branches, r.openGoals, r.timeMs, csvSafe(r.reason), r.canonicalDigest,
-                            ref.canonicalDigest));
+                            ref.canonicalDigest, r.pipelineCsv));
                         csv.flush();
+                        pSel += r.selectMs;
+                        pComp += r.computeMs;
+                        pWait += r.lockWaitMs;
+                        pHeld += r.lockHeldMs;
+                        pRuns++;
                         if (isAnomaly(r.status)) {
                             String f = writeDiagnostics(outDir, spec, w, rep, r, ref);
                             anomalies.add(r.status + " " + shortName(spec) + " w=" + w + " rep="
@@ -399,6 +416,14 @@ public class MtStressMatrix {
                     log("[mt-stress:%s] w=%-4d ok=%d diverge=%d nonclosure=%d exception=%d", tag, w,
                         counts[Status.OK.ordinal()], counts[Status.DIVERGE.ordinal()],
                         counts[Status.NONCLOSURE.ordinal()], counts[Status.EXCEPTION.ordinal()]);
+                    if (PipelineStats.ENABLED && pRuns > 0) {
+                        long tot = pSel + pComp + pWait + pHeld;
+                        log("[mt-stress:%s] w=%-4d pipeline(mean ms): select=%d compute=%d "
+                            + "lockWait=%d lockHeld=%d | serial=%.0f%% contention=%.0f%%", tag, w,
+                            pSel / pRuns, pComp / pRuns, pWait / pRuns, pHeld / pRuns,
+                            tot == 0 ? 0.0 : 100.0 * pHeld / tot,
+                            tot == 0 ? 0.0 : 100.0 * pWait / tot);
+                    }
                 }
             }
         }
@@ -526,9 +551,19 @@ public class MtStressMatrix {
             Proof proof = env.getLoadedProof();
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
+            int maxSteps = Integer.getInteger("key.mt.stresstest.maxsteps", 0);
+            if (maxSteps > 0) {
+                starter.setMaxRuleApplications(maxSteps);
+            }
+            PipelineStats.GLOBAL.reset();
             long t0 = System.nanoTime();
             var info = starter.start();
             r.timeMs = (System.nanoTime() - t0) / 1_000_000L;
+            r.selectMs = PipelineStats.GLOBAL.selectMs();
+            r.computeMs = PipelineStats.GLOBAL.computeMs();
+            r.lockWaitMs = PipelineStats.GLOBAL.lockWaitMs();
+            r.lockHeldMs = PipelineStats.GLOBAL.lockHeldMs();
+            r.pipelineCsv = PipelineStats.GLOBAL.csvRow();
             ProofFingerprint fp = ProofFingerprint.of(proof);
             r.closed = fp.closed;
             r.nodes = fp.nodeCount;
