@@ -103,6 +103,14 @@ public class ProofCollections {
          */
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
         // settings.setRunOnlyOn("performance, performancePOConstruction");
+        // perf round 3: the perfTest group (defined below) is the curated measurement set. By
+        // default ALL groups run (full regression, exactly like main); pass
+        // -Dkey.runallproofs.runOnlyOn=perfTest to restrict to it, e.g. to reproduce the combined
+        // benchmark without running the whole suite.
+        String runOnly = System.getProperty("key.runallproofs.runOnlyOn", "");
+        if (!runOnly.isBlank()) {
+            settings.setRunOnlyOn(runOnly);
+        }
 
         settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
@@ -187,6 +195,33 @@ public class ProofCollections {
         // updateSimplificationPerformance
         // .provable("performance-test/updateSimplification/loop_5000.key");
 
+
+        // ----------------------------------------------------------------------------------
+        // Perf round 3 (cost-memoization / queue-redesign experiment) goal set.
+        //
+        // The 12 goals supplied for evaluating strategy-cost memoization, split into a
+        // development ("test") subset used while iterating on the change and a held-out
+        // ("validation") subset only consulted to confirm we did not overfit. The split is
+        // stratified across categories (heap lists, search/sort, arithmetic, information flow,
+        // static init) so each subset is representative.
+        //
+        // Selected to run via setRunOnlyOn("perfTest, perfValidation") above. REVERT before
+        // merging to main.
+        var perfTest = c.group("perfTest");
+        perfTest.provable("heap/list_seq/SimplifiedLinkedList.remove.key");
+        perfTest.provable("standard_key/arith/gemplusDecimal/add.key");
+        perfTest.provable("heap/saddleback_search/Saddleback_search.key");
+        perfTest.provable("standard_key/java_dl/symmArray.key");
+        perfTest.provable("heap/coincidence_count/project.key");
+        perfTest.provable("heap/list_seq/ArrayList.remove.1.key");
+
+        var perfValidation = c.group("perfValidation");
+        perfValidation.provable("standard_key/java_dl/jml-information-flow.key");
+        perfValidation.provable("heap/quicksort/sort.key");
+        perfValidation.provable("heap/list/ArrayList_concatenate.key");
+        perfValidation.provable("standard_key/arith/median.key");
+        perfValidation.provable("standard_key/staticInitialisation/objectOfErroneousClass.key");
+        perfValidation.provable("heap/removeDups/removeDup.key");
 
         // Tests for rule application restrictions
         var g = c.group("applicationRestrictions");

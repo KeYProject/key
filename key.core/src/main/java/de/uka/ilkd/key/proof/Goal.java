@@ -40,6 +40,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -256,6 +257,15 @@ public final class Goal implements ProofGoal<Goal> {
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex.sequentChanged(sci);
+        // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
+        // assumes-bases on their matching round (see QueueRuleApplicationManager#parkedByOp).
+        RuleApplicationManager<Goal> m = ruleAppManager;
+        while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
+            m = d.getDelegate();
+        }
+        if (m instanceof QueueRuleApplicationManager qm) {
+            qm.sequentChanged(sci);
+        }
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {

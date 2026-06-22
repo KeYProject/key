@@ -81,6 +81,9 @@ class TermImpl implements JTerm {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
+    /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
+    private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -439,6 +442,25 @@ class TermImpl implements JTerm {
             this.containsJavaBlockRecursive = result;
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    @Override
+    public boolean containsTransformerRecursive() {
+        if (containsTransformerRecursive == ThreeValuedTruth.UNKNOWN) {
+            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+            if (op instanceof Transformer) {
+                result = ThreeValuedTruth.TRUE;
+            } else {
+                for (int i = 0, arity = subs.size(); i < arity; i++) {
+                    if (subs.get(i).containsTransformerRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
+                    }
+                }
+            }
+            this.containsTransformerRecursive = result;
+        }
+        return containsTransformerRecursive == ThreeValuedTruth.TRUE;
     }
 
 

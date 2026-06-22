@@ -112,6 +112,24 @@ public final class ParsingFacade {
         return createParser(createLexer(stream));
     }
 
+    /**
+     * Releases the ANTLR prediction (DFA) cache of the KeY parser.
+     * <p>
+     * This cache is built lazily while parsing and held on the generated parser's {@code static}
+     * fields, so it stays resident for the whole JVM -- including during proof search, where it is
+     * not needed (on a large proof it retains ~15-20 MB). It is a pure cache: ANTLR rebuilds it
+     * transparently on the next parse, so dropping it is correctness-safe (one-time re-warm on a
+     * subsequent parse). Intended to be called once a problem/proof has finished loading.
+     */
+    public static void clearParserCaches() {
+        try {
+            new JavaKeYParser(new CommonTokenStream(createLexer(CharStreams.fromString(""))))
+                    .getInterpreter().clearDFA();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not clear parser DFA caches", e);
+        }
+    }
+
     public static JavaKeYLexer createLexer(Path file) throws IOException {
         return createLexer(CharStreams.fromPath(file));
     }
