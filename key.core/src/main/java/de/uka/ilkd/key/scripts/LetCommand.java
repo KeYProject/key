@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;

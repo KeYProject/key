@@ -43,7 +43,9 @@ public class DocumentationGenerator {
             listCategory(category, commandsByCategory.get(category));
         }
 
-        listCategory("Uncategorized", commandsByCategory.get("Uncategorized"));
+        List<Map.Entry<String, ProofScriptCommand>> uncategorized = commandsByCategory.get("Uncategorized");
+        if(uncategorized != null)
+            listCategory("Uncategorized", uncategorized);
 
     }
 
