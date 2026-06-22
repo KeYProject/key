@@ -25,6 +25,14 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/**
+ * This variable condition can be used to create a copy of a {@link SchemaVariable} 
+ * that has all instances of an {@link Annotation} removed from its 
+ * {@link TypeReference}.
+ *
+ * @author Daniel Grévent
+ */
 public final class RemoveAnnotation implements VariableCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoveAnnotation.class);
 
@@ -33,7 +41,17 @@ public final class RemoveAnnotation implements VariableCondition {
     private final SchemaVariable read, store;
     private final String annot;
 
-
+    /**
+     * create an instance of the variable condition.
+     *
+     * @param store the {@link SchemaVariable} in which the new copy is stored
+     * @param read the {@link SchemaVariable} that gets copied
+     * @param annot the fully qualified name of the {@link Annotation} to remove
+     *
+     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s in the 
+     *  `ALLOWED` array or the {@link Sort} of write is not the same as to {@link Sort} 
+     *  of `read`, so they do not correspond to the same kind of AST type.
+     */
     public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
         if (!store.sort().equals(read.sort())) {
             throw new RuntimeException("Expected left and right to have the same sort!");
@@ -63,16 +81,15 @@ public final class RemoveAnnotation implements VariableCondition {
             return matchCond;
         }
 
-        Object inst = svInst.getInstantiation(read);
+        if (svInst.getInstantiation(read) instanceof New n) {
+            TypeReference tRef = removeAnnotation(n.getTypeReference());
+            New replacement = newFromTypeRef(n, tRef);
 
-        if (!(inst instanceof New))
-            return matchCond;
-
-        TypeReference tRef = removeAnnotation(((New) inst).getTypeReference());
-        New replacement = newFromTypeRef((New) inst, tRef);
-
-        return matchCond.setInstantiations(
-            svInst.add(store, replacement, logicServices));
+            return matchCond.setInstantiations(
+                svInst.add(store, replacement, logicServices));
+        }
+        
+        return matchCond;
     }
 
     private TypeReference removeAnnotation(TypeReference tRef) {

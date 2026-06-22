@@ -4,29 +4,63 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import java.util.Arrays;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
-
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This variable condition can be used to check if the {@link TypeReference} of a 
+ * {@link SchemaVariable} contains a specific {@link Annotation}.
+ *
+ * @author Daniel Grévent
+ */
 public final class HasAnnotationCondition extends VariableConditionAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(HasAnnotationCondition.class);
+
+    private static final Sort[] ALLOWED = {
+         ProgramSVSort.SIMPLE_NEW, 
+         ProgramSVSort.LOCALVARIABLE, ProgramSVSort.VARIABLE,
+    };
 
     private final SchemaVariable variable;
     private final String annot;
 
+    /**
+     * create an instance of the variable condition.
+     *
+     * @param variable the variable whos {@link TypeReference} is to check for 
+     *  {@link Annotation}s.
+     * @param annot the fully qualified name of the {@link Annotation} to check for
+     *
+     * @throws IllegalArgumentException if `variable` is not one of the {@link Sort}s 
+     *  in the `ALLOWED` array or the {@link Sort} has the name `Field`.
+     */
     public HasAnnotationCondition(SchemaVariable variable, String annot) {
+        if (!Arrays.stream(ALLOWED).anyMatch(variable.sort()::equals) && 
+                !variable.sort().toString().equals("Field")) {
+            throw new IllegalArgumentException(
+                "Unsupported sort: " + variable.sort() + ", supported: " +
+                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("", 
+                        (a, b) -> a + " " + b));
+        }
+
         this.variable = variable;
         this.annot = annot;
     }
@@ -42,26 +76,18 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         if (inst instanceof New n) {
             return matchesTypeAnnots(n.getTypeReference());
-        }
-
-        if (!(inst instanceof JTerm))
-            return false;
-
-        var op = ((JTerm) inst).op();
-
-        if (op.arity() != 0)
-            return false;
-
-        if (op instanceof Function) {
-            return matchesTypeAnnots(getFieldType(services, (Function) op));
-        } else if (op instanceof ProgramVariable variable) {
+        } else if (inst instanceof ProgramVariable variable) {
             return matchesTypeAnnots(variable.getTypeReference());
+        } else if (inst instanceof JTerm term &&
+                term.op().arity() == 0 &&
+                term.op() instanceof Function func) {
+            return matchesTypeAnnots(getFieldType(services, func));
         }
 
         return false;
     }
 
-    public TypeReference getFieldType(Services services, Function op) {
+    private TypeReference getFieldType(Services services, Function op) {
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
 
         if (name == null)
@@ -69,31 +95,27 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         var classType = services.getJavaInfo().getTypeByName(name.className());
 
-        if (classType == null ||
-                !(classType.getJavaType() instanceof ClassDeclaration))
-            return null;
+        if (classType != null 
+                && classType.getJavaType() instanceof ClassDeclaration classDecl) {
+            ImmutableList<Field> fields = classDecl.getAllFields(services);
 
-        var classDecl = (ClassDeclaration) classType.getJavaType();
+            return fields.stream()
+                    .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
+                    .findFirst()
+                    .map(f -> f.getProgramVariable().getTypeReference())
+                    .orElse(null);
+        }
 
-        var fields = classDecl.getAllFields(services);
 
-        // this is a bit too brittle for me
-        var field = fields.stream()
-                .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
-                .findFirst()
-                .orElse(null);
-
-        if (field == null)
-            return null;
-
-        return field.getProgramVariable().getTypeReference();
+        return null;
     }
 
     private boolean matchesTypeAnnots(TypeReference typeRef) {
         if (typeRef == null)
             return false;
+
         return typeRef.getAnnotations().stream()
-                .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
+            .anyMatch(a -> a.getKeyJavaType().getFullName().equals(annot));
     }
 
     @Override
