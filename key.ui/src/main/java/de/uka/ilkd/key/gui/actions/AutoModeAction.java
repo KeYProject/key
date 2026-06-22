@@ -18,7 +18,6 @@ import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.*;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 public class AutoModeAction extends MainWindowAction {

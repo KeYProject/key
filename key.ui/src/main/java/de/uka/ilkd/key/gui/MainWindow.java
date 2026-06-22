@@ -802,12 +802,12 @@ public final class MainWindow extends JFrame {
     // @formatter:on
     private List<Action> createAutomationActions() {
         return List.of(new AutoModeAction(this),
-                new MacroAutomationAction(this,
-                        new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
-                        IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)),
-                new MacroAutomationAction(this,
-                        new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
-                        IconFactory.automationPrepareLogo(TOOLBAR_ICON_SIZE)));
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
+                IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
+                IconFactory.automationPrepareLogo(TOOLBAR_ICON_SIZE)));
     }
 
     /**
@@ -1706,10 +1706,17 @@ public final class MainWindow extends JFrame {
                 Component component = SwingUtilities.getDeepestComponentAt(contentPane,
                     containerPoint.x, containerPoint.y);
 
-                if (eventID == MouseEvent.MOUSE_PRESSED && isLiveComponent(component)) {
-                    currentComponent = component;
-                    dispatchForCurrentComponent(e);
+                if (isLiveComponent(component)) {
+                    if (eventID == MouseEvent.MOUSE_PRESSED) {
+                        currentComponent = component;
+                        dispatchForCurrentComponent(e);
+                    }
+                    glassPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    glassPane.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 }
+
+
             }
         }
 

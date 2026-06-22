@@ -8,11 +8,7 @@ import javax.swing.Icon;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import org.key_project.prover.engine.TaskStartedInfo;
 
 /**
  * Automation action that executes a proof macro.
