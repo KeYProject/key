@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -36,6 +37,16 @@ class ProofPruner {
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {
+        // special case: prune cached goal = only need to re-open the final node
+        var cby = cuttingPoint.lookup(ClosedBy.class);
+        if (cby != null) {
+            cuttingPoint.deregister(cby, ClosedBy.class);
+            var goal = proof.getClosedGoal(cuttingPoint);
+            proof.reOpenGoal(goal);
+            refreshGoal(goal, cuttingPoint);
+            return ImmutableList.of(cuttingPoint);
+        }
+
         // there is only one leaf containing an open goal that is interesting for pruning the
         // subtree of <code>node</code>, namely the first leave that is found by a breadth
         // first search.
