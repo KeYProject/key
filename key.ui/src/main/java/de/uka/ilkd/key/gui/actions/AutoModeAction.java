@@ -25,11 +25,8 @@ public final class AutoModeAction extends MainWindowAction {
     private static final KeyStroke START_KEY =
         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    /**
-     *
-     */
     private static final long serialVersionUID = -7702898691162947994L;
-    final Icon startLogo = IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
+    final Icon startLogo = IconFactory.automationWithOverlay(MainWindow.TOOLBAR_ICON_SIZE, "");
     final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
     private Proof associatedProof;
@@ -173,4 +170,8 @@ public final class AutoModeAction extends MainWindowAction {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Full Automation";
+    }
 }

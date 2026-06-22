@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -364,6 +365,102 @@ public final class IconFactory {
     public static Icon autoModeStopLogo(int size) {
         // return scaleIcon(autoModeStop, size, size);
         return AUTO_MODE_STOP.load(size);
+    }
+
+    /**
+     * Creates an icon with a play button and a letter overlay.
+     * <p>
+     * Used for automation actions to distinguish different modes visually. The base icon is the
+     * standard green play button ({@link #autoModeStartLogo(int)}), with a bold italic letter
+     * overlaid in the bottom-right corner.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @param letter the letter to overlay (e.g., "R" for Run, "F" for Full, "P" for Prepare), or
+     *        {@code null} for just the play button
+     * @return the composite icon with letter overlay
+     * @see #automationRunLogo(int)
+     * @see #automationFullPilotLogo(int)
+     * @see #automationPrepareLogo(int)
+     */
+    public static Icon automationWithOverlay(int size, String letter) {
+        Icon baseIcon = autoModeStartLogo(size);
+
+        BufferedImage image = new BufferedImage(size + 5, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+        // Draw base icon
+        baseIcon.paintIcon(null, g2d, 0, 0);
+
+        if (letter == null) {
+            return new ImageIcon(image);
+        }
+
+        // Draw letter overlay
+        g2d.setColor(Color.BLACK);
+        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC, (int) (size * 0.9f));
+        g2d.setFont(font);
+
+        FontMetrics fm = g2d.getFontMetrics();
+        int textWidth = fm.stringWidth(letter);
+        int textHeight = fm.getAscent() - fm.getDescent();
+
+        // Position letter in bottom-right corner
+        int x = size - textWidth;
+
+        g2d.drawString(letter, x + 5, size);
+        g2d.dispose();
+
+        return new ImageIcon(image);
+    }
+
+    /**
+     * Creates an icon for the "Run Automation" action.
+     * <p>
+     * This is the legacy default automation mode that starts/stops automated proof search.
+     * The icon shows a green play button with an "R" overlay.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @return the automation run icon
+     */
+    public static Icon automationRunLogo(int size) {
+        return automationWithOverlay(size, "R");
+    }
+
+    /**
+     * Creates an icon for the "Full Auto Pilot" action.
+     * <p>
+     * This automation mode performs: finish symbolic execution, separate proof obligations, expand
+     * invariant definitions, and try to close all proof obligations.
+     * The icon shows a green play button with an "F" overlay.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @return the full auto pilot icon
+     * @see de.uka.ilkd.key.macros.FullAutoPilotProofMacro
+     */
+    public static Icon automationFullPilotLogo(int size) {
+        return automationWithOverlay(size, "F");
+    }
+
+    /**
+     * Creates an icon for the "Prepare-only Autopilot" action.
+     * <p>
+     * This automation mode performs: finish symbolic execution, separate proof obligations, and
+     * expand invariant definitions (without trying to close goals).
+     * The icon shows a green play button with a "P" overlay.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @return the prepare-only autopilot icon
+     * @see de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro
+     */
+    public static Icon automationPrepareLogo(int size) {
+        return automationWithOverlay(size, "P");
     }
 
     public static Icon selectDecProcArrow(int size) {
