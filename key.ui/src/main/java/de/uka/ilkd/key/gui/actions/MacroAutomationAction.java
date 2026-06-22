@@ -6,9 +6,13 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.Icon;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
 
 /**
  * Automation action that executes a proof macro.
@@ -17,23 +21,10 @@ import de.uka.ilkd.key.proof.Proof;
  * action classes for each macro, this generic wrapper can be used to expose any {@link ProofMacro}
  * as an automation option in the dropdown menu.
  * </p>
- * <p>
- * Example usage:
- *
- * <pre>
- * {@code
- * actions.add(new MacroAutomationAction(mainWindow,
- *     new FullAutoPilotProofMacro(),
- *     "Full Auto Pilot",
- *     IconFactory.automationFullPilotLogo(16)));
- * }
- * </pre>
- * </p>
  *
  * @see ProofMacro
- * @see MainWindow#createAutomationActions()
  */
-public class MacroAutomationAction extends MainWindowAction {
+public class MacroAutomationAction extends AutoModeAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,25 +36,22 @@ public class MacroAutomationAction extends MainWindowAction {
      *
      * @param mainWindow the main window this action belongs to
      * @param macro the proof macro to execute
-     * @param name the display name shown in the dropdown menu
      * @param icon the icon displayed on the action button
      */
-    public MacroAutomationAction(MainWindow mainWindow, ProofMacro macro, String name, Icon icon) {
-        super(mainWindow);
+    public MacroAutomationAction(MainWindow mainWindow, ProofMacro macro, Icon icon) {
+        super(mainWindow, icon);
         this.macro = macro;
-        putValue(NAME, name);
-        putValue(SHORT_DESCRIPTION, macro.getDescription());
-        putValue(SMALL_ICON, icon);
+        setName(macro.getName());
+        setTooltip(macro.getDescription());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!getMediator().isInAutoMode()) {
-            Proof proof = getMediator().getSelectedProof();
-            if (proof != null && !proof.closed()) {
-                getMediator().getUI().getProofControl()
-                        .runMacro(getMediator().getSelectedNode(), macro, null);
-            }
+        KeYMediator mediator = getMediator();
+        if (mediator.isInAutoMode()) {
+            getMediator().getUI().getProofControl().stopAutoMode();
+        } else {
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, null);
         }
     }
 

@@ -18,16 +18,17 @@ import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.*;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
-public final class AutoModeAction extends MainWindowAction {
+public class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     private static final long serialVersionUID = -7702898691162947994L;
-    final Icon startLogo = IconFactory.automationWithOverlay(MainWindow.TOOLBAR_ICON_SIZE, "");
-    final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
+    private final Icon startLogo;
+    private final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
     private Proof associatedProof;
 
@@ -60,11 +61,16 @@ public final class AutoModeAction extends MainWindowAction {
     };
 
     public AutoModeAction(MainWindow mainWindow) {
+        this(mainWindow, IconFactory.automationWithOverlay(MainWindow.TOOLBAR_ICON_SIZE, ""));
+    }
+
+    public AutoModeAction(MainWindow mainWindow, Icon startLogo) {
         super(mainWindow);
         associatedProof = getMediator().getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
+        this.startLogo = startLogo;
         setIcon(startLogo);
 
         enable();

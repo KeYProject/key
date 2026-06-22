@@ -797,32 +797,17 @@ public final class MainWindow extends JFrame {
      *
      * @return list of automation actions
      * @see MacroAutomationAction
-     * @see RunAutomationAction
+     * @see AutoModeAction
      */
     // @formatter:on
     private List<Action> createAutomationActions() {
-        List<Action> actions = new ArrayList<>();
-
-        // Legacy default action (first item = default, triggered by Ctrl+Space)
-        actions.add(new RunAutomationAction(this));
-
-        // Full Auto Pilot: Finish symbolic execution, separate obligations, expand invariants, try
-        // close
-        actions.add(new MacroAutomationAction(this,
-            new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
-            "Full Auto Pilot",
-            IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)));
-
-        // Prepare-only Auto Pilot: Same as Full Auto Pilot but without trying to close goals
-        actions.add(new MacroAutomationAction(this,
-            new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
-            "Prepare-only Autopilot",
-            IconFactory.automationPrepareLogo(TOOLBAR_ICON_SIZE)));
-
-        // Add new automation actions here:
-        // actions.add(new YourNewAutomationAction(this));
-
-        return actions;
+        return List.of(new AutoModeAction(this),
+                new MacroAutomationAction(this,
+                        new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
+                        IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)),
+                new MacroAutomationAction(this,
+                        new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
+                        IconFactory.automationPrepareLogo(TOOLBAR_ICON_SIZE)));
     }
 
     /**
@@ -860,6 +845,7 @@ public final class MainWindow extends JFrame {
         automationComponent.setEnabled(initialProof != null && !initialProof.closed());
 
         automationComponent.getActionComponent().putClientProperty("hideActionText", Boolean.TRUE);
+        automationComponent.getActionComponent().putClientProperty("isAutoButton", Boolean.TRUE);
 
         return automationComponent;
     }
@@ -1732,8 +1718,8 @@ public final class MainWindow extends JFrame {
             // this is not the most elegant way to identify the right
             // components, but it scales well ;-)
             while (c != null) {
-                if ((c instanceof JComponent)
-                        && AUTO_MODE_TEXT.equals(((JComponent) c).getToolTipText())) {
+                if (c instanceof JComponent jc
+                        && jc.getClientProperty("isAutoButton") == Boolean.TRUE) {
                     return true;
                 }
                 c = c.getParent();
