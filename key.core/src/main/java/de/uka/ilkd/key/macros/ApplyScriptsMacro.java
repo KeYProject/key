@@ -51,6 +51,29 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A proof macro that executes JML proof scripts attached to {@code @assert} statements.
+ * <p>
+ * This macro processes goals that have JML assertions with embedded proof scripts.
+ * For each such goal, it extracts the proof script, resolves any pending updates,
+ * handles {@code obtain} variables, and executes the script commands using the
+ * {@link ProofScriptEngine}. Goals without JML assertions are delegated to a
+ * fallback macro if one is provided.
+ * </p>
+ * <p>
+ * The macro supports:
+ * </p>
+ * <ul>
+ * <li>Execution of proof commands specified in JML assertion proofs</li>
+ * <li>Resolution of update applications before script execution</li>
+ * <li>Handling of {@code obtain} clauses with various forms (such_that, equals, from_goal)</li>
+ * <li>Branch management during script execution</li>
+ * <li>Settings stack management (push/pop) to preserve prover configuration</li>
+ * </ul>
+ *
+ * @author Mattias Ulbrich
+ */
+
 public class ApplyScriptsMacro extends AbstractProofMacro {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
     public static final Property<Map<LocationVariable, JFunction>> USER_DATA_JML_OBTAIN_VAR_MAP =
@@ -84,7 +107,29 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
+    /**
+     * A wrapper for a {@link JTerm} that contains obtain variables which need to be resolved
+     * before the term can be used in proof script execution.
+     * <p>
+     * Obtain variables are placeholders (represented as {@link LocationVariable}) that are
+     * bound to concrete values during script execution via {@code __obtain} commands. This
+     * record defers the resolution of these variables until the term is actually needed,
+     * ensuring proper sequencing where obtain variables must be bound before use.
+     * </p>
+     */
     record ObtainAwareTerm(JTerm term) {
+        /**
+         * Resolves all obtain variables in this term by replacing them with their bound
+         * values from the given obtain map.
+         *
+         * @param obtainMap a mapping from obtain variables ({@link LocationVariable}) to their
+         *        bound values ({@link JFunction}); variables not present in this map will
+         *        cause an error if they appear in the term
+         * @param services the proof services used for term factory operations
+         * @return a new {@link JTerm} with all obtain variables replaced by their resolved values
+         * @throws RuntimeException if the term contains an obtain variable that has not been
+         *         bound yet (i.e., appears in the term before being obtained)
+         */
         JTerm resolve(Map<LocationVariable, JFunction> obtainMap, Services services) {
             OpReplacer pvr = new OpReplacer(obtainMap, services.getTermFactory());
             JTerm result = pvr.replace(term);

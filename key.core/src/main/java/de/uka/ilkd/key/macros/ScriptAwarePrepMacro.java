@@ -17,25 +17,28 @@
 package de.uka.ilkd.key.macros;
 
 /**
- * This class captures a proof macro which is meant to automise KeY proof
- * workflow if scripts are present in the JML code.
- *
- * It is experimental.
- *
- * It performs the following steps:
+ * A proof macro that automates the KeY proof workflow when JML proof scripts are present,
+ * without attempting to close goals.
+ * <p>
+ * This macro executes a sequence of sub-macros to handle proofs with embedded JML scripts:
+ * </p>
  * <ol>
- * <li>Finish symbolic execution
- * <li>Apply macros
- * <li>It does not try to close provable goals
+ * <li>Completes symbolic execution phase</li>
+ * <li>Applies JML proof scripts via {@link ApplyScriptsMacro}</li>
+ * <li>Does not attempt to close provable goals (unlike {@link ScriptAwareMacro})</li>
  * </ol>
+ * <p>
+ * The macro is accessible via the script command {@code "script-prep-auto"} and is categorized
+ * under "Auto Pilot". It is useful for preparing proofs for further manual interaction.
+ * </p>
  *
  * @author mattias ulbrich
  * @see ScriptAwareMacro
+ * @see ApplyScriptsMacro
  */
 public class ScriptAwarePrepMacro extends SequentialProofMacro {
 
-    private final ProofMacro autoMacro = new SymbolicExecutionOnlyMacro(); // new
-                                                                           // FinishSymbolicExecutionMacro();
+    private final ProofMacro autoMacro = new SymbolicExecutionOnlyMacro();
     private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(null);
 
     @Override
@@ -55,7 +58,7 @@ public class ScriptAwarePrepMacro extends SequentialProofMacro {
 
     @Override
     public String getDescription() {
-        return "TODO";
+        return "Automatically executes JML proof scripts without closing goals";
     }
 
     @Override

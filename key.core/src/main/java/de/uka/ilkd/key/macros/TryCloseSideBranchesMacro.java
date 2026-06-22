@@ -13,6 +13,31 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * A proof macro that attempts to automatically close provable side branch goals.
+ * <p>
+ * This macro is a specialized variant of {@link TryCloseMacro} that focuses exclusively
+ * on "easy" side goals that arise from exceptional execution paths, specifically:
+ * </p>
+ * <ul>
+ * <li>Null reference exceptions</li>
+ * <li>Index out of bounds exceptions</li>
+ * </ul>
+ * <p>
+ * The macro traverses up the proof tree from each goal and identifies goals that belong
+ * to side branches by examining node branch labels. Only goals on branches labeled with
+ * "Null Reference" or "Index Out of Bounds" are processed.
+ * </p>
+ * <p>
+ * This is useful for quickly discharging trivial exceptional cases while leaving the
+ * main proof goals untouched for further manual or automated reasoning.
+ * </p>
+ * <p>
+ * Accessible via the script command {@code "tryclose-sidebranches"}.
+ * </p>
+ *
+ * @see TryCloseMacro
+ */
 public class TryCloseSideBranchesMacro extends TryCloseMacro {
 
     /**

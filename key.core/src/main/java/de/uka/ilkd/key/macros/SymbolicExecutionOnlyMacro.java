@@ -30,11 +30,46 @@ import org.key_project.util.Streams;
 import org.jspecify.annotations.NonNull;
 
 /**
- * This macro is very restritive in which rules are allowed to be applied for symbolic
- * execution. No reasoning rules should ever be applied.
+ * A proof macro that performs symbolic execution only, without applying any reasoning rules.
+ *
+ * <p>
+ * This macro restricts rule application to a carefully selected set of rules that are safe
+ * for symbolic execution. It continues executing until all modalities (program operators)
+ * have been eliminated from the sequent, leaving only first-order proof obligations.
+ * </p>
+ * <p>
+ * The admitted rules are loaded from resource files:
+ * </p>
+ * <ul>
+ * <li>{@code SymbolicExecutionOnlyMacro.admittedRules.txt} - specific rule names</li>
+ * <li>{@code SymbolicExecutionOnlyMacro.admittedRuleSets.txt} - entire rule sets</li>
+ * </ul>
+ * <p>
+ * In addition to the configured rules, the following are always admitted:
+ * </p>
+ * <ul>
+ * <li>{@code ifthenelse_split_for} when both branches contain updated modalities (Spec. treatment)</li>
+ * <li>{@link OneStepSimplifier} applications on updated modalities (for {@code <inv>()} calls)</li>
+ * <li>{@link UseOperationContractRule}, {@link JmlAssertRule}, {@link WhileInvariantRule},
+ *     and {@link LoopScopeInvariantRule}</li>
+ * </ul>
+ * <p>
+ * The macro uses a {@link FilterSymbexStrategy} that filters rule applications based on
+ * {@link #isAdmittedRule(RuleApp)}. It also includes special handling to avoid infinite
+ * recursion on the "throw null" branch of try-catch-throw constructs.
+ * </p>
+ * <p>
+ * Accessible via the script command {@code "symbex-only"} and categorized under "Auto Pilot".
+ * </p>
+ *
+ * <p>Special treatment is required for throw clauses in case they are produced by treatment
+ * of a throw clause. Then symb. execution might loop forever if not checked.</p>
  *
  * @author mattias ulbrich
+ * @see StrategyProofMacro
+ * @see FilterSymbexStrategy
  */
+
 public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
     private static final List<String> ADMITTED_RULES;
