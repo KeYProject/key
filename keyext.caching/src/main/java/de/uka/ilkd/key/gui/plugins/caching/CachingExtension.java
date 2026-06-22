@@ -215,7 +215,7 @@ public class CachingExtension
         if (underlyingObject instanceof Node node) {
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseByReference(this, mediator, node));
-            actions.add(new CopyReferencedProof(mediator, node));
+            actions.add(new CopyReferencedProof(this, mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;

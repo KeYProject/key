@@ -35,6 +35,8 @@ tasks.register('runAntlr4Key', JavaExec) {
     }
 }
 compileJava.dependsOn runAntlr4Key
+sourcesJar.dependsOn runAntlr4Key
+javadocJar.dependsOn runAntlr4Key
 
 sourceSets.main.java.srcDirs(String.valueOf(projectDir) + '/build/generated-src/antlr/main/')
 

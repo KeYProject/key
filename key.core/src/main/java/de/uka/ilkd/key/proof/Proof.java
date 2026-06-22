@@ -278,6 +278,13 @@ public class Proof implements ProofObject<Goal>, Named {
         // Do required cleanup
         if (getServices() != null) {
             getServices().getSpecificationRepository().removeProof(this);
+            // Drop the global JavaParserFacade resolution cache. It is a WeakHashMap whose values
+            // strongly reference their own (weak) keys, so without this the proof's Services - and
+            // thus the whole proof tree - would leak through it. See JavaParserFactory#dispose.
+            var javaService = getServices().getJavaServiceOrNull();
+            if (javaService != null) {
+                javaService.getProgramFactory().dispose();
+            }
         }
         if (localMgt != null) {
             localMgt.removeProofListener(); // This is strongly required because the listener is

@@ -529,6 +529,15 @@ public class Services implements TermServices, LogicServices, ProofServices {
         return javaService;
     }
 
+    /**
+     * @return the {@link JavaService}, or {@code null} if Java was never activated for this
+     *         {@link Services} (e.g. a pure first-order proof). Unlike {@link #getJavaService()}
+     *         this never asserts and is safe to call during disposal.
+     */
+    public @Nullable JavaService getJavaServiceOrNull() {
+        return javaService;
+    }
+
     private JavaService activateJavaPath(@NonNull Path bootClassPath,
             @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
