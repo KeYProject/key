@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.scripts.meta;
 
 /**
- * Signals if an unknown/unexpected argument has been provided for injection.
+ * Exception thrown when an unrecognized argument is provided during script execution.
+ * Occurs when a script passes an argument name that doesn't match any annotated field.
  *
  * @author Mattias Ulbrich
  */

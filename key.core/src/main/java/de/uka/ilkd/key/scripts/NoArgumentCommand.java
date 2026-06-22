@@ -8,10 +8,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
-/**
- * @author Alexander Weigl
- * @version 1 (28.03.17)
- */
+/// Base class for proof script commands that do not accept any arguments.
+/// Simplifies implementation by providing an empty argument list.
+///
+/// @author Alexander Weigl
+/// @version 1 (28.03.17)
 public abstract class NoArgumentCommand implements ProofScriptCommand {
     @Override
     public List<ProofScriptArgument> getArguments() {

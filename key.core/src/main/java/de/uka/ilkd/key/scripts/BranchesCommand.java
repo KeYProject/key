@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
@@ -24,6 +25,33 @@ import org.key_project.util.lookup.Property;
 
 import org.jspecify.annotations.Nullable;
 
+
+
+/// The `branches` command manages branch selection in proofs with multiple open goals.
+/// It maintains a stack of decision points and allows navigating between branches.
+///
+/// ## Usage Examples
+/// - `branches push` - Pushes the current decision point onto the stack
+/// - `branches pop` - Pops the last decision point from the stack
+/// - `branches select branch="Case 1"` - Selects a branch by name
+/// - `branches select child=0` - Selects a branch by child index
+/// - `branches single` - Selects the single non-main goal (for rules with one main goal)
+///
+/// @author Mattias Ulbrich
+@Documentation(category = "Control", value = """
+        The `branches` command manages branch selection in proofs with multiple open goals.
+        It maintains a stack of decision points and allows navigating between branches.
+
+        This is useful for focusing on specific branches of a proof or for systematically
+        working through all cases of a case distinction.
+
+        #### Usage Examples
+        - `branches push` - Pushes the current decision point onto the stack
+        - `branches pop` - Pops the last decision point from the stack
+        - `branches select branch="Case 1"` - Selects a branch by name
+        - `branches select child=0` - Selects a branch by child index
+        - `branches single` - Selects the single non-main goal (for rules with one main goal)
+        """)
 public class BranchesCommand extends AbstractCommand {
     private static final Property<Stack<Integer>> USER_DATA_BRANCH_STACK =
         new Property<>("BRANCH_STACK");
@@ -148,12 +176,16 @@ public class BranchesCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        /** A formula defining the goal to select */
         @Argument
+        @Documentation("The operation mode: 'push', 'pop', 'select', or 'single'")
         public String mode;
+
         @Option(value = "branch")
+        @Documentation("The name of the branch to select (used with mode='select')")
         public @Nullable String branch;
+
         @Option(value = "child")
+        @Documentation("The child index to select (used with mode='select')")
         public @Nullable Integer child;
     }
 

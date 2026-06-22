@@ -12,10 +12,12 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * @author Alexander Weigl
- * @version 1 (21.04.17)
- */
+/// Utility class for extracting metadata from proof script command annotations.
+/// Generates usage documentation, parameter descriptions, and category information
+/// from [@Documentation], [Argument], [Option], and [Flag] annotations.
+///
+/// @author Alexander Weigl
+/// @version 1 (21.04.17)
 public final class ArgumentsLifter {
     private static final String OPEN_BRACKET = "\u27e8";
     private static final String CLOSE_BRACKET = "\u27e9";

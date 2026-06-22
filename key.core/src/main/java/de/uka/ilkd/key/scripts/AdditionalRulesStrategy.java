@@ -25,6 +25,11 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
 
+/// A strategy wrapper that adds or restricts rule applications based on configuration.
+/// Used by the `auto` command to customize which rules are available during automatic proof search.
+/// Supports priority assignments (high, medium, low, or numeric) and rule set filtering.
+///
+/// @author Mattias Ulbrich
 class AdditionalRulesStrategy extends FilterStrategy {
     /** Name of that strategy */
     private static final Name NAME = new Name(

@@ -7,8 +7,13 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 
+/// Terminates script execution immediately by throwing an InterruptedException.
+/// Can be used to conditionally abort script processing based on proof state.
+///
+/// @author Mattias Ulbrich
 @Documentation(category = "Control", value = """
-        Exits the currently running script context unconditionally.
+        Terminates script execution immediately by throwing an InterruptedException.
+        Can be used to conditionally abort script processing based on proof state.
         (In the future, there may try-catch blocks to react to this).
         """)
 public class ExitCommand extends NoArgumentCommand {

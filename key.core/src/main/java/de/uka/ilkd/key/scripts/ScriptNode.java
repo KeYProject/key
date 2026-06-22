@@ -12,6 +12,10 @@ import de.uka.ilkd.key.proof.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Represents a node in the script execution tree.
+/// Tracks command execution, proof state, and encountered errors for debugging and reporting.
+///
+/// @author Mattias Ulbrich
 public class ScriptNode {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptNode.class);
 

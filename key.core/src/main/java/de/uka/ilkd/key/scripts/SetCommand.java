@@ -24,6 +24,25 @@ import org.key_project.util.lookup.Property;
 
 import org.jspecify.annotations.Nullable;
 
+/// Configures proof settings and strategy properties.
+/// Controls aspects like one-step simplification, maximum proof steps, and custom key-value
+/// settings.
+/// Supports push/pop of settings stacks for temporary configuration changes.
+///
+/// @author Mattias Ulbrich
+@Documentation(category = "Control",
+    value = """
+            The `set` command configures various proof settings and strategy properties.
+
+            It can be used to:
+            - Enable or disable the one-step simplifier (OSS)
+            - Set the maximum number of automatic proof steps
+            - Configure strategy-specific settings via key-value pairs
+            - Manage a stack of settings configurations (push/pop)
+            - Store user-defined data
+
+            Settings changes persist for the remainder of the script execution unless popped from the stack.
+            """)
 public class SetCommand extends AbstractCommand {
     public static final Property<ArrayList<StrategyProperties>> USER_DATA_SETTINGS_STACK =
         new Property<>("settingsStack");

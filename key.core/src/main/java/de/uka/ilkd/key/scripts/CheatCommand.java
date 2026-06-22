@@ -20,6 +20,11 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+/// Unsound command that closes the current proof goal unconditionally.
+/// Should only be used for testing and proof debugging, similar to `sorry` in Isabelle
+/// or `admit` in Rocq/Coq.
+///
+/// @author Mattias Ulbrich
 @Documentation(category = "Internal", value = """
         Use this to close a goal unconditionally. This is unsound and should only
         be used for testing and proof debugging purposes. It is similar to 'sorry'

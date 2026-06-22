@@ -8,7 +8,10 @@ import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.Nullable;
 
-
+/// Base exception for script execution errors.
+/// Carries optional location information pointing to the source of the error in the script.
+///
+/// @author Mattias Ulbrich
 public class ScriptException extends Exception implements HasLocation {
 
     private static final long serialVersionUID = -1200219771837971833L;

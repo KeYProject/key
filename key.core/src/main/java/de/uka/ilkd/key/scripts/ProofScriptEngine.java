@@ -26,10 +26,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Mattias Ulbrich
- * @author Alexander Weigl
- */
+/// The central engine for executing proof scripts in KeY.
+/// Manages command registration, loading, and execution on proofs.
+/// Maintains an [EngineState] for tracking execution context.
+///
+/// @author Mattias Ulbrich
+/// @author Alexander Weigl
 public class ProofScriptEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
 

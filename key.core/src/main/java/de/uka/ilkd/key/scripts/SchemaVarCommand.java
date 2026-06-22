@@ -72,8 +72,11 @@ public class SchemaVarCommand extends AbstractCommand {
             """)
     public static class Parameters {
         @Argument(0)
+        @Documentation("The type of schema variable: 'Formula' or a sort name")
         public @MonotonicNonNull String type;
+
         @Argument(1)
+        @Documentation("The name of the schema variable (must start with @)")
         public @MonotonicNonNull String var;
     }
 

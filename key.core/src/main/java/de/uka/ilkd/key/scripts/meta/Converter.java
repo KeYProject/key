@@ -6,8 +6,10 @@ package de.uka.ilkd.key.scripts.meta;
 /**
  * A {@link Converter} translates an instance of {@code R} to an instance of {@code T}.
  *
- * @param <R> the result type
- * @param <T> the source type
+ * Caution: The type arguments have the order "result, input"!
+ *
+ * @param <R> the result type after conversion
+ * @param <T> the source type before conversion
  * @author Alexander Weigl
  */
 public interface Converter<R, T> {

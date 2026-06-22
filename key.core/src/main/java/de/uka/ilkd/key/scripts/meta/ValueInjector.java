@@ -14,10 +14,12 @@ import org.key_project.util.java.IntegerUtil;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 
-/**
- * @author Alexander Weigl
- * @version 1 (29.03.17)
- */
+/// Injects values from script arguments into annotated parameter objects.
+/// Handles type conversion using registered [Converter] instances and validates
+/// parameters that implement [VerifyableParameters].
+///
+/// @author Alexander Weigl
+/// @version 1 (29.03.17)
 public class ValueInjector {
     /**
      * A default instance

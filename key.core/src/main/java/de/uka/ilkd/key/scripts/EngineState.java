@@ -38,10 +38,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Alexander Weigl
- * @version 1 (28.03.17)
- */
+/// Maintains the execution state for proof script evaluation.
+/// Holds references to the current proof, goal, abbreviations, and user data.
+/// Also provides type converters for parsing script arguments.
+///
+/// @author Alexander Weigl
+/// @version 1 (28.03.17)
 @NullMarked
 public class EngineState {
     public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);

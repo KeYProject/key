@@ -48,10 +48,11 @@ import org.jspecify.annotations.NonNull;
  * In addition to the configured rules, the following are always admitted:
  * </p>
  * <ul>
- * <li>{@code ifthenelse_split_for} when both branches contain updated modalities (Spec. treatment)</li>
+ * <li>{@code ifthenelse_split_for} when both branches contain updated modalities (Spec.
+ * treatment)</li>
  * <li>{@link OneStepSimplifier} applications on updated modalities (for {@code <inv>()} calls)</li>
  * <li>{@link UseOperationContractRule}, {@link JmlAssertRule}, {@link WhileInvariantRule},
- *     and {@link LoopScopeInvariantRule}</li>
+ * and {@link LoopScopeInvariantRule}</li>
  * </ul>
  * <p>
  * The macro uses a {@link FilterSymbexStrategy} that filters rule applications based on
@@ -62,8 +63,10 @@ import org.jspecify.annotations.NonNull;
  * Accessible via the script command {@code "symbex-only"} and categorized under "Auto Pilot".
  * </p>
  *
- * <p>Special treatment is required for throw clauses in case they are produced by treatment
- * of a throw clause. Then symb. execution might loop forever if not checked.</p>
+ * <p>
+ * Special treatment is required for throw clauses in case they are produced by treatment
+ * of a throw clause. Then symb. execution might loop forever if not checked.
+ * </p>
  *
  * @author mattias ulbrich
  * @see StrategyProofMacro

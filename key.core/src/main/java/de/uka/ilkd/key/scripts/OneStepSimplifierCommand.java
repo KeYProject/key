@@ -16,6 +16,11 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+/// Applies the one-step simplifier (OSS) to formulas in the current sequent.
+/// The OSS applies built-in simplification rules like boolean normalization,
+/// arithmetic simplifications, and equality reasoning.
+///
+/// @author Mattias Ulbrich
 public class OneStepSimplifierCommand extends AbstractCommand {
 
     public OneStepSimplifierCommand() {
