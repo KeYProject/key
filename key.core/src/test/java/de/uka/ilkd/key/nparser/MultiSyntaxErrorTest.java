@@ -33,10 +33,12 @@ public class MultiSyntaxErrorTest {
         List<PositionedString> msgs = ExceptionTools.getMessages(ex);
         assertTrue(msgs.size() >= 2,
             "both missing semicolons should be reported, but got: " + msgs);
-        // each error carries its own location (different lines)
-        assertTrue(
-            msgs.stream().map(m -> m.getLocation().getPosition().line()).distinct().count() >= 2,
-            "the reported errors should point at different lines: " + msgs);
+        // Each error points at the insertion point of the missing ';' (the end of the declaration
+        // on lines 2 and 4), not at the next, unexpected token (lines 3 and 5).
+        var lines = msgs.stream().map(m -> m.getLocation().getPosition().line())
+                .collect(java.util.stream.Collectors.toSet());
+        assertTrue(lines.contains(2) && lines.contains(4),
+            "errors should mark the missing ';' on lines 2 and 4, but got lines: " + lines);
     }
 
     @Test

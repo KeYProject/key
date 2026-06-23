@@ -67,9 +67,18 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
         // Replace ANTLR's terse default messages (e.g. "mismatched input ';' expecting ...") with a
         // concise, human-readable description that names the expected token(s) and what was found.
-        if (e instanceof InputMismatchException) {
+        if (e instanceof InputMismatchException ime) {
             msg = ExceptionTools.describeSyntaxError(parser.getVocabulary(), tok,
                 e.getExpectedTokens());
+            // For a missing closing/terminating token, point at the insertion point just after the
+            // preceding token (where the missing token belongs) rather than the next, unexpected
+            // token - matching the single-error path. The recovery parser's LL prediction yields a
+            // broad expected set, so accept a closing token being among the expected ones.
+            Position ip = ExceptionTools.insertionPointFor(ime, false);
+            if (ip != null) {
+                line = ip.line();
+                charPositionInLine = ip.column() - 1; // SyntaxError stores a 0-based column
+            }
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
             MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
