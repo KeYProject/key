@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.IntStream;
@@ -121,6 +122,13 @@ public final class ExceptionTools {
                 result.add(new PositionedString(ple.getMessage(), safeLocation(ple)));
                 for (Throwable sub : ple.getSubExceptions()) {
                     result.add(new PositionedString(subErrorText(sub), safeLocation(sub)));
+                }
+                break;
+            }
+            if (e instanceof SyntaxErrorReporter.ParserException pe && pe.getErrors().size() > 1) {
+                // several syntax errors collected from one file: report each with its own location
+                for (SyntaxErrorReporter.SyntaxError se : pe.getErrors()) {
+                    result.add(new PositionedString(se.getMessage(), se.getLocation()));
                 }
                 break;
             }

@@ -93,6 +93,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
     }
 
     /**
+     * @return the number of syntax errors discovered by this listener
+     */
+    public int errorCount() {
+        return errors.size();
+    }
+
+    /**
      * Throws an exception if an error has occured.
      *
      * @throws de.uka.ilkd.key.parser.proofjava.ParseException
@@ -177,6 +184,21 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         public String positionAsUrl() {
             return String.format("file://source:%d", line);
         }
+
+        /**
+         * @return the (already humanized, for an InputMismatch) error message of this single error
+         */
+        public String getMessage() {
+            return msg;
+        }
+
+        /**
+         * @return the source location of this error (1-based line and column)
+         */
+        public Location getLocation() {
+            // charPositionInLine is 0-based
+            return new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+        }
     }
 
     public static class ParserException extends RuntimeException implements HasLocation {
@@ -215,6 +237,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         @Override
         public @NonNull Location getLocation() {
             return location;
+        }
+
+        /**
+         * @return the individual syntax errors, in the order they were encountered
+         */
+        public List<SyntaxError> getErrors() {
+            return Collections.unmodifiableList(errors);
         }
     }
 }
