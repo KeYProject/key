@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -11,13 +10,11 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericArgument;
-import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -67,47 +64,6 @@ public final class ParametricSortInstance extends AbstractSort {
         return new Name(base.name() + "<" + parameters + ">");
     }
 
-    private static ImmutableSet<Sort> computeExt(ParametricSortDecl base,
-            ImmutableList<GenericArgument> args, Services services) {
-        ImmutableSet<Sort> result = DefaultImmutableSet.nil();
-
-        // 1. extensions by base sort
-        ImmutableSet<Sort> baseExt = base.getExtendedSorts();
-        if (!baseExt.isEmpty()) {
-            for (Sort s : baseExt) {
-                result =
-                    result.add(instantiate(s, getInstMap(base, args),
-                        services));
-            }
-        }
-
-        // 2. extensions by variances
-        ImmutableList<GenericParameter> cov = base.getParameters();
-        int number = 0;
-        for (GenericParameter parameter : base.getParameters()) {
-            switch (parameter.variance()) {
-                case COVARIANT -> {
-                    // take all bases of that arg and add the modified sort as ext class
-                    /*
-                     * for (Sort s : parameter.genericSort().extendsSorts()) {
-                     * ImmutableList<Sort> newArgs = args.replace(number, s);
-                     * result = result.add(ParametricSortInstance.get(base, newArgs));
-                     * }
-                     */
-                    // throw new UnsupportedOperationException(
-                    // "Covariance currently not supported");
-                }
-                case CONTRAVARIANT -> throw new UnsupportedOperationException(
-                    "Contravariance currently not supported");
-
-                case INVARIANT -> {
-                    /* Nothing to be done */}
-            }
-        }
-
-        return result;
-    }
-
     public ParametricSortDecl getBase() {
         return base;
     }
@@ -139,20 +95,30 @@ public final class ParametricSortInstance extends AbstractSort {
 
     @Override
     public boolean extendsTrans(@NonNull Sort sort) {
-        return sort == this || extendsSorts()
-                .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
-    }
+        if (sort == this)
+            return true;
 
-    /// Compute an instantiation mapping.
-    private static Map<GenericSort, GenericArgument> getInstMap(ParametricSortDecl base,
-            ImmutableList<GenericArgument> args) {
-        var map = new HashMap<GenericSort, GenericArgument>();
-        for (int i = 0; i < base.getParameters().size(); i++) {
-            var param = base.getParameters().get(i);
-            var arg = args.get(i);
-            map.put(param.sort(), arg);
+        if (sort instanceof ParametricSortInstance psi && psi.getBase().equals(base)) {
+            assert psi.getArgs().size() == args.size();
+            var baseParams = psi.getBase().getParameters();
+            var matches = true;
+            for (int i = 0; i < psi.getArgs().size(); i++) {
+                var oa = psi.getArgs().get(i);
+                var ta = args.get(i);
+                var variance = baseParams.get(i).variance();
+                switch (variance) {
+                    case COVARIANT -> matches &= ta.sort().extendsTrans(oa.sort());
+                    case CONTRAVARIANT -> matches &= oa.sort().extendsTrans(ta.sort());
+                    case INVARIANT -> matches &= oa.sort() == ta.sort();
+                }
+            }
+            if (matches) {
+                return true;
+            }
         }
-        return map;
+
+        return extendsSorts()
+                .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
     }
 
     public static Sort instantiate(GenericSort genericSort, Sort instantiation,

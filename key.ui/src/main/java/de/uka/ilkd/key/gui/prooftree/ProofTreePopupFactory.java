@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
@@ -382,6 +383,9 @@ public final class ProofTreePopupFactory {
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed && context.proof
                                         .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
+                    setEnabled(true);
+                }
+                if (context.invokedNode.lookup(ClosedBy.class) != null) {
                     setEnabled(true);
                 }
             }

@@ -12,6 +12,10 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=JavaKeYLexer; } // use tokens from STLexer.g4
 
+problem
+   : (PROBLEM LBRACE (t = termorseq) RBRACE | CHOOSECONTRACT (chooseContract = string_value SEMI)? | PROOFOBLIGATION (proofObligation = cvalue)? SEMI?) proofScriptEntry?
+   ;
+
 decls
 :
     ( bootClassPath          // for problems

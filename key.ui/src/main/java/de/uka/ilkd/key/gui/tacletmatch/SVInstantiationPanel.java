@@ -26,6 +26,7 @@ import javax.swing.text.JTextComponent;
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -313,9 +314,24 @@ public class SVInstantiationPanel extends JPanel {
             toggle = TmStyle.disclosure("the whole instantiation");
             toggle.addActionListener(e -> setExpanded(!expanded));
 
+            // the inline field stays small; an edit icon (the same one the error dialog uses) opens
+            // a larger, resizable editor for comfortably entering long instantiations
+            JButton edit = new JButton(IconFactory.editFile(12));
+            edit.setFocusable(false);
+            edit.setBorderPainted(false);
+            edit.setContentAreaFilled(false);
+            edit.setMargin(new Insets(0, 3, 0, 3));
+            edit.setToolTipText("Edit in a larger, resizable window");
+            edit.addActionListener(e -> openInEditor());
+
+            JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            controls.setOpaque(false);
+            controls.add(toggle);
+            controls.add(edit);
+
             JPanel east = new JPanel(new BorderLayout());
             east.setOpaque(false);
-            east.add(toggle, BorderLayout.NORTH);
+            east.add(controls, BorderLayout.NORTH);
 
             component = new JPanel(new BorderLayout(4, 0));
             component.setOpaque(false);
@@ -347,6 +363,47 @@ public class SVInstantiationPanel extends JPanel {
             scroll.setBorder(on
                     ? BorderFactory.createLineBorder(hl != null ? hl : new Color(0x378ADD), 2)
                     : defaultBorder);
+        }
+
+        /**
+         * opens the field's content in a larger, resizable editor window; on OK the edited text
+         * replaces the field's content (which refreshes the status/preview as usual).
+         */
+        private void openInEditor() {
+            Window owner = SwingUtilities.getWindowAncestor(component);
+            JDialog dlg = new JDialog(owner, "Edit instantiation",
+                Dialog.ModalityType.APPLICATION_MODAL);
+
+            JTextArea ta = new JTextArea(area.getText(), 14, 60);
+            ta.setFont(TmStyle.mono(ta));
+            ta.setLineWrap(true);
+            ta.setWrapStyleWord(true);
+
+            JButton ok = new JButton("OK");
+            JButton cancel = new JButton("Cancel");
+            ok.addActionListener(e -> {
+                area.setText(ta.getText());
+                autoExpandIfMultiline();
+                dlg.dispose();
+            });
+            cancel.addActionListener(e -> dlg.dispose());
+
+            JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+            buttons.setOpaque(false);
+            buttons.add(cancel);
+            buttons.add(ok);
+
+            JPanel content = new JPanel(new BorderLayout(0, 8));
+            content.setBorder(new EmptyBorder(8, 8, 8, 8));
+            content.add(new JScrollPane(ta), BorderLayout.CENTER);
+            content.add(buttons, BorderLayout.SOUTH);
+            dlg.setContentPane(content);
+            dlg.getRootPane().setDefaultButton(ok);
+            dlg.pack();
+            dlg.setMinimumSize(new Dimension(320, 200));
+            dlg.setLocationRelativeTo(owner);
+            SwingUtilities.invokeLater(ta::requestFocusInWindow);
+            dlg.setVisible(true);
         }
 
         private void updateHeight() {

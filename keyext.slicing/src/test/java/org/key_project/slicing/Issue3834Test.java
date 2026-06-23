@@ -16,7 +16,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class Issue3437Test {
+/**
+ * Regression test for issue #3834. The loop scope rule introduces "before" variables (e.g.
+ * {@code k_before}) via {@code NewLocalVarsCondition}. These names used to carry a {@code #}-index
+ * taken from a proof-global counter that is advanced as a side effect of (speculative) taclet
+ * matching. The number of increments differs between a freshly created proof and one that has been
+ * pruned and re-run, so the variable name changed (e.g. {@code k_before#0} vs. {@code k_before#1}),
+ * which broke slicing (it relies on formula equivalence across reloads).
+ * <p>
+ * The scenario mirrors {@link Issue3437Test}: load the proof, prune it and re-run automode so that
+ * the (previously volatile) counters would differ, then slice the proof and reload the slice.
+ */
+public class Issue3834Test {
     public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
@@ -24,14 +35,15 @@ public class Issue3437Test {
         GeneralSettings.noPruningClosed = false;
 
         var file = testCaseDirectory.resolve(
-            "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof");
+            "issues/3834/SumAndMax(SumAndMax__sumAndMax((I)).JML normal_behavior operation contract.0.proof");
         var env = KeYEnvironment.load(file);
         var proof = env.getLoadedProof();
         var tracker = new DependencyTracker(proof);
         env.getProofControl().startAutoMode(proof, proof.openEnabledGoals());
         env.getProofControl().waitWhileAutoMode();
         assertTrue(proof.closed());
-        // prune and re-run automode to ensure the counters on the temporary variables are different
+        // prune and re-run automode so the loop scope rule is reapplied; previously this changed
+        // the counter on the temporary "before" variables and thereby their names
         proof.pruneProof(proof.findAny(x -> x.serialNr() == 13));
         env.getProofControl().startAutoMode(proof, proof.openEnabledGoals());
         env.getProofControl().waitWhileAutoMode();
