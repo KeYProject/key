@@ -104,6 +104,9 @@ public final class IssueDialog extends JDialog {
     private final JTextPane txtSource = new JTextPane();
     private final JTextArea txtStacktrace = new JTextArea();
 
+    /** offset (in the source preview) of the currently selected issue, used for scroll-to-error */
+    private int currentErrorOffset = 0;
+
     private final JList<PositionedIssueString> listWarnings;
 
     private final JButton btnEditFile = new JButton();
@@ -310,6 +313,15 @@ public final class IssueDialog extends JDialog {
         pack();
         chkDetails.setSelected(false);
         setLocationRelativeTo(owner);
+        // On the initial show the source preview is finally laid out, so re-run the scroll that was
+        // a no-op during construction (modelToView2D == null before layout). Without this the
+        // selected issue's line is shown only after the user clicks another issue and back.
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                SwingUtilities.invokeLater(IssueDialog.this::scrollToError);
+            }
+        });
     }
 
     // creates stacktrace area, but do not show
@@ -702,26 +714,33 @@ public final class IssueDialog extends JDialog {
                 // ensure that the currently selected problem is shown in view
                 int offset =
                     pos.isNegative() ? 0 : getOffsetFromLineColumn(txtSource.getDocument(), pos);
+                currentErrorOffset = offset;
                 txtSource.setCaretPosition(offset);
                 // setCaretPosition does not scroll the viewport while the dialog is not yet laid
-                // out; scroll to the error explicitly once the layout has settled, so the offending
-                // line is visible (and not left at the top of the file).
-                final int errorOffset = offset;
-                SwingUtilities.invokeLater(() -> {
-                    try {
-                        var rect = txtSource.modelToView2D(errorOffset);
-                        if (rect != null) {
-                            txtSource.scrollRectToVisible(rect.getBounds());
-                        }
-                    } catch (BadLocationException ignore) {
-                        // best effort: leave the view where it is
-                    }
-                });
+                // out; scroll to the error explicitly. On the initial show this still runs before
+                // layout (modelToView2D == null), so the scroll is also re-run from componentShown.
+                SwingUtilities.invokeLater(this::scrollToError);
             } catch (Exception e) {
                 LOGGER.warn("Failed to update preview", e);
             }
         }
         validate();
+    }
+
+    /**
+     * Scrolls the source preview so the currently selected issue ({@link #currentErrorOffset}) is
+     * visible. A no-op while the text pane is not yet laid out ({@code modelToView2D == null}),
+     * which is why it is invoked both from {@link #updatePreview} and on {@code componentShown}.
+     */
+    private void scrollToError() {
+        try {
+            var rect = txtSource.modelToView2D(currentErrorOffset);
+            if (rect != null) {
+                txtSource.scrollRectToVisible(rect.getBounds());
+            }
+        } catch (BadLocationException ignore) {
+            // best effort: leave the view where it is
+        }
     }
 
     private void updateStackTrace(PositionedIssueString issue) {
