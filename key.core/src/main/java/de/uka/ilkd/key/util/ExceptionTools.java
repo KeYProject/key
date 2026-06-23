@@ -115,6 +115,15 @@ public final class ExceptionTools {
         List<PositionedString> result = new ArrayList<>();
         // Search the cause chain for an exception that bundles several located issues.
         for (Throwable e = throwable; e != null; e = e.getCause()) {
+            if (e instanceof ProblemLoaderException ple && !ple.getSubExceptions().isEmpty()) {
+                // e.g. a partial proof replay: report every rule application that failed, led by
+                // the summary, instead of only the first.
+                result.add(new PositionedString(ple.getMessage(), safeLocation(ple)));
+                for (Throwable sub : ple.getSubExceptions()) {
+                    result.add(new PositionedString(subErrorText(sub), safeLocation(sub)));
+                }
+                break;
+            }
             if (e instanceof BuildingExceptions be) {
                 for (BuildingIssue issue : be.getErrors()) {
                     result.add(issue.asPositionedString());
@@ -151,6 +160,17 @@ public final class ExceptionTools {
         } catch (Exception e) {
             return Location.UNDEFINED;
         }
+    }
+
+    /**
+     * Message for a bundled sub-problem. Prefers the exception's own message (which, for the
+     * replay errors, carries the contextual "Line .., goal .., rule .." text); only when it has
+     * none do we fall back to {@link #getMessage} (which would otherwise unwrap a
+     * {@link ProblemLoaderException} to its cause and drop that context).
+     */
+    private static String subErrorText(Throwable sub) {
+        String own = sub.getMessage();
+        return (own != null && !own.isBlank()) ? own : getMessage(sub);
     }
 
     public static String getNiceMessage(InputMismatchException ime) {

@@ -564,7 +564,7 @@ public final class IssueDialog extends JDialog {
             ((BuildingExceptions) exception).getErrors().forEach(
                 it -> LOGGER.info("Error", it));
         }
-        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
+        IssueDialog dlg = new IssueDialog(parent, "Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
     }
