@@ -40,6 +40,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
     public static final AtomicLong PERF_PEEK = new AtomicLong();
     public static final AtomicLong PERF_CREATE_CONTAINER = new AtomicLong();
+    /** Count of rule-app containers queued (= candidate apps cost-evaluated); for eval-to-apply. */
+    public static final AtomicLong PERF_CONTAINERS = new AtomicLong();
 
     /**
      * The goal this manager belongs to.
@@ -157,6 +159,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     private void addRuleApp(RuleAppContainer rac) {
+        PERF_CONTAINERS.incrementAndGet();
         var time = System.nanoTime();
         try {
             queue = push(rac, queue);

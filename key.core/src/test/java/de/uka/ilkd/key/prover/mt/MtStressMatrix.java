@@ -165,6 +165,11 @@ public class MtStressMatrix {
         long computeMs;
         long lockWaitMs;
         long lockHeldMs;
+        long costEvalMs;
+        long queueMs;
+        long candidates;
+        long applied;
+        String topRules = "";
         String pipelineCsv = PipelineStats.ZERO_ROW;
     }
 
@@ -382,6 +387,11 @@ public class MtStressMatrix {
                     long pComp = 0;
                     long pWait = 0;
                     long pHeld = 0;
+                    long pEval = 0;
+                    long pQueue = 0;
+                    long pCand = 0;
+                    long pApplied = 0;
+                    String lastTopRules = "";
                     int pRuns = 0;
                     for (int rep = 0; rep < reps; rep++) {
                         Run r = runWithWatchdog(spec, examples, w, timeoutMs);
@@ -397,6 +407,11 @@ public class MtStressMatrix {
                         pComp += r.computeMs;
                         pWait += r.lockWaitMs;
                         pHeld += r.lockHeldMs;
+                        pEval += r.costEvalMs;
+                        pQueue += r.queueMs;
+                        pCand += r.candidates;
+                        pApplied += r.applied;
+                        lastTopRules = r.topRules;
                         pRuns++;
                         if (isAnomaly(r.status)) {
                             String f = writeDiagnostics(outDir, spec, w, rep, r, ref);
@@ -423,6 +438,13 @@ public class MtStressMatrix {
                             pSel / pRuns, pComp / pRuns, pWait / pRuns, pHeld / pRuns,
                             tot == 0 ? 0.0 : 100.0 * pHeld / tot,
                             tot == 0 ? 0.0 : 100.0 * pWait / tot);
+                        // costEval/queue are run-level totals for the strategy's cost machinery (they
+                        // span select AND the rule reporting during commit, so not a select sub-slice);
+                        // candidates/applied is the key overhead ratio.
+                        log("[mt-stress:%s] w=%-4d   strategy(mean ms): costEval=%d queue=%d "
+                            + "| candidates/applied=%.1f", tag, w, pEval / pRuns, pQueue / pRuns,
+                            pApplied == 0 ? 0.0 : (double) pCand / pApplied);
+                        log("[mt-stress:%s] w=%-4d   hot rules: %s", tag, w, lastTopRules);
                     }
                 }
             }
@@ -563,6 +585,11 @@ public class MtStressMatrix {
             r.computeMs = PipelineStats.GLOBAL.computeMs();
             r.lockWaitMs = PipelineStats.GLOBAL.lockWaitMs();
             r.lockHeldMs = PipelineStats.GLOBAL.lockHeldMs();
+            r.costEvalMs = PipelineStats.GLOBAL.costEvalMs();
+            r.queueMs = PipelineStats.GLOBAL.queueMs();
+            r.candidates = PipelineStats.GLOBAL.candidates();
+            r.applied = PipelineStats.GLOBAL.appliedSteps();
+            r.topRules = PipelineStats.GLOBAL.topRules(8);
             r.pipelineCsv = PipelineStats.GLOBAL.csvRow();
             ProofFingerprint fp = ProofFingerprint.of(proof);
             r.closed = fp.closed;

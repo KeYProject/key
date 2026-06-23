@@ -474,6 +474,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             final int applied = appliedSteps.incrementAndGet();
             if (PipelineStats.ENABLED) {
                 PipelineStats.GLOBAL.incApplied();
+                PipelineStats.GLOBAL.recordRule(app.rule().name().toString());
             }
             fireTaskProgress();
 
