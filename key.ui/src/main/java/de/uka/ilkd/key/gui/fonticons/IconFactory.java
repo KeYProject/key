@@ -418,20 +418,6 @@ public final class IconFactory {
     }
 
     /**
-     * Creates an icon for the "Run Automation" action.
-     * <p>
-     * This is the legacy default automation mode that starts/stops automated proof search.
-     * The icon shows a green play button with an "R" overlay.
-     * </p>
-     *
-     * @param size the size of the icon in pixels
-     * @return the automation run icon
-     */
-    public static Icon automationRunLogo(int size) {
-        return automationWithOverlay(size, "R");
-    }
-
-    /**
      * Creates an icon for the "Full Auto Pilot" action.
      * <p>
      * This automation mode performs: finish symbolic execution, separate proof obligations, expand
