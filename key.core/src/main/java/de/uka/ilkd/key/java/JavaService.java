@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.JPContext;
@@ -216,13 +218,61 @@ public class JavaService {
             String head = result.substring(0, idx);
             String[] items =
                 result.substring(idx + "expected one of".length()).trim().split("\\s+");
-            final int limit = 6;
-            if (items.length > limit) {
-                result = head + "expected one of "
-                    + String.join(" ", Arrays.copyOf(items, limit)) + " ...";
+            // Drop JavaCard / schema-internal alternatives (e.g. "#abortJavaCardTransaction");
+            // they are noise for ordinary Java source and otherwise crowd out the relevant ones.
+            List<String> relevant = Arrays.stream(items)
+                    .filter(t -> !t.startsWith("\"#"))
+                    .collect(Collectors.toList());
+            if (relevant.isEmpty()) {
+                relevant = Arrays.asList(items);
             }
+            final int limit = 6;
+            String list = relevant.size() > limit
+                    ? String.join(" ", relevant.subList(0, limit)) + " ..."
+                    : String.join(" ", relevant);
+            result = head + "expected one of " + list;
         }
-        return result;
+        return humanizeJavaParserJargon(cleanFoundToken(result));
+    }
+
+    /**
+     * Rewrites JavaParser symbol-solver jargon into the user-facing wording KeY uses elsewhere:
+     * {@code "Unsolved symbol : Foobar"} becomes {@code "Cannot resolve 'Foobar'. No variable,
+     * field, or type with this name is in scope here (check for typos)."}. Text without that jargon
+     * is returned unchanged.
+     *
+     * @param message a message that may contain JavaParser symbol-solver jargon
+     * @return the message with that jargon humanized
+     */
+    public static String humanizeJavaParserJargon(@Nullable String message) {
+        if (message == null) {
+            return "";
+        }
+        return message.replaceAll("Unsolved symbol\\s*:\\s*([A-Za-z_$][\\w$.]*)",
+            "Cannot resolve '$1'. No variable, field, or type with this name is in scope here "
+                + "(check for typos)");
+    }
+
+    /**
+     * The offending token quoted in a JavaParser message can be a multi-line construct (e.g. a
+     * block comment); its raw text - with (escaped) line breaks - makes the message span many
+     * lines. Collapse the internal whitespace of that quoted {@code unexpected "..."} token to
+     * single spaces and shorten it if very long, so the message stays on one readable line.
+     *
+     * @param message a JavaParser message whose lead-in has already been rewritten
+     * @return the message with its offending token collapsed to a single line
+     */
+    private static String cleanFoundToken(String message) {
+        Matcher m = Pattern.compile("unexpected \"(.*?)\"", Pattern.DOTALL).matcher(message);
+        if (!m.find()) {
+            return message;
+        }
+        String token = m.group(1).replaceAll("\\\\[nrt]|\\s+", " ").trim();
+        final int max = 60;
+        if (token.length() > max) {
+            token = token.substring(0, max) + "…";
+        }
+        return message.substring(0, m.start(1)) + token + message.substring(m.end(1));
     }
 
     // region parsing of compilation units
