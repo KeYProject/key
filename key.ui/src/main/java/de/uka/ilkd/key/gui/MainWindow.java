@@ -55,6 +55,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
+import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -801,7 +802,10 @@ public final class MainWindow extends JFrame {
      */
     // @formatter:on
     private List<Action> createAutomationActions() {
-        return List.of(new AutoModeAction(this),
+        return List.of(
+            new MacroAutomationAction(this,
+                new DefaultAutoMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "")),
             new MacroAutomationAction(this,
                 new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
                 IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)),

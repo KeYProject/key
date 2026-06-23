@@ -31,7 +31,7 @@ public class DefaultAutoMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {
-        return "Apply Strategy";
+        return "Full Automation";
     }
 
     @Override
@@ -46,7 +46,8 @@ public class DefaultAutoMacro extends AbstractProofMacro {
 
     @Override
     public String getDescription() {
-        return "Runs the active proof strategy on the selected subtree (same as Auto button)";
+        return "<html>Runs the full proof strategy on the selected subtree.<br>" +
+            "The strategy can be configured in 'Proof Search Strategy' tab.";
     }
 
     @Override
