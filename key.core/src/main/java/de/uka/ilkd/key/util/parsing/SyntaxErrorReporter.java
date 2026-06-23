@@ -67,9 +67,18 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
         // Replace ANTLR's terse default messages (e.g. "mismatched input ';' expecting ...") with a
         // concise, human-readable description that names the expected token(s) and what was found.
-        if (e instanceof InputMismatchException) {
+        if (e instanceof InputMismatchException ime) {
             msg = ExceptionTools.describeSyntaxError(parser.getVocabulary(), tok,
                 e.getExpectedTokens());
+            // For a missing closing/terminating token, point at the insertion point just after the
+            // preceding token (where the missing token belongs) rather than the next, unexpected
+            // token - matching the single-error path. The recovery parser's LL prediction yields a
+            // broad expected set, so accept a closing token being among the expected ones.
+            Position ip = ExceptionTools.insertionPointFor(ime, false);
+            if (ip != null) {
+                line = ip.line();
+                charPositionInLine = ip.column() - 1; // SyntaxError stores a 0-based column
+            }
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
             MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
@@ -90,6 +99,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     public boolean hasErrors() {
         return !errors.isEmpty();
+    }
+
+    /**
+     * @return the number of syntax errors discovered by this listener
+     */
+    public int errorCount() {
+        return errors.size();
     }
 
     /**
@@ -177,6 +193,21 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         public String positionAsUrl() {
             return String.format("file://source:%d", line);
         }
+
+        /**
+         * @return the (already humanized, for an InputMismatch) error message of this single error
+         */
+        public String getMessage() {
+            return msg;
+        }
+
+        /**
+         * @return the source location of this error (1-based line and column)
+         */
+        public Location getLocation() {
+            // charPositionInLine is 0-based
+            return new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+        }
     }
 
     public static class ParserException extends RuntimeException implements HasLocation {
@@ -215,6 +246,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         @Override
         public @NonNull Location getLocation() {
             return location;
+        }
+
+        /**
+         * @return the individual syntax errors, in the order they were encountered
+         */
+        public List<SyntaxError> getErrors() {
+            return Collections.unmodifiableList(errors);
         }
     }
 }
