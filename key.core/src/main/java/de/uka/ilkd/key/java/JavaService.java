@@ -263,7 +263,9 @@ public class JavaService {
      * @return the message with its offending token collapsed to a single line
      */
     private static String cleanFoundToken(String message) {
-        Matcher m = Pattern.compile("unexpected \"(.*?)\"", Pattern.DOTALL).matcher(message);
+        // JavaParser writes the offending token as {@code unexpected "..."} (note: it can use more
+        // than one space); match one-or-more spaces so the token is found and collapsed.
+        Matcher m = Pattern.compile("unexpected\\s+\"(.*?)\"", Pattern.DOTALL).matcher(message);
         if (!m.find()) {
             return message;
         }

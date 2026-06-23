@@ -61,8 +61,9 @@ class JavaServiceMessageTest {
 
     @Test
     void collapsesMultiLineOffendingToken() {
-        // the offending token is an (escaped) multi-line comment
-        String in = "Parse error. Found \"/*@ loop_invariant 0 <= i\\n @ && x\\n @*/\", "
+        // the offending token is an (escaped) multi-line comment; JavaParser writes "Found \"...\""
+        // with two spaces, so the message reads "unexpected \"...\"" - the cleanup must still match
+        String in = "Parse error. Found  \"/*@ loop_invariant 0 <= i\\n @ && x\\n @*/\", "
             + "expected one of \"!\" \"(\"";
         String out = JavaService.simplifyJavaParserMessage(in);
         assertFalse(out.contains("\\n"), "escaped newlines should be collapsed: " + out);
