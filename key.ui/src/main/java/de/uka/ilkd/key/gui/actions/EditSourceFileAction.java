@@ -66,9 +66,13 @@ public class EditSourceFileAction extends KeyAction {
      */
     private final Window parent;
     /**
-     * The exception.
+     * The exception (when constructed from one); {@code null} when an explicit location was given.
      */
     private final Throwable exception;
+    /** explicit location to open at; overrides the one derived from {@link #exception} */
+    private final Location overrideLocation;
+    /** message to show next to the source when {@link #overrideLocation} is used */
+    private final String overrideMessage;
 
     /**
      * Instantiates a new edits the source file action.
@@ -81,7 +85,29 @@ public class EditSourceFileAction extends KeyAction {
         setIcon(IconFactory.editFile(16));
         this.parent = parent;
         this.exception = exception;
+        this.overrideLocation = null;
+        this.overrideMessage = null;
         setEnabled(exception != null);
+    }
+
+    /**
+     * Opens the editor directly at the given location. Used to jump to a <em>specific</em> issue
+     * when several are reported, so the editor opens at the selected issue rather than the first.
+     *
+     * @param parent the parent window
+     * @param location the location to open and place the caret at
+     * @param message the message to show next to the source
+     */
+    public EditSourceFileAction(final Window parent, final Location location,
+            final String message) {
+        setName("Edit File");
+        setIcon(IconFactory.editFile(16));
+        this.parent = parent;
+        this.exception = null;
+        this.overrideLocation = location;
+        this.overrideMessage = message == null ? "" : message;
+        setEnabled(location != null && location.getFileUri() != null
+                && !location.getPosition().isNegative());
     }
 
     /**
@@ -106,16 +132,15 @@ public class EditSourceFileAction extends KeyAction {
         textArea.setCaretPosition(i);
     }
 
-    private static JScrollPane createParserMessageScrollPane(final Throwable exception,
+    private static JScrollPane createParserMessageScrollPane(final String message,
             final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
-        String message = exception.getMessage();
-        message = message == null ? "" : message;
-        parserMessage.setText(message);
+        String msg = message == null ? "" : message;
+        parserMessage.setText(msg);
         parserMessage.setEditable(false);
         parserMessage.setColumns(columnNumber);
         // approximate # rows
-        parserMessage.setRows(message.length() / (columnNumber - 10));
+        parserMessage.setRows(Math.max(1, msg.length() / (columnNumber - 10)));
         parserMessage.setLineWrap(true);
         parserMessage.setWrapStyleWord(true);
         parserMessage.setBorder(new TitledBorder("Parser Message"));
@@ -235,19 +260,27 @@ public class EditSourceFileAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        if (exception == null) {
-            JOptionPane.showMessageDialog(
-                SwingUtilities.windowForComponent((Component) arg0.getSource()),
-                "The given exception does not carry any positional information.",
-                "Position not available", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
-            final Location location = ExceptionTools.getLocation(exception);
-            if (location == null)
-                throw new IOException("Cannot recover file location from exception.");
-            final URI uri = location.fileUri();
+            final Location location;
+            final String message;
+            if (overrideLocation != null) {
+                location = overrideLocation;
+                message = overrideMessage;
+            } else if (exception != null) {
+                location = ExceptionTools.getLocation(exception);
+                message = exception.getMessage() == null ? "" : exception.getMessage();
+            } else {
+                location = null;
+                message = "";
+            }
+            if (location == null || location.getFileUri() == null) {
+                JOptionPane.showMessageDialog(
+                    SwingUtilities.windowForComponent((Component) arg0.getSource()),
+                    "The given problem does not carry any positional information.",
+                    "Position not available", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            final URI uri = location.getFileUri();
 
             // indicate edit/readonly in dialog title
             String prefix;
@@ -263,7 +296,7 @@ public class EditSourceFileAction extends KeyAction {
             final int columnNumber = 75;
 
             final JScrollPane parserMessageScrollPane =
-                createParserMessageScrollPane(exception, columnNumber);
+                createParserMessageScrollPane(message, columnNumber);
 
             final JTextPane txtSource = createSrcTextPane(location);
 

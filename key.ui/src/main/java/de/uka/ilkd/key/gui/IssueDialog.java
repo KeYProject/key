@@ -329,9 +329,8 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
         listWarnings
                 .addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
-        // enable/disable "open file" and "show details"
-        listWarnings.addListSelectionListener(
-            e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+        // "Edit File" is (re)bound to the selected issue in updatePreview (so it opens at that
+        // issue's location); here we only manage "show details"
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().getAdditionalInfo().isEmpty()) {
                 chkDetails.setSelected(false);
@@ -537,6 +536,18 @@ public final class IssueDialog extends JDialog {
         fTextField.setEditable(false);
         lTextField.setEditable(false);
         cTextField.setEditable(false);
+        // make the location a clickable link that opens the source at the selected issue
+        fTextField.setForeground(new Color(0x0b, 0x57, 0xd0));
+        fTextField.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        fTextField.setToolTipText("Click to open the source file at this location");
+        fTextField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (btnEditFile.isEnabled()) {
+                    btnEditFile.doClick();
+                }
+            }
+        });
         locPanel.add(fTextField);
         locPanel.add(lTextField);
         locPanel.add(cTextField);
@@ -645,7 +656,10 @@ public final class IssueDialog extends JDialog {
         cTextField.setText("Column: " + pos.column());
         lTextField.setText("Line: " + pos.line());
 
-        btnEditFile.setEnabled(pos != Position.UNDEFINED);
+        // Bind "Edit File" (and the clickable location field) to THIS issue, so jumping to the
+        // source opens at the selected issue rather than the first one reported. The action enables
+        // itself only when the issue carries a usable file location.
+        btnEditFile.setAction(new EditSourceFileAction(this, location, issue.getText()));
 
         if (location.getFileURI().isEmpty()) {
             fTextField.setVisible(false);
