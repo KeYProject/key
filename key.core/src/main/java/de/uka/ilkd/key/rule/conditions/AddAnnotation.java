@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This variable condition can be used to create a copy of a {@link SchemaVariable} 
+ * This variable condition can be used to create a copy of a {@link SchemaVariable}
  * that has an additional {@link Annotation} in its {@link TypeReference}.
  *
  * @author Daniel Grévent
@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 public final class AddAnnotation implements VariableCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddAnnotation.class);
     private static final Sort[] ALLOWED = {
-         ProgramSVSort.SIMPLE_NEW, 
-         ProgramSVSort.LOCALVARIABLE, ProgramSVSort.VARIABLE 
+        ProgramSVSort.SIMPLE_NEW,
+        ProgramSVSort.LOCALVARIABLE, ProgramSVSort.VARIABLE
     };
 
     private final SchemaVariable read, store;
@@ -53,19 +53,20 @@ public final class AddAnnotation implements VariableCondition {
      * @param read the {@link SchemaVariable} that gets copied
      * @param annot the fully qualified name of the {@link Annotation} to add
      *
-     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s 
-     *  in the `ALLOWED` array or the {@link Sort} of write is not compatible with 
-     *  that of `read`, so they do not correspond to the same kind of AST type.
+     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s
+     *         in the `ALLOWED` array or the {@link Sort} of write is not compatible with
+     *         that of `read`, so they do not correspond to the same kind of AST type.
      */
     public AddAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
         if (!equivalent(store.sort(), read.sort())) {
-            throw new IllegalArgumentException("Expected left and right to have an equivalent sort!");
+            throw new IllegalArgumentException(
+                "Expected left and right to have an equivalent sort!");
         }
 
         if (!Arrays.stream(ALLOWED).anyMatch(read.sort()::equals)) {
             throw new IllegalArgumentException(
                 "Unsupported sort: " + read.sort() + ", supported: " +
-                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("", 
+                    Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("",
                         (a, b) -> a + " " + b));
         }
 
@@ -74,13 +75,16 @@ public final class AddAnnotation implements VariableCondition {
         this.annot = annot;
     }
 
-    /* check that two sorts that are part of `ALLOWED` are correspond to a same 
-     * underlying type */
+    /*
+     * check that two sorts that are part of `ALLOWED` are correspond to a same
+     * underlying type
+     */
     private static boolean equivalent(Sort a, Sort b) {
-        if (a == b) return true;
-        if (a == ProgramSVSort.VARIABLE && b == ProgramSVSort.LOCALVARIABLE 
+        if (a == b)
+            return true;
+        if (a == ProgramSVSort.VARIABLE && b == ProgramSVSort.LOCALVARIABLE
                 || b == ProgramSVSort.VARIABLE && a == ProgramSVSort.LOCALVARIABLE)
-            return true; 
+            return true;
 
         return false;
     }
@@ -100,10 +104,10 @@ public final class AddAnnotation implements VariableCondition {
         Object inst = svInst.getInstantiation(read);
 
         Annotation annotation = build((Services) logicServices);
-        if (inst instanceof ProgramVariable variable) {    
+        if (inst instanceof ProgramVariable variable) {
             TypeReference tRef = addAnnotation(variable.getTypeReference(), annotation);
             LocationVariable replacement = newFromTypeRef(
-                    variable, (Services)logicServices, tRef);
+                variable, (Services) logicServices, tRef);
 
             return matchCond.setInstantiations(
                 svInst.add(store, replacement, logicServices));
@@ -135,13 +139,14 @@ public final class AddAnnotation implements VariableCondition {
             tRef.getKeYJavaType());
     }
 
-    private static LocationVariable newFromTypeRef(ProgramVariable v, Services services, TypeReference tRef) {
+    private static LocationVariable newFromTypeRef(ProgramVariable v, Services services,
+            TypeReference tRef) {
         return new LocationVariable(
-                services.getVariableNamer().getTemporaryNameProposal(v.name().toString()),
-                tRef, 
-                v.getContainerType(), 
-                v.isStatic(), 
-                v.isModel(), v.isGhost(), v.isFinal());
+            services.getVariableNamer().getTemporaryNameProposal(v.name().toString()),
+            tRef,
+            v.getContainerType(),
+            v.isStatic(),
+            v.isModel(), v.isGhost(), v.isFinal());
     }
 
     private static New newFromTypeRef(New n, TypeReference tRef) {

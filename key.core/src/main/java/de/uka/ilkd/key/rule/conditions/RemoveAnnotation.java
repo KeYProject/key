@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This variable condition can be used to create a copy of a {@link SchemaVariable} 
- * that has all instances of an {@link Annotation} removed from its 
+ * This variable condition can be used to create a copy of a {@link SchemaVariable}
+ * that has all instances of an {@link Annotation} removed from its
  * {@link TypeReference}.
  *
  * @author Daniel Grévent
@@ -48,9 +48,9 @@ public final class RemoveAnnotation implements VariableCondition {
      * @param read the {@link SchemaVariable} that gets copied
      * @param annot the fully qualified name of the {@link Annotation} to remove
      *
-     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s in the 
-     *  `ALLOWED` array or the {@link Sort} of write is not the same as to {@link Sort} 
-     *  of `read`, so they do not correspond to the same kind of AST type.
+     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s in the
+     *         `ALLOWED` array or the {@link Sort} of write is not the same as to {@link Sort}
+     *         of `read`, so they do not correspond to the same kind of AST type.
      */
     public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
         if (!store.sort().equals(read.sort())) {
@@ -88,7 +88,7 @@ public final class RemoveAnnotation implements VariableCondition {
             return matchCond.setInstantiations(
                 svInst.add(store, replacement, logicServices));
         }
-        
+
         return matchCond;
     }
 
