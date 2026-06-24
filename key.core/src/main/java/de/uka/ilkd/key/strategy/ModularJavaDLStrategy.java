@@ -10,7 +10,6 @@ import java.util.function.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
@@ -57,6 +56,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     private final ResponsibleStrategyCache responsibleStrategyCache;
 
+    /// the conflict-resolution cost dispatcher; kept for {@link #costRuleSetDispatchers}
+    private final RuleSetDispatchFeature conflictCostDispatcher;
+
     public ModularJavaDLStrategy(Proof proof, List<ComponentStrategy> componentStrategies,
             StrategyProperties properties) {
         super(proof);
@@ -69,7 +71,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         // if more than one strategy is responsible for a _ruleset_ we need to determine how to
         // resolve the
         // competing computations
-        RuleSetDispatchFeature conflictCostDispatcher = resolveConflicts();
+        conflictCostDispatcher = resolveConflicts();
 
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
         Feature reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost,
@@ -80,10 +82,12 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             (rule) -> responsibleStrategyCache.getResponsibleStrategies(rule, strategies,
                 StrategyAspect.Instantiation));
 
-        // the feature for the cost computation
+        // the feature for the cost computation. Age (goal time) is NOT part of the strategy cost:
+        // it is a first-class container-level term added once by RuleAppContainer.withAge, so the
+        // cost here is age-free (this lets cost reuse carry the age-free base forward verbatim).
         totalCost =
             add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
-                reduceCostTillMaxF, conflictCostDispatcher, AgeFeature.INSTANCE);
+                reduceCostTillMaxF, conflictCostDispatcher);
 
         // The feature for instantiateApp, built once instead of on every call.
         // Note that no conflict dispatcher takes part in this sum: resolveConflicts()
@@ -93,8 +97,26 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         enableInstantiate();
         totalInstCost =
             add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
-                reduceInstTillMaxF, AgeFeature.INSTANCE);
+                reduceInstTillMaxF);
         disableInstantiate();
+    }
+
+    /**
+     * The {@link RuleSetDispatchFeature}s that contribute to a rule's COST (the conflict-resolution
+     * dispatcher plus each component strategy's cost dispatcher). Exposed for {@link CostReuse}'s
+     * feature-locality classification, which must NOT reach this via reflection from the strategy
+     * object (that would traverse the live proof graph the strategy references).
+     */
+    public List<RuleSetDispatchFeature> costRuleSetDispatchers() {
+        final List<RuleSetDispatchFeature> result = new ArrayList<>();
+        result.add(conflictCostDispatcher);
+        for (ComponentStrategy s : strategies) {
+            final RuleSetDispatchFeature d = s.getDispatcher(StrategyAspect.Cost);
+            if (d != null) {
+                result.add(d);
+            }
+        }
+        return result;
     }
 
     private record StratAndDispatcher(ComponentStrategy strategy,
