@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import java.util.List;
+
 public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
     /**
      * Body.
@@ -36,6 +38,14 @@ public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
     }
 
     public ActiveCase(ImmutableArray<? extends Statement> body) {
+        this.body = body;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+    }
+
+    public ActiveCase(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments)  {
+        super(new ExtList(comments.toArray()), pi);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();

@@ -1264,6 +1264,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 reportError(n, "Switch entry got a schema variable that is not a program SV");
             }
             return List.of(v);
+        } else if (n.isActive()) {
+            return List.of(new ActiveCase(body, pi, c));
         } else if (n.getLabels().isEmpty()) {
             // Default branch
             return List.of(new Default(body, pi, c));
