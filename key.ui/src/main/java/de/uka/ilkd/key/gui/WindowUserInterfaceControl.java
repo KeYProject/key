@@ -210,6 +210,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
+                // Show the macro's aggregate result (total rules applied / goals closed). Without
+                // this the status line keeps whatever the macro's last internal strategy run left
+                // there -- a tiny partial count rather than the whole macro's work.
+                mainWindow.displayResults(info.toString());
                 final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
                         && mainWindow.getMediator().getSelectedProof() == proof) {
@@ -539,11 +543,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
-                        result.getErrorList().getFirst());
+                        "The proof could only be loaded partially: " + result.getErrorList().size()
+                            + " rule application(s) could not be replayed (see the list below).",
+                        result.getErrorList());
                 }
             }
         }

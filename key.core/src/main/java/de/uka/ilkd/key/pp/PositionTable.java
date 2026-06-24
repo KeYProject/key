@@ -205,6 +205,14 @@ public class PositionTable {
         return children[i];
     }
 
+    public int getRows() {
+        return rows;
+    }
+
+    public Range getRange(int i) {
+        return new Range(startPos[i], endPos[i]);
+    }
+
     /**
      * returns a String representation of the position table
      */
