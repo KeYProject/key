@@ -1258,7 +1258,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<Statement> body = map(n.getStatements());
-        if (n.getLabels().isEmpty()) {
+        if (n instanceof KeySwitchEntrySV sv) {
+            var v = lookupSchemaVariable(new Name(sv.getSchemaVar()));
+            if (!(v instanceof ProgramSV)) {
+                reportError(n, "Switch entry got a schema variable that is not a program SV");
+            }
+            return List.of(v);
+        } else if (n.getLabels().isEmpty()) {
             // Default branch
             return List.of(new Default(body, pi, c));
         } else {
