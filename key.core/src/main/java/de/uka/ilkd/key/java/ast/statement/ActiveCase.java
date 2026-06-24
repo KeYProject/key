@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -11,8 +13,6 @@ import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
     /**
@@ -44,7 +44,7 @@ public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
         innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
-    public ActiveCase(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments)  {
+    public ActiveCase(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
         super(new ExtList(comments.toArray()), pi);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
