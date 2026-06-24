@@ -5,6 +5,7 @@ package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,8 +150,8 @@ public class ProofIndependentSettings {
             filename.getParentFile().mkdirs();
         }
 
-        try (var out =
-            new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
+        try (var out = new BufferedWriter(new FileWriter(
+            filename.toString().replace(".props", ".json"), StandardCharsets.UTF_8))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
             LOGGER.error("Could not store settings to {}", filename, e);
