@@ -788,13 +788,19 @@ public class LogicPrinter {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            // printTerm is the central recursive method (called once per subterm), so the
+            // notation and the visible-label set are looked up once here instead of up to three
+            // times. getVisibleTermLabels is only consulted when the term actually has labels,
+            // preserving the previous short-circuit (its SequentViewLogicPrinter override
+            // allocates and filters on every call).
+            final Notation notation = notationInfo.getNotation(t.op());
+            final boolean parens = t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+                    && notation.getPriority() < NotationInfo.PRIORITY_ATOM;
+            if (parens) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op()).print(t, this);
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notation.print(t, this);
+            if (parens) {
                 layouter.print(")");
             }
         }
