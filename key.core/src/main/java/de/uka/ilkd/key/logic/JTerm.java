@@ -120,6 +120,16 @@ public interface JTerm
     boolean containsJavaBlockRecursive();
 
     /**
+     * Checks if this {@link JTerm} or one of its direct or indirect children has a
+     * {@link de.uka.ilkd.key.logic.op.Transformer} operator. Cached; used by
+     * {@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix} to skip the prefix walk in the common
+     * transformer-free case.
+     *
+     * @return {@code true} iff a transformer occurs anywhere in the term tree
+     */
+    boolean containsTransformerRecursive();
+
+    /**
      * Returns a human-readable source of this term. For example the filename with line and offset.
      */
     default @Nullable String getOrigin() { return null; }
