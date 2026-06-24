@@ -36,7 +36,6 @@ class ProofPruner {
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {
-
         // there is only one leaf containing an open goal that is interesting for pruning the
         // subtree of <code>node</code>, namely the first leave that is found by a breadth
         // first search.

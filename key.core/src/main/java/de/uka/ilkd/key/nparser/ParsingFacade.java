@@ -180,12 +180,17 @@ public final class ParsingFacade {
         try {
             ctx = p.file();
         } catch (ParseCancellationException ex) {
-            LOGGER.warn("SLL was not enough");
+            LOGGER.warn("SLL was not enough; retrying with LL and error recovery");
+            // Re-parse with LL prediction and ANTLR's default error recovery so that ALL syntax
+            // errors are collected (the bail strategy above stops at the first). To avoid
+            // regressing the polished single-error message and position, keep the bail-path
+            // exception when recovery finds exactly one error; report the whole list only when
+            // there are several. Zero errors means SLL was merely insufficient and the LL parse
+            // actually succeeded - fall through and return the tree.
             stream.seek(0);
             p = createParser(stream);
-            p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
-            if (p.getErrorReporter().hasErrors()) {
+            if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
             }
         }

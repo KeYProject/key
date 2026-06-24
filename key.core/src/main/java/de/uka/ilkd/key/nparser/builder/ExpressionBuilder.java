@@ -670,6 +670,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 String reason = ExceptionTools.getMessages(e).stream()
                         .map(de.uka.ilkd.key.speclang.PositionedString::getText)
                         .collect(Collectors.joining("\n"));
+                reason = JavaService.humanizeJavaParserJargon(reason);
                 throw new BuildingException(t, pos,
                     "Could not parse Java block '" + cleanJava + "':\n" + reason,
                     e);
