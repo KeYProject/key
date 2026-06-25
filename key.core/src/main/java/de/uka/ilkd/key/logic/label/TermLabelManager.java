@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -2156,10 +2155,55 @@ public class TermLabelManager {
      * @see TermLabel#isProofRelevant()
      */
     public static JTerm removeIrrelevantLabels(JTerm term, TermFactory tf) {
+        // Identity-preserving rebuild: only allocate along paths that actually carry an irrelevant
+        // label, and return the original term unchanged otherwise. The previous implementation
+        // rebuilt the whole term tree on every call (stream().map()/filter().collect() per node),
+        // which was the single biggest allocator during proof search (~20%) even though the vast
+        // majority of subterms have no irrelevant labels and need not change.
+        final ImmutableArray<JTerm> subs = term.subs();
+        final int n = subs.size();
+        JTerm[] newSubs = null; // allocated lazily, only once a sub actually changes
+        for (int i = 0; i < n; i++) {
+            final JTerm oldSub = subs.get(i);
+            final JTerm newSub = removeIrrelevantLabels(oldSub, tf);
+            if (newSub != oldSub && newSubs == null) {
+                newSubs = new JTerm[n];
+                for (int j = 0; j < i; j++) {
+                    newSubs[j] = subs.get(j);
+                }
+            }
+            if (newSubs != null) {
+                newSubs[i] = newSub;
+            }
+        }
+
+        final ImmutableArray<TermLabel> labels = term.getLabels();
+        ImmutableArray<TermLabel> newLabels = labels;
+        if (!labels.isEmpty()) {
+            int relevant = 0;
+            for (int i = 0, sz = labels.size(); i < sz; i++) {
+                if (labels.get(i).isProofRelevant()) {
+                    relevant++;
+                }
+            }
+            if (relevant != labels.size()) {
+                final TermLabel[] kept = new TermLabel[relevant];
+                int k = 0;
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    final TermLabel l = labels.get(i);
+                    if (l.isProofRelevant()) {
+                        kept[k++] = l;
+                    }
+                }
+                newLabels = new ImmutableArray<>(kept);
+            }
+        }
+
+        if (newSubs == null && newLabels == labels) {
+            return term; // no irrelevant label anywhere in this subtree -> no allocation
+        }
         return tf.createTerm(term.op(),
-            new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
-                    .collect(Collectors.toList())),
-            term.boundVars(), new ImmutableArray<>(term.getLabels().stream()
-                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
+            newSubs == null ? subs : new ImmutableArray<>(newSubs),
+            term.boundVars(), newLabels);
     }
 }

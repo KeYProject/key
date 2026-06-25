@@ -71,4 +71,15 @@ public class TmTextTest {
         assertEquals(6, TmText.offsetOf(s, 2, 4), "end of the second line");
         assertEquals(6, TmText.offsetOf(s, 9, 1), "a line past the end clamps to the length");
     }
+
+    @Test
+    public void lineCount() {
+        assertEquals(1, TmText.lineCount(null));
+        assertEquals(1, TmText.lineCount(""));
+        assertEquals(1, TmText.lineCount("one line"));
+        assertEquals(2, TmText.lineCount("a\nb"));
+        assertEquals(3, TmText.lineCount("a\nb\nc"));
+        assertEquals(3, TmText.lineCount("a\nb\n"), "a trailing newline still bounds a third line");
+    }
+
 }

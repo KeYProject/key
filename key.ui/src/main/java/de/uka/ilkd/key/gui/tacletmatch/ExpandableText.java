@@ -34,8 +34,9 @@ public class ExpandableText extends JPanel {
     public ExpandableText(String text, int limit) {
         this.full = text == null ? "" : text;
         this.limit = limit;
-        // only collapse genuinely long content; short multi-line terms are shown in full (wrapped)
-        this.expandable = full.length() > limit;
+        // collapse genuinely long content, or anything taller than two lines, so a big term does
+        // not dominate the panel; short one/two-line terms are shown in full (wrapped)
+        this.expandable = full.length() > limit || TmText.lineCount(full) > 2;
 
         setOpaque(false);
         setLayout(new BorderLayout(4, 0));

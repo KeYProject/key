@@ -48,6 +48,20 @@ final class TmText {
         return "<html><div style='width:480px'>" + esc + "</div></html>";
     }
 
+    /** the number of lines in {@code s} (newline count + 1; {@code 1} for {@code null}/empty). */
+    static int lineCount(String s) {
+        if (s == null || s.isEmpty()) {
+            return 1;
+        }
+        int lines = 1;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '\n') {
+                lines++;
+            }
+        }
+        return lines;
+    }
+
     /**
      * the character offset into {@code s} of the given 1-based {@code line} and 1-based
      * {@code column}, clamped to {@code [0, s.length()]}.

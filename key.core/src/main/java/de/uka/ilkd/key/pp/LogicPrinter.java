@@ -690,7 +690,15 @@ public class LogicPrinter {
             layouter.markEndSub();
             layouter.end();
         } catch (UnbalancedBlocksException e) {
+            reset();
             throw new RuntimeException("Unbalanced blocks in pretty printer", e);
+        } catch (RuntimeException | Error e) {
+            // A failure deep in the recursive term printing (e.g. a NullPointerException) unwinds
+            // past the pending end() calls and leaves the layouter with open blocks. Discard the
+            // dirty layouter so that a subsequently reused printer does not fail with a misleading
+            // UnbalancedBlocksException that masks this root cause.
+            reset();
+            throw e;
         }
     }
 
@@ -731,9 +739,19 @@ public class LogicPrinter {
      * @param seq The Sequent to be pretty-printed
      */
     public void printSequent(Sequent seq) {
-        layouter.beginC(0);
-        printSequentInExistingBlock(seq);
-        layouter.end();
+        try {
+            layouter.beginC(0);
+            printSequentInExistingBlock(seq);
+            layouter.end();
+        } catch (UnbalancedBlocksException e) {
+            reset();
+            throw new RuntimeException("Unbalanced blocks in pretty printer", e);
+        } catch (RuntimeException | Error e) {
+            // See printFilteredSequent: discard the layouter left dirty by a printing failure so a
+            // reused printer cannot later fail with a misleading UnbalancedBlocksException.
+            reset();
+            throw e;
+        }
     }
 
     /**
@@ -788,13 +806,19 @@ public class LogicPrinter {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            // printTerm is the central recursive method (called once per subterm), so the
+            // notation and the visible-label set are looked up once here instead of up to three
+            // times. getVisibleTermLabels is only consulted when the term actually has labels,
+            // preserving the previous short-circuit (its SequentViewLogicPrinter override
+            // allocates and filters on every call).
+            final Notation notation = notationInfo.getNotation(t.op());
+            final boolean parens = t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+                    && notation.getPriority() < NotationInfo.PRIORITY_ATOM;
+            if (parens) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op()).print(t, this);
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notation.print(t, this);
+            if (parens) {
                 layouter.print(")");
             }
         }

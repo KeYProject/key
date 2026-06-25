@@ -66,11 +66,13 @@ public final class CloseByReference extends KeyAction {
             });
         }
         List<Integer> mismatches = new ArrayList<>();
+        List<Integer> matches = new ArrayList<>();
         for (Node n : nodes) {
             // search other proofs for matching nodes
             ClosedBy c = ReferenceSearcher.findPreviousProof(
                 mediator.getCurrentlyOpenedProofs(), n);
             if (c != null) {
+                matches.add(n.serialNr());
                 n.proof().closeGoal(n.proof().getOpenGoal(n));
                 n.register(c, ClosedBy.class);
             } else {
@@ -80,12 +82,23 @@ public final class CloseByReference extends KeyAction {
         if (!nodes.isEmpty()) {
             cachingExtension.updateGUIState(nodes.get(0).proof());
         }
-        if (!mismatches.isEmpty()) {
+        if (!mismatches.isEmpty() || !matches.isEmpty()) {
+            var sb = new StringBuilder();
+            if (!matches.isEmpty()) {
+                sb.append("Cache hit found for node(s) ");
+                sb.append(Arrays.toString(matches.toArray()));
+            }
+            if (!mismatches.isEmpty()) {
+                if (!sb.isEmpty()) {
+                    sb.append('\n');
+                }
+                sb.append("No matching branch found for node(s) ");
+                sb.append(Arrays.toString(mismatches.toArray()));
+            }
             // since e.getSource() is the popup menu, it is better to use the MainWindow
             // instance here as a parent
-            JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
-                "Proof Caching error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(MainWindow.getInstance(), sb.toString(),
+                "Proof Caching", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
