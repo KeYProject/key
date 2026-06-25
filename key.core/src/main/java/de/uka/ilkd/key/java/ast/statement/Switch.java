@@ -268,7 +268,8 @@ public class Switch extends BranchStatement
     @Override
     public boolean hasNextPrefixElement() {
         return !branches.isEmpty() && (branches.get(0) instanceof PossibleProgramPrefix
-        || branches.get(0) instanceof Default && branches.size() > 1 && branches.get(1) instanceof PossibleProgramPrefix);
+                || branches.get(0) instanceof Default && branches.size() > 1
+                        && branches.get(1) instanceof PossibleProgramPrefix);
     }
 
     @Override
@@ -288,7 +289,7 @@ public class Switch extends BranchStatement
             if (branches.get(0) instanceof PossibleProgramPrefix pre)
                 return pre.getLastPrefixElement();
             return ((PossibleProgramPrefix) branches.get(1)).getLastPrefixElement();
-        };
+        } ;
         return this;
     }
 
