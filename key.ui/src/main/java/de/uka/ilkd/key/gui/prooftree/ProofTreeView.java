@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.LayerUI;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
@@ -170,6 +171,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private ImmutableList<Node> modifiedSubtrees = null;
 
     /**
+     * Overlay painted over the tree while it catches up after a run (see {@code autoModeStopped}),
+     * so the user sees that the tree is busy reconciling rather than frozen. Only shown for large
+     * proofs ({@link #BUSY_OVERLAY_NODE_THRESHOLD}) to avoid a flicker on cheap updates.
+     */
+    private final BusyLayerUI busyLayerUI = new BusyLayerUI();
+    private JLayer<JComponent> busyLayer;
+    private static final int BUSY_OVERLAY_NODE_THRESHOLD = 20000;
+
+    /**
      * the search dialog
      */
     private final ProofTreeSearchBar proofTreeSearchPanel;
@@ -314,7 +324,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel = new ProofTreeSearchBar(this);
         bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
 
-        add(new JScrollPane(delegateView), BorderLayout.CENTER);
+        // Wrap the scroll pane in a JLayer so the post-run catch-up can paint a "busy" overlay
+        // (see autoModeStopped). The layer is transparent unless busy, and the tree/scroll pane
+        // hierarchy below it is unchanged (delegateView.getParent().getParent() is still the pane).
+        busyLayer = new JLayer<>(new JScrollPane(delegateView), busyLayerUI);
+        add(busyLayer, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
         layoutKeYComponent();
@@ -1069,7 +1083,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
             final boolean rebuildAll = dirtyWhileHidden;
             modifiedSubtrees = null;
             dirtyWhileHidden = false;
-            GuiUtilities.deferAfterAutoMode(() -> reconcileTreeAfterAutoMode(subtrees, rebuildAll));
+            GuiUtilities.deferAfterAutoMode(() -> {
+                // On large proofs the reconcile blocks the EDT; paint a "busy" banner first (forced
+                // synchronously, since the reconcile that follows holds the EDT) so the user sees the
+                // tree is updating rather than frozen. Skipped on small proofs to avoid a flicker.
+                final Proof p = mediator.getSelectedProof();
+                final boolean showBusy = p != null && !mediator.isInAutoMode()
+                        && p.countNodes() > BUSY_OVERLAY_NODE_THRESHOLD;
+                if (showBusy) {
+                    busyLayerUI.setBusy(true);
+                    busyLayer.paintImmediately(0, 0, busyLayer.getWidth(), busyLayer.getHeight());
+                }
+                try {
+                    reconcileTreeAfterAutoMode(subtrees, rebuildAll);
+                } finally {
+                    if (showBusy) {
+                        busyLayerUI.setBusy(false);
+                        busyLayer.repaint();
+                    }
+                }
+            });
         }
 
         /**
@@ -1521,5 +1554,48 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Collection<TreePath> expansionState,
             TreePath selectionPath,
             Integer scrollState) {
+    }
+
+    /**
+     * Layer that paints a "currently updating" banner over the proof tree while it reconciles a
+     * large proof after a run (see {@code autoModeStopped}). Transparent unless {@link #busy}; the
+     * flag is toggled and read only on the EDT.
+     */
+    private static final class BusyLayerUI extends LayerUI<JComponent> {
+        private boolean busy;
+
+        void setBusy(boolean busy) {
+            this.busy = busy;
+        }
+
+        @Override
+        public void paint(Graphics g, JComponent c) {
+            super.paint(g, c);
+            if (!busy) {
+                return;
+            }
+            Graphics2D g2 = (Graphics2D) g.create();
+            try {
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+                final int w = c.getWidth();
+                final int h = c.getHeight();
+                g2.setColor(new Color(0, 0, 0, 70)); // dim the (stale) tree behind the banner
+                g2.fillRect(0, 0, w, h);
+                final String msg = "Updating proof tree…";
+                g2.setFont(c.getFont().deriveFont(Font.BOLD, 14f));
+                final FontMetrics fm = g2.getFontMetrics();
+                final int tw = fm.stringWidth(msg);
+                final int th = fm.getHeight();
+                final int x = (w - tw) / 2;
+                final int y = (h - th) / 2;
+                g2.setColor(new Color(0, 0, 0, 170));
+                g2.fillRoundRect(x - 16, y - 10, tw + 32, th + 20, 14, 14);
+                g2.setColor(Color.WHITE);
+                g2.drawString(msg, x, y + fm.getAscent());
+            } finally {
+                g2.dispose();
+            }
+        }
     }
 }
