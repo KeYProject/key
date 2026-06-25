@@ -1085,6 +1085,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (mediator.getSelectedProof() == null || mediator.isInAutoMode()) {
                 return;
             }
+            if (!panelActive) {
+                // The proof tree tab was switched away from before this deferred catch-up ran: the
+                // panel is passivated and the model is non-attentive. Touching the tree now would
+                // fire treeStructureChanged at a non-displayed large-model JTree and NPE in its
+                // FixedHeightLayoutCache (no realized root). Just mark it dirty -- activatePanel
+                // rebuilds the tree (and re-attentivates the model) when the tab is shown again.
+                dirtyWhileHidden = true;
+                return;
+            }
             delegateView.removeTreeSelectionListener(treeSelectionListener);
             setProof(mediator.getSelectedProof());
             if (subtrees != null) {
