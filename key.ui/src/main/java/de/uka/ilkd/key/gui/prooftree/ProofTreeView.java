@@ -1078,7 +1078,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * meanwhile started -- that run's {@code autoModeStopped} reconciles instead.
          *
          * @param subtrees the goals worked on during the run (refreshed individually), or null
-         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated mid-run)
+         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated
+         *        mid-run)
          */
         private synchronized void reconcileTreeAfterAutoMode(ImmutableList<Node> subtrees,
                 boolean rebuildAll) {

@@ -26,7 +26,8 @@ public final class GuiUtilities {
      * dispatch thread, instead of inline in the synchronous {@code autoModeStopped} dispatch. This
      * keeps a heavy refresh (e.g. the proof tree reconciling a very large proof) from blocking the
      * cheaper views (goal list, sequent, status) in that shared pass: those finish and repaint
-     * first, then each deferred catch-up runs as its own EDT task. The task itself still runs on the
+     * first, then each deferred catch-up runs as its own EDT task. The task itself still runs on
+     * the
      * EDT, so it must only touch Swing state.
      *
      * @param refresh the component's catch-up work
