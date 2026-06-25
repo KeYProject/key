@@ -42,7 +42,6 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
@@ -162,12 +161,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         };
 
     private final ConfigChangeListener configChangeListener = e -> setProofTreeFont();
-
-    /**
-     * Roots of subtrees containing all nodes to which rules have been applied; this is used when
-     * auto mode is active
-     */
-    private ImmutableList<Node> modifiedSubtrees = null;
 
     /**
      * Opaque overlay shown over the tree while the (active) panel reconciles a large proof after a
@@ -1058,10 +1051,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 LOGGER.debug("delegateModel is null");
                 return;
             }
-
-            // save goals on which the prover may work
-            modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
-
             if (delegateModel.isAttentive()) {
                 mediator.removeKeYSelectionListener(proofListener);
             }
@@ -1076,47 +1065,35 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
-            // The tree reconciliation below can be expensive on large proofs (the model was kept
-            // non-attentive during the run). Capture the per-run state now and defer the actual
-            // refresh to its own EDT task, so this synchronous autoModeStopped dispatch returns at
-            // once and the cheaper views (goal list, sequent, status) repaint first instead of
-            // waiting for a large-tree rebuild.
-            final ImmutableList<Node> subtrees = modifiedSubtrees;
-            final boolean rebuildAll = dirtyWhileHidden;
-            modifiedSubtrees = null;
+            // The tree reconciliation can be expensive on large proofs (the proof-tree listener is
+            // suspended during the run, so the model is stale and needs a full rebuild). Defer it
+            // to
+            // its own EDT task so this synchronous autoModeStopped dispatch returns at once and the
+            // cheaper views (goal list, sequent, status) repaint first instead of waiting.
             dirtyWhileHidden = false;
-            GuiUtilities.deferAfterAutoMode(() -> reconcileTreeAfterAutoMode(subtrees, rebuildAll));
+            GuiUtilities.deferAfterAutoMode(this::reconcileTreeAfterAutoMode);
         }
 
         /**
          * Heavy proof-tree catch-up after an auto-mode/macro run, run as its own EDT task (see
          * {@link GuiUtilities#deferAfterAutoMode}). Skips if no proof is selected or a new run has
-         * meanwhile started -- that run's {@code autoModeStopped} reconciles instead.
-         *
-         * @param subtrees the goals worked on during the run (refreshed individually), or null
-         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated
-         *        mid-run)
+         * meanwhile started; if the tab is passivated it just marks the view dirty so activatePanel
+         * rebuilds it when shown again.
          */
-        private synchronized void reconcileTreeAfterAutoMode(ImmutableList<Node> subtrees,
-                boolean rebuildAll) {
+        private synchronized void reconcileTreeAfterAutoMode() {
             if (mediator.getSelectedProof() == null || mediator.isInAutoMode()) {
                 return;
             }
             if (!panelActive) {
-                // The proof tree tab was switched away from before this deferred catch-up ran: the
-                // panel is passivated and the model is non-attentive. Touching the tree now would
-                // fire treeStructureChanged at a non-displayed large-model JTree and NPE in its
-                // FixedHeightLayoutCache (no realized root). Just mark it dirty -- activatePanel
-                // rebuilds the tree (and re-attentivates the model) when the tab is shown again.
+                // The proof tree tab is passivated (the user switched away): the model is
+                // non-attentive. Just mark it dirty -- activatePanel rebuilds the tree (and
+                // re-attentivates the model) when the tab is shown again.
                 dirtyWhileHidden = true;
                 return;
             }
-            // On a large proof this reconcile blocks the EDT; show the busy overlay first so the
-            // user sees the tree is updating rather than frozen. Painting it is forced
-            // synchronously
-            // (the reconcile that follows holds the EDT) but it is opaque, so only the overlay is
-            // painted -- the covered tree is not forced to lay out. Gated by node count to avoid a
-            // flicker on cheap updates.
+            // On a large proof this rebuild blocks the EDT; show the busy overlay first so the user
+            // sees the tree is updating rather than frozen. It is opaque, so painting it forces no
+            // tree layout. Gated by node count to avoid a flicker on cheap updates.
             final boolean showBusy =
                 mediator.getSelectedProof().countNodes() > BUSY_OVERLAY_NODE_THRESHOLD;
             if (showBusy) {
@@ -1126,19 +1103,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
             try {
                 delegateView.removeTreeSelectionListener(treeSelectionListener);
                 setProof(mediator.getSelectedProof());
-                if (subtrees != null) {
-                    for (final Node n : subtrees) {
-                        if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
-                            delegateModel.updateTree(n);
-                        }
-                    }
-                }
+                // Rebuild the run-stale large-model tree robustly: detach the view, clear and
+                // refresh the model, then re-attach so BasicTreeUI rebuilds its
+                // FixedHeightLayoutCache with a fresh root. Firing a bare root treeStructureChanged
+                // on the still-attached large-model view instead NPEs in FixedHeightLayoutCache
+                // when
+                // its cached root no longer matches the model -- which the deferred timing hits.
+                delegateView.setModel(null);
+                delegateModel.updateTree((Node) null);
                 if (!delegateModel.isAttentive()) {
                     delegateModel.setAttentive(true);
                 }
-                if (rebuildAll) {
-                    delegateModel.updateTree((Node) null);
-                }
+                delegateView.setModel(delegateModel);
                 mediator.addKeYSelectionListenerChecked(proofListener);
                 makeSelectedNodeVisible(mediator.getSelectedNode());
                 delegateView.addTreeSelectionListener(treeSelectionListener);
