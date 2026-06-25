@@ -170,15 +170,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private ImmutableList<Node> modifiedSubtrees = null;
 
     /**
-     * Opaque overlay shown over the tree while the (active) panel reconciles a large proof after a
-     * run, so the user sees that the tree is busy updating rather than frozen. Only used while the
-     * panel is active and above {@link #BUSY_OVERLAY_NODE_THRESHOLD} nodes; being opaque, painting
-     * it never forces the (covered) tree to lay out.
-     */
-    private final BusyOverlay busyOverlay = new BusyOverlay();
-    private static final int BUSY_OVERLAY_NODE_THRESHOLD = 20000;
-
-    /**
      * the search dialog
      */
     private final ProofTreeSearchBar proofTreeSearchPanel;
@@ -323,14 +314,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel = new ProofTreeSearchBar(this);
         bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
 
-        // Stack the busy overlay on top of the scroll pane (OverlayLayout): the overlay is hidden
-        // unless a large-proof catch-up is running. The scroll pane / tree hierarchy below is
-        // unchanged (delegateView.getParent().getParent() is still the scroll pane).
-        JPanel treeArea = new JPanel();
-        treeArea.setLayout(new OverlayLayout(treeArea));
-        treeArea.add(busyOverlay); // index 0 -> painted on top
-        treeArea.add(new JScrollPane(delegateView));
-        add(treeArea, BorderLayout.CENTER);
+        add(new JScrollPane(delegateView), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
         layoutKeYComponent();
@@ -1108,44 +1092,29 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 dirtyWhileHidden = true;
                 return;
             }
-            // On a large proof this can block the EDT; show the busy overlay first so the user sees
-            // the tree is updating rather than frozen. It is opaque, so painting it forces no tree
-            // layout. Gated by node count to avoid a flicker on cheap updates.
-            final boolean showBusy =
-                mediator.getSelectedProof().countNodes() > BUSY_OVERLAY_NODE_THRESHOLD;
-            if (showBusy) {
-                busyOverlay.setVisible(true);
-                busyOverlay.paintImmediately(0, 0, busyOverlay.getWidth(), busyOverlay.getHeight());
-            }
-            try {
-                delegateView.removeTreeSelectionListener(treeSelectionListener);
-                setProof(mediator.getSelectedProof());
-                // Refresh only the subtrees the prover worked on; this preserves selection and
-                // expansion elsewhere. (A full updateTree(null) rebuild would collapse and
-                // re-render the whole tree, resetting both.)
-                if (subtrees != null) {
-                    for (final Node n : subtrees) {
-                        if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
-                            delegateModel.updateTree(n);
-                        }
+            delegateView.removeTreeSelectionListener(treeSelectionListener);
+            setProof(mediator.getSelectedProof());
+            // Refresh only the subtrees the prover worked on; this preserves selection and
+            // expansion elsewhere. (A full updateTree(null) rebuild would collapse and re-render
+            // the
+            // whole tree, resetting both.)
+            if (subtrees != null) {
+                for (final Node n : subtrees) {
+                    if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                        delegateModel.updateTree(n);
                     }
                 }
-                if (!delegateModel.isAttentive()) {
-                    delegateModel.setAttentive(true);
-                }
-                if (rebuildAll) {
-                    delegateModel.updateTree((Node) null);
-                }
-                mediator.addKeYSelectionListenerChecked(proofListener);
-                makeSelectedNodeVisible(mediator.getSelectedNode());
-                delegateView.addTreeSelectionListener(treeSelectionListener);
-                delegateView.validate();
-            } finally {
-                if (showBusy) {
-                    busyOverlay.setVisible(false);
-                    busyOverlay.repaint();
-                }
             }
+            if (!delegateModel.isAttentive()) {
+                delegateModel.setAttentive(true);
+            }
+            if (rebuildAll) {
+                delegateModel.updateTree((Node) null);
+            }
+            mediator.addKeYSelectionListenerChecked(proofListener);
+            makeSelectedNodeVisible(mediator.getSelectedNode());
+            delegateView.addTreeSelectionListener(treeSelectionListener);
+            delegateView.validate();
         }
     }
 
@@ -1563,45 +1532,5 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Collection<TreePath> expansionState,
             TreePath selectionPath,
             Integer scrollState) {
-    }
-
-    /**
-     * Opaque overlay that, while visible, covers the tree with a centered "updating" banner (see
-     * the
-     * deferred catch-up in {@code reconcileTreeAfterAutoMode}). Being opaque, painting it never
-     * forces the tree beneath to lay out. Hidden by default.
-     */
-    private static final class BusyOverlay extends JComponent {
-        private static final String MSG = "Updating proof tree…";
-
-        BusyOverlay() {
-            setOpaque(true);
-            setVisible(false);
-            Color bg = UIManager.getColor("Tree.background");
-            setBackground(bg != null ? bg : Color.WHITE);
-            Color fg = UIManager.getColor("Tree.foreground");
-            setForeground(fg != null ? fg : Color.BLACK);
-            Font font = UIManager.getFont("Tree.font");
-            setFont(font != null ? font : new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            try {
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRect(0, 0, getWidth(), getHeight());
-                g2.setColor(getForeground());
-                g2.setFont(getFont().deriveFont(Font.BOLD, 14f));
-                final FontMetrics fm = g2.getFontMetrics();
-                final int x = (getWidth() - fm.stringWidth(MSG)) / 2;
-                final int y = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
-                g2.drawString(MSG, x, y);
-            } finally {
-                g2.dispose();
-            }
-        }
     }
 }
