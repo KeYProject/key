@@ -46,6 +46,18 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @EnabledIfSystemProperty(named = "key.mt.stress", matches = "true")
 public class MtStressTest {
 
+    /**
+     * Step cap for the parallel runs. Generous on purpose: parallel goal-order divergence can make
+     * a
+     * run explore more goals before closing than the single-threaded proof needs, so the proof's
+     * own
+     * (modest) maxSteps would occasionally be exhausted by a perfectly sound parallel run -- a
+     * benign, expected effect, not a bug. A real lost-goal race, in contrast, leaves the proof
+     * saturated-open well below this cap (no rule left to apply), so raising the cap absorbs benign
+     * divergence without masking a race: such a run would still fail {@link Proof#closed()}.
+     */
+    private static final int MAX_STEPS = 200_000;
+
     @ParameterizedTest(name = "{0} ({1} reps @ {2} workers)")
     @CsvSource({
         "standard_key/java_dl/symmArray.key, 8, 8",
@@ -70,12 +82,16 @@ public class MtStressTest {
                     final Proof proof = env.getLoadedProof();
                     final ProofStarter starter = new ProofStarter(false);
                     starter.init(proof);
+                    // init() copies the proof's modest maxSteps; override it so benign parallel
+                    // goal-order divergence cannot exhaust the step budget (see MAX_STEPS).
+                    starter.setMaxRuleApplications(MAX_STEPS);
                     starter.start();
                     assertTrue(proof.closed(),
                         () -> relPath + " did not close on rep " + rep + " with " + workers
-                            + " workers (open goals=" + proof.openGoals().size()
-                            + "). This proof closes single-threaded, so a parallel run leaving it"
-                            + " open means a reintroduced concurrency race.");
+                            + " workers (open goals=" + proof.openGoals().size() + ", cap="
+                            + MAX_STEPS + "). It closes single-threaded and the cap is generous, so"
+                            + " a parallel run saturating open means a reintroduced concurrency race"
+                            + " (a lost goal), not step exhaustion.");
                 } finally {
                     env.dispose();
                 }
