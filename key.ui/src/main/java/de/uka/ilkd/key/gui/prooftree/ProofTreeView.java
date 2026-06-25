@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
@@ -161,6 +162,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
         };
 
     private final ConfigChangeListener configChangeListener = e -> setProofTreeFont();
+
+    /**
+     * Roots of subtrees containing all nodes to which rules have been applied; this is used when
+     * auto mode is active to refresh only the affected subtrees on catch-up.
+     */
+    private ImmutableList<Node> modifiedSubtrees = null;
 
     /**
      * Opaque overlay shown over the tree while the (active) panel reconciles a large proof after a
@@ -1051,6 +1058,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 LOGGER.debug("delegateModel is null");
                 return;
             }
+
+            // save goals on which the prover may work, to refresh just those subtrees afterwards
+            modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
+
             if (delegateModel.isAttentive()) {
                 mediator.removeKeYSelectionListener(proofListener);
             }
@@ -1065,22 +1076,28 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
-            // The tree reconciliation can be expensive on large proofs (the proof-tree listener is
-            // suspended during the run, so the model is stale and needs a full rebuild). Defer it
-            // to
-            // its own EDT task so this synchronous autoModeStopped dispatch returns at once and the
-            // cheaper views (goal list, sequent, status) repaint first instead of waiting.
+            // Defer the tree catch-up to its own EDT task so this synchronous autoModeStopped
+            // dispatch returns at once and the cheaper views (goal list, sequent, status) repaint
+            // first instead of waiting for the proof-tree refresh.
+            final ImmutableList<Node> subtrees = modifiedSubtrees;
+            final boolean rebuildAll = dirtyWhileHidden;
+            modifiedSubtrees = null;
             dirtyWhileHidden = false;
-            GuiUtilities.deferAfterAutoMode(this::reconcileTreeAfterAutoMode);
+            GuiUtilities.deferAfterAutoMode(() -> reconcileTreeAfterAutoMode(subtrees, rebuildAll));
         }
 
         /**
-         * Heavy proof-tree catch-up after an auto-mode/macro run, run as its own EDT task (see
+         * Proof-tree catch-up after an auto-mode/macro run, run as its own EDT task (see
          * {@link GuiUtilities#deferAfterAutoMode}). Skips if no proof is selected or a new run has
          * meanwhile started; if the tab is passivated it just marks the view dirty so activatePanel
          * rebuilds it when shown again.
+         *
+         * @param subtrees the goals worked on during the run (refreshed individually), or null
+         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated
+         *        mid-run)
          */
-        private synchronized void reconcileTreeAfterAutoMode() {
+        private synchronized void reconcileTreeAfterAutoMode(ImmutableList<Node> subtrees,
+                boolean rebuildAll) {
             if (mediator.getSelectedProof() == null || mediator.isInAutoMode()) {
                 return;
             }
@@ -1091,9 +1108,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 dirtyWhileHidden = true;
                 return;
             }
-            // On a large proof this rebuild blocks the EDT; show the busy overlay first so the user
-            // sees the tree is updating rather than frozen. It is opaque, so painting it forces no
-            // tree layout. Gated by node count to avoid a flicker on cheap updates.
+            // On a large proof this can block the EDT; show the busy overlay first so the user sees
+            // the tree is updating rather than frozen. It is opaque, so painting it forces no tree
+            // layout. Gated by node count to avoid a flicker on cheap updates.
             final boolean showBusy =
                 mediator.getSelectedProof().countNodes() > BUSY_OVERLAY_NODE_THRESHOLD;
             if (showBusy) {
@@ -1103,13 +1120,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
             try {
                 delegateView.removeTreeSelectionListener(treeSelectionListener);
                 setProof(mediator.getSelectedProof());
+                // Refresh only the subtrees the prover worked on; this preserves selection and
+                // expansion elsewhere. (A full updateTree(null) rebuild would collapse and
+                // re-render the whole tree, resetting both.)
+                if (subtrees != null) {
+                    for (final Node n : subtrees) {
+                        if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                            delegateModel.updateTree(n);
+                        }
+                    }
+                }
                 if (!delegateModel.isAttentive()) {
                     delegateModel.setAttentive(true);
                 }
-                // Full rebuild of the run-stale tree (the model was non-attentive during the run).
-                // GUIProofTreeModel.updateTree keeps the root identity stable, so this no longer
-                // NPEs the large-model view's FixedHeightLayoutCache even when deferred.
-                delegateModel.updateTree((Node) null);
+                if (rebuildAll) {
+                    delegateModel.updateTree((Node) null);
+                }
                 mediator.addKeYSelectionListenerChecked(proofListener);
                 makeSelectedNodeVisible(mediator.getSelectedNode());
                 delegateView.addTreeSelectionListener(treeSelectionListener);
