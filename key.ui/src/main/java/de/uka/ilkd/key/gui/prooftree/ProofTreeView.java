@@ -30,6 +30,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -1059,10 +1060,35 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
+            // The tree reconciliation below can be expensive on large proofs (the model was kept
+            // non-attentive during the run). Capture the per-run state now and defer the actual
+            // refresh to its own EDT task, so this synchronous autoModeStopped dispatch returns at
+            // once and the cheaper views (goal list, sequent, status) repaint first instead of
+            // waiting for a large-tree rebuild.
+            final ImmutableList<Node> subtrees = modifiedSubtrees;
+            final boolean rebuildAll = dirtyWhileHidden;
+            modifiedSubtrees = null;
+            dirtyWhileHidden = false;
+            GuiUtilities.deferAfterAutoMode(() -> reconcileTreeAfterAutoMode(subtrees, rebuildAll));
+        }
+
+        /**
+         * Heavy proof-tree catch-up after an auto-mode/macro run, run as its own EDT task (see
+         * {@link GuiUtilities#deferAfterAutoMode}). Skips if no proof is selected or a new run has
+         * meanwhile started -- that run's {@code autoModeStopped} reconciles instead.
+         *
+         * @param subtrees the goals worked on during the run (refreshed individually), or null
+         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated mid-run)
+         */
+        private synchronized void reconcileTreeAfterAutoMode(ImmutableList<Node> subtrees,
+                boolean rebuildAll) {
+            if (mediator.getSelectedProof() == null || mediator.isInAutoMode()) {
+                return;
+            }
             delegateView.removeTreeSelectionListener(treeSelectionListener);
             setProof(mediator.getSelectedProof());
-            if (modifiedSubtrees != null) {
-                for (final Node n : modifiedSubtrees) {
+            if (subtrees != null) {
+                for (final Node n : subtrees) {
                     if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
                         delegateModel.updateTree(n);
                     }
@@ -1071,16 +1097,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (!delegateModel.isAttentive()) {
                 delegateModel.setAttentive(true);
             }
-            if (dirtyWhileHidden) {
-                // the tab was (re-)activated while the strategy was running
-                dirtyWhileHidden = false;
+            if (rebuildAll) {
                 delegateModel.updateTree((Node) null);
             }
             mediator.addKeYSelectionListenerChecked(proofListener);
             makeSelectedNodeVisible(mediator.getSelectedNode());
             delegateView.addTreeSelectionListener(treeSelectionListener);
             delegateView.validate();
-            modifiedSubtrees = null;
         }
     }
 
