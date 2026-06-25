@@ -621,6 +621,10 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
                     occurred[i] = true;
                     if (pe instanceof MethodFrame) {
                         return (((MethodFrame) pe).getProgramVariable() == null) ? 1 : 2;
+                    } if (pe instanceof Switch s && s.getChildCount() > 2 && s.getChild(0) instanceof Default &&
+                            s.getChild(1) instanceof PossibleProgramPrefix
+                    ) {
+                        return 2;
                     } else {
                         return nextChild[i];
                     }

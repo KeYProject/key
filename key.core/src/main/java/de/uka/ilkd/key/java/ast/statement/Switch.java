@@ -267,13 +267,16 @@ public class Switch extends BranchStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !branches.isEmpty() && branches.get(0) instanceof PossibleProgramPrefix;
+        return !branches.isEmpty() && (branches.get(0) instanceof PossibleProgramPrefix
+        || branches.get(0) instanceof Default && branches.size() > 1 && branches.get(1) instanceof PossibleProgramPrefix);
     }
 
     @Override
     public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (PossibleProgramPrefix) branches.get(0);
+            if (branches.get(0) instanceof PossibleProgramPrefix pre)
+                return pre;
+            return (PossibleProgramPrefix) branches.get(1);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
@@ -281,9 +284,12 @@ public class Switch extends BranchStatement
 
     @Override
     public PossibleProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement()
-                ? ((PossibleProgramPrefix) branches.get(0)).getLastPrefixElement()
-                : this;
+        if (hasNextPrefixElement()) {
+            if (branches.get(0) instanceof PossibleProgramPrefix pre)
+                return pre.getLastPrefixElement();
+            return ((PossibleProgramPrefix) branches.get(1)).getLastPrefixElement();
+        };
+        return this;
     }
 
     @Override
