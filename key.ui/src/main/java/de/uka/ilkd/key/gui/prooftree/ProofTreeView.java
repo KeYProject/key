@@ -1103,18 +1103,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             try {
                 delegateView.removeTreeSelectionListener(treeSelectionListener);
                 setProof(mediator.getSelectedProof());
-                // Rebuild the run-stale large-model tree robustly: detach the view, clear and
-                // refresh the model, then re-attach so BasicTreeUI rebuilds its
-                // FixedHeightLayoutCache with a fresh root. Firing a bare root treeStructureChanged
-                // on the still-attached large-model view instead NPEs in FixedHeightLayoutCache
-                // when
-                // its cached root no longer matches the model -- which the deferred timing hits.
-                delegateView.setModel(null);
-                delegateModel.updateTree((Node) null);
                 if (!delegateModel.isAttentive()) {
                     delegateModel.setAttentive(true);
                 }
-                delegateView.setModel(delegateModel);
+                // Full rebuild of the run-stale tree (the model was non-attentive during the run).
+                // GUIProofTreeModel.updateTree keeps the root identity stable, so this no longer
+                // NPEs the large-model view's FixedHeightLayoutCache even when deferred.
+                delegateModel.updateTree((Node) null);
                 mediator.addKeYSelectionListenerChecked(proofListener);
                 makeSelectedNodeVisible(mediator.getSelectedNode());
                 delegateView.addTreeSelectionListener(treeSelectionListener);
