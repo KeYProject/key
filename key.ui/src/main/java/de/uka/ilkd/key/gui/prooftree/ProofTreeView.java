@@ -30,7 +30,6 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -165,7 +164,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     /**
      * Roots of subtrees containing all nodes to which rules have been applied; this is used when
-     * auto mode is active to refresh only the affected subtrees on catch-up.
+     * auto mode is active
      */
     private ImmutableList<Node> modifiedSubtrees = null;
 
@@ -1043,7 +1042,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 return;
             }
 
-            // save goals on which the prover may work, to refresh just those subtrees afterwards
+            // save goals on which the prover may work
             modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
 
             if (delegateModel.isAttentive()) {
@@ -1060,46 +1059,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
-            // Defer the tree catch-up to its own EDT task so this synchronous autoModeStopped
-            // dispatch returns at once and the cheaper views (goal list, sequent, status) repaint
-            // first instead of waiting for the proof-tree refresh.
-            final ImmutableList<Node> subtrees = modifiedSubtrees;
-            final boolean rebuildAll = dirtyWhileHidden;
-            modifiedSubtrees = null;
-            dirtyWhileHidden = false;
-            GuiUtilities.deferAfterAutoMode(() -> reconcileTreeAfterAutoMode(subtrees, rebuildAll));
-        }
-
-        /**
-         * Proof-tree catch-up after an auto-mode/macro run, run as its own EDT task (see
-         * {@link GuiUtilities#deferAfterAutoMode}). Skips if no proof is selected or a new run has
-         * meanwhile started; if the tab is passivated it just marks the view dirty so activatePanel
-         * rebuilds it when shown again.
-         *
-         * @param subtrees the goals worked on during the run (refreshed individually), or null
-         * @param rebuildAll whether the whole tree must be rebuilt (the tab was (re-)activated
-         *        mid-run)
-         */
-        private synchronized void reconcileTreeAfterAutoMode(ImmutableList<Node> subtrees,
-                boolean rebuildAll) {
-            if (mediator.getSelectedProof() == null || mediator.isInAutoMode()) {
-                return;
-            }
-            if (!panelActive) {
-                // The proof tree tab is passivated (the user switched away): the model is
-                // non-attentive. Just mark it dirty -- activatePanel rebuilds the tree (and
-                // re-attentivates the model) when the tab is shown again.
-                dirtyWhileHidden = true;
-                return;
-            }
             delegateView.removeTreeSelectionListener(treeSelectionListener);
             setProof(mediator.getSelectedProof());
-            // Refresh only the subtrees the prover worked on; this preserves selection and
-            // expansion elsewhere. (A full updateTree(null) rebuild would collapse and re-render
-            // the
-            // whole tree, resetting both.)
-            if (subtrees != null) {
-                for (final Node n : subtrees) {
+            if (modifiedSubtrees != null) {
+                for (final Node n : modifiedSubtrees) {
                     if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
                         delegateModel.updateTree(n);
                     }
@@ -1108,13 +1071,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (!delegateModel.isAttentive()) {
                 delegateModel.setAttentive(true);
             }
-            if (rebuildAll) {
+            if (dirtyWhileHidden) {
+                // the tab was (re-)activated while the strategy was running
+                dirtyWhileHidden = false;
                 delegateModel.updateTree((Node) null);
             }
             mediator.addKeYSelectionListenerChecked(proofListener);
             makeSelectedNodeVisible(mediator.getSelectedNode());
             delegateView.addTreeSelectionListener(treeSelectionListener);
             delegateView.validate();
+            modifiedSubtrees = null;
         }
     }
 

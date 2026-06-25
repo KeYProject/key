@@ -428,17 +428,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         // bigger change, redraw whole tree
         if (trn == null || trn == getRoot()) {
-            // Keep the root node's identity stable across the cache clear. getRoot() recreates the
-            // root GUIBranchNode otherwise, so the structure-change event would carry a root the
-            // view's FixedHeightLayoutCache does not recognise -- which NPEs it (changedNode null),
-            // notably when the rebuild runs deferred. Re-inserting the same root and flushing its
-            // children gives a clean full rebuild without the identity mismatch.
-            GUIBranchNode root = (GUIBranchNode) getRoot();
             proofTreeNodes.clear();
             branchNodes.clear();
-            branchNodes.put(proof.root(), root);
-            root.flushCache();
-            fireTreeStructureChanged(new Object[] { root });
+            fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
 

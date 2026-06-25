@@ -21,21 +21,6 @@ public final class GuiUtilities {
         throw new Error("Do not instantiate");
     }
 
-    /**
-     * Schedules a GUI component's post-auto-mode catch-up to run as its own task on the event
-     * dispatch thread, instead of inline in the synchronous {@code autoModeStopped} dispatch. This
-     * keeps a heavy refresh (e.g. the proof tree reconciling a very large proof) from blocking the
-     * cheaper views (goal list, sequent, status) in that shared pass: those finish and repaint
-     * first, then each deferred catch-up runs as its own EDT task. The task itself still runs on
-     * the
-     * EDT, so it must only touch Swing state.
-     *
-     * @param refresh the component's catch-up work
-     */
-    public static void deferAfterAutoMode(Runnable refresh) {
-        SwingUtilities.invokeLater(refresh);
-    }
-
     /// Copies the content in the bounds of `pos` in the `view` as plain text
     /// into the system clipboard. It translates the nbsp into breakable spaces.
     public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
