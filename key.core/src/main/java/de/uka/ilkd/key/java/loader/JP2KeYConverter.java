@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
+import de.uka.ilkd.key.java.transformations.pipeline.EnumClassDeclaration;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -352,6 +353,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
                 parentIsInterface, isLibrary, extending, getClassSpec(n));
+        } else if (n instanceof EnumClassDeclaration) {
+            td = new de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration(pi, c, modArray,
+                name, fullName, members, parentIsInterface, isLibrary, extending, implementing,
+                ImmutableList.fromList(getClassSpec(n)), kjt.getSort());
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
