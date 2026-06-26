@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -94,7 +95,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         if (name == null)
             return null;
 
-        var classType = services.getJavaInfo().getTypeByName(name.className());
+        KeYJavaType classType = services.getJavaInfo().getTypeByName(name.className());
 
         if (classType != null
                 && classType.getJavaType() instanceof ClassDeclaration classDecl) {
