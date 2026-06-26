@@ -159,7 +159,10 @@ public class MtSpeedupBenchmark {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
             System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
         } else {
-            System.clearProperty(ParallelProver.PARALLEL_PROPERTY);
+            // Force true sequential. Clearing is NOT enough: an unset property falls back to the
+            // persisted general setting (ParallelProver.isEnabled()), which may be parallel-on, so
+            // the "single" baseline would secretly run parallel. Set it explicitly to false.
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "false");
         }
         try {
             Proof proof = env.getLoadedProof();
