@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -25,10 +26,8 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -202,7 +201,26 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
         final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
-        return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
+
+        // hack: update everything with the <<imp>> term label to implicit
+        Term preImpl = updateImplicit(pre);
+
+        return freePre != null ? services.getTermBuilder().and(preImpl, freePre) : preImpl;
+    }
+
+    private Term updateImplicit(Term pre) {
+        if (pre.getLabel(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME) != null) {
+            // TODO: introduce specific label
+            return tb.tf().setOriginRefTypeRecursive(pre, OriginRefType.IMPLICIT_REQUIRES_PARAMSOK, true);
+        }
+        List<Term> subs = pre.subs().toList();
+        if (subs.isEmpty()) {
+            return pre;
+        }
+
+        subs.replaceAll(term -> updateImplicit(term));
+        return tb.tf().createTerm(pre.op(), new ImmutableArray<>(subs), pre.boundVars(), pre.javaBlock(), pre.getOriginRef());
+
     }
 
     /**

@@ -112,8 +112,6 @@ public class SourceViewPatcher {
 
             HeapSourceCollection hsc = new HeapSourceCollection(node.sequent());
             hsc.collect(node);
-            LocalVarCollection lvc = new LocalVarCollection(node.sequent());
-            lvc.collect(node);
             SequentBackTransformer transformer = new SequentBackTransformer(
                     services,
                     proof,
