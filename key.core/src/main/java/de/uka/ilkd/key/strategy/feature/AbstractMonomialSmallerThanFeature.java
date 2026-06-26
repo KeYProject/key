@@ -45,15 +45,12 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
         if (res == null) {
             res = introductionTimeHelp(op, goal);
-            // Do NOT cache the "not introduced (yet)" answer (-1): op may be introduced by a later
-            // rule application, after which introductionTimeHelp would find a real time. Caching
-            // the
-            // -1 would freeze it, making the value depend on whether op happened to be first
-            // queried
-            // before or after its introduction -- i.e. on the access pattern (which features run,
-            // when). That makes term ordering, and hence OneStepSimplifier rewriting, subtly
-            // non-deterministic. A real introduction time, once found, is stable (the introducing
-            // rule stays in the applied-rule prefix), so it is safe to cache.
+            // introductionTimeHelp returns the introducer's depth from the root -- identical for
+            // every goal below that introducer, hence goal-independent and stable (the introducing
+            // rule stays in the applied-rule prefix). The shared cache is therefore deterministic
+            // regardless of which goal/order fills it first (verified: bypassing the cache leaves
+            // proofs unchanged). The -1 ("no skolem introducer in the prefix", i.e. a problem
+            // symbol) is just not worth caching -- recomputing it is trivial.
             if (res != -1) {
                 synchronized (introductionTimeCache) {
                     introductionTimeCache.put(op, res);
