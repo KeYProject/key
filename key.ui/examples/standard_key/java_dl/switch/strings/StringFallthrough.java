@@ -17,6 +17,7 @@ public final class StringFallthrough {
       @   assignable \strictly_nothing;
       @*/
     public int weight(String s) {
+        String s1 = "b";
         int r = 0;
         switch (s) {
         case "a":

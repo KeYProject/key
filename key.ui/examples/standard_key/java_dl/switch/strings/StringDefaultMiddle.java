@@ -14,6 +14,8 @@ public final class StringDefaultMiddle {
       @   assignable \strictly_nothing;
       @*/
     public int rank(String s) {
+        String s1 = "b";
+        s1 = "c";
         switch (s) {
         case "a":
             return 1;

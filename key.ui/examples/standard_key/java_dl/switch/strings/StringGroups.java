@@ -16,6 +16,11 @@ public final class StringGroups {
       @   assignable \strictly_nothing;
       @*/
     public int parseBool(String s) {
+        String s1 = "yes";
+        s1 = "true";
+        s1 = "n";
+        s1 = "no";
+        s1 = "false";
         switch (s) {
         case "y":
         case "yes":

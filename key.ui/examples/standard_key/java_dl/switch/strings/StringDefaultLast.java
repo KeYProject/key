@@ -20,6 +20,8 @@ public final class StringDefaultLast {
       @   assignable \strictly_nothing;
       @*/
     public int code(String s) {
+        String s1 = "green";
+        s1 = "blue";
         switch (s) {
         case "red":
             return 0;
