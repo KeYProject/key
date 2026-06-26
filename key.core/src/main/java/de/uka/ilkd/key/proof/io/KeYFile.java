@@ -228,6 +228,22 @@ public class KeYFile implements EnvInput {
     }
 
 
+    /**
+     * Normalizes a path string read from a KeY/proof file so that it can be parsed by
+     * {@link Paths#get(String, String...)} on the current platform. KeY now always writes path
+     * separators as forward slashes, but proofs saved by older versions on Windows may contain
+     * backslashes. On POSIX a backslash is a valid file-name character, so such a path would not be
+     * split into segments and could not be resolved. Converting backslashes to forward slashes is
+     * safe on all platforms (Windows accepts '/' as a separator) and keeps these legacy proofs
+     * loadable.
+     *
+     * @param path the raw path string as stored in the file
+     * @return the path string with backslashes replaced by forward slashes
+     */
+    private static String normalizeStoredPath(String path) {
+        return path.replace('\\', '/');
+    }
+
     @Override
     public Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
@@ -235,6 +251,7 @@ public class KeYFile implements EnvInput {
         if (bootClassPath == null) {
             return null;
         }
+        bootClassPath = normalizeStoredPath(bootClassPath);
         Path bootClassPathFile = Paths.get(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -263,6 +280,7 @@ public class KeYFile implements EnvInput {
             if (cp == null) {
                 fileList.add(null);
             } else {
+                cp = normalizeStoredPath(cp);
                 var f = Paths.get(cp);
                 if (!f.isAbsolute()) {
                     f = parentDirectory.resolve(cp);
@@ -278,6 +296,7 @@ public class KeYFile implements EnvInput {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
+            javaPath = normalizeStoredPath(javaPath);
             Path absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file

@@ -110,4 +110,32 @@ public class TestPosInOcc {
         pio = pio.replaceSequentFormula(cfma2);
         assertSame(pio.subTerm(), terms2[2]);
     }
+
+    /**
+     * A {@link PosInOccurrence} must render itself in a human-readable way, naming the position and
+     * the formula it points at. Regression guard against the default {@code Object} representation
+     * ({@code PosInOccurrence@<hash>}) leaking into user-facing messages (e.g. proof-replay
+     * errors).
+     */
+    @Test
+    public void testToStringIsReadable() {
+        Sort sort1 = new SortImpl(new Name("S1"));
+        LogicVariable x = new LogicVariable(new Name("x"), sort1);
+        Function f = new JFunction(new Name("f"), sort1, sort1);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+
+        JTerm fml = TB.func(p, new JTerm[] { TB.func(f, new JTerm[] { TB.var(x) }) });
+
+        String antec =
+            new PosInOccurrence(new SequentFormula(fml), PosInTerm.getTopLevel(), true).toString();
+        assertFalse(antec.contains("PosInOccurrence@"),
+            "toString must not fall back to the default Object representation, but was: " + antec);
+        assertTrue(antec.contains(fml.toString()),
+            "toString should mention the formula, but was: " + antec);
+        assertTrue(antec.contains("antecedent"), antec);
+
+        String succ =
+            new PosInOccurrence(new SequentFormula(fml), PosInTerm.getTopLevel(), false).toString();
+        assertTrue(succ.contains("succedent"), succ);
+    }
 }
