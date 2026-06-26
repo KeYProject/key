@@ -58,7 +58,7 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
             boolean isConst = EnumClassDeclaration.isEnumConstant(progvar);
             return isConst != negated;
         }
-        return !negated;
+        return true;
     }
 
 
