@@ -90,7 +90,7 @@ literals:
   | floatnum
   | string_literal
   | emptyset
-  | LPAREN {allowMatchId=true;} (term | seq) {allowMatchId=false;} RPAREN
+//  | LPAREN {allowMatchId=true;} (term | seq) {allowMatchId=false;} RPAREN
 ;
 
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
