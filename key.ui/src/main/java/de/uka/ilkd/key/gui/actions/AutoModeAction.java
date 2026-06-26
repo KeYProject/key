@@ -20,17 +20,15 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
-public final class AutoModeAction extends MainWindowAction {
+public class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    /**
-     *
-     */
     private static final long serialVersionUID = -7702898691162947994L;
-    final Icon startLogo = IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
-    final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
+    // Stop icon has some extra space to have the same dimension as the auto button
+    private static final Icon STOP_ICON =
+        IconFactory.iconWithOverlay(IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE), "");
 
     private Proof associatedProof;
 
@@ -63,12 +61,16 @@ public final class AutoModeAction extends MainWindowAction {
     };
 
     public AutoModeAction(MainWindow mainWindow) {
+        this(mainWindow, IconFactory.automationWithOverlay(MainWindow.TOOLBAR_ICON_SIZE, ""));
+    }
+
+    public AutoModeAction(MainWindow mainWindow, Icon startIcon) {
         super(mainWindow);
         associatedProof = getMediator().getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
-        setIcon(startLogo);
+        setIcon(startIcon);
 
         enable();
 
@@ -113,7 +115,7 @@ public final class AutoModeAction extends MainWindowAction {
                     associatedProof.removeProofTreeListener(ptl);
                 }
                 putValue(NAME, "Stop");
-                putValue(SMALL_ICON, stopLogo);
+                putValue(SMALL_ICON, STOP_ICON);
                 putValue(ACCELERATOR_KEY, STOP_KEY);
                 enable();
             }
@@ -127,7 +129,7 @@ public final class AutoModeAction extends MainWindowAction {
                     associatedProof.addProofTreeListener(ptl);
                 }
                 putValue(NAME, getStartCommand());
-                putValue(SMALL_ICON, startLogo);
+                putValue(SMALL_ICON, startIcon);
                 putValue(ACCELERATOR_KEY, START_KEY);
                 enable();
             }
@@ -173,4 +175,8 @@ public final class AutoModeAction extends MainWindowAction {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Full Automation";
+    }
 }
