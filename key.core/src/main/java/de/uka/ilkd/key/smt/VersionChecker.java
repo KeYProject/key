@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,12 @@ import org.jspecify.annotations.Nullable;
 public class VersionChecker {
     public static final VersionChecker INSTANCE = new VersionChecker();
 
-    private static final long MAX_DELAY = 1000;
+    /**
+     * Upper bound for how long we wait for the solver to print its version and exit. Generous on
+     * purpose: this runs once per solver, and a too-small bound made version detection flaky on
+     * loaded CI machines (cold process start &gt; 1s).
+     */
+    private static final long MAX_DELAY = 10_000;
 
     /**
      *
@@ -30,22 +36,29 @@ public class VersionChecker {
         Process p = null;
         try {
             p = pb.start();
-            p.waitFor(MAX_DELAY, TimeUnit.MILLISECONDS);
+            // Wait for the process to actually finish before reading. Previously the code gated on
+            // BufferedReader.ready(), which returns false whenever the output has not been buffered
+            // yet (a race under load) and then reported "no version". Honor the timeout instead and
+            // read only after the process has terminated, so the output is already available.
+            if (!p.waitFor(MAX_DELAY, TimeUnit.MILLISECONDS)) {
+                p.destroyForcibly();
+                return null;
+            }
             try (BufferedReader r = new BufferedReader(
                 new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
-                // Avoid potential blocking by the buffer's readLine()
-                if (!r.ready()) {
-                    return null;
-                }
-                String line = r.readLine();
-                // TODO weigl for Java 11 use "p.destroyForcibly();"
-                return line;
+                // The process has exited, so this read does not block.
+                return r.readLine();
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (IOException e) {
+            // Solver not found / not executable: treat as "version unknown" rather than crashing
+            // the caller.
+            return null;
         } finally {
             if (p != null && p.isAlive()) {
-                p.destroy();
+                p.destroyForcibly();
             }
         }
     }
