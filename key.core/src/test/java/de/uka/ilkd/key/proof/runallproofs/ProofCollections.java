@@ -1027,6 +1027,7 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/switch/strings/StringNoDefault.key");
 
         // tests that KeY can deal with identical classes in different packages
+        g = c.group("identicalClasses");
         g.provable("standard_key/java_dl/identical_classes/pkgA_inc.key");
         g.provable("standard_key/java_dl/identical_classes/pkgB_inc.key");
 
