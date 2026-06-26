@@ -185,6 +185,12 @@ public final class IconFactory {
 
     private static final HashMap<String, Icon> cache = new HashMap<>();
 
+    /**
+     * Additional horizontal space in pixels reserved for the overlay letter in
+     * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
+     */
+    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+
     private IconFactory() {
     }
 
@@ -379,14 +385,16 @@ public final class IconFactory {
      * @param letter the letter to overlay (e.g., "R" for Run, "F" for Full, "P" for Prepare), or
      *        {@code null} for just the play button
      * @return the composite icon with letter overlay
-     * @see #automationRunLogo(int)
-     * @see #automationFullPilotLogo(int)
-     * @see #automationPrepareLogo(int)
      */
     public static Icon automationWithOverlay(int size, String letter) {
         Icon baseIcon = autoModeStartLogo(size);
+        return iconWithOverlay(baseIcon, letter);
+    }
 
-        BufferedImage image = new BufferedImage(size + 5, size, BufferedImage.TYPE_INT_ARGB);
+    public static Icon iconWithOverlay(Icon baseIcon, String letter) {
+        BufferedImage image =
+            new BufferedImage(baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE,
+                baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -401,7 +409,8 @@ public final class IconFactory {
 
         // Draw letter overlay
         g2d.setColor(Color.BLACK);
-        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC, (int) (size * 0.9f));
+        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC,
+            (int) (baseIcon.getIconHeight() * 0.9f));
         g2d.setFont(font);
 
         FontMetrics fm = g2d.getFontMetrics();
@@ -409,44 +418,12 @@ public final class IconFactory {
         int textHeight = fm.getAscent() - fm.getDescent();
 
         // Position letter in bottom-right corner
-        int x = size - textWidth;
+        int x = baseIcon.getIconWidth() - textWidth;
 
-        g2d.drawString(letter, x + 5, size);
+        g2d.drawString(letter, x + 5, baseIcon.getIconHeight());
         g2d.dispose();
 
         return new ImageIcon(image);
-    }
-
-    /**
-     * Creates an icon for the "Full Auto Pilot" action.
-     * <p>
-     * This automation mode performs: finish symbolic execution, separate proof obligations, expand
-     * invariant definitions, and try to close all proof obligations.
-     * The icon shows a green play button with an "F" overlay.
-     * </p>
-     *
-     * @param size the size of the icon in pixels
-     * @return the full auto pilot icon
-     * @see de.uka.ilkd.key.macros.FullAutoPilotProofMacro
-     */
-    public static Icon automationFullPilotLogo(int size) {
-        return automationWithOverlay(size, "F");
-    }
-
-    /**
-     * Creates an icon for the "Prepare-only Autopilot" action.
-     * <p>
-     * This automation mode performs: finish symbolic execution, separate proof obligations, and
-     * expand invariant definitions (without trying to close goals).
-     * The icon shows a green play button with a "P" overlay.
-     * </p>
-     *
-     * @param size the size of the icon in pixels
-     * @return the prepare-only autopilot icon
-     * @see de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro
-     */
-    public static Icon automationPrepareLogo(int size) {
-        return automationWithOverlay(size, "P");
     }
 
     public static Icon selectDecProcArrow(int size) {

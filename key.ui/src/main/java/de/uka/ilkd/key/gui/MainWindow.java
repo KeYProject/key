@@ -805,13 +805,16 @@ public final class MainWindow extends JFrame {
         return List.of(
             new MacroAutomationAction(this,
                 new DefaultAutoMacro(),
-                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "")),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "A")),
             new MacroAutomationAction(this,
                 new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
-                IconFactory.automationFullPilotLogo(TOOLBAR_ICON_SIZE)),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "S")),
             new MacroAutomationAction(this,
                 new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
-                IconFactory.automationPrepareLogo(TOOLBAR_ICON_SIZE)));
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P"))
+        // when it is finished ... new MacroAutomationAction(this ... ScriptMacro ... "J" (*J*ML
+        // scripts)
+        );
     }
 
     /**
