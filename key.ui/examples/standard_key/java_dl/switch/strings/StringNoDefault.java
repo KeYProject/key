@@ -8,6 +8,7 @@ public final class StringNoDefault {
     /*@ public normal_behavior
       @   requires s != null;
       @   requires s.equals("yes") || s.equals("no");
+      @   requires s.equals("yes") != s.equals("no");
       @   ensures s.equals("yes") ==> \result == 1;
       @   ensures s.equals("no")  ==> \result == 0;
       @   assignable \strictly_nothing;
