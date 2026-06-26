@@ -228,7 +228,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder FINAL =
         new ConstructorBasedBuilder("final", FinalReferenceCondition.class, SV);
     public static final AbstractConditionBuilder ENUM_CONST =
-        new ConstructorBasedBuilder("isEnumConst", EnumConstantCondition.class, SV);
+        new ConstructorBasedBuilder("enumConstant", EnumConstantCondition.class, SV);
     public static final AbstractConditionBuilder LOCAL_VARIABLE =
         new ConstructorBasedBuilder("isLocalVariable", LocalVariableCondition.class, SV);
     public static final AbstractConditionBuilder ARRAY_LENGTH =
