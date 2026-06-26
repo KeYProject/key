@@ -16,6 +16,7 @@ import java.util.Optional;
  * Implements the 'Method' Positioning strategy for InsertionTerms
  * The terms get written simply at the start and end of the method
  */
+@Deprecated
 public class MethodPositioner extends InsPositionProvider {
 
     private final URI fileUri;

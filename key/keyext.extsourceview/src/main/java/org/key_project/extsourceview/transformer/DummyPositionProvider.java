@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+@Deprecated
 public class DummyPositionProvider extends InsPositionProvider {
     public DummyPositionProvider() {
         super(null, null, null);

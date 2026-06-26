@@ -1,8 +1,11 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -12,23 +15,81 @@ import org.key_project.extsourceview.Utils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Implements the 'Heap' Positioning strategy for InsertionTerms
  * The terms get written in the lines where the contained heaps originate from
  */
-public class MovingPositioner extends InsPositionProvider{
+public class MovingPositioner extends InsPositionProvider {
     private final URI fileUri;
 
     private final HeapSourceCollection heapSources;
+    private final List<SourceElement> statements;
+
+    /** maps each program variable to the first line where it is written */
+    private final Map<String, Integer> localVarMap = new HashMap<>();
+
+    private class WrittenAndDeclaredPVLineCollector extends JavaASTVisitor {
+        public WrittenAndDeclaredPVLineCollector(ProgramElement root, Services services) {
+            super(root, services);
+        }
+
+        @Override
+        protected void doDefaultAction(SourceElement node) {
+            if (node instanceof Assignment) {
+                ProgramElement lhs = ((Assignment) node).getChildAt(0);
+                if (lhs instanceof ProgramVariable) {
+                    ProgramVariable pv = (ProgramVariable) lhs;
+                    if (!pv.isMember()) {
+                        int l = node.getStartPosition().getLine();
+                        String varName = pv.name().toString();
+                        if (!localVarMap.containsKey(varName)) {
+                            localVarMap.put(varName, l);
+                        } else {
+                            int o = localVarMap.get(varName);
+                            if (o > l) {
+                                localVarMap.put(varName, l);
+                            }
+                        }
+                    }
+                }
+            } /*else if (node instanceof VariableSpecification) {
+                VariableSpecification vs = (VariableSpecification) node;
+                ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+                if (!pv.isMember()) {
+//                    declaredPVs = declaredPVs.add(pv);
+                    String varName = pv.name().toString();
+                    int l = node.getStartPosition().getLine();
+                    if (!localVarMap.containsKey(varName)) {
+                        localVarMap.put(varName, l);
+                    } else {
+                        int o = localVarMap.get(varName);
+                        if (o > l) {
+                            localVarMap.put(varName, l);
+                        }
+                    }
+                }
+            }*/
+        }
+    }
 
     public MovingPositioner(URI fileUri, Services svc, Proof proof, Node node, HeapSourceCollection hsc) {
         super(svc, proof, node);
+
+        statements = createStatementList();
+
+        for (SourceElement statement : statements) {
+            /*ImmutableSet<ProgramVariable> getLocalIns = MiscTools.getLocalIns(
+                (ProgramElement) statement, svc);
+            ImmutableSet<ProgramVariable> getLocalOuts = MiscTools.getLocalOuts(
+                (ProgramElement) statement, svc);*/
+
+            WrittenAndDeclaredPVLineCollector wpvc = new WrittenAndDeclaredPVLineCollector(
+                (ProgramElement) statement, svc);
+            wpvc.start();
+        }
 
         this.fileUri = fileUri;
         this.heapSources = hsc;
@@ -64,6 +125,100 @@ public class MovingPositioner extends InsPositionProvider{
         }
 
         return result;
+    }
+
+    public static List<LocalVarReference> listLocalVarUpdates(Sequent s, Term t, boolean distinct) throws InternTransformException, TransformException {
+        var result = new ArrayList<LocalVarReference>();
+
+        if (t.op().name().toString().equals("store") && t.arity() == 4) {
+            var updates = listLocalVarUpdates(s, t);
+            result.add(new LocalVarReference(updates));
+        } else if (t.op().name().toString().equals("anon") && t.arity() == 3) {
+            var updates = listLocalVarUpdates(s, t);
+            result.add(new LocalVarReference(updates));
+        } else if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
+            var updates = listLocalVarUpdates(s, t.sub(0));
+            result.add(new LocalVarReference(updates));
+        } else {
+            for (var sub: t.subs()) {
+                result.addAll(listLocalVarUpdates(s, sub, false));
+            }
+        }
+
+        if (distinct) {
+            var dist = new ArrayList<LocalVarReference>();
+            for (var h: result) {
+                if (dist.stream().noneMatch(p -> p.heapEquals(h))) {
+                    dist.add(h);
+                }
+            }
+            result = dist;
+        }
+
+        return result;
+    }
+
+    public static List<LocalVarReference.LocalVarUpdate> listLocalVarUpdates(Sequent s, Term t) throws InternTransformException, TransformException {
+
+        /*
+        if (!t.sort().name().toString().equals("Heap")) {
+            throw new InternTransformException("Not a heap");
+        }*/
+
+        var result = new ArrayList<LocalVarReference.LocalVarUpdate>();
+
+        if (t.op().name().toString().equals("store")) {
+            result.add(LocalVarReference.newStoreUpdate(t));
+            result.addAll(listLocalVarUpdates(s, t.sub(0)));
+            return result;
+        } else if (t.op().name().toString().equals("anon")) {
+            result.add(LocalVarReference.newAnonUpdate(t));
+            result.addAll(listLocalVarUpdates(s, t.sub(0)));
+            return result;
+        } else if (t.op() instanceof LocationVariable && t.op().name().toString().startsWith("heap")) {
+            result.add(LocalVarReference.newHeap(t));
+            return result;
+        } else if (t.op() instanceof Function && t.arity() == 0) {
+
+            for (var ss : s.antecedent()) {
+                var f = ss.formula();
+                if (f.op() == Equality.EQUALS && f.arity() == 2 && f.sub(0).sort().name().toString().equals("Heap") && f.sub(0).op().name().toString().equals(t.op().name().toString())) {
+                    result.add(LocalVarReference.newIndirect(t));
+                    result.addAll(listLocalVarUpdates(s, f.sub(1)));
+                    return result;
+                }
+                if (f.op() == Equality.EQUALS && f.arity() == 2 && f.sub(1).sort().name().toString().equals("Heap") && f.sub(1).op().name().toString().equals(t.op().name().toString())) {
+                    result.add(LocalVarReference.newIndirect(t));
+                    result.addAll(listLocalVarUpdates(s, f.sub(0)));
+                    return result;
+                }
+            }
+
+            for (var ss : s.succedent()) {
+                var fnot = ss.formula();
+                if (fnot.op() == Junctor.NOT && fnot.arity() == 1) {
+                    var f = fnot.sub(0);
+                    if (f.op() == Equality.EQUALS && f.arity() == 2 && f.sub(0).sort().name().toString().equals("Heap") && f.sub(0).op().name().toString().equals(t.op().name().toString())) {
+                        result.add(LocalVarReference.newIndirect(t));
+                        result.addAll(listLocalVarUpdates(s, f.sub(1)));
+                        return result;
+                    }
+                    if (f.op() == Equality.EQUALS && f.arity() == 2 && f.sub(1).sort().name().toString().equals("Heap") && f.sub(1).op().name().toString().equals(t.op().name().toString())) {
+                        result.add(LocalVarReference.newIndirect(t));
+                        result.addAll(listLocalVarUpdates(s, f.sub(0)));
+                        return result;
+                    }
+                }
+            }
+
+            //throw new TransformException("failed to find definition for Function '" + t.op().name().toString() + "'");
+
+            result.add(LocalVarReference.newHeap(t));
+            return result;
+
+        } else {
+            throw new TransformException("Unknown heap op", t.op().getClass().getSimpleName()+" -> '" + t.op().name().toString() + "'");
+        }
     }
 
     public static List<HeapReference.HeapUpdate> listHeapUpdates(Sequent s, Term t) throws InternTransformException, TransformException {
@@ -145,6 +300,35 @@ public class MovingPositioner extends InsPositionProvider{
         }
     }
 
+    private List<SourceElement> createStatementList() {
+
+        List<SourceElement> statements = new ArrayList<>();
+        for (Node cur = this.node; cur != null; cur = cur.parent()) {
+            SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
+            if (activeStatement != null) {
+                var pi = activeStatement.getPositionInfo();
+                if (pi.startEndValid()) {
+                    // filter out multiline (hack)
+                    var start = pi.getStartPosition();
+                    var end = pi.getEndPosition();
+                    if (end.getLine() - start.getLine() == 0) {
+                        statements.add(activeStatement);
+                    }
+                }
+            }
+        }
+
+        return statements;
+    }
+
+    /**
+     * Search from the current node upwards until an node with an active statement is found.
+     * Return its line number, or the start of the method body, if none is found.
+     * @param fileUri
+     * @return
+     * @throws InternTransformException
+     * @throws TransformException
+     */
     private int getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
 
         for (Node cur = this.node; cur != null; cur = cur.parent()) {
@@ -206,9 +390,9 @@ public class MovingPositioner extends InsPositionProvider{
 
         // ======== [2.2] (if there are _no_ heaps - move forward to (before) symb exec)
 
-        if (heaps.size() == 0 && !containsObserverFunc(term) && symbExecPos > 0) {
+        /*if (heaps.size() == 0 && !containsObserverFunc(term) && symbExecPos > 0) {
             position = symbExecPos-1;
-        }
+        }*/
 
         // ======== [3] move further forward, but only until we reach the symb exec position
         //              and not over lines that introduce heap updates.
@@ -216,18 +400,78 @@ public class MovingPositioner extends InsPositionProvider{
 
         if (!containsObserverFunc(term)) {
             while (true) {
-                if (position + 1 >= symbExecPos) break;
-
-                if (canMoveAssumeAfterLine(position)) {
-                    position++;
-                } else {
+                if (position  >= symbExecPos) {
+                    // done: we reached the position of the symb. ex.
                     break;
                 }
+
+                //if (canMoveAssumeAfterLine(position)) {
+                    if (canMoveLocalVar(term, position)) {
+                        position++;
+                    } else {
+                        System.out.println();
+                        break;
+                    }
+                /*} else {
+                    System.out.println();
+                    break;
+                }*/
             }
         }
 
         var indent = getLineIndent(fileUri, position);
         return new InsertionPosition(position, position-1, indent);
+    }
+
+    private boolean canMoveLocalVar(Term term, int position) {
+        // TODO: we somehow need to remove everything before the position the original assumptions comes from (e.g. loop invariant, post condition)
+        List<String> locVarNamesCanditates = collectLocVarNames(term);
+//        System.out.println("Term: " + term + "\nlocVarNamesCanditates: " + locVarNamesCanditates);
+        for (String locVarName : locVarNamesCanditates) {
+            if (localVarMap.containsKey(locVarName)) {
+                // localVarMap holds the maximum line number we can move this term to
+                int varLine = localVarMap.get(locVarName);
+                if (varLine > position) {
+                    // not yet reached the maximum
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String existsProgVar(String name) {
+        int i = name.lastIndexOf('_');
+        if (i < 0) {
+            return null;
+        } else {
+            String noPrefix = name.substring(0, i);
+            for (var f : node.getLocalProgVars()) {
+                if (f.name().toString().equals(noPrefix)) {
+                    return noPrefix;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<String> collectLocVarNames(Term term) {
+        List<String> result = new ArrayList<>();
+
+        if (term.op() instanceof Function) {
+            String noPrefix = existsProgVar(term.op().name().toString());
+            if (noPrefix != null) {
+                //Function f = (Function) term.op();
+                result.add(noPrefix);
+                return result;
+            }
+        }
+        if (!term.subs().isEmpty()) {
+            for (Term sub : term.subs()) {
+                result.addAll(collectLocVarNames(sub));
+            }
+        }
+        return result;
     }
 
     private boolean containsObserverFunc(Term term) {

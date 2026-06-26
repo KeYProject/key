@@ -429,7 +429,7 @@ public class SequentBackTransformer {
         if (ante) {
             return new InsertionTerm(InsertionType.ASSUME, term, pios);
         } else {
-            // special-case, this should be an [assume] (but is in the antecedent)
+            // special-case, this should be an [assume] (but is in the succedent)
             return new InsertionTerm(InsertionType.ASSUME, termNot(term), pios);
         }
     }

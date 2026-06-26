@@ -9,7 +9,6 @@ import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -27,9 +26,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -116,6 +112,8 @@ public class SourceViewPatcher {
 
             HeapSourceCollection hsc = new HeapSourceCollection(node.sequent());
             hsc.collect(node);
+            LocalVarCollection lvc = new LocalVarCollection(node.sequent());
+            lvc.collect(node);
             SequentBackTransformer transformer = new SequentBackTransformer(
                     services,
                     proof,
