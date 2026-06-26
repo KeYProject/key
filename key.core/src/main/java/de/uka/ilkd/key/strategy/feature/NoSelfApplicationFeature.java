@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.CostLocal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
@@ -16,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
  * This feature checks that the position of application is not contained in the if-formulas. If the
  * rule application is admissible, zero is returned.
  */
+@CostLocal
 public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new NoSelfApplicationFeature();

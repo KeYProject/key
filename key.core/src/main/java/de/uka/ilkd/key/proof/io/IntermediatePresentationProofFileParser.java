@@ -208,7 +208,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
                         (Class<? extends AbstractPredicateAbstractionLattice>) Class.forName(str);
                 } catch (ClassNotFoundException e) {
-                    errors.add(e);
+                    errors.add(new IllegalArgumentException(
+                        "Unknown predicate abstraction lattice type \"" + str + "\".", e));
                 }
             }
             case MERGE_ABSTRACTION_PREDICATES ->

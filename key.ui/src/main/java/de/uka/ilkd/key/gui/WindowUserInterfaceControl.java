@@ -544,11 +544,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
-                        result.getErrorList().getFirst());
+                        "The proof could only be loaded partially: " + result.getErrorList().size()
+                            + " rule application(s) could not be replayed (see the list below).",
+                        result.getErrorList());
                 }
             }
         }

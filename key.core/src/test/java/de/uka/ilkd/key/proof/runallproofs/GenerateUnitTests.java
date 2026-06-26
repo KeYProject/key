@@ -121,10 +121,13 @@ public class GenerateUnitTests {
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
-        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
+        vars.put("keySettings", settings.getGlobalKeYSettings()
+                .replace("\n", "\\\\n")
+                .replace("\r", "\\\\r"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\\\n"));
+                    .replace("\n", "\\\\n")
+                    .replace("\r", "\\\\r"));
         if (unit.isResetEachTest()) {
             vars.put("killSwitch",
                 "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");

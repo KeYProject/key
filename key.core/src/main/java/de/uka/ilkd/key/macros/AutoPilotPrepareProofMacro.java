@@ -36,7 +36,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     public String getName() {
-        return "Auto Pilot (Preparation Only)";
+        return "Structured Automation (Prep. Only)";
     }
 
     @Override
@@ -46,8 +46,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
-            + "<li>Expand invariant definitions</ol>";
+        return "<html>This configures the automation such that it preserves<br>" +
+            "the program structure and makes it easier to comprehend the<br>" +
+            "resulting proof. It produces proof goals without program<br>" +
+            "references, but does not try to close these goals.<br>" +
+            "The steps are:<ol><li>Finish symbolic execution" +
+            "<li>Separate proof obligations" +
+            "<li>Expand invariant definitions</ol>";
     }
 
     @Override

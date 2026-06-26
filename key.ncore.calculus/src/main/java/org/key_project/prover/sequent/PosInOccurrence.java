@@ -217,6 +217,12 @@ public class PosInOccurrence {
         return h;
     }
 
+    @Override
+    public String toString() {
+        return "term at " + posInTerm() + " of formula \"" + sequentFormula() + "\" in the "
+            + (inAntec ? "antecedent" : "succedent");
+    }
+
     /// Replaces the formula associated with this occurrence and returns a new object pointing
     /// to the same position within the new formula.
     ///

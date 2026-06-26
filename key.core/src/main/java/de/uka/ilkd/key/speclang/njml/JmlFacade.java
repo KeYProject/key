@@ -38,6 +38,21 @@ public final class JmlFacade {
     }
 
     /**
+     * Releases the ANTLR prediction (DFA) cache of the JML parser. It is a pure, lazily-built cache
+     * held on the generated parser's static fields, only needed while parsing, not during proof
+     * search; ANTLR rebuilds it transparently on the next parse. See
+     * {@code ParsingFacade.clearParserCaches}.
+     */
+    public static void clearCaches() {
+        try {
+            new JmlParser(new CommonTokenStream(createLexer(CharStreams.fromString(""))))
+                    .getInterpreter().clearDFA();
+        } catch (RuntimeException ignored) {
+            // best-effort cache release; a failure here only forgoes the memory saving
+        }
+    }
+
+    /**
      * Creates a JML lexer for the given string with position. The position information of the lexer
      * is changed accordingly.
      */

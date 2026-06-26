@@ -15,7 +15,7 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
-import org.key_project.logic.IntIterator;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -36,18 +36,20 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
      */
     private JTerm replace(JTerm term, JTerm with, TermLabelState termLabelState,
             TacletLabelHint labelHint, PosInOccurrence posOfFind,
-            IntIterator it,
+            PosInTerm pit, int depthIdx,
             MatchResultInfo mc,
             Sort maxSort, Goal goal, Services services, TacletApp ruleApp) {
-        if (it.hasNext()) {
-            final int indexOfNextSubTerm = it.next();
+        // walk the find-position by index instead of via PosInTerm.iterator(), to avoid allocating
+        // a PiTIterator per rule application (same indices/order as the forward iterator).
+        if (depthIdx < pit.depth()) {
+            final int indexOfNextSubTerm = pit.getIndexAt(depthIdx);
 
             final JTerm[] subs = new JTerm[term.arity()];
             term.subs().arraycopy(0, subs, 0, term.arity());
 
             final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm);
             subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with, termLabelState,
-                labelHint, posOfFind, it, mc, newMaxSort, goal, services, ruleApp);
+                labelHint, posOfFind, pit, depthIdx + 1, mc, newMaxSort, goal, services, ruleApp);
 
             return services.getTermFactory().createTerm(term.op(), subs, term.boundVars(),
                 term.getLabels());
@@ -71,11 +73,10 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             MatchResultInfo matchCond,
             TacletApp ruleApp) {
         final JTerm term = (JTerm) posOfFind.sequentFormula().formula();
-        final IntIterator it = posOfFind.posInTerm().iterator();
         final JTerm rwTemplate = gt.replaceWith();
 
         JTerm formula = replace(term, rwTemplate, termLabelState, new TacletLabelHint(rwTemplate),
-            posOfFind, it, matchCond, term.sort(), goal, services, ruleApp);
+            posOfFind, posOfFind.posInTerm(), 0, matchCond, term.sort(), goal, services, ruleApp);
         formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
             posOfFind, taclet, goal, null, rwTemplate);
         if (term == formula) {

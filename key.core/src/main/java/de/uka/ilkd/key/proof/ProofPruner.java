@@ -67,8 +67,16 @@ class ProofPruner {
 
             if (initConfig != null && visitedNode.parent() != null) {
                 proof.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                for (final NoPosTacletApp app : visitedNode.parent()
-                        .getLocalIntroducedRules()) {
+            }
+            // Deregister taclets that were locally introduced (e.g. via \addrules) in the pruned
+            // subtree. These are stored on the node at which they were introduced, so we must
+            // iterate the node itself rather than its parent: otherwise taclets introduced at a
+            // leaf of a branch other than firstLeaf are never deregistered (the parent-based loop
+            // only ever reaches the introduced rules of nodes that have a child in the subtree).
+            // The cutting point itself survives the pruning, so its locally introduced rules are
+            // kept.
+            if (initConfig != null && visitedNode != cuttingPoint) {
+                for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
                     initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                 }
             }

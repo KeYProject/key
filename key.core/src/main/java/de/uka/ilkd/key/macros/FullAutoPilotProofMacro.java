@@ -29,7 +29,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     @Override
     public String getName() {
-        return "Full Auto Pilot";
+        return "Structured Automation";
     }
 
     @Override
@@ -44,8 +44,14 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
-            + "<li>Expand invariant definitions" + "<li>Try to close all proof obligations</ol>";
+        return "<html>This configures the automation such that it preserves<br>" +
+            "the program structure and makes it easier to comprehend the<br>" +
+            "resulting proof.<br>" +
+            "The steps are:" +
+            "<ol><li>Finish symbolic execution" +
+            "<li>Separate proof obligations" +
+            "<li>Expand invariant definitions" +
+            "<li>Try to close all proof obligations</ol>";
     }
 
     @Override

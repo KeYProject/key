@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -29,9 +28,21 @@ public class UrlRuleSource extends RuleSource {
     UrlRuleSource(final URL url) {
         this.url = url;
         if ("file".equals(url.getProtocol())) {
-            numberOfBytes = new File(url.getFile()).length();
+            numberOfBytes = fileSizeOrCountStream();
         } else {
             numberOfBytes = countBytesByReadingStream();
+        }
+    }
+
+    private long fileSizeOrCountStream() {
+        try {
+            // Resolve the file via the URI (like file()) rather than url.getFile(): the latter is
+            // not percent-decoded and keeps the leading '/' of "file:/C:/..." on Windows, so for
+            // paths containing spaces (%20) or on Windows it would point at a non-existent file and
+            // report a length of 0.
+            return Files.size(Paths.get(url.toURI()));
+        } catch (URISyntaxException | IOException e) {
+            return countBytesByReadingStream();
         }
     }
 
