@@ -123,16 +123,20 @@ public class JmlScriptTest {
         Pattern.compile("[/][*]!(?<yaml>.+?)[*][/]", Pattern.DOTALL | Pattern.MULTILINE);
 
     private static Parameters readParams(Path path) throws IOException {
-        String lines = Files.readString(path);
+        String lines = Files.readString(path).replace("\r", "");
         var matcher = SETTINGS.matcher(lines).results().toList();
         if (!matcher.isEmpty()) {
             var input = matcher.getFirst().group("yaml");
             var objectMapper = new ObjectMapper(new YAMLFactory());
             objectMapper.findAndRegisterModules();
-            return objectMapper.readValue(input, Parameters.class);
+            Parameters params = objectMapper.readValue(input, Parameters.class);
+            System.out.println("!!! Parameters for " + path + ": " + params);
+            return params;
         } else {
+            System.out.println("!!! no Params");
             return new Parameters();
         }
+
     }
 
     public static Stream<Arguments> filesProvider() throws URISyntaxException, IOException {
