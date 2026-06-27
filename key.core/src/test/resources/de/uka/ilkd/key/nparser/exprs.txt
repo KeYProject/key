@@ -1,3 +1,4 @@
+\forall int x; true
 (bprod{int y;}(1, 2, y) = 0)
 1 = 1 -> 2 = 2
 \< { int x = 1; } \> x=1
@@ -13,7 +14,6 @@ true & false
 \if (3=4 & 1=1) \then (\if (3=4) \then (1) \else (2)) \else (2)
 aa + bb*cc
 aa%bb*cc < -123
-\forall int x; true
 \forall numbers x; x = x
 (int)3+2
 #\forall int[][] i; \forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j
@@ -34,3 +34,5 @@ seqEmpty + seqEmpty
 ∅ ⊆ \emptyset
 \emptyset ∖ \emptyset
 (∅ ∊ ∅) & true
+∅
+∅ & true

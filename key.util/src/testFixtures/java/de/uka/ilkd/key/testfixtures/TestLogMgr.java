@@ -38,21 +38,11 @@ public class TestLogMgr implements AfterTestExecutionCallback, BeforeTestExecuti
 
     @Override
     public void afterTestExecution(ExtensionContext context) {
-        root.detachAppender(listAppender);
-        root.addAppender(consoleAppender);
-        if (context.getExecutionException().isPresent()) {
-            for (var s : listAppender.strList) {
-                System.out.print(s);
-            }
-            System.out.flush();
-        }
-        listAppender.strList.clear();
+
     }
 
     @Override
     public void beforeTestExecution(ExtensionContext context) {
-        System.out.flush();
-        root.detachAppender(consoleAppender);
-        root.addAppender(listAppender);
+
     }
 }
