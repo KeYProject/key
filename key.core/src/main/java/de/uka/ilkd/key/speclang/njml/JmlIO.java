@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.UserInputValidator;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -177,7 +179,27 @@ public class JmlIO {
         Object obj = ctx.accept(visitor);
         ImmutableList<PositionedString> newWarnings = ImmutableList.fromList(visitor.getWarnings());
         warnings = warnings.prepend(newWarnings);
+        // Validate the user-supplied JML term (e.g. reject generic sorts, see issue #3409). The set
+        // of checks lives in UserInputValidator.
+        UserInputValidator.validate(termOf(obj), "a JML expression")
+                .ifPresent(msg -> {
+                    throw new BuildingException(ctx, msg);
+                });
         return obj;
+    }
+
+    /** Extracts the {@link JTerm} carried by a JML interpretation result, if any. */
+    private static @Nullable JTerm termOf(Object obj) {
+        if (obj instanceof SLExpression e && e.isTerm()) {
+            return e.getTerm();
+        }
+        if (obj instanceof JTerm t) {
+            return t;
+        }
+        if (obj instanceof Pair<?, ?> p && p.second instanceof JTerm t) {
+            return t;
+        }
+        return null;
     }
 
     /**

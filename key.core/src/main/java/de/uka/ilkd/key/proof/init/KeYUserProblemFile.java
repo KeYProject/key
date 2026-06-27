@@ -6,8 +6,10 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.UserInputValidator;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -136,6 +138,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             }
         } catch (Exception e) {
             throw new ProofInputException(e);
+        }
+
+        // Validate the user-supplied problem (e.g. reject generic sorts that must not occur in a
+        // concrete sequent, see issue #3409). The set of checks lives in UserInputValidator.
+        Optional<String> issue = UserInputValidator.validate(problem, "a \\problem");
+        if (issue.isPresent()) {
+            throw new ProofInputException(issue.get());
         }
     }
 
