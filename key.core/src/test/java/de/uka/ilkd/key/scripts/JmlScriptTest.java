@@ -157,5 +157,16 @@ public class JmlScriptTest {
         public String exception;
         public boolean deleteTmpDir = true;
         public Map<String, String> settings;
+
+        @Override
+        public String toString() {
+            return "Parameters{" +
+                    "shouldClose=" + shouldClose +
+                    ", method='" + method + '\'' +
+                    ", exception='" + exception + '\'' +
+                    ", deleteTmpDir=" + deleteTmpDir +
+                    ", settings=" + settings +
+                    '}';
+        }
     }
 }
