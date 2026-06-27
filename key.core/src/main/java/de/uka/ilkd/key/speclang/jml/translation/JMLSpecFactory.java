@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
@@ -71,7 +72,6 @@ import static java.lang.String.format;
  * This is the public interface to the jml.translation package.
  */
 public class JMLSpecFactory {
-
     public static final String AT_PRE = "AtPre";
     protected final TermBuilder tb;
     protected final Services services;
@@ -389,7 +389,7 @@ public class JMLSpecFactory {
 
     public ProgramVariableCollection createProgramVariables(IProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
-        progVar.selfVar = tb.selfVar(pm, pm.getContainerType(), false);
+        progVar.selfVar = tb.selfVar(pm, new TypeRef(pm.getContainerType()), false);
         progVar.paramVars = tb.paramVars(pm, false);
         progVar.resultVar = tb.resultVar(pm, false);
         progVar.excVar = pm.isModel() ? null : tb.excVar(pm, false);
@@ -626,7 +626,8 @@ public class JMLSpecFactory {
                 services.getJavaInfo().getKeYJavaType(abbrv.typeName().first.getText());
             final ProgramElementName abbrVarName =
                 new ProgramElementName(abbrv.abbrevName().first.getText());
-            final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
+            final LocationVariable abbrVar =
+                new LocationVariable(abbrVarName, new TypeRef(abbrKJT), true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as
@@ -1504,11 +1505,12 @@ public class JMLSpecFactory {
         final ImmutableList<LocationVariable> parameters = pm.collectParameters();
         for (LocationVariable parameter : parameters) {
             atPreVars.put(parameter,
-                tb.atPreVar(parameter.toString(), parameter.getKeYJavaType(), true));
+                tb.atPreVar(parameter.toString(), parameter.getTypeReference(), true));
         }
         final ImmutableList<LocationVariable> paramVars =
             append(collectLocalVariablesVisibleTo(statement, pm), parameters);
-        return new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false),
+        return new ProgramVariableCollection(
+            tb.selfVar(pm, new TypeRef(pm.getContainerType()), false),
             paramVars, tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
             Collections.emptyMap(), // should be the pre-state of the enclosing contract
             Collections.emptyMap() // ignore for now

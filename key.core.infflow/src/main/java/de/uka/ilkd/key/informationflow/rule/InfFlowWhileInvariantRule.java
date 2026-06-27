@@ -15,7 +15,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -251,7 +251,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
-        final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+        final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
@@ -269,7 +269,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
-        final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+        final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
         final String name = tb.newName(varTerm + "_Before");
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
@@ -284,7 +284,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
-        final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+        final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
         final String name = tb.newName(varTerm + "_After");
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
@@ -302,7 +302,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         for (final JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
-            final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
 
             final String name = tb.newName(varTerm + "_Before");
             final LocationVariable varAtPostVar =
@@ -324,7 +324,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         for (final JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
-            final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
 
             final String name = tb.newName(varTerm + "_After");
             final LocationVariable varAtPostVar =

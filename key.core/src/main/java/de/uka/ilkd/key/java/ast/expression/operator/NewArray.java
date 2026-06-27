@@ -210,6 +210,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
             if (index == 0) {
                 return arrayInitializer;
             }
+            index--;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

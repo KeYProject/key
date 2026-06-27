@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.statement.Catch;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
@@ -181,7 +183,7 @@ public final class AuxiliaryContractBuilders {
                     statements.add(KeYJavaASTFactory.assign(flag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                        services.getJavaInfo().getKeYJavaType("boolean")));
+                        new TypeRef(services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
 
@@ -190,7 +192,7 @@ public final class AuxiliaryContractBuilders {
                     statements.add(KeYJavaASTFactory.assign(flag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                        services.getJavaInfo().getKeYJavaType("boolean")));
+                        new TypeRef(services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
             if (variables.returnFlag != null) {
@@ -199,7 +201,8 @@ public final class AuxiliaryContractBuilders {
                         KeYJavaASTFactory.assign(variables.returnFlag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(variables.returnFlag,
-                        BooleanLiteral.FALSE, services.getJavaInfo().getKeYJavaType("boolean")));
+                        BooleanLiteral.FALSE,
+                        new TypeRef(services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
         }
@@ -215,9 +218,9 @@ public final class AuxiliaryContractBuilders {
                     statements.add(
                         KeYJavaASTFactory.assign(variables.result, resultType.getDefaultValue()));
                 } else {
-                    KeYJavaType resultType = variables.result.getKeYJavaType();
+                    TypeReference resultType = variables.result.getTypeReference();
                     statements.add(KeYJavaASTFactory.declare(variables.result,
-                        resultType.getDefaultValue(), resultType));
+                        resultType.getKeYJavaType().getDefaultValue(), resultType));
                 }
             }
         }
@@ -239,7 +242,7 @@ public final class AuxiliaryContractBuilders {
                 statements.add(KeYJavaASTFactory.assign(variables.exception, NullLiteral.NULL));
             } else {
                 statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
-                    variables.exception.getKeYJavaType()));
+                    variables.exception.getTypeReference()));
             }
         }
 
@@ -295,7 +298,7 @@ public final class AuxiliaryContractBuilders {
                 final ProgramVariable exceptionParameter) {
             Catch katch = KeYJavaASTFactory.catchClause(
                 KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(),
-                    exceptionParameter.getKeYJavaType(), exceptionParameter),
+                    exceptionParameter.getTypeReference(), exceptionParameter),
                 new StatementBlock(
                     KeYJavaASTFactory.assign(variables.exception, exceptionParameter)));
             return new Try(new StatementBlock(labeledBlock), new Branch[] { katch });
@@ -443,7 +446,7 @@ public final class AuxiliaryContractBuilders {
                 String newName =
                     services.getTermBuilder().newName(value.name() + suffix);
                 LocationVariable newValue =
-                    new LocationVariable(new ProgramElementName(newName), value.getKeYJavaType());
+                    new LocationVariable(new ProgramElementName(newName), value.getTypeReference());
 
                 result.put(key, newValue);
             }
@@ -493,7 +496,7 @@ public final class AuxiliaryContractBuilders {
                 String newName =
                     services.getTermBuilder().newName(placeholderVariable.name().toString());
                 LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName),
-                    placeholderVariable.getKeYJavaType());
+                    placeholderVariable.getTypeReference());
 
                 if (goal != null) {
                     goal.addProgramVariable(newVariable);
@@ -1193,14 +1196,15 @@ public final class AuxiliaryContractBuilders {
          */
         private static LocationVariable[] createLoopVariables(final Services services) {
             LocationVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
-                "cond", services.getJavaInfo().getKeYJavaType("boolean"), services);
+                "cond", new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")), services);
 
             LocationVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
-                "brokeLoop", services.getJavaInfo().getKeYJavaType("boolean"), services);
+                "brokeLoop", new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")),
+                services);
 
             LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
-                    services.getJavaInfo().getKeYJavaType("boolean"), services);
+                    new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")), services);
             final LocationVariable[] loopVariables = { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;

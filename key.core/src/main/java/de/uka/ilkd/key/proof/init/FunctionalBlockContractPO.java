@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -272,7 +273,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final IProgramMethod pm = getProgramMethod();
 
         final StatementBlock block = getBlock();
-        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar =
+            tb.selfVar(pm, new TypeRef(getCalleeKeYJavaType()), makeNamesUnique);
         register(selfVar, services);
         final JTerm selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -296,7 +298,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                     .createAndRegister(selfTerm, false, contract.getBlock());
         final ProgramVariable exceptionParameter = KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal("e"),
-            variables.exception.getKeYJavaType());
+            variables.exception.getTypeReference());
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, variables,
@@ -394,7 +396,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final BlockContract.Variables variables, final Services services,
             final TermBuilder tb) {
         final KeYJavaType kjt = getCalleeKeYJavaType();
-        final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
+        final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()),
+            new ImmutableArray<>(), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
         JModality.JavaModalityKind kind = contract.getModalityKind();
         JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock());

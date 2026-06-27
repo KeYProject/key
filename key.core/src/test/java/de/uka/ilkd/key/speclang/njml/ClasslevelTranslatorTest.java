@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -68,10 +69,10 @@ public class ClasslevelTranslatorTest {
 
     public void parseAndInterpret(String expr) {
         Assertions.assertNotEquals("", expr);
-        KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
-        ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
-        ProgramVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
-        ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
+        var tRef = new TypeRef(new KeYJavaType(JavaDLTheory.ANY));
+        ProgramVariable self = new LocationVariable(new ProgramElementName("self"), tRef);
+        ProgramVariable result = new LocationVariable(new ProgramElementName("result"), tRef);
+        ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), tRef);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.Classlevel_commentsContext ctx = parser.classlevel_comments();

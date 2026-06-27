@@ -63,6 +63,35 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "wellFormedAnonEQ", "wellFormedMemsetArrayObjectEQ", "wellFormedMemsetArrayPrimitiveEQ",
         "wellFormedMemsetObjectEQ", "wellFormedMemsetLocSetEQ", "wellFormedMemsetPrimitiveEQ",
 
+        // universe rules
+        "createdRepfpElement",
+
+        "dismissSelectOfDominatedObject", "dismissSelectOfDominatingObject",
+        "dismissSelectOfDominatedAnon", "dismissSelectOfDominatedCreatedAnon",
+
+        "dismissSelectOfSelfRepfpComplementAnon", "dismissSelectOfSelfCreatedRepfpComplementAnon",
+        "dismissSelectOfDominatingRepfpComplementAnon",
+        "dismissSelectOfDominatingCreatedRepfpComplementAnon",
+
+        "dismissSelectOfDominatedObjectEQ", "dismissSelectOfDominatingObjectEQ",
+        "dismissSelectOfDominatedAnonEQ", "dismissSelectOfDominatedCreatedAnonEQ",
+
+        "dismissSelectOfSelfRepfpComplementAnonEQ",
+        "dismissSelectOfSelfCreatedRepfpComplementAnonEQ",
+        "dismissSelectOfDominatingRepfpComplementAnonEQ",
+        "dismissSelectOfDominatingCreatedRepfpComplementAnonEQ",
+
+        "simplifySelectOfDominatedAnon", "simplifySelectOfDominatedCreatedAnon",
+        "simplifySelectOfSelfRepfpComplementAnon", "simplifySelectOfSelfCreatedRepfpComplementAnon",
+        "simplifySelectOfDominatingRepfpComplementAnon",
+        "simplifySelectOfDominatingCreatedRepfpComplementAnon",
+
+        "simplifySelectOfDominatedAnonEQ", "simplifySelectOfDominatedCreatedAnonEQ",
+        "simplifySelectOfSelfRepfpComplementAnonEQ",
+        "simplifySelectOfSelfCreatedRepfpComplementAnonEQ",
+        "simplifySelectOfDominatingRepfpComplementAnonEQ",
+        "simplifySelectOfDominatingCreatedRepfpComplementAnonEQ",
+
         // locset rules
         "elementOfEmpty", "elementOfAllLocs", "elementOfSingleton", "elementOfUnion",
         "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields", "elementOfAllObjects",

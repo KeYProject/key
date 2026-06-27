@@ -19,6 +19,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * There are several types of class declarations:
  * <ul>
@@ -59,6 +62,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 
 public class ClassDeclaration extends TypeDeclaration implements Statement {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassDeclaration.class);
 
     protected final Extends extending;
 
@@ -252,14 +256,17 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
         ImmutableList<KeYJavaType> types = ImmutableSLList.nil();
+
         if (implementing != null) {
             for (int i = implementing.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());
             }
         }
+
         if (extending != null && !extending.getSupertypes().isEmpty()) {
             types = types.prepend(extending.getSupertypes().get(0).getKeYJavaType());
         }
+
         return types;
     }
 

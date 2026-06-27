@@ -1,0 +1,2016 @@
+<head>
+    <meta charset="UTF-8">
+    <title>NodeProofs.zproof - Proof Management Report</title>
+    <style type="text/css">
+        body, html {
+            margin: 0;
+            font-family: Arial;
+        }
+
+        .tab {
+            overflow: hidden;
+            background-color: #f1f1f1;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 20px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+        }
+
+        ul, #fileTree {
+            list-style-type: none;
+        }
+
+        #fileTree {
+            margin: 0;
+            padding: 0;
+        }
+
+        .caret {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .caret::before {
+            content: "\25B6";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+            transform: rotate(90deg);
+        }
+
+        .caret-down::before {
+            transform: rotate(0deg);
+        }
+
+        .nested {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 1px 1px;
+        }
+
+        th {
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th.clickable {
+            cursor: pointer;
+        }
+
+        td {
+            text-align: left;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        tr.blue {
+            color: #284FA8;
+            background-color: #DAE7FE;
+        }
+
+        td.SCCs {
+            text-align: left;
+            padding-left: 10px;
+            padding-right: 20px;
+            color: #284FA8;
+        }
+
+        thead.tableHead {
+            text-align: center;
+            color: #FFFFFF;
+            background-color: #6688D4;
+            font-family: sans-serif;
+            font-size: 120%;
+            font-weight: bold;
+            white-space: nowrap;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        #messages span {
+            display: block;
+            white-space: pre;
+        }
+
+    </style>
+    <script type="text/javascript">
+    // id: name of table
+    // column: index of column for sortint (starting at index 0)
+    // headerSize: count of static headers at the top to skip
+    function sortTable(id, column, headerSize) {
+      var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+      table = document.getElementById(id);
+      switching = true;
+
+      // Set the sorting direction to ascending:
+      dir = "asc";
+
+      // Make a loop that will continue until no switching has been done
+      while (switching) {
+        //start by saying: no switching is done:
+        switching = false;
+        rows = table.rows;
+
+        // Loop through all table rows (skip table headers)
+        for (i = headerSize; i < (rows.length - 1); i++) {
+          shouldSwitch = false;
+
+          /*Get the two elements you want to compare,
+          one from current row and one from the next:*/
+          x = rows[i].getElementsByTagName("TD")[column];
+          y = rows[i + 1].getElementsByTagName("TD")[column];
+
+          /*check if the two rows should switch place,
+          based on the direction, asc or desc:*/
+          if (dir == "asc") {
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch= true;
+              break;
+            }
+          } else if (dir == "desc") {
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+        if (shouldSwitch) {
+          /*If a switch has been marked, make the switch
+          and mark that a switch has been done:*/
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+          //Each time a switch is done, increase this count by 1:
+          switchcount ++;
+        } else {
+          /*If no switching has been done AND the direction is "asc",
+          set the direction to "desc" and run the while loop again.*/
+          if (switchcount == 0 && dir == "asc") {
+            dir = "desc";
+            switching = true;
+          }
+        }
+      }
+    }
+    </script>
+
+    <script type="text/javascript">
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+    </script>
+
+    <script type="text/javascript">
+    function handleClick(source) {
+    	var messages = document.getElementById("messages");
+    	var spans = messages.getElementsByTagName("span");
+    	var filter = source.value;
+    	console.log(filter);
+    	for (const s of spans) {
+    		var str = s.textContent;
+    		if (str.startsWith(filter)) {
+    			if (source.checked) {
+    				s.style.display = "block";
+    			} else {
+    				s.style.display = "none";
+    			}
+    		}
+    	}
+    }
+    </script>
+
+</head>
+
+<body>
+
+<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">Overview</button>
+    <button class="tablinks" onclick="openTab(event, 'files')">Files</button>
+	<button class="tablinks" onclick="openTab(event, 'contracts')">Contracts</button>
+	<button class="tablinks" onclick="openTab(event, 'dependencies')">Dependencies</button>
+</div>
+
+<div id="overview" class="tabcontent">
+    <ul>
+        <li>Bundle: NodeProofs.zproof</li>
+        <li>Checks run: settings, dependency, missing_proofs, replay</li>
+        <li>Date: 2025-09-19 13:48:44</li>
+        <li>Overall Status: OPEN</li>
+        <li>Contracts:
+            <div style="width:100%; text-align:center">
+                <div style="width: calc(5/79*100%); float:left;">proven</div>
+                <div style="width: calc(7/79*100%); float:left; white-space:nowrap;">dependencies left</div>
+                <div style="width: calc(67/79*100%); float:left;">unproven</div>
+            </div>
+            <div style="width:100%; background:#f1f1f1; color:white; text-align:center">
+                <div style="width: calc(5/79*100%); background:#4CAF50; float:left;">5</div>
+                <div style="width: calc(7/79*100%); background:#f48336; float:left;">7</div>
+                <div style="width: calc(67/79*100%); background:#f44336; float:left;">67</div>
+            </div>
+        </li>
+        <li>Standard output:
+            <div style="text-align:end;">
+                <div>
+                    <input type="checkbox" id="errors" name="errors" value="[    Error    ]" onclick="handleClick(this)" checked>
+                    <label for="errors">Error</label>
+                    <input type="checkbox" id="warnings" name="warnings" value="[   Warning   ]" onclick="handleClick(this)" checked>
+                    <label for="warnings">Warning</label>
+                    <input type="checkbox" id="info" name="info" value="[ Information ]" onclick="handleClick(this)" checked>
+                    <label for="info">Information</label>
+                    <input type="checkbox" id="debug" name="debug" value="[    Debug    ]" onclick="handleClick(this)" checked>
+                    <label for="debug">Debug</label>
+                </div>
+            </div>
+            <div id="messages"
+                 style="background-color:#002b36;
+                        color:#93a1a1;
+                        font-family:monospace;
+                        font-size:16px;
+                        width:max-content;
+                        padding:10px">
+<span>Running missing proofs checker ...</span>
+<span>[    Debug    ] Loading Java sources ...</span>
+<span>[    Debug    ] Java sources successfully loaded!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__isSimple()).JML accessible clause.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__UniverseNode(java.lang.Object)).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(java.lang.Object___inv_()).JML accessible clause.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__add(java.lang.Object)).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__get(int)).JML accessible clause.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__contains(java.lang.Object)).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__lemma()).JML model_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__get(int)).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__pop()).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__set(int,java.lang.Object)).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__contains(java.lang.Object)).JML accessible clause.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[    Debug    ] Loading proof from /tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__isSimple()).JML normal_behavior operation contract.0.proof</span>
+<span>[    Debug    ] ... loading done!</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::isSimple()].JML accessible clause.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::UniverseNode(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::get(int)].JML accessible clause.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::lemma()].JML model_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::pop()].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[ Information ] Proof exists for contract UniverseNode[UniverseNode::isSimple()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Iterable[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::pop()].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toUpperCase()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::hashCode()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::set(int,java.lang.Object)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([D,int)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::set(int,java.lang.Object)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.Retention[java.lang.annotation.Retention::value()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::add(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::hasNext()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::codePointCount(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::indexOf(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::intern()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[RecursiveList::RecursiveList()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.NullPointerException::NullPointerException()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Object[java.lang.Object::Object()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::size()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[UniverseList::UniverseList()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.annotation.ElementType::valueOf(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::valueOf(java.lang.String,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::set(int,java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::addAll(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.System[java.lang.System::arraycopy(java.lang.Object,int,java.lang.Object,int,int)].JML exceptional_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.math.BigInteger::mod(java.math.BigInteger)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::equals(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.lang.Number::intValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[KeYList::KeYList()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::valueOf(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([J,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::reverseBytes(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([I,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Character[java.lang.Character::digit(char,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::charAt(int)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::get(int)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf([C)].JML exceptional_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::pop()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.ArrayList::ArrayList()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([Z,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::min(long,long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.math.BigInteger::compareTo(java.math.BigInteger)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Comparable[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.ExceptionInInitializerError::getException()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::subList(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::pop()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::bitCount(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::startsWith(java.lang.String,int)].JML exceptional_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::indexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.Enum::name()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getChars(int,int,[C,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::codePointAt(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toLowerCase()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::toDegrees(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::charAt(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Iterator[java.util.Iterator::next()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([S,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::charAt(int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(boolean)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::copyValueOf([C)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::compareTo(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::previous()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.LinkedHashMap::LinkedHashMap()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::next()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::addAll(java.util.Collection)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::contains(java.lang.String)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Number[java.lang.Number::longValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::hasNext()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::subList(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Float[java.lang.Float::_isNaN(float)].JML model_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::get(int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::get(int)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(char)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::put(java.lang.Object,java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::toHexString(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::matches(java.lang.String)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::pop()].JML exceptional_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::get(int)].JML exceptional_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(char)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::equals([C,[C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(java.lang.Object)].JML normal_behavior operation contract.3</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([F,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::size()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::replaceFirst(java.lang.String,java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::addAll(java.util.Collection)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(char)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([S,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::listIterator(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([J)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([B,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::containsKey(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[   Warning   ] No proof found for contract List[List::pop()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::startsWith(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.Enum::name()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::_isNaN(double)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([Z,int,int,boolean)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::sqrt(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.Iterator::hasNext()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::min(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::equals([S,[S)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(java.lang.String,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.Iterator::next()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([D,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.math.BigInteger::valueOf(long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::atan(double)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::set(int,java.lang.Object)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::size()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::split(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::addAll(java.util.Collection)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::listIterator(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::lastIndexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::max(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toCharArray()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Character[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::set(int,java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::size()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toUpperCase()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String([C,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::containsValue(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::substring(int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::rotateRight(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([B,int,int,byte)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.Enum::getDeclaringClass()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.Enum::getDeclaringClass()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(char)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::hasPrevious()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::get(int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.Iterator::remove()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(boolean)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::Throwable(java.lang.String,java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Number[java.lang.Number::intValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::hashCode()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::replaceAll(java.lang.String,java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::equals(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::previousIndex()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::equals([B,[B)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::get(int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::size()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::containsValue(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::contains(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::indexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::listIterator()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Runnable[java.lang.Runnable::run()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getBytes(int,int,[B,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::add(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([I,int,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::remove()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::atan2(double,double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::asList([I)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::values()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::trim()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::longValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::toRadians(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::copyValueOf([C,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::abs(float)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::substring(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::isEmpty()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.Enum::ordinal()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::isNaN(double)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::split(java.lang.String,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Enum[java.lang.Enum::name()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Float[java.lang.Float::_isSame(float,float)].JML model_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Long[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String([C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::asList([Ljava.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.ArrayList::ArrayList(java.util.Collection)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::Throwable(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::lastIndexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::add(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::contains(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::addAll(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print([C)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf([C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::indexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::hasNext()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::iterator()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::set(int,java.lang.Object)].JML exceptional_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::add(java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.Iterator::remove()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::listIterator()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Float[java.lang.Float::_isNaN(float)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::signum(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::pow(double,double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::max(float,float)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([J,int,int,long)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.lang.Number::byteValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.Enum::ordinal()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::getInteger(java.lang.String,java.lang.Integer)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::pop()].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::abs(double)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.Annotation[java.lang.annotation.Annotation::hashCode()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::concat(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([S,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toString()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::get(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([J,long)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([F,int,int,float)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::listIterator()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getChars(int,int,[C,int)].JML exceptional_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([C,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([I,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::print(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(boolean)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getBytes()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::add(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::highestOneBit(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(java.lang.Object)].JML normal_behavior operation contract.2</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::contains(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::entrySet()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.lang.Number::longValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.lang.Number::shortValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::copyValueOf([C,int,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::max(double,double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::remove()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::contains(java.lang.String)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::hasNext()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Iterator[java.util.Iterator::remove()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::add(int,java.lang.Object)].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::size()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Float[java.lang.Float::_isSame(float,float)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.ArrayList::ArrayList()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::contains(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::hashCode()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.System[java.lang.System::arraycopy(java.lang.Object,int,java.lang.Object,int,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::size()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::add(int,java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::set(int,java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([B,byte)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String([C)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([Z,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::listIterator()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::reverse(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::addAll(int,java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Date[java.util.Date::Date()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::next()].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::pop()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::containsKey(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::isNaN(double)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::getInteger(java.lang.String,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::substring(int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::length()].JML normal_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::toString(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::size()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::endsWith(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::replace(char,char)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::decode(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::add(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::listIterator(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toLowerCase()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::add(java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::iterator()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::get(int)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::abs(long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::equals(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayIndexOutOfBoundsException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([F,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.Iterator::hasNext()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Enum[java.lang.Enum::valueOf(java.lang.Class,java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf([C,int,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::substring(int,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::isEmpty()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([B,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::compareToIgnoreCase(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::indexOf(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([D,double)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::asin(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::_isNaN(double)].JML model_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::get(int)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::length()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.annotation.ElementType::name()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.ArrayList::ArrayList(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::startsWith(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::toString(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::exp(double)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::get(int)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::max(long,long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([I)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::add(java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([I,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.Annotation[java.lang.annotation.Annotation::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::set(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::addAll(java.util.Collection)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::toOctalString(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::contains(java.lang.String)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::concat(java.lang.String)].JML normal_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::addAll(int,java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Iterator[java.util.Iterator::hasNext()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::indexOf(java.lang.String,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.LinkedList::LinkedList(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::hasPrevious()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::listIterator()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::nextIndex()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::keySet()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::length()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::size()].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::RecursiveNode(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::_isSame(double,double)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::parseInt(java.lang.String,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.LinkedList::toString()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::remove(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::values()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(java.lang.String,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.annotation.RetentionPolicy::valueOf(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::asList(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.System[java.lang.System::exit(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::parseInt(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::contains(java.lang.String)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Enum[java.lang.Enum::ordinal()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[KeYList::newNode(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([J,int,int)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Number[java.lang.Number::shortValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::keySet()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::isEmpty()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::add(java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::equals(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::size()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::codePointBefore(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::addAll(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::println([C)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getBytes()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.ElementType[java.lang.annotation.ElementType::values()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::floorMod(int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IllegalArgumentException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::trim()].JML normal_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::sin(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::lastIndexOf(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::addAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::clear()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::isEmpty()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.AssertionError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::get(int)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::abs(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::intValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::nextIndex()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::min(double,double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ClassCastException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::Throwable(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String([C,int,int)].JML exceptional_behavior operation contract.1</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::get(int)].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(long)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::add(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::add(java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::equals([J,[J)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::toArray()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::contains(java.lang.String)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.Annotation[java.lang.annotation.Annotation::annotationType()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Set::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.Target[java.lang.annotation.Target::value()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.Iterator::next()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::next()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.math.BigInteger::mod(java.math.BigInteger)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(java.lang.StringBuffer)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::next()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::size()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::regionMatches(int,java.lang.String,int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::removeAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.System[java.lang.System::arraycopy(java.lang.Object,int,java.lang.Object,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::offsetByCodePoints(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::indexOf(int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::isEmpty()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::iterator()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::Throwable()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::contains(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Number[java.lang.Number::byteValue()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::compareTo(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([B)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Throwable[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::endsWith(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ExceptionInInitializerError[java.lang.ExceptionInInitializerError::getCause()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::addAll(int,java.util.Collection)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::isSimple()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.StringBuffer[java.lang.StringBuffer::append(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([I,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Enum[java.lang.Enum::getDeclaringClass()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::listIterator()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.CloneNotSupportedException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::retainAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.NullPointerException::NullPointerException(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(java.lang.Object)].JML normal_behavior operation contract.4</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::byteValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::concat(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::isEmpty()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::lastIndexOf(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::equalsIgnoreCase(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::indexOf(java.lang.String,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::putAll(java.util.Map)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.annotation.RetentionPolicy::name()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::previousIndex()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::toBinaryString(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.math.BigInteger[java.math.BigInteger::compareTo(java.math.BigInteger)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::tan(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf([C,int,int)].JML exceptional_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.io.PrintStream[java.io.PrintStream::printf(java.lang.String,[Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.List::add(int,java.lang.Object)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Enum[java.lang.Comparable::compareTo(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([F,float)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::isEmpty()].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf([C,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.List::get(int)].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::compareTo(java.lang.Integer)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::put(java.lang.Object,java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Exception[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NoClassDefFoundError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::getChars(int,int,[C,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::toCharArray()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([D,int,int,double)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::isEmpty()].Non-interference contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIterator[java.util.ListIterator::set(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::hashCode()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::lowestOneBit(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOfRange([C,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::equals([I,[I)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(boolean)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::size()].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::pop()].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ListIteratorImpl[java.util.ListIterator::previous()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::getInteger(java.lang.String)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::acos(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.List::subList(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Map[java.util.Map::get(java.lang.Object)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(java.lang.Object)].JML normal_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.util.Collection::addAll(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::min(float,float)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.ArrayList[java.lang.Iterable::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::entrySet()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([S)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::contains(java.lang.String)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract List[List::size()].JML accessible clause.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::shortValue()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::copyValueOf([C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.IndexOutOfBoundsException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::regionMatches(boolean,int,java.lang.String,int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::copyValueOf([C,int,int)].JML exceptional_behavior operation contract.1</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Error[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::numberOfTrailingZeros(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::copyOf([J,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.OutOfMemoryError[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::format(java.lang.String,[Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::getLocalizedMessage()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NumberFormatException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::addAll(java.util.Collection)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract KeYList[List::size()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NegativeArraySizeException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::valueOf(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::isEmpty()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedHashMap[java.util.Map::putAll(java.util.Map)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract UniverseList[List::get(int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Double[java.lang.Double::_isSame(double,double)].JML model_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Math[java.lang.Math::cos(double)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.io.IOException[java.lang.Throwable::getCause()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::numberOfLeadingZeros(int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Set[java.util.Collection::containsAll(java.util.Collection)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::fill([Z,boolean)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::startsWith(java.lang.String,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.NullPointerException[java.lang.Throwable::getMessage()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArrayStoreException[java.lang.Throwable::printStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::sort([C,int,int)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Integer[java.lang.Integer::rotateLeft(int,int)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.ArithmeticException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Arrays[java.util.Arrays::asList([C)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.Float[java.lang.Float::isNaN(float)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.InterruptedException[java.lang.Throwable::toString()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.LinkedList[java.util.Collection::toArray([Ljava.lang.Object)].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.RuntimeException[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.VirtualMachineError[java.lang.Throwable::initCause(java.lang.Throwable)].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.Collection[java.util.Collection::addAll(java.util.Collection)].Non-interference contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveNode[RecursiveNode::isSimple()].JML accessible clause.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.LinkageError[java.lang.Throwable::fillInStackTrace()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::String([C,int,int)].JML exceptional_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.util.List[java.util.Collection::iterator()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::valueOf(long)].JML behavior operation contract.0</span>
+<span>[   Warning   ] No proof found for contract RecursiveList[List::pop()].JML normal_behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.annotation.RetentionPolicy[java.lang.annotation.RetentionPolicy::values()].JML behavior operation contract.0</span>
+<span>[    Debug    ] Ignoring internal contract java.lang.String[java.lang.String::compareTo(java.lang.String)].JML exceptional_behavior operation contract.0</span>
+<span>Running settings checker ...</span>
+<span>[    Debug    ] Reference settings (id 0) are: {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[    Debug    ] These settings already exist (with id 0): {initialisation=initialisation:disableStaticInitialisation, wdChecks=wdChecks:off, reach=reach:on, moreSeqRules=moreSeqRules:off, finalFields=finalFields:immutable, sequences=sequences:on, Strings=Strings:on, methodExpansion=methodExpansion:modularOnly, mergeGenerateIsWeakeningGoal=mergeGenerateIsWeakeningGoal:off, runtimeExceptions=runtimeExceptions:ban, wdOperator=wdOperator:L, JavaCard=JavaCard:off, integerSimplificationRules=integerSimplificationRules:full, floatRules=floatRules:strictfpOnly, permissions=permissions:off, modelFields=modelFields:showSatisfiability, javaLoopTreatment=javaLoopTreatment:efficient, assertions=assertions:on, bigint=bigint:on, intRules=intRules:arithmeticSemanticsIgnoringOF, programRules=programRules:Java, soundDefaultContracts=soundDefaultContracts:on}</span>
+<span>[ Information ] All settings are consistent!</span>
+<span>[ Information ] Settings check completed!</span>
+<span>Running replay checker ...</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::isSimple()].JML accessible clause.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::UniverseNode(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::get(int)].JML accessible clause.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::lemma()].JML model_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::pop()].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>[ Information ] Starting replay of proof UniverseNode[UniverseNode::isSimple()].JML normal_behavior operation contract.0</span>
+<span>[ Information ] ... successful (proof is closed)!</span>
+<span>Running dependency checker ...</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[   Warning   ] No saved modality information was found! Assuming "diamond" (incomplete for box contracts)!</span>
+<span>[ Information ] No illegal dependencies found.</span>
+<span>[    Debug    ] Searching for unproven dependencies ...</span>
+<span>[ Information ] Proof is closed and has no unproven dependencies: UniverseNode[UniverseNode::isSimple()].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof is closed and has no unproven dependencies: UniverseNode[UniverseNode::UniverseNode(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[ Information ] Proof is closed and has no unproven dependencies: UniverseNode[UniverseNode::isSimple()].JML accessible clause.0</span>
+<span>[ Information ] Proof is closed and has no unproven dependencies: UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</span>
+<span>[ Information ] Proof is closed and has no unproven dependencies: UniverseNode[UniverseNode::lemma()].JML model_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::add(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::get(int)].JML accessible clause.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::pop()].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0</span>
+<span>[   Warning   ] Unproven dependencies found for proof UniverseNode[UniverseNode::contains(java.lang.Object)].JML accessible clause.0</span>
+<span>[ Information ] Unproven dependencies found in bundle!</span>
+<span>[ Information ] Dependency checks completed!</span>
+<span>All checks done!</span>
+<span>Global result: OPEN</span>
+<span>All checks completed!</span>
+<span>Generating html report ...</span>
+            </div>
+        </li>
+    </ul>
+
+</div>
+
+<div id="files" class="tabcontent">
+    <h3>Files found inside proof bundle:</h3>
+	<ul id="fileTree">
+	    <li>
+	        <span class="caret">KeY_PM_unzip3138729814689723921</span>
+	        <ul class="nested active">
+	            <ul id="fileTree">
+	                <li>
+	                    <span class="caret">src</span>
+	                    <ul class="nested active">
+	                        <ul id="fileTree">
+	                            <li>
+	                                <span class="caret">qual</span>
+	                                <ul class="nested active">
+	                                    <ul id="fileTree">
+	                                        <li>
+	                                            Any.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            Bottom.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            Payload.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            Peer.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            Rep.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            RepOnly.java
+	                                        </li>
+	                                    </ul><ul id="fileTree">
+	                                        <li>
+	                                            Self.java
+	                                        </li>
+	                                    </ul>
+	                                </ul>
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                KeYList.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                KeYNode.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                List.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                RecursiveList.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                RecursiveNode.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                UniverseList.java
+	                            </li>
+	                        </ul><ul id="fileTree">
+	                            <li>
+	                                UniverseNode.java
+	                            </li>
+	                        </ul>
+	                    </ul>
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__UniverseNode(java.lang.Object)).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__add(java.lang.Object)).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__contains(java.lang.Object)).JML accessible clause.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__contains(java.lang.Object)).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__get(int)).JML accessible clause.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__get(int)).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__isSimple()).JML accessible clause.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__isSimple()).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__lemma()).JML model_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__pop()).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(UniverseNode__set(int,java.lang.Object)).JML normal_behavior operation contract.0.proof
+	                </li>
+	            </ul><ul id="fileTree">
+	                <li>
+	                    UniverseNode(java.lang.Object___inv_()).JML accessible clause.0.proof
+	                </li>
+	            </ul>
+	        </ul>
+	    </li>
+	</ul>
+</div>
+
+<div id="contracts" class="tabcontent">
+    <h3>Contracts with proof inside bundle:</h3>
+    <table id="contractTable">
+        <thead class="tableHead">
+        <tr>
+            <th rowspan="3" class="clickable" onclick="sortTable('contractTable', 0, 3)">Contract</th>
+            <th rowspan="3" class="clickable" onclick="sortTable('contractTable', 1, 3)">Source File</th>
+            <th colspan="7" style="text-align:center;">Proof</th>
+        </tr>
+        <tr>
+            <th rowspan="2">File</th>
+            <th rowspan="2" class="clickable" onclick="sortTable('contractTable', 3, 3)">Settings ID</th>
+            <th colspan="4" style="text-align:center;">Status</th>
+            <th rowspan="2">Statistics</th>
+        </tr>
+        <tr>
+            <th>loaded</th>
+            <th>replayed</th>
+            <th>state</th>
+            <th>dependencies</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::isSimple<br>
+                    type: JML accessible clause 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__isSimple()).JML accessible clause.0.proof"> UniverseNode(UniverseNode__isSimple()).JML accessible clause.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>✔</td>
+                <td>
+                    Nodes: 105 <br>  
+                    Interactive Steps: 0 <br>
+                    Automode Time: 70 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::UniverseNode<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__UniverseNode(java.lang.Object)).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__UniverseNode(java.lang.Object)).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>✔</td>
+                <td>
+                    Nodes: 824 <br>  
+                    Interactive Steps: 0 <br>
+                    Automode Time: 1079 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: java.lang.Object::&lt;inv&gt;<br>
+                    type: JML accessible clause 0 for java.lang.Object
+
+                </td>
+                <td><div title="jar:file:/home/boby/Dev/java/key/key.core/build/libs/key.core-2.12.4-dev.jar!/de/uka/ilkd/key/java/JavaRedux/java/lang/Object.java"> Object.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(java.lang.Object___inv_()).JML accessible clause.0.proof"> UniverseNode(java.lang.Object___inv_()).JML accessible clause.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>✔</td>
+                <td>
+                    Nodes: 337 <br>  
+                    Interactive Steps: 1 <br>
+                    Automode Time: 509 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::add<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__add(java.lang.Object)).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__add(java.lang.Object)).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 7819 <br>  
+                    Interactive Steps: 13 <br>
+                    Automode Time: 36362 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::get<br>
+                    type: JML accessible clause 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__get(int)).JML accessible clause.0.proof"> UniverseNode(UniverseNode__get(int)).JML accessible clause.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 9743 <br>  
+                    Interactive Steps: 2 <br>
+                    Automode Time: 10327 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::contains<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__contains(java.lang.Object)).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__contains(java.lang.Object)).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 3444 <br>  
+                    Interactive Steps: 15 <br>
+                    Automode Time: 13691 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::lemma<br>
+                    type: JML model_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__lemma()).JML model_behavior operation contract.0.proof"> UniverseNode(UniverseNode__lemma()).JML model_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>✔</td>
+                <td>
+                    Nodes: 5 <br>  
+                    Interactive Steps: 0 <br>
+                    Automode Time: 9 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::get<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__get(int)).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__get(int)).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 713 <br>  
+                    Interactive Steps: 0 <br>
+                    Automode Time: 664 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::pop<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__pop()).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__pop()).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 31918 <br>  
+                    Interactive Steps: 85 <br>
+                    Automode Time: 93897 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::set<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__set(int,java.lang.Object)).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__set(int,java.lang.Object)).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 6636 <br>  
+                    Interactive Steps: 85 <br>
+                    Automode Time: 62314 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::contains<br>
+                    type: JML accessible clause 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__contains(java.lang.Object)).JML accessible clause.0.proof"> UniverseNode(UniverseNode__contains(java.lang.Object)).JML accessible clause.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>open dep.</td>
+                <td>
+                    Nodes: 4221 <br>  
+                    Interactive Steps: 6 <br>
+                    Automode Time: 3803 ms
+                </td>
+            </tr>
+            <tr class="blue">
+                <td>
+                    class: UniverseNode<br>
+                    target: UniverseNode::isSimple<br>
+                    type: JML normal_behavior operation contract 0
+
+                </td>
+                <td><div title="file:/tmp/KeY_PM_unzip3138729814689723921/src/UniverseNode.java"> UniverseNode.java </div></td>
+                <td><div title="/tmp/KeY_PM_unzip3138729814689723921/UniverseNode(UniverseNode__isSimple()).JML normal_behavior operation contract.0.proof"> UniverseNode(UniverseNode__isSimple()).JML normal_behavior operation contract.0.proof</div></td> 
+                <td><a href="#settings-0">#00</a></td>
+                <td>✔</td>
+                <td>✔</td>
+                <td>closed</td>
+                <td>✔</td>
+                <td>
+                    Nodes: 61 <br>  
+                    Interactive Steps: 0 <br>
+                    Automode Time: 53 ms
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <h3>Contracts declared inside bundle without proof:</h3>
+    <table id="prooflessTable">
+        <thead class="tableHead">
+        <tr>
+            <th class="clickable" onclick="sortTable('prooflessTable', 0, 1)">Contract</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr class="blue">
+                        <td>class: List<br>
+            target: java.lang.Object::&lt;inv&gt;<br>
+            type: JML accessible clause 0 for java.lang.Object
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::pop<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::get<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::set<br>
+            type: JML exceptional_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::set<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::contains<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::pop<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::get<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::set<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::set<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::add<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::contains<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::RecursiveList<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::add<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::pop<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::set<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::add<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::get<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::UniverseList<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::add<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::set<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::size<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::get<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::size<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::pop<br>
+            type: JML exceptional_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::RecursiveNode<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::get<br>
+            type: JML exceptional_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::KeYList<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::pop<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::size<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::get<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: java.lang.Object::&lt;inv&gt;<br>
+            type: JML accessible clause 0 for java.lang.Object
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::contains<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::get<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::size<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::get<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: java.lang.Object::&lt;inv&gt;<br>
+            type: JML accessible clause 0 for java.lang.Object
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::contains<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::get<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::contains<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::newNode<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::size<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::get<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::set<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::contains<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::get<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::isSimple<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::contains<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::pop<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::pop<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::set<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: UniverseList<br>
+            target: UniverseList::contains<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::size<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::set<br>
+            type: JML exceptional_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: KeYList<br>
+            target: KeYList::pop<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::isSimple<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::get<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::size<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::add<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::get<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: java.lang.Object::&lt;inv&gt;<br>
+            type: JML accessible clause 0 for java.lang.Object
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::get<br>
+            type: JML accessible clause 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: java.lang.Object::&lt;inv&gt;<br>
+            type: JML accessible clause 0 for java.lang.Object
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::pop<br>
+            type: JML normal_behavior operation contract 0 for List
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: List<br>
+            target: List::size<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveNode<br>
+            target: RecursiveNode::contains<br>
+            type: JML normal_behavior operation contract 0
+            </td>
+                    </tr><tr class="blue">
+                        <td>class: RecursiveList<br>
+            target: RecursiveList::contains<br>
+            type: JML accessible clause 0 for List
+            </td>
+                    </tr>
+        </tbody>
+    </table>
+    <h3>Settings comparison:</h3>
+    <table>
+        <thead class="tableHead">
+        <tr>
+            <th>ID</th>
+            <th>JavaCard</th>
+            <th>Strings</th>
+            <th>assertions</th>
+            <th>bigint</th>
+            <th>finalFields</th>
+            <th>floatRules</th>
+            <th>initialisation</th>
+            <th>intRules</th>
+            <th>integerSimplificationRules</th>
+            <th>javaLoopTreatment</th>
+            <th>mergeGenerateIsWeakeningGoal</th>
+            <th>methodExpansion</th>
+            <th>modelFields</th>
+            <th>moreSeqRules</th>
+            <th>permissions</th>
+            <th>programRules</th>
+            <th>reach</th>
+            <th>runtimeExceptions</th>
+            <th>sequences</th>
+            <th>soundDefaultContracts</th>
+            <th>wdChecks</th>
+            <th>wdOperator</th>
+
+        </tr>
+        </thead>
+        <tbody>
+            <tr id="settings-0" class="blue">
+                <td>#00</td>
+                <td>off</td>
+                <td>on</td>
+                <td>on</td>
+                <td>on</td>
+                <td>immutable</td>
+                <td>strictfpOnly</td>
+                <td>disableStaticInitialisation</td>
+                <td>arithmeticSemanticsIgnoringOF</td>
+                <td>full</td>
+                <td>efficient</td>
+                <td>off</td>
+                <td>modularOnly</td>
+                <td>showSatisfiability</td>
+                <td>off</td>
+                <td>off</td>
+                <td>Java</td>
+                <td>on</td>
+                <td>ban</td>
+                <td>on</td>
+                <td>on</td>
+                <td>off</td>
+                <td>L</td>
+
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div id="dependencies" class="tabcontent">
+    <h3>Dependencies between contracts:</h3>
+        <table id="depTable">
+            <thead class="tableHead">
+            <tr>
+                <th class="clickable" onclick="sortTable('depTable', 0, 1)">Proof</th>
+                <th class="clickable" onclick="sortTable('depTable', 1, 1)">SCC</th>
+                <th></th>
+                <th>Dependencies</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 2),60%,90%);">UniverseNode[UniverseNode::contains(java.lang.Object)].JML accessible clause.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 2),60%,90%);">#02 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0<br>UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 4),60%,90%);">UniverseNode[UniverseNode::get(int)].JML accessible clause.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 4),60%,90%);">#04 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0<br>UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 0),60%,90%);">UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 0),60%,90%);">#00 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::contains(java.lang.Object)].JML normal_behavior operation contract.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 5),60%,90%);">UniverseNode[UniverseNode::isSimple()].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 5),60%,90%);">#05 (legal)</td>
+                    <td>&#10230;</td>
+                    <td></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 6),60%,90%);">UniverseNode[UniverseNode::pop()].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 6),60%,90%);">#06 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::isSimple()].JML normal_behavior operation contract.0<br>UniverseNode[UniverseNode::pop()].JML normal_behavior operation contract.0<br>UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 7),60%,90%);">UniverseNode[UniverseNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 7),60%,90%);">#07 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::set(int,java.lang.Object)].JML normal_behavior operation contract.0<br>UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 9),60%,90%);">UniverseNode[UniverseNode::add(java.lang.Object)].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 9),60%,90%);">#09 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::add(java.lang.Object)].JML normal_behavior operation contract.0<br>UniverseNode[UniverseNode::UniverseNode(java.lang.Object)].JML normal_behavior operation contract.0<br>UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 3),60%,90%);">UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 3),60%,90%);">#03 (legal)</td>
+                    <td>&#10230;</td>
+                    <td>UniverseNode[UniverseNode::get(int)].JML normal_behavior operation contract.0<br></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 8),60%,90%);">UniverseNode[UniverseNode::UniverseNode(java.lang.Object)].JML normal_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 8),60%,90%);">#08 (legal)</td>
+                    <td>&#10230;</td>
+                    <td></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 10),60%,90%);">UniverseNode[UniverseNode::isSimple()].JML accessible clause.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 10),60%,90%);">#10 (legal)</td>
+                    <td>&#10230;</td>
+                    <td></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 1),60%,90%);">UniverseNode[java.lang.Object::&lt;inv&gt;()].JML accessible clause.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 1),60%,90%);">#01 (legal)</td>
+                    <td>&#10230;</td>
+                    <td></td>
+                </tr><tr class="blue">
+                    <td style="background-color:hsl(calc(360/12 * 11),60%,90%);">UniverseNode[UniverseNode::lemma()].JML model_behavior operation contract.0</td>
+                    <td style="background-color:hsl(calc(360/12 * 11),60%,90%);">#11 (legal)</td>
+                    <td>&#10230;</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- make sure the table is sorted by SCC initially for a nice view -->
+        <script type="text/javascript">
+            sortTable('depTable', 1, 1);
+        </script>
+
+</div>
+
+<script type="text/javascript">
+// make the filetree foldable/expandable
+let toggler = document.getElementsByClassName("caret");
+for (let i = 0; i < toggler.length; i++) {
+	toggler[i].addEventListener("click", function() {
+		this.parentElement.querySelector(".nested").classList.toggle("active");
+		this.classList.toggle("caret-down");
+	});
+}
+
+// ensure that the overview tab is opened when the file is loaded
+document.getElementById("defaultOpen").click()
+</script>
+
+</body>

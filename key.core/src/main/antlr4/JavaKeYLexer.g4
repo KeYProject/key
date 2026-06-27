@@ -55,6 +55,9 @@ NEW_DEPENDING_ON: '\\newDependingOn';
 NEW_LOCAL_VARS: '\\newLocalVars';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
+HAS_ANNOTATION : '\\hasAnnotation';
+ADD_ANNOTATION : '\\addAnnotation';
+REMOVE_ANNOTATION : '\\removeAnnotation';
 // label occurs again for character `!'
 NOTFREEIN : '\\notFreeIn';
 STATIC : '\\static';

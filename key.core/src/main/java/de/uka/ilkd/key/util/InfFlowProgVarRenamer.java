@@ -141,14 +141,14 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         if (pv instanceof LocationVariable lv) {
             if (lv.getKeYJavaType() != null) {
                 return new LocationVariable(new ProgramElementName(newName.toString()),
-                    lv.getKeYJavaType(),
+                    lv.getTypeReference(),
                     lv.getContainerType(), lv.isStatic(), lv.isModel());
             } else {
                 return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
             }
         } else if (pv instanceof ProgramConstant pc) {
             return new ProgramConstant(new ProgramElementName(newName.toString()),
-                pc.getKeYJavaType(),
+                pc.getTypeReference(),
                 pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
         } else {
             throw new IllegalArgumentException("Unknown type for pv: " + pv);

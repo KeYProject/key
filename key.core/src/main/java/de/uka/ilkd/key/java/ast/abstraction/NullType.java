@@ -198,7 +198,6 @@ public class NullType implements ClassType {
         return null;
     }
 
-
     /**
      * returns the default value of the given type according to JLS Sect. 4.5.5
      *

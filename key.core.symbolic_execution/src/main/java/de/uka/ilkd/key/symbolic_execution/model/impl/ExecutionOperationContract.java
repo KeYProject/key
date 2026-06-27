@@ -110,7 +110,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             if (contract.hasSelfVar()) {
                 if (inst.pm().isConstructor()) {
                     selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(),
-                        inst.staticType(), services);
+                        inst.staticType().getKeYJavaType(), services);
                     if (selfTerm == null) {
                         throw new ProofInputException(
                             "Can't find self term, implementation of UseOperationContractRule might has changed!");

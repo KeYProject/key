@@ -6,7 +6,7 @@ package de.uka.ilkd.key.informationflow.proof.init;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -86,12 +86,10 @@ public class StateVars {
         paddedTermList = allTerms;
     }
 
-
     public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
             JTerm heap, JTerm mbyAtPre) {
         this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
-
 
     private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list, JTerm t) {
         if (t != null) {
@@ -100,7 +98,6 @@ public class StateVars {
             return list;
         }
     }
-
 
     private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list,
             ImmutableList<JTerm> list2) {
@@ -111,17 +108,14 @@ public class StateVars {
         return result;
     }
 
-
     public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm heap) {
         this(self, guard, localVars, null, null, heap, null);
     }
-
 
     public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
             JTerm exception, JTerm heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
-
 
     public StateVars(@Nullable JTerm self, ImmutableList<JTerm> localVars,
             @Nullable JTerm result, @Nullable JTerm exception,
@@ -129,11 +123,9 @@ public class StateVars {
         this(self, localVars, result, exception, heap, null);
     }
 
-
     public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm heap) {
         this(self, localVars, null, null, heap);
     }
-
 
     public StateVars(StateVars orig, String postfix, Services services) {
         this(copyVariable(orig.self, postfix, services),
@@ -145,7 +137,6 @@ public class StateVars {
             copyFunction(orig.mbyAtPre, postfix, services));
     }
 
-
     private static ImmutableList<JTerm> copyVariables(ImmutableList<JTerm> ts, String postfix,
             Services services) {
         ImmutableList<JTerm> result = ImmutableSLList.nil();
@@ -154,7 +145,6 @@ public class StateVars {
         }
         return result;
     }
-
 
     private static JTerm copyVariable(JTerm t, String postfix, Services services) {
         if (t != null) {
@@ -167,7 +157,6 @@ public class StateVars {
             return null;
         }
     }
-
 
     private static JTerm newVariable(JTerm t, String name, Services services) {
         if (t == null) {
@@ -185,7 +174,6 @@ public class StateVars {
         return tb.var(newVar);
     }
 
-
     private static JTerm copyHeapSymbol(JTerm t, String postfix, Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
@@ -197,7 +185,6 @@ public class StateVars {
             return null;
         }
     }
-
 
     private static JTerm newHeapSymbol(JTerm t, String name, Services services) {
         if (t == null) {
@@ -216,7 +203,6 @@ public class StateVars {
         }
     }
 
-
     private static JTerm newFunction(JTerm t, String name, Services services) {
         if (t == null) {
             return null;
@@ -226,7 +212,6 @@ public class StateVars {
         register(newFunc, services);
         return tb.func(newFunc);
     }
-
 
     private static JTerm copyFunction(JTerm t, String postfix, Services services) {
         if (t != null) {
@@ -240,32 +225,29 @@ public class StateVars {
         }
     }
 
-
-    public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
+    public static StateVars buildMethodContractPreVars(IProgramMethod pm, TypeReference typeRef,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
             new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
-        return new StateVars(buildSelfVar(services, pm, kjt, ""), buildParamVars(services, "", pm),
+        return new StateVars(buildSelfVar(services, pm, typeRef, ""),
+            buildParamVars(services, "", pm),
             buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
             buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
     }
 
-
     public static StateVars buildMethodContractPostVars(StateVars preVars, IProgramMethod pm,
-            KeYJavaType kjt, Services services) {
+            TypeReference typeRef, Services services) {
         final String postfix = "AtPost";
         // preVars.localVars: no local out variables
-        return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
+        return new StateVars(buildSelfVar(services, pm, typeRef, postfix), preVars.localVars,
             buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
             buildHeapFunc(postfix, new ImmutableArray<>(), services), preVars.mbyAtPre);
     }
-
 
     public static StateVars buildInfFlowPreVars(StateVars origPreVars, String postfix,
             Services services) {
         return new StateVars(origPreVars, postfix, services);
     }
-
 
     public static StateVars buildInfFlowPostVars(StateVars origPreVars, StateVars origPostVars,
             StateVars preVars, String postfix, Services services) {
@@ -297,18 +279,16 @@ public class StateVars {
         return new StateVars(self, guard, localPostVars, result, exception, heap, mbyAtPre);
     }
 
-
-    private static JTerm buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
+    private static JTerm buildSelfVar(Services services, IProgramMethod pm, TypeReference typeRef,
             String postfix) {
         if (pm.isStatic()) {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        JTerm selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
+        JTerm selfVar = tb.var(tb.selfVar(pm, typeRef, true, postfix));
         register(selfVar.op(ProgramVariable.class), services);
         return selfVar;
     }
-
 
     private static ImmutableList<JTerm> buildParamVars(Services services, String postfix,
             IProgramMethod pm) {
@@ -317,7 +297,6 @@ public class StateVars {
         register(ops(paramVars, ProgramVariable.class), services);
         return paramVars;
     }
-
 
     private static JTerm buildResultVar(IProgramMethod pm, Services services, String postfix) {
         if (pm.isVoid() || pm.isConstructor()) {
@@ -328,7 +307,6 @@ public class StateVars {
         register(resultVar.op(ProgramVariable.class), services);
         return resultVar;
     }
-
 
     private static JTerm buildHeapFunc(String postfix, ImmutableArray<TermLabel> labels,
             Services services) {
@@ -345,14 +323,12 @@ public class StateVars {
         }
     }
 
-
     private static JTerm buildExceptionVar(Services services, String postfix, IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
         JTerm excVar = tb.var(tb.excVar("exc" + postfix, pm, true));
         register(excVar.op(ProgramVariable.class), services);
         return excVar;
     }
-
 
     private static JTerm buildMbyVar(String postfix, Services services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -363,7 +339,6 @@ public class StateVars {
         return tb.func(mbyAtPreFunc);
     }
 
-
     static void register(ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
@@ -371,13 +346,11 @@ public class StateVars {
         }
     }
 
-
     static void register(ImmutableList<ProgramVariable> pvs, Services services) {
         for (ProgramVariable pv : pvs) {
             register(pv, services);
         }
     }
-
 
     static void register(Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
@@ -387,7 +360,6 @@ public class StateVars {
         }
     }
 
-
     static <T> ImmutableList<T> ops(ImmutableList<JTerm> terms, Class<T> opClass)
             throws IllegalArgumentException {
         ImmutableList<T> ops = ImmutableSLList.nil();
@@ -396,7 +368,6 @@ public class StateVars {
         }
         return ops;
     }
-
 
     @Override
     public String toString() {

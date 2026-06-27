@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -244,7 +245,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if (!pm.isVoid()) {
                     resultVar = new LocationVariable(
                         new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")),
-                        pm.getReturnType());
+                        new TypeRef(pm.getReturnType()));
                 }
             }
             if (resultVar != null) {

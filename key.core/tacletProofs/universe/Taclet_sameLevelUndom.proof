@@ -1,0 +1,363 @@
+\profile "Java Profile";
+
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:off",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:safe",
+        "bigint" : "bigint:on",
+        "finalFields" : "finalFields:immutable",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:off",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on",
+        "soundDefaultContracts" : "soundDefaultContracts:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     },
+    "Labels" : { 
+        "UseOriginLabels" : true
+     },
+    "NewSMT" : { 
+        
+     },
+    "SMTSettings" : { 
+        "SelectedTaclets" : [ 
+            
+         ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+     },
+    "Strategy" : { 
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : { 
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+         }
+     }
+ } 
+
+\proofObligation 
+// Proof-Obligation settings
+{ 
+    "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+    "name" : "sameLevelUndom"
+ }
+
+\proof {
+(keyLog "0" (keyUser "boby" ) (keyVersion "19f98e9b750147137d3ed98179e16502b6f60abf"))
+
+(autoModeTime "465")
+
+(branch "dummy ID"
+(rule "undomSymm" (formula "1") (term "0,0") (userinteraction))
+(rule "impRight" (formula "1"))
+(rule "orRight" (formula "2"))
+(rule "notLeft" (formula "1"))
+(rule "notRight" (formula "3"))
+(rule "andLeft" (formula "1"))
+(rule "undomDef" (formula "3") (userinteraction))
+(rule "andRight" (formula "3") (userinteraction))
+(branch "Case 1"
+   (rule "andRight" (formula "3") (userinteraction))
+   (branch "Case 1"
+      (rule "notRight" (formula "3") (userinteraction))
+      (rule "dominatesDef" (formula "1") (inst "n=n") (userinteraction))
+      (rule "exLeft" (formula "1") (inst "sk=n_0") (userinteraction))
+      (rule "owns2Dominates" (formula "2") (userinteraction))
+      (rule "owns2Dominates" (formula "4") (userinteraction))
+      (rule "dominatesDef" (formula "4") (inst "n=n") (userinteraction))
+      (rule "dominatesDef" (formula "2") (inst "n=n") (userinteraction))
+      (rule "exLeft" (formula "2") (inst "sk=n_1") (userinteraction))
+      (rule "exLeft" (formula "4") (inst "sk=n_2") (userinteraction))
+      (rule "dominatesDepthTransitive" (formula "1") (ifseqformula "4") (userinteraction))
+      (rule "cut" (inst "cutFormula=(add(n_2, n_0) = n_1)<<origin(\"User_Interaction @ node 195 (cut)\",\"[]\")>>") (userinteraction))
+      (branch "CUT: n_2 + n_0 = n_1 TRUE"
+         (rule "cut" (inst "cutFormula=(n_1 = Z(1(#)))<<origin(\"User_Interaction @ node 504 (cut)\",\"[]\")>>") (userinteraction))
+         (branch "CUT: n_1 = 1 TRUE"
+            (rule "cut" (inst "cutFormula=(n_2 = Z(1(#)))<<origin(\"User_Interaction @ node 542 (cut)\",\"[]\")>>") (userinteraction))
+            (branch "CUT: n_2 = 1 TRUE"
+               (rule "dominatesDepthDef" (formula "5") (inst "ov=ov") (userinteraction))
+               (rule "eqSymm" (formula "5") (term "1,2"))
+               (rule "eqSymm" (formula "5") (term "0,0,2,2"))
+               (rule "eqSymm" (formula "10"))
+               (rule "polySimp_homoEq" (formula "3"))
+               (rule "polySimp_elimSub" (formula "5") (term "2,1,0,2,2"))
+               (rule "mul_literals" (formula "5") (term "1,2,1,0,2,2"))
+               (rule "polySimp_mulComm0" (formula "3") (term "1,0"))
+               (rule "polySimp_addComm0" (formula "4") (term "2"))
+               (rule "polySimp_addComm0" (formula "5") (term "2,1,0,2,2"))
+               (rule "polySimp_addComm0" (formula "3") (term "1,1,0"))
+               (rule "polySimp_rightDist" (formula "3") (term "1,0"))
+               (rule "polySimp_mulComm0" (formula "3") (term "0,1,0"))
+               (rule "polySimp_addAssoc" (formula "3") (term "0"))
+               (rule "polySimp_addComm0" (formula "3") (term "0,0"))
+               (rule "applyEq" (formula "4") (term "1,2") (ifseqformula "1"))
+               (rule "polySimp_addComm0" (formula "4") (term "2"))
+               (rule "applyEqRigid" (formula "5") (term "0,1,2") (ifseqformula "7"))
+               (rule "eqSymm" (formula "5") (term "1,2"))
+               (rule "applyEq" (formula "3") (term "0,1,0") (ifseqformula "1"))
+               (rule "mul_literals" (formula "3") (term "1,0"))
+               (rule "polySimp_addComm1" (formula "3") (term "0"))
+               (rule "polySimp_addComm0" (formula "3") (term "0,0"))
+               (rule "applyEqRigid" (formula "8") (term "2") (ifseqformula "1"))
+               (rule "applyEqRigid" (formula "6") (term "2") (ifseqformula "2"))
+               (rule "applyEqRigid" (formula "3") (term "1,0") (ifseqformula "2"))
+               (rule "polySimp_addComm1" (formula "3") (term "0"))
+               (rule "add_literals" (formula "3") (term "0,0"))
+               (rule "add_zero_left" (formula "3") (term "0"))
+               (rule "polySimp_invertEq" (formula "3"))
+               (rule "times_zero_2" (formula "3") (term "1"))
+               (rule "polySimp_mulLiterals" (formula "3") (term "0"))
+               (rule "polySimp_elimOne" (formula "3") (term "0"))
+               (rule "applyEqRigid" (formula "5") (term "1,2,1,0,2,2") (ifseqformula "3"))
+               (rule "add_zero_right" (formula "5") (term "2,1,0,2,2"))
+               (rule "applyEq" (formula "5") (term "0,0,2") (ifseqformula "3"))
+               (rule "equal_literals" (formula "5") (term "0,2"))
+                (builtin "One Step Simplification" (formula "5"))
+               (rule "applyEq" (formula "4") (term "1,2") (ifseqformula "3"))
+               (rule "add_zero_right" (formula "4") (term "2"))
+               (rule "applyEqRigid" (formula "4") (term "0,0") (ifseqformula "3"))
+               (rule "leq_literals" (formula "4") (term "0"))
+                (builtin "One Step Simplification" (formula "4"))
+               (rule "closeFalse" (formula "4"))
+            )
+            (branch "CUT: n_2 = 1 FALSE"
+               (rule "dominatesSingleDepth" (formula "7") (inst "m=m") (userinteraction))
+               (rule "allLeft" (formula "7") (inst "t=Z(1(#))") (userinteraction))
+               (rule "dominatesDepthDef" (formula "7") (term "0") (inst "ov=ov") (userinteraction))
+                (builtin "One Step Simplification" (formula "7"))
+               (rule "leq_literals" (formula "7") (term "0,0"))
+                (builtin "One Step Simplification" (formula "7"))
+               (rule "eqSymm" (formula "12"))
+               (rule "eqSymm" (formula "7") (term "0"))
+               (rule "eqSymm" (formula "7") (term "1"))
+               (rule "replace_known_left" (formula "7") (term "0") (ifseqformula "10"))
+                (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "11")))
+               (rule "closeFalse" (formula "7"))
+            )
+         )
+         (branch "CUT: n_1 = 1 FALSE"
+            (rule "dominatesSingleDepth" (formula "4") (inst "m=m") (userinteraction))
+            (rule "allLeft" (formula "4") (inst "t=Z(1(#))") (userinteraction))
+            (rule "dominatesDepthDef" (formula "4") (term "0") (inst "ov=ov") (userinteraction))
+             (builtin "One Step Simplification" (formula "4"))
+            (rule "leq_literals" (formula "4") (term "0,0"))
+             (builtin "One Step Simplification" (formula "4"))
+            (rule "eqSymm" (formula "11"))
+            (rule "eqSymm" (formula "4") (term "1"))
+            (rule "eqSymm" (formula "4") (term "0"))
+            (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "7"))
+             (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "10")))
+            (rule "closeFalse" (formula "4"))
+         )
+      )
+      (branch "CUT: n_2 + n_0 = n_1 FALSE"
+         (rule "dominatesSingleDepth" (formula "1") (inst "m=m") (userinteraction))
+         (rule "allLeft" (formula "1") (inst "t=n_1") (userinteraction))
+         (rule "eqSymm" (formula "10"))
+         (rule "replace_known_left" (formula "1") (term "0") (ifseqformula "5"))
+          (builtin "One Step Simplification" (formula "1"))
+         (rule "polySimp_homoEq" (formula "9"))
+         (rule "polySimp_homoEq" (formula "1"))
+         (rule "polySimp_mulComm0" (formula "9") (term "1,0"))
+         (rule "polySimp_addComm0" (formula "2") (term "1,1,0"))
+         (rule "polySimp_addComm0" (formula "3") (term "2"))
+         (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+         (rule "polySimp_addComm0" (formula "9") (term "1,1,0"))
+         (rule "polySimp_addComm1" (formula "1") (term "0"))
+         (rule "polySimp_rightDist" (formula "9") (term "1,0"))
+         (rule "polySimp_mulComm0" (formula "9") (term "0,1,0"))
+         (rule "polySimp_addAssoc" (formula "9") (term "0"))
+         (rule "polySimp_addComm0" (formula "9") (term "0,0"))
+         (rule "polySimp_sepPosMonomial" (formula "1"))
+         (rule "polySimp_mulComm0" (formula "1") (term "1"))
+         (rule "polySimp_rightDist" (formula "1") (term "1"))
+         (rule "polySimp_mulLiterals" (formula "1") (term "1,1"))
+         (rule "polySimp_elimOne" (formula "1") (term "1,1"))
+         (rule "polySimp_mulComm0" (formula "1") (term "0,1"))
+         (rule "applyEq" (formula "7") (term "2") (ifseqformula "1"))
+         (rule "applyEq" (formula "3") (term "1,2") (ifseqformula "1"))
+         (rule "polySimp_addAssoc" (formula "3") (term "2"))
+         (rule "polySimp_pullOutFactor1" (formula "3") (term "0,2"))
+         (rule "add_literals" (formula "3") (term "1,0,2"))
+         (rule "times_zero_1" (formula "3") (term "0,2"))
+         (rule "add_zero_left" (formula "3") (term "2"))
+         (rule "applyEqRigid" (formula "8") (term "0,1,0") (ifseqformula "1"))
+         (rule "polySimp_pullOutFactor1" (formula "8") (term "0"))
+         (rule "add_literals" (formula "8") (term "1,0"))
+         (rule "times_zero_1" (formula "8") (term "0"))
+          (builtin "One Step Simplification" (formula "8"))
+         (rule "closeTrue" (formula "8"))
+      )
+   )
+   (branch "Case 2"
+      (rule "notRight" (formula "3") (userinteraction))
+      (rule "dominatesDef" (formula "1") (inst "n=n") (userinteraction))
+      (rule "exLeft" (formula "1") (inst "sk=n_0") (userinteraction))
+      (rule "owns2Dominates" (formula "2") (userinteraction))
+      (rule "dominatesDef" (formula "2") (inst "n=n") (userinteraction))
+      (rule "exLeft" (formula "2") (inst "sk=n_1") (userinteraction))
+      (rule "dominatesDepthTransitive" (formula "1") (ifseqformula "2") (userinteraction))
+      (rule "cut" (inst "cutFormula=(add(n_1, n_0) = Z(1(#)))<<origin(\"User_Interaction @ node 205 (cut)\",\"[]\")>>") (userinteraction))
+      (branch "CUT: n_1 + n_0 = 1 TRUE"
+         (rule "cut" (inst "cutFormula=(n_1 = Z(1(#)))<<origin(\"User_Interaction @ node 206 (cut)\",\"[]\")>>") (userinteraction))
+         (branch "CUT: n_1 = 1 TRUE"
+            (rule "applyEqRigid" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
+            (rule "cut" (inst "cutFormula=(n_0 = Z(0(#)))<<origin(\"User_Interaction @ node 417 (cut)\",\"[]\")>>") (userinteraction))
+            (branch "CUT: n_0 = 0 TRUE"
+               (rule "dominatesDepthDef" (formula "5") (inst "ov=ov") (userinteraction))
+               (rule "eqSymm" (formula "5") (term "1,2"))
+               (rule "eqSymm" (formula "5") (term "0,0,2,2"))
+               (rule "eqSymm" (formula "9"))
+               (rule "polySimp_elimSub" (formula "5") (term "2,1,0,2,2"))
+               (rule "mul_literals" (formula "5") (term "1,2,1,0,2,2"))
+               (rule "polySimp_homoEq" (formula "3"))
+               (rule "polySimp_mulComm0" (formula "3") (term "1,0"))
+               (rule "polySimp_addComm0" (formula "4") (term "2"))
+               (rule "polySimp_addComm0" (formula "5") (term "2,1,0,2,2"))
+               (rule "polySimp_rightDist" (formula "3") (term "1,0"))
+               (rule "mul_literals" (formula "3") (term "0,1,0"))
+               (rule "owns2Dominates" (formula "8"))
+               (rule "polySimp_addAssoc" (formula "3") (term "0"))
+               (rule "add_literals" (formula "3") (term "0,0"))
+               (rule "add_zero_left" (formula "3") (term "0"))
+               (rule "applyEqRigid" (formula "5") (term "1,2,1,0,2,2") (ifseqformula "1"))
+               (rule "add_zero_right" (formula "5") (term "2,1,0,2,2"))
+               (rule "applyEqRigid" (formula "3") (term "0,0") (ifseqformula "1"))
+               (rule "times_zero_2" (formula "3") (term "0"))
+                (builtin "One Step Simplification" (formula "3"))
+               (rule "true_left" (formula "3"))
+               (rule "applyEq" (formula "4") (term "0,0") (ifseqformula "1"))
+               (rule "leq_literals" (formula "4") (term "0"))
+                (builtin "One Step Simplification" (formula "4"))
+               (rule "closeFalse" (formula "4"))
+            )
+            (branch "CUT: n_0 = 0 FALSE"
+               (rule "eqSymm" (formula "9"))
+               (rule "polySimp_homoEq" (formula "2"))
+               (rule "polySimp_mulComm0" (formula "2") (term "1,0"))
+               (rule "polySimp_addComm0" (formula "3") (term "2"))
+               (rule "polySimp_rightDist" (formula "2") (term "1,0"))
+               (rule "mul_literals" (formula "2") (term "0,1,0"))
+               (rule "polySimp_addAssoc" (formula "2") (term "0"))
+               (rule "add_literals" (formula "2") (term "0,0"))
+               (rule "add_zero_left" (formula "2") (term "0"))
+               (rule "owns2Dominates" (formula "7"))
+               (rule "applyEq" (formula "3") (term "1,2") (ifseqformula "1"))
+               (rule "polySimp_addComm0" (formula "3") (term "2"))
+               (rule "applyEq" (formula "5") (term "2") (ifseqformula "1"))
+               (rule "polySimp_invertEq" (formula "2"))
+               (rule "polySimp_mulLiterals" (formula "2") (term "0"))
+               (rule "times_zero_2" (formula "2") (term "1"))
+               (rule "polySimp_elimOne" (formula "2") (term "0"))
+               (rule "close" (formula "9") (ifseqformula "2"))
+            )
+         )
+         (branch "CUT: n_1 = 1 FALSE"
+            (rule "dominatesSingleDepth" (formula "4") (inst "m=m") (userinteraction))
+            (rule "allLeft" (formula "4") (inst "t=Z(1(#))") (userinteraction))
+            (rule "dominatesDepthDef" (formula "4") (term "0") (inst "ov=ov") (userinteraction))
+             (builtin "One Step Simplification" (formula "4"))
+            (rule "leq_literals" (formula "4") (term "0,0"))
+             (builtin "One Step Simplification" (formula "4"))
+            (rule "eqSymm" (formula "10"))
+            (rule "eqSymm" (formula "4") (term "0"))
+            (rule "eqSymm" (formula "4") (term "1"))
+            (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "7"))
+             (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "9")))
+            (rule "closeFalse" (formula "4"))
+         )
+      )
+      (branch "CUT: n_1 + n_0 = 1 FALSE"
+         (rule "dominatesSingleDepth" (formula "1") (inst "m=m") (userinteraction))
+         (rule "allLeft" (formula "1") (inst "t=Z(1(#))") (userinteraction))
+         (rule "dominatesDepthDef" (formula "1") (term "0") (inst "ov=ov") (userinteraction))
+          (builtin "One Step Simplification" (formula "1"))
+         (rule "leq_literals" (formula "1") (term "0,0"))
+          (builtin "One Step Simplification" (formula "1"))
+         (rule "eqSymm" (formula "9"))
+         (rule "eqSymm" (formula "1") (term "0"))
+         (rule "replace_known_left" (formula "1") (term "0") (ifseqformula "7"))
+          (builtin "One Step Simplification" (formula "1"))
+         (rule "polySimp_homoEq" (formula "8"))
+         (rule "polySimp_homoEq" (formula "1"))
+         (rule "mul_literals" (formula "1") (term "1,0"))
+         (rule "polySimp_mulComm0" (formula "8") (term "1,0"))
+         (rule "polySimp_addComm0" (formula "2") (term "1,1,0"))
+         (rule "polySimp_addComm0" (formula "3") (term "2"))
+         (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+         (rule "polySimp_addComm0" (formula "8") (term "1,1,0"))
+         (rule "polySimp_addComm1" (formula "1") (term "0"))
+         (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+         (rule "polySimp_rightDist" (formula "8") (term "1,0"))
+         (rule "polySimp_mulComm0" (formula "8") (term "0,1,0"))
+         (rule "owns2Dominates" (formula "7"))
+         (rule "polySimp_addAssoc" (formula "9") (term "0"))
+         (rule "polySimp_sepPosMonomial" (formula "1"))
+         (rule "polySimp_mulComm0" (formula "1") (term "1"))
+         (rule "polySimp_rightDist" (formula "1") (term "1"))
+         (rule "mul_literals" (formula "1") (term "0,1"))
+         (rule "applyEqRigid" (formula "5") (term "2") (ifseqformula "1"))
+         (rule "applyEq" (formula "3") (term "1,2") (ifseqformula "1"))
+         (rule "polySimp_addAssoc" (formula "3") (term "2"))
+         (rule "polySimp_addComm0" (formula "3") (term "0,2"))
+         (rule "polySimp_pullOutFactor1b" (formula "3") (term "2"))
+         (rule "add_literals" (formula "3") (term "1,1,2"))
+         (rule "times_zero_1" (formula "3") (term "1,2"))
+         (rule "add_zero_right" (formula "3") (term "2"))
+         (rule "applyEq" (formula "9") (term "0,1,0") (ifseqformula "1"))
+         (rule "polySimp_pullOutFactor1" (formula "9") (term "0"))
+         (rule "add_literals" (formula "9") (term "1,0"))
+         (rule "times_zero_1" (formula "9") (term "0"))
+          (builtin "One Step Simplification" (formula "9"))
+         (rule "closeTrue" (formula "9"))
+      )
+   )
+)
+(branch "Case 2"
+   (rule "notRight" (formula "3"))
+   (rule "eqSymm" (formula "4"))
+   (rule "close" (formula "4") (ifseqformula "1"))
+)
+)
+}
