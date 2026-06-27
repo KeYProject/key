@@ -24,6 +24,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
+import org.key_project.util.parsing.UnterminatedModalityException;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -302,6 +304,11 @@ public final class ExceptionTools {
         // errors had a message but no location, so the GUI/console could not show the source.
         if (exc instanceof NoViableAltException nvae) {
             return Location.fromToken(nvae.getOffendingToken());
+        }
+
+        if (exc instanceof UnterminatedModalityException ume) {
+            return new Location(MiscTools.getURIFromTokenSource(ume.getSourceName()),
+                Position.fromOneZeroBased(ume.getLine(), ume.getCharPositionInLine()));
         }
 
         if (exc.getCause() != null) {
