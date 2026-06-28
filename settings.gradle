@@ -31,7 +31,6 @@ include "keyext.caching"
 include "keyext.isabelletranslation"
 
 include 'keyext.llm'
-include 'keyext.llm.api'
 
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.

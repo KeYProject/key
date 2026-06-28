@@ -3,17 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.net.URI;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.Supplier;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CMenu;
+import bibliothek.gui.dock.common.action.CRadioButton;
+import bibliothek.gui.dock.common.action.CRadioGroup;
+import com.google.gson.GsonBuilder;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -25,18 +19,23 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.proof.Proof;
-
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CMenu;
-import bibliothek.gui.dock.common.action.CRadioButton;
-import bibliothek.gui.dock.common.action.CRadioGroup;
-import com.google.gson.GsonBuilder;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.Supplier;
 
 /**
  *
@@ -46,22 +45,22 @@ import org.slf4j.LoggerFactory;
 public class LlmPrompt extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(LlmPrompt.class);
     public static final ColorSettings.ColorProperty COLOR_BG_INPUT = ColorSettings.define(
-        "llm.output.bg.input",
-        "Background color in chat of LLM answers", new Color(130, 180, 220, 255));
+            "llm.output.bg.input",
+            "Background color in chat of LLM answers", new Color(130, 180, 220, 255));
 
     public static final ColorSettings.ColorProperty COLOR_BG_ERROR =
-        ColorSettings.define("llm.output.bg.error", "Background color in chat of LLM answers",
-            new Color(255, 180, 180, 255));
+            ColorSettings.define("llm.output.bg.error", "Background color in chat of LLM answers",
+                    new Color(255, 180, 180, 255));
 
     public static final ColorSettings.ColorProperty COLOR_BG_ANSWER = ColorSettings.define(
-        "llm.output.bg.answer", "Background color in chat of LLM answers", Color.LIGHT_GRAY);
+            "llm.output.bg.answer", "Background color in chat of LLM answers", Color.LIGHT_GRAY);
 
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     private final JEditorPane txtInput = new JEditorPane();
 
     private final JPanel pOutput =
-        new JPanel(new MigLayout(new LC().fillX().debug().topToBottom().wrapAfter(1)));
+            new JPanel(new MigLayout(new LC().fillX().debug().topToBottom().wrapAfter(1)));
 
     private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
     private final SendPromptAction actionSendPrompt = new SendPromptAction();
@@ -99,8 +98,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         handle(new Exception("Test Exception"));
         handle(new GsonBuilder().create().fromJson(
-            "{\"id\":\"chatcmpl-CdLvyHhYLoKFk3F28rE6JgNJVGZHU\",\"created\":1763495142,\"model\":\"gpt-4.1-mini-2025-04-14\",\"object\":\"chat.completion\",\"system_fingerprint\":\"fp_3dcd5944f5\",\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"content\":\"Die Rayleigh-Streuung beschreibt die Streuung von Licht an kleinen Teilchen, deren Größe viel kleiner ist als die Lichtwellenlänge. Dabei wird kurzwelliges Licht (blaues und violettes) stärker gestreut als langwelliges (rotes), was z.B. den blauen Himmel erklärt. Die Intensität der Streuung ist proportional zur vierten Potenz der Frequenz des Lichts.\",\"role\":\"assistant\",\"annotations\":[]},\"provider_specific_fields\":{\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"protected_material_text\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}}],\"usage\":{\"completion_tokens\":91,\"prompt_tokens\":36,\"total_tokens\":127,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}},\"prompt_filter_results\":[{\"prompt_index\":0,\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"jailbreak\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}]}",
-            Map.class));
+                "{\"id\":\"chatcmpl-CdLvyHhYLoKFk3F28rE6JgNJVGZHU\",\"created\":1763495142,\"model\":\"gpt-4.1-mini-2025-04-14\",\"object\":\"chat.completion\",\"system_fingerprint\":\"fp_3dcd5944f5\",\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"content\":\"Die Rayleigh-Streuung beschreibt die Streuung von Licht an kleinen Teilchen, deren Größe viel kleiner ist als die Lichtwellenlänge. Dabei wird kurzwelliges Licht (blaues und violettes) stärker gestreut als langwelliges (rotes), was z.B. den blauen Himmel erklärt. Die Intensität der Streuung ist proportional zur vierten Potenz der Frequenz des Lichts.\",\"role\":\"assistant\",\"annotations\":[]},\"provider_specific_fields\":{\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"protected_material_text\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}}],\"usage\":{\"completion_tokens\":91,\"prompt_tokens\":36,\"total_tokens\":127,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}},\"prompt_filter_results\":[{\"prompt_index\":0,\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"jailbreak\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}]}",
+                Map.class));
         addInput("Input data");
 
         txtInput.addKeyListener(new KeyAdapter() {
@@ -140,7 +139,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
             tblFiles.removeAll();
             LlmSession session = LlmUtils.getSession(mediator.getSelectedProof());
             List<URI> possibleFiles =
-                new ArrayList<>(LlmUtils.getPossibleFiles(mediator.getSelectedProof()));
+                    new ArrayList<>(LlmUtils.getPossibleFiles(mediator.getSelectedProof()));
             Set<URI> selectedFiles = session.getSelectedFiles();
             possibleFiles.sort(Comparator.comparing(URI::toString));
             for (URI file : possibleFiles) {
@@ -153,8 +152,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
     }
 
     private OutputBox<String> addInput(String text) {
-        var o = addBox(new LlmPromptModel(LlmPromptModel.Kind.INPUT, text, text),
-            new RepromptAction(text));
+        var o = addBox(
+                new LlmPromptModel<>(LlmPromptModel.Kind.INPUT, text, text),
+                new RepromptAction(text));
         o.setBackground(COLOR_BG_INPUT.get());
         return o;
     }
@@ -172,8 +172,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
     private void handle(Map<String, Object> jsonResponse) {
         LOGGER.info("LLM prompt {}", jsonResponse);
         final var text =
-            ((Map<String, Object>) ((Map<String, Object>) ((List<?>) jsonResponse.get("choices"))
-                    .get(0)).get("message")).get("content").toString();
+                ((Map<String, Object>) ((Map<String, Object>) ((List<?>) jsonResponse.get("choices"))
+                        .get(0)).get("message")).get("content").toString();
         addBox(new LlmPromptModel<>(LlmPromptModel.Kind.OUTPUT, text, jsonResponse));
     }
 
@@ -201,7 +201,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
             menu.add(menuModels);
             var groupModels = new CRadioGroup();
             var llmSession =
-                LlmUtils.getSession(MainWindow.getInstance().getMediator().getSelectedProof());
+                    LlmUtils.getSession(MainWindow.getInstance().getMediator().getSelectedProof());
 
             for (var m : LlmSettings.INSTANCE.getAvailableModels()) {
                 var selected = m.equals(llmSession.getModel());
@@ -219,7 +219,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
         };
 
         var a = new DynamicCMenu("Settings", IconFactory.properties(MainWindow.TOOLBAR_ICON_SIZE),
-            supplier);
+                supplier);
         var help = HelpFacade.createHelpButton("user/LLM/");
         return List.of(help, a);
     }
@@ -261,8 +261,11 @@ public class LlmPrompt extends JPanel implements TabPanel {
             var node = MainWindow.getInstance().getMediator().getSelectedNode();
 
             LlmSession session = LlmUtils.getSession(proof);
+            LlmClientExtended.McpClient mcpClient = new BuiltInMCP();
+
             var txt = txtInput.getText();
-            LlmClient client = new LlmClient(session, new LlmContext(), txt);
+            var client = new LlmClientExtended(session, new LlmContext(), txt, mcpClient);
+            //var client = new LlmClient(session, new LlmContext(), txt);
             addInput(txt);
             txtInput.setText("");
 
