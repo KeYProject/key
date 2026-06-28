@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import com.github.javaparser.ParseProblemException;
 import org.key_project.ncore.java.NodeSteps.NodeStep;
 import org.key_project.ncore.java.PostSteps.PostStep;
 import org.key_project.ncore.java.PreSteps.PreStep;
@@ -30,7 +29,7 @@ import com.github.javaparser.utils.SourceRoot;
  */
 public class Generator implements Callable<Integer> {
     public static final Path ROOT = Paths.get("key.ncore.java/src/generated/java");
-    public static final Generator INSTANCE = new Generator();
+    private final String pathname;
 
     CompilationUnit metaModel;
 
@@ -38,50 +37,11 @@ public class Generator implements Callable<Integer> {
     List<PreStep> preSteps = new ArrayList<>(64);
     List<PostStep> postSteps = new ArrayList<>(64);
 
-    public static void main(String[] args) throws Exception {
-        try {
-            INSTANCE.call();
-        }catch (ParseProblemException ppe){
-            ppe.getProblems().forEach((it) -> System.err.format("%s: %s\n", it.getLocation(), it.getVerboseMessage()));
-            throw ppe;
-        }
+    public Generator(String pathname) {
+        this.pathname = pathname;
     }
 
-    public Generator() {
-        preSteps.add(new PreSteps.PreComputation());
-
-        addStep(NodeSteps::setPackage);
-        addStep(NodeSteps::enforceHierarchy);
-        addStep(NodeSteps::processFields);
-        addStep(NodeSteps::addAllFieldsConstructor);
-        addStep(NodeSteps::addAllWoOptFieldsConstructor);
-        addStep(NodeSteps::addCopyConstructor);
-        addStep(NodeSteps::addMatch);
-        addStep(NodeSteps::addWiths);
-        addStep(NodeSteps::addBuilder);
-
-        // weigl: this block adds the processing of
-        // PROPERTY_* accessors and Node -> Map construction
-        //addStep(NodeSteps::addOverrideConstructor);
-        //addStep(NodeSteps::addOverrideConstructor2);
-        //addStep(NodeSteps::addGetProperties);
-        //addStep(NodeSteps::processFieldsAccessor);
-
-        addStep(NodeSteps::addEquals);
-        addStep(NodeSteps::ToString);
-        addStep(NodeSteps::addHashCode);
-
-        addStep(NodeSteps::handleRoot);
-
-        postSteps.add(PostSteps::createVisitor);
-        postSteps.add(PostSteps::createArgVisitor);
-        postSteps.add(PostSteps::createVoidVisitor);
-        postSteps.add(PostSteps::createTraversalVisitor);
-        postSteps.add(PostSteps::createTraversalCopyOnDemandVisitor);
-        postSteps.add(PostSteps::createDeepCopyVisitor);
-    }
-
-    private void addStep(NodeStep nodeStep) {
+    void addStep(NodeStep nodeStep) {
         nodeSteps.add(nodeStep);
     }
 
@@ -101,8 +61,7 @@ public class Generator implements Callable<Integer> {
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_25);
 
         StaticJavaParser.setConfiguration(config);
-        metaModel = StaticJavaParser
-                .parse(new File("key.ncore.java/src/adt/java-ast.java").getAbsoluteFile());
+        metaModel = StaticJavaParser.parse(new File(pathname).getAbsoluteFile());
         Files.createDirectories(ROOT);
         SourceRoot sourceRoot = new SourceRoot(ROOT);
 
@@ -120,7 +79,7 @@ public class Generator implements Callable<Integer> {
             metaModel.addImport("java.util.*");
 
             for (var nodeStep : nodeSteps) {
-                nodeStep.applyOn((ClassOrInterfaceDeclaration) type);
+                nodeStep.applyOn(this, (ClassOrInterfaceDeclaration) type);
             }
 
             nodeUnits.add(cu);
