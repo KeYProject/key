@@ -78,26 +78,6 @@ public final class CostReuse {
 
     private CostReuse() {}
 
-    /**
-     * proof -> (taclet -> collected veto features). An ELIGIBLE taclet always has at least the
-     * top-level NonDuplicateApp veto, so an empty array is used as the INELIGIBLE sentinel
-     * (ConcurrentHashMap forbids null values).
-     * <p>
-     * The cache is keyed by PROOF FIRST and must NOT be flattened to a single global
-     * {@code taclet -> ...} map: a taclet's locality depends on the cost dispatchers in force,
-     * which
-     * differ with the taclet options, while {@link Taclet#equals} is only name + find term (it
-     * relies on name uniqueness WITHIN one taclet base). A global map would let one option set read
-     * another's verdict for a same-named but structurally different taclet. We key by proof rather
-     * than by strategy because a strategy need not depend on the proof -- the same strategy
-     * instance
-     * may be reused across proofs with different taclet options -- whereas a proof fixes exactly
-     * one
-     * option set / taclet base. Weak in the proof so the entry is released once the proof is
-     * collected; the inner map is keyed by taclet (names unique within a base).
-     */
-    private static final Map<Proof, Map<Taclet, Eligibility>> classification =
-        Collections.synchronizedMap(new WeakHashMap<>());
     /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
     private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
     /** Cached "not eligible for reuse" marker (the map forbids null values). */
@@ -122,7 +102,7 @@ public final class CostReuse {
     /**
      * @param strategy the goal's strategy; classified against its cost dispatchers (only used to
      *        obtain those -- never dereferenced beyond {@link #dispatchers})
-     * @param proof the proof, used purely as an identity cache key (see {@link #classification})
+     * @param proof the proof being worked on; supplies the per-proof classification cache
      * @param taclet the taclet whose cost is a candidate for reuse
      * @return how the taclet may reuse its cost, or {@code null} if it is not eligible at all.
      */
@@ -135,15 +115,20 @@ public final class CostReuse {
         if (disp.isEmpty()) {
             return null;
         }
-        // computeIfAbsent on the synchronizedMap briefly holds its mutex to fetch/create the inner
-        // per-proof map; the expensive classify() then runs on the (concurrent) inner map.
-        final Map<Taclet, Eligibility> perProof =
-            classification.computeIfAbsent(proof, p -> new ConcurrentHashMap<>());
-        final Eligibility e = perProof.computeIfAbsent(taclet, t -> {
+        // The verdict is cached in the PROOF's ServiceCaches, NOT a static map: a taclet's locality
+        // depends on the cost dispatchers in force (which differ with the taclet options), while
+        // Taclet#equals is only name + find term. A cache shared across proofs would let one option
+        // set read another's verdict for a same-named but structurally different taclet -- exactly
+        // the static-cache hazard ServiceCaches exists to avoid. Per proof, it is also freed with
+        // the proof. (ELIGIBLE => at least the top-level NonDuplicateApp veto, so the empty-veto
+        // INELIGIBLE acts as the "not eligible" sentinel, the map forbidding null values.)
+        final Map<Taclet, Object> cache = proof.getServices().getCaches()
+                .getCostReuseClassificationCache();
+        final Object e = cache.computeIfAbsent(taclet, t -> {
             final Eligibility res = classify(disp, t);
             return res == null ? INELIGIBLE : res;
         });
-        return e == INELIGIBLE ? null : e;
+        return e == INELIGIBLE ? null : (Eligibility) e;
     }
 
     private static @Nullable Eligibility classify(List<RuleSetDispatchFeature> dispatchers,
