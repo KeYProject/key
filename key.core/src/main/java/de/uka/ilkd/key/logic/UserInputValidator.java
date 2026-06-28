@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import de.uka.ilkd.key.logic.sort.GenericSort;
-
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -26,10 +25,16 @@ import org.jspecify.annotations.Nullable;
  * automatically scoped to user input only — automatic term creation never runs them, so there is
  * no extra cost on the proof-search hot path.</li>
  * </ul>
+ * Each check returns <em>all</em> problems it finds (not just the first), so a boundary can report
+ * them together. The callers turn the returned messages into the boundary's natural exception; the
+ * problem/JML boundaries bundle them into a {@code BuildingExceptions} so that the shared
+ * {@code ExceptionTools#getMessages} extraction (used by both the GUI {@code IssueDialog} and the
+ * console) reports every problem with its own entry.
+ * <p>
  * To add a new user-input check (e.g. a stricter well-typedness check), add a {@link Check} to
  * {@link #CHECKS}; no boundary needs to change. To add a new boundary, call
  * {@link #validate(JTerm, String)} / {@link #validate(Sequent, String)} there and raise the
- * boundary's natural (positioned) exception with the returned message.
+ * boundary's exception with the returned messages.
  *
  * @author KeY developers
  */
@@ -44,9 +49,9 @@ public final class UserInputValidator {
          * @param term a term produced from user input
          * @param context a short human-readable description of where the term came from, used in
          *        the error message (e.g. {@code "a \\problem"})
-         * @return an error message if {@code term} is invalid for user input, otherwise empty
+         * @return one error message per problem found in {@code term} (empty if it is acceptable)
          */
-        Optional<String> validate(JTerm term, String context);
+        List<String> validate(JTerm term, String context);
     }
 
     /** The registered user-input checks. Add new checks here. */
@@ -61,19 +66,17 @@ public final class UserInputValidator {
      * @param term a term produced from user input, may be {@code null}
      * @param context a short description of the origin for the error message (e.g. {@code "a
      *        \\problem"}, {@code "a JML expression"}, {@code "an instantiation"})
-     * @return the first validation error, or empty if {@code term} is acceptable
+     * @return all validation errors (empty if {@code term} is acceptable)
      */
-    public static Optional<String> validate(@Nullable JTerm term, String context) {
+    public static List<String> validate(@Nullable JTerm term, String context) {
         if (term == null) {
-            return Optional.empty();
+            return List.of();
         }
+        List<String> issues = new ArrayList<>();
         for (Check check : CHECKS) {
-            Optional<String> issue = check.validate(term, context);
-            if (issue.isPresent()) {
-                return issue;
-            }
+            issues.addAll(check.validate(term, context));
         }
-        return Optional.empty();
+        return issues;
     }
 
     /**
@@ -81,28 +84,26 @@ public final class UserInputValidator {
      *
      * @param sequent a sequent produced from user input, may be {@code null}
      * @param context a short description of the origin for the error message
-     * @return the first validation error, or empty if the sequent is acceptable
+     * @return all validation errors (empty if the sequent is acceptable)
      */
-    public static Optional<String> validate(@Nullable Sequent sequent, String context) {
+    public static List<String> validate(@Nullable Sequent sequent, String context) {
         if (sequent == null) {
-            return Optional.empty();
+            return List.of();
         }
+        List<String> issues = new ArrayList<>();
         for (SequentFormula sf : sequent) {
-            Optional<String> issue = validate((JTerm) sf.formula(), context);
-            if (issue.isPresent()) {
-                return issue;
-            }
+            issues.addAll(validate((JTerm) sf.formula(), context));
         }
-        return Optional.empty();
+        return issues;
     }
 
     /** Check: generic sorts (schematic taclet placeholders) must not occur in a concrete term. */
-    private static Optional<String> checkNoGenericSort(JTerm term, String context) {
-        GenericSort generic = GenericSortDetector.findIn(term);
-        if (generic == null) {
-            return Optional.empty();
+    private static List<String> checkNoGenericSort(JTerm term, String context) {
+        List<String> issues = new ArrayList<>();
+        for (Sort sort : GenericSortDetector.findIn(term)) {
+            issues.add("The sort '" + sort.name() + "' must not occur in " + context
+                + "; it is or contains a generic sort, which may only appear in taclets.");
         }
-        return Optional.of("The generic sort '" + generic.name() + "' must not occur in " + context
-            + ". Generic sorts may only be used in taclets.");
+        return issues;
     }
 }

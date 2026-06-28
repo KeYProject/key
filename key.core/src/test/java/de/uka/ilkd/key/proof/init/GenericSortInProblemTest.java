@@ -5,10 +5,13 @@ package de.uka.ilkd.key.proof.init;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.junit.jupiter.api.Test;
 
@@ -49,6 +52,23 @@ class GenericSortInProblemTest {
     @Test
     void genericSortDeclaredButUnusedStillLoads() {
         assertDoesNotThrow(() -> load("genericProblem/genericDeclaredOnly.key"));
+    }
+
+    /**
+     * Issue #3409 + reviewer feedback: a problem with several generic sorts must report all of them
+     * (not only the first), each as its own entry, through the shared
+     * {@link ExceptionTools#getMessages} extraction that both the GUI {@code IssueDialog} and the
+     * console rely on.
+     */
+    @Test
+    void allGenericSortsInProblemAreReported() {
+        ProblemLoaderException ex = assertThrows(ProblemLoaderException.class,
+            () -> load("genericProblem/genericTwoConsts.key"));
+        List<PositionedString> msgs = ExceptionTools.getMessages(ex);
+        assertTrue(msgs.stream().anyMatch(m -> m.getText().contains("'S'")),
+            "the generic sort S must be reported, got: " + msgs);
+        assertTrue(msgs.stream().anyMatch(m -> m.getText().contains("'T'")),
+            "the generic sort T must be reported as well (not just the first), got: " + msgs);
     }
 
     private static String collectMessages(Throwable t) {

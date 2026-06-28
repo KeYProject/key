@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
@@ -20,7 +21,8 @@ import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -181,10 +183,14 @@ public class JmlIO {
         warnings = warnings.prepend(newWarnings);
         // Validate the user-supplied JML term (e.g. reject generic sorts, see issue #3409). The set
         // of checks lives in UserInputValidator.
-        UserInputValidator.validate(termOf(obj), "a JML expression")
-                .ifPresent(msg -> {
-                    throw new BuildingException(ctx, msg);
-                });
+        List<String> issues = UserInputValidator.validate(termOf(obj), "a JML expression");
+        if (!issues.isEmpty()) {
+            // Bundle into a BuildingExceptions so that every rejected sort is reported separately
+            // (ExceptionTools#getMessages, used by the GUI IssueDialog and the console).
+            throw new BuildingExceptions(issues.stream()
+                    .map(msg -> BuildingIssue.createError(msg, ctx, null))
+                    .toList());
+        }
         return obj;
     }
 
