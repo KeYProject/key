@@ -185,9 +185,13 @@ public class RecentFileMenu {
             var file = ParsingFacade.parseConfigurationFile(filename);
             List<Configuration> recent = file.asConfigurationList();
             this.recentFiles.clear();
+            this.mostRecentFile = null;
             for (var c : recent) {
                 final var e = new RecentFileEntry(c);
-                if (mostRecentFile != null) {
+                // The list is stored most-recent-first, so the first entry is the most recent.
+                // (Previously this condition was inverted and overwrote mostRecentFile with every
+                // entry, leaving it null after startup -- issue #3711.)
+                if (mostRecentFile == null) {
                     mostRecentFile = e;
                 }
                 recentFiles.add(e);
