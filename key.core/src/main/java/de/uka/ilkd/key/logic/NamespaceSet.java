@@ -4,6 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
@@ -25,22 +28,31 @@ import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class NamespaceSet {
+    private final Map<Class<?>, Namespace<?>> namespaces = new HashMap<>();
 
-    private Namespace<QuantifiableVariable> varNS = new Namespace<>();
-    private Namespace<IProgramVariable> progVarNS = new Namespace<>();
-    // TODO: Operators should not be local to goals
-    private Namespace<Function> funcNS = new Namespace<>();
-    private Namespace<RuleSet> ruleSetNS = new Namespace<>();
-    private Namespace<Sort> sortNS = new Namespace<>();
-    private Namespace<SortAlias> sortAliases = new Namespace<>();
-    private Namespace<ParametricSortDecl> parametricSortNS = new Namespace<>();
-    private Namespace<ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
-    private Namespace<Choice> choiceNS = new Namespace<>();
+    /*
+     * private Namespace<QuantifiableVariable> varNS = new Namespace<>();
+     * private Namespace<IProgramVariable> progVarNS = new Namespace<>();
+     * // TODO: Operators should not be local to goals
+     * private Namespace<Function> funcNS = new Namespace<>();
+     * private Namespace<RuleSet> ruleSetNS = new Namespace<>();
+     * private Namespace<Sort> sortNS = new Namespace<>();
+     * private Namespace<SortAlias> sortAliases = new Namespace<>();
+     * private Namespace<ParametricSortDecl> parametricSortNS = new Namespace<>();
+     * private Namespace<ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
+     * private Namespace<Choice> choiceNS = new Namespace<>();
+     */
     private MetaSpace documentation = new MetaSpace();
 
     public NamespaceSet() {
     }
 
+    public NamespaceSet(Map<Class<?>, Namespace<?>> namespaces, MetaSpace documentation) {
+        this.documentation = documentation;
+        this.namespaces.putAll(namespaces);
+    }
+
+    @Deprecated
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<Function> funcNS,
             Namespace<Sort> sortNS,
@@ -55,6 +67,7 @@ public class NamespaceSet {
             choiceNS, programVarNS, new MetaSpace());
     }
 
+    @Deprecated
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<Function> funcNS,
             Namespace<Sort> sortNS,
@@ -65,115 +78,115 @@ public class NamespaceSet {
             Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS,
             MetaSpace documentation) {
-        this.varNS = varNS;
-        this.progVarNS = programVarNS;
-        this.funcNS = funcNS;
-        this.sortNS = sortNS;
-        this.sortAliases = sortAliases;
-        this.ruleSetNS = ruleSetNS;
-        this.choiceNS = choiceNS;
-        this.parametricSortNS = parametricSortNS;
-        this.parametricFuncNS = parametricFuncNS;
+        register(QuantifiableVariable.class, varNS);
+        register(IProgramVariable.class, programVarNS);
+        register(Function.class, funcNS);
+        register(Sort.class, sortNS);
+        register(SortAlias.class, sortAliases);
+        register(RuleSet.class, ruleSetNS);
+        register(Choice.class, choiceNS);
+        register(ParametricSortDecl.class, parametricSortNS);
+        register(ParametricFunctionDecl.class, parametricFuncNS);
         this.documentation = documentation;
+    }
+
+    private <T extends Named> void register(Class<T> clazz, Namespace<T> ns) {
+        namespaces.put(clazz, ns);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Named> Namespace<T> get(Class<T> key) {
+        return (Namespace<T>) namespaces.computeIfAbsent(key, (it) -> new Namespace<>());
     }
 
 
     public NamespaceSet copy() {
-        return new NamespaceSet(variables().copy(), functions().copy(),
-            sorts().copy(), sortAliases().copy(),
-            ruleSets().copy(), parametricSortNS.copy(), parametricFuncNS.copy(), choices().copy(),
-            programVariables().copy(),
-            documentation.copy());
+        var namespaces = new HashMap<Class<?>, Namespace<?>>();
+        this.namespaces.forEach((k, v) -> namespaces.put(k, v.copy()));
+        return new NamespaceSet(namespaces, documentation.copy());
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(variables(), functions(), sorts(), sortAliases(), ruleSets(),
-            parametricSorts(),
-            parametricFunctions(),
-            choices(), programVariables(), new MetaSpace(documentation));
+        return new NamespaceSet(namespaces, new MetaSpace(documentation));
     }
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
-        return new NamespaceSet(new Namespace<>(variables()),
-            new Namespace<>(functions()), new Namespace<>(sorts()), new Namespace<>(sortAliases()),
-            new Namespace<>(ruleSets()), new Namespace<>(parametricSorts()),
-            new Namespace<>(parametricFunctions()), new Namespace<>(choices()),
-            new Namespace<>(programVariables()),
-            new MetaSpace(documentation));
+        var namespaces = new HashMap<Class<?>, Namespace<?>>();
+        this.namespaces.forEach((k, v) -> namespaces.put(k, new Namespace<>(v)));
+        return new NamespaceSet(namespaces, new MetaSpace(documentation));
     }
 
     public Namespace<QuantifiableVariable> variables() {
-        return varNS;
+        return get(QuantifiableVariable.class);
     }
 
     public void setVariables(Namespace<QuantifiableVariable> varNS) {
-        this.varNS = varNS;
+        register(QuantifiableVariable.class, varNS);
     }
 
     public Namespace<IProgramVariable> programVariables() {
-        return progVarNS;
+        return get(IProgramVariable.class);
     }
 
     public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
-        this.progVarNS = progVarNS;
+        register(IProgramVariable.class, progVarNS);
     }
 
     public Namespace<Function> functions() {
-        return funcNS;
+        return get(Function.class);
     }
 
     public void setFunctions(Namespace<Function> funcNS) {
-        this.funcNS = funcNS;
+        register(Function.class, funcNS);
     }
 
     public Namespace<RuleSet> ruleSets() {
-        return ruleSetNS;
+        return get(RuleSet.class);
     }
 
     public void setRuleSets(Namespace<RuleSet> ruleSetNS) {
-        this.ruleSetNS = ruleSetNS;
+        register(RuleSet.class, ruleSetNS);
     }
 
     public Namespace<Sort> sorts() {
-        return sortNS;
+        return get(Sort.class);
     }
 
     public void setSorts(Namespace<Sort> sortNS) {
-        this.sortNS = sortNS;
+        register(Sort.class, sortNS);
     }
 
     public Namespace<SortAlias> sortAliases() {
-        return sortAliases;
+        return get(SortAlias.class);
     }
 
     public void setSortAliases(Namespace<SortAlias> sortAliases) {
-        this.sortAliases = sortAliases;
+        register(SortAlias.class, sortAliases);
     }
 
     public Namespace<ParametricSortDecl> parametricSorts() {
-        return parametricSortNS;
+        return get(ParametricSortDecl.class);
     }
 
     public void setParametricSorts(Namespace<ParametricSortDecl> parametricSortNS) {
-        this.parametricSortNS = parametricSortNS;
+        register(ParametricSortDecl.class, parametricSortNS);
     }
 
     public Namespace<ParametricFunctionDecl> parametricFunctions() {
-        return parametricFuncNS;
+        return get(ParametricFunctionDecl.class);
     }
 
-    public void setParametricFunctions(
-            Namespace<ParametricFunctionDecl> parametricFuncNS) {
-        this.parametricFuncNS = parametricFuncNS;
+    public void setParametricFunctions(Namespace<ParametricFunctionDecl> parametricFuncNS) {
+        register(ParametricFunctionDecl.class, parametricFuncNS);
     }
 
     public Namespace<Choice> choices() {
-        return choiceNS;
+        return get(Choice.class);
     }
 
     public void setChoices(Namespace<Choice> choiceNS) {
-        this.choiceNS = choiceNS;
+        register(Choice.class, choiceNS);
     }
 
     public void add(NamespaceSet ns) {
@@ -191,36 +204,33 @@ public class NamespaceSet {
     /**
      * returns all namespaces in an array
      */
-    private Namespace<?>[] asArray() {
-        return new Namespace[] { variables(), programVariables(), sorts(), ruleSets(), functions(),
-            choices() };
+    private Collection<Namespace<?>> asArray() {
+        return namespaces.values();
     }
 
     /**
      * returns all namespaces with symbols that may occur in a real sequent (this means all
      * namespaces without variables, choices and ruleSets)
      */
-    private Namespace<?>[] logicAsArray() {
-        return new Namespace[] { programVariables(), sorts(), sortAliases(), functions() };
+    private Collection<Namespace<?>> logicAsArray() {
+        return namespaces.values();
     }
 
     /**
      * looks up if the given name is found in one of the namespaces and returns the named object or
      * null if no object with the same name has been found
      */
-    public Named lookup(Name name) {
-        final Namespace<?>[] spaces = asArray();
-        return lookup(name, spaces);
+    public @Nullable Named lookup(Name name) {
+        return lookup(name, asArray());
     }
 
     /**
      * looks up for the symbol in the namespaces sort, functions and programVariables
      *
-     * @param name
-     *        the Name to look up
+     * @param name the Name to look up
      * @return the element of the given name or null
      */
-    public Named lookupLogicSymbol(Name name) {
+    public @Nullable Named lookupLogicSymbol(Name name) {
         return lookup(name, logicAsArray());
     }
 
@@ -234,7 +244,7 @@ public class NamespaceSet {
      * @return the first element with the given name if found in the given namespaces, otherwise
      *         <tt>null</tt>
      */
-    private Named lookup(Name name, final Namespace<?>[] spaces) {
+    private @Nullable Named lookup(Name name, Collection<Namespace<?>> spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) {
@@ -252,7 +262,7 @@ public class NamespaceSet {
         var sort = sorts().lookup(name);
         if (sort != null)
             return sort;
-        SortAlias alias = sortAliases.lookup(name);
+        SortAlias alias = sortAliases().lookup(name);
         if (alias != null)
             return alias.aliasedSort();
         return null;
@@ -278,38 +288,25 @@ public class NamespaceSet {
     }
 
     public void seal() {
-        varNS.seal();
-        progVarNS.seal();
-        funcNS.seal();
-        parametricFuncNS.seal();
-        ruleSetNS.seal();
-        sortNS.seal();
-        sortAliases.seal();
-        parametricSortNS.seal();
-        choiceNS.seal();
+        namespaces.forEach((a, b) -> b.seal());
     }
 
     public boolean isEmpty() {
-        return varNS.isEmpty() && programVariables().isEmpty() && funcNS.isEmpty()
-                && parametricFuncNS.isEmpty()
-                && ruleSetNS.isEmpty() && sortNS.isEmpty() && sortAliases.isEmpty()
-                && parametricSortNS.isEmpty() && choiceNS.isEmpty();
+        return namespaces.values().stream().allMatch(it -> it.isEmpty());
     }
 
 
     // create a namespace
     public NamespaceSet simplify() {
-        return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
-            sortAliases.simplify(),
-            ruleSetNS.simplify(), parametricSortNS.simplify(), parametricFuncNS.simplify(),
-            choiceNS.simplify(), progVarNS.simplify());
+        var newSpaces = new HashMap<>(namespaces);
+        namespaces.forEach((a, b) -> newSpaces.put(a, b.simplify()));
+        return new NamespaceSet(newSpaces, documentation);
     }
 
     public NamespaceSet getCompression() {
-        return new NamespaceSet(varNS.compress(), funcNS.compress(), sortNS.compress(),
-            sortAliases.compress(),
-            ruleSetNS.compress(), parametricSortNS.compress(), parametricFuncNS.compress(),
-            choiceNS.compress(), progVarNS.compress(), documentation);
+        var newSpaces = new HashMap<>(namespaces);
+        namespaces.forEach((a, b) -> newSpaces.put(a, b.compress()));
+        return new NamespaceSet(newSpaces, documentation);
     }
 
     public void flushToParent() {
@@ -319,10 +316,9 @@ public class NamespaceSet {
     }
 
     public NamespaceSet getParent() {
-        return new NamespaceSet(varNS.parent(), funcNS.parent(), sortNS.parent(),
-            sortAliases.parent(),
-            ruleSetNS.parent(), parametricSortNS.parent(), parametricFuncNS.parent(),
-            choiceNS.parent(), progVarNS.parent(), documentation.parent());
+        var newSpaces = new HashMap<>(namespaces);
+        namespaces.forEach((a, b) -> newSpaces.put(a, b.parent()));
+        return new NamespaceSet(newSpaces, documentation.parent());
     }
 
     public MetaSpace docs() {
