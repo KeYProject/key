@@ -6,6 +6,8 @@ package org.key_project.key.llm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
@@ -27,6 +29,11 @@ public class LlmSettings extends AbstractPropertiesSettings {
         createStringListProperty("availableModels",
             "azure.gpt-4.1-mini,gpt-oss:120b,mixtral:8x22b,qwen3-vl:235b-a22b-instruct");
 
+    private final PropertyEntry<Set<String>> allowedToolsWithApproval =
+        createStringSetProperty("allowedToolsWithApproval", new TreeSet<>());
+
+    private final PropertyEntry<Set<String>> allowedToolsWithoutApproval =
+        createStringSetProperty("allowedToolsWithoutApproval", new TreeSet<>());
 
     public LlmSettings() {
         super(CATEGORY);
@@ -69,5 +76,21 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setDefaultModel(String defaultModel) {
         this.defaultModel.set(defaultModel);
+    }
+
+    public Set<String> getAllowedToolsWithApproval() {
+        return allowedToolsWithApproval.get();
+    }
+
+    public Set<String> getAllowedToolsWithoutApproval() {
+        return allowedToolsWithoutApproval.get();
+    }
+
+    public void setAllowedToolsWithApproval(Set<String> val) {
+        allowedToolsWithApproval.set(val);
+    }
+
+    public void setAllowedToolsWithoutApproval(Set<String> val) {
+        allowedToolsWithoutApproval.set(val);
     }
 }

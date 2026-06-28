@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.key_project.key.llm.mcp.McpClient;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -102,7 +104,7 @@ public class LlmClientExtended implements Callable<Map<String, Object>> {
 
         // Add MCP tools if available
         if (mcpClient != null && !mcpClient.isClosed()) {
-            var tools = mcpClient.getToolsAsOpenAiFormat();
+            var tools = mcpClient.getTools();
             if (!tools.isEmpty()) {
                 data.put("tools", tools);
                 data.put("tool_choice", "auto");
@@ -345,43 +347,6 @@ public class LlmClientExtended implements Callable<Map<String, Object>> {
         // Make follow-up call with tool results
         logger.debug("Making follow-up call with tool results");
         return call();
-    }
-
-    /**
-     * MCP client interface for tool and resource access.
-     * <p>
-     * Implementations should handle communication with MCP servers,
-     * including tool discovery, invocation, and resource retrieval.
-     */
-    public interface McpClient {
-        /**
-         * Returns available tools in OpenAI API format.
-         *
-         * @return List of tool definitions
-         */
-        List<Map<String, Object>> getToolsAsOpenAiFormat();
-
-        /**
-         * Calls a tool with the given arguments.
-         *
-         * @param toolName The name of the tool to call
-         * @param arguments JSON string of arguments
-         * @return The tool result
-         * @throws Exception If the tool call fails
-         */
-        Object callTool(String toolName, String arguments) throws Exception;
-
-        /**
-         * Checks if the MCP client is still connected.
-         *
-         * @return true if connected, false otherwise
-         */
-        boolean isClosed();
-
-        /**
-         * Closes the MCP client and releases resources.
-         */
-        void close();
     }
 
     /**
