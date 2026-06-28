@@ -5,6 +5,7 @@ package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
@@ -184,7 +185,18 @@ public class TacletFindModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        return new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        JTerm result =
+            new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        // Validate the user-entered instantiation (e.g. reject generic sorts, see issue #3409). The
+        // set of checks lives in UserInputValidator. Unlike the (batch-parsed) \problem and JML
+        // boundaries, this field is validated live on every keystroke and its message is rendered
+        // as a single inline entry, so we surface the first problem; once the user fixes it, the
+        // next one (if any) appears on the next validation.
+        List<String> issues = UserInputValidator.validate(result, "an instantiation");
+        if (!issues.isEmpty()) {
+            throw new ParserException(issues.get(0), null);
+        }
+        return result;
     }
 
     /**
