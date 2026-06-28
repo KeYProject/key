@@ -505,8 +505,8 @@ public class Node implements Iterable<Node> {
         return -1;
     }
 
-    public StringBuffer getUniqueTacletId() {
-        StringBuffer id = new StringBuffer();
+    public StringBuilder getUniqueTacletId() {
+        StringBuilder id = new StringBuilder(32);
         int c = 0;
         Node n = this;
 

@@ -24,12 +24,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
@@ -52,17 +47,17 @@ public final class ExceptionTools {
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
         Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
-    private ExceptionTools() {}
+    private ExceptionTools() {
+    }
 
     /**
      * Get the throwable's message. This will return a nicer error message for
      * certain ANTLR exceptions.
      *
-     * @param throwable
-     *        a throwable
+     * @param throwable a throwable
      * @return message for the exception
      */
-    public static String getMessage(Throwable throwable) {
+    public static String getMessage(@Nullable Throwable throwable) {
         if (throwable == null) {
             return "";
         } else if (throwable instanceof ParseCancellationException
@@ -286,11 +281,9 @@ public final class ExceptionTools {
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
      * Result may be null.
      *
-     * @param exc
-     *        the Throwable to extract the Location from
+     * @param exc the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
-     * @throws MalformedURLException
-     *         if the no URL can be parsed from the String stored inside the
+     * @throws MalformedURLException if the no URL can be parsed from the String stored inside the
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
@@ -427,14 +420,4 @@ public final class ExceptionTools {
         }
     }
 
-    // TODO javaparser this was not unused
-    @Nullable
-    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
-        // ANTLR 3 - Recognition Exception.
-        if (exc.input != null) {
-            // ANTLR has 0-based column numbers
-            return new Location(parseFileName(exc.input.getSourceName()), exc.position);
-        }
-        return null;
-    }
 }

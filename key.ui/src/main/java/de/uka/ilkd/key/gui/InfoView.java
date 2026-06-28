@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ThreadUtilities;
-import de.uka.ilkd.key.util.XMLResources;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
@@ -43,7 +42,6 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
-    private final XMLResources xmlResources;
     private final ProofDisposedListener proofDisposedListener;
     private final KeYSelectionListener selectionListener = new InfoViewSelectionListener();
     private Node lastShownGoalNode;
@@ -52,7 +50,6 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public InfoView() {
         super(VERTICAL_SPLIT);
-        xmlResources = new XMLResources();
 
         // initial placement of the divider
         setDividerLocation(300);
@@ -188,7 +185,8 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
             final InfoTreeModel model;
             if (g != null) {
-                model = new InfoTreeModel(g, xmlResources, mainWindow);
+                var metaSpace = g.proof().getServices().getNamespaces().docs();
+                model = new InfoTreeModel(g, metaSpace, mainWindow);
                 g.proof().addProofDisposedListener(proofDisposedListener);
                 lastShownGoalNode = g.node();
             } else {

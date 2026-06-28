@@ -55,6 +55,9 @@ public class Log {
                 .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         if (verbosity != null) {
             Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
+            if (consoleAppender == null) {
+                return;
+            }
             consoleAppender.clearAllFilters();
             var filter = new ThresholdFilter();
             consoleAppender.addFilter(filter);

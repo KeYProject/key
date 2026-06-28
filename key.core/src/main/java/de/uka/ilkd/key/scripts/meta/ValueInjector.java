@@ -183,7 +183,6 @@ public class ValueInjector {
 
         if (meta.isFlag()) {
             val = args.namedArgs().get(meta.getName());
-            System.out.println("X" + val + "  " + args.namedArgs() + "  " + meta.getName());
             if (val == null) {
                 // can also be given w/o colon or equal sign, e.g., "command hide;"
                 var stringStream = args.positionalArgs().stream()

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.MetaSpace;
+
 /**
  * Every node of {@link InfoTree} is an instance of this class.
  *
@@ -53,13 +55,13 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     }
 
-    InfoTreeNode(Taclet taclet) {
+    InfoTreeNode(Taclet taclet, MetaSpace metaSpace) {
         super(taclet.displayName());
         this.rule = taclet;
         altName = taclet.name().toString();
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
         lp.printTaclet(taclet);
-        description = lp.result() + "\n\n Defined at:" + taclet.getOrigin()
+        description = lp.result() + "\n\n Defined at:" + metaSpace.findOrigin(taclet)
             + "\n\n under options:" + taclet.getChoices();
     }
 
@@ -69,10 +71,10 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         this.description = description;
     }
 
-    public InfoTreeNode(BuiltInRule br, Properties ruleExplanations) {
-        this(br.displayName(), ruleExplanations);
+    public InfoTreeNode(BuiltInRule br, MetaSpace ruleExplanations) {
+        this(br.displayName(), ruleExplanations.findDocumentation(br));
         rule = br;
-        description = "Defined at: " + br.getOrigin();
+        description = "Defined at: " + br.getClass();
     }
 
     String getTitle() {

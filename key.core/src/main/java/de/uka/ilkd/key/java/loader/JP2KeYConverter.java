@@ -44,6 +44,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
+import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.OperatorSV;
@@ -1694,6 +1695,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new Ccatch(pi, c, parameter, null, body);
     }
 
+    public MetaSpace docSpace() {
+        return services.getNamespaces().docs();
+    }
+
     @Override
     public Object visit(KeyCcatchReturn n, Void arg) {
         var pi = createPositionInfo(n);
@@ -1738,13 +1743,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     "Requested to find the default value of an unknown sort '%s'.", sortName));
             }
 
-            var doc = sort.getDocumentation();
-
+            String doc = services.getNamespaces().docs().findDocumentation(sort);
+            String origin = services.getNamespaces().docs().findOrigin(sort);
             if (doc == null) {
                 return reportError(n,
                     format("Requested to find the default value for the sort '%s', " +
                         "which does not have a documentary comment. The sort is defined at %s. ",
-                        sortName, sort.getOrigin()));
+                        sortName, origin));
             }
 
             int pos = doc.indexOf(DEFVALUE);
@@ -1756,7 +1761,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     return reportError(n,
                         format(
                             "Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
-                            sortName, sort.getOrigin()));
+                            sortName, origin));
                 }
 
                 // set this as the function name, as the user had written \dl_XXX
