@@ -6,7 +6,7 @@ package org.key_project.logic.op;
 import org.key_project.logic.*;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator extends Named, HasMeta, SyntaxElement {
+public interface Operator extends Named, HasMetaSpaceKey, SyntaxElement {
     /// the arity of this operator
     int arity();
 

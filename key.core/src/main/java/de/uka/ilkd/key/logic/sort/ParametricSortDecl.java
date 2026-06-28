@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic.sort;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericParameter;
 
-import org.key_project.logic.HasMeta;
+import org.key_project.logic.HasMetaSpaceKey;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 ///
 /// Get instantiated versions using [ParametricSortInstance#get(ParametricSortDecl, ImmutableList,
 /// Services)].
-public class ParametricSortDecl implements Named, HasMeta {
+public class ParametricSortDecl implements Named, HasMetaSpaceKey {
     private final Name name;
     private final boolean isAbstract;
     private final ImmutableList<GenericParameter> parameters;

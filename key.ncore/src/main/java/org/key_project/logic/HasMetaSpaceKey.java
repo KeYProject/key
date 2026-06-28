@@ -9,14 +9,14 @@ import org.jspecify.annotations.Nullable;
 /// de.uka.ilkd.key.logic.MetaSpace}.
 ///
 /// @author weigl
-public interface HasMeta {
+public interface HasMetaSpaceKey {
     String getMetaKey();
 
     default @Nullable String getDocumentation() {
         return null;
     }
 
-    record OptionCategory(String name) implements HasMeta {
+    record OptionCategory(String name) implements HasMetaSpaceKey {
         public String getMetaKey() {
             return "category/" + name;
         }

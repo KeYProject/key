@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.logic.HasMeta;
+import org.key_project.logic.HasMetaSpaceKey;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -37,7 +37,7 @@ public class MetaSpace {
         return metadata.get(key);
     }
 
-    public @Nullable String findDocumentation(HasMeta entity) {
+    public @Nullable String findDocumentation(HasMetaSpaceKey entity) {
         if (entity.getDocumentation() != null) {
             return entity.getDocumentation();
         }
@@ -47,7 +47,7 @@ public class MetaSpace {
     /**
      * Returns a human-readable source of this term. For example the filename with line and offset.
      */
-    public @Nullable String findOrigin(HasMeta entity) {
+    public @Nullable String findOrigin(HasMetaSpaceKey entity) {
         return (String) findMetadata(SPACE_PREFIX_ORIGIN + entity.getMetaKey());
     }
 
@@ -59,21 +59,21 @@ public class MetaSpace {
         return parent;
     }
 
-    public void setDocumentation(HasMeta entity, @Nullable String doc) {
+    public void setDocumentation(HasMetaSpaceKey entity, @Nullable String doc) {
         if (doc != null && doc.isBlank()) {
             return;
         }
         setMetadata(SPACE_PREFIX_DOC, entity, doc);
     }
 
-    public void setOrigin(HasMeta entity, @Nullable String origin) {
+    public void setOrigin(HasMetaSpaceKey entity, @Nullable String origin) {
         if (origin != null && origin.isBlank()) {
             return;
         }
         setMetadata(SPACE_PREFIX_ORIGIN, entity, origin);
     }
 
-    private void setMetadata(String prefix, HasMeta entity, @Nullable Object val) {
+    private void setMetadata(String prefix, HasMetaSpaceKey entity, @Nullable Object val) {
         var key = prefix + entity.getMetaKey();
         if (val == null) {
             metadata.remove(key);

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.GenericParameter;
 
-import org.key_project.logic.HasMeta;
+import org.key_project.logic.HasMetaSpaceKey;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Sorted;
@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
 /// ImmutableList, de.uka.ilkd.key.java.Services)].
-public final class ParametricFunctionDecl implements Named, Sorted, HasMeta {
+public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpaceKey {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;
     private final ImmutableArray<Sort> argSorts;

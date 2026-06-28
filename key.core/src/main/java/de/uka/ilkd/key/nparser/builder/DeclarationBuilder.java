@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.JavaKeYParser;
 
 import org.key_project.logic.Choice;
-import org.key_project.logic.HasMeta;
+import org.key_project.logic.HasMetaSpaceKey;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -125,7 +125,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
         String catDoc = processDocumentation(ctx.maindoc);
-        docsSpace().setDocumentation(new HasMeta.OptionCategory(cat), catDoc);
+        docsSpace().setDocumentation(new HasMetaSpaceKey.OptionCategory(cat), catDoc);
 
         for (JavaKeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
