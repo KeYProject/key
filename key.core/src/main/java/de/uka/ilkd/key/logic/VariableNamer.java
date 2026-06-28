@@ -677,7 +677,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * temporary indexed ProgramElementName
      */
-    public static class TempIndProgramElementName extends IndProgramElementName {
+    private static class TempIndProgramElementName extends IndProgramElementName {
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
             super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo);
         }
@@ -693,7 +693,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * regular indexed ProgramElementName
      */
-    public static class PermIndProgramElementName extends IndProgramElementName {
+    private static class PermIndProgramElementName extends IndProgramElementName {
         static final char SEPARATOR = '_';
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {

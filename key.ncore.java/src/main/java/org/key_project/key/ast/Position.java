@@ -12,5 +12,5 @@ package org.key_project.key.ast;
  * @version 1.0
  */
 
-record Position(int startLine, int startColumn, int endLine, int endColumn) {
+public record Position(int startLine, int startColumn, int endLine, int endColumn) {
 }

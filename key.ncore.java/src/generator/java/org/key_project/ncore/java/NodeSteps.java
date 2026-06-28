@@ -5,6 +5,7 @@ package org.key_project.ncore.java;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
@@ -17,6 +18,7 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.utils.Utils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -111,7 +113,7 @@ public class NodeSteps {
     record addEquals() implements NodeStep {
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration target) {
-            if (target.isAbstract() || target.isInterface()) {
+            if (isNonTerminal(target)) {
                 return;
             }
 
@@ -120,13 +122,10 @@ public class NodeSteps {
             equals.addAnnotation(Override.class);
             equals.setType(Boolean.TYPE);
             final var o = getNullableObject();
-            equals.getParameters().
-
-                    add(o);
+            equals.getParameters().add(o);
 
             BlockStmt body = equals.getBody().get();
             body.addStatement(
-
                     parseStatement("if(this == o) return true;"));
             body.addStatement(
 
@@ -145,18 +144,25 @@ public class NodeSteps {
         }
     }
 
-    record addHashCode() implements NodeStep {
+    record addHashCode(boolean caching) implements NodeStep {
+        addHashCode() {
+            this(true);
+        }
+
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration target) {
-            if (target.isAbstract() || target.isInterface()) {
+            if (isNonTerminal(target)) {
                 return;
             }
 
-            FieldDeclaration field = target.addField(Integer.class, "hashCode", PRIVATE);
-            final var variable = field.getVariables().getFirst();
-            field.addAnnotation("EqEx");
-            field.addAnnotation("Nullable");
-            field.addAnnotation("Internal");
+            VariableDeclarator variable = new VariableDeclarator(new PrimitiveType(PrimitiveType.Primitive.INT), "xxx");
+            if (caching) {
+                FieldDeclaration field = target.addField(Integer.class, "hashCode", PRIVATE);
+                variable = field.getVariables().getFirst();
+                field.addAnnotation("EqEx");
+                field.addAnnotation("Nullable");
+                field.addAnnotation("Internal");
+            }
 
             MethodDeclaration hashCode = target.addMethod("hashCode", PUBLIC);
             //hashCode.addModifier(FINAL);
@@ -174,11 +180,15 @@ public class NodeSteps {
                 assert false : "No defined fields";
             else {
                 final Expression compute = callObjects("hash", args);
-                final Expression hashCodeIsNull = new BinaryExpr(variable.getNameAsExpression(), new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
-                final var setHashCode = new ExpressionStmt(new AssignExpr(variable.getNameAsExpression(), compute, AssignExpr.Operator.ASSIGN));
-                hashCode.getBody().get().addStatement(
-                        new IfStmt(hashCodeIsNull, setHashCode, null));
-                hashCode.getBody().get().addStatement(new ReturnStmt(variable.getNameAsExpression()));
+                if (caching) {
+                    final Expression hashCodeIsNull = new BinaryExpr(variable.getNameAsExpression(), new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
+                    final var setHashCode = new ExpressionStmt(new AssignExpr(variable.getNameAsExpression(), compute, AssignExpr.Operator.ASSIGN));
+                    hashCode.getBody().get().addStatement(
+                            new IfStmt(hashCodeIsNull, setHashCode, null));
+                    hashCode.getBody().get().addStatement(new ReturnStmt(variable.getNameAsExpression()));
+                } else {
+                    hashCode.getBody().get().addStatement(new ReturnStmt(compute));
+                }
             }
         }
     }
@@ -186,7 +196,7 @@ public class NodeSteps {
     record ToString() implements NodeStep {
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration clazz) {
-            if (clazz.isAbstract() || clazz.isInterface()) {
+            if (isNonTerminal(clazz)) {
                 return;
             }
 
@@ -212,12 +222,10 @@ public class NodeSteps {
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration clazz) {
             if (isRoot(clazz)) {
                 clazz.setInterface(false);
-                clazz.addModifier(PUBLIC, ABSTRACT);
+                clazz.addModifier(PUBLIC);
                 clazz.getExtendedTypes().clear();
-
-                for (var field : clazz.getMethods()) {
-                    field.addModifier(PUBLIC, ABSTRACT);
-                }
+                clazz.setAnnotations(new NodeList<>());
+                clazz.addAnnotation(NullMarked.class);
             } else if (isNonTerminal(clazz)) {
 
             }
@@ -229,7 +237,7 @@ public class NodeSteps {
     }
 
     static boolean isNonTerminal(ClassOrInterfaceDeclaration clazz) {
-        return isRoot(clazz) || clazz.isInterface();
+        return isRoot(clazz) || clazz.isInterface() || clazz.hasModifier(ABSTRACT);
     }
 
     static boolean isTerminal(ClassOrInterfaceDeclaration clazz) {
@@ -409,7 +417,7 @@ public class NodeSteps {
     record addCopyConstructor() implements NodeStep {
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration target) {
-            if (target.isInterface()) {
+            if (isNonTerminal(target)) {
                 return;
             }
 
@@ -471,16 +479,20 @@ public class NodeSteps {
             target.addModifier(PUBLIC);
 
             boolean isAbstract = target.isAbstract() || target.isInterface();
+            boolean isRoot = isRoot(target);
             if (isAbstract) {
-                target.setInterface(true);
                 target.addModifier(SEALED);
-                target.removeModifier(ABSTRACT);
+                if (!isRoot) {
+                    target.setInterface(true);
+                    target.removeModifier(ABSTRACT);
+                    target.getMethods().forEach(it -> it.addModifier(DEFAULT));
+                }
+
                 var permittedTypes = generator.getStep(PreSteps.PreComputation.class).permittedTypes;
                 for (var s : permittedTypes.get(target.getNameAsString())) {
+                    if (s.equals("BaseAstNode")) continue;
                     target.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
                 }
-                //target.setExtendedTypes(new NodeList<>());
-                target.getMethods().forEach(it -> it.addModifier(DEFAULT));
             } else {
                 target.addModifier(FINAL);
                 target.setImplementedTypes(target.getExtendedTypes());
@@ -518,56 +530,95 @@ public class NodeSteps {
         return clone;
     }
 
-    record ProcessFields() implements NodeStep {
+    record ProcessFields(boolean immutable) implements NodeStep {
+        ProcessFields() {
+            this(true);
+        }
+
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration target) {
-            boolean isAbstract = target.isAbstract() || target.isInterface();
+            boolean isAbstract = isNonTerminal(target);
 
             for (var field : target.getFields()) {
                 if (isAbstract) {
                     field.remove();
                 } else {
-                    field.setModifiers(PRIVATE, FINAL);
+                    if (immutable) {
+                        field.setModifiers(PRIVATE, FINAL);
+                    } else {
+                        field.setModifiers(PRIVATE);
+                    }
                 }
 
                 for (var variable : field.getVariables()) {
-                    if (isList(variable)) {
+                    if (isList(variable) && immutable) {
                         var old = variable.getType().asClassOrInterfaceType();
                         old.setName("RoList");
                     }
 
-
-                    var getter = target.addMethod(variable.getNameAsString());
-                    getter.setType(variable.getType().clone());
-
-                    var nullable = field.getAnnotationByName("Nullable");
-                    if (nullable.isPresent()) {
-                        getter.addAndGetAnnotation(Nullable.class);
-                    }
-
-                    if (isAbstract) {
-                        // getter.addModifier(Modifier.DefaultKeyword.ABSTRACT);
-                        getter.setBody(null);
-                    } else {
-                        getter.getBody().get()
-                                .addStatement(new ReturnStmt(variable.getNameAsExpression()));
-                        getter.addModifier(PUBLIC);
+                    addGetter(target, field, variable, isAbstract);
+                    if (!immutable) {
+                        addSetter(target, field, variable, isAbstract);
                     }
                     field.getAnnotationByName("Override")
-                            .ifPresent(it -> {
-                                it.remove();
-                                getter.addAnnotation(it);
-                            });
+                            .ifPresent(it -> it.remove());
                 }
             }
+        }
+
+        private static void addSetter(ClassOrInterfaceDeclaration target, FieldDeclaration field, VariableDeclarator variable, boolean isAbstract) {
+            var setter = target.addMethod("set" + Utils.capitalize(variable.getNameAsString()));
+            setter.setType(new ClassOrInterfaceType(null, target.getNameAsString()));
+
+            var parameter = new Parameter(variable.getType().clone(), "value");
+
+            var nullable = field.getAnnotationByName("Nullable");
+            if (nullable.isPresent()) {
+                parameter.addAndGetAnnotation(Nullable.class);
+            }
+            setter.addParameter(parameter);
+
+            if (isAbstract) {
+                setter.addModifier(Modifier.DefaultKeyword.ABSTRACT);
+                setter.setBody(null);
+            } else {
+                setter.getBody().get().addStatement("%s = %s;".formatted(variable.getNameAsString(), "value"));
+                setter.getBody().get().addStatement(new ReturnStmt(new ThisExpr()));
+                setter.addModifier(PUBLIC);
+            }
+            field.getAnnotationByName("Override")
+                    .ifPresent(it -> setter.addAnnotation(it.clone()));
+        }
+
+        private void addGetter(ClassOrInterfaceDeclaration target, FieldDeclaration field, VariableDeclarator variable, boolean isAbstract) {
+            var getter = target.addMethod(variable.getNameAsString());
+            //immutable ? variable.getNameAsString() : "get" + Utils.capitalize(variable.getNameAsString()));
+            getter.setType(variable.getType().clone());
+
+            var nullable = field.getAnnotationByName("Nullable");
+            if (nullable.isPresent()) {
+                getter.addAndGetAnnotation(Nullable.class);
+            }
+
+            if (isAbstract) {
+                getter.addModifier(Modifier.DefaultKeyword.ABSTRACT);
+                getter.setBody(null);
+            } else {
+                getter.getBody().get()
+                        .addStatement(new ReturnStmt(variable.getNameAsExpression()));
+                getter.addModifier(PUBLIC);
+            }
+            field.getAnnotationByName("Override")
+                    .ifPresent(it -> getter.addAnnotation(it.clone()));
         }
     }
 
     record addBuilder() implements NodeStep {
         @Override
         public void applyOn(Generator generator, ClassOrInterfaceDeclaration target) {
-            if (target.isInterface())
+            if (isNonTerminal(target)) {
                 return;
+            }
 
             var builder = new ClassOrInterfaceDeclaration();
             builder.setName("Builder");

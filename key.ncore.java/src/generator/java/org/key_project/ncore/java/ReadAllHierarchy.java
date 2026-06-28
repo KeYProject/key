@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.reflect.AccessFlag;
 import java.util.*;
+/**
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
@@ -33,11 +34,9 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import static de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers.*;
 
 
-/**
  *
  * @author Alexander Weigl
  * @version 1 (4/11/26)
- */
 public class ReadAllHierarchy {
     static Set<Class<?>> allClasses = new HashSet<>(List.of(
         GreaterThan.class,
@@ -723,7 +722,6 @@ public class ReadAllHierarchy {
         Modifier.class,
         VisibilityModifier.class,
         CcatchReturnParameterDeclaration.class,
-        VariableNamer.PermIndProgramElementName.class,
         Subtype.class,
         AllObjects.class,
         Declaration.class,
@@ -746,7 +744,6 @@ public class ReadAllHierarchy {
         JML_CODE_SAFE_MATH.class,
         Public.class,
         JML_SPEC_SAFE_MATH.class,
-        VariableNamer.TempIndProgramElementName.class,
         Modifiers.STATIC.class));
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -797,3 +794,4 @@ public class ReadAllHierarchy {
         }
     }
 }
+*/
