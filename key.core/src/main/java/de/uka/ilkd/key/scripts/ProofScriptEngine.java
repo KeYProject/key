@@ -71,7 +71,7 @@ public class ProofScriptEngine {
         this.script = script;
     }
 
-    private static Map<String, ProofScriptCommand> loadCommands() {
+    public static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 

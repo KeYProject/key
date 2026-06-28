@@ -333,7 +333,7 @@ public final class MainWindow extends JFrame {
         recentFileMenu = new RecentFileMenu(this);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView(this, mediator);
+        infoView = new InfoView(mediator);
         strategySelectionView = new StrategySelectionView(this, mediator);
         openGoalsView = new GoalList(mediator);
 
