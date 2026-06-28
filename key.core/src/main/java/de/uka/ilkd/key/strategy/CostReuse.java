@@ -14,8 +14,8 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.Taclet;
-import org.key_project.prover.strategy.costbased.feature.CostLocal;
-import org.key_project.prover.strategy.costbased.feature.CostNonLocal;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
@@ -35,19 +35,19 @@ import org.jspecify.annotations.Nullable;
  * <ol>
  * <li><b>veto</b> ({@link AbstractNonDuplicateAppFeature}): a 0/Top guard. Collected and re-checked
  * at reuse time (an app that became a duplicate must still be dropped); not descended into.</li>
- * <li><b>explicit override</b>: {@link CostNonLocal} forces non-local (the author wins).</li>
- * <li><b>{@link CostLocal}</b>: local. For a leaf that is the whole story; for a composite it means
+ * <li><b>explicit override</b>: {@link VolatileCost} forces non-local (the author wins).</li>
+ * <li><b>{@link StableCost}</b>: local. For a leaf that is the whole story; for a composite it means
  * "transparent" -- the walk still recurses into its child features, so it stays local only if they
  * all are. There is NO automatic "any feature with children is transparent" guess: a composite is
  * trusted only because its author annotated it after checking that its own computation (including
  * any non-Feature inputs such as projections/term-generators) is find-local. The transparent
  * combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
  * <li><b>otherwise</b> (unannotated): non-local (the SAFE default). A new feature -- leaf or
- * composite -- is non-local until someone reviews it and adds {@link CostLocal}; forgetting costs
+ * composite -- is non-local until someone reviews it and adds {@link StableCost}; forgetting costs
  * only performance, never soundness.</li>
  * </ol>
- * A {@link CostLocal} composite is local only if, in addition to its child features, every child
- * {@link TermGenerator} it holds is also {@link CostLocal} -- a generator is a non-Feature input
+ * A {@link StableCost} composite is local only if, in addition to its child features, every child
+ * {@link TermGenerator} it holds is also {@link StableCost} -- a generator is a non-Feature input
  * that decides locality (e.g. {@code SuperTermGenerator} is find-local, {@code
  * SequentFormulasGenerator} reads the whole sequent and is not). The walk descends only through
  * {@link Feature}- and {@link TermGenerator}-typed references (never arbitrary objects): the live
@@ -56,7 +56,7 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Optional verification (<code>-Dkey.strategy.costReuse.verify</code>): when reuse is applied also
  * recompute the cost and log a warning on any mismatch -- a development aid to catch a feature that
- * is mis-classified local (it should then get {@link CostNonLocal}).
+ * is mis-classified local (it should then get {@link VolatileCost}).
  */
 public final class CostReuse {
 
@@ -80,7 +80,7 @@ public final class CostReuse {
     private static final Feature[] INELIGIBLE = new Feature[0];
 
     private enum Kind {
-        VETO, NON_LOCAL, LOCAL
+        VETO, VOLATILE, STABLE
     }
 
     /**
@@ -124,13 +124,13 @@ public final class CostReuse {
         }
         switch (kind(f)) {
             case VETO -> vetoes.add(f);
-            case NON_LOCAL -> local[0] = false;
+            case VOLATILE -> local[0] = false;
             // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are local
             // AND all its child TERM-GENERATORS are local. The generator matters because e.g.
             // ComprehendedSumFeature sums its body over a generator: SuperTermGenerator (find
             // ancestors) is local, but SequentFormulasGenerator (whole sequent) is not -- and a
             // generator is a non-Feature input the feature recursion would otherwise miss.
-            case LOCAL -> forEachChild(f, child -> {
+            case STABLE -> forEachChild(f, child -> {
                 if (child instanceof Feature cf) {
                     walk(cf, vetoes, local, seen);
                 } else if (!isLocal(child.getClass())) { // a TermGenerator (or similar input)
@@ -141,28 +141,28 @@ public final class CostReuse {
     }
 
     /**
-     * A non-Feature classifying input (e.g. a TermGenerator) is local only if {@link CostLocal}.
+     * A non-Feature classifying input (e.g. a TermGenerator) is local only if {@link StableCost}.
      */
     private static boolean isLocal(Class<?> c) {
-        return !c.isAnnotationPresent(CostNonLocal.class) && c.isAnnotationPresent(CostLocal.class);
+        return !c.isAnnotationPresent(VolatileCost.class) && c.isAnnotationPresent(StableCost.class);
     }
 
     /**
      * Classify a feature's class (cached). SOUND-by-construction: a feature is treated as local
-     * ONLY if it is explicitly {@link CostLocal}-annotated (its author asserts it depends only on
+     * ONLY if it is explicitly {@link StableCost}-annotated (its author asserts it depends only on
      * the app + find subterm, modulo its child features) -- there is no structural "any composite
-     * is transparent" guess. {@link CostNonLocal} forces non-local; everything unannotated is
+     * is transparent" guess. {@link VolatileCost} forces non-local; everything unannotated is
      * non-local (the safe default).
      */
     private static Kind kind(Feature f) {
         return kindCache.computeIfAbsent(f.getClass(), c -> {
-            if (c.isAnnotationPresent(CostNonLocal.class)) {
-                return Kind.NON_LOCAL; // explicit author override wins
+            if (c.isAnnotationPresent(VolatileCost.class)) {
+                return Kind.VOLATILE; // explicit author override wins
             }
             if (f instanceof AbstractNonDuplicateAppFeature) {
                 return Kind.VETO;
             }
-            return c.isAnnotationPresent(CostLocal.class) ? Kind.LOCAL : Kind.NON_LOCAL;
+            return c.isAnnotationPresent(StableCost.class) ? Kind.STABLE : Kind.VOLATILE;
         });
     }
 
@@ -211,11 +211,11 @@ public final class CostReuse {
 
     /**
      * Verification aid (only when {@link #VERIFY}): warn if a reused cost differs from the freshly
-     * recomputed one, i.e. some feature is mis-classified local and should be {@link CostNonLocal}.
+     * recomputed one, i.e. some feature is mis-classified local and should be {@link VolatileCost}.
      */
     static void warnMismatch(Taclet taclet, Object reused, Object fresh) {
         LOGGER.warn("cost-reuse mismatch for taclet {}: a feature is mis-classified local; "
-            + "annotate it @CostNonLocal (reused={}, fresh={})", taclet.name(), reused, fresh);
+            + "annotate it @VolatileCost (reused={}, fresh={})", taclet.name(), reused, fresh);
     }
 
     private static List<RuleSetDispatchFeature> dispatchers(Object strategy) {
