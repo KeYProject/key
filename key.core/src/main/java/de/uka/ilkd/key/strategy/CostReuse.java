@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.AbstractNonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
@@ -67,13 +68,23 @@ public final class CostReuse {
 
     private CostReuse() {}
 
-    private static volatile @Nullable List<RuleSetDispatchFeature> dispatchers;
     /**
-     * taclet -> collected veto features. An ELIGIBLE taclet always has at least the top-level
-     * NonDuplicateApp veto, so an empty array is used as the INELIGIBLE sentinel (ConcurrentHashMap
-     * forbids null values).
+     * proof -> (taclet -> collected veto features). An ELIGIBLE taclet always has at least the
+     * top-level NonDuplicateApp veto, so an empty array is used as the INELIGIBLE sentinel
+     * (ConcurrentHashMap forbids null values).
+     * <p>
+     * The cache is keyed by PROOF FIRST and must NOT be flattened to a single global
+     * {@code taclet -> ...} map: a taclet's locality depends on the cost dispatchers in force, which
+     * differ with the taclet options, while {@link Taclet#equals} is only name + find term (it
+     * relies on name uniqueness WITHIN one taclet base). A global map would let one option set read
+     * another's verdict for a same-named but structurally different taclet. We key by proof rather
+     * than by strategy because a strategy need not depend on the proof -- the same strategy instance
+     * may be reused across proofs with different taclet options -- whereas a proof fixes exactly one
+     * option set / taclet base. Weak in the proof so the entry is released once the proof is
+     * collected; the inner map is keyed by taclet (names unique within a base).
      */
-    private static final Map<Taclet, Feature[]> classification = new ConcurrentHashMap<>();
+    private static final Map<Proof, Map<Taclet, Feature[]>> classification =
+        Collections.synchronizedMap(new WeakHashMap<>());
     /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
     private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
     /** Cached "not eligible for reuse" marker (the map forbids null values). */
@@ -84,24 +95,39 @@ public final class CostReuse {
     }
 
     /**
-     * @return the {@link AbstractNonDuplicateAppFeature} vetoes to re-check for a cost-local
-     *         taclet,
+     * @param strategy the goal's strategy; classified against its cost dispatchers (only used to
+     *        obtain those -- never dereferenced beyond {@link #dispatchers})
+     * @param proof the proof, used purely as an identity cache key (see {@link #classification})
+     * @param taclet the taclet whose cost is a candidate for reuse
+     * @return the {@link AbstractNonDuplicateAppFeature} vetoes to re-check for a cost-local taclet,
      *         or {@code null} if the taclet is not eligible for cost reuse.
      */
-    public static Feature @Nullable [] vetoesIfEligible(Object strategy, Taclet taclet) {
-        final Feature[] r = classification.computeIfAbsent(taclet, t -> {
-            final Feature[] res = classify(strategy, t);
+    public static Feature @Nullable [] vetoesIfEligible(Strategy<?> strategy, Proof proof,
+            Taclet taclet) {
+        // Without cost dispatchers we cannot establish locality -> treat as ineligible, and do NOT
+        // cache that verdict: a later call with a classifiable strategy must be able to classify it.
+        final List<RuleSetDispatchFeature> disp = dispatchers(strategy);
+        if (disp.isEmpty()) {
+            return null;
+        }
+        // computeIfAbsent on the synchronizedMap briefly holds its mutex to fetch/create the inner
+        // per-proof map; the expensive classify() then runs on the (concurrent) inner map.
+        final Map<Taclet, Feature[]> perProof =
+            classification.computeIfAbsent(proof, p -> new ConcurrentHashMap<>());
+        final Feature[] r = perProof.computeIfAbsent(taclet, t -> {
+            final Feature[] res = classify(disp, t);
             return res == null ? INELIGIBLE : res;
         });
         return r == INELIGIBLE ? null : r;
     }
 
-    private static Feature @Nullable [] classify(Object strategy, Taclet taclet) {
+    private static Feature @Nullable [] classify(List<RuleSetDispatchFeature> dispatchers,
+            Taclet taclet) {
         final Set<Feature> vetoes = Collections.newSetFromMap(new IdentityHashMap<>());
         vetoes.add(NonDuplicateAppFeature.INSTANCE); // top-level veto, applies to every taclet
         final boolean[] local = { true };
         final Set<Feature> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        for (RuleSetDispatchFeature d : dispatchers(strategy)) {
+        for (RuleSetDispatchFeature d : dispatchers) {
             var rs = taclet.getRuleSets();
             while (!rs.isEmpty()) {
                 final Feature f = d.get(rs.head());
@@ -218,14 +244,16 @@ public final class CostReuse {
             + "annotate it @VolatileCost (reused={}, fresh={})", taclet.name(), reused, fresh);
     }
 
-    private static List<RuleSetDispatchFeature> dispatchers(Object strategy) {
-        List<RuleSetDispatchFeature> d = dispatchers;
-        if (d == null) {
-            d = strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers()
-                    : List.of();
-            dispatchers = d;
-        }
-        return d;
+    /**
+     * The cost dispatchers to classify against, taken from the strategy of the goal being costed.
+     * Must NOT be cached across strategies: different goals/proofs use different strategy instances
+     * (and some are not {@link ModularJavaDLStrategy} at all). A stale or empty cached value would
+     * make the {@link #walk} traverse nothing and thus classify every taclet as (wrongly) local.
+     * When the strategy exposes no cost dispatchers, the taclet is treated as ineligible (see
+     * {@link #vetoesIfEligible}) -- never as trivially local.
+     */
+    private static List<RuleSetDispatchFeature> dispatchers(Strategy<?> strategy) {
+        return strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers() : List.of();
     }
 
     private static List<Field> allFields(Class<?> c) {

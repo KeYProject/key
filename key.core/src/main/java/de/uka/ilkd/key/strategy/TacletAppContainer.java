@@ -242,8 +242,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         // only a regular (computeCost) base may be carried forward; an instantiation-supplied base
         // would re-cost differently, so such containers always fall through to a normal recompute
         if (ageFreeCostIsRegular && getAgeFreeCost() instanceof NumberRuleAppCost base) {
-            final Feature[] vetoes =
-                CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(), getTacletApp().taclet());
+            final Feature[] vetoes = CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(),
+                p_goal.proof(), getTacletApp().taclet());
             if (vetoes != null) {
                 final PosInOccurrence pos = getPosInOccurrence(p_goal);
                 final MutableState mState = new MutableState();
