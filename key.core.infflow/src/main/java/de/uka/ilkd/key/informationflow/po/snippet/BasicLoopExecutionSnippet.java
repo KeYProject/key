@@ -9,7 +9,6 @@ import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JTerm;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
@@ -102,8 +103,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         LoopSpecification inv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
-        final Assignment guardVarDecl = new CopyAssignment((LocationVariable) d.origVars.guard.op(),
-            inv.getLoop().getGuardExpression());
+        final Assignment guardVarDecl =
+            new Assignment(COPY, (LocationVariable) d.origVars.guard.op(),
+                inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame = context == null ? guardVarDecl
                 : new MethodFrame(null, context, new StatementBlock(guardVarDecl));
 

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ExpressionContainer;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.statement.If;
@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+
+import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
 
 /**
  * Extracts read and write access to fields ({@link IProgramVariable}) via assignments.
@@ -33,9 +35,9 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
     public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
         if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
             SourceElement statement = node.getNodeInfo().getActiveStatement();
-            if (statement instanceof CopyAssignment) {
+            if (statement instanceof Assignment a && a.getKind() == COPY) {
                 LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
-                listReferences(node, (CopyAssignment) statement,
+                listReferences(node, a,
                     services.getJavaInfo().getArrayLength(), result, true);
                 return result;
             } else if (statement instanceof If) {
@@ -66,7 +68,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
                     new DefaultProofReference<>(IProofReference.ACCESS, node,
-                        (ProgramVariable) pe);
+                        pv);
                 ProofReferenceUtil.merge(toFill, reference);
             }
         } else if (pe instanceof FieldReference fr) {

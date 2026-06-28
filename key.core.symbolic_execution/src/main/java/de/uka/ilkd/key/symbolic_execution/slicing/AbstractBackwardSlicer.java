@@ -14,8 +14,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
@@ -64,9 +64,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                     if (oldAliases != null) {
                         try {
                             // Update relevant locations if required
-                            if (activeStatement instanceof CopyAssignment) {
-                                SourceElement originalTarget =
-                                    ((CopyAssignment) activeStatement).getArguments().get(0);
+                            if (activeStatement instanceof Assignment a) {
+                                SourceElement originalTarget = a.getArguments().get(0);
                                 ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
                                 Location normalizedPrefix =
                                     normalizeAlias(services, relevantTarget, info);

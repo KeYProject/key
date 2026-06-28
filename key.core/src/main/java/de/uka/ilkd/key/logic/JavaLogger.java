@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (06.01.25)
  */
+@Deprecated
 public class JavaLogger {
     private final static Logger log = LoggerFactory.getLogger(JavaLogger.class);
     private final static File findJavaAst;

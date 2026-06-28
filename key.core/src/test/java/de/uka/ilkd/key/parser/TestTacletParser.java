@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ContextStatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.ArrayReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -366,7 +366,7 @@ public class TestTacletParser {
         JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
-        CopyAssignment ca = (CopyAssignment) ct.getChildAt(0);
+        Assignment ca = (Assignment) ct.getChildAt(0);
         ArrayReference ar = (ArrayReference) ca.getChildAt(0);
         for (int i = 0; i < 2; i++) {
             assertNotNull(ar.getChildAt(i));
@@ -379,11 +379,15 @@ public class TestTacletParser {
 
     @Test
     public void testSchemaJava11() {
-        parseTaclet("eval_order_array_access_right{" + " \\find(\\<{..#v=#ar[#e];...}\\>post)"
-            + "\\varcond(\\newTypeOf(#ar1, #ar)," + "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))"
-            + "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" + "#ar1[#k]=#ar[#k];}"
-            + "#v0=#e; #v=#ar1[#v0];...}\\>post)"
-            + "\\displayname \"eval_order_array_access_right\"}");
+        parseTaclet("""
+                eval_order_array_access_right{
+                    \\find(\\<{..#v=#ar[#e];...}\\>post)
+                    \\varcond(\\newTypeOf(#ar1, #ar),\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))
+                    \\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){#ar1[#k]=#ar[#k];}
+                                        #v0=#e; #v=#ar1[#v0];...}\\>post)
+                    \\displayname "eval_order_array_access_right"
+                }
+                """);
     }
 
 
