@@ -100,7 +100,7 @@ public final class ParsingFacade {
         return ci;
     }
 
-    static JavaKeYParser createParser(TokenSource lexer) {
+    public static JavaKeYParser createParser(TokenSource lexer) {
         JavaKeYParser p = new JavaKeYParser(new CommonTokenStream(lexer));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());

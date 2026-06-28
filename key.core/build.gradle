@@ -1,5 +1,6 @@
 plugins {
     id 'java-test-fixtures'
+    id "org.javacc.javacc" version "4.0.3"
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -42,8 +43,14 @@ dependencies {
 }
 
 // The target directory for JavaCC (parser generation)
-//def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
-//def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
+def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+compileJavacc {
+    inputDirectory = file('src/main/javacc')
+    outputDirectory = file(javaCCOutputDirMain)
+
+}
+sourceSets.main.java.srcDirs(javaCCOutputDirMain)
 
 sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
 

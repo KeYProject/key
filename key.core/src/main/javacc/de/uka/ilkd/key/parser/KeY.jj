@@ -1,0 +1,1337 @@
+/**
+ * JavaCC Grammar for KeY Logic
+ * Equivalent to KeYParser.g4 and KeYLexer.g4 (ANTLR4)
+ */
+options {
+    STATIC = false;
+    JAVA_UNICODE_ESCAPE = false;
+    UNICODE_INPUT = true;
+    IGNORE_CASE = false;
+    LOOKAHEAD = 2;
+    FORCE_LA_CHECK = true;
+    //DEBUG_LOOKAHEAD = true;
+}
+
+PARSER_BEGIN(KeY)
+
+package de.uka.ilkd.key.parser;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
+public class KeY {
+
+    private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
+    public SyntaxErrorReporter getErrorReporter() { return errorReporter; }
+
+    // Modality tracking (equivalent to ANTLR lexer members)
+    private static HashMap<String,String> modNames = new LinkedHashMap<>(20);
+    private static HashMap<String,String> modPairs = new LinkedHashMap<>(20);
+
+    static {
+        modNames.put("\\<","diamond");
+        modNames.put("\\diamond","diamond");
+        modNames.put("\\diamond_transaction","diamond_transaction");
+        modNames.put("\\[","box");
+        modNames.put("\\box","box");
+        modNames.put("\\box_transaction","box_transaction");
+        modNames.put("\\[[","throughout");
+        modNames.put("\\throughout","throughout");
+        modNames.put("\\throughout_transaction","throughout_transaction");
+
+        modPairs.put("\\<","\\>");
+        modPairs.put("\\[","\\]");
+        modPairs.put("\\[[","\\]]");
+        modPairs.put("\\modality","\\endmodality");
+        modPairs.put("\\diamond","\\endmodality");
+        modPairs.put("\\diamond_transaction","\\endmodality");
+        modPairs.put("\\box","\\endmodality");
+        modPairs.put("\\box_transaction","\\endmodality");
+        modPairs.put("\\throughout","\\endmodality");
+        modPairs.put("\\throughout_transaction","\\endmodality");
+    }
+}
+
+PARSER_END(KeY)
+
+// ============================================================================
+// SKIP DEFINITIONS
+// ============================================================================
+
+SKIP : {
+    " " | "\t" | "\n" | "\r" | "\u00a0"  // WS
+}
+
+// ML_COMMENT - non-greedy: matches until first */
+SKIP : {
+    < ML_COMMENT: "/*" (~["*"] | ("*" ~["/"]))* "*/" > |
+    < SL_COMMENT: "//" (~["\n"])*"\n" >
+}
+
+// ============================================================================
+// TOKEN DEFINITIONS (equivalent to KeYLexer.g4 tokens)
+// ============================================================================
+
+TOKEN : {
+    < SORTS: "\\sorts" >
+|   < GENERIC: "\\generic" >
+|   < PROXY: "\\proxy" >
+|   < EXTENDS: "\\extends" >
+|   < ONEOF: "\\oneof" >
+|   < ABSTRACT: "\\abstract" >
+|   < ALIAS: "\\alias" >
+|   < SCHEMAVARIABLES: "\\schemaVariables" >
+|   < SCHEMAVAR: "\\schemaVar" >
+|   < MODALOPERATOR: "\\modalOperator" >
+|   < PROGRAM: "\\program" >
+|   < FORMULA: "\\formula" >
+|   < TERM: "\\term" >
+|   < UPDATE: "\\update" >
+|   < VARIABLES: "\\variables" >
+|   < VARIABLE: "\\variable" >
+|   < SKOLEMTERM: "\\skolemTerm" >
+|   < SKOLEMFORMULA: "\\skolemFormula" >
+|   < TERMLABEL: "\\termlabel" >
+|   < MODIFIABLE: "\\modifiable" >
+|   < PROGRAMVARIABLES: "\\programVariables" >
+|   < STORE_TERM_IN: "\\storeTermIn" >
+|   < STORE_STMT_IN: "\\storeStmtIn" >
+|   < HAS_INVARIANT: "\\hasInvariant" >
+|   < GET_INVARIANT: "\\getInvariant" >
+|   < GET_FREE_INVARIANT: "\\getFreeInvariant" >
+|   < GET_VARIANT: "\\getVariant" >
+|   < IS_LABELED: "\\isLabeled" >
+|   < SAME_OBSERVER: "\\sameObserver" >
+|   < VARCOND: "\\varcond" >
+|   < APPLY_UPDATE_ON_RIGID: "\\applyUpdateOnRigid" >
+|   < DEPENDINGON: "\\dependingOn" >
+|   < DISJOINTMODULONULL: "\\disjointModuloNull" >
+|   < DROP_EFFECTLESS_ELEMENTARIES: "\\dropEffectlessElementaries" >
+|   < DROP_EFFECTLESS_STORES: "\\dropEffectlessStores" >
+|   < SIMPLIFY_IF_THEN_ELSE_UPDATE: "\\simplifyIfThenElseUpdate" >
+|   < ENUM_CONST: "\\enumConstant" >
+|   < FREELABELIN: "\\freeLabelIn" >
+|   < HASSORT: "\\hasSort" >
+|   < FIELDTYPE: "\\fieldType" >
+|   < FINAL: "\\final" >
+|   < ELEMSORT: "\\elemSort" >
+|   < HASLABEL: "\\hasLabel" >
+|   < HASSUBFORMULAS: "\\hasSubFormulas" >
+|   < ISARRAY: "\\isArray" >
+|   < ISARRAYLENGTH: "\\isArrayLength" >
+|   < ISCONSTANT: "\\isConstant" >
+|   < ISENUMTYPE: "\\isEnumType" >
+|   < ISINDUCTVAR: "\\isInductVar" >
+|   < ISLOCALVARIABLE: "\\isLocalVariable" >
+|   < ISOBSERVER: "\\isObserver" >
+|   < DIFFERENT: "\\different" >
+|   < METADISJOINT: "\\metaDisjoint" >
+|   < ISTHISREFERENCE: "\\isThisReference" >
+|   < DIFFERENTFIELDS: "\\differentFields" >
+|   < ISREFERENCE: "\\isReference" >
+|   < ISREFERENCEARRAY: "\\isReferenceArray" >
+|   < ISSTATICFIELD: "\\isStaticField" >
+|   < ISMODELFIELD: "\\isModelField" >
+|   < ISINSTRICTFP: "\\isInStrictFp" >
+|   < ISSUBTYPE: "\\sub" >
+|   < EQUAL_UNIQUE: "\\equalUnique" >
+|   < NEW: "\\new" >
+|   < NEW_TYPE_OF: "\\newTypeOf" >
+|   < NEW_DEPENDING_ON: "\\newDependingOn" >
+|   < NEW_LOCAL_VARS: "\\newLocalVars" >
+|   < HAS_ELEMENTARY_SORT: "\\hasElementarySort" >
+|   < NEWLABEL: "\\newLabel" >
+|   < CONTAINS_ASSIGNMENT: "\\containsAssignment" >
+|   < NOT_: "\\not" >
+|   < NOTFREEIN: "\\notFreeIn" >
+|   < SAME: "\\same" >
+|   < STATIC: "\\static" >
+|   < STATICMETHODREFERENCE: "\\staticMethodReference" >
+|   < MAXEXPANDMETHOD: "\\mayExpandMethod" >
+|   < STRICT: "\\strict" >
+|   < TYPEOF: "\\typeof" >
+|   < INSTANTIATE_GENERIC: "\\instantiateGeneric" >
+|   < FORALL: "\\forall" | "\u2200" >
+|   < EXISTS: "\\exists" | "\u2203" >
+|   < SUBST: "\\subst" >
+|   < IF: "\\if" >
+|   < IFEX: "\\ifEx" >
+|   < THEN: "\\then" >
+|   < ELSE: "\\else" >
+|   < INCLUDE: "\\include" >
+|   < INCLUDELDTS: "\\includeLDTs" >
+|   < CLASSPATH: "\\classpath" >
+|   < BOOTCLASSPATH: "\\bootclasspath" >
+|   < NODEFAULTCLASSES: "\\noDefaultClasses" >
+|   < JAVASOURCE: "\\javaSource" >
+|   < WITHOPTIONS: "\\withOptions" >
+|   < OPTIONSDECL: "\\optionsDecl" >
+|   < KEYSETTINGS: "\\settings" >
+|   < PROFILE: "\\profile" >
+|   < TRUE: "true" >
+|   < FALSE: "false" >
+|   < SAMEUPDATELEVEL: "\\sameUpdateLevel" >
+|   < INSEQUENTSTATE: "\\inSequentState" >
+|   < ANTECEDENTPOLARITY: "\\antecedentPolarity" >
+|   < SUCCEDENTPOLARITY: "\\succedentPolarity" >
+|   < CLOSEGOAL: "\\closegoal" >
+|   < HEURISTICSDECL: "\\heuristicsDecl" >
+|   < NONINTERACTIVE: "\\noninteractive" >
+|   < DISPLAYNAME: "\\displayname" >
+|   < HELPTEXT: "\\helptext" >
+|   < REPLACEWITH: "\\replacewith" >
+|   < ADDRULES: "\\addrules" >
+|   < ADDPROGVARS: "\\addprogvars" >
+|   < HEURISTICS: "\\heuristics" >
+|   < FIND: "\\find" >
+|   < ADD: "\\add" >
+|   < ASSUMES: "\\assumes" >
+|   < TRIGGER: "\\trigger" >
+|   < AVOID: "\\avoid" >
+|   < PREDICATES: "\\predicates" >
+|   < FUNCTIONS: "\\functions" >
+|   < DATATYPES: "\\datatypes" >
+|   < TRANSFORMERS: "\\transformers" >
+|   < UNIQUE: "\\unique" >
+|   < FREE: "\\free" >
+|   < RULES: "\\rules" >
+|   < AXIOMS: "\\axioms" >
+|   < PROBLEM: "\\problem" >
+|   < CHOOSECONTRACT: "\\chooseContract" >
+|   < PROOFOBLIGATION: "\\proofObligation" >
+|   < PROOF: "\\proof" >
+|   < PROOFSCRIPT: "\\proofScript" >
+|   < CONTRACTS: "\\contracts" >
+|   < INVARIANTS: "\\invariants" >
+|   < LEMMA: "\\lemma" >
+|   < IN_TYPE: "\\inType" >
+|   < IS_ABSTRACT_OR_INTERFACE: "\\isAbstractOrInterface" >
+|   < IS_FINAL: "\\isFinal" >
+|   < CONTAINERTYPE: "\\containerType" >
+|   < UTF_PRECEDES: "\u227A" | "\\precedes" >
+|   < UTF_IN: "\u220A" | "\\in" >
+|   < UTF_EMPTY: "\u2205" | "\\emptyset" >
+|   < UTF_UNION: "\u222A" | "\\cup" >
+|   < UTF_INTERSECT: "\u2229" | "\\cap" >
+|   < UTF_SUBSET_EQ: "\u2286" | "\\subseteq" >
+|   < UTF_SUBSEQ: "\u2282" | "\\subset" >
+|   < UTF_SETMINUS: "\u2216" | "\\setminus" >
+|   < SEMI: ";" >
+|   < SLASH: "/" >
+|   < COLON: ":" >
+|   < DOUBLECOLON: "::" >
+|   < ASSIGN: ":=" >
+|   < DOT: "." >
+|   < DOTRANGE: ".." >
+|   < COMMA: "," >
+|   < LPAREN: "(" >
+|   < RPAREN: ")" >
+|   < LBRACE: "{" >
+|   < RBRACE: "}" >
+|   < LBRACKET: "[" >
+|   < RBRACKET: "]" >
+|   < EMPTYBRACKETS: "[]" >
+|   < AT: "@" >
+|   < PARALLEL: "||" >
+|   < OR: "|" | "\u2228" >
+|   < AND: "&" | "\u2227" >
+|   < NOT: "!" | "\u00AC" >
+|   < IMP: "->" | "\u2192" >
+|   < EQUALS: "=" >
+|   < NOT_EQUALS: "!=" | "\u2260" >
+|   < SEQARROW: "==>" | "\u27F9" >
+|   < EXP: "^" >
+|   < TILDE: "~" >
+|   < PERCENT: "%" >
+|   < STAR: "*" >
+|   < MINUS: "-" >
+|   < PLUS: "+" >
+|   < GREATER: ">" >
+|   < GREATEREQUAL: ">=" | "\u2265" >
+|   < OPENTYPEPARAMS: "<[" >
+|   < CLOSETYPEPARAMS: "]>" >
+|  < STRING_LITERAL: "\"" (~["\"", "\\"] | "\\" ["n", "t", "r", "\\", "\""])* "\"" >
+|   < LESS: "<" >
+|   < LESSEQUAL: "<=" | "\u2264" >
+|   < LGUILLEMETS: "<<" | "\u00AB" | "\u2039" >
+|   < RGUILLEMETS: ">>" | "\u00BB" | "\u203A" >
+|   < EQV: "<->" | "\u2194" >
+|   < CHAR_LITERAL: "'" ( [" "-"&"] | ["("-"["] | ["]"-"~"] | ("\\" ("'" | "\\" | "n" | "r" | "t" | "b" | "f" | "\"" | "u" (["a"-"f"] | ["A"-"F"] | ["0"-"9"]) (["a"-"f"] | ["A"-"F"] | ["0"-"9"]) (["a"-"f"] | ["A"-"F"] | ["0"-"9"]) (["a"-"f"] | ["A"-"F"] | ["0"-"9"]))) ) "'" >
+|   < BIN_LITERAL: "0" "b" ( ["0"-"1"] | "_" )+ ( "l" | "L" )? >
+|   < HEX_LITERAL: "0" "x" ( ["0"-"9"] | ["a"-"f"] | ["A"-"F"] | "_" )+ ( "l" | "L" )? >
+|   < IDENT: ( ["a"-"z"] | ["A"-"Z"] | "_" | "#" | "$" ) ( ["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_" | "#" | "$" )* >
+|   < INT_LITERAL: ( ["0"-"9"] | "_" )+ ( "l" | "L" )? >
+|   < FLOAT_LITERAL: ( (["0"-"9"])+ ( "." (["0"-"9"])* )? ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? | "." (["0"-"9"])+ ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? ) ( "f" | "F" ) >
+|   < DOUBLE_LITERAL: ( (["0"-"9"])+ ( "." (["0"-"9"])* )? ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? | "." (["0"-"9"])+ ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? ) ( "d" | "D" ) >
+|   < REAL_LITERAL: ( (["0"-"9"])+ ( "." (["0"-"9"])* )? ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? | "." (["0"-"9"])+ ( ("e"|"E") ("+"|"-")? (["0"-"9"])+ )? ) ( "r" | "R" )? >
+|   < DOC_COMMENT: "/*!" ( (~["*"]) | ("*" (~["/"])) )* "*/" >
+|   < ERROR_UKNOWN_ESCAPE: "\\" ( ["a"-"z"] | ["A"-"Z"] | "_" ) ( ["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_" | "#" | "$" )* >
+|   < ERROR_CHAR: ~[] >
+|   < MODALITY: 
+        "\\<" (~[])* "\\>"
+      | "\\[" (~[])* "\\]"
+      | "\\[[" (~[])* "\\]]"
+      | "\\modality" (~[])* "\\endmodality"
+      | "\\diamond" (~[])* "\\endmodality"
+      | "\\diamond_transaction" (~[])* "\\endmodality"
+      | "\\box" (~[])* "\\endmodality"
+      | "\\box_transaction" (~[])* "\\endmodality"
+      | "\\throughout" (~[])* "\\endmodality"
+      | "\\throughout_transaction" (~[])* "\\endmodality"
+    >
+}
+
+// ============================================================================
+// PARSER RULES (equivalent to KeYParser.g4)
+// ============================================================================
+
+void file() : {}
+{
+    ( <DOC_COMMENT> )*
+    ( decls()
+    | ( profile())?
+      ( preferences())?
+      (decl())*
+      [ problem()]
+      [ proof() ]
+    )
+    <EOF>
+}
+
+void decls() : {}
+{
+	(decl())+
+}
+
+void decl() : {}
+{
+    bootClassPath()
+    | classPaths()
+    | javaSource()
+    | one_include_statement()
+    | options_choice()
+    | option_decls()
+    | sort_decls()
+    | prog_var_decls()
+    | schema_var_decls()
+    | pred_decls()
+    | func_decls()
+    | transform_decls()
+    | datatype_decls()
+    | ruleset_decls()
+    | contracts()
+    | invariants()
+    | rulesOrAxioms()
+}
+
+void problem() : {}
+{
+    ( 
+        <PROBLEM> <LBRACE> termorseq() <RBRACE>
+      | <CHOOSECONTRACT> ( string_value() <SEMI> )?
+      | <PROOFOBLIGATION> ( cvalue())? (<SEMI>)?
+    )
+    ( proofScriptEntry())?
+}
+
+void one_include_statement() : {}
+{
+    ( <INCLUDE> | <INCLUDELDTS> )
+    one_include() ( <COMMA> one_include())* <SEMI>
+}
+
+void one_include() : {}
+{
+<IDENT> | string_value()
+}
+
+void options_choice() : {}
+{
+    <WITHOPTIONS> activated_choice() ( <COMMA> activated_choice())* <SEMI>
+}
+
+void activated_choice() : {}
+{
+    <IDENT> <COLON> <IDENT>
+}
+
+void option_decls() : {}
+{
+    <OPTIONSDECL> <LBRACE> ( choice() <SEMI> )* <RBRACE>
+}
+
+void choice() : {}
+{
+    ( <DOC_COMMENT> )*
+    <IDENT>
+    ( <COLON> <LBRACE> optionDecl() ( <COMMA> optionDecl())* <RBRACE> )?
+}
+
+void optionDecl() : {}
+{
+    ( <DOC_COMMENT> )? <IDENT>
+}
+
+void sort_decls() : {}
+{
+    <SORTS> <LBRACE> ( one_sort_decl())* <RBRACE>
+}
+
+void one_sort_decl() : {}
+{
+    ( <DOC_COMMENT> )?
+    (
+        <GENERIC> simple_ident_dots_comma_list() ( <ONEOF> oneof_sorts())? ( <EXTENDS> extends_sorts())? <SEMI>
+      | <PROXY> simple_ident_dots_comma_list() ( <EXTENDS> extends_sorts())? <SEMI>
+      | ( <ABSTRACT> )? ( simple_ident_dots_comma_list() | parametric_sort_decl()) ( <EXTENDS> extends_sorts())? <SEMI>
+      | <ALIAS> simple_ident_dots() <EQUALS> sortId() <SEMI>
+    )
+}
+
+void parametric_sort_decl() : {}
+{
+    simple_ident_dots()
+    formal_sort_param_decls()
+}
+
+void simple_ident_dots() : {}
+{
+    simple_ident() ( <DOT> simple_ident())*
+}
+
+void simple_ident_dots_comma_list() : {}
+{
+    simple_ident_dots() ( <COMMA> simple_ident_dots())*
+}
+
+void extends_sorts() : {}
+{
+    sortId() ( <COMMA> sortId())*
+}
+
+void oneof_sorts() : {}
+{
+    <LBRACE> sortId() ( <COMMA> sortId())* <RBRACE>
+}
+
+void keyjavatype() : {}
+{
+    simple_ident_dots() ( <EMPTYBRACKETS> )*
+}
+
+void prog_var_decls() : {}
+{
+    <PROGRAMVARIABLES>
+    <LBRACE>
+    (
+        keyjavatype()
+        simple_ident_comma_list()
+        <SEMI>
+    )*
+    <RBRACE>
+}
+
+void string_literal() : {}
+{
+    <STRING_LITERAL>
+}
+
+void string_value() : {}
+{
+    <STRING_LITERAL>
+}
+
+void simple_ident() : {}
+{
+    <IDENT>
+}
+
+void simple_ident_comma_list() : {}
+{
+    simple_ident() ( <COMMA> simple_ident())*
+}
+
+void schema_var_decls() : {}
+{
+    <SCHEMAVARIABLES> <LBRACE>
+    ( one_schema_var_decl() <SEMI> )*
+    <RBRACE>
+}
+
+void one_schema_var_decl() : {}
+{
+    <MODALOPERATOR> one_schema_modal_op_decl()
+  | <PROGRAM> ( schema_modifiers())? <IDENT> ( <LBRACKET> <IDENT> <EQUALS> simple_ident_dots() <RBRACKET> )? simple_ident_comma_list()
+  | <FORMULA> ( schema_modifiers())? simple_ident_comma_list()
+  | <TERMLABEL> ( schema_modifiers())? simple_ident_comma_list()
+  | <UPDATE> ( schema_modifiers())? simple_ident_comma_list()
+  | <SKOLEMFORMULA> ( schema_modifiers())? simple_ident_comma_list()
+  | ( <TERM> | <VARIABLES> | <VARIABLE> | <SKOLEMTERM> ) ( schema_modifiers())? sortId() simple_ident_comma_list()
+}
+
+void schema_modifiers() : {}
+{
+    <LBRACKET> simple_ident_comma_list() <RBRACKET>
+}
+
+void one_schema_modal_op_decl() : {}
+{
+    ( <LPAREN> <IDENT> <RPAREN> )?
+    <LBRACE> simple_ident_comma_list() <RBRACE> <IDENT>
+}
+
+void pred_decl() : {}
+{
+    ( <DOC_COMMENT> )?
+    funcpred_name()
+    ( formal_sort_param_decls())?
+    ( where_to_bind())?
+    arg_sorts()
+    <SEMI>
+}
+
+void pred_decls() : {}
+{
+    <PREDICATES> <LBRACE> ( pred_decl())* <RBRACE>
+}
+
+void func_decl() : {}
+{
+    ( <DOC_COMMENT> )?
+    ( <UNIQUE> )?
+    sortId()
+    funcpred_name()
+    ( formal_sort_param_decls())?
+    ( where_to_bind())?
+    arg_sorts()
+    <SEMI>
+}
+
+void datatype_decls() : {}
+{
+    <DATATYPES> <LBRACE> ( datatype_decl())* <RBRACE>
+}
+
+void datatype_decl() : {}
+{
+    ( <DOC_COMMENT> )?
+    simple_ident() ( formal_sort_param_decls())?
+    <EQUALS>
+    datatype_constructor() ( <OR> datatype_constructor())*
+    <SEMI>
+}
+
+void datatype_constructor() : {}
+{
+    simple_ident()
+    (
+        <LPAREN>
+        ( sortId() simple_ident()
+          ( <COMMA> sortId() simple_ident())*
+        )?
+        <RPAREN>
+    )?
+}
+
+void formal_sort_param_decls() : {}
+{
+    <OPENTYPEPARAMS>
+    formal_sort_param_decl() ( <COMMA> formal_sort_param_decl())*
+    <CLOSETYPEPARAMS>
+}
+
+void formal_sort_param_decl() : {}
+{
+    ( <PLUS> | <MINUS> )? <IDENT>
+}
+
+void func_decls() : {}
+{
+    <FUNCTIONS>
+    <LBRACE>
+    ( func_decl())*
+    <RBRACE>
+}
+
+void arg_sorts_or_formula() : {}
+{
+    ( <LPAREN>
+      arg_sorts_or_formula_helper()
+      ( <COMMA> arg_sorts_or_formula_helper())*
+      <RPAREN>
+    )?
+}
+
+void arg_sorts_or_formula_helper() : {}
+{
+    sortId() | <FORMULA>
+}
+
+void transform_decl() : {}
+{
+    ( <DOC_COMMENT> )?
+    ( sortId() | <FORMULA> )
+    funcpred_name()
+    arg_sorts_or_formula()
+    <SEMI>
+}
+
+void transform_decls() : {}
+{
+    <TRANSFORMERS> <LBRACE> ( transform_decl())* <RBRACE>
+}
+
+void arg_sorts() : {}
+{
+    ( <LPAREN> sortId() ( <COMMA> sortId())* <RPAREN> )?
+}
+
+void where_to_bind() : {}
+{
+    <LBRACE>
+    one_where_elem()
+    ( <COMMA> one_where_elem())*
+    <RBRACE>
+}
+
+void one_where_elem() : {}
+{
+    <TRUE> | <FALSE>
+}
+
+void ruleset_decls() : {}
+{
+    <HEURISTICSDECL> <LBRACE> ( ( <DOC_COMMENT> )? <IDENT> <SEMI> )* <RBRACE>
+}
+
+void sortId() : {}
+{
+    simple_ident_dots() ( formal_sort_args())? ( <EMPTYBRACKETS> )*
+}
+
+void formal_sort_args() : {}
+{
+    <OPENTYPEPARAMS>
+    sortId() ( <COMMA> sortId())*
+    <CLOSETYPEPARAMS>
+}
+
+void funcpred_name() : {}
+{
+    ( simple_ident_dots() | <INT_LITERAL> ) (formal_sort_args())?
+}
+
+// ==========================================================================
+// Terms and Formulas
+// ============================================================================
+
+void termEOF() : {}
+{
+    term() <EOF>
+}
+
+void boolean_literal() : {}
+{
+    <TRUE> | <FALSE>
+}
+
+void literals() : {}
+{
+    boolean_literal()
+  | char_literal()
+  | integer()
+  | floatnum()
+  | string_literal()
+  | emptyset()
+}
+
+void emptyset() : {}
+{
+    <UTF_EMPTY>
+}
+
+void term() : {}
+{
+    parallel_term()
+}
+
+void parallel_term() : {}
+{
+    elementary_update_term() ( <PARALLEL> elementary_update_term())*
+}
+
+void elementary_update_term() : {}
+{
+    equivalence_term() ( <ASSIGN> equivalence_term())?
+}
+
+void equivalence_term() : {}
+{
+    implication_term() ( <EQV> implication_term())*
+}
+
+void implication_term() : {}
+{
+    disjunction_term() ( <IMP> implication_term())?
+}
+
+void disjunction_term() : {}
+{
+    conjunction_term() ( <OR> conjunction_term())*
+}
+
+void conjunction_term() : {}
+{
+    term60() ( <AND> term60())*
+}
+
+void term60() : {}
+{
+		LOOKAHEAD(1)
+    unary_formula() | equality_term()
+}
+
+void unary_formula() : {}
+{
+   LOOKAHEAD(1)
+    <NOT> term60()
+  | LOOKAHEAD(1) (LOOKAHEAD(1) <FORALL> | LOOKAHEAD(1) <EXISTS> )
+    bound_variables() term60()
+  | LOOKAHEAD(1) <MODALITY> term60()
+}
+
+void equality_term() : {}
+{
+    comparison_term() ( ( <NOT_EQUALS> | <EQUALS> ) comparison_term())?
+}
+
+void comparison_term() : {}
+{
+    weak_arith_term() ( ( <LESS> | <LESSEQUAL> | <GREATER> | <GREATEREQUAL> | <UTF_PRECEDES> | <UTF_SUBSET_EQ> | <UTF_SUBSEQ> | <UTF_IN> ) weak_arith_term())?
+}
+
+void weak_arith_term() : {}
+{
+    strong_arith_term_1() ( ( <PLUS> | <MINUS> | <UTF_UNION> | <UTF_INTERSECT> | <UTF_SETMINUS> ) strong_arith_term_1())*
+}
+
+void strong_arith_term_1() : {}
+{
+    strong_arith_term_2() ( <STAR> strong_arith_term_2())*
+}
+
+void strong_arith_term_2() : {}
+{
+    atom_prefix() ( ( <PERCENT> | <SLASH> ) atom_prefix())*
+}
+
+void update_term() : {}
+{
+    <LBRACE> parallel_term() <RBRACE> ( atom_prefix() | unary_formula())
+}
+
+void substitution_term() : {}
+{
+    <LBRACE> <SUBST> one_bound_variable() <SEMI> comparison_term() <RBRACE>
+    ( atom_prefix() | unary_formula())
+}
+
+void cast_term() : {}
+{
+    <LPAREN> sortId() <RPAREN> atom_prefix()
+}
+
+void unary_minus_term() : {}
+{
+    <MINUS> atom_prefix()
+}
+
+void atom_prefix() : {}
+{
+    update_term()
+  | substitution_term()
+  | locset_term()
+  | unary_minus_term()
+  | LOOKAHEAD(10) cast_term()
+  | bracket_term()
+}
+
+void bracket_term() : {}
+{
+    primitive_labeled_term() ( bracket_suffix_heap())* ( attribute())*
+}
+
+void bracket_suffix_heap() : {}
+{
+    brace_suffix() ( <AT> bracket_term())?
+}
+
+void brace_suffix() : {}
+{
+    <LBRACKET> term() <ASSIGN> term() <RBRACKET>
+  | <LBRACKET> simple_ident() argument_list() <RBRACKET>
+  | <LBRACKET> <STAR> <RBRACKET>
+  | <LBRACKET> term() ( <DOTRANGE> term())? <RBRACKET>
+}
+
+void primitive_labeled_term() : {}
+{
+    primitive_term() ( <LGUILLEMETS> label() <RGUILLEMETS> )?
+}
+
+void termParen() : {}
+{
+    <LPAREN> term() <RPAREN> ( attribute())*
+}
+
+void abbreviation() : {}
+{
+    <AT> simple_ident()
+}
+
+void primitive_term() : {}
+{
+    termParen()
+  | ifThenElseTerm()
+  | ifExThenElseTerm()
+  | abbreviation()
+  | accessterm()
+  | literals()
+}
+
+void accessterm() : {}
+{
+    simple_ident()
+    ( formal_sort_args())?
+    ( call())?
+    ( attribute())*
+}
+
+void attribute() : {}
+{
+    <DOT> <STAR>
+  | <DOT> simple_ident() ( call())? ( <AT> bracket_term())?
+  | <DOT> <LPAREN> sortId() <DOUBLECOLON> simple_ident() <RPAREN>
+     ( call())? ( <AT> bracket_term())?
+}
+
+void call() : {}
+{
+    ( <LBRACE> bound_variables() <RBRACE> )? argument_list()
+}
+
+void label() : {}
+{
+    single_label() ( <COMMA> single_label())*
+}
+
+void single_label() : {}
+{
+    ( <IDENT> | <STAR> )
+    ( <LPAREN>
+        ( string_value()
+          ( <COMMA> string_value())*
+        )?
+      <RPAREN>
+    )?
+}
+
+void location_term() : {}
+{
+    <LPAREN> equivalence_term() <COMMA> equivalence_term() <RPAREN>
+}
+
+void ifThenElseTerm() : {}
+{
+    <IF> <LPAREN> term() <RPAREN>
+    <THEN> <LPAREN> term() <RPAREN>
+    <ELSE> <LPAREN> term() <RPAREN>
+}
+
+void ifExThenElseTerm() : {}
+{
+    <IFEX> bound_variables()
+    <LPAREN> term() <RPAREN>
+    <THEN> <LPAREN> term() <RPAREN>
+    <ELSE> <LPAREN> term() <RPAREN>
+}
+
+void locset_term() : {}
+{
+    <LBRACE>
+        ( location_term() ( <COMMA> location_term())* )?
+    <RBRACE>
+}
+
+void bound_variables() : {}
+{
+    one_bound_variable()
+    ( <COMMA> one_bound_variable())*
+    <SEMI>
+}
+
+void one_bound_variable() : {}
+{
+    (LOOKAHEAD(sortId() simple_ident()) sortId())? simple_ident()
+}
+
+void argument_list() : {}
+{
+    <LPAREN>
+    ( term() ( <COMMA> term())* )?
+    <RPAREN>
+}
+
+void integer_with_minux() : {}
+{
+    ( <MINUS> )? integer()
+}
+
+void integer() : {}
+{
+    <INT_LITERAL> | <HEX_LITERAL> | <BIN_LITERAL>
+}
+
+void floatnum() : {}
+{
+    ( <MINUS> )? <FLOAT_LITERAL>
+  | ( <MINUS> )? <DOUBLE_LITERAL>
+  | ( <MINUS> )? <REAL_LITERAL>
+}
+
+void char_literal() : {}
+{
+    <CHAR_LITERAL>
+}
+
+void triggers() : {}
+{
+    <TRIGGER>
+    <LBRACE> <IDENT> <RBRACE>
+    term()
+    ( <AVOID> term() ( <COMMA> term())* )?
+    <SEMI>
+}
+
+void taclet() : {}
+{
+    ( <DOC_COMMENT> )?
+    ( <LEMMA> )?
+    <IDENT> ( option_list())?
+    <LBRACE>
+    ( term()
+    |
+        ( <SCHEMAVAR> one_schema_var_decl() <SEMI> )*
+        ( <ASSUMES> <LPAREN> seq() <RPAREN> )?
+        ( <FIND> <LPAREN> termorseq() <RPAREN>
+            ( <SAMEUPDATELEVEL> | <INSEQUENTSTATE> | <ANTECEDENTPOLARITY> | <SUCCEDENTPOLARITY> )*
+        )?
+        ( <VARCOND> <LPAREN> varexplist() <RPAREN> )*
+        goalspecs()
+        modifiers()
+    )
+    <RBRACE>
+}
+
+void modifiers() : {}
+{
+    ( rulesets()
+    | <NONINTERACTIVE>
+    | <DISPLAYNAME> string_value()
+    | <HELPTEXT> string_value()
+    | triggers()
+    )*
+}
+
+void seq() : {}
+{
+    [semisequent()] <SEQARROW> [semisequent()]
+}
+
+void seqEOF() : {}
+{
+    seq() <EOF>
+}
+
+void termorseq() : {}
+{
+    term() ( <COMMA> seq() | <SEQARROW> semisequent())?
+  | <SEQARROW> semisequent()
+}
+
+void semisequent() : {}
+{
+  	term() ( <COMMA> term())*
+}
+
+void varexplist() : {}
+{
+    varexp() ( <COMMA> varexp())*
+}
+
+void varexp() : {}
+{
+    ( <NOT_> )?
+    varexpId()
+    ( <LBRACKET> one_varexp_param() ( <COMMA> one_varexp_param())* <RBRACKET> )?
+    ( <LPAREN> varexp_argument() ( <COMMA> varexp_argument())* <RPAREN> )?
+}
+
+void one_varexp_param() : {}
+{
+    <IDENT>
+}
+
+void varexpId() : {}
+{
+    <APPLY_UPDATE_ON_RIGID>
+  | <SAME_OBSERVER>
+  | <DROP_EFFECTLESS_ELEMENTARIES>
+  | <DROP_EFFECTLESS_STORES>
+  | <DIFFERENTFIELDS>
+  | <SIMPLIFY_IF_THEN_ELSE_UPDATE>
+  | <CONTAINS_ASSIGNMENT>
+  | <ISENUMTYPE>
+  | <ISTHISREFERENCE>
+  | <STATICMETHODREFERENCE>
+  | <ISREFERENCEARRAY>
+  | <ISARRAY>
+  | <ISARRAYLENGTH>
+  | <IS_ABSTRACT_OR_INTERFACE>
+  | <IS_FINAL>
+  | <ENUM_CONST>
+  | <FINAL>
+  | <STATIC>
+  | <ISLOCALVARIABLE>
+  | <ISOBSERVER>
+  | <DIFFERENT>
+  | <METADISJOINT>
+  | <EQUAL_UNIQUE>
+  | <FREELABELIN>
+  | <ISCONSTANT>
+  | <HASLABEL>
+  | <ISSTATICFIELD>
+  | <ISMODELFIELD>
+  | <HASSUBFORMULAS>
+  | <FIELDTYPE>
+  | <NEW>
+  | <NEW_TYPE_OF>
+  | <NEW_DEPENDING_ON>
+  | <NEW_LOCAL_VARS>
+  | <HAS_ELEMENTARY_SORT>
+  | <SAME>
+  | <ISSUBTYPE>
+  | <STRICT> <ISSUBTYPE>
+  | <DISJOINTMODULONULL>
+  | <NOTFREEIN>
+  | <HASSORT>
+  | <NEWLABEL>
+  | <ISREFERENCE>
+  | <MAXEXPANDMETHOD>
+  | <STORE_TERM_IN>
+  | <STORE_STMT_IN>
+  | <HAS_INVARIANT>
+  | <GET_INVARIANT>
+  | <GET_FREE_INVARIANT>
+  | <GET_VARIANT>
+  | <IS_LABELED>
+  | <ISINSTRICTFP>
+}
+
+void varexp_argument() : {}
+{
+    <TYPEOF> <LPAREN> <IDENT> <RPAREN>
+  | <CONTAINERTYPE> <LPAREN> <IDENT> <RPAREN>
+  | <DEPENDINGON> <LPAREN> <IDENT> <RPAREN>
+  | term()
+}
+
+void goalspecs() : {}
+{
+    <CLOSEGOAL>
+  | goalspecwithoption() ( <SEMI> goalspecwithoption())*
+}
+
+void goalspecwithoption() : {}
+{
+    option_list() <LBRACE> goalspec() <RBRACE>
+  | goalspec()
+}
+
+void option() : {}
+{
+    <IDENT> <COLON> <IDENT>
+}
+
+void option_list() : {}
+{
+    <LPAREN>
+    option_expr_top() ( <COMMA> option_expr_top())*
+    <RPAREN>
+}
+
+void option_expr_top() : {}
+{
+    option_expr_or()
+}
+
+void option_expr_or() : {}
+{
+    option_expr_and() ( <OR> option_expr_and())*
+}
+
+void option_expr_and() : {}
+{
+    option_expr_not() ( <AND> option_expr_not())*
+}
+
+void option_expr_not() : {}
+{
+    ( <NOT> )? option_expr_primary()
+}
+
+void option_expr_primary() : {}
+{
+    <LPAREN> option_expr_or() <RPAREN>
+  | option()
+}
+
+void goalspec() : {}
+{
+    ( string_value() ( <LBRACKET> simple_ident() <RBRACKET> )? <COLON> )?
+    ( LOOKAHEAD(2)
+      replacewith()
+      ( add())?
+      ( addrules())?
+      ( addprogvar())?
+    | LOOKAHEAD(2)
+      add() ( addrules())?
+    | addrules()
+    )
+}
+
+void replacewith() : {}
+{
+    <REPLACEWITH> <LPAREN> termorseq() <RPAREN>
+}
+
+void add() : {}
+{
+    <ADD> <LPAREN> seq() <RPAREN>
+}
+
+void addrules() : {}
+{
+    <ADDRULES> <LPAREN> tacletlist() <RPAREN>
+}
+
+void addprogvar() : {}
+{
+    <ADDPROGVARS> <LPAREN> pvset() <RPAREN>
+}
+
+void tacletlist() : {}
+{
+    taclet() ( <COMMA> taclet())*
+}
+
+void pvset() : {}
+{
+    varId() ( <COMMA> varId())*
+}
+
+void rulesets() : {}
+{
+    <HEURISTICS> <LPAREN> ruleset()
+    ( <COMMA> ruleset())* <RPAREN>
+}
+
+void ruleset() : {}
+{
+    <IDENT>
+}
+
+void metaId() : {}
+{
+    simple_ident()
+}
+
+void metaTerm() : {}
+{
+    metaId() ( <LPAREN> term() ( <COMMA> term())* <RPAREN> )?
+}
+
+void contracts() : {}
+{
+    <CONTRACTS>
+    <LBRACE>
+    ( one_contract())*
+    <RBRACE>
+}
+
+void invariants() : {}
+{
+    <INVARIANTS> <LPAREN> one_bound_variable() <RPAREN>
+    <LBRACE>
+    ( one_invariant())*
+    <RBRACE>
+}
+
+void one_contract() : {}
+{
+    simple_ident() <LBRACE>
+    ( prog_var_decls())?
+    term() <MODIFIABLE> term()
+    <RBRACE> <SEMI>
+}
+
+void one_invariant() : {}
+{
+    simple_ident() <LBRACE>
+    term()
+    ( <DISPLAYNAME> string_value())?
+    <RBRACE> <SEMI>
+}
+
+void rulesOrAxioms() : {}
+{
+    ( <DOC_COMMENT> )?
+    ( <RULES> | <AXIOMS> )
+    ( option_list())?
+    <LBRACE> ( taclet() <SEMI> )* <RBRACE>
+}
+
+void bootClassPath() : {}
+{
+    <BOOTCLASSPATH> string_value() <SEMI>
+}
+
+void classPaths() : {}
+{
+    <CLASSPATH> string_value() ( <COMMA> string_value())* <SEMI>
+}
+
+void javaSource() : {}
+{
+    <JAVASOURCE> oneJavaSource() <SEMI>
+}
+
+void oneJavaSource() : {}
+{
+    ( string_value() | <COLON> )+
+}
+
+void profile() : {}
+{
+    <PROFILE> string_value() <SEMI>
+}
+
+void preferences() : {}
+{
+    <KEYSETTINGS> ( <LBRACE> ( string_value())? <RBRACE> | cvalue())
+}
+
+void proofScriptEntry() : {}
+{
+    <PROOFSCRIPT>
+    ( <STRING_LITERAL> (<SEMI>)?
+    | <LBRACE> proofScript() <RBRACE>
+    )
+}
+
+void proofScriptEOF() : {}
+{
+    proofScript() <EOF>
+}
+
+void proofScript() : {}
+{
+    ( proofScriptCommand())*
+}
+
+void proofScriptCommand() : {}
+{
+    <IDENT> proofScriptParameters() <SEMI>
+}
+
+void proofScriptParameters() : {}
+{
+    ( proofScriptParameter())*
+}
+
+void proofScriptParameter() : {}
+{
+    ( proofScriptParameterName() ( <COLON> | <EQUALS> ))? proofScriptExpression()
+}
+
+void proofScriptParameterName() : {}
+{
+    ( <AT> )? <IDENT>
+}
+
+void proofScriptExpression() : {}
+{
+    boolean_literal()
+  | char_literal()
+  | integer()
+  | floatnum()
+  | string_literal()
+  | <LPAREN> ( term() | seq()) <RPAREN>
+  | simple_ident()
+  | abbreviation()
+  | literals()
+  | proofScriptCodeBlock()
+}
+
+void proofScriptCodeBlock() : {}
+{
+    <LBRACE> proofScript() <RBRACE>
+}
+
+void proof() : {}
+{
+    <PROOF> <EOF>
+}
+
+void cfile() : {}
+{
+    ( cvalue())* <EOF>
+}
+
+void ckv() : {}
+{
+    ( <DOC_COMMENT> )? ckey() <COLON> cvalue()
+}
+
+void ckey() : {}
+{
+    <IDENT> | <STRING_LITERAL>
+}
+
+void cvalue() : {}
+{
+    <IDENT>
+  | <STRING_LITERAL>
+  | <BIN_LITERAL>
+  | <HEX_LITERAL>
+  | ( <MINUS> )? <INT_LITERAL>
+  | ( <MINUS> )? <FLOAT_LITERAL>
+  | ( <MINUS> )? <DOUBLE_LITERAL>
+  | ( <MINUS> )? <REAL_LITERAL>
+  | <TRUE> | <FALSE>
+  | <LBRACE>
+     ( ckv() ( <COMMA> ckv())* )? ( <COMMA> )?
+    <RBRACE>
+  | <LBRACKET> ( cvalue() ( <COMMA> cvalue())* )? ( <COMMA> )? <RBRACKET>
+}
+
+void varId() : {}
+{
+    <IDENT>
+}
+
+void varIds() : {}
+{
+    simple_ident_comma_list()
+}

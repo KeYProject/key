@@ -1,9 +1,16 @@
 package de.uka.ilkd.key.peg;
 
-import org.parboiled.Parboiled;
-import org.parboiled.errors.InvalidInputError;
-import org.parboiled.parserunners.ReportingParseRunner;
-import org.parboiled.support.ParsingResult;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.KeY;
+import de.uka.ilkd.key.parser.KeYTokenManager;
+import de.uka.ilkd.key.parser.ParseException;
+import de.uka.ilkd.key.parser.SimpleCharStream;
+import org.antlr.v4.runtime.CharStreams;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  *
@@ -11,37 +18,29 @@ import org.parboiled.support.ParsingResult;
  * @version 1 (25.06.26)
  */
 public class Test {
+    public static void main(String[] args) throws IOException, ParseException {
+        var in = Files.readString(Path.of("super.key"));
+        var tm = new KeYTokenManager(new SimpleCharStream(new StringReader(in)));
 
-    public static void main(String[] args) {
-        var p = Parboiled.createParser(KeYParboiledParser.class);
+        int q = 1000;
+        for (int n = 1; n < q; n++) {
+            double x = System.nanoTime();
+            for (int i = 0; i < n; i++) {
+                var k = new KeY(new StringReader(in));
+                k.file();
+            }
+            double y = System.nanoTime();
 
-        final var intX = new ReportingParseRunner<>(p.OneBoundVariable()).run("int x");
-        ((InvalidInputError)intX.parseErrors.getFirst()).getFailedMatchers().forEach(System.out::println);
-        System.out.println(intX.matched);
+            double a = System.nanoTime();
+            for (int i = 0; i < n; i++) {
+                ParsingFacade.createParser(ParsingFacade.createLexer(CharStreams.fromString(in)))
+                        .file();
+            }
+            double b = System.nanoTime();
 
 
-        System.out.println(new ReportingParseRunner<>(p.OpNot()).run("!").matched);
-        System.out.println(new ReportingParseRunner<>(p.Term60()).run("!x").matched);
+            System.out.printf("%2.2f\n", (y - x) / (b - a));
+        }
 
-        ParsingResult<Object> result
-                = new ReportingParseRunner<>(p.Problem()).run(
-                """
-                        \\problem{
-                            (true & true
-                        }
-                        """
-
-        );
-        System.out.println(result.matched);
-        System.out.println(result.parseErrors.getFirst().getErrorMessage());
-        System.out.println(result.parseErrors.getFirst().getStartIndex());
-        System.out.println(result.parseErrors.getFirst().getEndIndex());
-        ((InvalidInputError) result.parseErrors.getFirst()).getFailedMatchers()
-                .stream().map(
-                        it -> it.getElementAtLevel(it.length() - 1).matcher
-                )
-                .forEach(System.out::println);
-
-        System.out.println(result);
     }
 }
