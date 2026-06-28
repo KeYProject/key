@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -19,13 +21,18 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     private final PropertyEntry<String> authToken = createStringProperty("authToken", "");
     private final PropertyEntry<String> apiEndpoint =
-        createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu/v1");
+            createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu/v1");
     private final PropertyEntry<String> defaultModel =
-        createStringProperty("defaultModel", "azure.gpt-4.1-mini");
+            createStringProperty("defaultModel", "azure.gpt-4.1-mini");
     private final PropertyEntry<List<String>> availableModels =
-        createStringListProperty("availableModels",
-            "azure.gpt-4.1-mini,gpt-oss:120b,mixtral:8x22b,qwen3-vl:235b-a22b-instruct");
+            createStringListProperty("availableModels",
+                    "azure.gpt-4.1-mini,gpt-oss:120b,mixtral:8x22b,qwen3-vl:235b-a22b-instruct");
 
+    private final PropertyEntry<Set<String>> allowedToolsWithApproval =
+            createStringSetProperty("allowedToolsWithApproval", new TreeSet<>());
+
+    private final PropertyEntry<Set<String>> allowedToolsWithoutApproval =
+            createStringSetProperty("allowedToolsWithoutApproval", new TreeSet<>());
 
     public LlmSettings() {
         super(CATEGORY);
@@ -68,5 +75,21 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setDefaultModel(String defaultModel) {
         this.defaultModel.set(defaultModel);
+    }
+
+    public Set<String> getAllowedToolsWithApproval() {
+        return allowedToolsWithApproval.get();
+    }
+
+    public Set<String> getAllowedToolsWithoutApproval() {
+        return allowedToolsWithoutApproval.get();
+    }
+
+    public void setAllowedToolsWithApproval(Set<String> val) {
+        allowedToolsWithApproval.set(val);
+    }
+
+    public void setAllowedToolsWithoutApproval(Set<String> val) {
+        allowedToolsWithoutApproval.set(val);
     }
 }

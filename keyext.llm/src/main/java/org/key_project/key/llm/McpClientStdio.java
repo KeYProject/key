@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.key_project.key.llm.mcp.McpClient;
+import org.key_project.key.llm.mcp.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +55,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alexander Weigl
  * @version 1.0 (6/28/26)
- * @see LlmClientExtended.McpClient
+ * @see McpClient
  * @see <a href="https://modelcontextprotocol.io/">Model Context Protocol Specification</a>
  */
-public class McpClientStdio implements LlmClientExtended.McpClient {
+public class McpClientStdio implements McpClient {
     private static final Logger logger = LoggerFactory.getLogger(McpClientStdio.class);
     private static final Gson GSON = new GsonBuilder().create();
 
@@ -183,8 +185,8 @@ public class McpClientStdio implements LlmClientExtended.McpClient {
     }
 
     @Override
-    public List<Map<String, Object>> getToolsAsOpenAiFormat() {
-        return new ArrayList<>(cachedTools);
+    public List<Tool> getTools() {
+        return new ArrayList<>();
     }
 
     @Override

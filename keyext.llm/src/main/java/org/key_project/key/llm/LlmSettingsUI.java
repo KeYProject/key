@@ -5,11 +5,12 @@ package org.key_project.key.llm;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import org.key_project.key.llm.mcp.BuiltInMCPClient;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
@@ -23,6 +24,8 @@ public class LlmSettingsUI extends SettingsPanel {
     private final JComboBox<String> cboDefaultModel;
     private final JList<String> selAvailableModels;
     private final JButton btnFetchModels;
+
+    private final JTable selAvailableTools;
 
     public LlmSettingsUI(LlmSettings settings) {
         model = new LlmSettings(settings);
@@ -48,6 +51,51 @@ public class LlmSettingsUI extends SettingsPanel {
                 model::setAvailableModels, model.getAvailableModels(), s -> s);
 
         addTitledComponent("test", btnFetchModels, "test");
+
+        var mcpClient = new BuiltInMCPClient().getAllToolNames().stream().toList();
+        var name = new Column<>("Name", String.class, (String s) -> s);
+        var awR = new Column<>("AwR", Boolean.class,
+                (String s) -> model.getAllowedToolsWithApproval().contains(s),
+                (String s, Object value) -> {
+                    if (value == Boolean.TRUE)
+                        model.getAllowedToolsWithApproval().add(s);
+                    else
+                        model.getAllowedToolsWithApproval().remove(s);
+                }
+        );
+        var awoR = new Column<>("AwoR", Boolean.class, (String s) -> model.getAllowedToolsWithoutApproval().contains(s),
+                (String s, Object value) -> {
+                    if (value == Boolean.TRUE)
+                        model.getAllowedToolsWithoutApproval().add(s);
+                    else
+                        model.getAllowedToolsWithoutApproval().remove(s);
+                }
+        );
+        selAvailableTools = addTableBox("Tools Models", "", mcpClient, name, awR, awoR);
+
+        // Set checkbox editor for boolean columns
+        selAvailableTools.setDefaultEditor(Boolean.class, new DefaultCellEditor(new JCheckBox()));
+
+        // Set checkbox renderer for boolean columns
+        selAvailableTools.setDefaultRenderer(Boolean.class, new DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JCheckBox checkBox = new JCheckBox();
+                if (value instanceof Boolean bool) {
+                    checkBox.setSelected(bool);
+                }
+                checkBox.setHorizontalAlignment(JLabel.CENTER);
+                if (isSelected) {
+                    checkBox.setBackground(table.getSelectionBackground());
+                    checkBox.setForeground(table.getSelectionForeground());
+                } else {
+                    checkBox.setBackground(table.getBackground());
+                    checkBox.setForeground(table.getForeground());
+                }
+                return checkBox;
+            }
+        });
     }
 
     public LlmSettings getModel() {
@@ -72,391 +120,6 @@ public class LlmSettingsUI extends SettingsPanel {
                 listModel.clear();
                 listModel.addAll(seq);
                 cboDefaultModel.setSelectedItem(listModel.get(0));
-
-                /*
-
-  "data": [
-    {
-      "id": "kit.gpt-oss-120b",
-      "name": "kit.gpt-oss-120b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.gpt-oss-120b",
-        "name": "kit.gpt-oss-120b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.gpt-oss-120b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.qwen3-reranker-8b",
-      "name": "kit.qwen3-reranker-8b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.qwen3-reranker-8b",
-        "name": "kit.qwen3-reranker-8b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.qwen3-reranker-8b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.qwen3-embedding-8b",
-      "name": "kit.qwen3-embedding-8b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.qwen3-embedding-8b",
-        "name": "kit.qwen3-embedding-8b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.qwen3-embedding-8b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.qwen3.5-397b-A17b",
-      "name": "kit.qwen3.5-397b-A17b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.qwen3.5-397b-A17b",
-        "name": "kit.qwen3.5-397b-A17b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.qwen3.5-397b-A17b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.mistral-small-4-119b-a8b",
-      "name": "kit.mistral-small-4-119b-a8b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.mistral-small-4-119b-a8b",
-        "name": "kit.mistral-small-4-119b-a8b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.mistral-small-4-119b-a8b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.minimax-m2.7-229b",
-      "name": "kit.minimax-m2.7-229b",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.minimax-m2.7-229b",
-        "name": "kit.minimax-m2.7-229b",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.minimax-m2.7-229b"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.gemma4-31b-it",
-      "name": "kit.gemma4-31b-it",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.gemma4-31b-it",
-        "name": "kit.gemma4-31b-it",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.gemma4-31b-it"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.flux.2-dev",
-      "name": "kit.flux.2-dev",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.flux.2-dev",
-        "name": "kit.flux.2-dev",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.flux.2-dev"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.voxtral-4b-tts-2603",
-      "name": "kit.voxtral-4b-tts-2603",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.voxtral-4b-tts-2603",
-        "name": "kit.voxtral-4b-tts-2603",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.voxtral-4b-tts-2603"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "kit.whisper-large-v3",
-      "name": "kit.whisper-large-v3",
-      "owned_by": "openai",
-      "openai": {
-        "id": "kit.whisper-large-v3",
-        "name": "kit.whisper-large-v3",
-        "owned_by": "openai",
-        "openai": {
-          "id": "kit.whisper-large-v3"
-        },
-        "urlIdx": 0,
-        "connection_type": "local"
-      },
-      "urlIdx": 0,
-      "connection_type": "local",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-4.1",
-      "name": "azure.gpt-4.1",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-4.1",
-        "name": "azure.gpt-4.1",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-4.1"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-4.1-mini",
-      "name": "azure.gpt-4.1-mini",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-4.1-mini",
-        "name": "azure.gpt-4.1-mini",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-4.1-mini"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-4.1-nano",
-      "name": "azure.gpt-4.1-nano",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-4.1-nano",
-        "name": "azure.gpt-4.1-nano",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-4.1-nano"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.o3",
-      "name": "azure.o3",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.o3",
-        "name": "azure.o3",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.o3"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.o4-mini",
-      "name": "azure.o4-mini",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.o4-mini",
-        "name": "azure.o4-mini",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.o4-mini"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5.1",
-      "name": "azure.gpt-5.1",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5.1",
-        "name": "azure.gpt-5.1",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5.1"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5",
-      "name": "azure.gpt-5",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5",
-        "name": "azure.gpt-5",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5-mini",
-      "name": "azure.gpt-5-mini",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5-mini",
-        "name": "azure.gpt-5-mini",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5-mini"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5-nano",
-      "name": "azure.gpt-5-nano",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5-nano",
-        "name": "azure.gpt-5-nano",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5-nano"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5.4",
-      "name": "azure.gpt-5.4",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5.4",
-        "name": "azure.gpt-5.4",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5.4"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    },
-    {
-      "id": "azure.gpt-5.5",
-      "name": "azure.gpt-5.5",
-      "owned_by": "openai",
-      "openai": {
-        "id": "azure.gpt-5.5",
-        "name": "azure.gpt-5.5",
-        "owned_by": "openai",
-        "openai": {
-          "id": "azure.gpt-5.5"
-        },
-        "urlIdx": 1,
-        "connection_type": "external"
-      },
-      "urlIdx": 1,
-      "connection_type": "external",
-      "provider": ""
-    }
-  ]
-}
-                 */
                 System.out.println(data);
             }
         }

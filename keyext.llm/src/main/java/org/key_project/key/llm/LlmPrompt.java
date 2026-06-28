@@ -23,6 +23,8 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
+import org.key_project.key.llm.mcp.BuiltInMCPClient;
+import org.key_project.key.llm.mcp.McpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -261,10 +263,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
             var node = MainWindow.getInstance().getMediator().getSelectedNode();
 
             LlmSession session = LlmUtils.getSession(proof);
-            LlmClientExtended.McpClient mcpClient = new BuiltInMCP();
 
             var txt = txtInput.getText();
-            var client = new LlmClientExtended(session, new LlmContext(), txt, mcpClient);
+            var client = new LlmClientExtended(session, new LlmContext(), txt, session.getMcpClient());
             //var client = new LlmClient(session, new LlmContext(), txt);
             addInput(txt);
             txtInput.setText("");

@@ -32,12 +32,12 @@ public class LlmUtils {
             if (session != null) {
                 return session;
             }
-            session = new LlmSession(settings.getApiEndpoint(), settings.getAuthToken());
+            session = LlmSession.createUsingSettings();
             proof.register(session, LlmSession.class);
             return session;
         } else {
             if (globalSession == null) {
-                globalSession = new LlmSession(settings.getApiEndpoint(), settings.getAuthToken());
+                globalSession = LlmSession.createUsingSettings();
             }
             return globalSession;
         }
