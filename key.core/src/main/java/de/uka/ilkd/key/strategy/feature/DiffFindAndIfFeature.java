@@ -12,6 +12,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -19,6 +20,9 @@ import org.key_project.util.collection.ImmutableList;
  * matched to different members of the sequent. If a taclet has more than one formula in its
  * <tt>\assumes</tt> part, all of the must be matched to different members.
  */
+// Stable: compares the find position against the application's own \assumes instantiations, both
+// fixed for a given rule application.
+@StableCost
 public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
