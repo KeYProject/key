@@ -336,7 +336,7 @@ public class RecentFileMenu {
                 mainWindow.loadProblem(file, pl -> {
                     if (profile != null) {
                         pl.setProfileOfNewProofs(profile);
-                        // pl.setAdditionalProfileOptions(additionalProfileOptions);
+                        pl.setAdditionalProfileOptions(additionalProfileOptions);
                     }
                     pl.setLoadSingleJavaFile(fileEntry.singleJava);
                 });

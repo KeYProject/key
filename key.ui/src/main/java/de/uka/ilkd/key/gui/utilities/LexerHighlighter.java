@@ -90,9 +90,11 @@ public abstract class LexerHighlighter {
 
     private void highlightToken(StyledDocument sd, int startIdx, Token tok) {
         var attribute = getStyle(tok.getType());
-        sd.setCharacterAttributes(startIdx + tok.getStartIndex(),
-            1 + tok.getStopIndex() - tok.getStartIndex(),
-            attribute, true);
+        if (attribute != null) {
+            sd.setCharacterAttributes(startIdx + tok.getStartIndex(),
+                1 + tok.getStopIndex() - tok.getStartIndex(),
+                attribute, true);
+        }
     }
 
     protected abstract Pattern getMarkdownPattern();
@@ -126,7 +128,7 @@ public abstract class LexerHighlighter {
         private final AttributeSet STYLE_KEYWORDS = define(COLOR_KEYWORD.get(), true, false);
         private final AttributeSet STYLE_IDENTIFIER = define(COLOR_IDENTIFIER.get(), true, false);
         private final AttributeSet STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
-        private final AttributeSet STYLE_MODALITY = define(COLOR_COMMENT.get(), false, true);
+        private final AttributeSet STYLE_MODALITY = define(COLOR_MODALITY.get(), false, true);
         private final AttributeSet STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
 
 

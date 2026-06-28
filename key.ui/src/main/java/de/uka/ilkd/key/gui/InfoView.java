@@ -12,21 +12,20 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.InfoView.InfoNodeFactory.InfoTreeNode;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
-import de.uka.ilkd.key.logic.MetaSpace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.label.TermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
@@ -47,20 +46,18 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.logic.Choice;
-import org.key_project.logic.HasMeta;
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.util.collection.ImmutableList;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
@@ -125,9 +122,9 @@ public class InfoView extends JSplitPane implements TabPanel {
         setName("infoViewPane");
 
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        root.add(nodeFactory.create("No proof loaded",
-            "In this pane, the available logical rules will be displayed and/or explained."));
+        InfoNodeFactory.InfoTreeNode root = nodeFactory.create("No proof loaded",
+            () -> "In this pane, the available logical rules will be displayed and/or explained.",
+            List::of);
         infoTree.setModel(new DefaultTreeModel(root));
         infoTree.setShowsRootHandles(true);
         infoTree.setRootVisible(false);
@@ -165,7 +162,7 @@ public class InfoView extends JSplitPane implements TabPanel {
 
             @Override
             public void proofDisposed(ProofDisposedEvent e) {
-                updateModel(null);
+                SwingUtilities.invokeLater(() -> updateModel(null));
             }
         };
 
@@ -180,9 +177,10 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             private void checkPopup(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    Object selected =
-                        ((InfoTreeNode) infoTree.getLastSelectedPathComponent()).getUserObject();
+                final Object lastSelectedPathComponent = infoTree.getLastSelectedPathComponent();
+                if (lastSelectedPathComponent instanceof InfoNodeFactory.InfoTreeNode node
+                        && e.isPopupTrigger()) {
+                    Object selected = node.getUserObject();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         ContextMenuKind.INFO_TREE, selected, mediator);
                     if (menu.getComponentCount() > 0) {
@@ -193,9 +191,9 @@ public class InfoView extends JSplitPane implements TabPanel {
         });
 
         infoTree.addTreeSelectionListener(e -> {
-            InfoTreeNode node = (InfoTreeNode) infoTree.getLastSelectedPathComponent();
-            if (node != null) {
-                contentPane.setText(node.getDescription());
+            Object node = infoTree.getLastSelectedPathComponent();
+            if (node instanceof InfoNodeFactory.InfoTreeNode infoTreeNode) {
+                contentPane.setText(infoTreeNode.getDescription());
                 lexerHighlighter.highlightPaneMarkdown(contentPane);
             } else {
                 contentPane.setText("");
@@ -259,7 +257,7 @@ public class InfoView extends JSplitPane implements TabPanel {
     }
 
     private JTextPane createInfoArea() {
-        var description = new JTextPane();
+        JTextPane description = new JTextPane();
         description.setEditable(false);
         description.setBorder(BorderFactory.createTitledBorder(""));
         description.setCaretPosition(0);
@@ -278,285 +276,344 @@ public class InfoView extends JSplitPane implements TabPanel {
             "Display descriptions for documented interpreted function and predicate symbols.";
 
 
-        private DefaultMutableTreeNode createInfoTreeRoot(Goal g) {
-            InfoTreeNode root = create(
-                "This is the root node of InfoTreeModel. It should not be visible.", "");
-
-            MetaSpace docs = g.proof().getServices().getNamespaces().docs();
-
-            root.add(createNodeRules(docs, g));
-            root.add(createNodeTermLabels(docs, g.proof()));
-            final var namespaces = g.getLocalNamespaces();
-            root.add(createNodeFunctions(docs, namespaces.functions()));
-            root.add(createNodeTacletOptions(docs, g.proof().getInitConfig()));
-            root.add(createNodeChoices(docs, namespaces.choices()));
-            root.add(createNodeRS("Parametric Funcions", docs,
-                namespaces.parametricFunctions().allElements()));
-            root.add(createNodePS(docs, namespaces.parametricSorts().allElements()));
-            root.add(createNodeRS("Rule Sets", docs,
-                namespaces.ruleSets().allElements()));
-            root.add(
-                createNodeAliases(docs, namespaces.sortAliases().allElements()));
-            root.add(createNodeRS("Variables", docs,
-                namespaces.variables().allElements()));
-            root.add(createNodeRS("Program Variables", docs,
-                namespaces.programVariables().allElements()));
-            root.add(createNodeScripts(docs));
-            return root;
+        private InfoTreeNode createInfoTreeRoot(Goal g) {
+            return create("This is the root node of InfoTreeModel.It should not be visible.",
+                () -> "",
+                () -> {
+                    MetaSpace docs = g.proof().getServices().getNamespaces().docs();
+                    final NamespaceSet namespaces = g.getLocalNamespaces();
+                    return List.of(
+                        createNodeRules(docs, g),
+                        createNodeTermLabels(docs, g.proof()),
+                        createNodeFunctions(docs, namespaces.functions()),
+                        createNodeTacletOptions(docs, g.proof().getInitConfig()),
+                        createNodeChoices(docs, namespaces.choices()),
+                        createNodeRS("Parametric Functions", docs,
+                            namespaces.parametricFunctions().allElements()),
+                        createNodePS(docs, namespaces.parametricSorts().allElements()),
+                        createNodePF(docs, namespaces.parametricFunctions().allElements()),
+                        createNodeRS("Rule Sets", docs,
+                            namespaces.ruleSets().allElements()),
+                        createNodeAliases(docs, namespaces.sortAliases().allElements()),
+                        createNodeRS("Variables", docs,
+                            namespaces.variables().allElements()),
+                        createNodeRS("Program Variables", docs,
+                            namespaces.programVariables().allElements()),
+                        createNodeScripts(docs));
+                });
         }
 
-        private MutableTreeNode createNodeAliases(MetaSpace docs,
-                Collection<SortAlias> sortAliases) {
-            var tlRoot = create("Sort Alias", "");
-            for (var alias : sortAliases) {
-                tlRoot.add(new InfoTreeNode(alias.name().toString(),
-                    () -> "Alias of " + alias.aliasedSort() + "\n"
-                        + docs.findDocumentation(alias.aliasedSort())));
-            }
-            return tlRoot;
+        private InfoTreeNode createNodeAliases(
+                MetaSpace docs, Collection<SortAlias> sortAliases) {
+            return create("Sort Alias", () -> "", () -> sortAliases.stream().map(
+                alias -> new InfoTreeNode(alias.name().toString(),
+                    () -> "Alias of %s\n%s".formatted(alias.aliasedSort(),
+                        requireNonNullElse(docs.findDocumentation(alias.aliasedSort()), "not set")),
+                    List::of)).toList());
         }
 
-        private MutableTreeNode createNodeRS(String title, MetaSpace docs,
-                Collection<? extends HasMeta> ruleSets) {
-            var tlRoot = create(title, "");
-            for (var element : ruleSets) {
-                tlRoot.add(
-                    new InfoTreeNode(element.toString(), () -> docs.findDocumentation(element)));
-            }
-            return tlRoot;
+        private InfoTreeNode createNodeRS(String title, MetaSpace docs,
+                Collection<? extends HasMetaSpaceKey> ruleSets) {
+            return create(title, () -> "",
+                () -> ruleSets.stream()
+                        .map(element -> create(element.toString(),
+                            () -> docs.findDocumentation(element),
+                            List::of))
+                        .toList());
         }
 
-        private MutableTreeNode createNodePS(MetaSpace docs,
+        private InfoTreeNode createNodePS(MetaSpace docs,
                 @MonotonicNonNull Collection<ParametricSortDecl> sorts) {
-            var tlRoot = create("Parametric Sorts", "");
-            for (var element : sorts) {
-                tlRoot.add(
-                    new InfoTreeNode(element.name().toString(),
-                        () -> docs.findDocumentation(element) + "\n\n---\nparams:" +
-                            element.getParameters() + "\n\n---\nextends: "
-                            + element.getExtendedSorts() +
-                            "\n\n---\n"));
-            }
-            return tlRoot;
+            return create("Parametric Sorts", () -> "",
+                () -> sorts.stream().map(element -> create(element.name().toString(),
+                    () -> "%s\n\n---\nparams:%s\n\n---\nextends: %s\n\n---\n".formatted(
+                        requireNonNullElse(docs.findDocumentation(element), "no doc set"),
+                        element.getParameters(), element.getExtendedSorts()),
+                    List::of)).toList());
         }
 
-        private MutableTreeNode createNodePF(MetaSpace docs,
-                Namespace<ParametricFunctionDecl> funcs) {
-            var tlRoot = create("Parametric Functions", "");
-            for (var element : funcs.allElements()) {
-                tlRoot.add(
-                    new InfoTreeNode(element.toString(), () -> docs.findDocumentation(element)));
-            }
-            return tlRoot;
+        private InfoTreeNode createNodePF(MetaSpace docs,
+                Collection<ParametricFunctionDecl> funcs) {
+            return create("Parametric Functions", () -> "",
+                () -> funcs.stream()
+                        .map(
+                            it -> create(it.toString(), () -> docs.findDocumentation(it), List::of))
+                        .toList());
         }
 
         private InfoTreeNode createNodeChoices(MetaSpace docs, Namespace<Choice> choices) {
-            var tlRoot = create("Choices", "Browse descriptions for currently available choices");
-            Multimap<String, InfoTreeNode> map =
-                MultimapBuilder.hashKeys().arrayListValues(4).build();
-            choices.allElements().forEach((c) -> map.put(c.category(),
-                new InfoTreeNode(c.name().toString(), () -> docs.findDocumentation(c))));
-            for (var s : map.keySet()) {
-                var cat = new InfoTreeNode(s,
-                    () -> docs.findDocumentation(new HasMeta.OptionCategory(s)));
-                map.get(s).forEach(cat::add);
-                tlRoot.add(cat);
-            }
-            return tlRoot;
+            return create("Choices",
+                () -> "Browse descriptions for currently available choices", () -> {
+                    Multimap<String, InfoTreeNode> map =
+                        MultimapBuilder.hashKeys().arrayListValues(4).build();
+                    choices.allElements().forEach(c -> map.put(c.category(),
+                        create(c.name().toString(), () -> docs.findDocumentation(c))));
+                    return map.keySet().stream().map(s -> {
+                        return create(s,
+                            () -> docs.findDocumentation(new HasMetaSpaceKey.OptionCategory(s)),
+                            () -> new ArrayList<>(map.get(s)));
+                    }).toList();
+                });
         }
 
         private InfoTreeNode createNodeScripts(MetaSpace docs) {
-            var tlRoot = create("Proof Script Commands",
-                "Browse descriptions for currently available proof script commands.");
-            ProofScriptEngine.loadCommands().forEach((key, value) -> {
-                tlRoot.add(new InfoTreeNode(key, () -> value.getDocumentation()));
-            });
-            return tlRoot;
+            return create("Proof Script Commands",
+                () -> "Browse descriptions for currently available proof script commands.",
+                () -> ProofScriptEngine.loadCommands().entrySet().stream()
+                        .map((e) -> create(e.getKey(), e.getValue()::getDocumentation)).toList());
         }
 
         private InfoTreeNode createNodeRules(MetaSpace docs, Goal g) {
-            var tlRoot = create("Rules", "Browse descriptions for currently available rules.");
+            return create("Rules", () -> "Browse descriptions for currently available rules.",
+                () -> {
+                    List<NoPosTacletApp> set =
+                        new ArrayList<>(g.ruleAppIndex().tacletIndex().allNoPosTacletApps());
+                    OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
+                    if (simplifier != null && !simplifier.isShutdown()) {
+                        set.addAll(simplifier.getCapturedTaclets());
+                    }
+                    set.sort(Comparator.comparing(RuleApp::displayName));
 
-            List<NoPosTacletApp> set =
-                new ArrayList<>(g.ruleAppIndex().tacletIndex().allNoPosTacletApps());
-            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
-            if (simplifier != null && !simplifier.isShutdown()) {
-                set.addAll(simplifier.getCapturedTaclets());
-            }
-            set.sort(Comparator.comparing(RuleApp::displayName));
-
-            tlRoot.add(createNodeBuiltInRules(docs, g));
-            tlRoot.add(createNodeAxiom(docs,
-                set.stream().filter(it -> {
-                    RuleJustification just = g.proof().mgt().getJustification(it);
-                    return just != null && just.isAxiomJustification();
-                })));
-
-            tlRoot.add(createNodeLemmas(docs, set.stream().filter(it -> {
-                RuleJustification just = g.proof().mgt().getJustification(it);
-                return just != null && !just.isAxiomJustification();
-            })));
-
-            return tlRoot;
+                    return List.of(
+                        createNodeBuiltInRules(docs, g),
+                        createNodeAxiom(docs,
+                            set.stream().filter(it -> {
+                                RuleJustification just = g.proof().mgt().getJustification(it);
+                                return just != null && just.isAxiomJustification();
+                            }).toList()),
+                        createNodeLemmas(docs, set.stream().filter(it -> {
+                            RuleJustification just = g.proof().mgt().getJustification(it);
+                            return just != null && !just.isAxiomJustification();
+                        })));
+                });
         }
 
-        private MutableTreeNode createNodeBuiltInRules(MetaSpace docs, Goal g) {
-            InfoTreeNode builtInRoot = create("Built-In",
-                "Some logical rules are implemented in Java code. This is because their semantics "
-                    +
-                    "cannot easily be expressed in KeY's Taclet language.");
-            ImmutableList<BuiltInRule> rules =
-                g.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules();
-            for (BuiltInRule br : rules) {
-                builtInRoot.add(create(br, docs));
-            }
-            return builtInRoot;
+        private InfoTreeNode createNodeBuiltInRules(MetaSpace docs, Goal g) {
+            return create("Built-In",
+                () -> "Some logical rules are implemented in Java code. This is because their semantics "
+                    + "cannot easily be expressed in KeY's Taclet language.",
+                () -> g.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()
+                        .map(br -> create(br, docs))
+                        .toList());
         }
 
-        private MutableTreeNode createNodeAxiom(MetaSpace docs, Stream<NoPosTacletApp> seq) {
-            InfoTreeNode axiomTacletRoot = create(TACLET_BASE, """
+        private InfoTreeNode createNodeAxiom(MetaSpace docs, List<NoPosTacletApp> seq) {
+            var title = ("%s (%d)".formatted(TACLET_BASE, seq.size()));
+            return create(title, () -> """
                     Most logical rules are implemented as Taclets.
 
                     Taclets are schematic logical rules formulated in the Taclet Language.\s
                     The language is defined and explained in the KeY book.
-                    """);
-            Map<String, List<NoPosTacletApp>> ruleAppIndex = new TreeMap<>();
-            seq.forEach(it -> ruleAppIndex.computeIfAbsent(it.displayName(), k -> new ArrayList<>())
-                    .add(it));
-
-            ruleAppIndex.forEach((key, value) -> {
-                if (value.size() > 1) {
-                    InfoTreeNode group = create("%s (%d)".formatted(key, value.size()), "");
-                    axiomTacletRoot.add(group);
-                    value.forEach(it -> group.add(create(it.rule(), docs)));
-                } else {
-                    value.forEach(it -> axiomTacletRoot.add(create(it.rule(), docs)));
-                }
-            });
-            var count = ruleAppIndex.values().stream().mapToInt(List::size).sum();
-            axiomTacletRoot.setUserObject("%s (%d)".formatted(TACLET_BASE, count));
-            return axiomTacletRoot;
+                    """,
+                () -> {
+                    Map<String, List<NoPosTacletApp>> ruleAppIndex = new TreeMap<>();
+                    seq.forEach(
+                        it -> ruleAppIndex.computeIfAbsent(it.displayName(), k -> new ArrayList<>())
+                                .add(it));
+                    return ruleAppIndex.entrySet().stream().flatMap(entry -> {
+                        var value = entry.getValue();
+                        var key = entry.getKey();
+                        if (value.size() > 1) {
+                            return Stream.of(
+                                create("%s (%d)".formatted(key, value.size()), () -> "",
+                                    () -> value.stream().map(it -> create(it.rule(), docs))
+                                            .toList()));
+                        } else {
+                            return value.stream().map(it -> create(it.rule(), docs));
+                        }
+                    }).toList();
+                });
         }
 
-        private MutableTreeNode createNodeLemmas(MetaSpace docs, Stream<NoPosTacletApp> seq) {
-            InfoTreeNode proveableTacletsRoot = create(LEMMAS,
-                """
+        private InfoTreeNode createNodeLemmas(MetaSpace docs, Stream<NoPosTacletApp> seq) {
+            return create(LEMMAS,
+                () -> """
                         Taclets which have been introduced using File->Load User-Defined Taclets are filed here.
 
                         Loading User Defined Taclets opens side branches on which the soundness of the lemma taclets must be established.
-                        """);
-            seq.forEach(it -> proveableTacletsRoot.add(create(it.rule(), docs)));
-            return proveableTacletsRoot;
+                        """,
+                () -> seq.map(it -> create(it.rule(), docs)).toList());
         }
 
-        private MutableTreeNode createNodeTermLabels(MetaSpace docs, Proof proof) {
-            var tlRoot =
-                create("Term Labels", "Show descriptions for currently available term labels.");
-            var mgr = TermLabelManager.getTermLabelManager(proof.getServices());
-            var factories = mgr.getFactories();
+        private InfoTreeNode create(String title, Supplier<String> description) {
+            return create(title, description, List::of);
+        }
 
-            var labelNames = new ArrayList<>(factories.keySet());
-            labelNames.sort(Comparator.comparing(Name::toString));
+        private InfoTreeNode createNodeTermLabels(MetaSpace docs, Proof proof) {
+            return create("Term Labels",
+                () -> "Show descriptions for currently available term labels.",
+                () -> {
+                    TermLabelManager mgr =
+                        TermLabelManager.getTermLabelManager(proof.getServices());
+                    Map<Name, TermLabelFactory<?>> factories = mgr.getFactories();
 
-            for (Name name : labelNames) {
-                tlRoot.add(new InfoTreeNode(name.toString(),
-                    () -> factories.get(name).getDocumentation()));
-            }
-            return tlRoot;
+                    ArrayList<Name> labelNames = new ArrayList<>(factories.keySet());
+                    labelNames.sort(Comparator.comparing(Name::toString));
+
+                    return labelNames.stream()
+                            .map(name -> create(name.toString(),
+                                () -> factories.get(name).getDocumentation()))
+                            .toList();
+                });
         }
 
         private InfoTreeNode createNodeFunctions(MetaSpace docs,
                 Namespace<? extends Function> functions) {
-            var fnRoot = create("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
-            var fnByName = create("By Name", DEFAULT_FUNCTIONS_LABEL);
-            var fnByReturnType = create("By Return Type", DEFAULT_FUNCTIONS_LABEL);
+            return create("Function Symbols", () -> DEFAULT_FUNCTIONS_LABEL,
+                () -> {
+                    ArrayList<? extends Function> seq = new ArrayList<>(functions.allElements());
+                    seq.sort(Comparator.comparing(it -> it.name().toString()));
 
-            fnRoot.add(fnByName);
-            fnRoot.add(fnByReturnType);
+                    TreeMap<Sort, List<InfoTreeNode>> byReturn = new TreeMap<>(
+                        Comparator.comparing(it -> it.name().toString()));
 
-            var seq = new ArrayList<>(functions.allElements());
-            seq.sort(Comparator.comparing(it -> it.name().toString()));
+                    var flatList = new ArrayList<InfoTreeNode>();
+                    var byType = new ArrayList<InfoTreeNode>();
 
-            var byReturn = new TreeMap<Sort, List<InfoTreeNode>>(
-                Comparator.comparing(it -> it.name().toString()));
+                    for (Function fn : seq) {
+                        String fnName = "%s(%s) : %s".formatted(
+                            fn.name(),
+                            fn.argSorts().stream().map(it -> it.name().toString())
+                                    .collect(Collectors.joining(", ")),
+                            fn.sort().name());
+                        Sort fnSort = fn.sort();
 
-            for (var fn : seq) {
-                var fnName = "%s(%s) : %s".formatted(
-                    fn.name(),
-                    fn.argSorts().stream().map(it -> it.name().toString())
-                            .collect(Collectors.joining(", ")),
-                    fn.sort().name());
-                var fnSort = fn.sort();
+                        // flat list:
+                        Supplier<String> stringSupplier = () -> docs.findDocumentation(fn);
+                        flatList.add(create(fnName, stringSupplier));
 
-                // flat list:
-                Supplier<String> stringSupplier = () -> docs.findDocumentation(fn);
-                fnByName.add(new InfoTreeNode(fnName, stringSupplier));
+                        // by return type
+                        byReturn.putIfAbsent(fnSort, new ArrayList<>());
+                        byReturn.get(fnSort).add(create(fnName, stringSupplier));
+                    }
 
-                // by return type
-                byReturn.putIfAbsent(fnSort, new ArrayList<>());
-                byReturn.get(fnSort).add(new InfoTreeNode(fnName, stringSupplier));
-            }
+                    for (Map.Entry<Sort, List<InfoTreeNode>> entry : byReturn.entrySet()) {
+                        InfoTreeNode node = create(entry.getKey().name().toString(), () -> "",
+                            () -> entry.getValue());
+                        byType.add(node);
+                    }
 
-            for (var entry : byReturn.entrySet()) {
-                var node = create(entry.getKey().name().toString(), "");
-                entry.getValue().forEach(node::add);
-                fnByReturnType.add(node);
-            }
+                    InfoTreeNode fnByName =
+                        create("By Name", () -> DEFAULT_FUNCTIONS_LABEL, () -> flatList);
+                    InfoTreeNode fnByReturnType =
+                        create("By Return Type", () -> DEFAULT_FUNCTIONS_LABEL, () -> byType);
 
-            return fnRoot;
+                    return List.of(fnByName, fnByReturnType);
+                });
         }
 
         private InfoTreeNode createNodeTacletOptions(MetaSpace docs, InitConfig initConfig) {
-            InfoTreeNode localRoot =
-                create("Active Taclet Options", "Shows the activated Taclet options");
-            for (Choice activatedChoice : initConfig.getActivatedChoices()) {
-                localRoot.add(
-                    create(activatedChoice.name().toString(),
-                        docs.findDocumentation(activatedChoice)));
-            }
-            return localRoot;
+            return create("Active Taclet Options",
+                () -> "Shows the activated Taclet options", () -> initConfig.getActivatedChoices()
+                        .stream()
+                        .map(it -> create(it.name().toString(),
+                            () -> "" + docs.findDocumentation(it), List::of))
+                        .toList());
         }
 
 
-        public InfoTreeNode create(Taclet taclet, MetaSpace metaSpace) {
-            LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
-            lp.printTaclet(taclet);
-            String doc = metaSpace.findDocumentation(taclet);
-            String origin = metaSpace.findOrigin(taclet);
-
+        private InfoTreeNode create(Taclet taclet, MetaSpace metaSpace) {
             return create(taclet.name().toString(),
-                () -> (doc != null ? doc + "\n\n" : "") +
-                        ("```key\n%s\n```\n\n".formatted(lp.result())) +
-                        ("Defined at: %s \n under options: (%s)".formatted(origin,
-                            taclet.getChoices())));
+                () -> {
+                    LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
+                    lp.printTaclet(taclet);
+                    String doc = metaSpace.findDocumentation(taclet);
+                    String origin = metaSpace.findOrigin(taclet);
+                    return requireNonNullElse(doc, "No documentation given.")
+                        + "\n\n"
+                        + "```key\n%s\n```\n\n".formatted(lp.result())
+                        + "Defined at: %s \n under options: (%s)".formatted(
+                            requireNonNullElse(origin, "not set"),
+                            taclet.getChoices());
+                },
+                List::of);
         }
 
-        public InfoTreeNode create(BuiltInRule br, MetaSpace docs) {
-            var description = "Defined at in Java class" + br.getClass();
+        private InfoTreeNode create(BuiltInRule br, MetaSpace docs) {
+            String description = "Defined in Java class" + br.getClass();
             return create(br.displayName(), () -> Stream.of(docs.findDocumentation(br), description)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n\n")));
+                    .collect(Collectors.joining("\n\n")),
+                List::of);
         }
 
-        public InfoTreeNode create(String title, String description) {
-            return create(title, () -> description);
+        private InfoTreeNode create(String title, Supplier<String> description,
+                Supplier<List<InfoTreeNode>> children) {
+            return new InfoTreeNode(title, description, children);
         }
 
-        public InfoTreeNode create(String title, Supplier<String> description) {
-            return new InfoTreeNode(title, description);
-        }
-
-
-        public static class InfoTreeNode extends DefaultMutableTreeNode {
+        private static class InfoTreeNode implements TreeNode {
             private final Supplier<@Nullable String> description;
+            private final String title;
+            private @Nullable List<InfoTreeNode> children;
+            private final Supplier<List<InfoTreeNode>> childrenSupplier;
+            private TreeNode parent;
+            private Object userObject;
 
-            public InfoTreeNode(String name, Supplier<@Nullable String> description) {
-                super(name);
+            public InfoTreeNode(String name, Supplier<String> description,
+                    Supplier<List<InfoTreeNode>> children) {
+                this.title = name;
                 this.description = description;
+                this.childrenSupplier = children;
+            }
+
+            @Override
+            public String toString() {
+                return title;
             }
 
             public @Nullable String getDescription() {
                 return description.get();
+            }
+
+            public List<InfoTreeNode> getChildren() {
+                if (children == null) {
+                    children = childrenSupplier.get();
+                }
+                return children;
+            }
+
+            @Override
+            public TreeNode getChildAt(int childIndex) {
+                return getChildren().get(childIndex);
+            }
+
+            @Override
+            public int getChildCount() {
+                return getChildren().size();
+            }
+
+            @Override
+            public TreeNode getParent() {
+                return parent;
+            }
+
+            @Override
+            public int getIndex(TreeNode node) {
+                return getChildren().indexOf(node);
+            }
+
+            @Override
+            public boolean getAllowsChildren() {
+                return true;
+            }
+
+            @Override
+            public boolean isLeaf() {
+                return getChildren().isEmpty();
+            }
+
+            @Override
+            public Enumeration<? extends TreeNode> children() {
+                return Collections.enumeration(getChildren());
+            }
+
+            public Object getUserObject() {
+                return userObject;
+            }
+
+            public void setUserObject(Object userObject) {
+                this.userObject = userObject;
             }
         }
     }

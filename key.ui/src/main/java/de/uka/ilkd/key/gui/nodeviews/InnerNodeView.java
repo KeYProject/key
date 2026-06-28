@@ -250,8 +250,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 getLineWidth());
         tacletInfo.setText(tacletDescription);
         LexerHighlighter lh = new LexerHighlighter.KeYLexerHighlighter();
-        lh.highlightPaneAll(tacletInfo, tacletDescription.indexOf('\n'), -1);
-
+        int start = Math.max(0, tacletDescription.indexOf('\n'));
+        lh.highlightPaneAll(tacletInfo, start, -1);
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
