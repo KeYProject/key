@@ -77,6 +77,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
     }
 
+    /**
+     * {@inheritDoc} The find formula is unchanged iff the formula now carried by this container's
+     * position tag is identity-equal to the one present when the container was created. (Terms are
+     * immutable, so any rewrite -- including an independent sibling rewrite that {@link
+     * #isStillApplicable} tolerates -- yields a fresh formula object.)
+     */
+    @Override
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        final PosInOccurrence cur = getPosInOccurrence(p_goal);
+        return cur != null && cur.sequentFormula() == applicationPosition.sequentFormula();
+    }
+
 
     /**
      * @return true iff a subformula that contains the find position stored by this object has been

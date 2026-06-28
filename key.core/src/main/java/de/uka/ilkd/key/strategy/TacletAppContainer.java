@@ -56,10 +56,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     private final RuleAppCost ageFreeCost;
     /**
-     * Whether {@link #ageFreeCost} is the regular strategy cost ({@link Strategy#computeCost}) and so
+     * Whether {@link #ageFreeCost} is the regular strategy cost ({@link Strategy#computeCost}) and
+     * so
      * may be carried forward by cost reuse. It is {@code false} only for containers built from a
      * strategy-supplied instantiation cost ({@link Strategy#instantiateApp}, the
-     * {@link #instantiateApp} collector): for those the stored cost is the instantiation score, which
+     * {@link #instantiateApp} collector): for those the stored cost is the instantiation score,
+     * which
      * differs from a regular re-cost (e.g. an instantiated quantifier app re-costs to infinity), so
      * reusing it would be unsound. Such containers must always be re-costed normally instead.
      */
@@ -242,12 +244,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         // only a regular (computeCost) base may be carried forward; an instantiation-supplied base
         // would re-cost differently, so such containers always fall through to a normal recompute
         if (ageFreeCostIsRegular && getAgeFreeCost() instanceof NumberRuleAppCost base) {
-            final Feature[] vetoes = CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(),
+            final CostReuse.Eligibility elig = CostReuse.eligibility(p_goal.getGoalStrategy(),
                 p_goal.proof(), getTacletApp().taclet());
-            if (vetoes != null) {
+            // A subterm-local cost may always be carried forward; a formula-local one only while
+            // the
+            // find formula is unchanged (an independent sibling rewrite leaves the find subterm but
+            // not the formula intact). Otherwise fall through to a normal recompute.
+            if (elig != null && (!elig.weakStable() || findFormulaUnchanged(p_goal))) {
                 final PosInOccurrence pos = getPosInOccurrence(p_goal);
                 final MutableState mState = new MutableState();
-                for (Feature veto : vetoes) {
+                for (Feature veto : elig.vetoes()) {
                     if (veto.computeCost(getTacletApp(), pos, p_goal,
                         mState) instanceof TopRuleAppCost) {
                         return null;
@@ -266,6 +272,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
         return createContainer(p_goal);
+    }
+
+    /**
+     * @return {@code true} iff the find formula this container was created for is still present
+     *         unchanged in the goal -- the precondition for carrying forward a {@code @}
+     *         {@code WeakStableCost} cost. The base container has no find formula and so
+     *         conservatively answers {@code false} (such a cost is never reused for it).
+     */
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        return false;
     }
 
     /**

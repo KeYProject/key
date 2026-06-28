@@ -10,12 +10,17 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 
 
 /**
  * Feature that returns the maximum number of literals occurring within a d-path of the find-formula
  * as a formula of the antecedent. Used terminology is defined in Diss. by Martin Giese.
  */
+// Reads the whole find formula (pos.sequentFormula().formula()) -- its d-path count, so the cost is
+// fixed by the formula but can change if a sibling part of it is rewritten. Reusable only while the
+// find formula is unchanged; see WeakStableCost.
+@WeakStableCost
 public class CountMaxDPathFeature extends AbstractBetaFeature {
 
     public final static Feature INSTANCE = new CountMaxDPathFeature();
