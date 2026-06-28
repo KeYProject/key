@@ -13,8 +13,8 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the

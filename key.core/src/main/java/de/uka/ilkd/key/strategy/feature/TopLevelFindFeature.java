@@ -41,7 +41,8 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
     public final static Feature ANTEC_OR_SUCC_WITH_UPDATE =
         new TopLevelFindFeature(Update.ALLOW, Side.ANTEC_OR_SUCC);
 
-    public final static Feature ANTEC_WITH_UPDATE = new TopLevelFindFeature(Update.ALLOW, Side.ANTEC);
+    public final static Feature ANTEC_WITH_UPDATE =
+        new TopLevelFindFeature(Update.ALLOW, Side.ANTEC);
 
     public final static Feature SUCC_WITH_UPDATE = new TopLevelFindFeature(Update.ALLOW, Side.SUCC);
 
