@@ -120,6 +120,9 @@ public class ProofCollections {
         oldBook.provable("standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key");
         oldBook.provable("standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");;
 
+        // Real literals
+        var reals = c.group("reals");
+        reals.provable("standard_key/reals/realLiterals.key");
 
         // Comprehension Tests
         var comprehensions = c.group("comprehensions");
