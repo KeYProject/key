@@ -31,10 +31,6 @@ dependencies {
     testFixturesApi(testFixtures(project(":key.util")))
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
-}
-
 // The target directory for JavaCC (parser generation)
 //def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
 //def javaCCOutputDirMain = file("$javaCCOutputDir/main")
