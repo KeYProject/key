@@ -8,9 +8,8 @@ import org.antlr.v4.runtime.Token;
 /**
  * The position of a source element, given by its line and column number. Depending on the
  * implementation, the valid range of defined line and column numbers may be limited and cut off if
- * superceded.
+ * superseded.
  */
-
 public class Position implements Comparable<Position> {
 
     /**

@@ -47,9 +47,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
-import org.key_project.util.parsing.SourceNames;
 
-import org.antlr.v4.runtime.TokenSource;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -755,14 +753,6 @@ public final class MiscTools {
         // Path p = fs.getPath(entryName);
         // return p.toUri();
         // }
-    }
-
-    public static @Nullable URI getURIFromTokenSource(TokenSource source) {
-        return SourceNames.getURIFromTokenSource(source);
-    }
-
-    public static @Nullable URI getURIFromTokenSource(String source) {
-        return SourceNames.getURIFromTokenSource(source);
     }
 
     /**

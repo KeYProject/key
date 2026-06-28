@@ -11,12 +11,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.*;
 import org.jspecify.annotations.NonNull;
@@ -82,7 +82,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             }
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-            MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
+            SourceNames.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,

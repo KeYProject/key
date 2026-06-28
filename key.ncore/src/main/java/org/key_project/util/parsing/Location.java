@@ -26,7 +26,6 @@ import org.jspecify.annotations.NonNull;
  * @param position The position in the file
  * @author Hubert Schmid
  */
-
 public record Location(URI fileUri, Position position) implements Comparable<Location> {
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
