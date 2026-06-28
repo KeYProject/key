@@ -24,6 +24,11 @@ public abstract class BranchStatement extends JavaStatement implements NonTermin
 
     }
 
+    public BranchStatement(PositionInfo pos) {
+        super(pos);
+    }
+
+
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.

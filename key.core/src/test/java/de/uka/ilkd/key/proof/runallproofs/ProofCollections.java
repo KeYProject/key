@@ -1010,8 +1010,24 @@ public class ProofCollections {
         // this is to test that proving large switch statements are reasonable fast
         g.provable("standard_key/java_dl/switch/large_switch.key");
 
+        // Claude generated tests
+        g.provable("standard_key/java_dl/switch/int/DefaultFirst.key");
+        g.provable("standard_key/java_dl/switch/int/DefaultLast.key");
+        g.provable("standard_key/java_dl/switch/int/DefaultMiddle.key");
+        g.provable("standard_key/java_dl/switch/int/Fallthrough.key");
+        g.provable("standard_key/java_dl/switch/int/FallthroughGroups.key");
+        g.provable("standard_key/java_dl/switch/int/MixedFallthrough.key");
+        g.provable("standard_key/java_dl/switch/int/NoDefault.key");
+        g.provable("standard_key/java_dl/switch/enums/TrafficLight.key");
+        g.provable("standard_key/java_dl/switch/enums/WeekdayKind.key");
+        g.provable("standard_key/java_dl/switch/strings/StringDefaultLast.key");
+        g.provable("standard_key/java_dl/switch/strings/StringDefaultMiddle.key");
+        g.provable("standard_key/java_dl/switch/strings/StringFallthrough.key");
+        g.provable("standard_key/java_dl/switch/strings/StringGroups.key");
+        g.provable("standard_key/java_dl/switch/strings/StringNoDefault.key");
 
         // tests that KeY can deal with identical classes in different packages
+        g = c.group("identicalClasses");
         g.provable("standard_key/java_dl/identical_classes/pkgA_inc.key");
         g.provable("standard_key/java_dl/identical_classes/pkgB_inc.key");
 

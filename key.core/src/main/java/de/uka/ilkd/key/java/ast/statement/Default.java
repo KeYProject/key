@@ -5,10 +5,7 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.ast.Comment;
-import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
@@ -18,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Default.
  *
  */
-public class Default extends BranchImp {
+public class Default extends SwitchBranch {
 
     /**
      * Body.
@@ -56,7 +53,7 @@ public class Default extends BranchImp {
     }
 
     public Default(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
-        super(pi, comments);
+        super(new ExtList(comments.toArray()), pi);
         this.body = body;
     }
 
@@ -71,6 +68,11 @@ public class Default extends BranchImp {
             result += body.size();
         }
         return result;
+    }
+
+    @Override
+    public SourceElement getFirstElement() {
+        return body.get(0);
     }
 
     /**

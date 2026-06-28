@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
+import de.uka.ilkd.key.java.transformations.pipeline.EnumClassDeclaration;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -353,6 +354,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
                 parentIsInterface, isLibrary, extending, getClassSpec(n));
+        } else if (n instanceof EnumClassDeclaration) {
+            td = new de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration(pi, c, modArray,
+                name, fullName, members, parentIsInterface, isLibrary, extending, implementing,
+                ImmutableList.fromList(getClassSpec(n)), kjt.getSort());
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
@@ -1259,7 +1264,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<Statement> body = map(n.getStatements());
-        if (n.getLabels().isEmpty()) {
+        if (n instanceof KeySwitchEntrySV sv) {
+            var v = lookupSchemaVariable(new Name(sv.getSchemaVar()));
+            if (!(v instanceof ProgramSV)) {
+                reportError(n, "Switch entry got a schema variable that is not a program SV");
+            }
+            return List.of(v);
+        } else if (n.isActive()) {
+            return List.of(new ActiveCase(body, pi, c));
+        } else if (n.getLabels().isEmpty()) {
             // Default branch
             return List.of(new Default(body, pi, c));
         } else {

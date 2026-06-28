@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.*;
@@ -308,7 +308,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,
             PrefixOccurrences prefixOccurrences) {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        if (pe instanceof ProgramPrefix nt) {
+        if (pe instanceof PossibleProgramPrefix nt) {
             int next = prefixOccurrences.occurred(pe);
             if (next < nt.getChildCount()) {
                 return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);
@@ -569,7 +569,8 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
          */
         static final Class<?>[] prefixClasses =
             new Class<?>[] { StatementBlock.class, LabeledStatement.class, Try.class,
-                MethodFrame.class, SynchronizedBlock.class, LoopScopeBlock.class, Exec.class };
+                MethodFrame.class, SynchronizedBlock.class, LoopScopeBlock.class, Exec.class,
+                Switch.class, ActiveCase.class };
 
         /**
          * number of prefix types
@@ -585,7 +586,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
          * fields to indicate the position of the next relevant child (the next possible prefix
          * element or real statement
          */
-        static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0 };
+        static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0, 1, 0 };
 
         PrefixOccurrences() {
             reset();
@@ -611,6 +612,11 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
                     occurred[i] = true;
                     if (pe instanceof MethodFrame) {
                         return (((MethodFrame) pe).getProgramVariable() == null) ? 1 : 2;
+                    }
+                    if (pe instanceof Switch s && s.getChildCount() > 2
+                            && s.getChild(0) instanceof Default &&
+                            s.getChild(1) instanceof PossibleProgramPrefix) {
+                        return 2;
                     } else {
                         return nextChild[i];
                     }

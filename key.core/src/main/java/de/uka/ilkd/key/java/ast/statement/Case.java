@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Case.
  *
  */
-public class Case extends BranchImp implements ExpressionContainer {
+public class Case extends SwitchBranch implements ExpressionContainer {
 
     /**
      * Expression.
@@ -81,7 +81,7 @@ public class Case extends BranchImp implements ExpressionContainer {
 
     public Case(Expression expr, ImmutableArray<Statement> body, PositionInfo pi,
             List<Comment> comments) {
-        super(pi, comments);
+        super(new ExtList(comments.toArray()), pi);
         this.expression = expr;
         this.body = body;
     }

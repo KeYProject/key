@@ -317,9 +317,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix curPrefix) {
+        if (pe instanceof PossibleProgramPrefix curPrefix) {
 
-            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
+            final ImmutableArray<PossibleProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
 
             // fail fast check

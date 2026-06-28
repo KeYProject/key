@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.Debug;
 
@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
 public class StatementBlock extends JavaStatement implements StatementContainer,
-        TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
+        TypeDeclarationContainer, VariableScope, TypeScope, PossibleProgramPrefix {
 
     /**
      * Body.
@@ -143,10 +143,9 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * computes the prefix elements for the given array of statment block
      */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(
-            ImmutableArray<? extends Statement> b,
-            ProgramPrefix current) {
-        final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
+    public static ImmutableArray<PossibleProgramPrefix> computePrefixElements(
+            PossibleProgramPrefix current) {
+        final ArrayList<PossibleProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
 
         while (current.hasNextPrefixElement()) {
@@ -156,7 +155,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
         return new ImmutableArray<>(prefix);
     }
-
 
     /**
      * Get body.
@@ -291,22 +289,28 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public boolean hasNextPrefixElement() {
-        return !body.isEmpty() && (body.get(0) instanceof ProgramPrefix);
+    public boolean isPrefix() {
+        return !isEmpty();
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public boolean hasNextPrefixElement() {
+        return !body.isEmpty() && (body.get(0) instanceof PossibleProgramPrefix);
+    }
+
+    @Override
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.get(0);
+            return (PossibleProgramPrefix) body.get(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? ((ProgramPrefix) body.get(0)).getLastPrefixElement() : this;
+    public PossibleProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? ((PossibleProgramPrefix) body.get(0)).getLastPrefixElement()
+                : this;
     }
 
     @Override
@@ -321,8 +325,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return computePrefixElements(body, this);
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
+        return computePrefixElements(this);
     }
 
     @Override

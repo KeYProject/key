@@ -1726,7 +1726,7 @@ public class TermBuilder {
 
     /**
      * Final fields can be treated differently outside the heap.
-     * This methods creates a heap-independent read access to final field.
+     * This method creates a heap-independent read access to final field.
      *
      * @param asSort the sort of the result.
      * @param o the object to access

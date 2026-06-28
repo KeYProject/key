@@ -26,13 +26,15 @@ import org.key_project.logic.op.sv.SchemaVariable;
 public final class EnumConstantCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;
+    private final boolean negated;
 
     /**
      * the static reference condition checks if a suggested instantiation for a schema variable
      * denotes a reference to an enum constant.
      */
-    public EnumConstantCondition(SchemaVariable reference) {
+    public EnumConstantCondition(SchemaVariable reference, boolean negated) {
         this.reference = reference;
+        this.negated = negated;
     }
 
 
@@ -50,11 +52,11 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
             } else if (subst instanceof JTerm && ((JTerm) subst).op() instanceof ProgramVariable) {
                 progvar = (ProgramVariable) ((JTerm) subst).op();
             } else {
-                return false;
+                return negated;
             }
 
-            return EnumClassDeclaration.isEnumConstant(progvar);
-
+            boolean isConst = EnumClassDeclaration.isEnumConstant(progvar);
+            return isConst != negated;
         }
         return true;
     }

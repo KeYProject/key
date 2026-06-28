@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -21,7 +21,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author <TT>AutoDoc</TT>
  */
-public class Try extends BranchStatement implements StatementContainer, ProgramPrefix {
+public class Try extends BranchStatement implements StatementContainer, PossibleProgramPrefix {
 
     private final StatementBlock body;
     private final ImmutableArray<Branch> branches;
@@ -110,20 +110,20 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
+        return !body.isEmpty() && body.getStatementAt(0) instanceof PossibleProgramPrefix;
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.getStatementAt(0);
+            return (PossibleProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
@@ -138,8 +138,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(body.getBody(), this);
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
+        return StatementBlock.computePrefixElements(this);
     }
 
 

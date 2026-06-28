@@ -2358,7 +2358,6 @@ ExpressionSVWrapper ExpressionSV() :
 	}
 }
 
-
 CatchSVWrapper CatchSV() :
 {
 }
@@ -2376,6 +2375,16 @@ CcatchSVWrapper CcatchSV() :
     <SVIDENTIFIER>
     {
         return factory.getCcatchSV(token.image);
+    }
+}
+
+SwitchBranchSVWrapper SwitchBranchSV() :
+{
+}
+{
+    <SVIDENTIFIER>
+    {
+        return factory.getSwitchBranchSV(token.image);
     }
 }
 
@@ -3987,6 +3996,10 @@ Switch SwitchStatement() :
 	}
     "(" expr = Expression() ")" "{"
 
+	(
+	    { SwitchBranchSVWrapper sbsv; } "case:" sbsv=SwitchBranchSV()
+    	{ branches.add(sbsv); }
+    |
 	( branch = SwitchLabel()
 	    {
 		stats = new ASTArrayList<Statement>();
@@ -4000,12 +4013,15 @@ Switch SwitchStatement() :
 	    {
 		if (branch instanceof Case) {
 		    ((Case)branch).setBody(stats);
+		} else if (branch instanceof ActiveCase) {
+            ((ActiveCase) branch).setBody(stats);
 		} else {
 		    ((Default)branch).setBody(stats);
 		}
 		branches.add(branch);
 	    }
-	  )*
+	  )
+	)*
 
 
 	"}"
@@ -4043,6 +4059,14 @@ Branch SwitchLabel() :
      {
 	 result = factory.createDefault();
 	 setPrefixInfo(result);
+     }
+       ":"
+       )
+     |
+     ( "active-case"
+     {
+     result = factory.createActiveCase();
+     setPrefixInfo(result);
      }
        ":"
        )

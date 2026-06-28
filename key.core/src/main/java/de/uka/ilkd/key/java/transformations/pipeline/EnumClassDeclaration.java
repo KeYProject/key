@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.List;
 
+import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
@@ -126,10 +127,15 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
     }
 
     private void addInternalFields() {
-        var init = new ArrayInitializerExpr();
+        var initializer = new ArrayInitializerExpr();
         for (var ec : getEnumConstantDeclarations()) {
-            init.values().add(new StringLiteralExpr(ec.getNameAsString()));
+            initializer.values().add(new StringLiteralExpr(ec.getNameAsString()));
         }
+        var init = new ArrayCreationExpr(
+            new ClassOrInterfaceType(
+                new ClassOrInterfaceType(new ClassOrInterfaceType(null, "java"), "lang"), "String"),
+            new NodeList<>(new ArrayCreationLevel()),
+            initializer);
         addMember(new FieldDeclaration(
             new NodeList<>(new Modifier(PRIVATE),
                 new Modifier(STATIC)),

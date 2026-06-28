@@ -6,20 +6,25 @@ package de.uka.ilkd.key.java.ast.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
-import org.key_project.util.ExtList;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class is used for wrapping an enum into a standard class type.
  *
  * <p>
- * In addition the programvariables that represent enum constants are memorized. Thus this class is
+ * In addition, the programvariables that represent enum constants are memorized. Thus this class is
  * able to have queries on the enum constants.
  *
  * @author mulbrich
@@ -33,27 +38,22 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private final List<IProgramVariable> constants = new ArrayList<>();
 
-    /**
-     * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
-     * ClassDeclaration but has memory about which fields have been declared as enum constants.
-     *
-     * @param children
-     *        children in the ast (members)
-     * @param fullName
-     *        of the class/enum
-     * @param isLibrary
-     *        see class constructor
-     */
-    // TODO javaparser
-    public EnumClassDeclaration(
-            ExtList children, ProgramElementName fullName, boolean isLibrary
-    /* , List<EnumConstantDeclaration> enumConstantDeclarations */) {
-        super(children, fullName, isLibrary);
+    public EnumClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+            ProgramElementName name, ProgramElementName fullName,
+            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface, boolean isLibrary,
+            Extends extending, Implements implementing, ImmutableList<TextualJMLConstruct> spec,
+            Sort sort) {
+        super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending,
+            implementing, false, false, false, spec);
 
-        // for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-        // String constName = ecd.getEnumConstantSpecification().getName();
-        // constants.add(findAttr(constName));
-        // }
+        for (var m : members) {
+            if (m instanceof FieldDeclaration fd && fd.isFinal() && fd.isStatic() && fd.isPublic()
+                    && fd.getFieldSpecifications().size() == 1) {
+                var fs = fd.getFieldSpecifications().get(0);
+                if (fs.getProgramVariable().sort() == sort)
+                    constants.add(fs.getProgramVariable());
+            }
+        }
     }
 
     /*
@@ -124,8 +124,8 @@ public class EnumClassDeclaration extends ClassDeclaration {
     public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration) {
-            return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
+        if (type instanceof EnumClassDeclaration ecd) {
+            return ecd.isLocalEnumConstant(attribute);
         } else {
             return false;
         }

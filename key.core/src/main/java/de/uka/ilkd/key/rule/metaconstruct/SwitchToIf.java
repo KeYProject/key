@@ -134,11 +134,11 @@ public class SwitchToIf extends ProgramTransformer {
      */
     private ChangeBreakResult changeBreaks(Switch sw, Break b, boolean noNewBreak) {
         int n = sw.getBranchCount();
-        Branch[] branches = new Branch[n];
+        SwitchBranch[] branches = new SwitchBranch[n];
         for (int i = 0; i < n; i++) {
             final var branch = recChangeBreaks(sw.getBranchAt(i), b, noNewBreak);
             noNewBreak = branch.noNewBreak;
-            branches[i] = (Branch) branch.result;
+            branches[i] = (SwitchBranch) branch.result;
         }
         return new ChangeBreakResult(KeYJavaASTFactory.switchBlock(sw.getExpression(), branches),
             noNewBreak);

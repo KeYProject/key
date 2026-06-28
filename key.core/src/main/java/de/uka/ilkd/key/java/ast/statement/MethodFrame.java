@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.util.Debug;
@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableArray;
  * The statement inserted by KeY if a method call is executed.
  */
 public class MethodFrame extends JavaStatement
-        implements StatementContainer, ProgramPrefix {
+        implements StatementContainer, PossibleProgramPrefix {
 
     /**
      * result
@@ -118,20 +118,20 @@ public class MethodFrame extends JavaStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
+        return !body.isEmpty() && body.getStatementAt(0) instanceof PossibleProgramPrefix;
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.getStatementAt(0);
+            return (PossibleProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
@@ -146,8 +146,8 @@ public class MethodFrame extends JavaStatement
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(body.getBody(), this);
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
+        return StatementBlock.computePrefixElements(this);
     }
 
     public PosInProgram getFirstActiveChildPos() {

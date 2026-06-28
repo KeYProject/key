@@ -272,6 +272,9 @@ public final class TypeConverter {
         } else if (var.isStatic()) {
             final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+            if (var.isFinal() && FinalHeapResolution.recallIsFinalEnabled()) {
+                return tb.staticFinalDot(var.sort(), fieldSymbol);
+            }
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
