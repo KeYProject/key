@@ -1,0 +1,36 @@
+sourceSets {
+    generator {
+        java {
+            srcDir("src/generator/java")
+        }
+    }
+    main {
+        java { srcDir("src/generated/java") }
+    }
+}
+
+dependencies {
+    //implementation project(':key.core')
+    //generatorImplementation(project(":key.core"))
+
+
+    implementation("info.picocli:picocli:4.7.7")
+
+    def JP_VERSION = "3.28.0-K13.5"
+    implementation("org.key-project.proofjava:javaparser-core:$JP_VERSION")
+    implementation("org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION")
+
+
+    generatorImplementation("org.key-project.proofjava:javaparser-core:$JP_VERSION")
+    generatorImplementation("org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION")
+
+
+
+    testImplementation("com.google.truth:truth:1.4.5")
+}
+
+tasks.register("runGenerator", JavaExec) {
+    group = "application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set("org.key_project.ncore.java.Generator")
+}

@@ -11,6 +11,7 @@ dependencies {
     api project(':key.ncore')
     api project(':key.ncore.calculus')
     api project(':key.ncore.compiler')
+    api project(':key.ncore.java')
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
