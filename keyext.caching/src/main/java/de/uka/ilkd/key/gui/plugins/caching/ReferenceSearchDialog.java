@@ -61,7 +61,6 @@ public class ReferenceSearchDialog extends JDialog {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
         table.getTableHeader().setReorderingAllowed(false);
-        this.setLocationByPlatform(true);
         this.setTitle("Proof Caching");
         this.listener = listener;
 
@@ -100,6 +99,7 @@ public class ReferenceSearchDialog extends JDialog {
         }
 
         this.pack();
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     private JButton getApplyButton() {
