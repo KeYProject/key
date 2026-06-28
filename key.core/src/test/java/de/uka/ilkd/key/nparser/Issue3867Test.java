@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.key_project.util.parsing.Location;
 
 import org.junit.jupiter.api.Test;
 

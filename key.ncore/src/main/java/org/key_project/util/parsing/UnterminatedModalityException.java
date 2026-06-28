@@ -3,19 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.parsing;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Thrown by the KeY lexer when the body of a modality (a schematic program) contains another
  * modality-opening keyword, which means the current modality's closing keyword
  * ({@code \endmodality} / {@code \>} / {@code \]}) is missing. It carries the position of the
- * <em>opening</em> of the unterminated modality so the error can be reported there (rather than at
- * the next, unrelated closing keyword the lexer would otherwise run on to). See issue #3867.
- *
- * <p>
- * This lives in {@code key.ncore} so the generated lexer can throw it; the position is turned into
- * a
- * proper {@code Location} by {@code ExceptionTools} in {@code key.core}.
+ * <em>opening</em> of the unterminated modality (via {@link HasLocation}) so the error can be
+ * reported there, rather than at the next, unrelated closing keyword the lexer would otherwise run
+ * on to. See issue #3867.
  */
-public class UnterminatedModalityException extends RuntimeException {
+public class UnterminatedModalityException extends RuntimeException implements HasLocation {
     private static final long serialVersionUID = 1L;
 
     /** 1-based line of the modality opening. */
@@ -32,18 +30,9 @@ public class UnterminatedModalityException extends RuntimeException {
         this.sourceName = sourceName;
     }
 
-    /** @return the 1-based line of the modality opening */
-    public int getLine() {
-        return line;
-    }
-
-    /** @return the 0-based column (ANTLR convention) of the modality opening */
-    public int getCharPositionInLine() {
-        return charPositionInLine;
-    }
-
-    /** @return the source name (file/URI string) reported by the lexer's input */
-    public String getSourceName() {
-        return sourceName;
+    @Override
+    public @Nullable Location getLocation() {
+        return new Location(SourceNames.getURIFromTokenSource(sourceName),
+            Position.fromOneZeroBased(line, charPositionInLine));
     }
 }

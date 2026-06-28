@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.java.Position;
-
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.parsing.Position;
 
 
 public class SortMismatchException extends SVInstantiationExceptionWithPosition {

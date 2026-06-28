@@ -12,19 +12,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
 import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.util.parsing.HasLocation;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
-import org.key_project.util.parsing.UnterminatedModalityException;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -304,11 +303,6 @@ public final class ExceptionTools {
         // errors had a message but no location, so the GUI/console could not show the source.
         if (exc instanceof NoViableAltException nvae) {
             return Location.fromToken(nvae.getOffendingToken());
-        }
-
-        if (exc instanceof UnterminatedModalityException ume) {
-            return new Location(MiscTools.getURIFromTokenSource(ume.getSourceName()),
-                Position.fromOneZeroBased(ume.getLine(), ume.getCharPositionInLine()));
         }
 
         if (exc.getCause() != null) {

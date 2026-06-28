@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 import javax.tools.*;
 
 import de.uka.ilkd.key.gui.PositionedIssueString;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.Configuration;
 
 import org.key_project.util.Streams;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;

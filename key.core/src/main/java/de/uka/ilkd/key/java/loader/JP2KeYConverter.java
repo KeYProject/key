@@ -36,7 +36,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -52,6 +51,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.Modifier;
@@ -401,8 +401,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         URI uri = node.findCompilationUnit()
                 .flatMap(com.github.javaparser.ast.CompilationUnit::getStorage)
                 .map(it -> it.getPath().toUri()).orElse(null);
-        Position startPos = Position.fromJPPosition(r.begin);
-        Position endPos = Position.fromJPPosition(r.end);
+        Position startPos = JavaSourceLocations.positionFromJP(r.begin);
+        Position endPos = JavaSourceLocations.positionFromJP(r.end);
         return new PositionInfo(startPos, endPos, uri);
     }
 
@@ -714,7 +714,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             } catch (UnsolvedSymbolException e1) {
                 throw new ParserException("Cannot resolve '" + n + "'. No variable, field, or type "
                     + "with this name is in scope here (check for typos).",
-                    Location.fromNode(n));
+                    JavaSourceLocations.locationFromNode(n));
             }
         }
     }
@@ -1016,7 +1016,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             } catch (UnsolvedSymbolException e1) {
                 throw new ParserException("Cannot resolve '" + n + "'. No variable, field, or type "
                     + "with this name is in scope here (check for typos).",
-                    Location.fromNode(n));
+                    JavaSourceLocations.locationFromNode(n));
             }
         }
 

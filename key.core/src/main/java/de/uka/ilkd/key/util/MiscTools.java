@@ -47,8 +47,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
+import org.key_project.util.parsing.SourceNames;
 
-import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.TokenSource;
 import org.jspecify.annotations.Nullable;
 
@@ -758,25 +758,11 @@ public final class MiscTools {
     }
 
     public static @Nullable URI getURIFromTokenSource(TokenSource source) {
-        return getURIFromTokenSource(source.getSourceName());
+        return SourceNames.getURIFromTokenSource(source);
     }
 
     public static @Nullable URI getURIFromTokenSource(String source) {
-        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-            return null;
-        }
-
-        try {
-            URI uri = new URI(source);
-            if (uri.getScheme() != null) {
-                // use this URI only if there is an explicit scheme;
-                // otherwise parse it as a filename
-                return uri;
-            }
-        } catch (URISyntaxException ignored) {
-        }
-
-        return Path.of(source).toUri();
+        return SourceNames.getURIFromTokenSource(source);
     }
 
     /**

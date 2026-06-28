@@ -18,7 +18,6 @@ import javax.swing.text.Highlighter;
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.parsing.Position;
 
 /**
  * Lets the user instantiate the taclet's {@code \assumes} sequent in one of two ways, chosen with a

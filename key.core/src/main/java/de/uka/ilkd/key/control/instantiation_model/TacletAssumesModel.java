@@ -6,7 +6,6 @@ package de.uka.ilkd.key.control.instantiation_model;
 import java.util.Iterator;
 import javax.swing.*;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -26,6 +25,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
 

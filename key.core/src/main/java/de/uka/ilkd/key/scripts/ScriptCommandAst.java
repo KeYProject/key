@@ -9,7 +9,8 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
+
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;

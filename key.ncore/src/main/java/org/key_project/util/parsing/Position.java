@@ -1,10 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.java;
+package org.key_project.util.parsing;
 
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The position of a source element, given by its line and column number. Depending on the
@@ -86,14 +85,6 @@ public class Position implements Comparable<Position> {
      */
     public static Position fromToken(Token token) {
         return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
-    }
-
-    public static Position fromJPPosition(com.github.javaparser.@Nullable Position p) {
-        if (p == null || p.invalid() || (p.line == -1 && p.column == -1)) {
-            return UNDEFINED;
-        } else {
-            return newOneBased(p.line, p.column);
-        }
     }
 
     /**

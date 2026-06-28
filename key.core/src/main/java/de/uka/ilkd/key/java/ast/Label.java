@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.parsing.Position;
 
 public interface Label extends TerminalProgramElement {
 

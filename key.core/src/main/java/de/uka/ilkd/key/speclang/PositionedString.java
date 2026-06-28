@@ -6,11 +6,11 @@ package de.uka.ilkd.key.speclang;
 import java.net.URI;
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;

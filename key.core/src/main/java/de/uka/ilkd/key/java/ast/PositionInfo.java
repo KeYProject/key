@@ -9,7 +9,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
