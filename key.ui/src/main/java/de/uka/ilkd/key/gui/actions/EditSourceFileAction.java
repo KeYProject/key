@@ -26,11 +26,11 @@ import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.CurrentLineHighlighter;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

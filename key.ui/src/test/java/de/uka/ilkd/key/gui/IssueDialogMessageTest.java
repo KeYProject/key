@@ -10,7 +10,8 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
+
+import org.key_project.util.parsing.Location;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,8 @@ public class IssueDialogMessageTest {
 
     /**
      * Resolves the dialog's mark offset for {@code loc} via the same document line model the dialog
-     * uses ({@link IssueDialog#getOffsetFromLineColumn(Document, de.uka.ilkd.key.java.Position)}).
+     * uses
+     * ({@link IssueDialog#getOffsetFromLineColumn(Document, org.key_project.util.parsing.Position)}).
      * The document content equals {@code source}, so the returned offset indexes into it directly.
      */
     private static int offsetIn(String source, Location loc) throws Exception {

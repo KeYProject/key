@@ -181,7 +181,14 @@ public abstract class LexerHighlighter {
                     STYLE_OPERATORS;
                 case ERROR_UKNOWN_ESCAPE, ERROR_CHAR -> STYLE_ERROR;
                 case IDENT -> STYLE_IDENTIFIER;
-                case COMMENT, SL_COMMENT -> STYLE_COMMENT;
+                // 'COMMENT' is a lexer *mode*, not a token type; mode and token ids share one int
+                // space, so as a case label it aliases whatever token has the same id -- a
+                // duplicate
+                // case label once the modality lexer modes renumbered things (#3867). It was a dead
+                // no-op anyway: single-line comments are SL_COMMENT (here); a whole '/* ... */' /
+                // '/*! ... */' is emitted as COMMENT_END / DOC_COMMENT (currently grouped with the
+                // keywords above; ML_COMMENT is a 'more' rule and never a token).
+                case SL_COMMENT -> STYLE_COMMENT;
                 case CHAR_LITERAL, QUOTED_STRING_LITERAL, TRUE, FALSE,
                         STRING_LITERAL, BIN_LITERAL, HEX_LITERAL, INT_LITERAL, FLOAT_LITERAL,
                         DOUBLE_LITERAL, REAL_LITERAL ->

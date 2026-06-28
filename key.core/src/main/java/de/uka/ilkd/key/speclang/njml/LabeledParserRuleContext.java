@@ -8,7 +8,8 @@ import java.net.URI;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
@@ -51,7 +52,7 @@ public class LabeledParserRuleContext {
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx,
             OriginTermLabel.SpecType specType) {
-        URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
+        URI filename = SourceNames.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
         return new OriginTermLabelFactory().createOriginTermLabel(origin);

@@ -2,8 +2,8 @@
 package de.uka.ilkd.key.parser.proofjava;
 
 import de.uka.ilkd.key.util.parsing.LocatableException;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 import java.net.URL;
 
 /**

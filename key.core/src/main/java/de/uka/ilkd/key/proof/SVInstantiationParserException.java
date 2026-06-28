@@ -5,7 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Position;
 
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
 

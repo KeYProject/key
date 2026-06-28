@@ -7,13 +7,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.helper.FindResources;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;

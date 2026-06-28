@@ -19,7 +19,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.key_project.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Disabled;

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.loader;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.ast.Node;
 import org.jspecify.annotations.Nullable;

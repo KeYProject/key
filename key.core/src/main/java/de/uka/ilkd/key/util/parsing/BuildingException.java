@@ -5,9 +5,10 @@ package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -106,7 +107,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() {
         if (offendingSymbol != null) {
-            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            URI uri = SourceNames.getURIFromTokenSource(offendingSymbol.getTokenSource());
             Position p = overridePosition != null ? overridePosition
                     : Position.fromToken(offendingSymbol);
             return new Location(uri, p);

@@ -7,10 +7,11 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
@@ -64,7 +65,7 @@ public class SLExceptionFactory {
     }
 
     public SLExceptionFactory updatePosition(Token start) {
-        fileName = MiscTools.getURIFromTokenSource(start.getTokenSource());
+        fileName = SourceNames.getURIFromTokenSource(start.getTokenSource());
         line = start.getLine();
         column = start.getCharPositionInLine();
         return this;

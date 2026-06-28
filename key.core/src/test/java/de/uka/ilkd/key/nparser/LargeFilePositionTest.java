@@ -7,8 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.key_project.util.parsing.Location;
 
 import org.junit.jupiter.api.Test;
 

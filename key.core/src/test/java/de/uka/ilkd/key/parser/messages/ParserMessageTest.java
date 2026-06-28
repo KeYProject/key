@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.parsing.Location;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

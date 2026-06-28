@@ -1,20 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.parser;
+package org.key_project.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.util.MiscTools;
-
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
@@ -33,41 +26,12 @@ import org.jspecify.annotations.NonNull;
  * @param position The position in the file
  * @author Hubert Schmid
  */
-
 public record Location(URI fileUri, Position position) implements Comparable<Location> {
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
-    /**
-     * Legacy constructor for creating a new Location from a String denoting the file path and line
-     * and column number, tries to convert the path given as String into a URL.
-     *
-     * @param filename path to the resource of the Location
-     * @param position position of the Location
-     * @throws RuntimeException if the given string is null or can not be parsed to URL
-     * @deprecated Use {@link #Location(URI, Position)} instead.
-     */
-    @Deprecated
-    public static Location fromFileName(String filename, Position position) {
-        try {
-            return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
-                position);
-        } catch (MalformedURLException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static Location fromToken(Token token) {
-        return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),
+        return new Location(SourceNames.getURIFromTokenSource(token.getTokenSource()),
             Position.fromToken(token));
-    }
-
-    public static Location fromNode(Node n) {
-        var fileUri = n.findCompilationUnit().flatMap(CompilationUnit::getStorage)
-                .map(it -> it.getPath().toUri())
-                .orElse(null);
-
-        var pos = n.getRange().map(it -> it.begin).orElse(null);
-        return new Location(fileUri, Position.fromJPPosition(pos));
     }
 
     public URI getFileUri() { return fileUri; }

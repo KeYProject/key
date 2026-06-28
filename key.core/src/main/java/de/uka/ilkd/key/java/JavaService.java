@@ -194,7 +194,7 @@ public class JavaService {
                 .orElse(new Position(-1, -1));
         return new BuildingIssue(simplifyJavaParserMessage(problem.getVerboseMessage()),
             problem.getCause().orElse(null), false,
-            de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
+            JavaSourceLocations.positionFromJP(loc), source);
     }
 
     /**

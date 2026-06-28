@@ -9,8 +9,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 
