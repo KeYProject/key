@@ -9,52 +9,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a {@link Feature} that is only <em>weakly</em> stable: its cost for a given rule
- * application
- * stays the same as long as the formula the application sits in is unchanged, but it may read that
- * whole formula, not just the term the application is applied to, so its cost can change if some
- * other part of the same formula (for instance above or beside the find position) is rewritten.
+ * The middle of the three-way locality scale ({@link StableCost} / {@code WeakStableCost} /
+ * {@link VolatileCost}): marks a {@link Feature} that is stable only as long as the formula the
+ * application sits in is unchanged. Unlike {@link StableCost}, which looks only at the applied-to
+ * term (and below) -- which a surviving application keeps fixed -- a feature marked here reads the
+ * whole find formula, so its cost can change when a sibling part of that formula is rewritten even
+ * though the applied-to term is untouched. Its cost may therefore be reused only while the find
+ * formula is still the one present when the cost was first computed; the strategy checks this and
+ * recomputes as soon as the formula is rewritten.
  *
  * <p>
- * This is the middle ground between {@link StableCost} and {@link VolatileCost}:
- * <ul>
- * <li>{@link StableCost}, fully stable: the cost looks only at the applied-to term (and below),
- * which a surviving application keeps unchanged, so the cost can always be reused.</li>
- * <li>{@link WeakStableCost}, weakly stable: the cost also reads the surrounding formula, so it
- * may be reused only while that find formula is still the very one that was present when the cost
- * was first computed; the strategy checks this and recomputes as soon as the formula is
- * rewritten.</li>
- * <li>{@link VolatileCost}, not stable: the cost depends on the wider goal and is never
- * reused.</li>
- * </ul>
- *
- * <p>
- * The cost of a feature you mark here must still NOT depend on anything the proof changes beyond
- * the
- * find formula:
- * <ul>
- * <li>the <em>other</em> formulas in the sequent,</li>
- * <li>which rules have already been applied earlier in the proof,</li>
- * <li>which instantiations have already been tried on the goal,</li>
- * <li>or any other changing or global state.</li>
- * </ul>
- * If your feature reads any of those, mark it {@link VolatileCost} instead, not this one. The only
- * extra freedom this annotation grants over {@link StableCost} is reading the find formula as a
- * whole.
- *
- * <p>
- * <b>What if I get it wrong?</b> As with {@link StableCost}, leaving a feature unmarked is always
- * safe (its cost is simply recomputed and never reused). Marking a feature here that actually
- * depends on the wider goal lets the strategy work with a stale cost; it never makes a found proof
- * invalid, but it can change or stall the search. Run {@code -Dkey.strategy.costReuse.verify=true}
- * to have every reused cost recomputed and checked against a fresh value.
- *
- * <p>
- * <b>Features built from other features.</b> As with {@link StableCost}, you may mark a combining
- * feature here only when every part it builds on is itself at most weakly stable; the classifier
- * verifies those parts automatically and your annotation vouches that your own combining logic
- * reads
- * nothing beyond the find formula.
+ * It must still read nothing beyond the find formula: not the other formulas of the sequent, the
+ * rules already applied, the instantiations already tried, nor any other goal state -- a feature
+ * that does is {@link VolatileCost}. Everything {@link StableCost} says otherwise applies here too
+ * (unmarked is always safe; how a combining feature and its term-generators are handled; the
+ * {@code -Dkey.strategy.costReuse.verify=true} cross-check) -- read "the find formula" for "the
+ * applied-to term".
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
