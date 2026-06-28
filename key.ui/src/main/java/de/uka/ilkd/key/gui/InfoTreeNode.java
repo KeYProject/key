@@ -6,12 +6,13 @@ package de.uka.ilkd.key.gui;
 import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.uka.ilkd.key.logic.MetaSpace;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.MetaSpace;
 
 /**
  * Every node of {@link InfoTree} is an instance of this class.

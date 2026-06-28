@@ -255,7 +255,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().choices();
     }
 
-    protected MetaSpace docsSpace() {
+    protected org.key_project.logic.MetaSpace docsSpace() {
         return namespaces().docs();
     }
 

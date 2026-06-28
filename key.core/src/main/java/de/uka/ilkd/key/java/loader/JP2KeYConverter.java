@@ -32,7 +32,6 @@ import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.MetaSpace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
@@ -45,6 +44,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
+import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.OperatorSV;

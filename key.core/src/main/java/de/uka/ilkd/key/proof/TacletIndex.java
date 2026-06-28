@@ -29,10 +29,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.indexing.RuleIndex;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -264,7 +261,9 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
 
     @Override
     public Set<NoPosTacletApp> allNoPosTacletApps() {
-        return new HashSet<>(allNoPosTacletAppsStream().collect(Collectors.toUnmodifiableSet()));
+        Comparator<NoPosTacletApp> cmp = Comparator.comparing(it -> it.taclet().name());
+        return allNoPosTacletAppsStream()
+                .collect(Collectors.toCollection(() -> new TreeSet<>(cmp)));
     }
 
     public Stream<NoPosTacletApp> allNoPosTacletAppsStream() {

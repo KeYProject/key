@@ -468,7 +468,9 @@ public class IntermediateProofReplayer {
             } else if (possibleApps.size() == 1) {
                 ourApp = possibleApps.getFirst();
             } else {
-                var taclets = possibleApps.stream().map(TacletApp::toString)
+                var docs = proof.getServices().getNamespaces().docs();
+                var taclets = possibleApps.stream().map(
+                    it -> it + "\n-- defined at " + docs.findOrigin(it.rule()))
                         .collect(Collectors.joining("\n---\n"));
                 throw new TacletAppConstructionException(
                     "There are more than one possible taclet available with name \"" + tacletName
@@ -526,9 +528,6 @@ public class IntermediateProofReplayer {
         }
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
-        if (ourApp == null) {
-            System.out.println("§sdsfs");
-        }
 
         ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {

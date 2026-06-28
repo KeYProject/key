@@ -42,12 +42,13 @@ public class NamespaceSet {
      * private Namespace<ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
      * private Namespace<Choice> choiceNS = new Namespace<>();
      */
-    private MetaSpace documentation = new MetaSpace();
+    private org.key_project.logic.MetaSpace documentation = new org.key_project.logic.MetaSpace();
 
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Map<Class<?>, Namespace<?>> namespaces, MetaSpace documentation) {
+    public NamespaceSet(Map<Class<?>, Namespace<?>> namespaces,
+            org.key_project.logic.MetaSpace documentation) {
         this.documentation = documentation;
         this.namespaces.putAll(namespaces);
     }
@@ -64,7 +65,7 @@ public class NamespaceSet {
             Namespace<IProgramVariable> programVarNS) {
         this(varNS, funcNS, sortNS, sortAliases, ruleSetNS,
             parametricSortNS, parametricFuncNS,
-            choiceNS, programVarNS, new MetaSpace());
+            choiceNS, programVarNS, new org.key_project.logic.MetaSpace());
     }
 
     @Deprecated
@@ -77,7 +78,7 @@ public class NamespaceSet {
             Namespace<ParametricFunctionDecl> parametricFuncNS,
             Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS,
-            MetaSpace documentation) {
+            org.key_project.logic.MetaSpace documentation) {
         register(QuantifiableVariable.class, varNS);
         register(IProgramVariable.class, programVarNS);
         register(Function.class, funcNS);
@@ -107,14 +108,14 @@ public class NamespaceSet {
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(namespaces, new MetaSpace(documentation));
+        return new NamespaceSet(namespaces, new org.key_project.logic.MetaSpace(documentation));
     }
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         var namespaces = new HashMap<Class<?>, Namespace<?>>();
         this.namespaces.forEach((k, v) -> namespaces.put(k, new Namespace<>(v)));
-        return new NamespaceSet(namespaces, new MetaSpace(documentation));
+        return new NamespaceSet(namespaces, new org.key_project.logic.MetaSpace(documentation));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -321,7 +322,7 @@ public class NamespaceSet {
         return new NamespaceSet(newSpaces, documentation.parent());
     }
 
-    public MetaSpace docs() {
+    public org.key_project.logic.MetaSpace docs() {
         return documentation;
     }
 }

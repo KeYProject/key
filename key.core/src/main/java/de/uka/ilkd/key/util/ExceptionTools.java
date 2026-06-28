@@ -7,7 +7,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -421,14 +420,4 @@ public final class ExceptionTools {
         }
     }
 
-    private static @Nullable Location getLocation(InputMismatchException exc) {
-        var token = exc.getOffendingToken();
-
-        return token == null ? null
-                : new Location(
-                    // FIXME weigl: This does not work on Windows. Illegal characters.
-                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
-                            .normalize().toUri(),
-                    de.uka.ilkd.key.java.Position.fromToken(token));
-    }
 }

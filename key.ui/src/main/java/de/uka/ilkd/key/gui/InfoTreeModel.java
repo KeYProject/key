@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui;
 import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.logic.MetaSpace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 
