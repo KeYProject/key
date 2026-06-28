@@ -8,20 +8,33 @@ import java.net.URI;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.key_project.key.llm.mcp.BuiltInMCPClient;
+import org.key_project.key.llm.mcp.McpClient;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (11/18/25)
  */
 public class LlmSession {
+    private final BuiltInMCPClient mcpClient;
     private String model = "azure.gpt-4.1-mini";
     private String apiEndpoint;
     private String authToken;
     private Set<URI> selectedFiles = new TreeSet<>();
 
-    public LlmSession(String apiEndpoint, String authToken) {
+    /// Initialize
+    public static LlmSession createUsingSettings() {
+        return new LlmSession(LlmSettings.INSTANCE.getApiEndpoint(),
+            LlmSettings.INSTANCE.getAuthToken(),
+            LlmSettings.INSTANCE.getDefaultModel());
+    }
+
+    public LlmSession(String apiEndpoint, String authToken, String model) {
         this.apiEndpoint = apiEndpoint;
         this.authToken = authToken;
+        this.model = model;
+        mcpClient = new BuiltInMCPClient();
     }
 
     public String getApiEndpoint() {
@@ -54,5 +67,9 @@ public class LlmSession {
 
     public void setSelectedFiles(Set<URI> selectedFiles) {
         this.selectedFiles = selectedFiles;
+    }
+
+    public McpClient getMcpClient() {
+        return mcpClient;
     }
 }

@@ -13,8 +13,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
@@ -189,18 +191,12 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Adds a new combobox to the panel.
      *
-     * @param title
-     *        label of the combo box
-     * @param info
-     *        help text
-     * @param selectionIndex
-     *        which item to initially select
-     * @param validator
-     *        validator
-     * @param items
-     *        the items
-     * @param <T>
-     *        the type of the items
+     * @param title label of the combo box
+     * @param info help text
+     * @param selectionIndex which item to initially select
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
      * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
@@ -241,6 +237,111 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JLabel label = new JLabel(title);
         label.setLabelFor(component);
         addRowWithHelp(helpText, label, component);
+    }
+
+    /// Shows a list with the given `seq` items, and arbitrary actions
+    ///
+    protected <T> JList<T> addListBox(String title,
+            String info,
+            List<T> seq,
+            KeyAction... action) {
+        var model = new DefaultListModel<T>();
+        model.addAll(seq);
+
+        JList<T> list = new JList<>(model);
+        JScrollPane field = new JScrollPane(list);
+
+        var panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        for (var keyAction : action) {
+            panel.add(new JButton(keyAction));
+        }
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        pCenter.add(panel);
+
+        return list;
+    }
+
+
+    public record Column<T, R>(String name,
+            Class<R> clazz,
+            Getter<T, R> value,
+            @Nullable Setter<T> setValue) {
+
+        public Column(String name, Class<R> clazz, Getter<T, R> value) {
+            this(name, clazz, value, null);
+        }
+
+        public interface Getter<T, R> extends Function<T, R> {
+        }
+
+        public interface Setter<T> {
+            void set(T object, Object value);
+        }
+    }
+
+    protected <T> JTable addTableBox(
+            String title, String info, List<T> seq,
+            Column<T, ?>... columns) {
+        var model = new AbstractTableModel() {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columns[columnIndex].clazz();
+            }
+
+            public String getColumnName(int columnIndex) {
+                return columns[columnIndex].name();
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                final T s = seq.get(rowIndex);
+                columns[columnIndex].setValue.set(s, aValue);
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columns[columnIndex].setValue != null;
+            }
+
+            @Override
+            public int getRowCount() {
+                return seq.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return columns.length;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return columns[columnIndex].value.apply(seq.get(rowIndex));
+            }
+        };
+
+        var list = new JTable(model);
+        JScrollPane field = new JScrollPane(list);
+        var panel = new JPanel(new MigLayout(new LC().fillX()));
+        panel.add(field, new CC().span(3).growX().wrap());
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        pCenter.add(panel);
+
+        return list;
     }
 
     protected <T> JList<T> addListBox(String title, String info,
@@ -357,18 +458,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * text
      * field), otherwise the {@link Validator} will fail.
      *
-     * @param title
-     *        the title of the text field
-     * @param min
-     *        the minimum value that can be entered
-     * @param max
-     *        the maximum value that can be entered
-     * @param step
-     *        the step size used when changing the entered value using the JSpinner's arrow
+     * @param title the title of the text field
+     * @param min the minimum value that can be entered
+     * @param max the maximum value that can be entered
+     * @param step the step size used when changing the entered value using the JSpinner's arrow
      *        buttons
      * @param info * arbitrary information about the text field
-     * @param validator
-     *        a validator for checking the entered values
+     * @param validator a validator for checking the entered values
      * @param <T> * the class of the minimum value
      * @return the created JSpinner
      */
@@ -418,8 +514,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Creates an empty validator instance.
      *
-     * @param <T>
-     *        arbitrary
+     * @param <T> arbitrary
      * @return non-null
      */
     protected <T> Validator<T> emptyValidator() {
