@@ -2,6 +2,8 @@ package org.key_project.ncore.java;
 
 import com.github.javaparser.ParseProblemException;
 
+import java.util.List;
+
 /**
  *
  * @author Alexander Weigl
@@ -45,12 +47,12 @@ public class JavaMain {
 
         gen.addStep(new NodeSteps.handleRoot());
 
-        gen.postSteps.add(PostSteps::createVisitor);
-        gen.postSteps.add(PostSteps::createArgVisitor);
-        gen.postSteps.add(PostSteps::createVoidVisitor);
-        gen.postSteps.add(PostSteps::createTraversalVisitor);
-        gen.postSteps.add(PostSteps::createTraversalCopyOnDemandVisitor);
-        gen.postSteps.add(PostSteps::createDeepCopyVisitor);
+        var post = new PostSteps();
+        gen.postSteps.add(post.new CreateVisitor());
+        gen.postSteps.add(post.new CreateArgVisitor());
+        gen.postSteps.add(post.new CreateVoidVisitor());
+        gen.postSteps.add(post.new CreateTraversalVisitor());
+        gen.postSteps.add(post.new CreateTraversalCopyOnDemandVisitor());
         return gen;
     }
 }

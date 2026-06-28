@@ -1,9 +1,10 @@
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 
 @Root
-class BaseAstNode implements AstNode {
+abstract class BaseAstNode implements AstNode {
     @Nullable Position position;
 }
 
@@ -27,10 +28,10 @@ class Abbreviation {
  * ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)? SEMI;
  * }</pre>
  */
-class AbstractSortDeclimplements {
-    @Nullable String docComment;
+class AbstractSortDecl {
     boolean isAbstract;
     List<SimpleIdentDots> sortIds;
+    @Nullable String docComment;
     @Nullable FormalSortParamDecls formalSortParamDecls;
     @Nullable ExtendsSorts extendsSorts;
 }
@@ -101,9 +102,6 @@ class AddRules {
 }
 
 
-
-
-
 /**
  * Represents an alias sort declaration.
  * Corresponds to the grammar rule:
@@ -119,10 +117,6 @@ class AliasDeclimplements {
 
 
 }
-
-
-
-
 
 
 /**
@@ -164,9 +158,6 @@ class Attribute {
 }
 
 
-
-
-
 /**
  * Base abstract class for all AST nodes providing common position tracking.
  *
@@ -186,11 +177,6 @@ class Attribute {
 class BooleanLiteral extends Literals {
     boolean value;
 }
-
-
-
-
-
 
 
 /**
@@ -234,7 +220,6 @@ class BracketSuffixHeap {
     java.util.List<Term> indices;
 
 }
-
 
 
 /**
@@ -296,11 +281,6 @@ class CharLiteral extends Literals {
 
 
 }
-
-
-
-
-
 
 
 /**
@@ -366,10 +346,6 @@ class ComparisonTerm {
 }
 
 
-
-
-
-
 /**
  * Represents a configuration file.
  * Corresponds to the grammar rule:
@@ -400,10 +376,6 @@ class ConjunctionTerm {
 }
 
 
-
-
-
-
 /**
  * Represents contracts container.
  * Corresponds to the grammar rule:
@@ -431,9 +403,6 @@ class CValue {
 }
 
 
-
-
-
 /**
  * Represents a datatype constructor.
  * Corresponds to the grammar rule:
@@ -446,11 +415,6 @@ class DatatypeConstructor {
     SimpleIdentDots name;
     ArgSorts argSorts;
 }
-
-
-
-
-
 
 
 /**
@@ -468,10 +432,6 @@ class DatatypeDecl {
     @Nullable FormalSortParamDecls formalSortParams;
     List<DatatypeConstructor> constructors;
 }
-
-
-
-
 
 
 /**
@@ -494,26 +454,8 @@ class DatatypeDecls {
  * @version 1.0
  */
 
-interface Declaration  {
+interface Declaration {
     // Marker interface for all declarations
-}
-
-
-
-
-
-
-
-/**
- * Represents a list of declarations in a KeY specification file.
- * Corresponds to the grammar rule: decls
- *
- * @author Cline
- * @version 1.0
- */
-
-class DeclList {
-    List<Declaration> declarations;
 }
 
 
@@ -582,10 +524,6 @@ class EquivalenceTerm {
 }
 
 
-
-
-
-
 /**
  * Represents extends sort clause.
  * Corresponds to the grammar rule:
@@ -611,7 +549,7 @@ class File {
     List<String> docComments;
     @Nullable Profile profile;
     @Nullable Preferences preferences;
-    DeclList decls;
+    List<Declaration> decls;
     @Nullable Problem problem;
     @Nullable Proof proof;
 }
@@ -630,11 +568,6 @@ class FloatLiteral extends Literals {
 }
 
 
-
-
-
-
-
 /**
  * Represents formal sort arguments (type parameters).
  * Corresponds to: OPENTYPEPARAMS sortId (COMMA sortId)* CLOSETYPEPARAMS;
@@ -648,10 +581,6 @@ class FormalSortArgs {
 
 
 }
-
-
-
-
 
 
 /**
@@ -680,9 +609,6 @@ class Formula {
 }
 
 
-
-
-
 /**
  * Represents a function declaration.
  * Corresponds to the grammar rule:
@@ -702,10 +628,6 @@ class FuncDecl {
 }
 
 
-
-
-
-
 /**
  * Represents function declarations.
  * Corresponds to the grammar rule:
@@ -719,8 +641,6 @@ class FuncDecls {
 
 }
 
-
-        
 
 /**
  * Represents a function/predicate name with optional sort prefix.
@@ -737,17 +657,12 @@ class FuncPredName {
 }
 
 
-
-
-
-
-
 /**
  * Represents a generic sort declaration.
  * Corresponds to the grammar rule for GENERIC kind in one_sort_decl.
  */
 
-class GenericSortDecl{
+class GenericSortDecl {
     @Nullable String docComment;
     List<String> sortNames;
     @Nullable ExtendsSorts extendsSorts;
@@ -768,10 +683,6 @@ class GenericSortDecl{
 class GoalSpec {
     TermOrSeq termOrSeq;
 }
-
-
-
-
 
 
 /**
@@ -838,11 +749,6 @@ class ImplicationTerm {
 }
 
 
-
-
-
-
-
 /**
  * Represents an include statement in a KeY specification file.
  * Corresponds to the grammar rule:
@@ -858,8 +764,6 @@ class IncludeStatement {
 }
 
 
-
-
 /**
  * Represents an integer literal.
  * Corresponds to the grammar rule:
@@ -873,10 +777,6 @@ class IntegerLiteral extends Literals {
 
 
 }
-
-
-
-
 
 
 /**
@@ -931,10 +831,8 @@ class Label {
  * }</pre>
  */
 
-abstract class Literals {}
-
-
-
+abstract class Literals {
+}
 
 
 /**
@@ -983,10 +881,6 @@ class ModalityTerm {
 }
 
 
-
-
-
-
 /**
  * Represents modifiers for taclets.
  * Corresponds to the grammar rule:
@@ -1013,9 +907,6 @@ class NegationTerm {
 
 
 }
-
-
-
 
 
 /**
@@ -1049,9 +940,6 @@ class OneContract {
 }
 
 
-
-
-
 /**
  * Represents a single include (absolute or relative file).
  * Corresponds to the grammar rule:
@@ -1068,10 +956,6 @@ class OneInclude {
 }
 
 
-
-
-
-
 /**
  * Represents a single invariant definition.
  * Corresponds to the grammar rule:
@@ -1085,10 +969,6 @@ class OneInvariant {
     Term formula;
     @Nullable String displayName;
 }
-
-
-
-
 
 
 /**
@@ -1115,6 +995,7 @@ class OneSchemaVarDecl {
     enum Kind {
         MODAL_OPERATOR, PROGRAM, FORMULA, TERMLABEL, UPDATE, SKOLEM_FORMULA, TERM, VARIABLES, VARIABLE, SKOLEM_TERM
     }
+
     Kind kind;
     @Nullable SchemaModifiers modifiers;
     @Nullable SortId sortId;
@@ -1173,8 +1054,6 @@ class OptionsChoice {
 }
 
 
-        
-
 /**
  * Represents a parallel term (multiple updates in parallel).
  * Corresponds to the grammar rule:
@@ -1215,7 +1094,7 @@ class PredDecls {
     List<PredDecl> decls;
 
 }
-       
+
 
 /**
  * Represents a preferences/settings declaration in a KeY specification file.
@@ -1224,7 +1103,7 @@ class PredDecls {
  * @author Cline
  * @version 1.0
  */
-class Preferences  {
+class Preferences {
     @Nullable String stringValue;
     @Nullable CValue cvalue;
 }
@@ -1244,9 +1123,6 @@ class Problem {
 }
 
 
-
-
-
 /**
  * Represents a profile declaration in a KeY specification file.
  * Corresponds to: PROFILE name=string_value SEMI;
@@ -1255,13 +1131,9 @@ class Problem {
  * @version 1.0
  */
 
-class Profile  {
+class Profile {
     String name;
 }
-
-
-
-
 
 
 /**
@@ -1286,7 +1158,7 @@ class ProgVarDecls {
  * @version 1.0
  */
 
-class Proof  {
+class Proof {
 }
 
 
@@ -1304,9 +1176,6 @@ class ProofScriptCommand {
 }
 
 
-
-
-
 /**
  * Represents a proof script entry (either a reference to an external script or an inline script).
  * Corresponds to the grammar rule:
@@ -1319,10 +1188,6 @@ class ProofScriptEntry {
     @Nullable String scriptPath;
     @Nullable ProofScript inlineScript;
 }
-
-
-
-
 
 
 /**
@@ -1338,8 +1203,6 @@ class ProofScript {
 }
 
 
-        
-
 /**
  * Represents a proof script command parameter.
  * Corresponds to the grammar rule:
@@ -1354,17 +1217,12 @@ class ProofScriptParameter {
 }
 
 
-
-
-
-
-
 /**
  * Represents a proxy sort declaration.
  * Corresponds to the grammar rule for PROXY kind in one_sort_decl.
  */
 
-class ProxySortDecl{
+class ProxySortDecl {
     @Nullable String docComment;
     List<String> sortNames;
     KeyJavaType javaType;
@@ -1390,9 +1248,6 @@ class QuantifierTerm {
 }
 
 
-
-
-
 /**
  * Represents replace-with clause in taclet.
  * Corresponds to the grammar rule:
@@ -1406,11 +1261,6 @@ class ReplaceWith {
     @Nullable Seq antecedent;
     @Nullable Seq succulent;
 }
-
-
-
-
-
 
 
 /**
@@ -1442,10 +1292,6 @@ class RulesetDecls {
 }
 
 
-        
-
-
-
 /**
  * Represents a rule or axiom.
  * Corresponds to the grammar rule:
@@ -1464,10 +1310,6 @@ class RulesOrAxioms {
 
 
 }
-
-
-
-
 
 
 /**
@@ -1499,10 +1341,6 @@ class SchemaVarDecl {
 }
 
 
-
-
-
-
 /**
  * Represents schema variable declarations.
  * Corresponds to the grammar rule:
@@ -1530,10 +1368,6 @@ class SemiSequent {
 }
 
 
-
-
-
-
 /**
  * Represents a sequence of terms (antecedent or succulent).
  * Corresponds to the grammar rule:
@@ -1546,7 +1380,6 @@ class Seq {
     List<Term> terms;
 
 }
-
 
 
 /**
@@ -1564,10 +1397,6 @@ class SimpleIdentDots {
 }
 
 
-
-
-
-
 /**
  * Represents sort declarations.
  * Corresponds to the grammar rule:
@@ -1580,13 +1409,6 @@ class SortDecls {
     List<OneSortDecl> sortDecls;
 
 }
-
-
-
-
-
-        
-
 
 
 /**
@@ -1656,12 +1478,6 @@ class StrongArithTerm2 {
 }
 
 
-
-
-
-
-
-
 /**
  * Stub AST node classes for remaining KeY grammar constructs.
  * These are placeholder implementations that can be expanded as needed.
@@ -1681,14 +1497,14 @@ class StubAstNodes {
         boolean isLDTs;
         List<OneInclude> includes;
 
-        
+
     }
 
     static class OneInclude {
         @Nullable String absFile;
         @Nullable String relFile;
 
-        
+
     }
 
     /**
@@ -1709,7 +1525,7 @@ class StubAstNodes {
     static class OptionDecls {
         List<Choice> choices;
 
-        
+
     }
 
     static class Choice {
@@ -1717,14 +1533,14 @@ class StubAstNodes {
         String category;
         List<OptionDecl> options;
 
-        
+
     }
 
     static class OptionDecl {
         @Nullable String docComment;
         List<String> choices;
 
-        
+
     }
 
     /**
@@ -1733,7 +1549,7 @@ class StubAstNodes {
     static class SortDecls {
         List<OneSortDecl> sorts;
 
-        
+
     }
 
     static class OneSortDecl {
@@ -1745,7 +1561,7 @@ class StubAstNodes {
         @Nullable String extendsSorts;
         @Nullable String aliasTarget;
 
-        
+
     }
 
     /**
@@ -1754,14 +1570,14 @@ class StubAstNodes {
     static class ProgVarDecls {
         List<ProgVarDecl> variables;
 
-        
+
     }
 
     static class ProgVarDecl {
         String type;
         List<String> names;
 
-        
+
     }
 
     /**
@@ -1770,7 +1586,7 @@ class StubAstNodes {
     static class SchemaVarDecls {
         List<OneSchemaVarDecl> schemaVars;
 
-        
+
     }
 
     static class OneSchemaVarDecl {
@@ -1780,13 +1596,13 @@ class StubAstNodes {
         String name;
         @Nullable SortId sort;
 
-        
+
     }
 
     static class SchemaModifiers {
         List<String> options;
 
-        
+
     }
 
     /**
@@ -1795,7 +1611,7 @@ class StubAstNodes {
     static class PredDecls {
         List<PredDecl> predicates;
 
-        
+
     }
 
     static class PredDecl {
@@ -1803,7 +1619,7 @@ class StubAstNodes {
         String name;
         List<SortId> argSorts;
 
-        
+
     }
 
     /**
@@ -1812,7 +1628,7 @@ class StubAstNodes {
     static class FuncDecls {
         List<FuncDecl> functions;
 
-        
+
     }
 
     static class FuncDecl {
@@ -1822,7 +1638,7 @@ class StubAstNodes {
         String name;
         List<SortId> argSorts;
 
-        
+
     }
 
     /**
@@ -1831,7 +1647,7 @@ class StubAstNodes {
     static class TransformDecls {
         List<TransformDecl> transforms;
 
-        
+
     }
 
     static class TransformDecl {
@@ -1841,7 +1657,6 @@ class StubAstNodes {
         String name;
         List<Object> argSorts;
 
-        
 
         boolean returnsFormula() {
             return returnsFormula;
@@ -1854,7 +1669,7 @@ class StubAstNodes {
     static class DatatypeDecls {
         List<DatatypeDecl> datatypes;
 
-        
+
     }
 
     static class DatatypeDecl {
@@ -1862,7 +1677,7 @@ class StubAstNodes {
         String name;
         List<DatatypeConstructor> constructors;
 
-        
+
     }
 
     static class DatatypeConstructor {
@@ -1870,7 +1685,7 @@ class StubAstNodes {
         List<String> argSorts;
         List<String> argNames;
 
-        
+
     }
 
     /**
@@ -1879,7 +1694,7 @@ class StubAstNodes {
     static class RulesetDecls {
         List<String> rulesets;
 
-        
+
     }
 
     /**
@@ -1888,7 +1703,7 @@ class StubAstNodes {
     static class Contracts {
         List<OneContract> contracts;
 
-        
+
     }
 
     /**
@@ -1898,7 +1713,7 @@ class StubAstNodes {
         OneBoundVariable selfVar;
         List<OneInvariant> invariants;
 
-        
+
     }
 
     /**
@@ -1910,7 +1725,7 @@ class StubAstNodes {
         @Nullable OptionList options;
         List<Taclet> taclets;
 
-        
+
     }
 
     // ==================== Taclet Support Classes ====================
@@ -1925,41 +1740,41 @@ class StubAstNodes {
         @Nullable String propCategory;
         @Nullable String propValue;
 
-        
+
     }
 
     static class Seq {
         SemiSequent antecedent;
         SemiSequent succedent;
 
-        
+
     }
 
     static class TermOrSeq {
         @Nullable Term term;
         @Nullable Seq seq;
 
-        
+
     }
 
     static class SemiSequent {
         List<Term> terms;
 
-        
+
     }
 
     static class GoalSpecs {
         boolean closeGoal;
         List<GoalSpecWithOption> specs;
 
-        
+
     }
 
     static class GoalSpecWithOption {
         @Nullable OptionList options;
         GoalSpec spec;
 
-        
+
     }
 
     static class GoalSpec {
@@ -1970,32 +1785,31 @@ class StubAstNodes {
         @Nullable AddRules addRules;
         @Nullable AddProgVars addProgVars;
 
-        
+
     }
 
     static class ReplaceWith {
         TermOrSeq termOrSeq;
 
-        
+
     }
 
     static class Add {
         Seq seq;
 
 
-        
     }
 
     static class AddRules {
         List<Taclet> taclets;
 
-        
+
     }
 
     static class AddProgVars {
         List<String> varIds;
 
-        
+
     }
 
     static class Modifiers {
@@ -2005,7 +1819,7 @@ class StubAstNodes {
         @Nullable String helpText;
         @Nullable Triggers triggers;
 
-        
+
     }
 
     static class Triggers {
@@ -2013,13 +1827,13 @@ class StubAstNodes {
         Term triggerTerm;
         List<Term> avoidTerms;
 
-        
+
     }
 
     static class VarexpList {
         List<Varexp> varexps;
 
-        
+
     }
 
     static class Varexp {
@@ -2028,7 +1842,7 @@ class StubAstNodes {
         List<String> parameters;
         List<Object> arguments;
 
-        
+
     }
 
 
@@ -2037,7 +1851,7 @@ class StubAstNodes {
     static class Label {
         List<SingleLabel> labels;
 
-        
+
     }
 
     static class SingleLabel {
@@ -2045,20 +1859,20 @@ class StubAstNodes {
         boolean isStar;
         List<String> params;
 
-        
+
     }
 
     static class LocsetTerm {
         List<LocationTerm> locations;
 
-        
+
     }
 
     static class LocationTerm {
         Term obj;
         Term field;
 
-        
+
     }
 
     static class AccessTerm {
@@ -2068,14 +1882,14 @@ class StubAstNodes {
         @Nullable Call call;
         List<Attribute> attributes;
 
-        
+
     }
 
     static class Call {
         @Nullable BoundVariables boundVars;
         List<Term> args;
 
-        
+
     }
 
     static class Attribute {
@@ -2087,13 +1901,13 @@ class StubAstNodes {
         @Nullable Call call;
         @Nullable BracketTerm heap;
 
-        
+
     }
 
     static class Abbreviation {
         String name;
 
-        
+
     }
 
     static class IfThenElseTerm {
@@ -2101,7 +1915,7 @@ class StubAstNodes {
         Term thenT;
         Term elseT;
 
-        
+
     }
 
     static class IfExThenElseTerm {
@@ -2110,7 +1924,7 @@ class StubAstNodes {
         Term thenT;
         Term elseT;
 
-        
+
     }
 
     static class BracketTerm {
@@ -2118,14 +1932,14 @@ class StubAstNodes {
         List<BracketSuffixHeap> suffixes;
         List<Attribute> attributes;
 
-        
+
     }
 
     static class BracketSuffixHeap {
         BraceSuffix braceSuffix;
         @Nullable BracketTerm heap;
 
-        
+
     }
 
     static class BraceSuffix {
@@ -2139,7 +1953,7 @@ class StubAstNodes {
         @Nullable Term indexTerm;
         @Nullable Term rangeTo;
 
-        
+
     }
 
     // ==================== Proof Script Classes ====================
@@ -2147,14 +1961,14 @@ class StubAstNodes {
     static class ProofScript {
         List<ProofScriptCommand> commands;
 
-        
+
     }
 
     static class ProofScriptCommand {
         String cmd;
         List<ProofScriptParameter> parameters;
 
-        
+
     }
 
     // ==================== Configuration Classes ====================
@@ -2162,7 +1976,7 @@ class StubAstNodes {
     static class ConfigurationFile {
         List<CValue> values;
 
-        
+
     }
 
     static class CKV {
@@ -2170,7 +1984,7 @@ class StubAstNodes {
         CKey key;
         CValue value;
 
-        
+
     }
 }
 
@@ -2189,12 +2003,6 @@ class SubstitutionTerm {
 
 
 }
-
-
-
-
-
-
 
 
 /**
@@ -2222,9 +2030,6 @@ class Taclet {
 }
 
 
-
-
-
 /**
  * Represents a term in KeY logic.
  * Terms can be simple (literals, variables) or complex (quantified formulas, modalities, etc.)
@@ -2250,9 +2055,6 @@ class Term {
 }
 
 
-
-
-
 /**
  * Represents either a term or a sequence (for taclet find clauses).
  * Corresponds to the grammar rule:
@@ -2266,9 +2068,6 @@ class TermOrSeq {
     @Nullable Seq antecedent;
     @Nullable Seq succulent;
 }
-
-
-
 
 
 /**
@@ -2288,10 +2087,6 @@ class TransformDecl {
 }
 
 
-
-
-
-
 /**
  * Represents transformer declarations.
  * Corresponds to the grammar rule:
@@ -2305,8 +2100,6 @@ class TransformDecls {
 
 }
 
-
-        
 
 /**
  * Represents triggers clause in taclet.
@@ -2351,8 +2144,6 @@ class UpdateTerm {
 }
 
 
-
-
 /**
  * Represents a variable expression (name and type).
  * Corresponds to the grammar rule:
@@ -2365,10 +2156,6 @@ class Varexp {
     String name;
     KeyJavaType type;
 }
-
-
-
-
 
 
 /**
@@ -2402,10 +2189,6 @@ class WeakArithTerm {
 
 
 }
-
-
-
-
 
 
 /**
