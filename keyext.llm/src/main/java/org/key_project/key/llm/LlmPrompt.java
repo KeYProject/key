@@ -154,7 +154,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
     }
 
     private OutputBox<String> addInput(String text) {
-        var o = addBox(new LlmPromptModel(LlmPromptModel.Kind.INPUT, text, text),
+        var o = addBox(
+            new LlmPromptModel<>(LlmPromptModel.Kind.INPUT, text, text),
             new RepromptAction(text));
         o.setBackground(COLOR_BG_INPUT.get());
         return o;
@@ -262,8 +263,11 @@ public class LlmPrompt extends JPanel implements TabPanel {
             var node = MainWindow.getInstance().getMediator().getSelectedNode();
 
             LlmSession session = LlmUtils.getSession(proof);
+            LlmClientExtended.McpClient mcpClient = new BuiltInMCP();
+
             var txt = txtInput.getText();
-            LlmClient client = new LlmClient(session, new LlmContext(), txt);
+            var client = new LlmClientExtended(session, new LlmContext(), txt, mcpClient);
+            // var client = new LlmClient(session, new LlmContext(), txt);
             addInput(txt);
             txtInput.setText("");
 
