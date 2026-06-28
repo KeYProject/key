@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * This class is used for wrapping an enum into a standard class type.
  *
  * <p>
- * In addition the programvariables that represent enum constants are memorized. Thus this class is
+ * In addition, the programvariables that represent enum constants are memorized. Thus this class is
  * able to have queries on the enum constants.
  *
  * mulbrich: Update 2025 (a mere 19 years later):
