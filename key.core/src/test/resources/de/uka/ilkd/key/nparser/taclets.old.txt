@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 30 08:41:43 CEST 2026
+# Date: Sat Apr 25 17:11:57 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -11641,6 +11641,12 @@ intersectionSetMinusItself_2 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== intro (intro) =========================================
+intro {
+\add [equals(t,sk)]==>[] 
+
+Choices: true}
+-----------------------------------------------------
 == irrflConcrete1 (irrflConcrete1) =========================================
 irrflConcrete1 {
 \find(lt(i,i)==>)
@@ -17990,19 +17996,20 @@ tryCatchThrow {
     #slist1
   }
 ... }}| (post))
-\replacewith(#allmodal ((modal operator))|{{ ..
-  if (#se == null) {
-    try {
-      throw new java.lang.NullPointerException();
-    } catch (#t #v0) {
-      #slist1
-    }
-  } else if (#se instanceof #t) {
+\sameUpdateLevel\add []==>[equals(#se,null)] \replacewith(#allmodal ((modal operator))|{{ ..
+  if (#se instanceof #t) {
     #t #v0;
     #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
+  }
+... }}| (post)) ;
+\add [equals(#se,null)]==>[] \replacewith(#allmodal ((modal operator))|{{ ..
+  try {
+    throw new java.lang.NullPointerException();
+  } catch (#t #v0) {
+    #slist1
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)

@@ -702,6 +702,8 @@ fragment IDCHAR
    | '$'
    ;
 
+MATCH_IDENT: '?' IDENT?;
+
 IDENT
    : ((LETTER | '_' | '#' | '$') (IDCHAR)*)
    ;

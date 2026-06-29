@@ -17,6 +17,10 @@ dependencies {
 
     api project(':key.util')
 
+    // Make Javadoc accessible at runtime
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
+    implementation 'com.github.therapi:therapi-runtime-javadoc:0.13.0'
+
     def JP_VERSION = "3.28.0-K13.5"
     api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
     api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
@@ -30,6 +34,10 @@ dependencies {
 
     // test fixtures
     testFixturesApi(testFixtures(project(":key.util")))
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
 }
 
 // The target directory for JavaCC (parser generation)
@@ -99,7 +107,8 @@ classes.dependsOn << generateSolverPropsList
 tasks.withType(Test) {
     enableAssertions = true
     // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
-    systemProperties += System.properties.findAll { it.key.toString().startsWith("key.mt.retention") }
+    // Other test cases also need "key." prefixed properties
+    systemProperties += System.properties.findAll { it.key.toString().startsWith("key.") }
     if (project.hasProperty("stressHeap")) {
         maxHeapSize = project.property("stressHeap")
     }

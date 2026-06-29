@@ -393,7 +393,7 @@ public final class JavaInfo {
     /**
      * returns a KeYJavaType having the given sort
      */
-    public KeYJavaType getKeYJavaType(Sort sort) {
+    public @Nullable KeYJavaType getKeYJavaType(Sort sort) {
         List<KeYJavaType> l = lookupSort2KJTCache(sort);
         if (l != null && l.size() > 0) {
             // Return first KeYJavaType found for sort.

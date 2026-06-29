@@ -432,9 +432,8 @@ public final class StrategyProperties extends Properties {
         }
     }
 
-
     @Override
-    public synchronized Object clone() {
+    public synchronized StrategyProperties clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
         sp.putAll(p);

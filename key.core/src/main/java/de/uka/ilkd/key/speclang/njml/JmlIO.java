@@ -9,6 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.UserInputValidator;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -224,6 +226,22 @@ public class JmlIO {
         } else {
             return (JTerm) interpret;
         }
+    }
+
+    /**
+     * Interpret the given parse tree as an KeYJavaType in the current context.
+     * May return null if the KJT cannot be resolved.
+     */
+    public @Nullable KeYJavaType translateType(JmlParser.TypespecContext ctx) {
+        Object interpreted = interpret(ctx);
+        return switch (interpreted) {
+            case SLExpression slExpression -> slExpression.getType();
+            case Sort sort -> services.getJavaInfo().getKeYJavaType(sort);
+            case KeYJavaType kjt -> kjt;
+            case Type type -> services.getJavaInfo().getKeYJavaType(type);
+            default -> throw new IllegalArgumentException("Cannot translate to KeYJavaType: " +
+                interpreted + " of class " + interpreted.getClass());
+        };
     }
 
     /**
@@ -437,4 +455,5 @@ public class JmlIO {
     public void clearWarnings() {
         warnings = ImmutableList.nil();
     }
+
 }

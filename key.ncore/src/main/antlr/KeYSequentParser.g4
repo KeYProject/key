@@ -2,7 +2,6 @@ parser grammar KeYSequentParser;
 
 import KeYTermParser;
 
-options { tokenVocab = KeYLexer; }
 seq
    : ant = semisequent SEQARROW suc = semisequent
    ;

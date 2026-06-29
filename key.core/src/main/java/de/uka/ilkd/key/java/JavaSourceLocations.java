@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import java.net.URI;
+import java.util.Optional;
+
+import de.uka.ilkd.key.java.ast.PositionInfo;
+
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
@@ -50,5 +55,22 @@ public final class JavaSourceLocations {
 
         var pos = n.getRange().map(it -> it.begin).orElse(null);
         return new Location(fileUri, positionFromJP(pos));
+    }
+
+    /**
+     * Builds a {@link Location} from a {@link PositionInfo} (a KeY source-element position carrying
+     * a file URI and a start position).
+     *
+     * @param info the position info
+     * @return the corresponding location, or {@link Location#UNDEFINED} if no file URI is available
+     */
+    public static Location fromPositionInfo(PositionInfo info) {
+        Optional<URI> uri = info.getURI();
+        if (uri.isEmpty()) {
+            return Location.UNDEFINED;
+        } else {
+            Position pos = info.getStartPosition();
+            return new Location(uri.get(), pos);
+        }
     }
 }

@@ -108,7 +108,7 @@ public final class ParsingFacade {
     }
 
 
-    private static JavaKeYParser createParser(CharStream stream) {
+    public static JavaKeYParser createParser(CharStream stream) {
         return createParser(createLexer(stream));
     }
 

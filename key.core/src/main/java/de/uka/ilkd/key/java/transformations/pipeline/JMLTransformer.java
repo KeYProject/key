@@ -235,8 +235,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             case ASSUME -> KIND_ASSUME;
         };
         KeYMarkerStatement stmt = new KeYMarkerStatement(kind);
-        // TODO simulate/ copy token range.
-        stmt.setData(KEY_EXPR, ctx);
+        stmt.setData(KEY_ASSERT, stat);
         return stmt;
     }
 

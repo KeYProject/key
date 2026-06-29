@@ -2,7 +2,6 @@ parser grammar KeYGlobalDeclParser;
 
 import KeYTacletParser;
 
-options { tokenVocab = KeYLexer; }
 decls
    : (string = programSource // for problems
    | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls

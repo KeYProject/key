@@ -49,6 +49,22 @@ public interface ImmutableSet<T extends @Nullable Object>
         return set.add(values);
     }
 
+    static <T extends @Nullable Object> ImmutableSet<T> of() {
+        return empty();
+    }
+
+    static <T extends @Nullable Object> ImmutableSet<T> of(T... elems) {
+        return DefaultImmutableSet.fromImmutableList(ImmutableList.of(elems));
+    }
+
+    static <T> ImmutableSet<T> from(Iterable<T> ts) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        for (T t : ts) {
+            result = result.add(t);
+        }
+        return result;
+    }
+
     /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
      */

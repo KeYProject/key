@@ -32,8 +32,8 @@ public class FocusCommandTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 4);");
-        ProofScriptEngine pse = new ProofScriptEngine(script);
-        pse.execute(env.getUi(), p);
+        ProofScriptEngine pse = new ProofScriptEngine(p);
+        pse.execute(env.getUi(), script);
 
         assertEquals(1, p.openGoals().size());
         Goal g = p.openGoals().head();
@@ -53,8 +53,8 @@ public class FocusCommandTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 3);");
-        ProofScriptEngine pse = new ProofScriptEngine(script);
-        pse.execute(env.getUi(), p);
+        ProofScriptEngine pse = new ProofScriptEngine(p);
+        pse.execute(env.getUi(), script);
 
         assertEquals(1, p.openGoals().size());
         Goal g = p.openGoals().head();
