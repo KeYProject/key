@@ -5,24 +5,24 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
 import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.util.parsing.HasLocation;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -340,7 +340,7 @@ public final class ExceptionTools {
         if (ip == null) {
             return Location.fromToken(offending);
         }
-        return new Location(MiscTools.getURIFromTokenSource(offending.getTokenSource()), ip);
+        return new Location(SourceNames.getURIFromTokenSource(offending.getTokenSource()), ip);
     }
 
     /**
@@ -411,13 +411,4 @@ public final class ExceptionTools {
         }
         return false;
     }
-
-    private static URI parseFileName(String filename) throws MalformedURLException {
-        try {
-            return filename == null ? null : MiscTools.parseURL(filename).toURI();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

@@ -6,11 +6,16 @@ package de.uka.ilkd.key.speclang.njml;
 import java.io.IOException;
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
-import org.antlr.v4.runtime.*;
+import org.key_project.util.parsing.Position;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 
 /**

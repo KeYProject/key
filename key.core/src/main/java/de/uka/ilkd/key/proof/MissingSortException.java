@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof;
 
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Position;
 
 public class MissingSortException extends SVInstantiationExceptionWithPosition {
     private final String toInstantiate;

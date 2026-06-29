@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 
 import org.key_project.logic.Property;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.util.parsing.Position;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none

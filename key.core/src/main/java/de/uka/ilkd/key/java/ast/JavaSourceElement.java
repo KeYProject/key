@@ -5,10 +5,10 @@ package de.uka.ilkd.key.java.ast;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

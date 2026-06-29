@@ -6,7 +6,6 @@ package de.uka.ilkd.key.control.instantiation_model;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -24,6 +23,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.parsing.Position;
 
 public class TacletInstantiationModel {
 

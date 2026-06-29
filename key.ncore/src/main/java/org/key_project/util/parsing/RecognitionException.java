@@ -1,12 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.util;
+package org.key_project.util.parsing;
 
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.IntStream;
 
@@ -29,6 +26,6 @@ public class RecognitionException extends Exception implements HasLocation {
 
     @Override
     public Location getLocation() {
-        return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
+        return new Location(SourceNames.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

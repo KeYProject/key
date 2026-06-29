@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.util.parsing.Position;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
