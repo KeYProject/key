@@ -20,8 +20,12 @@ import org.slf4j.LoggerFactory;
 public class SMTTermBinOp extends SMTTerm {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTTermBinOp.class);
 
-    private static Map<Op, String> bvSymbols;
-    private static Map<Op, String> intSymbols;
+    /*
+     * Built once, fully, and published as immutable maps (see SMTTermMultOp): never lazily
+     * initialized, to avoid a half-built map being observed during concurrent SMT translation.
+     */
+    private static final Map<Op, String> bvSymbols = createBvSymbols();
+    private static final Map<Op, String> intSymbols = createIntSymbols();
 
     public enum OpProperty {
         NONE, LEFTASSOC, RIGHTASSOC, FULLASSOC, CHAINABLE, PAIRWISE
@@ -45,9 +49,6 @@ public class SMTTermBinOp extends SMTTerm {
         this.right = right;
         this.left.upp = this;
         this.right.upp = this;
-        if (bvSymbols == null || intSymbols == null) {
-            initMaps();
-        }
 
         throw new RuntimeException("BinaryOps are no longer supported.");
     }
@@ -64,9 +65,9 @@ public class SMTTermBinOp extends SMTTerm {
         };
     }
 
-    private static void initMaps() {
+    private static Map<Op, String> createBvSymbols() {
         // bitvec
-        bvSymbols = new HashMap<>();
+        HashMap<Op, String> bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -98,9 +99,12 @@ public class SMTTermBinOp extends SMTTerm {
         bvSymbols.put(Op.BVSLE, "bvsle");
         bvSymbols.put(Op.BVSGT, "bvsgt");
         bvSymbols.put(Op.BVSGE, "bvsge");
+        return Map.copyOf(bvSymbols);
+    }
 
+    private static Map<Op, String> createIntSymbols() {
         // int
-        intSymbols = new HashMap<>();
+        HashMap<Op, String> intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -114,6 +118,7 @@ public class SMTTermBinOp extends SMTTerm {
         intSymbols.put(Op.REM, "rem");
         intSymbols.put(Op.PLUS, "+");
         intSymbols.put(Op.MINUS, "-");
+        return Map.copyOf(intSymbols);
     }
 
 
