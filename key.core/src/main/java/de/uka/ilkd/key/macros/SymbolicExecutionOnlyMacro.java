@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.macros;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -79,18 +78,27 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
     private static final List<String> ADMITTED_RULE_SETS;
     static {
         try {
-            ADMITTED_RULES = Arrays.asList(
-                Streams.toString(SymbolicExecutionOnlyMacro.class
-                        .getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRules.txt"))
-                        .split("\n"));
-            ADMITTED_RULE_SETS = Arrays.asList(
-                Streams.toString(SymbolicExecutionOnlyMacro.class
-                        .getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRuleSets.txt"))
-                        .split("\n"));
+            ADMITTED_RULES = readLines("SymbolicExecutionOnlyMacro.admittedRules.txt");
+            ADMITTED_RULE_SETS = readLines("SymbolicExecutionOnlyMacro.admittedRuleSets.txt");
         } catch (IOException e) {
             throw new RuntimeException(
                 "Failed to load admitted rules for symbolic execution macro.", e);
         }
+    }
+
+    /**
+     * Reads the (rule or rule set) names from a resource, one per line. Splits on any line
+     * terminator and strips surrounding whitespace so that the entries also match when the
+     * resource is checked out with CRLF line endings. Otherwise a trailing {@code '\r'} would
+     * keep {@link #isAdmittedRule(RuleApp)} from ever matching, disabling symbolic execution on
+     * Windows checkouts.
+     */
+    private static List<String> readLines(String resource) throws IOException {
+        return Streams.toString(SymbolicExecutionOnlyMacro.class.getResourceAsStream(resource))
+                .lines()
+                .map(String::strip)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 
     @Override
