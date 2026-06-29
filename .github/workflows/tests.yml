@@ -26,8 +26,10 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         java: [ 21 ]
         modules: [
-          key.core
-          ]
+          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
+          key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
+          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
+          keyext.proofmanagement]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
@@ -60,7 +62,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue :${{ matrix.modules }}:test --tests=JmlScriptTest
+        run: ./gradlew --continue :${{ matrix.modules }}:test
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -73,7 +75,6 @@ jobs:
             !**/jacocoTestReport.xml
 
   integration-tests:
-    if: false
     env:
       GH_TOKEN: ${{ github.token }}
     continue-on-error: true
