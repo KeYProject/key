@@ -147,6 +147,7 @@ public class JmlScriptTest {
         } else {
             return Files.list(Paths.get(jmlUrl.toURI()))
                     .filter(p -> p.toString().endsWith(".java"))
+                    .sorted()
                     .map(p -> Arguments.of(p, p.getFileName().toString()));
         }
     }
