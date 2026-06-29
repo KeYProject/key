@@ -13,9 +13,10 @@ import java.util.ArrayDeque;
 /// Handles nested block structures and branch management commands.
 ///
 /// @author Mattias Ulbrich
-public class ScriptTreeParser {
+@Deprecated
+class ScriptTreeParser {
 
-    public static ScriptNode parse(Reader reader) throws IOException, ScriptException {
+    private static ScriptNode parse(Reader reader) throws IOException, ScriptException {
 
         ScriptNode root = null;
         ScriptNode last = null;

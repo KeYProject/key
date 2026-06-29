@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author mattias ulbrich
  */
+@Deprecated
 class ScriptLineParser {
 
     /**
