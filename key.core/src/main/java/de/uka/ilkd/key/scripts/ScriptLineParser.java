@@ -157,6 +157,10 @@ class ScriptLineParser {
                     }
                 }
                 case '\r' -> {
+                    // ignore a carriage return entirely (CRLF line endings): without the
+                    // 'continue' it would fall through to the append below and end up inside the
+                    // command, breaking scripts parsed from files checked out with CRLF.
+                    continue;
                 }
                 case '"', '\'' -> {
                     switch (state) {
