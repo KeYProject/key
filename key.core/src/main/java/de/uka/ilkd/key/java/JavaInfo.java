@@ -1130,13 +1130,23 @@ public final class JavaInfo {
      *
      * @return the default execution context
      */
-    public ExecutionContext getDefaultExecutionContext() {
+    public synchronized ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
-            var cu = services.getJavaService()
-                    .readCompilationUnit("public class %s { void %s() {} }"
-                            .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
-                                DEFAULT_EXECUTION_CONTEXT_METHOD));
-            final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            // Register the synthetic __Default__ class only if it is not already in the (shared)
+            // Java model. A copied Services shares its JavaService -- which owns the parsed model
+            // --
+            // so once any JavaInfo has registered __Default__ every copy can look it up rather than
+            // re-parse it. Re-parsing per proof registers a type lazily on the proving path, which
+            // races under the parallel prover (and repeats work needlessly). The single, load-time
+            // registration is done by the ProblemInitializer warm-up.
+            KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            if (kjt == null) {
+                services.getJavaService()
+                        .readCompilationUnit("public class %s { void %s() {} }"
+                                .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
+                                    DEFAULT_EXECUTION_CONTEXT_METHOD));
+                kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            }
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableList.nil()), null);
         }
