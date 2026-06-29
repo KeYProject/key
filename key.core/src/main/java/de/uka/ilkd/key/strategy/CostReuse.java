@@ -24,7 +24,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Phase-2 cost reuse (perf round 3): decide whether a taclet's strategy cost is a pure function of
+ * Decide whether a taclet's strategy cost is a pure function of
  * the rule app and its find-position subterm (plus the always-recomputed age term and
  * {@code NonDuplicateApp}-family vetoes). For such "cost-local" taclets the base re-cost performed
  * by {@link TacletAppContainer#createFurtherApps} on every peek round can be replaced by arithmetic
@@ -38,31 +38,28 @@ import org.jspecify.annotations.Nullable;
  * <li><b>veto</b> ({@link AbstractNonDuplicateAppFeature}): a 0/Top guard. Collected and re-checked
  * at reuse time (an app that became a duplicate must still be dropped); not descended into.</li>
  * <li><b>explicit override</b>: {@link VolatileCost} forces non-local (the author wins).</li>
- * <li><b>{@link StableCost}</b>: local. For a leaf that is the whole story; for a composite it
- * means
- * "transparent" -- the walk still recurses into its child features, so it stays local only if they
- * all are. There is NO automatic "any feature with children is transparent" guess: a composite is
- * trusted only because its author annotated it after checking that its own computation (including
- * any non-Feature inputs such as projections/term-generators) is find-local. The transparent
- * combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
+ * <li><b>{@link StableCost}</b>: local -- for a leaf that is the whole story; for a composite it
+ * means "transparent": the walk still recurses into its child features, so it stays local only if
+ * they all are. There is NO automatic "any feature with children is transparent" guess; a composite
+ * is trusted only because its author annotated it after checking that its own computation
+ * (including any non-Feature inputs such as projections/term-generators) is find-local. The
+ * transparent combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
  * <li><b>{@link WeakStableCost}</b>: weakly local -- the cost also reads the whole find formula
- * (not just the find subterm), so the taclet stays eligible but its cost may be carried forward
- * only
- * while that find formula is unchanged. The reuse site enforces this; an independent sibling
- * rewrite
- * that {@link FindTacletAppContainer#isStillApplicable} tolerates (find subterm intact, formula
- * not)
- * still forces a recompute. Recurses into children like {@link StableCost}.</li>
+ * (not just the find subterm), so the taclet stays eligible but its cost is carried forward only
+ * while that find formula is unchanged. The reuse site enforces this: an independent sibling
+ * rewrite that {@link FindTacletAppContainer#isStillApplicable} tolerates (find subterm intact,
+ * formula not) still forces a recompute. Recurses into children like {@link StableCost}.</li>
  * <li><b>otherwise</b> (unannotated): non-local (the SAFE default). A new feature -- leaf or
  * composite -- is non-local until someone reviews it and adds {@link StableCost}; forgetting costs
  * only performance, never soundness.</li>
  * </ol>
- * A {@link StableCost} composite is local only if, in addition to its child features, every child
- * {@link TermGenerator} it holds is also {@link StableCost} -- a generator is a non-Feature input
- * that decides locality (e.g. {@code SuperTermGenerator} is find-local, {@code
- * SequentFormulasGenerator} reads the whole sequent and is not). The walk descends only through
- * {@link Feature}- and {@link TermGenerator}-typed references (never arbitrary objects): the live
- * feature tree holds mutable scratch state (e.g. TermBuffers) that must not be traversed.
+ * A {@link StableCost} composite is local only if, in addition to its child features, every
+ * {@link TermGenerator} it holds is at least as local. A generator that walks below the find
+ * ({@code SubtermGenerator}) is find-local; one that walks up to the find's ancestors
+ * ({@code SuperTermGenerator}) is {@link WeakStableCost}; one that reads the whole sequent
+ * ({@code SequentFormulasGenerator}) is non-local. The walk follows only {@link Feature}- and
+ * {@link TermGenerator}-typed references, never arbitrary objects: the live feature tree holds
+ * mutable scratch state (e.g. TermBuffers) that must not be traversed.
  *
  * <p>
  * Optional verification (<code>-Dkey.strategy.costReuse.verify</code>): when reuse is applied also
@@ -108,9 +105,8 @@ public final class CostReuse {
      */
     public static @Nullable Eligibility eligibility(Strategy<?> strategy, Proof proof,
             Taclet taclet) {
-        // Without cost dispatchers we cannot establish locality -> treat as ineligible, and do NOT
-        // cache that verdict: a later call with a classifiable strategy must be able to classify
-        // it.
+        // Without cost dispatchers we cannot establish locality -> treat as ineligible, and do not
+        // cache that verdict, so a later call with a classifiable strategy can still classify it.
         final List<RuleSetDispatchFeature> disp = dispatchers(strategy);
         if (disp.isEmpty()) {
             return null;
@@ -164,15 +160,12 @@ public final class CostReuse {
         switch (k) {
             case VETO -> vetoes.add(f);
             case VOLATILE -> local[0] = false;
-            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are local
-            // AND all its child TERM-GENERATORS are local. WEAK_STABLE recurses the same way but
-            // additionally records that some feature reads the whole find formula -- so the
-            // taclet's
-            // cost may be reused only while that formula is unchanged (see Eligibility). The
-            // generator check matters because e.g. ComprehendedSumFeature sums its body over a
-            // generator: SuperTermGenerator (find ancestors) is local, but SequentFormulasGenerator
-            // (whole sequent) is not -- a generator is a non-Feature input the recursion would
-            // miss.
+            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are
+            // local and all its child TERM-GENERATORS are at least as local. WEAK_STABLE
+            // recurses the same way but also records that some part reads the whole find
+            // formula, so reuse is gated on that formula being unchanged (see Eligibility). A
+            // generator is a non-Feature input the recursion would otherwise miss (e.g.
+            // ComprehendedSumFeature sums its body over one).
             case STABLE, WEAK_STABLE -> {
                 if (k == Kind.WEAK_STABLE) {
                     weakStable[0] = true;
@@ -180,8 +173,13 @@ public final class CostReuse {
                 forEachChild(f, child -> {
                     if (child instanceof Feature cf) {
                         walk(cf, vetoes, local, weakStable, seen);
-                    } else if (!isLocal(child.getClass())) { // a TermGenerator (or similar input)
-                        local[0] = false;
+                    } else { // a TermGenerator (or similar non-Feature input)
+                        final Class<?> gc = child.getClass();
+                        if (gc.isAnnotationPresent(WeakStableCost.class)) {
+                            weakStable[0] = true;
+                        } else if (!isLocal(gc)) {
+                            local[0] = false;
+                        }
                     }
                 });
             }
@@ -189,7 +187,8 @@ public final class CostReuse {
     }
 
     /**
-     * A non-Feature classifying input (e.g. a TermGenerator) is local only if {@link StableCost}.
+     * A non-Feature classifying input (e.g. a TermGenerator) is fully local only if
+     * {@link StableCost}; a {@link WeakStableCost} one (handled by the caller) is weakly local.
      */
     private static boolean isLocal(Class<?> c) {
         return !c.isAnnotationPresent(VolatileCost.class)
