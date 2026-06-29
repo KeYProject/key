@@ -34,6 +34,18 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             return -1;
         }
 
+        // A newSmallSym taclet introduces its symbol as a SkolemTermSV instantiation, which is
+        // always a skolem-constant function (TacletApp.createSkolemConstant). So an op that is not
+        // a skolem-constant function can never have been introduced by one: its time is -1, with no
+        // need to scan the applied-rule history. This is what made the scan a hotspot -- the common
+        // monomial atoms (program variables, ordinary functions) are not skolem constants, yet
+        // walked the full O(history) on every compare and, never being "introduced", were never
+        // cached. (A skolem constant from some OTHER rule still walks and returns -1; only the
+        // structurally-impossible ops are short-circuited, so every result is unchanged.)
+        if (!(op instanceof Function func) || !func.isSkolemConstant()) {
+            return -1;
+        }
+
         final LRUCache<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
         Integer res;
