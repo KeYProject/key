@@ -21,7 +21,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -118,8 +117,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      */
     private ImmutableList<JTerm> extractTermListForPredicate(IProgramMethod pm,
             ProofObligationVars poVars, boolean hasMby) {
-        ImmutableList<JTerm> relevantPreVars = ImmutableSLList.nil();
-        ImmutableList<JTerm> relevantPostVars = ImmutableSLList.nil();
+        ImmutableList<JTerm> relevantPreVars = ImmutableList.nil();
+        ImmutableList<JTerm> relevantPostVars = ImmutableList.nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors

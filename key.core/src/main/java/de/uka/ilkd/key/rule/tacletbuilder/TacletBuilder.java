@@ -28,7 +28,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -45,19 +44,19 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     protected Name name = NONAME;
     protected Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
-    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
-    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
-    protected ImmutableList<NewDependingOn> varsNewDependingOn = ImmutableSLList.nil();
+    protected ImmutableList<NewVarcond> varsNew = ImmutableList.nil();
+    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableList.nil();
+    protected ImmutableList<NewDependingOn> varsNewDependingOn = ImmutableList.nil();
     protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
-        ImmutableSLList.nil();
-    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
+        ImmutableList.nil();
+    protected ImmutableList<RuleSet> ruleSets = ImmutableList.nil();
     protected TacletAttributes attrs = new TacletAttributes(NONAME.toString(), null);
 
     /**
      * List of additional generic conditions on the instantiations of schema variables.
      */
     protected ImmutableList<VariableCondition> variableConditions =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =

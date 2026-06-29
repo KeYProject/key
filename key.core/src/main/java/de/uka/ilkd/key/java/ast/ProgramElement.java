@@ -8,7 +8,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -28,7 +27,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
 
     ///
     default ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
 

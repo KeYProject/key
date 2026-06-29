@@ -27,7 +27,6 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -53,7 +52,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class JmlIO {
 
-    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
+    private ImmutableList<PositionedString> warnings = ImmutableList.nil();
 
     private final Services services;
 
@@ -440,7 +439,7 @@ public class JmlIO {
         this.specMathMode = null;
         clearWarnings();
         exceptionVariable(null);
-        parameters(ImmutableSLList.nil());
+        parameters(ImmutableList.nil());
         return this;
     }
 
@@ -454,7 +453,7 @@ public class JmlIO {
     }
 
     public void clearWarnings() {
-        warnings = ImmutableSLList.nil();
+        warnings = ImmutableList.nil();
     }
 
 }

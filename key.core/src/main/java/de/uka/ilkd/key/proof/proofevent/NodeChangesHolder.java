@@ -5,14 +5,13 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 public class NodeChangesHolder {
     public ImmutableList<SequentChangeInfo> scis;
 
     NodeChangesHolder() {
-        this(ImmutableSLList.nil());
+        this(ImmutableList.nil());
     }
 
     NodeChangesHolder(

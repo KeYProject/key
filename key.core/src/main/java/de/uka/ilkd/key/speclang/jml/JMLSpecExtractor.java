@@ -67,7 +67,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL;
     private final Services services;
     private final JMLSpecFactory jsf;
-    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
+    private ImmutableList<PositionedString> warnings = ImmutableList.nil();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -575,7 +575,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (constructs.isEmpty()) {
             return result;
         }
-        TextualJMLConstruct c = constructs.take(constructs.size() - 1).head();
+        TextualJMLConstruct c = constructs.skip(constructs.size() - 1).head();
         if (c instanceof TextualJMLLoopSpec textualLoopSpec) {
             result = jsf.createJMLLoopInvariant(pm, loop, textualLoopSpec);
 

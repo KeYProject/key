@@ -33,7 +33,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -1109,7 +1108,7 @@ public abstract class AbstractUpdateExtractor {
         ImmutableList<JTerm> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
         // Combine memory layout with original updates
         Map<LocationVariable, JTerm> preUpdateMap = new HashMap<>();
-        ImmutableList<JTerm> additionalUpdates = ImmutableSLList.nil();
+        ImmutableList<JTerm> additionalUpdates = ImmutableList.nil();
         for (ExtractLocationParameter evp : locations) {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
             preUpdateMap.put(evp.getPreVariable(), evp.getPreUpdateTarget());
@@ -1270,7 +1269,7 @@ public abstract class AbstractUpdateExtractor {
             boolean currentLayout) {
         ImmutableList<JTerm> originalUpdates;
         if (!currentLayout) {
-            originalUpdates = ImmutableSLList.nil();
+            originalUpdates = ImmutableList.nil();
         } else {
             if (node.proof().root() == node) {
                 originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
@@ -1460,7 +1459,7 @@ public abstract class AbstractUpdateExtractor {
          * @param goal The current {@link Goal} to start backward iteration at.
          */
         public NodeGoal(Goal goal) {
-            this(goal.node(), ImmutableSLList.<Goal>nil().prepend(goal));
+            this(goal.node(), ImmutableList.<Goal>nil().prepend(goal));
         }
 
         /**

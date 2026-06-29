@@ -13,7 +13,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is responsible for pruning a proof tree at a certain cutting point. It has been
@@ -168,7 +167,7 @@ class ProofPruner {
     }
 
     private ImmutableList<Node> cut(Node node) {
-        ImmutableList<Node> children = ImmutableSLList.nil();
+        ImmutableList<Node> children = ImmutableList.nil();
         Iterator<Node> it = node.childrenIterator();
 
         while (it.hasNext()) {

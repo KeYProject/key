@@ -24,7 +24,6 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -138,7 +137,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         // the concrete lattice.
         if (concreteRule.requiresDistinguishablePathConditions()
                 || concreteRule instanceof MergeWithLatticeAbstraction) {
-            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
+            ImmutableList<SymbolicExecutionState> allStates = ImmutableList.nil();
             allStates = allStates.prepend(mergePartnerStates);
             allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
 

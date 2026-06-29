@@ -22,7 +22,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.engine.GoalChooserFactory;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -100,7 +99,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
 

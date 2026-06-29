@@ -24,7 +24,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -110,20 +109,20 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if (!isStillApplicable(p_goal)
                 || (getTacletApp().assumesInstantionsComplete()
                         && !assumesFormulasStillValid(p_goal))) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         final TacletAppContainer newCont = costLocalReusedContainerOr(p_goal);
         if (newCont == null) {
             // a veto fired on the cost-local fast path: the re-costed base would be infinite
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         if (newCont.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         ImmutableList<RuleAppContainer> res =
-            ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
+            ImmutableList.<RuleAppContainer>singleton(newCont);
 
         if (getTacletApp().assumesInstantionsComplete()) {
             res = addInstances(getTacletApp(), res, p_goal);
@@ -268,7 +267,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             costs.add(p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal));
         }
 
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
+        ImmutableList<RuleAppContainer> result = ImmutableList.nil();
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container =
                 createContainer(p_app.head(), p_pio, p_goal, cost, true);

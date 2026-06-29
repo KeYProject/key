@@ -42,7 +42,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -80,7 +79,7 @@ public final class Goal implements ProofGoal<Goal> {
      * list of all applied rule applications at this branch
      */
     private ImmutableList<RuleApp> appliedRuleApps =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -134,7 +133,7 @@ public final class Goal implements ProofGoal<Goal> {
             Services services) {
         this.node = node;
         this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
-        this.appliedRuleApps = ImmutableSLList.nil();
+        this.appliedRuleApps = ImmutableList.nil();
         this.goalStrategy = null;
         this.strategyInfos = new MapProperties();
         this.tagManager = new FormulaTagManager(this);
@@ -553,7 +552,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.nil();
+        ImmutableList<Goal> goalList = ImmutableList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced

@@ -35,7 +35,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.Token;
@@ -380,7 +379,7 @@ public final class JmlTermFactory {
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
             ImmutableList<LogicVariable> _qvs =
-                ImmutableSLList.<LogicVariable>nil().prepend(lv);
+                ImmutableList.<LogicVariable>singleton(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -908,7 +907,7 @@ public final class JmlTermFactory {
                     || t.op().equals(locSetLDT.getSingleton())) {
                 return t;
             } else {
-                ImmutableList<SLExpression> exprList = ImmutableSLList.nil();
+                ImmutableList<SLExpression> exprList = ImmutableList.nil();
                 exprList = exprList.append(expr);
                 return createLocSet(exprList);
             }
@@ -917,7 +916,7 @@ public final class JmlTermFactory {
     }
 
     public JTerm createLocSet(ImmutableList<SLExpression> exprList) {
-        ImmutableList<JTerm> singletons = ImmutableSLList.nil();
+        ImmutableList<JTerm> singletons = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
                 JTerm t = expr.getTerm();
@@ -956,7 +955,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression createPairwiseDisjoint(ImmutableList<JTerm> list) {
-        ImmutableList<JTerm> disTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> disTerms = ImmutableList.nil();
         while (!list.isEmpty()) {
             JTerm t1 = list.head();
             list = list.tail();
@@ -978,7 +977,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression seqConst(ImmutableList<SLExpression> exprList) {
-        ImmutableList<JTerm> terms = ImmutableSLList.nil();
+        ImmutableList<JTerm> terms = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
                 JTerm t = ensureTerm(expr.getTerm());
@@ -1261,7 +1260,7 @@ public final class JmlTermFactory {
 
             JTerm[] args;
             if (list == null) {
-                list = ImmutableSLList.nil();
+                list = ImmutableList.nil();
             }
 
             JTerm heap = tb.getBaseHeap();

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.prover.impl;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -69,10 +68,10 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
     @Override
     protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
-        ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 
-        nextGoals = ImmutableSLList.nil();
+        nextGoals = ImmutableList.nil();
 
         // Only consider automatic goals
         newGoals = newGoals.filter(Goal::isAutomatic);

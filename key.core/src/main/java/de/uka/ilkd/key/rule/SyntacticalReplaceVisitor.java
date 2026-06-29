@@ -32,7 +32,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
@@ -396,7 +395,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     private Operator handleParametricFunction(ParametricFunctionInstance pfi) {
-        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        ImmutableList<GenericArgument> args = ImmutableList.nil();
 
         for (int i = pfi.getArgs().size() - 1; i >= 0; i--) {
             args = args.prepend(pfi.getArgs().get(i).instantiate(svInst, services));

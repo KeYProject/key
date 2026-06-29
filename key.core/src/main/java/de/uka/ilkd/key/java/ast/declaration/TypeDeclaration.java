@@ -18,7 +18,6 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -225,10 +224,10 @@ public abstract class TypeDeclaration extends JavaDeclaration
      */
     public ImmutableList<Field> getAllFields(Services services) {
         if (members == null) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
 
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {

@@ -24,7 +24,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,10 +47,10 @@ public class TestNonDuplicateAppFeature {
 
     /** Root sequent {@code ==> A -> B, B -> A} (two distinct succedent formulas). */
     private static Sequent twoImplications() {
-        ImmutableList<SequentFormula> succ = ImmutableSLList.<SequentFormula>nil()
+        ImmutableList<SequentFormula> succ = ImmutableList.<SequentFormula>nil()
                 .append(new SequentFormula(TacletForTests.parseTerm("A -> B")))
                 .append(new SequentFormula(TacletForTests.parseTerm("B -> A")));
-        return JavaDLSequentKit.createSequent(ImmutableSLList.nil(), succ);
+        return JavaDLSequentKit.createSequent(ImmutableList.nil(), succ);
     }
 
     private static Goal goalFor(Node n, TacletIndex idx) {
@@ -128,7 +127,7 @@ public class TestNonDuplicateAppFeature {
         Proof proof = new Proof("TestNonDuplicateAppFeature", TacletForTests.initConfig());
         SequentFormula conj = new SequentFormula(TacletForTests.parseTerm("(A -> B) & (A -> B)"));
         Node root = new Node(proof,
-            JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ImmutableSLList.singleton(conj)));
+            JavaDLSequentKit.createSequent(ImmutableList.nil(), ImmutableList.singleton(conj)));
         proof.setRoot(root);
 
         TacletIndex idx = TacletIndexKit.getKit().createTacletIndex();

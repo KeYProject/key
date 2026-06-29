@@ -41,7 +41,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.Name;
 import org.key_project.prover.engine.GoalChooserFactory;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -143,31 +142,31 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations(
             boolean predicateEvaluationEnabled) {
         ImmutableList<TermLabelPolicy> symExcPolicies =
-            ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
+            ImmutableList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
 
-        ImmutableList<TermLabelUpdate> bcUps = ImmutableSLList.<TermLabelUpdate>nil()
+        ImmutableList<TermLabelUpdate> bcUps = ImmutableList.<TermLabelUpdate>nil()
                 .prepend(new BlockContractValidityTermLabelUpdate());
         ImmutableList<TermLabelUpdate> lbUps =
-            ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
-        ImmutableList<TermLabelUpdate> nbUps = ImmutableSLList.<TermLabelUpdate>nil()
+            ImmutableList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
+        ImmutableList<TermLabelUpdate> nbUps = ImmutableList.<TermLabelUpdate>nil()
                 .prepend(new LoopInvariantNormalBehaviorTermLabelUpdate());
         ImmutableList<TermLabelUpdate> seUps =
-            ImmutableSLList.<TermLabelUpdate>nil().prepend(new SymbolicExecutionTermLabelUpdate());
+            ImmutableList.<TermLabelUpdate>nil().prepend(new SymbolicExecutionTermLabelUpdate());
 
         ImmutableList<TermLabelRefactoring> bcRefs =
-            ImmutableSLList.<TermLabelRefactoring>nil().prepend(
+            ImmutableList.<TermLabelRefactoring>nil().prepend(
                 new RemoveInCheckBranchesTermLabelRefactoring(BlockContractValidityTermLabel.NAME));
-        ImmutableList<TermLabelRefactoring> lbRefs = ImmutableSLList.<TermLabelRefactoring>nil()
+        ImmutableList<TermLabelRefactoring> lbRefs = ImmutableList.<TermLabelRefactoring>nil()
                 .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
                     SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME));
-        ImmutableList<TermLabelRefactoring> nbRefs = ImmutableSLList.<TermLabelRefactoring>nil()
+        ImmutableList<TermLabelRefactoring> nbRefs = ImmutableList.<TermLabelRefactoring>nil()
                 .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
                     SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME));
         ImmutableList<TermLabelRefactoring> seRefs =
-            ImmutableSLList.<TermLabelRefactoring>nil().prepend(
+            ImmutableList.<TermLabelRefactoring>nil().prepend(
                 new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
 
-        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+        ImmutableList<TermLabelConfiguration> result = ImmutableList.nil();
         result = result.prepend(new TermLabelConfiguration(BlockContractValidityTermLabel.NAME,
             new BlockContractValidityTermLabelFactory(), null, symExcPolicies, null, null, bcUps,
             bcRefs, null));
@@ -185,10 +184,10 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
             seRefs, null));
         if (predicateEvaluationEnabled) {
             ImmutableList<TermLabelPolicy> predPolicies =
-                ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
+                ImmutableList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
             ImmutableList<TermLabelUpdate> predUpdates =
-                ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
-            ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList
+                ImmutableList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
+            ImmutableList<TermLabelRefactoring> predRefs = ImmutableList
                     .<TermLabelRefactoring>nil().prepend(new FormulaTermLabelRefactoring());
             result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
                 new FormulaTermLabelFactory(), null, predPolicies, null, null, predUpdates,

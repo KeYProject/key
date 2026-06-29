@@ -20,7 +20,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -63,7 +62,7 @@ public class AutoCommand extends AbstractCommand {
             goals = state().getProof().openGoals();
         } else {
             final Goal goal = state().getFirstOpenAutomaticGoal();
-            goals = ImmutableList.of(goal);
+            goals = ImmutableList.<Goal>singleton(goal);
 
             if (arguments.matches != null || arguments.breakpoint != null) {
                 setupFocussedBreakpointStrategy( //
@@ -109,7 +108,7 @@ public class AutoCommand extends AbstractCommand {
         // start actual autoprove
         try {
             for (Goal goal : goals) {
-                applyStrategy.start(state().getProof(), ImmutableSLList.<Goal>nil().prepend(goal));
+                applyStrategy.start(state().getProof(), ImmutableList.<Goal>singleton(goal));
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {

@@ -154,7 +154,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             }
         } else {
             New n = (New) mr;
-            ImmutableList<KeYJavaType> sig = ImmutableSLList.nil();
+            ImmutableList<KeYJavaType> sig = ImmutableList.nil();
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
@@ -191,7 +191,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
     private static ImmutableList<JTerm> getActualParams(MethodOrConstructorReference mr,
             ExecutionContext ec, Services services) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (Expression expr : mr.getArguments()) {
             JTerm actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
             result = result.append(actualParam);
@@ -672,7 +672,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected JTerm atPreUpdates;
         protected JTerm reachableState;
         protected ImmutableList<UseOperationContractRule.AnonUpdateData> anonUpdateDatas =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         protected final Map<LocationVariable, JTerm> modifiables;
         protected final JTerm globalDefs;
         protected final JTerm originalPre;

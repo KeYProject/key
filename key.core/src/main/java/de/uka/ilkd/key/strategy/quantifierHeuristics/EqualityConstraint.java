@@ -25,7 +25,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
@@ -538,8 +537,8 @@ public class EqualityConstraint implements Constraint {
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
     private Constraint unifyHelp(JTerm t1, JTerm t2, boolean modifyThis, Services services) {
-        return unifyHelp(t1, t2, ImmutableSLList.nil(),
-            ImmutableSLList.nil(), null, modifyThis, services);
+        return unifyHelp(t1, t2, ImmutableList.nil(),
+            ImmutableList.nil(), null, modifyThis, services);
     }
 
 
@@ -742,8 +741,8 @@ public class EqualityConstraint implements Constraint {
      * @return a boolean that is true iff. adding a mapping (mv,term) would cause a cycle
      */
     private boolean hasCycle(Metavariable mv, JTerm term, Services services) {
-        ImmutableList<Metavariable> body = ImmutableSLList.nil();
-        ImmutableList<JTerm> fringe = ImmutableSLList.nil();
+        ImmutableList<Metavariable> body = ImmutableList.nil();
+        ImmutableList<JTerm> fringe = ImmutableList.nil();
         JTerm checkForCycle = term;
 
         while (true) {

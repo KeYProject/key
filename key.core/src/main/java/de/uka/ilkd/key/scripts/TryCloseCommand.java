@@ -58,9 +58,9 @@ public class TryCloseCommand extends AbstractCommand {
                 int num = Integer.parseInt(args.branch);
                 ImmutableList<Goal> goals = state().getProof().openEnabledGoals();
                 if (num >= 0) {
-                    target = goals.take(num).head().node();
+                    target = goals.get(num).node();
                 } else {
-                    target = goals.take(goals.size() + num).head().node();
+                    target = goals.get(goals.size() + num).node();
                 }
             } catch (NumberFormatException e) {
                 target = state().getProof().root();

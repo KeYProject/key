@@ -23,7 +23,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -171,7 +170,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -185,7 +184,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex2(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -198,7 +197,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex3(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
         ImmutableList<Taclet> listD = listB.prepend(remove_ff.taclet());

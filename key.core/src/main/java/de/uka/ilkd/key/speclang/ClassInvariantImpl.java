@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 import org.key_project.logic.op.Operator;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -211,6 +211,6 @@ public final class ClassInvariantImpl implements ClassInvariant {
         self = this.originalSelfVar;
         return new OriginalVariables(self, null, null,
             new LinkedHashMap<>(),
-            ImmutableSLList.nil());
+            ImmutableList.nil());
     }
 }

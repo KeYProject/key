@@ -17,7 +17,6 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      */
     @Override
     public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, Goal goal) {
-        return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+        return start(proof, ImmutableList.<Goal>nil().prepend(goal));
     }
 
     /*
@@ -244,7 +243,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         final GoalChooser<Proof, Goal> goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.nil());
+            goalChooser.init(null, ImmutableList.nil());
         }
     }
 

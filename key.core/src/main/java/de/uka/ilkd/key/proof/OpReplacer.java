@@ -16,7 +16,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
@@ -275,7 +274,7 @@ public class OpReplacer {
      * @return the list of transformed terms.
      */
     public ImmutableList<JTerm> replace(ImmutableList<JTerm> terms) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (final JTerm term : terms) {
             result = result.append(replace(term));
         }
@@ -289,7 +288,7 @@ public class OpReplacer {
      * @return the list of transformed terms.
      */
     public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> result = ImmutableSLList.nil();
+        ImmutableList<InfFlowSpec> result = ImmutableList.nil();
         if (terms == null) {
             return result;
         }

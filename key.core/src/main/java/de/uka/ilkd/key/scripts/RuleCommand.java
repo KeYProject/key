@@ -30,7 +30,6 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
@@ -280,7 +279,7 @@ public class RuleCommand extends AbstractCommand {
         final Goal g = state.getFirstOpenAutomaticGoal();
         final BuiltInRuleAppIndex index = g.ruleAppIndex().builtInRuleAppIndex();
 
-        ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
+        ImmutableList<IBuiltInRuleApp> allApps = ImmutableList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
@@ -311,7 +310,7 @@ public class RuleCommand extends AbstractCommand {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;

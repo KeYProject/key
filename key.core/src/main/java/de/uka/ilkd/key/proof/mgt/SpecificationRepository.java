@@ -164,7 +164,7 @@ public class SpecificationRepository {
         tacletBuilder.setFind(limitedTerm);
         tacletBuilder.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableSLList.nil(), unlimitedTerm));
+                ImmutableList.nil(), unlimitedTerm));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
         // tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
@@ -191,9 +191,9 @@ public class SpecificationRepository {
         tacletBuilder.setFind(tb.func(unlimited, subs));
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
         final Sequent addedSeq =
-            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(cf));
+            JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(cf));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
-            ImmutableSLList.nil(), tb.func(unlimited, subs)));
+            ImmutableList.nil(), tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         tacletBuilder.setName(
@@ -260,7 +260,7 @@ public class SpecificationRepository {
 
     private ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingMethods(KeYJavaType kjt,
             IProgramMethod pm) {
-        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableSLList.nil();
+        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableList.nil();
 
         // static methods and constructors are not overriden
         if (pm.isConstructor() || pm.isStatic()) {
@@ -896,23 +896,23 @@ public class SpecificationRepository {
 
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                        kjt, new Private(), null, invDef, selfVar, ImmutableSLList.nil(), null);
+                        kjt, new Private(), null, invDef, selfVar, ImmutableList.nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                    new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
+                    new Private(), null, staticInvDef, null, ImmutableList.nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
                     "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                    new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
+                    new Private(), null, freeInvDef, selfVar, ImmutableList.nil(), null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
                     "Free static class invariant axiom for " + kjt.getFullName(),
                     freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
-                    ImmutableSLList.nil(), null);
+                    ImmutableList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
 
             }
@@ -966,7 +966,7 @@ public class SpecificationRepository {
                     // We need to construct an inheritance chain of contracts
                     // starting at the bottom
                     ImmutableList<FunctionalOperationContract> lookupContracts =
-                        ImmutableSLList.nil();
+                        ImmutableList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
                     List<KeYJavaType> superTypes =
                         services.getJavaInfo().getAllSupertypes(kjt);

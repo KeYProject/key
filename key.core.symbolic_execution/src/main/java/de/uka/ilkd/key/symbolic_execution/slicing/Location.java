@@ -12,7 +12,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Represents a location like a local variable, method parameter, static field or an instance field
@@ -43,7 +42,7 @@ public class Location {
      */
     public Location(Access... accesses) {
         assert accesses != null;
-        this.accesses = ImmutableSLList.<Access>nil().append(accesses);
+        this.accesses = ImmutableList.<Access>nil().append(accesses);
     }
 
     /**

@@ -24,7 +24,6 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
@@ -122,7 +121,7 @@ public class RewriteCommand extends AbstractCommand {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent

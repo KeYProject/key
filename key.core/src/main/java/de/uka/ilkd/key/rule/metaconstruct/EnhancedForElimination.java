@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -240,7 +240,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, data.execContext());
         final IProgramMethod iteratorMethod =
             services.getJavaInfo().getProgramMethod(iterableType, ITERATOR_METHOD_NAME,
-                ImmutableSLList.nil(), data.execContext().getTypeReference().getKeYJavaType());
+                ImmutableList.nil(), data.execContext().getTypeReference().getKeYJavaType());
 
         // local variable "it"
         final KeYJavaType iteratorType = iteratorMethod.getReturnType();

@@ -28,7 +28,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -120,7 +119,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static ImmutableList<LocationVariable> addGhostParams(
             ImmutableList<LocationVariable> paramVars, ImmutableList<LocationVariable> origParams) {
         // make sure ghost parameters are present
-        ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> ghostParams = ImmutableList.nil();
         for (LocationVariable param : origParams) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
@@ -180,7 +179,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
         } else {
-            params = ImmutableSLList.nil();
+            params = ImmutableList.nil();
         }
         return new Variables(self, result, exception, atPres, params, heap, anonHeap, services);
     }

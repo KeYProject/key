@@ -35,7 +35,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -122,7 +121,7 @@ public abstract class AbstractProofReplayer {
         }
 
         // Load ifInsts, if applicable
-        builtinIfInsts = ImmutableSLList.nil();
+        builtinIfInsts = ImmutableList.nil();
         for (PosInOccurrence oldFormulaPio : RuleAppUtil
                 .assumesInstantiationsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
             PosInOccurrence newFormula =
@@ -266,7 +265,7 @@ public abstract class AbstractProofReplayer {
         ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
             getInterestingInstantiations(instantantions), services);
 
-        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
                 .assumesInstantiationsOfRuleApp(originalTacletApp, originalStep)
                 .stream()

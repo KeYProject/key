@@ -18,7 +18,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
@@ -63,8 +62,8 @@ public class TermComparisonWithHoles {
             JTerm startTerm = (JTerm) pit.getSubTerm(pio.sequentFormula().formula());
 
             boolean result = unifyHelp(referenceTerm, startTerm,
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(),
+                ImmutableList.<QuantifiableVariable>nil(),
+                ImmutableList.<QuantifiableVariable>nil(),
                 fpath);
             if (result) {
                 return true;

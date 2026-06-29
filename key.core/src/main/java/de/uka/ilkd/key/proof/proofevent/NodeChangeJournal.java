@@ -17,7 +17,6 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -56,7 +55,7 @@ public class NodeChangeJournal implements GoalListener {
      * listeners
      */
     public RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
-        ImmutableList<NodeReplacement> nrs = ImmutableSLList.nil();
+        ImmutableList<NodeReplacement> nrs = ImmutableList.nil();
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
             final Node newNode = entry.key();

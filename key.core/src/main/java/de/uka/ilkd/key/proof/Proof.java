@@ -39,7 +39,6 @@ import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NullMarked;
@@ -82,14 +81,14 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * list with the open goals of the proof
      */
-    private ImmutableList<Goal> openGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> openGoals = ImmutableList.nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches possible.
      * If the list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
      */
-    private ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> closedGoals = ImmutableList.nil();
 
     /**
      * declarations &c, read from a problem file or otherwise
@@ -250,7 +249,7 @@ public class Proof implements ProofObject<Goal>, Named {
             InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
+                    .createSuccSequent(ImmutableList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
@@ -516,7 +515,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @see Goal#isAutomatic()
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
+        ImmutableList<Goal> enabledGoals = ImmutableList.nil();
         for (Goal g : goals) {
             if (g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
@@ -574,7 +573,7 @@ public class Proof implements ProofObject<Goal>, Named {
         if (b) {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
-            fireProofGoalsAdded(ImmutableSLList.nil());
+            fireProofGoalsAdded(ImmutableList.nil());
         }
     }
 
@@ -687,7 +686,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     void removeOpenGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal openGoal : openGoals()) {
             if (!toBeRemoved.contains(openGoal.node())) {
                 newGoalList = newGoalList.append(openGoal);
@@ -704,7 +703,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param toBeRemoved the goals to remove
      */
     void removeClosedGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal closedGoal : closedGoals) {
             if (!toBeRemoved.contains(closedGoal.node())) {
                 newGoalList = newGoalList.prepend(closedGoal);
@@ -888,7 +887,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * fires the event that new goals have been added to the list of goals
      */
     protected void fireProofGoalsAdded(Goal goal) {
-        fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
+        fireProofGoalsAdded(ImmutableList.<Goal>nil().prepend(goal));
     }
 
 
@@ -1060,7 +1059,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the goals below node that are contained in <code>fromGoals</code>
      */
     private static ImmutableList<Goal> getGoalsBelow(Node node, ImmutableList<Goal> fromGoals) {
-        ImmutableList<Goal> result = ImmutableSLList.nil();
+        ImmutableList<Goal> result = ImmutableList.nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : fromGoals) {
             // if list contains node, remove it to make the list faster later

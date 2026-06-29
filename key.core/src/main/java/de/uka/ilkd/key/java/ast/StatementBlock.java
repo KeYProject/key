@@ -21,7 +21,6 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -89,7 +88,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-        attachedJML = ImmutableSLList.nil();
+        attachedJML = ImmutableList.nil();
     }
 
 

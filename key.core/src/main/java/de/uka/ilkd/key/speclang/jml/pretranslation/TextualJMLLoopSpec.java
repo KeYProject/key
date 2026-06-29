@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
@@ -137,14 +136,14 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                    map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             if (!map.containsKey(h.toString())) {
-                map.put(h.toString(), ImmutableSLList.nil());
+                map.put(h.toString(), ImmutableList.nil());
             }
         }
         return map;
@@ -157,14 +156,14 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                    map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             if (!map.containsKey(h.toString())) {
-                map.put(h.toString(), ImmutableSLList.nil());
+                map.put(h.toString(), ImmutableList.nil());
             }
         }
         return map;

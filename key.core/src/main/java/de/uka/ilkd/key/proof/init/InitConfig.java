@@ -32,7 +32,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -53,7 +52,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
     /// List of all known taclets.
-    private ImmutableList<Taclet> taclets = ImmutableSLList.nil();
+    private ImmutableList<Taclet> taclets = ImmutableList.nil();
 
     /**
      * Map of categories to their default choice. The choices are overridden in activateChoice
@@ -293,7 +292,7 @@ public class InitConfig {
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null ? ImmutableSLList.nil()
+        return (profile == null ? ImmutableList.nil()
                 : profile.getStandardRules().standardBuiltInRules());
     }
 

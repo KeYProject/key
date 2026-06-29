@@ -21,7 +21,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -444,7 +443,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                         firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                 assert variable != null;
                 createValues(variable, pairsList, firstPair, childrenInfo, values,
-                    ImmutableSLList.nil());
+                    ImmutableList.nil());
                 variable.values = values.toArray(new IExecutionValue[0]);
             }
             return values;

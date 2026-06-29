@@ -10,7 +10,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Default implementation of {@link ISymbolicLayout}.
@@ -31,7 +30,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * The contained {@link ISymbolicObject}s.
      */
-    private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+    private ImmutableList<ISymbolicObject> objects = ImmutableList.nil();
 
     /**
      * Constructor.

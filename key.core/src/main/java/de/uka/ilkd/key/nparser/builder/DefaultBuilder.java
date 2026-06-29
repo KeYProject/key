@@ -32,7 +32,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -381,7 +380,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "Expected %d sort arguments, got only %d",
                 params.size(), ctx.sortId().size());
         }
-        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        ImmutableList<GenericArgument> args = ImmutableList.nil();
         for (int i = params.size() - 1; i >= 0; i--) {
             var arg = ctx.sortId(i);
             var sort = visitSortId(arg);

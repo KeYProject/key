@@ -40,7 +40,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     }
 
     protected DefaultImmutableSet() {
-        elementList = ImmutableSLList.nil();
+        elementList = ImmutableList.nil();
     }
 
     /**
@@ -49,7 +49,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
      * @param element of type <T> the new Set contains
      */
     private DefaultImmutableSet(T element) {
-        elementList = (ImmutableSLList.<T>nil()).prepend(element);
+        elementList = ImmutableList.<T>singleton(element);
     }
 
     /**
@@ -155,7 +155,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
             return (ImmutableSet<T>) set;
         }
 
-        ImmutableList<T> intersectElements = ImmutableSLList.nil();
+        ImmutableList<T> intersectElements = ImmutableList.nil();
         for (T el : set) {
             if (contains(el)) {
                 intersectElements = intersectElements.prepend(el);
@@ -353,7 +353,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         /** @return Iterator<T> of the set */
         @Override
         public Iterator<T> iterator() {
-            return ImmutableSLList.<T>nil().iterator();
+            return ImmutableList.<T>nil().iterator();
         }
 
         /** @return true iff this set is subset of set s */

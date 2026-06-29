@@ -11,7 +11,6 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,9 @@ public class TestLeftistHeapOfInteger {
 
     @BeforeEach
     public void setUp() {
-        a = ImmutableSLList.<Integer>nil().prepend(13).prepend(20).prepend(5).prepend(7).prepend(16)
+        a = ImmutableList.<Integer>nil().prepend(13).prepend(20).prepend(5).prepend(7).prepend(16)
                 .prepend(60).prepend(20).prepend(-34);
-        b = ImmutableSLList.<Integer>nil().prepend(-1000).prepend(1000).prepend(8);
+        b = ImmutableList.<Integer>nil().prepend(-1000).prepend(1000).prepend(8);
     }
 
     @Test
@@ -102,7 +101,7 @@ public class TestLeftistHeapOfInteger {
         assertTrue(equals(h.sortedIterator(), elements.iterator()),
             "Unsorted heap iterator does not return the right elements");
 
-        ImmutableList<Integer> list = ImmutableSLList.nil();
+        ImmutableList<Integer> list = ImmutableList.nil();
         lastElement = null;
 
         while (!h.isEmpty()) {
@@ -131,8 +130,8 @@ public class TestLeftistHeapOfInteger {
     public void testInsertIterator() {
         ImmutableHeap<Integer> h = ImmutableLeftistHeap.nilHeap();
 
-        h = h.insert(ImmutableSLList.<Integer>nil().iterator());
-        checkHeap(ImmutableSLList.nil(), h);
+        h = h.insert(ImmutableList.<Integer>nil().iterator());
+        checkHeap(ImmutableList.nil(), h);
         assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h = h.insert(a.iterator());
@@ -141,7 +140,7 @@ public class TestLeftistHeapOfInteger {
         h = h.insert(a.iterator());
         checkHeap(a.prepend(a), h);
 
-        h = h.insert(ImmutableSLList.<Integer>nil().iterator());
+        h = h.insert(ImmutableList.<Integer>nil().iterator());
         checkHeap(a.prepend(a), h);
 
         h = h.insert(h.iterator());
@@ -174,7 +173,7 @@ public class TestLeftistHeapOfInteger {
         ImmutableHeap<Integer> h = ImmutableLeftistHeap.nilHeap();
 
         // Test removal of all elements (from empty heap)
-        checkHeap(ImmutableSLList.nil(), removeAll(h, a.iterator()));
+        checkHeap(ImmutableList.nil(), removeAll(h, a.iterator()));
 
         h = h.insert(a.iterator());
         checkHeap(a, h);
@@ -183,7 +182,7 @@ public class TestLeftistHeapOfInteger {
         checkHeap(a.removeAll(a.head()), h.removeAll(a.head()));
 
         // Test removal of all elements
-        checkHeap(ImmutableSLList.nil(), removeAll(h, a.iterator()));
+        checkHeap(ImmutableList.nil(), removeAll(h, a.iterator()));
 
         // Test removal of non-existing elements
         assertSame(h, removeAll(h, b.iterator()), "Heap should not be different");
@@ -192,7 +191,7 @@ public class TestLeftistHeapOfInteger {
     @Test
     public void testLargeHeap() {
         ImmutableHeap<Integer> h = ImmutableLeftistHeap.nilHeap();
-        ImmutableList<Integer> l = ImmutableSLList.nil();
+        ImmutableList<Integer> l = ImmutableList.nil();
 
         int i = 1000;
         while (i-- != 0) {

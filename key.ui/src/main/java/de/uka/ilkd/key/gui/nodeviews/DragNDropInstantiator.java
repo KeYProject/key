@@ -34,7 +34,6 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -184,7 +183,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         final Sequent sequent = seqView.getMediator().getSelectedGoal().sequent();
 
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableList.nil();
         if (targetPos.isSequent()) {
             // collects all applicable taclets at the source position
             // which have an addrule section
@@ -220,7 +219,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> getDirectionDependentApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services, final Sequent sequent) {
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableList.nil();
         // all applicable taclets where the drag source has been interpreted
         // as
         // the find part and the drop position as the one of the
@@ -286,10 +285,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             TacletFilter filter, Services services) {
 
         if (findPos == null || findPos.isSequent()) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
-        ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableList.nil();
         KeYMediator r = seqView.getMediator();
 
         // if in replaceWithMode only apps that contain at least one replacewith
@@ -318,7 +317,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> addPositionInformation(ImmutableList<TacletApp> tacletApps,
             PosInOccurrence findPos, Services services) {
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableList.nil();
         for (TacletApp tacletApp : tacletApps) {
             TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
@@ -349,7 +348,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
             Sequent seq, PosInOccurrence assumesPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<PosTacletApp> result = ImmutableList.nil();
 
         final ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations;
 
@@ -361,7 +360,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             final AssumesFormulaInstSeq assumesInstantiationInSeq =
                 new AssumesFormulaInstSeq(seq, assumesPIO.isInAntec(),
                     assumesPIO.sequentFormula());
-            assumesFormulaInstantiations = ImmutableSLList.<AssumesFormulaInstantiation>nil()
+            assumesFormulaInstantiations = ImmutableList.<AssumesFormulaInstantiation>nil()
                     .prepend(assumesInstantiationInSeq);
         }
 
@@ -377,7 +376,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 } else if (assumesFormulaInstantiations == null) {
                     // as either all taclets have an assumes-sequent or none
                     // we can exit here
-                    return ImmutableSLList.nil();
+                    return ImmutableList.nil();
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
@@ -414,9 +413,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
             PosInOccurrence missingSVPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<PosTacletApp> result = ImmutableList.nil();
         if (missingSVPIO == null) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         for (PosTacletApp app1 : apps) {

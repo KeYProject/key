@@ -19,7 +19,6 @@ import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -69,7 +68,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return a list of the parameter variables
      */
     final static ImmutableList<LocationVariable> convertParams(ImmutableSet<LocationVariable> set) {
-        ImmutableList<LocationVariable> list = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> list = ImmutableList.nil();
         for (LocationVariable pv : set) {
             list = list.append(pv);
         }

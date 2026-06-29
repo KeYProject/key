@@ -15,7 +15,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -98,7 +97,7 @@ public abstract class GenericSortCondition {
         if (!(s1 instanceof ParametricSortInstance ps1) || ps1.getBase() != psi.getBase()) {
             return null;
         }
-        ImmutableList<GenericSortCondition> conds = ImmutableSLList.nil();
+        ImmutableList<GenericSortCondition> conds = ImmutableList.nil();
         for (int i = psi.getArgs().size() - 1; i >= 0; i--) {
             var a0 = psi.getArgs().get(i);
             var a1 = ps1.getArgs().get(i);

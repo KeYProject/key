@@ -26,7 +26,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 
@@ -136,7 +135,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         JTerm selfAtPostSV = (poVars.pre.self == poVars.post.self ? selfAtPreSV
                 : createTermSV(poVars.post.self, schemaPrefix, services));
 
-        ImmutableList<JTerm> localVarsAtPostSVs = ImmutableSLList.nil();
+        ImmutableList<JTerm> localVarsAtPostSVs = ImmutableList.nil();
         Iterator<JTerm> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
         Iterator<JTerm> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (JTerm appDataPostLocalVar : poVars.post.localVars) {
@@ -245,7 +244,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.localVars == null) {
             localVars = null;
         } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.nil();
+            localVars = ImmutableList.nil();
         }
         if (origVars.result == null) {
             result = null;

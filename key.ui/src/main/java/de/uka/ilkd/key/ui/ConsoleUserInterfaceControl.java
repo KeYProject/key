@@ -46,7 +46,6 @@ import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Location;
 
@@ -63,7 +62,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-    ImmutableList<Proof> proofStack = ImmutableSLList.nil();
+    ImmutableList<Proof> proofStack = ImmutableList.nil();
 
     final KeYMediator mediator;
 

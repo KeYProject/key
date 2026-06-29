@@ -16,7 +16,7 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.*;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -73,9 +73,9 @@ public class TestSymbolicLayoutWriterAndReader {
     protected ISymbolicLayout createModel() {
         KeYlessLayout model = new KeYlessLayout();
         model.addEquivalenceClass(
-            new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
+            new KeYlessEquivalenceClass(ImmutableList.<String>nil().append("A", "B", "C"), "A"));
         model.addEquivalenceClass(
-            new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
+            new KeYlessEquivalenceClass(ImmutableList.<String>nil().append("1", "2", "3"), "63"));
         // state
         KeYlessState state = new KeYlessState("exampleState");
         state.addValue(new KeYlessValue("v1", "v1", false, "-1", "v1Value", "t1", null));

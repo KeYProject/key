@@ -33,7 +33,6 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -410,7 +409,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     private ImmutableList<LocationVariable> addGhostParams(
             ImmutableList<LocationVariable> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> ghostParams = ImmutableList.nil();
         for (LocationVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
@@ -423,7 +422,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<JTerm> addGhostParamTerms(ImmutableList<JTerm> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<JTerm> ghostParams = ImmutableSLList.nil();
+        ImmutableList<JTerm> ghostParams = ImmutableList.nil();
         for (LocationVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(tb.var(param));

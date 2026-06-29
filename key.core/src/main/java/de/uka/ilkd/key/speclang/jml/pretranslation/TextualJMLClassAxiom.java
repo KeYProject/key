@@ -8,7 +8,6 @@ import java.util.Objects;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -26,8 +25,8 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      */
     public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext inv) {
-        super(ImmutableSLList.nil()); // no modifiers allowed in axiom clause (see
-                                      // Sect. 8 of reference manual)
+        super(ImmutableList.nil()); // no modifiers allowed in axiom clause (see
+                                    // Sect. 8 of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);

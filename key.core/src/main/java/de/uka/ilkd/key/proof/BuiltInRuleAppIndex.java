@@ -10,7 +10,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class BuiltInRuleAppIndex {
 
@@ -34,7 +33,7 @@ public class BuiltInRuleAppIndex {
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, PosInOccurrence pos) {
 
-        ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.nil();
+        ImmutableList<IBuiltInRuleApp> result = ImmutableList.nil();
 
         ImmutableList<BuiltInRule> rules = index.rules();
         while (!rules.isEmpty()) {
@@ -98,7 +97,7 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
             SequentFormula cfma, NewRuleListener listener) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
-        ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
+        ImmutableList<BuiltInRule> subrules = ImmutableList.nil();
         while (!rules.isEmpty()) {
             final BuiltInRule rule = rules.head();
             rules = rules.tail();
