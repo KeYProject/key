@@ -70,8 +70,7 @@ public class TermLabelManager {
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelFactory}.
      */
-    private final Map<Name, TermLabelFactory<?>> factoryMap =
-        new LinkedHashMap<>();
+    private final Map<Name, TermLabelFactory<?>> factoryMap = new LinkedHashMap<>();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied
@@ -1490,6 +1489,10 @@ public class TermLabelManager {
         determineAndRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
         return refactorings;
+    }
+
+    public Map<Name, TermLabelFactory<?>> getFactories() {
+        return Collections.unmodifiableMap(factoryMap);
     }
 
     /**

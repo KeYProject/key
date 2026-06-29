@@ -40,9 +40,4 @@ public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
     default RuleExecutor<Goal> getExecutor() {
         return this;
     }
-
-    @Override
-    default @Nullable String getOrigin() {
-        return "defined in Java: " + getClass().getName();
-    }
 }

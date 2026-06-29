@@ -32,7 +32,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * abstract taclet builder class to be inherited from taclet builders specialised for their concrete
@@ -63,7 +62,6 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
-    protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -326,21 +324,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         }
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public void setHelpText(@Nullable Object accept) {
-        // throw new RuntimeException("To be implemented");
-    }
-
     public static class TacletBuilderException extends IllegalArgumentException {
-
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -6710383705714015291L;
         private final Name tacletname;
         private final String errorMessage;
 

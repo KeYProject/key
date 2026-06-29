@@ -16,7 +16,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -128,9 +127,4 @@ public interface JTerm
      * @return {@code true} iff a transformer occurs anywhere in the term tree
      */
     boolean containsTransformerRecursive();
-
-    /**
-     * Returns a human-readable source of this term. For example the filename with line and offset.
-     */
-    default @Nullable String getOrigin() { return null; }
 }

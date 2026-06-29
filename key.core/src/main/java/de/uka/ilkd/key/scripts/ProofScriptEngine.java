@@ -114,12 +114,13 @@ public class ProofScriptEngine {
 
             String cmd = ast.asCommandLine();
 
-            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
-            if (stateMap.getObserver() != null && stateMap.isEchoOn()) {
-                stateMap.getObserver().accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
-            }
 
             try {
+                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                if (stateMap.getObserver() != null && stateMap.isEchoOn()) {
+                    stateMap.getObserver().accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
+                }
+
                 ProofScriptCommand command = COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name, ast.location());

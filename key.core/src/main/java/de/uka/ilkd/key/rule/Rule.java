@@ -4,11 +4,17 @@
 package de.uka.ilkd.key.rule;
 
 
-import org.key_project.logic.HasOrigin;
+import org.key_project.logic.HasMetaSpaceKey;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends org.key_project.prover.rules.Rule, HasOrigin {
+public interface Rule extends org.key_project.prover.rules.Rule, HasMetaSpaceKey {
+    @Override
+    default @NonNull String getMetaKey() {
+        return "rule/" + this.name();
+    }
 }

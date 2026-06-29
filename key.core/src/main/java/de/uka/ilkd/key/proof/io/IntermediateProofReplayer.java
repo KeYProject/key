@@ -456,9 +456,27 @@ public class IntermediateProofReplayer {
         TacletApp ourApp;
         PosInOccurrence pos = null;
 
-        Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
+        Name nTacletName = new Name(tacletName);
+        Taclet t = proof.getInitConfig().lookupActiveTaclet(nTacletName);
         if (t == null) {
-            ourApp = currGoal.indexOfTaclets().lookup(tacletName);
+            var possibleApps = currGoal.indexOfTaclets().allNoPosTacletAppsStream()
+                    .filter(it -> it.taclet().name().equals(nTacletName))
+                    .toList();
+
+            if (possibleApps.isEmpty()) {
+                ourApp = null;
+            } else if (possibleApps.size() == 1) {
+                ourApp = possibleApps.getFirst();
+            } else {
+                var docs = proof.getServices().getNamespaces().docs();
+                var taclets = possibleApps.stream().map(
+                    it -> it + "\n-- defined at " + docs.findOrigin(it.rule()))
+                        .collect(Collectors.joining("\n---\n"));
+                throw new TacletAppConstructionException(
+                    "There are more than one possible taclet available with name \"" + tacletName
+                        + "\". " +
+                        "Most three similar names are: " + taclets);
+            }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
