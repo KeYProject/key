@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -264,8 +265,26 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         Throwable error = null;
         // While more than one worker runs, advertise that a multi-threaded run is active so that
         // rules not yet safe under concurrency (e.g. MergeRule) disable themselves.
-        final RunScope mtScope = workerCount > 1 ? enterMultiThreadedRun() : () -> {
-        };
+        final RunScope mtScope;
+        if (workerCount > 1) {
+            final RunScope marker = enterMultiThreadedRun();
+            // Seal the Java type model for the duration of the parallel run: no new type may be
+            // registered while workers prove concurrently. Types are pre-registered at load time
+            // (ProblemInitializer), so a stray lazy registration on the proving path now fails fast
+            // (IllegalStateException) instead of racing the shared model.
+            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
+            // Materialise the default execution context on this proof's (fresh) JavaInfo before
+            // sealing, so the matcher reads it instead of registering it during the run.
+            javaInfo.getDefaultExecutionContext();
+            javaInfo.sealTypeRegistration();
+            mtScope = () -> {
+                javaInfo.unsealTypeRegistration();
+                marker.close();
+            };
+        } else {
+            mtScope = () -> {
+            };
+        }
         try (var ignored = proof.suspendNonEssentialListeners(); mtScope) {
             List<Future<?>> futures = new ArrayList<>(workerCount);
             try {
