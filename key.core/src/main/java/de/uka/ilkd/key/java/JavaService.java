@@ -350,6 +350,15 @@ public class JavaService {
      * @return a KeY structured compilation unit.
      */
     public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(String text) {
+        if (services.getJavaInfo().isTypeRegistrationSealed()) {
+            // The type model is sealed for the duration of a (parallel) proof run; registering a
+            // new type here would be a lazy registration on the proving path, racing the shared
+            // model. Fail fast rather than corrupt it. All types must be registered before proving
+            // starts -- see the ProblemInitializer warm-up of the default execution context.
+            throw new IllegalStateException(
+                "Java type registration attempted while the type model is sealed (during a proof "
+                    + "run): " + trim(text));
+        }
         parseSpecialClasses();
         LOGGER.debug("Reading {}", trim(text));
         var reader = new StringReader(text);
