@@ -10,7 +10,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -267,7 +266,7 @@ public final class FormulaTagManager {
         public final long age;
 
         public FormulaInfo(PosInOccurrence pio, long age) {
-            this(pio, ImmutableSLList.nil(), age);
+            this(pio, ImmutableList.nil(), age);
         }
 
         private FormulaInfo(PosInOccurrence pio, ImmutableList<FormulaChangeInfo> modifications,

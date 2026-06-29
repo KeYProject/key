@@ -7,7 +7,6 @@ import org.key_project.logic.IntIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * An InitialPositionTable is a PositionTable that describes the beginning of the element/subelement
@@ -22,12 +21,12 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class InitialPositionTable extends PositionTable {
 
-    private ImmutableList<Range> updateRanges = ImmutableSLList.nil();
+    private ImmutableList<Range> updateRanges = ImmutableList.nil();
 
     /** Ranges of keywords */
-    private ImmutableList<Range> keywordRanges = ImmutableSLList.nil();
+    private ImmutableList<Range> keywordRanges = ImmutableList.nil();
     /** Ranges of java blocks */
-    private ImmutableList<Range> javaBlockRanges = ImmutableSLList.nil();
+    private ImmutableList<Range> javaBlockRanges = ImmutableList.nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -88,7 +87,7 @@ public class InitialPositionTable extends PositionTable {
      */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
             SequentPrintFilter filter) {
-        ImmutableList<Integer> p = ImmutableSLList.nil();
+        ImmutableList<Integer> p = ImmutableList.nil();
         p = prependPathInFormula(p, pio);
         int index = indexOfCfma(pio.sequentFormula(), filter);
         if (index == -1) {

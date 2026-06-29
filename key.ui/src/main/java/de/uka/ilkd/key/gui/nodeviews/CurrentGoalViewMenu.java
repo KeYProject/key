@@ -42,7 +42,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.NonNull;
@@ -120,7 +119,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             ImmutableList<TacletApp> list) {
         return list.stream()
                 .filter(app -> !app.rule().name().toString().equals(INTRODUCE_AXIOM_TACLET_NAME))
-                .collect(ImmutableSLList.toImmutableList());
+                .collect(ImmutableList.collector());
     }
 
     /**
@@ -130,7 +129,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        ImmutableList<TacletApp> result = ImmutableList.nil();
 
         for (TacletApp tacletApp : list) {
             Taclet taclet = tacletApp.taclet();
@@ -323,7 +322,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
             TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        ImmutableList<TacletApp> result = ImmutableList.nil();
 
         List<TacletApp> list = new ArrayList<>(finds.size());
 

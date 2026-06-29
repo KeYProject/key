@@ -18,7 +18,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -76,7 +75,7 @@ public final class InfFlowMethodContractTacletBuilder
             ProofObligationVars contAppData2, Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
             getInformFlowContracts(methodContract.getTarget(), services);
-        ImmutableList<JTerm> contractsApplications = ImmutableSLList.nil();
+        ImmutableList<JTerm> contractsApplications = ImmutableList.nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(cont, contAppData, contAppData2, services);

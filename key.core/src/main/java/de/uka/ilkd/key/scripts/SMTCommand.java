@@ -17,7 +17,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class SMTCommand extends AbstractCommand {
         if (args.all) {
             goals = state.getProof().openGoals();
         } else {
-            goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
 
         for (Goal goal : goals) {

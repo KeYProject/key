@@ -15,7 +15,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +45,7 @@ public class TestGoal {
     @Test
     public void testSetBack0() {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
-            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
+            ImmutableList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
 
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
@@ -98,7 +97,7 @@ public class TestGoal {
     @Test
     public void testSetBackRemovesJustificationOfResidualBranch() {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
-            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
+            ImmutableList.of(new SequentFormula(TacletForTests.parseTerm("A"))));
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
         proof = new Proof("", seq, null, initConfig.createTacletIndex(),
@@ -133,7 +132,7 @@ public class TestGoal {
     @Test
     public void testSetBack1() throws Exception {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
-            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
+            ImmutableList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
         Node root = new Node(proof, seq);
         proof.setRoot(root);
         Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),

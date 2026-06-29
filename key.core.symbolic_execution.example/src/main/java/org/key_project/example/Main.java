@@ -31,7 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class Main {
                 // Find method to symbolically execute
                 KeYJavaType classType = env.getJavaInfo().getKeYJavaType("Number");
                 IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, "equals",
-                    ImmutableSLList.<KeYJavaType>nil().append(classType), classType);
+                    ImmutableList.<KeYJavaType>nil().append(classType), classType);
                 // Instantiate proof for symbolic execution of the program method (Java semantics)
                 AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(),
                     "Symbolic Execution of: " + pm, pm, null, // An optional precondition

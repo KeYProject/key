@@ -11,7 +11,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -76,7 +75,7 @@ public class ChoiceSettings extends AbstractSettings {
     }
 
     private static ImmutableSet<Choice> choiceMap2choiceSet(Map<String, String> ccc) {
-        ImmutableList<Choice> choices = ImmutableSLList.nil();
+        ImmutableList<Choice> choices = ImmutableList.nil();
         for (final Map.Entry<String, String> entry : ccc.entrySet()) {
             choices = choices.prepend(new Choice(new Name(entry.getValue()), entry.getKey()));
         }

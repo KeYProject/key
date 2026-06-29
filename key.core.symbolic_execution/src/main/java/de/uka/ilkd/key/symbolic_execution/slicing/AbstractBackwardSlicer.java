@@ -25,7 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Provides a basic implementation of backward slicing algorithms.
@@ -165,7 +164,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             if (!newAlternatives.equals(oldAlternatives)) {
                 // Compute old variables
                 ImmutableList<ImmutableList<Access>> newAlternativeVariables =
-                    ImmutableSLList.nil();
+                    ImmutableList.nil();
                 for (Location newALternative : newAlternatives) {
                     newAlternativeVariables =
                         newAlternativeVariables.prepend(newALternative.getAccesses());
@@ -185,7 +184,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                                 newLocations.add(newAlternative);
                             } else {
                                 ImmutableList<Access> oldRemainignVariables =
-                                    oldVariables.take(commonPrefixLength);
+                                    oldVariables.skip(commonPrefixLength);
                                 ImmutableList<Access> newAccesses =
                                     newAlternative.getAccesses().append(oldRemainignVariables);
                                 newLocations.add(new Location(newAccesses));

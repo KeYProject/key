@@ -35,7 +35,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -117,8 +116,8 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private Pair<ImmutableList<JTerm>, ImmutableList<JTerm>> sort(JTerm spec) {
         assert spec != null;
-        ImmutableList<JTerm> implicit = ImmutableSLList.nil();
-        ImmutableList<JTerm> explicit = ImmutableSLList.nil();
+        ImmutableList<JTerm> implicit = ImmutableList.nil();
+        ImmutableList<JTerm> explicit = ImmutableList.nil();
         if (spec.arity() > 0 && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
             if (spec.hasLabels()
@@ -328,7 +327,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<JTerm> replace(Iterable<JTerm> l, Variables vars) {
-        ImmutableList<JTerm> res = ImmutableSLList.nil();
+        ImmutableList<JTerm> res = ImmutableList.nil();
         for (JTerm t : l) {
             res = res.append(replace(t, vars));
         }
@@ -336,7 +335,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<LocationVariable> getHeaps() {
-        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableList.nil();
         return result.append(getHeap());
     }
 
@@ -571,7 +570,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private TermListAndFunc buildFreePre(JTerm implicitPre, LocationVariable self,
             LocationVariable heap, ImmutableList<LocationVariable> params,
             Services services) {
-        ImmutableList<JTerm> resList = ImmutableSLList.nil();
+        ImmutableList<JTerm> resList = ImmutableList.nil();
 
         // "self != null"
         final JTerm selfNotNull = generateSelfNotNull(self);
@@ -626,7 +625,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private TermListAndFunc buildFreePreForTaclet(JTerm implicitPre, TermSV self,
             TermSV heap, ImmutableList<JOperatorSV> params,
             Services services) {
-        ImmutableList<JTerm> resList = ImmutableSLList.nil();
+        ImmutableList<JTerm> resList = ImmutableList.nil();
 
         // "self != null"
         final JTerm selfNotNull = generateSelfNotNull(self);
@@ -846,7 +845,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return a list of all remaining clauses
      */
     ImmutableList<JTerm> getRest() {
-        ImmutableList<JTerm> rest = ImmutableSLList.nil();
+        ImmutableList<JTerm> rest = ImmutableList.nil();
         final JTerm accessible = this.accessible;
         if (accessible != null) {
             rest = rest.append(accessible);

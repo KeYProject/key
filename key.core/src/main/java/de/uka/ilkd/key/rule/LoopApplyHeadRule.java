@@ -23,7 +23,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -104,7 +103,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
             new SequentFormula(
                 tb.apply(update, tb.prog(modality.kind(), newJavaBlock, target.sub(0)))),
             ruleApp.pio);
-        return ImmutableSLList.<Goal>nil().append(goal);
+        return ImmutableList.<Goal>nil().append(goal);
     }
 
     @Override

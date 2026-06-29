@@ -39,9 +39,9 @@ public class SelectCommand extends AbstractCommand {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
 
             if (args.number >= 0) {
-                g = goals.take(args.number).head();
+                g = goals.get(args.number);
             } else {
-                g = goals.take(goals.size() + args.number).head();
+                g = goals.get(goals.size() + args.number);
             }
         } else if (args.formula != null && args.number == null && args.branch == null) {
             g = findGoalWith(args.formula, state.getProof());

@@ -38,7 +38,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
@@ -282,9 +281,9 @@ public class QueryExpand implements BuiltInRule {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
-        final ImmutableSLList<QuantifiableVariable> instVars;
+        final ImmutableList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
-            instVars = ImmutableSLList.nil();
+            instVars = ImmutableList.nil();
         } else {
             instVars = null;
         }

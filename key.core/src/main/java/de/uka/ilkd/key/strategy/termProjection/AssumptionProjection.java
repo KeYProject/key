@@ -40,6 +40,6 @@ public class AssumptionProjection implements ProjectionToTerm<Goal> {
                     + " but got "
                     + app;
 
-        return tapp.assumesFormulaInstantiations().take(no).head().getSequentFormula().formula();
+        return tapp.assumesFormulaInstantiations().get(no).getSequentFormula().formula();
     }
 }

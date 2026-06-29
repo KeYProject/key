@@ -19,7 +19,6 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -184,7 +183,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         final ImmutableList<SequentChangeInfo> newSequentsForGoals = checkAssumesGoals(goal,
             tacletApp.assumesFormulaInstantiations(), mc, taclet.goalTemplates().size());
 
-        ImmutableList<SequentChangeInfo> result = ImmutableSLList.nil();
+        ImmutableList<SequentChangeInfo> result = ImmutableList.nil();
         final Iterator<SequentChangeInfo> it = newSequentsForGoals.iterator();
         for (var gt : taclet.goalTemplates()) {
             final SequentChangeInfo currentSequent = it.next();

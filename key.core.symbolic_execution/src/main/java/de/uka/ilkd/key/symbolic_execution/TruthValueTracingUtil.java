@@ -246,7 +246,7 @@ public final class TruthValueTracingUtil {
                     if (!isClosingRule(taclet)) { // Not a closing taclet
                         checkPerformed = true;
                         TacletGoalTemplate tacletGoal =
-                            taclet.goalTemplates().reverse().take(childIndexOnParent).head();
+                            taclet.goalTemplates().reverse().get(childIndexOnParent);
                         // Check for new minor ids created by parent rule application
                         updatePredicateResultBasedOnNewMinorIds(child, termLabelName,
                             services.getTermBuilder(), nodeResult);

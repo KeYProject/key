@@ -14,7 +14,6 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -138,8 +137,8 @@ class UniTrigger implements Trigger {
     private static boolean containsLoop(
             ImmutableMap<QuantifiableVariable, Term> varMap,
             QuantifiableVariable var) {
-        ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
-        ImmutableList<Term> fringe = ImmutableSLList.nil();
+        ImmutableList<QuantifiableVariable> body = ImmutableList.nil();
+        ImmutableList<Term> fringe = ImmutableList.nil();
         Term checkForCycle = varMap.get(var);
 
         if (checkForCycle.op() == var) {

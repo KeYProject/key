@@ -28,7 +28,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -110,7 +109,7 @@ public class InstantiateCommand extends AbstractCommand {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
                     && !(RENAMING_TERM_PROPERTY.equalsModThisProperty(sf.formula(), p.formula))) {

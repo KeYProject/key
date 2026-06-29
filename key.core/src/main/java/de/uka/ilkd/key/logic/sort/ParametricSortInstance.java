@@ -16,7 +16,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -140,7 +139,7 @@ public final class ParametricSortInstance extends AbstractSort {
             return arg == null ? gs : arg.sort();
         } else if (sort instanceof ParametricSortInstance psi) {
             var base = psi.getBase();
-            ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+            ImmutableList<GenericArgument> args = ImmutableList.nil();
             for (int i = psi.getArgs().size() - 1; i >= 0; i--) {
                 var psiArg = psi.getArgs().get(i);
                 args = args.prepend(new GenericArgument(instantiate(psiArg.sort(), map, services)));
@@ -176,7 +175,7 @@ public final class ParametricSortInstance extends AbstractSort {
 
     /// Get the sort if this parametric sort with all generics instantiated with `instMap`.
     public Sort resolveSort(SVInstantiations instMap, Services services) {
-        ImmutableList<GenericArgument> newArgs = ImmutableSLList.nil();
+        ImmutableList<GenericArgument> newArgs = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             GenericArgument arg = args.get(i);
             var sort = arg.sort();

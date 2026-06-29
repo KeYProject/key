@@ -17,7 +17,6 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 public class UseDependencyContractApp<T extends UseDependencyContractRule>
@@ -32,7 +31,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
 
     public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio,
             Contract instantiation, PosInOccurrence step) {
-        this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
+        this(builtInRule, pio, ImmutableList.nil(), instantiation, step);
     }
 
     public UseDependencyContractApp(UseDependencyContractRule rule, PosInOccurrence pio,

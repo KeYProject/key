@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This filter takes a search string and yields a sequent containing only sequent formulas that
@@ -50,7 +50,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             return;
         }
 
-        antec = ImmutableSLList.nil();
+        antec = ImmutableList.nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
@@ -63,7 +63,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             }
         }
 
-        succ = ImmutableSLList.nil();
+        succ = ImmutableList.nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -71,9 +70,9 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     }
 
     protected void setupGoals(ImmutableList<Goal> p_goals) {
-        goalList = ImmutableSLList.nil();
-        selectedList = ImmutableSLList.nil();
-        nextGoals = ImmutableSLList.nil();
+        goalList = ImmutableList.nil();
+        selectedList = ImmutableList.nil();
+        nextGoals = ImmutableList.nil();
 
         if (allGoalsSatisfiable) {
             goalList = p_goals;
@@ -151,7 +150,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      */
     public void removeGoal(Goal goal) {
         selectedList = selectedList.removeAll(goal);
-        nextGoals = ImmutableSLList.nil();
+        nextGoals = ImmutableList.nil();
 
         if (selectedList.isEmpty()) {
             setupGoals(goalList);
@@ -176,7 +175,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         if (proof.openGoals().isEmpty())
         // proof has been closed
         {
-            nextGoals = selectedList = goalList = ImmutableSLList.nil();
+            nextGoals = selectedList = goalList = ImmutableList.nil();
         } else {
             if (selectedList.isEmpty()
                     || (currentSubtreeRoot != null && !isSatisfiableSubtree(currentSubtreeRoot))) {
@@ -186,10 +185,10 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     }
 
     protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
-        ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 
-        nextGoals = ImmutableSLList.nil();
+        nextGoals = ImmutableList.nil();
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
@@ -233,7 +232,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
 
     protected static ImmutableList<Goal> rotateList(ImmutableList<Goal> p_list) {
         if (p_list.isEmpty()) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         return p_list.tail().append(p_list.head());
@@ -242,7 +241,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     protected void removeClosedGoals() {
         boolean changed = false;
         Iterator<Goal> it = goalList.iterator();
-        goalList = ImmutableSLList.nil();
+        goalList = ImmutableList.nil();
 
         while (it.hasNext()) {
             final Goal goal = it.next();
@@ -254,7 +253,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         }
 
         it = selectedList.iterator();
-        ImmutableList<Goal> newList = ImmutableSLList.nil();
+        ImmutableList<Goal> newList = ImmutableList.nil();
 
         while (it.hasNext()) {
             final Goal goal = it.next();
@@ -271,11 +270,11 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         }
 
         if (changed) {
-            nextGoals = ImmutableSLList.nil();
+            nextGoals = ImmutableList.nil();
 
             // for "selectedList", order does matter
             it = newList.iterator();
-            selectedList = ImmutableSLList.nil();
+            selectedList = ImmutableList.nil();
             while (it.hasNext()) {
                 selectedList = selectedList.prepend(it.next());
             }

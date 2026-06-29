@@ -11,7 +11,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
@@ -98,7 +97,7 @@ public class ForToWhile extends ProgramTransformer {
      */
     @Override
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
+        ImmutableList<SchemaVariable> ret = ImmutableList.nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

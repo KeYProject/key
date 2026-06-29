@@ -8,7 +8,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -17,7 +16,7 @@ import org.key_project.util.collection.ImmutableSLList;
 public class InstantiationProposerCollection implements InstantiationProposer {
 
     private ImmutableList<InstantiationProposer> proposers =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
 
     /**
      * adds an instantiation proposer to the collection

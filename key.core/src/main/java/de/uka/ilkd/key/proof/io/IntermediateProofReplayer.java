@@ -67,7 +67,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -529,7 +528,7 @@ public class IntermediateProofReplayer {
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
                 ifFormulaList
@@ -608,7 +607,7 @@ public class IntermediateProofReplayer {
 
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
-            builtinIfInsts = ImmutableSLList.nil();
+            builtinIfInsts = ImmutableList.nil();
             for (final Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
                 final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
@@ -853,7 +852,7 @@ public class IntermediateProofReplayer {
 
         }
 
-        ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> joinPartners = ImmutableList.nil();
         for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
             SymbolicExecutionStateWithProgCnt ownSEState =

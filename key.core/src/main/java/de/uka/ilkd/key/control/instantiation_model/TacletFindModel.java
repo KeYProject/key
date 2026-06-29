@@ -35,7 +35,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
@@ -118,7 +117,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         noEditRow = count - 1;
 
-        ImmutableList<String> proposals = ImmutableSLList.nil();
+        ImmutableList<String> proposals = ImmutableList.nil();
 
         for (SchemaVariable var : tacletApp.uninstantiatedVars()) {
 

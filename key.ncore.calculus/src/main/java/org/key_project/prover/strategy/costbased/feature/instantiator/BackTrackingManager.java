@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -148,7 +148,7 @@ public final class BackTrackingManager {
     }
 
     private void cancelChoicePoint() {
-        pushChoices(ImmutableSLList.<CPBranch>nil().iterator(), null);
+        pushChoices(ImmutableList.<CPBranch>nil().iterator(), null);
     }
 
 

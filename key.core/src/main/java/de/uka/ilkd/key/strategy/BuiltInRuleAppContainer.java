@@ -13,7 +13,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -115,7 +114,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
             Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
+        ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
             result = result.prepend(createAppContainer(bir, pio, goal));
@@ -129,16 +128,16 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
         if (!isStillApplicable(goal)) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
-        return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
+        return ImmutableList.<RuleAppContainer>singleton(container);
     }
 
 

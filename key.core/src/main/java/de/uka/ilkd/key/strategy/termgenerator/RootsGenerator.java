@@ -22,7 +22,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -90,7 +90,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     private Iterator<Term> emptyIterator() {
-        return ImmutableSLList.<Term>nil().iterator();
+        return ImmutableList.<Term>nil().iterator();
     }
 
     private Iterator<Term> toIterator(Term res) {
@@ -98,7 +98,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
             tb.ff())) {
             return emptyIterator();
         }
-        return ImmutableSLList.<Term>nil().prepend(res).iterator();
+        return ImmutableList.<Term>singleton(res).iterator();
     }
 
     private Term breakDownEq(Term p_var, BigInteger lit, int pow) {

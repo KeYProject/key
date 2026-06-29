@@ -8,7 +8,6 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -45,8 +44,8 @@ public class InfFlowSpec {
     }
 
     private InfFlowSpec() {
-        this.preExpressions = ImmutableSLList.nil();
-        this.postExpressions = ImmutableSLList.nil();
-        this.newObjects = ImmutableSLList.nil();
+        this.preExpressions = ImmutableList.nil();
+        this.postExpressions = ImmutableList.nil();
+        this.newObjects = ImmutableList.nil();
     }
 }

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * While.
@@ -63,7 +62,7 @@ public class While extends LoopStatement {
     }
 
     public While(PositionInfo pi, List<Comment> c, Guard guard, Statement body) {
-        super(pi, c, null, null, guard, body, ImmutableSLList.nil());
+        super(pi, c, null, null, guard, body, ImmutableList.nil());
     }
 
     public While(PositionInfo pi, List<Comment> c, Guard guard, Statement body,

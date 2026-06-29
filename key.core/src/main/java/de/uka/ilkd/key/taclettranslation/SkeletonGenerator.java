@@ -12,7 +12,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public interface SkeletonGenerator {
     SkeletonGenerator DEFAULT_TACLET_TRANSLATOR = new DefaultTacletTranslator();
@@ -71,7 +70,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * @return A list of all formulae of the semisequent <code>s </code>.
      */
     private ImmutableList<JTerm> getFormulaeOfSemisequent(Semisequent s) {
-        ImmutableList<JTerm> terms = ImmutableSLList.nil();
+        ImmutableList<JTerm> terms = ImmutableList.nil();
         for (SequentFormula cf : s) {
             terms = terms.append((JTerm) cf.formula());
         }

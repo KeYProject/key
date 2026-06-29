@@ -645,7 +645,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (var pv : list) {
             if (pv != null) {
                 JTerm t = tb.var(pv);
@@ -674,7 +674,7 @@ public final class MiscTools {
 
     public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
             ImmutableList<JTerm> localOuts) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);

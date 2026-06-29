@@ -79,7 +79,7 @@ public final class Immutables {
             return list;
         }
 
-        ImmutableList<ImmutableList<T>> stack = ImmutableSLList.nil();
+        ImmutableList<ImmutableList<T>> stack = ImmutableList.nil();
 
         while (!list.isEmpty()) {
             stack = stack.prepend(list);
@@ -87,7 +87,7 @@ public final class Immutables {
         }
 
         HashSet<T> alreadySeen = new HashSet<>();
-        ImmutableList<T> result = ImmutableSLList.nil();
+        ImmutableList<T> result = ImmutableList.nil();
 
         while (!stack.isEmpty()) {
             ImmutableList<T> top = stack.head();
@@ -165,7 +165,7 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object> ImmutableList<T> createListFrom(
             Iterable<? extends T> iterable) {
-        ImmutableList<T> result = ImmutableSLList.nil();
+        ImmutableList<T> result = ImmutableList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
         }
@@ -186,17 +186,20 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts,
             Predicate<? super T> predicate) {
+        return ts.stream().filter(predicate).collect(ImmutableList.collector());
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
-        ImmutableList<T> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) {
-            T hd = ts.head();
-            if (predicate.test(hd)) {
-                acc = acc.prepend(hd);
-            }
-            ts = ts.tail();
-        }
-        return acc.reverse();
+        /*
+         * ImmutableList<T> acc = ImmutableList.nil();
+         * while (!ts.isEmpty()) {
+         * T hd = ts.head();
+         * if (predicate.test(hd)) {
+         * acc = acc.prepend(hd);
+         * }
+         * ts = ts.tail();
+         * }
+         * return acc.reverse();
+         */
     }
 
     /**
@@ -210,14 +213,17 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(
             ImmutableList<T> ts, Function<? super T, R> function) {
-        // This must be a loop. A tail recursive implementation is not optimised
-        // by the compiler and quickly leads to a stack overflow.
-        ImmutableList<R> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) {
-            T hd = ts.head();
-            acc = acc.prepend(function.apply(hd));
-            ts = ts.tail();
-        }
-        return acc.reverse();
+        return ts.stream().map(function).collect(ImmutableList.collector());
+        /*
+         * // This must be a loop. A tail recursive implementation is not optimised
+         * // by the compiler and quickly leads to a stack overflow.
+         * ImmutableList<R> acc = ImmutableList.nil();
+         * while (!ts.isEmpty()) {
+         * T hd = ts.head();
+         * acc = acc.prepend(function.apply(hd));
+         * ts = ts.tail();
+         * }
+         * return acc.reverse();
+         */
     }
 }

@@ -24,7 +24,7 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.BackTracki
 import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -124,7 +124,7 @@ public class SVInstantiationCP implements Feature {
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
 
-            return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();
+            return ImmutableList.<CPBranch>singleton(branch).iterator();
         }
 
     }

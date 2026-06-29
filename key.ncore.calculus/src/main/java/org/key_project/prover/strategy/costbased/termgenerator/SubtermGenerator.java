@@ -15,7 +15,6 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -78,7 +77,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         protected final LogicServices services;
 
         protected SubIterator(Term t, MutableState mState, LogicServices services) {
-            termStack = ImmutableSLList.<Term>nil().prepend(t);
+            termStack = ImmutableList.<Term>singleton(t);
             this.mState = mState;
             this.services = services;
         }
