@@ -12,13 +12,13 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.6.0"
+    id "com.diffplug.spotless" version "8.7.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.61"
 
     // Plugin for publishing via the new Nexus API
-    id "com.vanniktech.maven.publish" version "0.36.0" apply false
+    id "com.vanniktech.maven.publish" version "0.37.0" apply false
 }
 
 
@@ -66,7 +66,7 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.18")
-        testImplementation("ch.qos.logback:logback-classic:1.5.34")
+        testImplementation("ch.qos.logback:logback-classic:1.5.37")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -78,11 +78,11 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.34")
+        testImplementation("ch.qos.logback:logback-classic:1.5.37")
         testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation("ch.qos.logback:logback-classic:1.5.34")
+        testImplementation("ch.qos.logback:logback-classic:1.5.37")
 
-        testImplementation(platform("org.junit:junit-bom:6.1.0"))
+        testImplementation(platform("org.junit:junit-bom:6.1.1"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
@@ -393,7 +393,7 @@ tasks.register('alldoc', Javadoc){
         links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
         links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.18/"
         links += "https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
-        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.34/"
+        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.37/"
         links +="https://www.javadoc.io/doc/com.formdev/flatlaf/3.7/"
         links +="https://www.javadoc.io/doc/com.miglayout/miglayout-swing/11.4.3/"
         links +="https://www.javadoc.io/doc/com.squareup/javapoet/1.13.0/"

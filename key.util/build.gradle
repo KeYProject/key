@@ -10,13 +10,13 @@ dependencies {
     // we also export these dependency into src/test/java.
     testFixturesApi(project(':key.util'))
 
-    testFixturesApi(platform("org.junit:junit-bom:6.1.0"))
+    testFixturesApi(platform("org.junit:junit-bom:6.1.1"))
     testFixturesApi("org.junit.jupiter:junit-jupiter-api")
     testFixturesApi("org.junit.jupiter:junit-jupiter-params")
     testFixturesApi("org.assertj:assertj-core:3.27.7")
     testFixturesApi("org.jspecify:jspecify:1.0.0")
 
-    testFixturesApi("ch.qos.logback:logback-classic:1.5.34")
+    testFixturesApi("ch.qos.logback:logback-classic:1.5.37")
 
     // test fixtures
     testFixturesApi("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4")
