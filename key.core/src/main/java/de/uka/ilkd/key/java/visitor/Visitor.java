@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -62,6 +63,8 @@ public interface Visitor {
 
     void performActionOnSetUnion(SetUnion x);
 
+
+
     void performActionOnIntersect(Intersect x);
 
     void performActionOnSetMinus(SetMinus x);
@@ -83,6 +86,22 @@ public interface Visitor {
     void performActionOnSeqReverse(SeqReverse x);
 
     void performActionOnSeqPut(SeqPut seqPut);
+
+    void performActionOnMSetUnion(MSetUnion x);
+
+    void performActionOnMSetIntersect(MSetIntersect x);
+
+    void performActionOnMSetSum(MSetSum x);
+
+    void performActionOnMSetDiff(MSetDiff x);
+
+    void performActionOnEmptyMSetLiteral(EmptyMSetLiteral x);
+
+    void performActionOnMSetSingle(MSetSingle x);
+
+    void performActionOnMSetMul(MSetMul x);
+
+    void performActionOnMSetCard(MSetCard x);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 

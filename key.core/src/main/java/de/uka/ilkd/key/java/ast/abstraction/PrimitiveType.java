@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ast.expression.literal.*;
-import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -59,6 +58,8 @@ public final class PrimitiveType implements Type {
         new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
     public static final PrimitiveType JAVA_TYPE =
         new PrimitiveType("\\TYPE", NullLiteral.NULL, SortLDT.NAME);
+    public static final PrimitiveType JAVA_MSET =
+        new PrimitiveType("\\mset", EmptyMSetLiteral.INSTANCE, MSetLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
