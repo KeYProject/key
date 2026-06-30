@@ -83,6 +83,12 @@ class TermImpl implements JTerm {
     /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
     private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
 
+    /**
+     * Cached renaming-invariant hashCode ({@link RenamingTermProperty#hashCodeModThisProperty}),
+     * used to fast-reject unequal pairs in equality modulo renaming. {@code 0} = not yet computed.
+     */
+    private int hashcodeModRenaming = 0;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -418,6 +424,19 @@ class TermImpl implements JTerm {
             this.containsJavaBlockRecursive = result;
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    /**
+     * Renaming-invariant hashCode, computed lazily on first use and cached. Used by
+     * {@link RenamingTermProperty} to fast-reject pairs that cannot be equal modulo renaming.
+     */
+    public int hashCodeModRenaming() {
+        if (hashcodeModRenaming == 0) {
+            final int h = de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY
+                    .hashCodeModThisProperty(this);
+            hashcodeModRenaming = h == 0 ? 1 : h;
+        }
+        return hashcodeModRenaming;
     }
 
     @Override

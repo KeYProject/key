@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -57,6 +58,14 @@ public class RenamingTermProperty implements Property<Term> {
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
+        }
+        // Fast reject via the renaming-invariant hashCode (cached per term, see
+        // JTerm#hashCodeModRenaming): if it differs the terms cannot be equal modulo renaming, so
+        // the O(term) unifyHelp walk is skipped. Benefits every equals-mod-renaming caller
+        // (quantifier cost heuristics, taclet matching, sequent-redundancy checks).
+        if (term1 instanceof JTerm t1 && term2 instanceof JTerm t2
+                && t1.hashCodeModRenaming() != t2.hashCodeModRenaming()) {
+            return false;
         }
         return unifyHelp(term1, term2, ImmutableList.nil(),
             ImmutableList.nil(), null);
