@@ -23,7 +23,15 @@ public interface List extends java.util.Collection
      @*/
    public java.lang.Object get(int arg0);
    public java.lang.Object set(int arg0, java.lang.Object arg1);
-   
+
+   /*@ public normal_behavior
+     @ requires 0 <= idx && idx < seq.length;
+     @ ensures ((Object)\old(seq)[idx]) == \result;
+     @ ensures seq == \seq_concat(\old(seq)[0 .. idx], \old(seq)[idx + 1 .. \old(seq).length]);
+     @ assignable seq;
+     @*/
+   public java.lang.Object remove(int idx);
+
    public int indexOf(java.lang.Object arg0);
    public int lastIndexOf(java.lang.Object arg0);
    
