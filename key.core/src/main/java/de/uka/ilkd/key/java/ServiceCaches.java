@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.SessionCaches;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -97,6 +99,16 @@ public class ServiceCaches implements SessionCaches {
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
+
+    /**
+     * Per-proof cache for {@code CostReuse}'s feature-locality classification (taclet -> its
+     * reuse-eligibility verdict). Held here, like the other proof-scoped caches, so it is freed
+     * with
+     * the proof and never shared between proofs with different taclet options. Values are opaque to
+     * this class (a {@code CostReuse.Eligibility}, or its ineligible sentinel) to keep this package
+     * independent of the strategy package.
+     */
+    private final Map<Taclet, Object> costReuseClassificationCache = new ConcurrentHashMap<>();
 
     private final LRUCache<org.key_project.logic.Term, Monomial> monomialCache =
         new LRUCache<>(2000);
@@ -196,6 +208,10 @@ public class ServiceCaches implements SessionCaches {
 
     public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
         return introductionTimeCache;
+    }
+
+    public final Map<Taclet, Object> getCostReuseClassificationCache() {
+        return costReuseClassificationCache;
     }
 
     public final LRUCache<org.key_project.logic.Term, Monomial> getMonomialCache() {

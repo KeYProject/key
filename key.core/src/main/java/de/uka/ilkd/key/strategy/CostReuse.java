@@ -9,20 +9,22 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.AbstractNonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.Taclet;
-import org.key_project.prover.strategy.costbased.feature.CostLocal;
-import org.key_project.prover.strategy.costbased.feature.CostNonLocal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.VolatileCost;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * Phase-2 cost reuse (perf round 3): decide whether a taclet's strategy cost is a pure function of
+ * Decide whether a taclet's strategy cost is a pure function of
  * the rule app and its find-position subterm (plus the always-recomputed age term and
  * {@code NonDuplicateApp}-family vetoes). For such "cost-local" taclets the base re-cost performed
  * by {@link TacletAppContainer#createFurtherApps} on every peek round can be replaced by arithmetic
@@ -35,28 +37,34 @@ import org.jspecify.annotations.Nullable;
  * <ol>
  * <li><b>veto</b> ({@link AbstractNonDuplicateAppFeature}): a 0/Top guard. Collected and re-checked
  * at reuse time (an app that became a duplicate must still be dropped); not descended into.</li>
- * <li><b>explicit override</b>: {@link CostNonLocal} forces non-local (the author wins).</li>
- * <li><b>{@link CostLocal}</b>: local. For a leaf that is the whole story; for a composite it means
- * "transparent" -- the walk still recurses into its child features, so it stays local only if they
- * all are. There is NO automatic "any feature with children is transparent" guess: a composite is
- * trusted only because its author annotated it after checking that its own computation (including
- * any non-Feature inputs such as projections/term-generators) is find-local. The transparent
- * combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
+ * <li><b>explicit override</b>: {@link VolatileCost} forces non-local (the author wins).</li>
+ * <li><b>{@link StableCost}</b>: local -- for a leaf that is the whole story; for a composite it
+ * means "transparent": the walk still recurses into its child features, so it stays local only if
+ * they all are. There is NO automatic "any feature with children is transparent" guess; a composite
+ * is trusted only because its author annotated it after checking that its own computation
+ * (including any non-Feature inputs such as projections/term-generators) is find-local. The
+ * transparent combinators are annotated once (Sum/Shannon/Scale/Let/ComprehendedSum/...).</li>
+ * <li><b>{@link WeakStableCost}</b>: weakly local -- the cost also reads the whole find formula
+ * (not just the find subterm), so the taclet stays eligible but its cost is carried forward only
+ * while that find formula is unchanged. The reuse site enforces this: an independent sibling
+ * rewrite that {@link FindTacletAppContainer#isStillApplicable} tolerates (find subterm intact,
+ * formula not) still forces a recompute. Recurses into children like {@link StableCost}.</li>
  * <li><b>otherwise</b> (unannotated): non-local (the SAFE default). A new feature -- leaf or
- * composite -- is non-local until someone reviews it and adds {@link CostLocal}; forgetting costs
+ * composite -- is non-local until someone reviews it and adds {@link StableCost}; forgetting costs
  * only performance, never soundness.</li>
  * </ol>
- * A {@link CostLocal} composite is local only if, in addition to its child features, every child
- * {@link TermGenerator} it holds is also {@link CostLocal} -- a generator is a non-Feature input
- * that decides locality (e.g. {@code SuperTermGenerator} is find-local, {@code
- * SequentFormulasGenerator} reads the whole sequent and is not). The walk descends only through
- * {@link Feature}- and {@link TermGenerator}-typed references (never arbitrary objects): the live
- * feature tree holds mutable scratch state (e.g. TermBuffers) that must not be traversed.
+ * A {@link StableCost} composite is local only if, in addition to its child features, every
+ * {@link TermGenerator} it holds is at least as local. A generator that walks below the find
+ * ({@code SubtermGenerator}) is find-local; one that walks up to the find's ancestors
+ * ({@code SuperTermGenerator}) is {@link WeakStableCost}; one that reads the whole sequent
+ * ({@code SequentFormulasGenerator}) is non-local. The walk follows only {@link Feature}- and
+ * {@link TermGenerator}-typed references, never arbitrary objects: the live feature tree holds
+ * mutable scratch state (e.g. TermBuffers) that must not be traversed.
  *
  * <p>
  * Optional verification (<code>-Dkey.strategy.costReuse.verify</code>): when reuse is applied also
  * recompute the cost and log a warning on any mismatch -- a development aid to catch a feature that
- * is mis-classified local (it should then get {@link CostNonLocal}).
+ * is mis-classified local (it should then get {@link VolatileCost}).
  */
 public final class CostReuse {
 
@@ -67,102 +75,145 @@ public final class CostReuse {
 
     private CostReuse() {}
 
-    private static volatile @Nullable List<RuleSetDispatchFeature> dispatchers;
-    /**
-     * taclet -> collected veto features. An ELIGIBLE taclet always has at least the top-level
-     * NonDuplicateApp veto, so an empty array is used as the INELIGIBLE sentinel (ConcurrentHashMap
-     * forbids null values).
-     */
-    private static final Map<Taclet, Feature[]> classification = new ConcurrentHashMap<>();
     /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
     private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
     /** Cached "not eligible for reuse" marker (the map forbids null values). */
-    private static final Feature[] INELIGIBLE = new Feature[0];
+    private static final Eligibility INELIGIBLE = new Eligibility(new Feature[0], false);
 
     private enum Kind {
-        VETO, NON_LOCAL, LOCAL
+        VETO, VOLATILE, STABLE, WEAK_STABLE
     }
 
     /**
-     * @return the {@link AbstractNonDuplicateAppFeature} vetoes to re-check for a cost-local
-     *         taclet,
-     *         or {@code null} if the taclet is not eligible for cost reuse.
+     * How an eligible taclet may reuse its cost.
+     *
+     * @param vetoes the {@link AbstractNonDuplicateAppFeature} guards to re-check at reuse time
+     * @param weakStable {@code true} if some feature reads the whole find formula
+     *        ({@link WeakStableCost}); such a cost may be reused only while that find formula is
+     *        unchanged. {@code false} for a purely subterm-local ({@link StableCost}) taclet, whose
+     *        cost may always be carried forward.
      */
-    public static Feature @Nullable [] vetoesIfEligible(Object strategy, Taclet taclet) {
-        final Feature[] r = classification.computeIfAbsent(taclet, t -> {
-            final Feature[] res = classify(strategy, t);
-            return res == null ? INELIGIBLE : res;
-        });
-        return r == INELIGIBLE ? null : r;
+    public record Eligibility(Feature[] vetoes, boolean weakStable) {
     }
 
-    private static Feature @Nullable [] classify(Object strategy, Taclet taclet) {
+    /**
+     * @param strategy the goal's strategy; classified against its cost dispatchers (only used to
+     *        obtain those -- never dereferenced beyond {@link #dispatchers})
+     * @param proof the proof being worked on; supplies the per-proof classification cache
+     * @param taclet the taclet whose cost is a candidate for reuse
+     * @return how the taclet may reuse its cost, or {@code null} if it is not eligible at all.
+     */
+    public static @Nullable Eligibility eligibility(Strategy<?> strategy, Proof proof,
+            Taclet taclet) {
+        // Without cost dispatchers we cannot establish locality -> treat as ineligible, and do not
+        // cache that verdict, so a later call with a classifiable strategy can still classify it.
+        final List<RuleSetDispatchFeature> disp = dispatchers(strategy);
+        if (disp.isEmpty()) {
+            return null;
+        }
+        // The verdict is cached in the PROOF's ServiceCaches, NOT a static map: a taclet's locality
+        // depends on the cost dispatchers in force (which differ with the taclet options), while
+        // Taclet#equals is only name + find term. A cache shared across proofs would let one option
+        // set read another's verdict for a same-named but structurally different taclet -- exactly
+        // the static-cache hazard ServiceCaches exists to avoid. Per proof, it is also freed with
+        // the proof. (ELIGIBLE => at least the top-level NonDuplicateApp veto, so the empty-veto
+        // INELIGIBLE acts as the "not eligible" sentinel, the map forbidding null values.)
+        final Map<Taclet, Object> cache = proof.getServices().getCaches()
+                .getCostReuseClassificationCache();
+        final Object e = cache.computeIfAbsent(taclet, t -> {
+            final Eligibility res = classify(disp, t);
+            return res == null ? INELIGIBLE : res;
+        });
+        return e == INELIGIBLE ? null : (Eligibility) e;
+    }
+
+    private static @Nullable Eligibility classify(List<RuleSetDispatchFeature> dispatchers,
+            Taclet taclet) {
         final Set<Feature> vetoes = Collections.newSetFromMap(new IdentityHashMap<>());
         vetoes.add(NonDuplicateAppFeature.INSTANCE); // top-level veto, applies to every taclet
         final boolean[] local = { true };
+        final boolean[] weakStable = { false };
         final Set<Feature> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        for (RuleSetDispatchFeature d : dispatchers(strategy)) {
+        for (RuleSetDispatchFeature d : dispatchers) {
             var rs = taclet.getRuleSets();
             while (!rs.isEmpty()) {
                 final Feature f = d.get(rs.head());
                 if (f != null) {
-                    walk(f, vetoes, local, seen);
+                    walk(f, vetoes, local, weakStable, seen);
                 }
                 rs = rs.tail();
             }
         }
-        return local[0] ? vetoes.toArray(new Feature[0]) : null;
+        return local[0] ? new Eligibility(vetoes.toArray(new Feature[0]), weakStable[0]) : null;
     }
 
     /**
      * Classify a feature; for a transparent composite, recurse into its child features and require
      * its child term-generators to be local too (see the class comment).
      */
-    private static void walk(Feature f, Set<Feature> vetoes, boolean[] local, Set<Feature> seen) {
+    private static void walk(Feature f, Set<Feature> vetoes, boolean[] local, boolean[] weakStable,
+            Set<Feature> seen) {
         if (!local[0] || !seen.add(f)) {
             return;
         }
-        switch (kind(f)) {
+        final Kind k = kind(f);
+        switch (k) {
             case VETO -> vetoes.add(f);
-            case NON_LOCAL -> local[0] = false;
-            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are local
-            // AND all its child TERM-GENERATORS are local. The generator matters because e.g.
-            // ComprehendedSumFeature sums its body over a generator: SuperTermGenerator (find
-            // ancestors) is local, but SequentFormulasGenerator (whole sequent) is not -- and a
-            // generator is a non-Feature input the feature recursion would otherwise miss.
-            case LOCAL -> forEachChild(f, child -> {
-                if (child instanceof Feature cf) {
-                    walk(cf, vetoes, local, seen);
-                } else if (!isLocal(child.getClass())) { // a TermGenerator (or similar input)
-                    local[0] = false;
+            case VOLATILE -> local[0] = false;
+            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are
+            // local and all its child TERM-GENERATORS are at least as local. WEAK_STABLE
+            // recurses the same way but also records that some part reads the whole find
+            // formula, so reuse is gated on that formula being unchanged (see Eligibility). A
+            // generator is a non-Feature input the recursion would otherwise miss (e.g.
+            // ComprehendedSumFeature sums its body over one).
+            case STABLE, WEAK_STABLE -> {
+                if (k == Kind.WEAK_STABLE) {
+                    weakStable[0] = true;
                 }
-            });
+                forEachChild(f, child -> {
+                    if (child instanceof Feature cf) {
+                        walk(cf, vetoes, local, weakStable, seen);
+                    } else { // a TermGenerator (or similar non-Feature input)
+                        final Class<?> gc = child.getClass();
+                        if (gc.isAnnotationPresent(WeakStableCost.class)) {
+                            weakStable[0] = true;
+                        } else if (!isLocal(gc)) {
+                            local[0] = false;
+                        }
+                    }
+                });
+            }
         }
     }
 
     /**
-     * A non-Feature classifying input (e.g. a TermGenerator) is local only if {@link CostLocal}.
+     * A non-Feature classifying input (e.g. a TermGenerator) is fully local only if
+     * {@link StableCost}; a {@link WeakStableCost} one (handled by the caller) is weakly local.
      */
     private static boolean isLocal(Class<?> c) {
-        return !c.isAnnotationPresent(CostNonLocal.class) && c.isAnnotationPresent(CostLocal.class);
+        return !c.isAnnotationPresent(VolatileCost.class)
+                && c.isAnnotationPresent(StableCost.class);
     }
 
     /**
      * Classify a feature's class (cached). SOUND-by-construction: a feature is treated as local
-     * ONLY if it is explicitly {@link CostLocal}-annotated (its author asserts it depends only on
+     * ONLY if it is explicitly {@link StableCost}-annotated (its author asserts it depends only on
      * the app + find subterm, modulo its child features) -- there is no structural "any composite
-     * is transparent" guess. {@link CostNonLocal} forces non-local; everything unannotated is
+     * is transparent" guess. {@link VolatileCost} forces non-local; everything unannotated is
      * non-local (the safe default).
      */
     private static Kind kind(Feature f) {
         return kindCache.computeIfAbsent(f.getClass(), c -> {
-            if (c.isAnnotationPresent(CostNonLocal.class)) {
-                return Kind.NON_LOCAL; // explicit author override wins
+            if (c.isAnnotationPresent(VolatileCost.class)) {
+                return Kind.VOLATILE; // explicit author override wins
             }
             if (f instanceof AbstractNonDuplicateAppFeature) {
                 return Kind.VETO;
             }
-            return c.isAnnotationPresent(CostLocal.class) ? Kind.LOCAL : Kind.NON_LOCAL;
+            if (c.isAnnotationPresent(WeakStableCost.class)) {
+                return Kind.WEAK_STABLE;
+            }
+            return c.isAnnotationPresent(StableCost.class) ? Kind.STABLE : Kind.VOLATILE;
         });
     }
 
@@ -211,21 +262,23 @@ public final class CostReuse {
 
     /**
      * Verification aid (only when {@link #VERIFY}): warn if a reused cost differs from the freshly
-     * recomputed one, i.e. some feature is mis-classified local and should be {@link CostNonLocal}.
+     * recomputed one, i.e. some feature is mis-classified local and should be {@link VolatileCost}.
      */
     static void warnMismatch(Taclet taclet, Object reused, Object fresh) {
         LOGGER.warn("cost-reuse mismatch for taclet {}: a feature is mis-classified local; "
-            + "annotate it @CostNonLocal (reused={}, fresh={})", taclet.name(), reused, fresh);
+            + "annotate it @VolatileCost (reused={}, fresh={})", taclet.name(), reused, fresh);
     }
 
-    private static List<RuleSetDispatchFeature> dispatchers(Object strategy) {
-        List<RuleSetDispatchFeature> d = dispatchers;
-        if (d == null) {
-            d = strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers()
-                    : List.of();
-            dispatchers = d;
-        }
-        return d;
+    /**
+     * The cost dispatchers to classify against, taken from the strategy of the goal being costed.
+     * Must NOT be cached across strategies: different goals/proofs use different strategy instances
+     * (and some are not {@link ModularJavaDLStrategy} at all). A stale or empty cached value would
+     * make the {@link #walk} traverse nothing and thus classify every taclet as (wrongly) local.
+     * When the strategy exposes no cost dispatchers, the taclet is treated as ineligible (see
+     * {@link #vetoesIfEligible}) -- never as trivially local.
+     */
+    private static List<RuleSetDispatchFeature> dispatchers(Strategy<?> strategy) {
+        return strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers() : List.of();
     }
 
     private static List<Field> allFields(Class<?> c) {

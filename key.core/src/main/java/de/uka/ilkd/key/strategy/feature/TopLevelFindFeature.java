@@ -11,88 +11,77 @@ import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a
- * top-level formula of the antecedent or a top-level formula of the succedent
+ * top-level formula of the antecedent or a top-level formula of the succedent. The {@code …_UPDATE}
+ * variants also accept a focus that sits below a prefix of update applications only.
  */
-public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
+@StableCost
+public final class TopLevelFindFeature extends BinaryTacletAppFeature {
 
-    private static abstract class TopLevelWithoutUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence pos);
-
-        @Override
-        protected boolean checkPosition(PosInOccurrence pos) {
-            return pos.isTopLevel() && matches(pos);
-        }
+    /** Whether a focus below a pure update prefix still counts as top-level. */
+    private enum Update {
+        WITHOUT, ALLOW
     }
 
-    private static abstract class TopLevelWithUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence pos);
-
-        @Override
-        protected boolean checkPosition(PosInOccurrence pos) {
-            if (!pos.isTopLevel()) {
-                final PIOPathIterator it = pos.iterator();
-                while (it.next() != -1) {
-                    if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
-                        return false;
-                    }
-                }
-            }
-
-            return matches(pos);
-        }
+    /** Which side(s) of the sequent the focus must be on. */
+    private enum Side {
+        ANTEC_OR_SUCC, ANTEC, SUCC
     }
 
-    public final static Feature ANTEC_OR_SUCC = new TopLevelWithoutUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return true;
-        }
-    };
+    public final static Feature ANTEC_OR_SUCC =
+        new TopLevelFindFeature(Update.WITHOUT, Side.ANTEC_OR_SUCC);
 
-    public final static Feature ANTEC = new TopLevelWithoutUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return pos.isInAntec();
-        }
-    };
+    public final static Feature ANTEC = new TopLevelFindFeature(Update.WITHOUT, Side.ANTEC);
 
-    public final static Feature SUCC = new TopLevelWithoutUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return !pos.isInAntec();
-        }
-    };
+    public final static Feature SUCC = new TopLevelFindFeature(Update.WITHOUT, Side.SUCC);
 
-    public final static Feature ANTEC_OR_SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return true;
-        }
-    };
+    public final static Feature ANTEC_OR_SUCC_WITH_UPDATE =
+        new TopLevelFindFeature(Update.ALLOW, Side.ANTEC_OR_SUCC);
 
-    public final static Feature ANTEC_WITH_UPDATE = new TopLevelWithUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return pos.isInAntec();
-        }
-    };
+    public final static Feature ANTEC_WITH_UPDATE =
+        new TopLevelFindFeature(Update.ALLOW, Side.ANTEC);
 
-    public final static Feature SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
-        @Override
-        protected boolean matches(PosInOccurrence pos) {
-            return !pos.isInAntec();
-        }
-    };
+    public final static Feature SUCC_WITH_UPDATE = new TopLevelFindFeature(Update.ALLOW, Side.SUCC);
+
+    private final Update update;
+    private final Side side;
+
+    private TopLevelFindFeature(Update update, Side side) {
+        this.update = update;
+        this.side = side;
+    }
 
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
-        return checkPosition(pos);
+        return atTopLevel(pos) && matchesSide(pos);
     }
 
-    protected abstract boolean checkPosition(PosInOccurrence pos);
+    private boolean atTopLevel(PosInOccurrence pos) {
+        if (pos.isTopLevel()) {
+            return true;
+        }
+        if (update == Update.WITHOUT) {
+            return false;
+        }
+        // ALLOW: accept iff everything above the focus is an update application
+        final PIOPathIterator it = pos.iterator();
+        while (it.next() != -1) {
+            if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    private boolean matchesSide(PosInOccurrence pos) {
+        return switch (side) {
+            case ANTEC_OR_SUCC -> true;
+            case ANTEC -> pos.isInAntec();
+            case SUCC -> !pos.isInAntec();
+        };
+    }
 }
