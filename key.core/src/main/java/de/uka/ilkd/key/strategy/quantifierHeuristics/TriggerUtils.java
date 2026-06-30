@@ -53,10 +53,9 @@ class TriggerUtils {
             ImmutableSet<? extends QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         if (!set0.isEmpty() && !set1.isEmpty()) {
-            for (QuantifiableVariable aSet0 : set0) {
-                final QuantifiableVariable el = aSet0;
-                if (set1.contains(el)) {
-                    res = res.add(el);
+            for (QuantifiableVariable element : set0) {
+                if (set1.contains(element)) {
+                    res = res.add(element);
                 }
             }
         }
@@ -69,13 +68,16 @@ class TriggerUtils {
             ImmutableSet<? extends QuantifiableVariable> set2) {
 
         final int size0 = set0.size();
-        final int size1 = set0.size();
-        final int size2 = set0.size();
+        final int size1 = set1.size();
+        final int size2 = set2.size();
 
         if (size0 == 0 || size1 == 0 || size2 == 0) {
             return DefaultImmutableSet.nil();
         }
 
+        // Intersect the two smaller sets first (smaller intermediate result), leaving the largest
+        // set for the outer intersection. The three-way result is order-independent, so this only
+        // affects work, not the outcome.
         if (size0 < size2 && size1 < size2) {
             return intersect(intersect(set0, set1), set2);
         } else if (size0 < size1 && size2 < size1) {
