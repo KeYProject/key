@@ -458,6 +458,11 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnRealLiteral(RealLiteral x) {
+        layouter.print(x.getValue());
+    }
+
+    @Override
     public void performActionOnPackageSpecification(PackageSpecification x) {
         layouter.nl();
         layouter.keyWord("package");

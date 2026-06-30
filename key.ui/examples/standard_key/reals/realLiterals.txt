@@ -1,0 +1,13 @@
+example.name = Real literals
+example.path = Data Types
+example.file = realLiterals.key
+
+Real numbers (the \real type)
+
+Shows the abstract \real type in action: real literals in the logic
+(1.25r, -0.5r, 100r), reasoning with real-sorted symbols and quantifiers,
+and a real-valued assignment modelled by an update {r := c}.
+
+The real LDT is still a stub without arithmetic axioms, so only
+equality/structural reasoning is demonstrated (there is no +, *, < on
+reals yet), and Java program blocks do not yet support the real type.

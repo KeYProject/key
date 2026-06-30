@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1283,6 +1284,17 @@ public class TermBuilder {
     public JTerm cTerm(String numberString) {
         return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
             numberTerm(numberString));
+    }
+
+    /**
+     * Create a term representing a real value as {@code \R(unscaledValue, scale)}, i.e.
+     * {@code unscaledValue * 10^(-scale)}. Both operands are unbounded {@code numbers}, so this is
+     * exact for any real literal: it preserves the sign, all fractional digits (including leading
+     * zeros) and the scale, without ever squeezing the value through a bounded {@code int}.
+     */
+    public JTerm rTerm(BigInteger unscaledValue, BigInteger scale) {
+        return func(services.getTypeConverter().getRealLDT().getRealNumberSymbol(),
+            numberTerm(unscaledValue.toString()), numberTerm(scale.toString()));
     }
 
     /**

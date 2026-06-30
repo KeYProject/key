@@ -186,7 +186,11 @@ public class LogicPrinter {
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
             NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
+        // Wrap in an explicit block so the layouter flushes its last pending break; without this
+        // the trailing formula of the semisequent is dropped (issue #243). Mirrors quickPrintTerm.
+        p.layouter().beginC();
         p.printSemisequent(s);
+        p.layouter().end();
         return p.result();
     }
 
