@@ -17,55 +17,65 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 
+/**
+ * A trigger consisting of a single term. Matching it against a target term yields the substitutions
+ * for the quantified variables; results are cached per target term.
+ */
 class UniTrigger implements Trigger {
 
     private final Term trigger;
-    private final ImmutableSet<QuantifiableVariable> uqvs;
+    /** The universal variables this trigger binds. */
+    private final ImmutableSet<QuantifiableVariable> universalVariables;
 
-    private final TriggersSet triggerSetThisBelongsTo;
+    private final TriggersSet owningTriggerSet;
 
+    /**
+     * If {@code true} the trigger carries a non-universal (existential) variable and may therefore
+     * only be matched by (two-sided) unification, not by basic matching.
+     */
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
 
     private final LRUCache<Term, ImmutableSet<Substitution>> matchResults =
         new LRUCache<>(1000);
 
-    UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> uqvs, boolean isUnify,
-            boolean isElementOfMultitrigger, TriggersSet triggerSetThisBelongsTo) {
+    UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> universalVariables,
+            boolean onlyUnify,
+            boolean isElementOfMultitrigger, TriggersSet owningTriggerSet) {
         this.trigger = trigger;
-        this.uqvs = uqvs;
-        this.onlyUnify = isUnify;
+        this.universalVariables = universalVariables;
+        this.onlyUnify = onlyUnify;
         this.isElementOfMultitrigger = isElementOfMultitrigger;
-        this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
+        this.owningTriggerSet = owningTriggerSet;
     }
 
     @Override
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
             Services services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
-        for (Term aTargetTerm : targetTerm) {
-            allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
+        ImmutableSet<Substitution> allSubs = DefaultImmutableSet.nil();
+        for (Term target : targetTerms) {
+            allSubs = allSubs.union(cachedSubstitutionsForTerm(target, services));
         }
-        return allsubs;
+        return allSubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, Services services) {
-        ImmutableSet<Substitution> res = matchResults.get(t);
-        if (res == null) {
-            res = getSubstitutionsFromTermHelp(t, services);
-            matchResults.put(t, res);
+    private ImmutableSet<Substitution> cachedSubstitutionsForTerm(Term target, Services services) {
+        ImmutableSet<Substitution> subs = matchResults.get(target);
+        if (subs == null) {
+            subs = computeSubstitutionsForTerm(target, services);
+            matchResults.put(target, subs);
         }
-        return res;
+        return subs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
-        ImmutableSet<Substitution> newSubs = DefaultImmutableSet.nil();
-        if (t.freeVars().size() > 0 || t.op() instanceof Quantifier) {
-            newSubs = Matching.twoSidedMatching(this, t, services);
+    private ImmutableSet<Substitution> computeSubstitutionsForTerm(Term target, Services services) {
+        ImmutableSet<Substitution> subs = DefaultImmutableSet.nil();
+        if (target.freeVars().size() > 0 || target.op() instanceof Quantifier) {
+            subs = Matching.twoSidedMatching(this, target, services);
         } else if (!onlyUnify) {
-            newSubs = Matching.basicMatching(this, t);
+            subs = Matching.basicMatching(this, target);
         }
-        return newSubs;
+        return subs;
     }
 
 
@@ -74,11 +84,11 @@ class UniTrigger implements Trigger {
         return trigger;
     }
 
-    public boolean equals(Object arg0) {
-        if (!(arg0 instanceof UniTrigger a)) {
+    public boolean equals(Object other) {
+        if (!(other instanceof UniTrigger otherTrigger)) {
             return false;
         }
-        return a.trigger.equals(trigger);
+        return otherTrigger.trigger.equals(trigger);
     }
 
     public int hashCode() {
@@ -90,41 +100,37 @@ class UniTrigger implements Trigger {
     }
 
     ImmutableSet<QuantifiableVariable> getUniVariables() {
-        return uqvs;
+        return universalVariables;
     }
 
     public TriggersSet getTriggerSetThisBelongsTo() {
-        return triggerSetThisBelongsTo;
+        return owningTriggerSet;
     }
 
 
 
     /**
-     * use similar algorithm as basic matching to detect loop
-     *
-     * @param candidate
-     * @param searchTerm
+     * Loop test: reject a candidate trigger if matching it against the search term produces a
+     * substitution that defines some variable cyclically in terms of itself (which would loop
+     * during instantiation). Uses the same matching as basic matching to find the substitutions.
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
-        final ImmutableSet<Substitution> substs =
+        final ImmutableSet<Substitution> substitutions =
             BasicMatching.getSubstitutions(candidate, searchTerm);
 
-        for (Substitution subst1 : substs) {
-            final Substitution subst = subst1;
-            if (containsLoop(subst)) {
+        for (Substitution substitution : substitutions) {
+            if (containsCycle(substitution)) {
                 return false;
             }
         }
         return true;
     }
 
-    /**
-     * Test whether this substitution constains loop. It is mainly used for unitrigger's loop test.
-     */
-    private static boolean containsLoop(Substitution subst) {
-        final var it = subst.getVarMap().keyIterator();
-        while (it.hasNext()) {
-            if (containsLoop(subst.getVarMap(), it.next())) {
+    /** Whether some variable of the substitution is (transitively) defined in terms of itself. */
+    private static boolean containsCycle(Substitution substitution) {
+        final var keys = substitution.getVarMap().keyIterator();
+        while (keys.hasNext()) {
+            if (reachesItself(substitution.getVarMap(), keys.next())) {
                 return true;
             }
         }
@@ -132,45 +138,47 @@ class UniTrigger implements Trigger {
     }
 
     /**
-     * Code copied from logic.EqualityConstraint
+     * Worklist reachability check (originally adapted from EqualityConstraint): starting from the
+     * term bound to {@code var}, follow variable bindings transitively and report whether
+     * {@code var}
+     * is reached again -- i.e. whether its definition is cyclic.
      */
-    private static boolean containsLoop(
+    private static boolean reachesItself(
             ImmutableMap<QuantifiableVariable, Term> varMap,
             QuantifiableVariable var) {
-        ImmutableList<QuantifiableVariable> body = ImmutableList.nil();
-        ImmutableList<Term> fringe = ImmutableList.nil();
-        Term checkForCycle = varMap.get(var);
+        ImmutableList<QuantifiableVariable> visited = ImmutableList.nil();
+        ImmutableList<Term> pending = ImmutableList.nil();
+        Term current = varMap.get(var);
 
-        if (checkForCycle.op() == var) {
+        if (current.op() == var) {
             return false;
         }
 
         while (true) {
-            for (var quantifiableVariable : checkForCycle.freeVars()) {
-                final QuantifiableVariable termVar = quantifiableVariable;
-                if (!body.contains(termVar)) {
-                    final var termVarterm = (JTerm) varMap.get(termVar);
-                    if (termVarterm != null) {
-                        if (termVarterm.freeVars().contains(var)) {
+            for (var freeVar : current.freeVars()) {
+                if (!visited.contains(freeVar)) {
+                    final var boundTerm = (JTerm) varMap.get(freeVar);
+                    if (boundTerm != null) {
+                        if (boundTerm.freeVars().contains(var)) {
                             return true;
                         }
-                        fringe = fringe.prepend(termVarterm);
+                        pending = pending.prepend(boundTerm);
                     }
 
-                    if (termVar == var) {
+                    if (freeVar == var) {
                         return true;
                     }
 
-                    body = body.prepend(termVar);
+                    visited = visited.prepend(freeVar);
                 }
             }
 
-            if (fringe.isEmpty()) {
+            if (pending.isEmpty()) {
                 return false;
             }
 
-            checkForCycle = fringe.head();
-            fringe = fringe.tail();
+            current = pending.head();
+            pending = pending.tail();
         }
     }
 
