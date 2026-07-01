@@ -70,6 +70,15 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     private Exception exception;
     private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
+    /** Whether {@link #doInBackground()} has begun; distinguishes cancel-before-start. */
+    private volatile boolean backgroundStarted = false;
+    /**
+     * Callback run exactly once when this worker's background task has truly ended (returned, or
+     * was
+     * cancelled before it started). Used to release the automode re-entrancy guard.
+     */
+    private Runnable onTerminated;
+
     /**
      * Instantiates a new proof macro worker.
      *
@@ -88,8 +97,30 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         this.posInOcc = posInOcc;
     }
 
+    /**
+     * Registers a callback run exactly once when this worker's background task has truly finished,
+     * used to release the automode re-entrancy guard.
+     *
+     * @param onTerminated the callback
+     */
+    public void setOnTerminated(Runnable onTerminated) {
+        this.onTerminated = onTerminated;
+    }
+
+    private void signalTerminated() {
+        final Runnable callback;
+        synchronized (this) {
+            callback = onTerminated;
+            onTerminated = null;
+        }
+        if (callback != null) {
+            callback.run();
+        }
+    }
+
     @Override
     protected ProofMacroFinishedInfo doInBackground() {
+        backgroundStarted = true;
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
@@ -106,6 +137,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
+        } finally {
+            signalTerminated();
         }
 
         return info;
@@ -135,6 +168,10 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
                 selectOpenGoalBelow();
             }
             emitProofMacroFinished(node, macro, posInOcc, info);
+        }
+        if (!backgroundStarted) {
+            // doInBackground never ran (cancelled before it started); release the guard here.
+            signalTerminated();
         }
     }
 
