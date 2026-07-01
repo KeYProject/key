@@ -24,21 +24,15 @@ public class TmTextTest {
     }
 
     @Test
-    public void truncateFirstLine() {
-        assertEquals("abc", TmText.truncateFirstLine("abc", 10), "short text is unchanged");
-        assertEquals("abc", TmText.truncateFirstLine("abc", 3), "length exactly at the limit");
-        assertEquals("abc …", TmText.truncateFirstLine("abcd", 3), "longer than the limit");
-        assertEquals("ab", TmText.truncateFirstLine("ab\nlong second line", 10),
-            "only the first line is considered");
-        assertEquals("", TmText.truncateFirstLine(null, 5));
-    }
-
-    @Test
     public void collapseToLine() {
         assertEquals("a b c", TmText.collapseToLine("a\nb\nc", 80), "newlines become spaces");
         assertEquals("abc", TmText.collapseToLine("abc", 3), "length exactly at the limit");
         assertEquals("a b …", TmText.collapseToLine("a\nb\nc", 3),
             "flattened first, then truncated by character count");
+        assertEquals("a & b", TmText.collapseToLine("a\n        &   b", 80),
+            "wrapped-formula indentation collapses to a single space");
+        assertEquals("x", TmText.collapseToLine("\n  x\n  ", 80),
+            "leading and trailing whitespace is trimmed");
         assertEquals("", TmText.collapseToLine(null, 5));
     }
 

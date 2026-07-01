@@ -45,7 +45,7 @@ public class AssumesSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** abbreviate candidate text longer than this in the list (full text on hover) */
-    private static final int ABBREV_LIMIT = 100;
+    private static final int ABBREV_LIMIT = 200;
 
     private static final Color OK_COLOR = new Color(0x1D9E75);
     private static final Color WARN_COLOR = new Color(0xBA7517);
@@ -445,7 +445,9 @@ public class AssumesSelectionPanel extends JPanel {
                 boolean isSelected, boolean cellHasFocus) {
             JLabel c = (JLabel) super.getListCellRendererComponent(l, value, index, isSelected,
                 cellHasFocus);
-            c.setText(TmText.truncateFirstLine(text((AssumesFormulaInstantiation) value),
+            // flatten a possibly multi-line, wrapped formula to one line so the whole thing shows
+            // (up to the abbreviation limit) instead of just its first wrapped segment
+            c.setText(TmText.collapseToLine(text((AssumesFormulaInstantiation) value),
                 ABBREV_LIMIT));
             c.setFont(TmStyle.mono(c));
             return c;
