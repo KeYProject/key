@@ -62,15 +62,25 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     private static final Name NAME = new Name("Use Operation Contract");
 
     /**
-     * Single-entry memo to avoid recomputing the instantiation between the applicability check and
-     * the application of the same focus term. Thread-local because {@code instantiate} is called
-     * from
-     * {@code isApplicable} (which has no rule app to attach to) and the rule INSTANCE lives in the
-     * shared taclet base: a plain static cache raced across concurrent workers. Confined to the
-     * worker thread it preserves the optimization (applicability + apply run on the same worker).
+     * Immutable snapshot pairing a focus term with its computed instantiation (which may be
+     * {@code null} for a non-applicable focus). See {@link #lastInstantiation}.
      */
-    private static final ThreadLocal<JTerm> lastFocusTerm = new ThreadLocal<>();
-    private static final ThreadLocal<Instantiation> lastInstantiation = new ThreadLocal<>();
+    private record InstantiationResult(JTerm focusTerm, @Nullable Instantiation instantiation) {
+    }
+
+    /**
+     * Single-entry memo to avoid recomputing the instantiation between the applicability check and
+     * the application of the same focus term. {@code instantiate} is reached from
+     * {@code isApplicable} (which runs off the commit lock, on any worker thread) and the rule
+     * INSTANCE lives in the shared taclet base, so this field is read and written by several
+     * threads. It holds an <em>immutable</em> {@link InstantiationResult} behind a {@code volatile}
+     * reference: a reader takes the reference once and then reads focus term and instantiation
+     * together from that one snapshot, so it can never pair one focus term with another's
+     * instantiation (the torn read a two-field pair would risk). This replaces a pair of per-thread
+     * {@link ThreadLocal}s, which pinned the last focus term (and thus its proof's term graph) and
+     * its {@link Instantiation} onto the long-lived worker-pool threads.
+     */
+    private static volatile @Nullable InstantiationResult lastInstantiation;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -365,18 +375,18 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         return (StatementBlock) result;
     }
 
-    private static Instantiation instantiate(JTerm focusTerm, Services services) {
-        // result cached (per worker thread)?
-        if (focusTerm == lastFocusTerm.get()) {
-            return lastInstantiation.get();
+    private static @Nullable Instantiation instantiate(JTerm focusTerm, Services services) {
+        // result cached (single-entry, shared across workers)?
+        final InstantiationResult last = lastInstantiation;
+        if (last != null && last.focusTerm() == focusTerm) {
+            return last.instantiation();
         }
 
         // compute
         final Instantiation result = computeInstantiation(focusTerm, services);
 
         // cache and return
-        lastFocusTerm.set(focusTerm);
-        lastInstantiation.set(result);
+        lastInstantiation = new InstantiationResult(focusTerm, result);
         return result;
     }
 
@@ -841,7 +851,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             }
 
             if (nullGoal != null) {
-                nullGoal.setBranchLabel("Null reference (%s = null)".formatted(inst.actualSelf));
+                final var self = inst.actualSelf;
+                nullGoal.setBranchLabel(() -> "Null reference (%s = null)".formatted(self));
             }
 
             assert preGoal != null && postGoal != null && excPostGoal != null;
