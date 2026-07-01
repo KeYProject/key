@@ -43,6 +43,8 @@ import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -76,6 +78,8 @@ public class Proof implements ProofObject<Goal>, Named {
      * list with prooftree listeners of this proof attention: firing events makes use of array
      * list's random access nature
      */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Proof.class);
+
     private final List<ProofTreeListener> listenerList = new LinkedList<>();
 
     /**
@@ -813,9 +817,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofExpanded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofExpanded(e));
         }
     }
 
@@ -825,9 +827,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofIsBeingPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofIsBeingPruned(e));
         }
     }
 
@@ -837,9 +837,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofPruned(e));
         }
     }
 
@@ -850,9 +848,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofStructureChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofStructureChanged(e));
         }
     }
 
@@ -863,9 +859,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalRemoved(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalRemoved(e));
         }
     }
 
@@ -876,9 +870,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsAdded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsAdded(e));
         }
     }
 
@@ -897,9 +889,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsChanged(e));
         }
     }
 
@@ -914,9 +904,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofClosed(e);
-            }
+            notifyListeners(listenerList, l -> l.proofClosed(e));
         }
     }
 
@@ -928,9 +916,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireNotesChanged(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.notesChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.notesChanged(e));
         }
     }
 
@@ -1158,13 +1144,44 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * Notifies all {@code listeners} of an event, isolating each callback. A proof listener is a
+     * passive observer; several fire from within a running rule application (e.g.
+     * {@link #fireRuleApplied} is called from {@code Goal.apply}). If a listener throws, that must
+     * not abort the proof search and leave the proof inconsistent. So a throwing listener is logged
+     * and removed from {@code listeners}, and the remaining listeners are still notified. The
+     * caller
+     * must hold the monitor of {@code listeners}.
+     *
+     * @param listeners the listeners to notify (a throwing listener is pruned from this list)
+     * @param notify the notification to deliver to each listener
+     * @param <L> the listener type
+     */
+    private static <L> void notifyListeners(List<L> listeners, Consumer<L> notify) {
+        List<L> broken = null;
+        for (L listener : listeners) {
+            try {
+                notify.accept(listener);
+            } catch (Exception e) {
+                LOGGER.error("proof listener {} threw while handling an event and will be "
+                    + "unregistered to keep the proof consistent", listener.getClass().getName(),
+                    e);
+                if (broken == null) {
+                    broken = new ArrayList<>();
+                }
+                broken.add(listener);
+            }
+        }
+        if (broken != null) {
+            listeners.removeAll(broken);
+        }
+    }
+
+    /**
      * fires the event that a rule has been applied
      */
     protected void fireRuleApplied(ProofEvent p_e) {
         synchronized (ruleAppListenerList) {
-            for (RuleAppListener ral : ruleAppListenerList) {
-                ral.ruleApplied(p_e);
-            }
+            notifyListeners(ruleAppListenerList, ral -> ral.ruleApplied(p_e));
         }
     }
 

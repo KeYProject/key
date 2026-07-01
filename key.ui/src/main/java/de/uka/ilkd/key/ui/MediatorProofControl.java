@@ -45,6 +45,15 @@ public class MediatorProofControl extends AbstractProofControl {
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
 
+    /**
+     * True while an automode/macro run is active or still winding down; released only when the
+     * worker's background task has truly ended. Prevents a second run from starting on the same
+     * proof before the first has fully stopped -- fast-clicking the auto button otherwise overlaps
+     * two provers on one proof and corrupts it.
+     */
+    private final java.util.concurrent.atomic.AtomicBoolean autoModeActive =
+        new java.util.concurrent.atomic.AtomicBoolean(false);
+
     public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
         this.ui = ui;
@@ -81,6 +90,9 @@ public class MediatorProofControl extends AbstractProofControl {
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
+        }
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
         }
         worker = new AutoModeWorker(proof, goals, ptl);
         ui.getMediator().initiateAutoMode(proof, true, false);
@@ -137,8 +149,12 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
+        }
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+        worker.setOnTerminated(() -> autoModeActive.set(false));
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
@@ -159,6 +175,7 @@ public class MediatorProofControl extends AbstractProofControl {
         private final ImmutableList<Goal> goals;
         private final ApplyStrategy applyStrategy;
         private ProofSearchInformation<Proof, Goal> info;
+        private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
                 ProverTaskListener ptl) {
@@ -189,6 +206,11 @@ public class MediatorProofControl extends AbstractProofControl {
             } finally {
                 // make it possible to free memory and falsify the isAutoMode() property
                 worker = null;
+                if (!backgroundStarted) {
+                    // doInBackground never ran (cancelled before it started); release the guard
+                    // here.
+                    autoModeActive.set(false);
+                }
                 // Clear strategy
                 synchronized (applyStrategy) {// wait for apply Strategy to terminate
                     applyStrategy.removeProverTaskObserver(ui);
@@ -215,14 +237,19 @@ public class MediatorProofControl extends AbstractProofControl {
 
         @Override
         protected ProofSearchInformation<Proof, Goal> doInBackground() {
-            boolean stopMode =
-                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
-                        .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            backgroundStarted = true;
+            try {
+                boolean stopMode =
+                    proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                            .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
-            info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
-                ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
-            return info;
+                info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
+                    ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+                return info;
+            } finally {
+                autoModeActive.set(false);
+            }
         }
     }
 }
