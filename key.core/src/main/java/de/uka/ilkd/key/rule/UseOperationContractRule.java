@@ -841,7 +841,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             }
 
             if (nullGoal != null) {
-                nullGoal.setBranchLabel("Null reference (%s = null)".formatted(inst.actualSelf));
+                final var self = inst.actualSelf;
+                nullGoal.setBranchLabel(() -> "Null reference (%s = null)".formatted(self));
             }
 
             assert preGoal != null && postGoal != null && excPostGoal != null;

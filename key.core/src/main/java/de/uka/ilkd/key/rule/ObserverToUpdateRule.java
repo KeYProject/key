@@ -186,7 +186,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" + inst.receiver + " = null)");
+            final var recv = inst.receiver;
+            nullGoal.setBranchLabel(() -> "Null reference (" + recv + " = null)");
         } else {
             result = goal.split(1);
             contGoal = result.head();
@@ -249,7 +250,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" + inst.actualSelf() + " = null)");
+            final var self = inst.actualSelf();
+            nullGoal.setBranchLabel(() -> "Null reference (" + self + " = null)");
         } else {
             result = goal.split(1);
             contGoal = result.head();
