@@ -24,20 +24,14 @@ final class TmText {
     }
 
     /**
-     * the first line of {@code s}, truncated to {@code limit} characters with an ellipsis appended
-     * when it was longer.
-     */
-    static String truncateFirstLine(String s, int limit) {
-        String line = firstLine(s);
-        return line.length() > limit ? line.substring(0, limit) + " …" : line;
-    }
-
-    /**
-     * {@code s} flattened to a single line (newlines become spaces), truncated to {@code limit}
-     * characters with an ellipsis appended when it was longer.
+     * {@code s} flattened to a single line and truncated to {@code limit} characters with an
+     * ellipsis appended when it was longer. Every run of whitespace (the newlines and the alignment
+     * indentation the pretty-printer inserts when it wraps a term) collapses to a single space, so
+     * a
+     * multi-line formula reads as one continuous line instead of a stub followed by blank gaps.
      */
     static String collapseToLine(String s, int limit) {
-        String oneLine = (s == null ? "" : s).replace('\n', ' ');
+        String oneLine = (s == null ? "" : s).replaceAll("\\s+", " ").trim();
         return oneLine.length() > limit ? oneLine.substring(0, limit) + " …" : oneLine;
     }
 
