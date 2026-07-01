@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.JModality;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 
 /**
  * Caches whether a Term contains a modality operation.
@@ -20,18 +20,25 @@ import org.key_project.util.LRUCache;
  * @author Julian Wiesler
  */
 public class ModalityCache {
-    /** the cache */
-    private final Map<Term, Boolean> termCache = new LRUCache<>(2000);
+    /**
+     * the cache. Thread-safe: a ModalityCache is shared across the parallel prover's workers via
+     * the macro's filter strategy (see the class note on {@link #lastSequent}).
+     */
+    private final Map<Term, Boolean> termCache = new ConcurrentLruCache<>(2000);
+
+    private record SequentResult(Sequent sequent, boolean value) {
+    }
 
     /**
-     * a single element cache for the sequent
-     * -> Caching more than one sequent did not help since the autopilot rarely revisits nodes
+     * A single-element cache for the last sequent's result, kept <em>per thread</em>. A
+     * {@link ModalityCache} is shared across the parallel prover's workers via the macro's filter
+     * strategy -- {@link #hasModality} is reached from {@code Strategy#isApprovedApp}, which runs
+     * off
+     * the commit lock -- so a shared single field pair would race, and a torn read could return
+     * another sequent's value. Caching more than one sequent did not help: the autopilot rarely
+     * revisits nodes.
      */
-    private Sequent sequent = null;
-    /**
-     * the value of the sequent cache
-     */
-    private boolean sequentValue = false;
+    private final ThreadLocal<SequentResult> lastSequent = new ThreadLocal<>();
 
     /**
      * Constructor
@@ -76,8 +83,9 @@ public class ModalityCache {
      * @return whether the sequent contained a modality term
      */
     public boolean hasModality(Sequent sequent) {
-        if (this.sequent == sequent) {
-            return sequentValue;
+        final SequentResult last = lastSequent.get();
+        if (last != null && last.sequent() == sequent) {
+            return last.value();
         }
 
         var result = false;
@@ -88,8 +96,7 @@ public class ModalityCache {
             }
         }
 
-        this.sequent = sequent;
-        sequentValue = result;
+        lastSequent.set(new SequentResult(sequent, result));
         return result;
     }
 }
