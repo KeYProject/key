@@ -62,14 +62,21 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     private static final Name NAME = new Name("Block Contract (Internal)");
 
     /**
+     * Single-entry memo to avoid recomputing the instantiation between the applicability check and
+     * the application of the same focus term. Thread-local because this rule's {@link #INSTANCE} is
+     * a shared singleton and {@code instantiate} is reached from the applicability check off the
+     * parallel prover's commit lock: a plain field pair raced across concurrent workers and could
+     * hand one worker another goal's instantiation. Confined to the worker thread it preserves the
+     * memo (applicability and apply run on the same worker).
+     *
      * @see #getLastFocusTerm()
      */
-    private JTerm lastFocusTerm;
+    private final ThreadLocal<JTerm> lastFocusTerm = new ThreadLocal<>();
 
     /**
      * @see #getLastInstantiation()
      */
-    private Instantiation lastInstantiation;
+    private final ThreadLocal<Instantiation> lastInstantiation = new ThreadLocal<>();
 
     protected BlockContractInternalRule() {
     }
@@ -169,17 +176,17 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public JTerm getLastFocusTerm() {
-        return lastFocusTerm;
+        return lastFocusTerm.get();
     }
 
     @Override
     protected void setLastFocusTerm(JTerm lastFocusTerm) {
-        this.lastFocusTerm = lastFocusTerm;
+        this.lastFocusTerm.set(lastFocusTerm);
     }
 
     @Override
     public Instantiation getLastInstantiation() {
-        return lastInstantiation;
+        return lastInstantiation.get();
     }
 
     @Override
@@ -189,7 +196,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     protected void setLastInstantiation(Instantiation lastInstantiation) {
-        this.lastInstantiation = lastInstantiation;
+        this.lastInstantiation.set(lastInstantiation);
     }
 
     @Override
