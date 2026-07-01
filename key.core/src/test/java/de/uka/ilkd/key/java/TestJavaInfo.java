@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -188,6 +189,40 @@ public class TestJavaInfo {
         assertNull(javaInfo.getPrimitiveKeYJavaType("java.lang.Object"),
             "Ooops, non primitive type found");
         assertNull(javaInfo.getPrimitiveKeYJavaType("myOwnType"), "Ooops, non existing type found");
+    }
+
+    /**
+     * The synthetic {@code __Default__} execution-context class is registered in the type model but
+     * must not leak into user-facing type enumerations: {@link JavaInfo#getAllKeYJavaTypes()} (i.e.
+     * {@code getAllKeYJavaTypes(false)}) has to hide it, while
+     * {@link JavaInfo#getAllKeYJavaTypes(boolean) getAllKeYJavaTypes(true)} still exposes it.
+     */
+    @Test
+    public void testInternalTypesHiddenFromEnumeration() {
+        // materialize + mark the synthetic __Default__ class
+        javaInfo.getDefaultExecutionContext();
+        final KeYJavaType def =
+            javaInfo.getTypeByClassName(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS);
+        assertNotNull(def, "__Default__ should be registered by getDefaultExecutionContext()");
+        assertTrue(def.isInternal(), "__Default__ must be marked internal");
+
+        final Collection<KeYJavaType> userTypes = javaInfo.getAllKeYJavaTypes(); // == (false)
+        final Collection<KeYJavaType> allTypes = javaInfo.getAllKeYJavaTypes(true);
+
+        assertTrue(allTypes.contains(def),
+            "getAllKeYJavaTypes(true) must include the synthetic __Default__ class");
+        assertFalse(userTypes.contains(def),
+            "getAllKeYJavaTypes() must hide the synthetic __Default__ class");
+
+        // the default view is exactly the non-internal types: a subset of the full view that
+        // contains no internal type and differs from it by precisely the one hidden type.
+        assertTrue(allTypes.containsAll(userTypes), "user types must be a subset of all types");
+        for (final KeYJavaType kjt : userTypes) {
+            assertFalse(kjt.isInternal(),
+                "getAllKeYJavaTypes() must not contain any internal type: " + kjt.getName());
+        }
+        assertEquals(allTypes.size() - 1, userTypes.size(),
+            "exactly the one internal type (__Default__) should be filtered out");
     }
 
 }
