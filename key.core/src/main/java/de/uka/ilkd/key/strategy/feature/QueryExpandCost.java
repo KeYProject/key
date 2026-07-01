@@ -8,8 +8,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
 
 import org.key_project.logic.Namespace;
@@ -202,33 +200,6 @@ public class QueryExpandCost implements Feature {
             }
         }
         return count;
-    }
-
-    /**
-     * This method determines whether the given goal belongs to a subtree of a step case or body
-     * preserves case. The search is done recursively for all parent nodes until either there are no
-     * more parent nodes or we have found an according (or opposing) branch label.
-     *
-     * @param goal the current proof goal
-     * @return a boolean saying whether the goal belongs to a step case
-     */
-    protected static boolean isStepCaseBranch(Goal goal) {
-        Node node = goal.node();
-        while (node != null) {
-            NodeInfo ni = node.getNodeInfo();
-            if (ni != null && ni.getBranchLabel() != null) {
-                String branchName = ni.getBranchLabel().toLowerCase();
-                if (branchName.contains("step case") || branchName.contains("body preserves")) {
-                    return true;
-                } else if (branchName.contains("base case")
-                        || branchName.contains("invariant initially")
-                        || branchName.contains("use case")) {
-                    return false;
-                }
-            }
-            node = node.parent();
-        }
-        return false;
     }
 
     public int getMaxRepetitionsOnSameTerm() {

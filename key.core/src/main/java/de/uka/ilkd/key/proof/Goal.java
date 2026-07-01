@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -616,6 +617,16 @@ public final class Goal implements ProofGoal<Goal> {
 
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
+    }
+
+    /**
+     * Sets the branch label lazily: {@code labelSupplier} is evaluated only when the label is first
+     * read (display/save), keeping term stringification off the proof-search path.
+     *
+     * @param labelSupplier supplies the branch label on demand
+     */
+    public void setBranchLabel(Supplier<String> labelSupplier) {
+        node.getNodeInfo().setBranchLabel(labelSupplier);
     }
 
     void pruneToParent() {
