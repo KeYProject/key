@@ -141,13 +141,15 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // A duplicate must agree on the focus term up to term labels (every comparePio variant,
         // including the modulo-position one, implies this), so it shares the candidate's focus-term
         // fingerprint and can only be in that bucket -- PROVIDED the fingerprint itself ignores
-        // term labels, matching the equality the buckets are probed with: a plain hashCode() is
-        // label-sensitive, so a duplicate whose focus differs only in (history-dependent, e.g.
-        // origin) labels would land in a different bucket and silently escape the veto. A find-less
-        // application (pos == null) lands in bucket 0, where all find-less applications of this
-        // name live (a taclet name is either find or find-less, never both).
+        // term labels, matching the equality the buckets are probed with: a label-sensitive
+        // fingerprint would put a duplicate whose focus differs only in (history-dependent, e.g.
+        // origin) labels into a different bucket, where it would silently escape the veto.
+        // AppliedRuleAppsNameCache#focusFingerprint is label-insensitive by construction. A
+        // find-less application (pos == null) lands in bucket 0, where all find-less applications
+        // of
+        // this name live (a taclet name is either find or find-less, never both).
         final int fingerprint = pos == null ? 0
-                : ((JTerm) pos.subTerm()).hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY);
+                : AppliedRuleAppsNameCache.focusFingerprint(pos.subTerm());
         List<RuleApp> apps = cache.get(node, app.rule().name(), fingerprint);
 
         // Check all rules with this name in the same fingerprint bucket
