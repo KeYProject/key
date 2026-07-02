@@ -38,6 +38,19 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             oldApp.instantiations().getUpdateContext();
         final ImmutableList<UpdateLabelPair> newUpdateContext =
             newApp.instantiations().getUpdateContext();
-        return oldUpdateContext.equals(newUpdateContext);
+        // compare the update terms modulo term labels: labels carry history (e.g. origin), and a
+        // duplicate check that is sensitive to them misses semantically equal applications
+        if (oldUpdateContext.size() != newUpdateContext.size()) {
+            return false;
+        }
+        final var oldIt = oldUpdateContext.iterator();
+        final var newIt = newUpdateContext.iterator();
+        while (oldIt.hasNext()) {
+            if (!oldIt.next().update().equalsModProperty(newIt.next().update(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
