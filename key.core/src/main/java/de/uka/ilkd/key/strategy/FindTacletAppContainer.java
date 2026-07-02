@@ -65,6 +65,14 @@ public class FindTacletAppContainer extends TacletAppContainer {
         positionTag = posTag;
     }
 
+    /**
+     * @return the original position for which this container was created (a stable key for the
+     *         deterministic queue tie-break, see {@link RuleAppContainer#compareTo})
+     */
+    PosInOccurrence getApplicationPosition() {
+        return applicationPosition;
+    }
+
 
     /**
      * @return true iff the stored rule app is applicable for the given sequent, i.e. if the

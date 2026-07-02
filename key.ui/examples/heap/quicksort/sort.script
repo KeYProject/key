@@ -1,5 +1,5 @@
 macro "autopilot-prep";
-tryclose;
+tryclose steps=15000;
 
 // assert openGoals == 1;
 
