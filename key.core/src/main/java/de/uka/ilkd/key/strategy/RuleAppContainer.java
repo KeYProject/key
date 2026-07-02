@@ -65,12 +65,12 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     }
 
     private static int compareByContent(RuleAppContainer ca, RuleAppContainer cb) {
-        final RuleApp a = ca.ruleApp;
-        final RuleApp b = cb.ruleApp;
-        if (a == b) {
+        if (ca == cb) {
             return 0;
         }
-        int c = a.rule().name().compareTo(b.rule().name());
+        final RuleApp a = ca.ruleApp;
+        final RuleApp b = cb.ruleApp;
+        int c = a == b ? 0 : a.rule().name().compareTo(b.rule().name());
         if (c != 0) {
             return c;
         }
@@ -78,10 +78,16 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // application position lives in the container, so it is the container position that has
         // to be compared -- otherwise two apps of the same taclet at different positions (with
         // equal instantiations) tie, and their order falls back to the history-dependent heap
-        // insertion order.
+        // insertion order. This must happen before the rule apps are shortcut-compared by
+        // identity: one and the same NoPosTacletApp object is indexed at every position the
+        // matched term occurs at, so containers for different occurrences of an identical
+        // subterm share their rule app.
         c = comparePos(applicationPosition(ca), applicationPosition(cb));
         if (c != 0) {
             return c;
+        }
+        if (a == b) {
+            return 0;
         }
         // Same rule and focus: distinguish by instantiations (e.g. two applyEq on different eqs).
         if (a instanceof TacletApp ta && b instanceof TacletApp tb) {
