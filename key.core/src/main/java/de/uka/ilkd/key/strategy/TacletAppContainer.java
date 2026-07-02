@@ -54,11 +54,23 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * across re-expansion and only re-add the current age, with no reconstruction arithmetic.
      */
     private final RuleAppCost ageFreeCost;
+    /**
+     * Whether {@link #ageFreeCost} is the regular strategy cost ({@link Strategy#computeCost}) and
+     * so
+     * may be carried forward by cost reuse. It is {@code false} only for containers built from a
+     * strategy-supplied instantiation cost ({@link Strategy#instantiateApp}, the
+     * {@link #instantiateApp} collector): for those the stored cost is the instantiation score,
+     * which
+     * differs from a regular re-cost (e.g. an instantiated quantifier app re-costs to infinity), so
+     * reusing it would be unsound. Such containers must always be re-costed normally instead.
+     */
+    private final boolean ageFreeCostIsRegular;
 
-    protected TacletAppContainer(RuleApp p_app, RuleAppCost p_ageFreeCost, RuleAppCost p_cost,
-            long p_age) {
+    protected TacletAppContainer(RuleApp p_app, RuleAppCost p_ageFreeCost,
+            boolean p_ageFreeCostIsRegular, RuleAppCost p_cost, long p_age) {
         super(p_app, p_cost);
         ageFreeCost = p_ageFreeCost;
+        ageFreeCostIsRegular = p_ageFreeCostIsRegular;
         age = p_age;
     }
 
@@ -83,21 +95,25 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
             PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
+        // the cost is the regular strategy cost, so it may be reused
         return createContainer(p_app, p_pio, p_goal,
-            p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
+            p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), true, p_initial);
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
             PosInOccurrence p_pio,
-            Goal p_goal, RuleAppCost p_ageFreeCost, boolean p_initial) {
+            Goal p_goal, RuleAppCost p_ageFreeCost, boolean p_ageFreeCostIsRegular,
+            boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
         final long localage = p_initial ? -1 : p_goal.getTime();
         final RuleAppCost cost = withAge(p_ageFreeCost, p_goal);
         if (p_pio == null) {
-            return new NoFindTacletAppContainer(p_app, p_ageFreeCost, cost, localage);
+            return new NoFindTacletAppContainer(p_app, p_ageFreeCost, p_ageFreeCostIsRegular, cost,
+                localage);
         } else {
-            return new FindTacletAppContainer(p_app, p_pio, p_ageFreeCost, cost, p_goal, localage);
+            return new FindTacletAppContainer(p_app, p_pio, p_ageFreeCost, p_ageFreeCostIsRegular,
+                cost, p_goal, localage);
         }
     }
 
@@ -191,7 +207,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return targetList;
         }
         return targetList.prepend(createContainer(app,
-            getPosInOccurrence(p_goal), p_goal, cost, false));
+            getPosInOccurrence(p_goal), p_goal, cost, false, false));
     }
 
     private static boolean sufficientlyCompleteApp(NoPosTacletApp app) {
@@ -224,18 +240,25 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Otherwise, and whenever reuse is disabled/inapplicable, falls back to the normal recompute.
      */
     private @Nullable TacletAppContainer costLocalReusedContainerOr(Goal p_goal) {
-        if (getAgeFreeCost() instanceof NumberRuleAppCost base) {
-            final Feature[] vetoes =
-                CostReuse.vetoesIfEligible(p_goal.getGoalStrategy(), getTacletApp().taclet());
-            if (vetoes != null) {
+        // only a regular (computeCost) base may be carried forward; an instantiation-supplied base
+        // would re-cost differently, so such containers always fall through to a normal recompute
+        if (ageFreeCostIsRegular && getAgeFreeCost() instanceof NumberRuleAppCost base) {
+            final CostReuse.Eligibility elig = CostReuse.eligibility(p_goal.getGoalStrategy(),
+                p_goal.proof(), getTacletApp().taclet());
+            // A subterm-local cost may always be carried forward; a formula-local one only while
+            // the
+            // find formula is unchanged (an independent sibling rewrite leaves the find subterm but
+            // not the formula intact). Otherwise fall through to a normal recompute.
+            if (elig != null && (!elig.weakStable() || findFormulaUnchanged(p_goal))) {
                 final PosInOccurrence pos = getPosInOccurrence(p_goal);
                 final MutableState mState = new MutableState();
-                for (Feature veto : vetoes) {
+                for (Feature veto : elig.vetoes()) {
                     if (veto.computeCost(getTacletApp(), pos, p_goal,
                         mState) instanceof TopRuleAppCost) {
                         return null;
                     }
                 }
+                // only for debugging or CI to raise warning flags for wrongly annotated features
                 if (CostReuse.VERIFY) {
                     final RuleAppCost freshBase =
                         p_goal.getGoalStrategy().computeCost(getTacletApp(), pos, p_goal);
@@ -244,10 +267,20 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     }
                 }
                 // carry the age-free base forward; createContainer re-adds the current age
-                return createContainer(getTacletApp(), pos, p_goal, base, false);
+                return createContainer(getTacletApp(), pos, p_goal, base, true, false);
             }
         }
         return createContainer(p_goal);
+    }
+
+    /**
+     * @return {@code true} iff the find formula this container was created for is still present
+     *         unchanged in the goal -- the precondition for carrying forward a {@code @}
+     *         {@code WeakStableCost} cost. The base container has no find formula and so
+     *         conservatively answers {@code false} (such a cost is never reused for it).
+     */
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        return false;
     }
 
     /**
@@ -270,7 +303,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         ImmutableList<RuleAppContainer> result = ImmutableList.nil();
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container =
-                createContainer(p_app.head(), p_pio, p_goal, cost, true);
+                createContainer(p_app.head(), p_pio, p_goal, cost, true, true);
             result = result.prepend(container);
             p_app = p_app.tail();
         }

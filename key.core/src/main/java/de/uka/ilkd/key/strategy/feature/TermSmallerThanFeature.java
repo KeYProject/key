@@ -8,14 +8,14 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.CostLocal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering
  */
-@CostLocal
+@StableCost
 public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;

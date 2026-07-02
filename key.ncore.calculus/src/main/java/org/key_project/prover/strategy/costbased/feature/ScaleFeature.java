@@ -147,7 +147,7 @@ public abstract class ScaleFeature implements Feature {
         return Math.abs(p) < 0.0000001;
     }
 
-    @CostLocal
+    @StableCost
     private static class MultFeature
             extends ScaleFeature {
         /// the coefficient

@@ -17,7 +17,7 @@ import org.jspecify.annotations.NonNull;
 /// depth zero or if not a find taclet)
 ///
 /// TODO: eliminate this class and use term features instead
-@CostLocal
+@StableCost
 public class FindDepthFeature implements Feature {
 
     private static final Feature INSTANCE = new FindDepthFeature();
