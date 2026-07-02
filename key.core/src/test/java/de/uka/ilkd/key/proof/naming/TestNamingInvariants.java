@@ -197,6 +197,37 @@ public class TestNamingInvariants {
         }
     }
 
+    // -------------------------------------------------------- saved-proof format compatibility
+
+    /**
+     * Frozen saved proof (checked-in resource) that APPLIES an added rule by its recorded name
+     * ({@code insert_hidden_taclet1_0}). Added-rule names are replayed by REGENERATION (the
+     * replayer looks the recorded name up in the goal-local taclet index -- see
+     * {@code IntermediateProofReplayer}), not via the {@code NameRecorder}: any change to the
+     * added-rule name format therefore breaks loading of every existing proof unless it ships
+     * with a name conversion in the replayer. This test pins that compatibility.
+     */
+    @Test
+    public void savedProofWithHiddenTacletReplays() throws Exception {
+        final KeYEnvironment<?> env = load("insertHidden.proof");
+        try {
+            final Proof proof = env.getLoadedProof();
+            boolean hiddenApplied = false;
+            final var it = proof.root().subtreeIterator();
+            while (it.hasNext()) {
+                final var node = it.next();
+                if (node.getAppliedRuleApp() != null && node.getAppliedRuleApp().rule().name()
+                        .toString().startsWith("insert_hidden")) {
+                    hiddenApplied = true;
+                }
+            }
+            assertTrue(hiddenApplied,
+                "the saved insert_hidden application must have been replayed");
+        } finally {
+            env.dispose();
+        }
+    }
+
     // ------------------------------------------------------------------- MT-strict variant
 
     /**
@@ -294,6 +325,11 @@ public class TestNamingInvariants {
      * andRight, then on the (b -> b) branch impRight and hide_left on the antecedent b. The
      * other branch stays untouched (the sibling witness).
      */
+    /** Exposed for the one-off proof-resource generator. */
+    static void splitAndHideForGenerator(Proof proof) {
+        splitAndHide(proof);
+    }
+
     private static void splitAndHide(Proof proof) {
         applyOnFormula(proof, proof.openGoals().head(), "andRight", 1, false);
         // the impRight-able branch is the one whose succedent formula is an implication
