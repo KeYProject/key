@@ -317,8 +317,14 @@ public class NamespaceSet {
     }
 
     public NamespaceSet getParent() {
-        var newSpaces = new HashMap<>(namespaces);
-        namespaces.forEach((a, b) -> newSpaces.put(a, b.parent()));
+        var newSpaces = new HashMap<Class<?>, Namespace<?>>();
+        // a namespace without an enclosing layer has no parent; represent that as an empty
+        // namespace rather than a null map value, so the "no null values" invariant the other
+        // map operations (copy, copyWithParent, getCompression) rely on keeps holding
+        namespaces.forEach((a, b) -> {
+            Namespace<?> parent = b.parent();
+            newSpaces.put(a, parent != null ? parent : new Namespace<>());
+        });
         return new NamespaceSet(newSpaces, documentation.parent());
     }
 
