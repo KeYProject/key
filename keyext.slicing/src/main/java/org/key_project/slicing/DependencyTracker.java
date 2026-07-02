@@ -73,6 +73,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
+    /**
+     * Set once tracking failed with an exception (after which {@link Proof} unregisters this
+     * tracker, see {@link #ruleApplied(ProofEvent)}). The dependency graph is then incomplete, so
+     * {@link #analyze} no longer returns results.
+     */
+    private boolean trackingDisabled = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -264,6 +270,24 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     @Override
     public void ruleApplied(ProofEvent e) {
+        if (trackingDisabled) {
+            return;
+        }
+        try {
+            trackRuleApplication(e);
+        } catch (RuntimeException ex) {
+            // Proof.fireRuleApplied isolates listeners: it logs this failure and unregisters the
+            // tracker, so a tracking error cannot break the ongoing proof search. Here we only
+            // record that tracking became incomplete, so that a later analyze() does not return a
+            // slice computed from the partial dependency graph; then rethrow for the proof to
+            // handle.
+            trackingDisabled = true;
+            analysisResults = null;
+            throw ex;
+        }
+    }
+
+    private void trackRuleApplication(ProofEvent e) {
         if (e.getSource() != proof) {
             throw new IllegalStateException(
                 "dependency tracker received rule application on wrong proof");
@@ -471,6 +495,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return analysis results (null if proof is not closed)
      */
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
+        if (trackingDisabled) {
+            // the dependency graph is incomplete after a tracking failure; do not return a slice
+            return null;
+        }
         if (analysisResults != null
                 && analysisResults.didDependencyAnalysis == doDependencyAnalysis
                 && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps
