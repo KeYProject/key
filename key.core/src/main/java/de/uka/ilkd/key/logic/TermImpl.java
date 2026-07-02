@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -70,8 +69,6 @@ class TermImpl implements JTerm {
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
-    /** Cached {@link #hashCodeModProperty} value for the irrelevant-term-labels property. */
-    private int hashcodeModLabels = -1;
 
     private Sort sort;
 
@@ -340,15 +337,6 @@ class TermImpl implements JTerm {
 
     @Override
     public int hashCodeModProperty(Property<? super JTerm> property) {
-        if (property == IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY) {
-            // cached like hashCode(): the strategy's duplicate-application veto fingerprints
-            // focus terms modulo labels on every candidate report, which without the cache
-            // re-traverses the whole subterm tree each time (same benign-race idiom as above)
-            if (hashcodeModLabels == -1) {
-                this.hashcodeModLabels = property.hashCodeModThisProperty(this);
-            }
-            return hashcodeModLabels;
-        }
         return property.hashCodeModThisProperty(this);
     }
 

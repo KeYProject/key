@@ -94,11 +94,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
     public int hashCodeModThisProperty(JTerm term) {
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
-        // recurse through the term's accessor, not this method directly, so every subterm's
-        // cached mod-labels hash (see TermImpl#hashCodeModProperty) is used and populated --
-        // making the computation incremental like Term#hashCode instead of O(subtree) per call
         hashcode = hashcode * 17 + EqualityUtils
-                .hashCodeModPropertyOfIterable(term.subs(), t -> t.hashCodeModProperty(this));
+                .hashCodeModPropertyOfIterable(term.subs(), this::hashCodeModThisProperty);
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode = hashcode * 17 + term.javaBlock().hashCode();
 
