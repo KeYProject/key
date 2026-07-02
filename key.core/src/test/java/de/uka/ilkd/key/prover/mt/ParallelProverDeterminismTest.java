@@ -35,15 +35,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParallelProverDeterminismTest {
 
     /**
-     * Small examples for which sequential and 1-worker proofs are identical. (Not yet the case for
-     * every example — see the residual divergence on e.g. Simple__square.key or the position-level
-     * difference on Simple__addWithTwoBlockContracts.key — so this list guards the examples the
-     * provers agree on against regressions.)
+     * Small examples for which sequential and 1-worker proofs are identical, node for node.
+     * (A few examples still show a residual same-rule position difference — e.g.
+     * Simple__addAbsoluteValues.key, Simple__generateByteArray.key — or a single-node size
+     * difference on larger proofs, so this list guards the examples the provers fully agree on
+     * against regressions.)
      */
     private static final String[] PROOFS = {
         "heap/block_contracts/Simple__add.key",
         "heap/block_contracts/Simple__addWithJump.key",
+        "heap/block_contracts/Simple__addWithTwoBlockContracts.key",
         "heap/block_contracts/Simple__getLength.key",
+        "heap/block_contracts/Simple__square.key",
         "heap/block_contracts/Simple__unnecessaryBlockContract.key",
         "heap/block_contracts/Simple__unnecessaryLoopInvariant.key",
     };

@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -11,13 +15,17 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.jspecify.annotations.NonNull;
 
@@ -53,10 +61,12 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // run-to-run proof variance under concurrent goal processing. Uses only stable keys (rule,
         // operator and schema-variable names; structural positions and instantiations); never
         // object hashCodes or toString(), which can embed identity (e.g. term-label hashes).
-        return compareByContent(ruleApp, o.ruleApp);
+        return compareByContent(this, o);
     }
 
-    private static int compareByContent(RuleApp a, RuleApp b) {
+    private static int compareByContent(RuleAppContainer ca, RuleAppContainer cb) {
+        final RuleApp a = ca.ruleApp;
+        final RuleApp b = cb.ruleApp;
         if (a == b) {
             return 0;
         }
@@ -64,7 +74,12 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         if (c != 0) {
             return c;
         }
-        c = comparePos(a.posInOccurrence(), b.posInOccurrence());
+        // Taclet apps are queued as NoPosTacletApps whose posInOccurrence() is null: their
+        // application position lives in the container, so it is the container position that has
+        // to be compared -- otherwise two apps of the same taclet at different positions (with
+        // equal instantiations) tie, and their order falls back to the history-dependent heap
+        // insertion order.
+        c = comparePos(applicationPosition(ca), applicationPosition(cb));
         if (c != 0) {
             return c;
         }
@@ -77,6 +92,17 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
             return compareAssumesInstantiations(ta, tb);
         }
         return 0;
+    }
+
+    /**
+     * The position a container's rule app is (to be) applied at: the creation-time position of a
+     * find-taclet container, or the rule app's own position for built-in rule apps.
+     */
+    private static PosInOccurrence applicationPosition(RuleAppContainer c) {
+        if (c instanceof FindTacletAppContainer findContainer) {
+            return findContainer.getApplicationPosition();
+        }
+        return c.ruleApp == null ? null : c.ruleApp.posInOccurrence();
     }
 
     /**
@@ -169,21 +195,42 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         if (ma == mb) {
             return 0;
         }
-        final var ia = ma.iterator();
-        final var ib = mb.iterator();
-        while (ia.hasNext() && ib.hasNext()) {
-            final var ea = ia.next();
-            final var eb = ib.next();
-            int c = ea.key().name().compareTo(eb.key().name());
+        // The maps iterate in build order, which differs between code paths (fresh match,
+        // re-expansion, assumes completion) even for equal content. Compare canonically -- sizes,
+        // then the entries sorted by schema-variable name -- so that the result is a consistent
+        // total order: an order-sensitive walk compares mismatched keys and turns compareTo
+        // asymmetric for content-equal apps, which silently corrupts the ordering of the whole
+        // rule-app queue (a leftist heap merges by pairwise comparisons).
+        int c = Integer.compare(ma.size(), mb.size());
+        if (c != 0) {
+            return c;
+        }
+        final var ea = sortedByName(ma);
+        final var eb = sortedByName(mb);
+        for (int i = 0; i < ea.size(); i++) {
+            c = ea.get(i).key().name().compareTo(eb.get(i).key().name());
             if (c != 0) {
                 return c;
             }
-            c = compareInstValue(ea.value().getInstantiation(), eb.value().getInstantiation());
+            c = compareInstValue(ea.get(i).value().getInstantiation(),
+                eb.get(i).value().getInstantiation());
             if (c != 0) {
                 return c;
             }
         }
-        return Boolean.compare(ia.hasNext(), ib.hasNext());
+        return 0;
+    }
+
+    /** The entries of an instantiation map, sorted by schema-variable name. */
+    private static List<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> sortedByName(
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> map) {
+        final List<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> entries =
+            new ArrayList<>(map.size());
+        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : map) {
+            entries.add(entry);
+        }
+        entries.sort(Comparator.comparing(entry -> entry.key().name()));
+        return entries;
     }
 
     private static int compareInstValue(Object va, Object vb) {
