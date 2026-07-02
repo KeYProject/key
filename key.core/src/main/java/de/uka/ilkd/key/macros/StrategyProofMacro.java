@@ -10,7 +10,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 
@@ -83,7 +83,11 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
 
         final GoalChooser goalChooser =
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
-        final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
+        // Route through the selection seam so the macro runs on the multi-core prover when it is
+        // enabled and the proof's profile supports it (otherwise the single-threaded
+        // ApplyStrategy).
+        final ProverCore applyStrategy =
+            AutoProvers.create(goalChooser, proof.getInitConfig().getProfile());
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
 
         //

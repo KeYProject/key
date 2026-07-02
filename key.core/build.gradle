@@ -106,6 +106,30 @@ classes.dependsOn << generateSolverPropsList
 
 tasks.withType(Test) {
     enableAssertions = true
+    // The whole suite is pinned to the single-threaded prover in the root build (key.prover.parallel
+    // = false); opt-in parallel tests override it at runtime. The forwarding loop below still lets
+    // the Gradle command line override it (e.g. -Dkey.prover.parallel=true).
+    // Forward the multithreading / parallel-prover properties from the Gradle command line to the
+    // test JVM (Gradle does not propagate -D automatically). Lets one run e.g.
+    //   ./gradlew :key.core:test --tests '*MtSpeedupBenchmark' -Dkey.mt.benchmark=true
+    // or toggle the parallel prover for any test via -Dkey.prover.parallel(.threads).
+    ["key.mt.benchmark", "key.mt.benchmark.threads", "key.mt.benchmark.proofs",
+     "key.mt.benchmark.maxsteps",
+     "key.mt.synth.splits", "key.mt.synth.worksplits", "key.mt.synth.work",
+     "key.mt.synth.linear", "key.mt.synth.loop",
+     "key.mt.jfr.probe", "key.mt.jfr.proof", "key.mt.jfr.workers", "key.mt.jfr.reps",
+     "key.prover.parallel", "key.prover.parallel.threads"].each { p ->
+        if (System.getProperty(p) != null) {
+            systemProperty(p, System.getProperty(p))
+        }
+    }
+    // Record a Flight Recording of the test JVM when -Dkey.mt.jfr=<file> is given. Used to profile
+    // the parallel prover's lock contention and hot paths (see MtJfrProbe).
+    if (System.getProperty("key.mt.jfr") != null) {
+        jvmArgs += ["-XX:StartFlightRecording=filename=${System.getProperty('key.mt.jfr')}," +
+                    "settings=profile,dumponexit=true,disk=true",
+                    "-XX:FlightRecorderOptions=stackdepth=128"]
+    }
     // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
     // Other test cases also need "key." prefixed properties
     systemProperties += System.properties.findAll { it.key.toString().startsWith("key.") }
@@ -156,6 +180,26 @@ tasks.register('testStrictSMT', Test) {
     systemProperty("key.newsmt2.stricttests", "true")
     filter {
         includeTestsMatching "MasterHandlerTest"
+    }
+}
+
+// Stress test for the goal-level parallel prover: run a few large splitting proofs many times at a
+// high (over-subscribed) worker count and assert each one closes. Slow (minutes), so it is gated out
+// of the normal unit-test suite and only runs here. Guards against reintroducing a concurrency race
+// that makes proofs nondeterministically fail to close. See MtStressTest.
+tasks.register('testMtStress', Test) {
+    description = 'Stress the parallel prover at high worker counts to catch non-closure races'
+    group = 'verification'
+    systemProperty("key.mt.stress", "true")
+    maxParallelForks = 1
+    // Each class proves many full proofs; give every test class a fresh JVM so global KeY state
+    // (settings, static caches/interners, the script parser) cannot leak between classes -- e.g.
+    // MtScriptStressTest's position-sensitive script must not inherit state from earlier classes.
+    forkEvery = 1
+    filter {
+        includeTestsMatching "MtStressTest"
+        includeTestsMatching "MtMacroStressTest"
+        includeTestsMatching "MtScriptStressTest"
     }
 }
 

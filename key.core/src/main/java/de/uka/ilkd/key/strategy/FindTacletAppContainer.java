@@ -55,14 +55,22 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @param age the age
      */
     FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
-            RuleAppCost ageFreeCost, RuleAppCost cost, Goal goal,
+            RuleAppCost ageFreeCost, boolean ageFreeCostIsRegular, RuleAppCost cost, Goal goal,
             long age) {
-        super(app, ageFreeCost, cost, age);
+        super(app, ageFreeCost, ageFreeCostIsRegular, cost, age);
         applicationPosition = pio;
 
         final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
         assert posTag != null : "No formula tag found for " + pio;
         positionTag = posTag;
+    }
+
+    /**
+     * @return the original position for which this container was created (a stable key for the
+     *         deterministic queue tie-break, see {@link RuleAppContainer#compareTo})
+     */
+    PosInOccurrence getApplicationPosition() {
+        return applicationPosition;
     }
 
 
@@ -75,6 +83,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
         PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
+    }
+
+    /**
+     * {@inheritDoc} The find formula is unchanged iff the formula now carried by this container's
+     * position tag is identity-equal to the one present when the container was created. (Terms are
+     * immutable, so any rewrite -- including an independent sibling rewrite that {@link
+     * #isStillApplicable} tolerates -- yields a fresh formula object.)
+     */
+    @Override
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        final PosInOccurrence cur = getPosInOccurrence(p_goal);
+        return cur != null && cur.sequentFormula() == applicationPosition.sequentFormula();
     }
 
 

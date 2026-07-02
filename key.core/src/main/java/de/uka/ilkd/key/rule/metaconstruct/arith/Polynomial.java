@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -48,7 +48,7 @@ public class Polynomial {
     }
 
     public static Polynomial create(Term polyTerm, Services services) {
-        final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
+        final Map<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
         polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
             services);
 

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -133,7 +133,14 @@ public class JModality extends Modality implements Operator {
     }
 
     public static class JavaModalityKind extends Kind {
-        private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
+        // Written only via this class's (public) constructor: the built-in kinds below at
+        // class-init, and ModalOperatorSV (schema modalities) at taclet-parse time -- both
+        // single-threaded -- and read via getKind only during proof replay. The goal-parallel
+        // prover's workers never touch it. A ConcurrentHashMap is used as cheap defensive
+        // hardening,
+        // since the constructor is public and the map is a global static (point lookups, non-null
+        // keys/values, never iterated -> a behaviour-neutral swap).
+        private static final Map<String, JavaModalityKind> kinds = new ConcurrentHashMap<>();
         /**
          * The diamond operator of dynamic logic. A formula {@code <alpha;>Phi} can be read as after
          * processing

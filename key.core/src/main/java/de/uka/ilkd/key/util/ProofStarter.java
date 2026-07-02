@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -250,7 +250,7 @@ public class ProofStarter {
             OneStepSimplifier.refreshOSS(proof);
 
             var goalChooser = profile.<Proof, Goal>getSelectedGoalChooserBuilder().create();
-            ProverCore<Proof, Goal> prover = new ApplyStrategy(goalChooser);
+            ProverCore<Proof, Goal> prover = AutoProvers.create(goalChooser, profile);
             if (ptl != null) {
                 prover.addProverTaskObserver(ptl);
             }

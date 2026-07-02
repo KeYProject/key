@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +22,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
@@ -105,8 +108,18 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
-            if (instEntry1 == null
-                    || !entry0.value().getInstantiation().equals(instEntry1.getInstantiation())) {
+            if (instEntry1 == null) {
+                return false;
+            }
+            // instantiation terms are compared modulo term labels: labels carry history (e.g.
+            // origin) and would make the duplicate check miss semantically equal applications
+            final Object inst0 = entry0.value().getInstantiation();
+            final Object inst1 = instEntry1.getInstantiation();
+            if (inst0 instanceof JTerm term0 && inst1 instanceof JTerm term1) {
+                if (!term0.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    return false;
+                }
+            } else if (!inst0.equals(inst1)) {
                 return false;
             }
         }
@@ -127,12 +140,16 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
         // A duplicate must agree on the focus term up to term labels (every comparePio variant,
         // including the modulo-position one, implies this), so it shares the candidate's focus-term
-        // fingerprint and can only be in that bucket. A find-less application (pos == null) lands
-        // in
-        // bucket 0, where all find-less applications of this name live (a taclet name is either
-        // find
-        // or find-less, never both).
-        final int fingerprint = pos == null ? 0 : pos.subTerm().hashCode();
+        // fingerprint and can only be in that bucket -- PROVIDED the fingerprint itself ignores
+        // term labels, matching the equality the buckets are probed with: a label-sensitive
+        // fingerprint would put a duplicate whose focus differs only in (history-dependent, e.g.
+        // origin) labels into a different bucket, where it would silently escape the veto.
+        // AppliedRuleAppsNameCache#focusFingerprint is label-insensitive by construction. A
+        // find-less application (pos == null) lands in bucket 0, where all find-less applications
+        // of
+        // this name live (a taclet name is either find or find-less, never both).
+        final int fingerprint = pos == null ? 0
+                : AppliedRuleAppsNameCache.focusFingerprint(pos.subTerm());
         List<RuleApp> apps = cache.get(node, app.rule().name(), fingerprint);
 
         // Check all rules with this name in the same fingerprint bucket

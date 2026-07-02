@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -589,6 +590,13 @@ public class MergeRule implements BuiltInRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        // MergeRule links several goals into one and would therefore need to lock multiple goals
+        // at once. That is not yet safe under goal-level concurrency, so the rule is disabled while
+        // a multi-worker parallel run is active (single-threaded proving is unaffected). See the
+        // multithreading effort (branch bubel/mt-goals).
+        if (ParallelProver.isMultiThreadedRunActive()) {
+            return false;
+        }
         return isOfAdmissibleForm(goal, pio, true);
     }
 
