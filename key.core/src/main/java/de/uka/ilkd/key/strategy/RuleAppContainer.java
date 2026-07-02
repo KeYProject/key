@@ -12,6 +12,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -68,7 +70,61 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         }
         // Same rule and focus: distinguish by instantiations (e.g. two applyEq on different eqs).
         if (a instanceof TacletApp ta && b instanceof TacletApp tb) {
-            return compareInstantiations(ta, tb);
+            c = compareInstantiations(ta, tb);
+            if (c != 0) {
+                return c;
+            }
+            return compareAssumesInstantiations(ta, tb);
+        }
+        return 0;
+    }
+
+    /**
+     * Compare the {@code \assumes} instantiations of two taclet apps. These are kept separately
+     * from the schema-variable map, so two apps of the same taclet at the same focus that use
+     * different assumes-formulas (e.g. {@code applyEq} instances rewriting with two different
+     * equations) are still tied after {@link #compareInstantiations}; without this comparison the
+     * queue order of such candidates — and thereby proof search — would depend on the
+     * (history-dependent) order in which they were inserted into the queue.
+     */
+    private static int compareAssumesInstantiations(TacletApp a, TacletApp b) {
+        final ImmutableList<AssumesFormulaInstantiation> ia = a.assumesFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> ib = b.assumesFormulaInstantiations();
+        if (ia == ib) {
+            return 0;
+        }
+        if (ia == null) {
+            return -1;
+        }
+        if (ib == null) {
+            return 1;
+        }
+        int c = Integer.compare(ia.size(), ib.size());
+        if (c != 0) {
+            return c;
+        }
+        final var ita = ia.iterator();
+        final var itb = ib.iterator();
+        while (ita.hasNext()) {
+            final AssumesFormulaInstantiation fa = ita.next();
+            final AssumesFormulaInstantiation fb = itb.next();
+            final boolean seqA = fa instanceof AssumesFormulaInstSeq;
+            final boolean seqB = fb instanceof AssumesFormulaInstSeq;
+            c = Boolean.compare(seqA, seqB);
+            if (c != 0) {
+                return c;
+            }
+            if (seqA) {
+                c = Boolean.compare(((AssumesFormulaInstSeq) fa).inAntecedent(),
+                    ((AssumesFormulaInstSeq) fb).inAntecedent());
+                if (c != 0) {
+                    return c;
+                }
+            }
+            c = compareByName(fa.getSequentFormula().formula(), fb.getSequentFormula().formula());
+            if (c != 0) {
+                return c;
+            }
         }
         return 0;
     }
