@@ -104,19 +104,12 @@ public class ParallelProverDeterminismTest {
     }
 
     /**
-     * Term-level identity (names included) is additionally asserted when
-     * {@code -Dkey.naming.termlevel=true}: the #3851 end state. Currently still gated on ONE
-     * remaining channel: block/loop-contract remembrance variables
-     * ({@code AuxiliaryContract.Variables.createVariable}) draw their {@code #<n>} suffix from
-     * the proof-global {@code VarNamerCnt} counter, which ticks differently between the
-     * sequential and the parallel path (observed: {@code z_Before_BLOCK#25} vs {@code #28}).
-     * Once that channel is branch-state-derived, the gate is removed.
-     */
-    private static final boolean TERM_LEVEL = Boolean.getBoolean("key.naming.termlevel");
-
-    /**
-     * Assert both proof trees applied the same rule at the same position at every tree path (and,
-     * see {@link #TERM_LEVEL}, term-identical sequents including all fresh names).
+     * Assert both proof trees applied the same rule at the same position at every tree path, and
+     * that the resulting sequents are term-identical -- including all fresh names. Name-level
+     * identity holds because every fresh name is a pure function of the goal-local branch state
+     * (#3851); a regression here means some name source became scheduling- or order-dependent
+     * again (historically: per-worker allocator tags, the temporary-name counter behind
+     * block/loop-contract remembrance variables).
      */
     private static void assertTreesEqual(String proof, Node a, Node b, String path) {
         assertEquals(ruleName(a), ruleName(b),
@@ -124,10 +117,8 @@ public class ParallelProverDeterminismTest {
         assertEquals(position(a), position(b),
             proof + ": rule " + ruleName(a) + " applied at different positions at tree path ["
                 + path + "]");
-        if (TERM_LEVEL) {
-            assertEquals(a.sequent().toString(), b.sequent().toString(),
-                proof + ": sequents differ (incl. names) at tree path [" + path + "]");
-        }
+        assertEquals(a.sequent().toString(), b.sequent().toString(),
+            proof + ": sequents differ (incl. names) at tree path [" + path + "]");
         assertEquals(a.childrenCount(), b.childrenCount(),
             proof + ": different branching at tree path [" + path + "]");
         for (int i = 0; i < a.childrenCount(); i++) {

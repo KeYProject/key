@@ -39,7 +39,6 @@ public class VariableNameProposer implements InstantiationProposer {
 
     private static final String GENERALNAMECOUNTER_PREFIX = "GenCnt";
     // private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
-    private static final String LABELCOUNTER_NAME = "LabelCnt";
 
 
     /**
@@ -218,10 +217,14 @@ public class VariableNameProposer implements InstantiationProposer {
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 
         lc.start();
+        // Smallest free index among the labels of the context program (and this application's
+        // previous proposals): a pure function of the matched program, replacing the
+        // proof-global counter whose value depended on unrelated earlier label mints (#3851).
         String proposal;
+        int cnt = 0;
         do {
-            proposal =
-                LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME).getCountPlusPlus();
+            proposal = LABEL_NAME_PREFIX + cnt;
+            cnt++;
         } while (lc.contains(new ProgramElementName(proposal))
                 || previousProposals.contains(proposal));
 
