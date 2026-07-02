@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
@@ -72,18 +71,17 @@ public class VariableNameProposer implements InstantiationProposer {
 
         Name name = services.getNameRecorder().getProposal();
         if (name == null || namespaces.lookup(name) != null) {
-            if (ParallelProver.isMultiThreadedRunActive()) {
-                // Mint via the per-proof allocator: globally unique across workers without a
-                // namespace-search race. Re-mint on the rare clash with a pre-existing symbol.
-                do {
-                    name = new Name(services.getNameAllocator().freshName(baseName.toString()));
-                } while (namespaces.lookup(name) != null);
-            } else {
-                int i = 0;
-                do {
-                    name = new Name(baseName + "_" + i++);
-                } while (namespaces.lookup(name) != null);
-            }
+            // Search from 0 against the passed namespaces. Callers on the proving path hand in
+            // the goal-local overlay, so the result is a pure function of the branch state:
+            // deterministic under any worker scheduling and free of cross-branch leakage
+            // (sibling branches deliberately reuse the same names, see #3851/#3848). This holds
+            // for the multi-core prover too: goals are owned by one worker at a time, the shared
+            // namespace base is immutable during an MT run and fresh symbols are registered
+            // branch-locally, so no cross-worker race on this search exists.
+            int i = 0;
+            do {
+                name = new Name(baseName + "_" + i++);
+            } while (namespaces.lookup(name) != null);
         }
 
         return name;
@@ -140,21 +138,17 @@ public class VariableNameProposer implements InstantiationProposer {
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
-        if (ParallelProver.isMultiThreadedRunActive()) {
-            // Allocator-minted skolem names are globally unique across workers without searching
-            // the shared namespace; still honour pre-existing symbols and recorded proposals.
-            do {
-                name = services.getNameAllocator().freshName(basename);
-                l_name = new Name(name);
-            } while (nss.lookup(l_name) != null || previousProposals.contains(name));
-        } else {
-            int cnt = 0;
-            do {
-                name = basename + cnt;
-                l_name = new Name(name);
-                cnt++;
-            } while (nss.lookup(l_name) != null || previousProposals.contains(name));
-        }
+        // Branch-state-derived: automode instantiates against the goal-local namespace overlay,
+        // so the smallest free index is a pure function of the branch -- identical no matter
+        // which worker (or how many) runs the goal, and never influenced by sibling branches.
+        // (Previously the multi-core prover minted here via a per-worker allocator, which made
+        // names scheduling-dependent -- the last source of MT proof-shape wobble, #3851.)
+        int cnt = 0;
+        do {
+            name = basename + cnt;
+            l_name = new Name(name);
+            cnt++;
+        } while (nss.lookup(l_name) != null || previousProposals.contains(name));
 
         return name;
     }
