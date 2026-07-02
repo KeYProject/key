@@ -41,8 +41,9 @@ import org.slf4j.LoggerFactory;
  * workers; each worker applies rules to its goal and offers the resulting subgoals back to the
  * scheduler. The run finishes when the scheduler becomes quiescent (no goal available and none in
  * flight) or a stop condition fires. Non-proving listeners are suspended for the whole run
- * (Phase 1), and each worker is bound to a {@link ParallelNameAllocator} worker id (Phase 2) so
- * fresh names stay disjoint across workers.
+ * (Phase 1). Fresh names need no per-worker treatment: minting searches the goal-local
+ * namespaces, so a name is a pure function of the branch state, identical no matter which worker
+ * processes the goal (#3851).
  *
  * <p>
  * <b>Concurrency model.</b> The per-goal rule step splits into a concurrent part and a serialized
@@ -54,9 +55,10 @@ import org.slf4j.LoggerFactory;
  * executor reaches through the {@link org.key_project.logic.Services} were made thread-safe by the
  * shared-state audit (lazy type caches, the specification repository, operator/parametric-function
  * interning, built-in-rule instantiation caches, NodeInfo/RuleJustificationInfo, the
- * OneStepSimplifier, the shared taclet-index cache), and fresh-name minting is routed through
- * {@link ParallelNameAllocator} so the shared namespace stays disjoint across workers. The
- * equivalence gate ({@code ProofEquivalenceTest}) and the real-proof gate guard the whole design.
+ * OneStepSimplifier, the shared taclet-index cache), and fresh-name minting searches only the
+ * goal-local namespaces of the owning worker's goal (branch-state-derived, #3851), never writing
+ * to the shared namespace. The equivalence gate ({@code ProofEquivalenceTest}) and the real-proof
+ * gate guard the whole design.
  *
  * <p>
  * Worker count comes from {@code -Dkey.prover.parallel.threads} (default 1).
@@ -289,9 +291,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             List<Future<?>> futures = new ArrayList<>(workerCount);
             try {
                 for (int w = 0; w < workerCount; w++) {
-                    final int workerId = w;
                     futures.add(
-                        pool.submit(() -> workerLoop(workerId, scheduler, commitLock, startTime)));
+                        pool.submit(() -> workerLoop(scheduler, commitLock, startTime)));
                 }
                 for (Future<?> f : futures) {
                     f.get();
@@ -363,23 +364,19 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     /** A single worker: claim goals and process them until the queue is quiescent or stopped. */
-    private void workerLoop(int workerId, GoalScheduler<Goal> scheduler, Object commitLock,
+    private void workerLoop(GoalScheduler<Goal> scheduler, Object commitLock,
             long startTime) {
         // Bind a per-worker name recorder so the rule executor's fresh-name proposals (made in the
         // lock-free compute phase) do not race on the shared one. Only relevant at >1 worker.
         Services.bindWorkerNameRecorder();
         try {
-            ParallelNameAllocator.runAsWorker(workerId, () -> {
-                try {
-                    Goal goal;
-                    while (!stopRequested && (goal = scheduler.claimOrAwait()) != null) {
-                        processStep(goal, scheduler, commitLock, startTime);
-                    }
-                } catch (InterruptedException e) {
-                    cancelled = true;
-                    Thread.currentThread().interrupt();
-                }
-            });
+            Goal goal;
+            while (!stopRequested && (goal = scheduler.claimOrAwait()) != null) {
+                processStep(goal, scheduler, commitLock, startTime);
+            }
+        } catch (InterruptedException e) {
+            cancelled = true;
+            Thread.currentThread().interrupt();
         } finally {
             Services.unbindWorkerNameRecorder();
         }
@@ -393,8 +390,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * <b>Rule selection runs outside the commit lock</b> — this is where the time goes (taclet
      * matching + strategy cost), and it is safe to run concurrently: the goal is owned exclusively
      * by this worker (the scheduler hands each goal to one worker), the shared proof namespace is
-     * immutable during the run (see {@code Goal#adaptNamespacesNewGoals}), fresh names are
-     * worker-disjoint ({@link ParallelNameAllocator}), and the strategy caches are thread-safe
+     * immutable during the run (see {@code Goal#adaptNamespacesNewGoals}), fresh names derive
+     * from the goal-local branch state alone (#3851), and the strategy caches are thread-safe
      * (shared exact-LRU). The commit lock wraps <em>only</em> {@code Goal#commitRuleApp} — the
      * proof-tree mutation, the one genuinely shared non-thread-safe step. The scheduler hand-off,
      * counters, progress and stop check run outside it (the scheduler has its own monitor and the

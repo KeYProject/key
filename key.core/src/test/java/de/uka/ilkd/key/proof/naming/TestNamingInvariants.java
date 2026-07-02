@@ -24,7 +24,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -233,12 +232,9 @@ public class TestNamingInvariants {
     /**
      * The same locality/reproducibility invariants under the MULTI-CORE prover: skolem names on a
      * goal must be a pure function of that goal's branch state, independent of which worker ran
-     * it. Documents the remaining #3851 defect (per-worker {@code __t<w>} name tags); gated until
-     * the state-derived naming lands, then the gate is removed and this becomes a permanent
-     * regression test.
+     * it (#3851; formerly violated by per-worker {@code __t<w>} name tags).
      */
     @Test
-    @EnabledIfSystemProperty(named = "key.naming.strict", matches = "true")
     public void skolemNamesAreWorkerIndependent() throws Exception {
         final String prop = "key.prover.parallel";
         final String threads = "key.prover.parallel.threads";
