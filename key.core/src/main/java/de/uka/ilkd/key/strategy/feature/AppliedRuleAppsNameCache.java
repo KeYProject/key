@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.AssertionFailure;
 
@@ -15,6 +16,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Establishes a cache for the applied rule apps to query them by name.
@@ -56,7 +59,10 @@ public class AppliedRuleAppsNameCache {
      */
     private static int fingerprint(RuleApp app) {
         final PosInOccurrence pio = app.posInOccurrence();
-        return pio == null ? 0 : pio.subTerm().hashCode();
+        // label-insensitive, matching the mod-term-labels equality the buckets are probed with
+        // (see AbstractNonDuplicateAppFeature.noDuplicateFindTaclet)
+        return pio == null ? 0
+                : ((JTerm) pio.subTerm()).hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY);
     }
 
     private static void add(HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache, RuleApp app) {
