@@ -9,10 +9,13 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -45,6 +48,24 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 @EnabledIfSystemProperty(named = "key.mt.stress", matches = "true")
 public class MtStressTest {
+
+    /**
+     * Loading an example applies its embedded settings to the global
+     * {@link ProofSettings#DEFAULT_SETTINGS}; snapshot and restore them so they neither leak into
+     * tests run later in the same JVM nor differ between the repetitions here.
+     */
+    private static String settingsSnapshot;
+
+    @BeforeAll
+    static void snapshotSettings() {
+        settingsSnapshot = ProofSettings.DEFAULT_SETTINGS.settingsToString();
+    }
+
+    @AfterAll
+    static void restoreSettings() {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+    }
+
 
     /**
      * Step cap for the parallel runs. Generous on purpose: parallel goal-order divergence can make
@@ -83,6 +104,7 @@ public class MtStressTest {
         try {
             for (int i = 0; i < reps; i++) {
                 final int rep = i;
+                ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
                 final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
                 try {
                     final Proof proof = env.getLoadedProof();
