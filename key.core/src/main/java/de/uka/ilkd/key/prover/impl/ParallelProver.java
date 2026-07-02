@@ -372,6 +372,16 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         try {
             Goal goal;
             while (!stopRequested && (goal = scheduler.claimOrAwait()) != null) {
+                if (proof.isErroneous()) {
+                    // An essential proof listener failed on some worker: wind all workers down
+                    // through the regular stop path (the claimed goal is returned below by the
+                    // loop exit; parked workers wake through the scheduler as with any stop).
+                    // Checking a volatile flag once per rule application is free next to the
+                    // step itself; no push notification into the workers is needed.
+                    requestStop("Proof search stopped: an essential proof listener failed.", null);
+                    scheduler.reoffer(goal);
+                    break;
+                }
                 processStep(goal, scheduler, commitLock, startTime);
             }
         } catch (InterruptedException e) {

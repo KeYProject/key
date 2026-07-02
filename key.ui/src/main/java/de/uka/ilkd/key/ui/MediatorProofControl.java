@@ -88,6 +88,14 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+        if (proof.isErroneous()) {
+            // The proof was marked erroneous by a failing essential proof listener; it may be
+            // inconsistent, so refuse a new run. Saving the proof for a later reload is still fine.
+            ui.notify(new GeneralInformationEvent(
+                "This proof is marked erroneous (an essential proof listener failed) and cannot be "
+                    + "continued. You can still save it and try to reload it later."));
+            return;
+        }
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
