@@ -14,8 +14,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.CostLocal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.jspecify.annotations.NonNull;
 
@@ -24,7 +24,7 @@ import org.jspecify.annotations.NonNull;
  * choose the left branch (subterm) and how the right branches. This is used to identify the
  * upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
  */
-@CostLocal
+@StableCost
 public class FindRightishFeature implements Feature {
     private final Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);

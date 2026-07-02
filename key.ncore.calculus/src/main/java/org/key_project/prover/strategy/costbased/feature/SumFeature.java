@@ -16,7 +16,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.jspecify.annotations.NonNull;
 
 /// A feature that computes the sum of a given list (vector) of features
-@CostLocal
+@StableCost
 public class SumFeature implements Feature {
 
     @Override

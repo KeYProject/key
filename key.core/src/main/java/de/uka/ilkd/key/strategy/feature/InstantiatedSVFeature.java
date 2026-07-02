@@ -10,15 +10,19 @@ import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.CostLocal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
  * not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+ *
+ * <p>
+ * {@link StableCost}: the instantiation is read from the rule application's own instantiations, not
+ * from the goal, so the result is fixed for a given application.
  */
-@CostLocal
+@StableCost
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm<Goal> instProj;
