@@ -36,13 +36,13 @@ public class ParallelProverDeterminismTest {
 
     /**
      * Small examples for which sequential and 1-worker proofs are identical, node for node.
-     * (A few examples still show a residual same-rule position difference — e.g.
-     * Simple__addAbsoluteValues.key, Simple__generateByteArray.key — or a single-node size
-     * difference on larger proofs, so this list guards the examples the provers fully agree on
-     * against regressions.)
+     * (Of the variance-benchmark set only SimplifiedLinkedList.remove still differs — the other,
+     * larger examples agree on the node count but are too expensive for a unit test, so this list
+     * guards the fast examples the provers fully agree on against regressions.)
      */
     private static final String[] PROOFS = {
         "heap/block_contracts/Simple__add.key",
+        "heap/block_contracts/Simple__addAbsoluteValues.key",
         "heap/block_contracts/Simple__addWithJump.key",
         "heap/block_contracts/Simple__addWithTwoBlockContracts.key",
         "heap/block_contracts/Simple__getLength.key",
