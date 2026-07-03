@@ -17,14 +17,15 @@ import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * Synthetic speedup/scaling benchmark for the goal-level parallel prover, complementing the
  * real-proof {@link MtSpeedupBenchmark}. It generates self-contained Java-DL {@code .key} problems
  * whose proof-tree <em>shape</em> is controlled, to map out the best/worst case of goal-level
- * parallelism. Enable with {@code -Dkey.mt.benchmark=true} (skipped otherwise). It asserts nothing,
+ * parallelism. Run with {@code ./gradlew :key.core:runSynthBench} (tagged {@code performance}). It
+ * asserts nothing,
  * only measures and prints.
  *
  * <p>
@@ -47,13 +48,12 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  *
  * <p>
  * Sizes come from system properties (so the shape can be swept without recompiling):
- * {@code -Dkey.mt.synth.splits} (default 11), {@code -Dkey.mt.synth.work} (default 250),
- * {@code -Dkey.mt.synth.linear} (default 2500), {@code -Dkey.mt.synth.loop} (default 1200). Worker
- * counts from {@code -Dkey.mt.benchmark.threads} (default {@code 1,2,4,8}).
+ * {@code -Psplits} (default 11), {@code -Pworksplits} (default 7), {@code -Pwork} (default 120),
+ * {@code -Plinear} (default 800), {@code -Ploop} (default 400). Worker
+ * counts from {@code -Pworkers} (default {@code 1,2,4,8}).
  *
- * @author Claude (KeY multithreading effort)
  */
-@EnabledIfSystemProperty(named = "key.mt.benchmark", matches = "true")
+@Tag("performance")
 public class MtSyntheticBenchmark {
 
     private static final int MAX_STEPS = 2_000_000;

@@ -1172,20 +1172,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
-     * Notifies all {@code listeners} of an event, isolating each callback. A proof listener is a
-     * passive observer; several fire from within a running rule application (e.g.
-     * {@link #fireRuleApplied} is called from {@code Goal.apply}). If a listener throws, that must
-     * not abort the proof search and leave the proof inconsistent. So a throwing listener is logged
-     * and removed from {@code listeners}, and the remaining listeners are still notified. The
-     * caller
-     * must hold the monitor of {@code listeners}.
-     *
-     * @param listeners the listeners to notify (a throwing listener is pruned from this list)
-     * @param notify the notification to deliver to each listener
-     * @param <L> the listener type
-     */
-    /**
-     * Notifies every listener of an event, isolating the proof from a listener that throws.
+     * Notifies every listener of an event, isolating the proof from a listener that throws. The
+     * caller must hold the monitor of {@code listeners}.
      *
      * <p>
      * A failing <em>non-essential</em> listener (a pure observer) is logged and unregistered, and
@@ -1200,8 +1188,14 @@ public class Proof implements ProofObject<Goal>, Named {
      * running search and blocks any new one -- while leaving the proof intact so it can still be
      * saved. The essential listener is <em>not</em> unregistered (dropping it would merely hide the
      * problem), and no further listeners are notified for this event.
+     *
+     * @param listeners the listeners to notify (a throwing non-essential listener is pruned)
+     * @param notify the notification to deliver to each listener
+     * @param <L> the listener type
+     * @return the pruned (broken, unregistered) listeners; empty if none. Callers that notified a
+     *         snapshot list must drop these from the live registration list themselves.
      */
-    private <L> void notifyListeners(List<L> listeners, Consumer<L> notify) {
+    private <L> List<L> notifyListeners(List<L> listeners, Consumer<L> notify) {
         List<L> broken = null;
         for (L listener : listeners) {
             try {
@@ -1224,7 +1218,9 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         if (broken != null) {
             listeners.removeAll(broken);
+            return broken;
         }
+        return List.of();
     }
 
     /**
@@ -1405,7 +1401,16 @@ public class Proof implements ProofObject<Goal>, Named {
                 // go through notifyListeners for the same per-listener exception isolation every
                 // other proofClosed dispatch uses; a throwing GUI listener must not escape here and
                 // abort the parallel run's winddown
-                notifyListeners(suspendedTreeListeners, l -> l.proofClosed(event));
+                List<ProofTreeListener> broken =
+                    notifyListeners(suspendedTreeListeners, l -> l.proofClosed(event));
+                if (!broken.isEmpty()) {
+                    // notifyListeners pruned them from the suspension snapshot, which is about to
+                    // be discarded -- but they were already re-attached above, so unregister them
+                    // from the live list as well.
+                    synchronized (listenerList) {
+                        listenerList.removeAll(broken);
+                    }
+                }
             }
         }
     }
