@@ -25,7 +25,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.NewRuleListener;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
@@ -88,7 +88,7 @@ public class TestTermTacletAppIndex {
     }
 
     private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache =
-        new LRUCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
+        new ConcurrentLruCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     private TermTacletAppIndexCacheSet realCache =
         new TermTacletAppIndexCacheSet(termTacletAppIndexCache);

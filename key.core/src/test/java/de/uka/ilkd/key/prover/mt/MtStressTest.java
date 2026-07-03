@@ -44,7 +44,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * deliberately not capped at the available cores: over-subscription increases thread interleaving,
  * which makes a race <em>more</em> likely to be caught on the few-core CI runners.
  *
- * @author Claude (KeY multithreading effort)
  */
 @EnabledIfSystemProperty(named = "key.mt.stress", matches = "true")
 public class MtStressTest {
@@ -81,11 +80,11 @@ public class MtStressTest {
     @CsvSource({
         "standard_key/java_dl/symmArray.key, 8, 8",
         "heap/list_seq/SimplifiedLinkedList.remove.key, 3, 8",
-        // An arithmetic proof: it exercises the strategy cost features that the heap proofs above
-        // do
-        // not -- monomial/polynomial ordering via LexPathOrdering, whose per-proof comparison and
-        // sort-depth caches are shared across workers. That gap is why the LexPathOrdering cache
-        // race stayed latent; this run guards the thread-safe (ConcurrentLruCache) fix.
+        // An arithmetic proof: it exercises the strategy cost features that the heap proofs
+        // above do not -- monomial/polynomial ordering via LexPathOrdering, whose per-proof
+        // comparison and sort-depth caches are shared across workers. That gap is why the
+        // LexPathOrdering cache race stayed latent; this run guards its thread-safe cache
+        // (a StripedLruCache).
         "standard_key/arith/gemplusDecimal/add.key, 6, 8",
     })
     void splittingProofClosesEveryRunInParallel(String relPath, int reps, int workers)

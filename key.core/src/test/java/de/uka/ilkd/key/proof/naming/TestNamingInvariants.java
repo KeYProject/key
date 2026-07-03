@@ -13,9 +13,11 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -234,33 +236,93 @@ public class TestNamingInvariants {
      * goal must be a pure function of that goal's branch state, independent of which worker ran
      * it (#3851; formerly violated by per-worker {@code __t<w>} name tags).
      */
+    private static final int MT_WORKERS = 8;
+
     @Test
     public void skolemNamesAreWorkerIndependent() throws Exception {
-        final String prop = "key.prover.parallel";
-        final String threads = "key.prover.parallel.threads";
-        final String oldProp = System.getProperty(prop);
-        final String oldThreads = System.getProperty(threads);
-        try {
-            System.setProperty(prop, "false");
-            final List<String> seq = runSkolemScenario();
-            System.setProperty(prop, "true");
-            System.setProperty(threads, "8");
-            final List<String> mt = runSkolemScenario();
-            assertEquals(seq, mt,
-                "skolem names must not depend on the worker/scheduling that produced them");
-        } finally {
-            restore(prop, oldProp);
-            restore(threads, oldThreads);
-        }
+        final List<String> seq = runSkolemScenario(0);
+        final List<String> mt = runSkolemScenario(MT_WORKERS);
+        assertEquals(seq, mt,
+            "skolem names must not depend on the worker/scheduling that produced them");
     }
 
-    private List<String> runSkolemScenario() throws Exception {
+    /**
+     * Runs the sibling-skolemization scenario and returns the per-goal {@code idx} skolem names.
+     * {@code workers == 0} hand-applies the split+skolemize on the calling thread (the sequential
+     * baseline). {@code workers > 0} pins the two-goal shape with a deterministic {@code andRight}
+     * split and then drives the {@code allRight} skolemization through {@link ProofStarter}, which
+     * selects the {@link ParallelProver} from the system properties -- so the fresh names are
+     * genuinely minted under the multi-core prover, not just under a flag that nothing reads.
+     */
+    private List<String> runSkolemScenario(int workers) throws Exception {
+        final String prop = ParallelProver.PARALLEL_PROPERTY;
+        final String threads = ParallelProver.THREADS_PROPERTY;
+        final String oldProp = System.getProperty(prop);
+        final String oldThreads = System.getProperty(threads);
         final KeYEnvironment<?> env = load("skolemSiblings.key");
         try {
             final Proof proof = env.getLoadedProof();
-            splitAndSkolemize(proof);
+            if (workers == 0) {
+                System.setProperty(prop, "false");
+                splitAndSkolemize(proof);
+            } else {
+                System.setProperty(prop, "true");
+                System.setProperty(threads, Integer.toString(workers));
+                // guard against a silently single-core run: the parallel prover must actually be
+                // selected and the worker count honoured exactly, so the skolemization below runs
+                // on more than one worker even on a low-core machine
+                assertTrue(ParallelProver.isEnabled(),
+                    "parallel prover must be enabled for the multi-worker run");
+                assertEquals(workers, ParallelProver.effectiveWorkerCount(),
+                    "the multi-worker run must use exactly the requested worker count");
+                assertTrue(ParallelProver.effectiveWorkerCount() > 1,
+                    "the worker-independence test is only meaningful with more than one worker");
+                // fix the two sibling goals deterministically, then let the parallel prover apply
+                // allRight (the only remaining rule) on each branch, minting the idx skolems
+                applyOnFormula(proof, proof.openGoals().head(), "andRight", 1, false);
+                final ProofStarter starter = new ProofStarter(false);
+                starter.init(proof);
+                starter.setMaxRuleApplications(1000);
+                starter.start(proof.openGoals());
+            }
             return skolemNamesPerGoal(proof, "idx");
         } finally {
+            restore(prop, oldProp);
+            restore(threads, oldThreads);
+            env.dispose();
+        }
+    }
+
+    /**
+     * Under an MT run, a no-mint split must give each sibling goal its OWN {@code NamespaceSet}.
+     * {@code Goal.split}/{@code clone} hand the siblings one shared set by reference, and
+     * {@code adaptNamespacesNewGoals} de-aliases them per goal via {@code resetLocalSymbols}. If
+     * that
+     * de-aliasing is skipped for a no-mint split (the reverted D2 "no-mint skip" optimization), the
+     * siblings keep aliasing one namespace, so a later skolem mint on one branch leaks into the
+     * other -- the branch namespaces then diverge from a single-threaded reload and replay breaks.
+     * This pins the sibling isolation directly, without depending on the rare race to manifest.
+     */
+    @Test
+    public void mtNoMintSplitGivesEachSiblingItsOwnNamespaces() throws Exception {
+        final KeYEnvironment<?> env = load("skolemSiblings.key");
+        final var scope = ParallelProver.enterMultiThreadedRun();
+        try {
+            final Proof proof = env.getLoadedProof();
+            assertTrue(ParallelProver.isMultiThreadedRunActive(),
+                "the MT-run marker must be set for adaptNamespacesNewGoals to take the MT branch");
+            // andRight is a purely propositional (no-mint) split of the root conjunction
+            applyOnFormula(proof, proof.openGoals().head(), "andRight", 1, false);
+            final ImmutableList<Goal> goals = proof.openGoals();
+            assertEquals(2, goals.size(), "andRight must produce two sibling goals");
+            final Goal a = goals.head();
+            final Goal b = goals.tail().head();
+            assertNotSame(a.getLocalNamespaces(), b.getLocalNamespaces(),
+                "sibling goals of a no-mint MT split must not share one NamespaceSet (D2 aliasing)");
+            assertNotSame(a.getLocalNamespaces().functions(), b.getLocalNamespaces().functions(),
+                "sibling function namespaces must be independent so skolem mints cannot leak across");
+        } finally {
+            scope.close();
             env.dispose();
         }
     }

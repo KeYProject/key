@@ -31,7 +31,6 @@ import org.key_project.prover.proof.SessionCaches;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -44,7 +43,7 @@ import org.key_project.util.collection.Pair;
  * <p>
  * This is a redesign of the old static caches which were implemented via final static {@link Map}s
  * like
- * {@code private static final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( MAX_TERM_TACLET_APP_INDEX_ENTRIES );}.
+ * {@code private static final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new ConcurrentLruCache<>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);}.
  * </p>
  * <p>
  * The old idea that memory is reused and shared between multiple {@link Proof}s by static variables
@@ -72,6 +71,20 @@ import org.key_project.util.collection.Pair;
  * proofs.</li>
  * </ul>
  * </p>
+ * <p>
+ * A proof's goals may be worked on by several worker threads at once, so most of these caches are
+ * read and written concurrently. They therefore use {@link ConcurrentLruCache}, which is
+ * thread-safe
+ * and evicts strictly in least-recently-used order. Exact eviction order matters for any cache
+ * whose
+ * value could be recomputed to something different, after an eviction, under a different access
+ * order; for those, approximate or striped eviction was observed to change proofs. Caches whose
+ * value does not depend on access order do not need this (for example
+ * {@link #introductionTimeCache},
+ * whose value is the depth at which an operator was introduced below the proof root and is the same
+ * for every goal beneath that point). The weak-keyed caches instead stay wrapped in
+ * {@link Collections#synchronizedMap}.
+ * </p>
  *
  * @author Martin Hentschel
  */
@@ -92,22 +105,10 @@ public class ServiceCaches implements SessionCaches {
      * "isBetaCandidate" uses
      *
      * keys: Term values: TermInfo
-     *
-     * NOTE (multithreading effort, branch bubel/mt-goals): the LRU caches below use
-     * ConcurrentLruCache (exact, single-lock) so they are safe under concurrent matching while
-     * preserving EXACT LRU eviction -- behaviour-preserving. Exact eviction matters for any cache
-     * whose value could be recomputed differently under a different access order after an eviction
-     * (e.g. the term interning cache); approximate/striped eviction was shown to change proofs.
-     * (introductionTimeCache is NOT such a case: its entry is an operator's introducer depth from
-     * the root, identical for every goal below that introducer, so it is goal-/order-independent --
-     * bypassing it leaves proofs unchanged.) The Weak caches stay wrapped in
-     * Collections.synchronizedMap.
      */
     private final Map<JTerm, TermInfo> betaCandidates =
         new ConcurrentLruCache<>(1000);
 
-    private final Map<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
-        new ConcurrentLruCache<>(1000);
 
     /**
      * the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for Skolem
@@ -220,10 +221,6 @@ public class ServiceCaches implements SessionCaches {
 
     public final Map<JTerm, TermInfo> getBetaCandidates() {
         return betaCandidates;
-    }
-
-    public final Map<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
-        return ifThenElseMalusCache;
     }
 
     /**

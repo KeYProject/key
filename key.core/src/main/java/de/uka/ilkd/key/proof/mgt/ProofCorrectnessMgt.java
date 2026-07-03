@@ -272,9 +272,10 @@ public final class ProofCorrectnessMgt {
 
     // These two listeners maintain contract-dependency bookkeeping the prover relies on, so they
     // are marked EssentialProofListener and keep firing while pure observers are suspended during
-    // a run (see Proof#suspendNonEssentialListeners). NOTE (mt-goals): cachedRuleApps is a plain
-    // LinkedHashSet; once rule application moves onto worker threads, its updates here must be made
-    // thread-safe (or folded into the serialized tree-commit step).
+    // a run (see Proof#suspendNonEssentialListeners). Under the parallel prover their updates stay
+    // serialized: rule-application events are delivered from the tree-commit step, which runs
+    // under the run's single commit lock, so the plain LinkedHashSet bookkeeping (cachedRuleApps)
+    // needs no further synchronization.
     private class DefaultMgtProofListener implements RuleAppListener, EssentialProofListener {
         @Override
         public void ruleApplied(ProofEvent e) {

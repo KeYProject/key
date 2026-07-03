@@ -98,7 +98,8 @@ public final class Main implements Callable<Integer> {
         description = "run automatic proof search on the multi-core prover with INT worker threads "
             + "(>= 1, capped at the available processors). Omit for the single-core prover. "
             + "The single-core-only features (proof caching, slicing, merge rule) are off under "
-            + "multi-worker runs (more than one worker), but stay on with a single worker.")
+            + "multi-worker runs (more than one worker); note that proof caching and slicing do "
+            + "not record parallel runs even with a single worker.")
     private int proverThreads = 0;
 
     /**

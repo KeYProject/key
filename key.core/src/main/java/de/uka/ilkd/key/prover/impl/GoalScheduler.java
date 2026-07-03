@@ -12,14 +12,14 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Thread-safe work queue that hands out open goals to worker threads, the scheduling core of the
- * goal-level parallel prover (multithreading effort, branch {@code bubel/mt-goals}, Phase 3).
+ * Thread-safe work queue that hands out open goals to worker threads &mdash; the scheduling core
+ * of the goal-level {@link ParallelProver}.
  *
  * <p>
- * This is a clean reimplementation of the 2018 {@code MultiCoreChooser} scheduling logic, decoupled
- * from the prover and using a <strong>single monitor</strong> instead of the original nested locks
- * &mdash; deliberately avoiding the lock-ordering fragility that made the earlier attempt
- * unmaintainable. It is parameterized over the goal type so it can be exercised in isolation.
+ * The design deliberately uses a <strong>single monitor</strong> instead of nested locks, avoiding
+ * the lock-ordering fragility that made an earlier (2018) multi-core scheduling attempt
+ * unmaintainable. It is decoupled from the prover and parameterized over the goal type so it can
+ * be exercised in isolation.
  *
  * <p>
  * Lifecycle of an item:

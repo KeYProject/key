@@ -60,11 +60,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
         final Map<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
-        Integer res;
 
-        synchronized (introductionTimeCache) {
-            res = introductionTimeCache.get(op);
-        }
+        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
+        Integer res = introductionTimeCache.get(op);
 
         if (res == null) {
             res = introductionTimeHelp(op, goal);
@@ -76,9 +74,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             // subtly non-deterministic. A real introduction time, once found, is stable (the
             // introducing rule stays in the applied-rule prefix), so it is safe to cache.
             if (res != -1) {
-                synchronized (introductionTimeCache) {
-                    introductionTimeCache.put(op, res);
-                }
+                introductionTimeCache.put(op, res);
             }
         }
 

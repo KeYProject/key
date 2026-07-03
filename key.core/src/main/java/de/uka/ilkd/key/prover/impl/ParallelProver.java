@@ -10,7 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -34,14 +36,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Experimental goal-level parallel prover, gated behind {@code -Dkey.prover.parallel}.
+ * Goal-level parallel prover. Enabled via the general settings (the prover-mode preference, also
+ * toggled from the status-line indicator); the {@code -Dkey.prover.parallel} system property,
+ * when set, transiently overrides that preference in either direction (see {@link #isEnabled()}).
  *
  * <p>
- * One worker thread per available goal: a {@link GoalScheduler} hands out open goals to a pool of
+ * A fixed pool of worker threads (count from the settings, clamped to the available processors;
+ * see {@link #effectiveWorkerCount()}): a {@link GoalScheduler} hands out open goals to the
  * workers; each worker applies rules to its goal and offers the resulting subgoals back to the
  * scheduler. The run finishes when the scheduler becomes quiescent (no goal available and none in
- * flight) or a stop condition fires. Non-proving listeners are suspended for the whole run
- * (Phase 1). Fresh names need no per-worker treatment: minting searches the goal-local
+ * flight) or a stop condition fires. Non-proving listeners are suspended for the whole run.
+ * Fresh names need no per-worker treatment: minting searches the goal-local
  * namespaces, so a name is a pure function of the branch state, identical no matter which worker
  * processes the goal (#3851).
  *
@@ -61,7 +66,10 @@ import org.slf4j.LoggerFactory;
  * gate guard the whole design.
  *
  * <p>
- * Worker count comes from {@code -Dkey.prover.parallel.threads} (default 1).
+ * <b>Limitation.</b> A custom goal chooser configured for a proof or profile applies only to the
+ * single-threaded prover: the parallel engine schedules goals through its {@link GoalScheduler}
+ * and does not consult the {@link GoalChooser} it is constructed with (the constructor keeps the
+ * parameter for API symmetry with {@code ApplyStrategy}).
  *
  * @author Claude (KeY multithreading effort)
  */
@@ -112,9 +120,24 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
     private final int workerCount;
 
-    /** Set once a stop condition fires; the first message wins. */
+    /**
+     * Set once a stop condition fires. {@link #requestStop} flips this with a compare-and-set so
+     * the
+     * first caller wins atomically -- the {@link #stopMessage}/{@link #nonCloseableGoal} pair is
+     * then
+     * written only by that winner, never interleaved between two concurrent stop requests.
+     */
+    private final AtomicBoolean stopRequested = new AtomicBoolean();
+    /** Set by {@link #requestStop} under the winning CAS; read once after the run. */
     private volatile @Nullable String stopMessage;
-    private volatile boolean stopRequested;
+
+    /**
+     * The first uncaught error from any worker, recorded before that worker rethrows. Read after
+     * the
+     * run so the reported error is deterministic (first-recorded), not whichever {@link Future} the
+     * join loop happens to observe first.
+     */
+    private final AtomicReference<@Nullable Throwable> firstError = new AtomicReference<>();
 
     /**
      * How long {@link #awaitWorkerTermination} waits for the workers to wind down after a stop. The
@@ -158,11 +181,18 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     /**
-     * The effective worker count. As with {@link #isEnabled()}, the {@link #THREADS_PROPERTY}
-     * overrides the setting (and is honoured exactly, allowing the over-subscription the stress
-     * tests
-     * rely on); the setting-derived count is clamped to the available processors.
+     * The number of workers a run started now would use. As with {@link #isEnabled()}, the
+     * {@link #THREADS_PROPERTY} overrides the setting (and is honoured exactly, allowing the
+     * over-subscription the stress tests rely on); the setting-derived count is clamped to the
+     * available processors. Exposed so tests can assert that a "multi-worker" run really is
+     * multi-worker rather than having silently degraded to a single worker.
+     *
+     * @return the effective worker count for the current settings / system properties
      */
+    public static int effectiveWorkerCount() {
+        return resolveWorkerCount();
+    }
+
     private static int resolveWorkerCount() {
         String property = System.getProperty(THREADS_PROPERTY);
         if (property != null) {
@@ -219,8 +249,15 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 
+    // synchronized on 'this' for the whole run, mirroring DefaultProver.doWork: the GUI's
+    // AutoModeWorker.done() waits for the run to finish via synchronized(applyStrategy) before it
+    // clears the prover, so without this the Stop button could null the proof and read a
+    // not-yet-set
+    // result while workers were still winding down. The workers never take this monitor (progress
+    // is
+    // no longer fired per step, see processStep), so holding it for the run cannot deadlock them.
     @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
+    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
             int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
@@ -235,12 +272,16 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         this.appliedSteps.set(0);
         this.closedCount.set(0);
         this.cancelled = false;
-        this.stopRequested = false;
+        this.stopRequested.set(false);
         this.stopMessage = null;
         this.nonCloseableGoal = null;
+        this.firstError.set(null);
 
+        // size 0 -> the status line shows an indeterminate ("busy") bar: the parallel prover does
+        // not report a meaningful per-step progress value (workers commit concurrently), so a
+        // determinate bar would either sit at zero or need thread-unsafe cross-worker counting.
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
-            PROCESSING_STRATEGY, maxApplications));
+            PROCESSING_STRATEGY, 0));
 
         ApplyStrategyInfo<Proof, Goal> result = runParallel(goals);
 
@@ -256,75 +297,62 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         scheduler.offerAll(goals);
         final Object commitLock = new Object();
 
-        final int poolId = POOL_COUNTER.incrementAndGet();
-        final ExecutorService pool = Executors.newFixedThreadPool(workerCount, r -> {
-            Thread t = new Thread(r, "key-prover-" + poolId);
-            t.setDaemon(true);
-            return t;
-        });
-
-        @Nullable
-        Throwable error = null;
-        // While more than one worker runs, advertise that a multi-threaded run is active so that
-        // rules not yet safe under concurrency (e.g. MergeRule) disable themselves.
-        final RunScope mtScope;
-        if (workerCount > 1) {
-            final RunScope marker = enterMultiThreadedRun();
-            // Seal the Java type model for the duration of the parallel run: no new type may be
-            // registered while workers prove concurrently. Types are pre-registered at load time
-            // (ProblemInitializer), so a stray lazy registration on the proving path now fails fast
-            // (IllegalStateException) instead of racing the shared model.
-            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
-            // Materialise the default execution context on this proof's (fresh) JavaInfo before
-            // sealing, so the matcher reads it instead of registering it during the run.
-            javaInfo.getDefaultExecutionContext();
-            javaInfo.sealTypeRegistration();
-            mtScope = () -> {
-                javaInfo.unsealTypeRegistration();
-                marker.close();
-            };
-        } else {
-            mtScope = () -> {
-            };
-        }
-        try (var ignored = proof.suspendNonEssentialListeners(); mtScope) {
-            List<Future<?>> futures = new ArrayList<>(workerCount);
-            try {
-                for (int w = 0; w < workerCount; w++) {
-                    futures.add(
-                        pool.submit(() -> workerLoop(scheduler, commitLock, startTime)));
+        // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed
+        // teardown: the pool is created *inside* this scope so that a failure while entering it
+        // (e.g.
+        // sealing) can never leak the marker or an unshut pool.
+        final RunScope mtScope = enterMultiWorkerRunScope();
+        try {
+            final int poolId = POOL_COUNTER.incrementAndGet();
+            final ExecutorService pool = Executors.newFixedThreadPool(workerCount, r -> {
+                Thread t = new Thread(r, "key-prover-" + poolId + "-worker");
+                t.setDaemon(true);
+                return t;
+            });
+            try (var ignored = proof.suspendNonEssentialListeners()) {
+                List<Future<?>> futures = new ArrayList<>(workerCount);
+                try {
+                    for (int w = 0; w < workerCount; w++) {
+                        futures.add(
+                            pool.submit(() -> workerLoop(scheduler, commitLock, startTime)));
+                    }
+                    for (Future<?> f : futures) {
+                        f.get();
+                    }
+                } catch (ExecutionException e) {
+                    // A worker terminated exceptionally. workerLoop recorded the first such error
+                    // in
+                    // firstError (and asked the others to stop) before rethrowing, so the reported
+                    // error below is deterministic regardless of which future we observe here.
+                    LOGGER.warn("parallel prover: a worker terminated exceptionally", e.getCause());
+                } catch (InterruptedException e) {
+                    cancelled = true;
+                } finally {
+                    // Stop the workers and WAIT for them to actually finish while the non-essential
+                    // (GUI) proof-tree listeners are STILL suspended by the enclosing
+                    // try-with-resources -- the inner finally runs before the resource is closed.
+                    // If
+                    // we returned (and let the listeners be re-attached) while a worker was still
+                    // mid-step, that worker would deliver a proofExpanded event into the live Swing
+                    // proof-tree model off the EDT and deadlock against it: the EDT holds the AWT
+                    // tree lock and wants the GUIProofTreeModel monitor, while the worker holds
+                    // that
+                    // monitor and wants the AWT tree lock. stopRequested makes the workers leave
+                    // their claim loop; shutdownNow unblocks any parked in the scheduler.
+                    stopRequested.set(true);
+                    pool.shutdownNow();
+                    awaitWorkerTermination(pool);
                 }
-                for (Future<?> f : futures) {
-                    f.get();
-                }
-            } catch (ExecutionException e) {
-                error = e.getCause() != null ? e.getCause() : e;
-                LOGGER.warn("parallel proof run failed", error);
-            } catch (InterruptedException e) {
-                cancelled = true;
-            } finally {
-                // Stop the workers and WAIT for them to actually finish while the non-essential
-                // (GUI) proof-tree listeners are STILL suspended by the enclosing
-                // try-with-resources -- the inner finally runs before the resource is closed. If we
-                // returned (and let the listeners be re-attached) while a worker was still
-                // mid-step,
-                // that worker would deliver a proofExpanded event into the live Swing proof-tree
-                // model off the EDT and deadlock against it: the EDT holds the AWT tree lock and
-                // wants the GUIProofTreeModel monitor, while the worker holds that monitor and
-                // wants
-                // the AWT tree lock. Setting stopRequested makes the workers leave their claim
-                // loop;
-                // shutdownNow unblocks any parked in the scheduler.
-                stopRequested = true;
-                pool.shutdownNow();
-                awaitWorkerTermination(pool);
             }
+        } finally {
+            mtScope.close();
         }
 
         // Publish the lock-free counters into the inherited fields for the result.
         countApplied = appliedSteps.get();
         closedGoals = closedCount.get();
 
+        final Throwable error = firstError.get();
         long time = System.currentTimeMillis() - startTime;
         final String message;
         if (error != null) {
@@ -341,22 +369,78 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     /**
+     * Enters the multi-worker run scope: while more than one worker runs, advertise that a
+     * multi-threaded run is active (so rules not yet safe under concurrency, e.g. MergeRule,
+     * disable
+     * themselves) and seal the Java type model (no new type may be registered while workers prove
+     * concurrently; types are pre-registered at load time, so a stray lazy registration now fails
+     * fast instead of racing the shared model). The returned scope reverses both on close. If
+     * sealing throws, the active-run marker is released before propagating, so it never leaks.
+     *
+     * @return a scope reversing the markers on close; a no-op scope for a single-worker run
+     */
+    private RunScope enterMultiWorkerRunScope() {
+        if (workerCount <= 1) {
+            return () -> {
+            };
+        }
+        final RunScope marker = enterMultiThreadedRun();
+        try {
+            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
+            // Materialise the default execution context on this proof's (fresh) JavaInfo before
+            // sealing, so the matcher reads it instead of registering it during the run.
+            javaInfo.getDefaultExecutionContext();
+            javaInfo.sealTypeRegistration();
+            return () -> {
+                javaInfo.unsealTypeRegistration();
+                marker.close();
+            };
+        } catch (Throwable t) {
+            marker.close();
+            throw t;
+        }
+    }
+
+    /**
      * Waits for the worker pool to terminate after {@link ExecutorService#shutdownNow()}. The wait
      * runs with the calling thread's interrupt status cleared (the run is often stopped by
      * interrupting this very thread, which would otherwise make {@code awaitTermination} return
-     * immediately and defeat the purpose) and restores the status afterwards. The generous timeout
-     * accommodates a worker that is mid-step (e.g. a large taclet match) when asked to stop; the
-     * stop is cooperative, so it returns as soon as the last worker leaves its step.
+     * immediately and defeat the purpose) and restores the status afterwards; further interrupts
+     * arriving mid-wait are likewise absorbed and the wait continues on the remaining budget. The
+     * generous timeout accommodates a worker that is mid-step (e.g. a large taclet match) when
+     * asked to stop; the stop is cooperative, so it returns as soon as the last worker leaves its
+     * step.
      */
     private void awaitWorkerTermination(ExecutorService pool) {
         boolean wasInterrupted = Thread.interrupted();
-        try {
-            if (!pool.awaitTermination(WORKER_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                LOGGER.warn("parallel prover workers did not stop within {}s of a stop request",
-                    WORKER_SHUTDOWN_TIMEOUT_SECONDS);
+        final long deadlineNanos =
+            System.nanoTime() + TimeUnit.SECONDS.toNanos(WORKER_SHUTDOWN_TIMEOUT_SECONDS);
+        boolean terminated = pool.isTerminated();
+        while (!terminated) {
+            final long remainingNanos = deadlineNanos - System.nanoTime();
+            if (remainingNanos <= 0) {
+                break;
             }
-        } catch (InterruptedException e) {
-            wasInterrupted = true;
+            try {
+                terminated = pool.awaitTermination(remainingNanos, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                // A further stop interrupt arrived mid-wait. This method exists precisely so the
+                // run does not return while a worker may still be mutating the proof (see the
+                // caller's deadlock note), so remember the interrupt and wait out the remaining
+                // budget instead of bailing early.
+                wasInterrupted = true;
+            }
+        }
+        if (!terminated) {
+            // A worker did not leave its step within the (generous) cap: it is genuinely stuck,
+            // which Java cannot force-terminate. Surface it as a run error so the caller does not
+            // treat the returned proof as complete, rather than silently returning while a
+            // worker may still be mutating it.
+            LOGGER.error("parallel prover workers did not stop within {}s of a stop request; "
+                + "the returned proof may be incomplete", WORKER_SHUTDOWN_TIMEOUT_SECONDS);
+            firstError.compareAndSet(null,
+                new IllegalStateException("parallel prover workers did not terminate within "
+                    + WORKER_SHUTDOWN_TIMEOUT_SECONDS + "s of a stop request"));
         }
         if (wasInterrupted) {
             Thread.currentThread().interrupt();
@@ -371,12 +455,36 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         Services.bindWorkerNameRecorder();
         try {
             Goal goal;
-            while (!stopRequested && (goal = scheduler.claimOrAwait()) != null) {
+            while (!stopRequested.get() && (goal = scheduler.claimOrAwait()) != null) {
+                if (proof.isErroneous()) {
+                    // An essential proof listener failed on some worker: wind all workers down
+                    // through the regular stop path (the claimed goal is returned below by the
+                    // loop exit; parked workers wake through the scheduler as with any stop).
+                    // Checking a volatile flag once per rule application is free next to the
+                    // step itself; no push notification into the workers is needed.
+                    requestStop("Proof search stopped: an essential proof listener failed.", null);
+                    scheduler.reoffer(goal);
+                    break;
+                }
                 processStep(goal, scheduler, commitLock, startTime);
             }
         } catch (InterruptedException e) {
-            cancelled = true;
+            // Workers are only ever interrupted by the wind-down's shutdownNow, which runs on
+            // normal completion, user stop and error stop alike -- so this carries no "user
+            // cancelled" information (a genuine cancel is recorded by start()'s own
+            // InterruptedException handler). Setting cancelled here would misreport an
+            // error-stopped run as user-interrupted to macro/script drivers.
             Thread.currentThread().interrupt();
+        } catch (Throwable t) {
+            // A worker died unexpectedly (e.g. a bug reached during a rule step). Record the first
+            // such error and ask all workers to stop, so the proof is not driven further under
+            // possibly corrupted state (the survivors see stopRequested and leave their loop). The
+            // reoffer/complete bookkeeping for the claimed goal is handled by processStep's
+            // finally;
+            // rethrow so the failure still surfaces via this worker's Future.
+            firstError.compareAndSet(null, t);
+            requestStop("Error.", null);
+            throw t;
         } finally {
             Services.unbindWorkerNameRecorder();
         }
@@ -405,7 +513,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         // happens per goal, which is what keeps the scheduler's accounting (and termination) sound.
         boolean handled = false;
         try {
-            if (stopRequested) {
+            if (stopRequested.get()) {
                 return;
             }
             // --- selection: concurrent across workers, no commit lock held ---
@@ -461,7 +569,12 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             }
 
             final int applied = appliedSteps.incrementAndGet();
-            fireTaskProgress();
+            // No per-step progress event: the status line shows an indeterminate bar for the whole
+            // parallel run (see start()), and firing taskProgress concurrently from every worker
+            // would drive listeners written for the single-threaded prover (e.g. AutoSaver, which
+            // serialises the proof) off the worker threads. The final counts reach listeners
+            // through
+            // taskFinished. Autosave-during-run is therefore inactive under the parallel prover.
 
             // Partition the successors into closed (just counted) and open (to be rescheduled).
             int closedNow = 0;
@@ -503,12 +616,18 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
     }
 
-    /** Records the first stop reason and signals all workers to finish. */
+    /**
+     * Records the first stop reason and signals all workers to finish. The compare-and-set makes
+     * the
+     * "first caller wins" atomic: only the winner writes the {@link #stopMessage}/
+     * {@link #nonCloseableGoal} pair (read after the run), so two concurrent stop requests can
+     * never
+     * mix one's message with the other's goal.
+     */
     private void requestStop(String message, @Nullable Goal goal) {
-        if (!stopRequested) {
+        if (stopRequested.compareAndSet(false, true)) {
             stopMessage = message;
             nonCloseableGoal = goal;
-            stopRequested = true;
         }
     }
 

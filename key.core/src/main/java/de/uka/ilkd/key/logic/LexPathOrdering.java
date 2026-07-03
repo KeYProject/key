@@ -20,7 +20,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ConcurrentLruCache;
+import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -32,8 +32,8 @@ public class LexPathOrdering implements TermOrdering {
      * Per-comparison memo, scoped to one top-level {@link #compare(Term, Term)} call. The
      * recursion of {@link #compareHelp} visits the pair-DAG of the two terms; on large terms with
      * structural sharing that DAG has far more distinct pairs than the bounded global
-     * {@link #cache} can hold, so the LRU is evicted mid-comparison and memoization collapses --
-     * measured two BILLION compareHelp calls (960M recomputations, 134s) for 1.68M comparisons on
+     * {@link #cache} can hold, so the LRU is evicted mid-comparison and memoization collapses,
+     * measured 2000M compareHelp calls (960M recomputations, 134s) for 1.68M comparisons on
      * an ips4o goal at 6000 proof steps. An unbounded per-call map restores true DAG complexity
      * (same run: 92M calls, 7.8s, byte-identical results). ThreadLocal because a LexPathOrdering
      * instance is shared across parallel-prover workers; the map is reused (cleared) per call, so
@@ -101,13 +101,14 @@ public class LexPathOrdering implements TermOrdering {
      * Comparison-result cache, a thread-safe bounded LRU. A {@link LexPathOrdering} lives in a
      * per-proof strategy cost feature ({@code SmallerThanFeature}) shared across all goals, and the
      * parallel prover evaluates rule-application cost concurrently, so this cache is read and
-     * written by several workers at once. A plain {@code HashMap}/{@code LRUCache} would corrupt
-     * under that (the latter mutates even on {@code get}); {@link ConcurrentLruCache} keeps the LRU
-     * bound while being thread-safe. Size tunable via {@code -Dkey.lexpath.cachesize}.
+     * written by several workers at once. The cached {@link CompRes} is a pure
+     * function of the key (the ordering of two fixed terms is fully determined by them), so
+     * eviction order never changes a result, only the hit rate. We therefore use the
+     * lower-contention {@link StripedLruCache} (per-segment locking) rather than the single-lock
+     * {@code ConcurrentLruCache}.
      */
-    private static final int CACHE_SIZE = Integer.getInteger("key.lexpath.cachesize", 10000);
-    private final ConcurrentLruCache<CacheKey, CompRes> cache =
-        new ConcurrentLruCache<>(CACHE_SIZE);
+    private final StripedLruCache<CacheKey, CompRes> cache =
+        new StripedLruCache<>(10000, 16);
 
 
     private CompRes compareHelp(Term p_a, Term p_b) {

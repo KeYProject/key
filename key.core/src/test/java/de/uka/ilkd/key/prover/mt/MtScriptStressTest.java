@@ -91,8 +91,8 @@ public class MtScriptStressTest {
     }
 
     /**
-     * A proof produced under the multi-core prover (with worker-tagged fresh names and a
-     * parallel-explored tree) must save and reload as a valid, closed proof under the single-core
+     * A proof produced under the multi-core prover (with a parallel-explored tree) must save and
+     * reload as a valid, closed proof under the single-core
      * prover -- i.e. the saved artifact carries no multi-core-specific corruption and replays
      * exactly like any other proof.
      */

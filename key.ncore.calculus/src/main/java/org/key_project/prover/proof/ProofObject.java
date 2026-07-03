@@ -43,6 +43,15 @@ public interface ProofObject<G extends @Nullable ProofGoal<G>> {
     /// @return true if the proof (i.e., all its goals) have been closed
     boolean closed();
 
+    /// Whether the proof has been flagged as erroneous (e.g. because an essential proof listener
+    /// failed and the step may have left it inconsistent). A prover must stop its search when this
+    /// becomes true. Defaults to `false` for proof objects without such a notion.
+    ///
+    /// @return true if the proof is erroneous and no further search must be performed
+    default boolean isErroneous() {
+        return false;
+    }
+
     /// returns the services which provide access to the meta infrastructure like
     /// namespaces for functions, sort etc.
     ///

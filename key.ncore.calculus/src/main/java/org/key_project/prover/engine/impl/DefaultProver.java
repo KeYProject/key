@@ -58,7 +58,13 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
     protected int closedGoals;
 
     /// Indicates whether the prover has been interrupted and should stop.
-    protected boolean cancelled;
+    ///
+    /// Written and read only by the thread driving the run (the one that called `start`): its
+    /// own interrupt handlers set it, and the driver queries it afterwards via
+    /// `hasBeenInterrupted()`. Worker threads of a parallel prover must NOT write it -- a worker
+    /// interrupt is part of every wind-down (including error stops) and carries no cancellation
+    /// information. Volatile as insurance should a cross-thread write slip back in.
+    protected volatile boolean cancelled;
 
     /// A condition that determines whether the prover should stop its execution.
     protected @Nullable StopCondition<Goal> stopCondition;
@@ -99,6 +105,16 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, time,
                 countApplied, srInfo);
             while (!shouldStop) {
+                if (proof.isErroneous()) {
+                    // The proof is flagged as erroneous (an essential proof listener failed --
+                    // possibly during the previous step of this very run): stop before applying
+                    // anything further. The proof refuses new searches but stays saveable.
+                    return new ApplyStrategyInfo<>(
+                        "Proof search stopped: the proof is marked erroneous "
+                            + "(an essential proof listener failed).",
+                        proof, null, srInfo == null ? null : srInfo.getGoal(),
+                        System.currentTimeMillis() - time, countApplied, closedGoals);
+                }
                 var applyAutomaticTime = System.nanoTime();
                 try {
                     srInfo = applyAutomaticRule(goalChooser, stopCondition,

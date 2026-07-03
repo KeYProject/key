@@ -97,11 +97,11 @@ public class GeneralSettings extends AbstractSettings {
      * single-threaded one. Single-core is the safe fallback and keeps the single-core-only features
      * (proof caching, slicing, merge rule, ...) available.
      * <p>
-     * Enabled by default in this pull-request build so the multi-core prover is easy to try; this
-     * is
-     * to be reverted to {@code false} (single-core) when the change is accepted for {@code main}.
+     * Single-core by default: the multi-core prover is opt-in (enable it in the settings, or via
+     * {@code -Dkey.prover.parallel=true}). It has to stay disabled by default so proofs built with
+     * the single-core-only features keep working out of the box.
      */
-    private boolean parallelProverEnabled = true;
+    private boolean parallelProverEnabled = false;
 
     /**
      * Number of worker threads for the multi-core prover. Only relevant when

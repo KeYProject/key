@@ -38,17 +38,12 @@ public class Monomial {
         final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
         monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);
-        Monomial res;
-
-        synchronized (monomialCache) {
-            res = monomialCache.get(monoTerm);
-        }
+        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
+        Monomial res = monomialCache.get(monoTerm);
 
         if (res == null) {
             res = createHelp(monoTerm, services);
-            synchronized (monomialCache) {
-                monomialCache.put(monoTerm, res);
-            }
+            monomialCache.put(monoTerm, res);
         }
         return res;
     }

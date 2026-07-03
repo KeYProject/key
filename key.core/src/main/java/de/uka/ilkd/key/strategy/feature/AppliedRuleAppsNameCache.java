@@ -10,9 +10,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 
 import org.jspecify.annotations.NonNull;
 
@@ -38,11 +39,15 @@ import org.jspecify.annotations.NonNull;
  */
 public class AppliedRuleAppsNameCache {
     /** cache of all applied rules of a node, by rule name and then by application fingerprint */
-    private final LRUCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
-        new LRUCache<>(32);
+    private final ConcurrentLruCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
+        new ConcurrentLruCache<>(32);
 
+    // Only the structural cache-fill in fillCacheForNode needs mutual exclusion (it does a compound
+    // read-modify-write across parent and child entries). Plain reads go straight to the
+    // already-thread-safe ConcurrentLruCache and re-check under the write lock on a miss, so no
+    // read
+    // lock is needed.
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
     public AppliedRuleAppsNameCache() {}
@@ -56,7 +61,7 @@ public class AppliedRuleAppsNameCache {
      * hash (more terms may share a bucket), but the {@code sameApplication} scan resolves any
      * collision, so this only trades a little bucket length for a much cheaper fingerprint.
      */
-    public static int focusFingerprint(org.key_project.logic.Term focus) {
+    public static int focusFingerprint(Term focus) {
         int h = focus.op().hashCode();
         final int arity = focus.arity();
         h = 31 * h + arity;
@@ -169,14 +174,7 @@ public class AppliedRuleAppsNameCache {
             throw new AssertionFailure("Expected an empty leaf node");
         }
 
-        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache;
-        try {
-            readLock.lock();
-            nodeCache = cache.get(node);
-        } finally {
-            readLock.unlock();
-        }
-
+        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache = cache.get(node);
         if (nodeCache == null) {
             nodeCache = fillCacheForNode(node);
         }
