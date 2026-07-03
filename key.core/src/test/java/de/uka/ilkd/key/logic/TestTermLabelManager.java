@@ -64,19 +64,6 @@ public class TestTermLabelManager {
     }
 
 
-    @Test
-    public void testrefactorGoal_directChildren_allRules() throws ProblemLoaderException {
-        doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_DIRECT_CHILDREN);
-    }
-
-    /**
-    *
-    */
-    @Test
-    public void testrefactorGoal_directChildren_ruleSpecific() throws ProblemLoaderException {
-        doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_DIRECT_CHILDREN, "rule");
-    }
-
     /**
     *
     */
@@ -186,14 +173,6 @@ public class TestTermLabelManager {
                     String expectedName = expected.getLabels().get(i).name().toString();
                     if ("ONE".equals(expectedName) || "ADD".equals(expectedName)
                             || "TWO".equals(expectedName) || "THREE".equals(expectedName)) {
-                        assertEquals(expectedName + "-CHANGED",
-                            current.getLabels().get(i).name().toString());
-                    } else {
-                        assertEquals(expectedName, current.getLabels().get(i).name().toString());
-                    }
-                } else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
-                    String expectedName = expected.getLabels().get(i).name().toString();
-                    if ("ONE".equals(expectedName) || "ADD".equals(expectedName)) {
                         assertEquals(expectedName + "-CHANGED",
                             current.getLabels().get(i).name().toString());
                     } else {

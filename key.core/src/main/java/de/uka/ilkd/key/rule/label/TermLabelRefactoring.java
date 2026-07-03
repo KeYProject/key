@@ -154,11 +154,6 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
         APPLICATION_BELOW_UPDATES,
 
         /**
-         * Refactor direct children of the application term.
-         */
-        APPLICATION_DIRECT_CHILDREN,
-
-        /**
          * Refactor children and grandchildren of the application term.
          */
         APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE,

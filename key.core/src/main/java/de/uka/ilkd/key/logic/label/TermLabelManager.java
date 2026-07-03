@@ -1169,8 +1169,6 @@ public class TermLabelManager {
                     } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                             .equals(scope)) {
                         refactorings.childAndGrandchildRefactorings.add(refactoring);
-                    } else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
-                        refactorings.directChildRefactorings.add(refactoring);
                     } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
                             .equals(scope)) {
                         refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
@@ -1214,8 +1212,6 @@ public class TermLabelManager {
             } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                     .equals(scope)) {
                 refactorings.childAndGrandchildRefactorings.add(refactoring);
-            } else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
-                refactorings.directChildRefactorings.add(refactoring);
             } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
                     .equals(scope)) {
                 refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
@@ -1268,18 +1264,15 @@ public class TermLabelManager {
      *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
      * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for
      *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-     * @param directChildRefactorings The {@link TermLabelRefactoring} for
-     *        {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
     protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
             Set<TermLabelRefactoring> belowUpdatesRefactorings,
             Set<TermLabelRefactoring> childAndGrandchildRefactorings,
-            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
-            Set<TermLabelRefactoring> directChildRefactorings) {
+            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents) {
         public RefactoringsContainer() {
             this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(),
-                new LinkedHashSet<>(), new LinkedHashSet<>());
+                new LinkedHashSet<>());
         }
 
         /**
@@ -1296,57 +1289,6 @@ public class TermLabelManager {
             return result;
         }
     }
-
-    /**
-     * Do direct child refactoring if required.
-     *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
-     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
-     *        to consider.
-     * @param tf The {@link TermFactory} to create the term.
-     * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
-     */
-    private JTerm refactorChildTerms(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
-        JTerm newApplicationTerm = applicationTerm;
-        if (!refactorings.directChildRefactorings().isEmpty()) {
-            boolean changed = false;
-            JTerm[] newSubs = new JTerm[newApplicationTerm.arity()];
-            for (int i = 0; i < newSubs.length; i++) {
-                final JTerm sub = newApplicationTerm.sub(i);
-                ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
-                    applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub,
-                    refactorings.directChildRefactorings());
-
-                if (newLabels != sub.getLabels()) {
-                    newSubs[i] =
-                        tf.createTerm(sub.op(), sub.subs(), sub.boundVars(),
-                            newLabels);
-                    changed = true;
-                } else {
-                    newSubs[i] = sub;
-                }
-            }
-            newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
-                newApplicationTerm.boundVars(),
-                newApplicationTerm.getLabels()) : applicationTerm;
-        }
-        return newApplicationTerm;
-    }
-
 
     /**
      * Perform below-updates refactoring if required.
@@ -1463,13 +1405,9 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
-        if (applicationTerm != null && (!refactorings.directChildRefactorings().isEmpty()
-                || !refactorings.childAndGrandchildRefactorings().isEmpty()
+        if (applicationTerm != null && (!refactorings.childAndGrandchildRefactorings().isEmpty()
                 || !refactorings.belowUpdatesRefactorings().isEmpty())) {
-            JTerm newApplicationTerm;
-            // Do direct child refactoring if required
-            newApplicationTerm = refactorChildTerms(state, services, applicationPosInOccurrence,
-                applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
+            JTerm newApplicationTerm = applicationTerm;
             // Perform below-updates refactoring
             newApplicationTerm =
                 refactorBelowUpdates(state, services, applicationPosInOccurrence, applicationTerm,

@@ -107,9 +107,6 @@ import org.key_project.prover.sequent.SequentFormula;
  *          <li>{@code 2 + 3 ~~> 5<>a>>}: A new label has to be added which is not provided by the
  *              rule. Implement a {@link TermLabelUpdate} which adds, sorts or removes
  *              {@link TermLabel} before a new {@link JTerm} is created.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: Implement a {@link TermLabelRefactoring}
- *              which works on {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN} to freely add or
- *              remove {@link TermLabel}s on direct children of the application {@link JTerm}.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 2 * (3<<a>> - 1)}: Implement a
  *              {@link TermLabelRefactoring} which works on
  *              {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE} to freely
