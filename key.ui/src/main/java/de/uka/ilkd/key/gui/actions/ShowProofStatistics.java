@@ -317,6 +317,15 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveBundleButton);
 
             // spotless:off
+            JButton soundinessButton = new JButton("Show Soundiness Report");
+            soundinessButton.setIcon(IconFactory.WARNING_UNSOUND.get());
+            soundinessButton.addActionListener(e -> {
+                de.uka.ilkd.key.gui.soundiness.SoundinessDialog dialog = 
+                    new de.uka.ilkd.key.gui.soundiness.SoundinessDialog(mainWindow, proof);
+                dialog.setVisible(true);
+            });
+            buttonPane2.add(soundinessButton);
+            
             /*
             if (proof.closedGoals().stream()
                     .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
