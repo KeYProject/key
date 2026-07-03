@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -19,12 +21,14 @@ import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
 
 import org.jspecify.annotations.NonNull;
 
 
 /**
- * The currently only class implementing the Term interface. TermFactory should be the only class
+ * The only class implementing the {@link JTerm} interface. A term may carry {@link TermLabel}s;
+ * unlabeled terms share a single empty label array. {@link TermFactory} should be the only class
  * dealing directly with the TermImpl class.
  */
 class TermImpl implements JTerm {
@@ -53,6 +57,14 @@ class TermImpl implements JTerm {
     private final Operator op;
     private final ImmutableArray<JTerm> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
+
+    /**
+     * The labels attached to this term, or the shared {@link #EMPTY_LABEL_LIST} if there are
+     * none. Never {@code null}. Term labels do not participate in {@link #equals(Object)} /
+     * {@link #hashCode()}; use {@link #equalsIncludingLabels(Object)} for a label-sensitive
+     * comparison.
+     */
+    private final ImmutableArray<TermLabel> labels;
 
     // caches
     private enum ThreeValuedTruth {
@@ -105,11 +117,25 @@ class TermImpl implements JTerm {
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars) {
+        this(op, subs, boundVars, null);
+    }
+
+    /**
+     * Constructs a term that may carry term labels.
+     *
+     * @param op the operator of the term
+     * @param subs the sub terms of the constructed term
+     * @param boundVars the bound variables (if applicable)
+     * @param labels the term's labels, or {@code null}/empty for an unlabeled term
+     */
+    public TermImpl(Operator op, ImmutableArray<JTerm> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, ImmutableArray<TermLabel> labels) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
+        this.labels = (labels == null || labels.isEmpty()) ? EMPTY_LABEL_LIST : labels;
     }
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
@@ -414,16 +440,22 @@ class TermImpl implements JTerm {
                 sb.append(op()).append("|{").append(javaBlock()).append("}| ");
             }
             sb.append("(").append(sub(0)).append(")");
-            return sb.toString();
         } else {
             sb.append(op().name());
             if (!boundVars.isEmpty()) {
                 sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }
-            if (arity() == 0) {
-                return sb.toString();
+            if (arity() != 0) {
+                sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
             }
-            sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
+        }
+
+        if (hasLabels()) {
+            final String labelsStr =
+                labels.stream().map(TermLabel::toString).collect(Collectors.joining(", "));
+            if (!labelsStr.isEmpty()) {
+                sb.append("<<").append(labelsStr).append(">>");
+            }
         }
 
         return sb.toString();
@@ -437,22 +469,29 @@ class TermImpl implements JTerm {
 
     @Override
     public boolean hasLabels() {
-        return false;
+        return !labels.isEmpty();
     }
 
     @Override
     public boolean containsLabel(TermLabel label) {
+        assert label != null : "Label must not be null";
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            if (label.equals(labels.get(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public TermLabel getLabel(Name termLabelName) {
-        return null;
+        return CollectionUtil.search(labels,
+            element -> Objects.equals(element.name(), termLabelName));
     }
 
     @Override
     public ImmutableArray<TermLabel> getLabels() {
-        return EMPTY_LABEL_LIST;
+        return labels;
     }
 
     /**

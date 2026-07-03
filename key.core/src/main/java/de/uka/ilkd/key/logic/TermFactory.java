@@ -119,10 +119,7 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
 
-        final TermImpl newTerm =
-            (labels == null || labels.isEmpty()
-                    ? new TermImpl(op, subs, boundVars)
-                    : new LabeledTermImpl(op, subs, boundVars, labels, origin));
+        final TermImpl newTerm = new TermImpl(op, subs, boundVars, labels);
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different. Terms carrying term labels (directly or in a subterm) are not cached
