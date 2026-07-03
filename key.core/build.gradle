@@ -182,6 +182,22 @@ tasks.register('testStrictSMT', Test) {
 // high (over-subscribed) worker count and assert each one closes. Slow (minutes), so it is gated out
 // of the normal unit-test suite and only runs here. Guards against reintroducing a concurrency race
 // that makes proofs nondeterministically fail to close. See MtStressTest.
+tasks.register('testMt2w', Test) {
+    description = 'Run a small RunAllProofs set on the multi-core prover with 2 workers'
+    group = 'verification'
+    forkEvery = 1
+    filter { includeTestsMatching "RunSmallProofsMt2wTest" }
+}
+
+// The 4-worker variant of testMt2w. Kept as its own task so CI can drop it if a runner cannot
+// sustain four over-subscribed workers (the 2-worker task is the must-pass one).
+tasks.register('testMt4w', Test) {
+    description = 'Run a small RunAllProofs set on the multi-core prover with 4 workers'
+    group = 'verification'
+    forkEvery = 1
+    filter { includeTestsMatching "RunSmallProofsMt4wTest" }
+}
+
 tasks.register('testMtStress', Test) {
     description = 'Stress the parallel prover at high worker counts to catch non-closure races'
     group = 'verification'
@@ -195,6 +211,7 @@ tasks.register('testMtStress', Test) {
         includeTestsMatching "MtStressTest"
         includeTestsMatching "MtMacroStressTest"
         includeTestsMatching "MtScriptStressTest"
+        includeTestsMatching "MtDeterminismCiTest"
     }
 }
 
@@ -310,6 +327,9 @@ tasks.register("testRAP", Test) {
     systemProperty 'key.matcher.compiled',
         (project.findProperty('matcher.compiled')
                 ?: System.getProperty('key.matcher.compiled', 'false'))
+    // each fork writes its own statistics file (runStatistics.csv.<pid>.csv) -- concurrent
+    // appends from parallel forks to one file can interleave mid-line
+    systemProperty 'key.rap.stats.perProcess', 'true'
     // set heap size for the test JVM(s) (overridable with -PrapHeap=8g for the large examples)
     minHeapSize = "1g"
     maxHeapSize = (project.findProperty('rapHeap') ?: '3g')

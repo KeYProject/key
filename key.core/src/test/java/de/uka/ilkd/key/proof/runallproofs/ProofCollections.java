@@ -26,6 +26,43 @@ public class ProofCollections {
 
     public static final String ENV_KEY_RAP_FUN_KEEP = "KEY_RAP_FUN_KEEP";
 
+    /**
+     * A small curated set of representative proofs (heap, arithmetic, splitting, quantifier) for
+     * running the RunAllProofs machinery under the <em>multi-core</em> prover. Uses
+     * {@link ForkMode#NOFORK} so the proofs are proved in the test JVM, where the caller
+     * ({@code RunSmallProofsMt*wTest}) has enabled the parallel prover via the system properties;
+     * a forked run would not inherit those. Kept small so a 2- and 4-worker pass is affordable on
+     * CI. Reload is enabled, so it also checks that MT-built proofs save and reload.
+     *
+     * @return the small multi-core proof collection
+     * @throws IOException if the KeY settings cannot be read
+     */
+    public static ProofCollection smallMultiThreaded() throws IOException {
+        var settings = new ProofCollectionSettings(new Date());
+        settings.setBaseDirectory("../key.ui/examples/");
+        settings.setStatisticsFile("build/reports/runallproofs/runStatisticsMt.csv");
+        settings.setForkMode(ForkMode.NOFORK);
+        settings.setReloadEnabled(true);
+        settings.setTempDir("build/runallproofs_tmp");
+        settings.setVerboseOutput(true);
+        // Give the multi-core runs headroom over the standard 10000-step budget: the proof size
+        // varies a few percent with the worker count (rule-app age is part of the strategy cost,
+        // and generation timing differs across schedules), and median.key sits right at the
+        // standard budget -- enough to close on one runner and be cut off on another.
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties")
+            + "\n[Strategy]MaximumNumberOfAutomaticApplications=20000");
+
+        var c = new ProofCollection(settings);
+        var g = c.group("multithreaded_smoke");
+        // small, closes under the multi-core prover (subset of the MT determinism/stress set)
+        g.provable("newBook/09.list_modelfield/ArrayList.remFirst.key");
+        g.provable("standard_key/arith/median.key");
+        g.provable("heap/list/ArrayList_concatenate.key");
+        g.provable("heap/saddleback_search/Saddleback_search.key");
+        g.provable("standard_key/java_dl/symmArray.key");
+        return c;
+    }
+
     public static ProofCollection automaticJavaDL() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         /*
