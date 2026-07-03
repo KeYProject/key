@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelMerger;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -108,12 +107,6 @@ import org.key_project.prover.sequent.SequentFormula;
  *          <li>{@code 2 + 3 ~~> 5<>a>>}: A new label has to be added which is not provided by the
  *              rule. Implement a {@link TermLabelUpdate} which adds, sorts or removes
  *              {@link TermLabel} before a new {@link JTerm} is created.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: A direct child of the application {@link JTerm}
- *              {@code a} contains the label before. Use a direct {@link ChildTermLabelPolicy} to
- *              ensure that it is added also to the new term.</li>
- *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 4<<a>>}: A child or grandchild of the application
- *              {@link JTerm} {@code a} contains the label before. Use a direct
- *              {@link ChildTermLabelPolicy} to ensure that it is added also to the new term.</li>
  *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: Implement a {@link TermLabelRefactoring}
  *              which works on {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN} to freely add or
  *              remove {@link TermLabel}s on direct children of the application {@link JTerm}.</li>

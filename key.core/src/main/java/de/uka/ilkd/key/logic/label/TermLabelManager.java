@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -86,30 +85,6 @@ public class TermLabelManager {
         new LinkedHashMap<>();
 
     /**
-     * All rule specific direct {@link ChildTermLabelPolicy}s.
-     */
-    private final Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificDirectChildTermLabelPolicies =
-        new LinkedHashMap<>();
-
-    /**
-     * All rule independent direct {@link ChildTermLabelPolicy}s.
-     */
-    private final Map<Name, ChildTermLabelPolicy> allRulesDirectChildTermLabelPolicies =
-        new LinkedHashMap<>();
-
-    /**
-     * All rule specific child and grandchild {@link ChildTermLabelPolicy}s.
-     */
-    private final Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificChildAndGrandchildTermLabelPolicies =
-        new LinkedHashMap<>();
-
-    /**
-     * All rule independent child and grandchild {@link ChildTermLabelPolicy}s.
-     */
-    private final Map<Name, ChildTermLabelPolicy> allRulesChildAndGrandchildTermLabelPolicies =
-        new LinkedHashMap<>();
-
-    /**
      * All rule independent {@link TermLabelUpdate}s.
      */
     private final Map<Name, ImmutableList<TermLabelUpdate>> ruleSpecificUpdates =
@@ -157,13 +132,6 @@ public class TermLabelManager {
                     applicationTermPolicyMap);
                 analyzeTermPolicies(conf.getTermLabelName(), conf.getModalityTermPolicies(),
                     modalityTermPolicyMap);
-                analyzeChildTermPolicies(conf.getTermLabelName(),
-                    conf.getDirectChildTermLabelPolicies(), allRulesDirectChildTermLabelPolicies,
-                    ruleSpecificDirectChildTermLabelPolicies);
-                analyzeChildTermPolicies(conf.getTermLabelName(),
-                    conf.getChildAndGrandchildTermLabelPolicies(),
-                    allRulesChildAndGrandchildTermLabelPolicies,
-                    ruleSpecificChildAndGrandchildTermLabelPolicies);
                 analyzeUpdates(conf.getTermLabelUpdates());
                 analyzeRefactorings(conf.getTermLabelRefactorings());
                 analyzeMerger(conf.getTermLabelName(), conf.getTermLabelMerger());
@@ -200,42 +168,6 @@ public class TermLabelManager {
         if (policies != null) {
             for (TermLabelPolicy policy : policies) {
                 policyMap.put(termLabelName, policy);
-            }
-        }
-    }
-
-    /**
-     * <p>
-     * Analyzes the given {@link ChildTermLabelPolicy} and adds it to the given policy {@link Map}s.
-     * </p>
-     * <p>
-     * This is a helper {@link Map} of {@link #TermLabelManager(ImmutableList)}.
-     * </p>
-     *
-     * @param termLabelName The name of the supported {@link TermLabel}.
-     * @param policies The {@link ChildTermLabelPolicy} instances to analyze.
-     * @param allRulesPolicyMap The policy {@link Map} with all rules to update.
-     * @param ruleSpecificPolicyMap The rule specific policy {@link Map} to update.
-     */
-    private void analyzeChildTermPolicies(Name termLabelName,
-            ImmutableList<ChildTermLabelPolicy> policies,
-            Map<Name, ChildTermLabelPolicy> allRulesPolicyMap,
-            Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicyMap) {
-        if (policies != null) {
-            for (ChildTermLabelPolicy policy : policies) {
-                ImmutableList<Name> supportedRules = policy.getSupportedRuleNames();
-                if (supportedRules == null || supportedRules.isEmpty()) {
-                    allRulesPolicyMap.put(termLabelName, policy);
-                } else {
-                    for (Name rule : supportedRules) {
-                        Map<Name, ChildTermLabelPolicy> ruleMap = ruleSpecificPolicyMap.get(rule);
-                        if (ruleMap == null) {
-                            ruleMap = new LinkedHashMap<>();
-                            ruleSpecificPolicyMap.put(rule, ruleMap);
-                        }
-                        ruleMap.put(termLabelName, policy);
-                    }
-                }
             }
         }
     }
@@ -602,25 +534,6 @@ public class TermLabelManager {
         // Re-add exiting application term labels based on application term policies.
         performTermLabelPolicies(state, services, applicationPosInOccurrence, applicationTerm, rule,
             goal, hint, tacletTerm, newTerm, applicationTermPolicyMap, newLabels);
-        // Add labels from direct child term policies.
-        Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
-            computeActiveChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, newTerm, ruleSpecificDirectChildTermLabelPolicies,
-                allRulesDirectChildTermLabelPolicies);
-        if (!activeDirectChildPolicies.isEmpty()) {
-            performDirectChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, newTerm, activeDirectChildPolicies, newLabels);
-        }
-
-        // Add labels from child and grandchild term policies.
-        Map<Name, ChildTermLabelPolicy> activeChildAndGrandchildPolicies =
-            computeActiveChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, newTerm, ruleSpecificChildAndGrandchildTermLabelPolicies,
-                allRulesChildAndGrandchildTermLabelPolicies);
-        if (!activeChildAndGrandchildPolicies.isEmpty()) {
-            performChildAndGrandchildPolicies(services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, newTerm, activeChildAndGrandchildPolicies, newLabels);
-        }
     }
 
     /**
@@ -805,158 +718,6 @@ public class TermLabelManager {
                 newLabels.add(label);
             }
         }
-    }
-
-    /**
-     * <p>
-     * Computes active {@link ChildTermLabelPolicy} instances which have to be executed during the
-     * given rule application.
-     * </p>
-     * <p>
-     * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, JTerm, JTerm)}
-     * </p>
-     *
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
-     * @param newTerm the template for the new {@link JTerm} to create
-     * @param ruleSpecificPolicies Rule specific {@link ChildTermLabelPolicy} instances.
-     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
-     * @return The active {@link ChildTermLabelPolicy} which have to be performed.
-     */
-    protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
-            Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
-            Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
-        Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
-            new LinkedHashMap<>();
-        if (rule != null) {
-            Map<Name, ChildTermLabelPolicy> rulePolicies = ruleSpecificPolicies.get(rule.name());
-            if (rulePolicies != null) {
-                for (Entry<Name, ChildTermLabelPolicy> entry : rulePolicies.entrySet()) {
-                    if (entry.getValue().isRuleApplicationSupported(services,
-                        applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                        newTerm)) {
-                        activeDirectChildPolicies.put(entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-        }
-        if (!ruleIndependentPolicies.isEmpty()) {
-            for (Entry<Name, ChildTermLabelPolicy> entry : ruleIndependentPolicies.entrySet()) {
-                if (entry.getValue().isRuleApplicationSupported(services,
-                    applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                    newTerm)) {
-                    activeDirectChildPolicies.put(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-        return activeDirectChildPolicies;
-    }
-
-    /**
-     * <p>
-     * Performs the given direct {@link ChildTermLabelPolicy} instances.
-     * </p>
-     * <p>
-     * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, JTerm, JTerm)}
-     * </p>
-     *
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
-     * @param newTerm the template for the new {@link JTerm} to create
-     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
-     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JTerm}.
-     */
-    protected void performDirectChildPolicies(TermServices services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
-            Map<Name, ChildTermLabelPolicy> policies, Set<TermLabel> newLabels) {
-        for (JTerm child : applicationTerm.subs()) {
-            for (TermLabel label : child.getLabels()) {
-                ChildTermLabelPolicy policy = policies.get(label.name());
-                if (policy != null && policy.addLabel(services, applicationPosInOccurrence,
-                    applicationTerm, rule, goal, hint, tacletTerm, newTerm, child, label)) {
-                    newLabels.add(label);
-                }
-            }
-        }
-    }
-
-    /**
-     * <p>
-     * Performs the given child and grandchild {@link ChildTermLabelPolicy} instances.
-     * </p>
-     * <p>
-     * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, JTerm, JTerm)}
-     * </p>
-     *
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
-     * @param newTerm the template for the new {@link JTerm} to create
-     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
-     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JTerm}.
-     */
-    protected void performChildAndGrandchildPolicies(final TermServices services,
-            final PosInOccurrence applicationPosInOccurrence,
-            final JTerm applicationTerm,
-            final Rule rule, final Goal goal, final Object hint, final JTerm tacletTerm,
-            final JTerm newTerm, final Map<Name, ChildTermLabelPolicy> policies,
-            final Set<TermLabel> newLabels) {
-        applicationTerm.execPreOrder((DefaultVisitor) p_visited -> {
-            final JTerm visited = (JTerm) p_visited;
-            if (visited != applicationTerm) {
-                for (TermLabel label : visited.getLabels()) {
-                    ChildTermLabelPolicy policy = policies.get(label.name());
-                    if (policy != null && policy.addLabel(services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, newTerm, visited,
-                        label)) {
-                        newLabels.add(label);
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -1869,16 +1630,6 @@ public class TermLabelManager {
         private final ImmutableList<TermLabelPolicy> modalityTermPolicies;
 
         /**
-         * The direct {@link ChildTermLabelPolicy} instances to use.
-         */
-        private final ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies;
-
-        /**
-         * The child and grandchild {@link ChildTermLabelPolicy} instances to use.
-         */
-        private final ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies;
-
-        /**
          * The {@link TermLabelUpdate} instances.
          */
         private final ImmutableList<TermLabelUpdate> termLabelUpdates;
@@ -1900,7 +1651,7 @@ public class TermLabelManager {
          * @param factory The {@link TermLabelFactory} to use.
          */
         public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory) {
-            this(termLabelName, factory, null, null, null, null, null, null, null);
+            this(termLabelName, factory, null, null, null, null, null);
         }
 
         /**
@@ -1912,10 +1663,6 @@ public class TermLabelManager {
          *        application term.
          * @param modalityTermPolicies The {@link TermLabelPolicy} instances applied on the modality
          *        term.
-         * @param directChildTermLabelPolicies The direct {@link ChildTermLabelPolicy} instances to
-         *        use.
-         * @param childAndGrandchildTermLabelPolicies The child and grandchild
-         *        {@link ChildTermLabelPolicy} instances to use.
          * @param termLabelUpdates The {@link TermLabelUpdate} instances.
          * @param termLabelRefactorings The {@link TermLabelRefactoring} instances.
          * @param termLabelMerger The {@link TermLabelMerger} instance.
@@ -1923,8 +1670,6 @@ public class TermLabelManager {
         public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory,
                 ImmutableList<TermLabelPolicy> applicationTermPolicies,
                 ImmutableList<TermLabelPolicy> modalityTermPolicies,
-                ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies,
-                ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies,
                 ImmutableList<TermLabelUpdate> termLabelUpdates,
                 ImmutableList<TermLabelRefactoring> termLabelRefactorings,
                 TermLabelMerger termLabelMerger) {
@@ -1934,8 +1679,6 @@ public class TermLabelManager {
             this.factory = factory;
             this.applicationTermPolicies = applicationTermPolicies;
             this.modalityTermPolicies = modalityTermPolicies;
-            this.directChildTermLabelPolicies = directChildTermLabelPolicies;
-            this.childAndGrandchildTermLabelPolicies = childAndGrandchildTermLabelPolicies;
             this.termLabelUpdates = termLabelUpdates;
             this.termLabelRefactorings = termLabelRefactorings;
             this.termLabelMerger = termLabelMerger;
@@ -1975,24 +1718,6 @@ public class TermLabelManager {
          */
         public ImmutableList<TermLabelPolicy> getModalityTermPolicies() {
             return modalityTermPolicies;
-        }
-
-        /**
-         * Returns the direct {@link ChildTermLabelPolicy} instances to use.
-         *
-         * @return The direct {@link ChildTermLabelPolicy} instances to use.
-         */
-        public ImmutableList<ChildTermLabelPolicy> getDirectChildTermLabelPolicies() {
-            return directChildTermLabelPolicies;
-        }
-
-        /**
-         * Returns the child and grandchild {@link ChildTermLabelPolicy} instances to use.
-         *
-         * @return The child and grandchild {@link ChildTermLabelPolicy} instances to use.
-         */
-        public ImmutableList<ChildTermLabelPolicy> getChildAndGrandchildTermLabelPolicies() {
-            return childAndGrandchildTermLabelPolicies;
         }
 
         /**
