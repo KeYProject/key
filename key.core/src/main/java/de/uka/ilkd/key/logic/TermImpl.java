@@ -5,9 +5,9 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -67,15 +67,8 @@ class TermImpl implements JTerm {
     private final ImmutableArray<TermLabel> labels;
 
     // caches
-    private enum ThreeValuedTruth {
-        TRUE, FALSE, UNKNOWN
-    }
 
     private int depth = -1;
-    /**
-     * A cached value for computing the term's rigidness.
-     */
-    private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
@@ -91,22 +84,42 @@ class TermImpl implements JTerm {
     private Sort sort;
 
     /**
-     * This flag indicates that the {@link JTerm} itself or one of its children contains a non-empty
-     * {@link JavaBlock}. {@link JTerm}s which provides a {@link JavaBlock} directly or indirectly
-     * can't be cached because it is possible that the contained meta information inside the
-     * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
+     * Packed lazily-computed tri-state predicates, two bits each (see {@link #FLAG_UNKNOWN} /
+     * {@link #FLAG_FALSE} / {@link #FLAG_TRUE}): rigidness, and whether this term or one of its
+     * children contains a {@link JavaBlock}, a {@link Transformer}, or a {@link TermLabel}.
+     * Written at most once per flag via {@link #FLAGS} CAS so that concurrent computation of
+     * different flags on the same (shared, immutable) term cannot lose updates.
      */
-    private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
+    private volatile int flags = 0;
 
-    /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
-    private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
+    private static final AtomicIntegerFieldUpdater<TermImpl> FLAGS =
+        AtomicIntegerFieldUpdater.newUpdater(TermImpl.class, "flags");
 
-    /**
-     * This flag indicates that the {@link JTerm} itself or one of its children carries a
-     * {@link TermLabel}. As {@link #equals(Object)} ignores term labels, label-sensitive
-     * consumers (e.g. the term factory cache) use this flag as a cheap guard.
-     */
-    private ThreeValuedTruth containsLabelsRecursive = ThreeValuedTruth.UNKNOWN;
+    private static final int FLAG_UNKNOWN = 0;
+    private static final int FLAG_FALSE = 1;
+    private static final int FLAG_TRUE = 2;
+    private static final int FLAG_MASK = 3;
+
+    private static final int SHIFT_RIGID = 0;
+    private static final int SHIFT_JAVA_BLOCK = 2;
+    private static final int SHIFT_TRANSFORMER = 4;
+    private static final int SHIFT_LABELS = 6;
+
+    /** @return the two-bit state of the flag at {@code shift} */
+    private int getFlag(int shift) {
+        return (flags >>> shift) & FLAG_MASK;
+    }
+
+    /** Stores {@code value} into the flag at {@code shift}, unless it has meanwhile been set. */
+    private void setFlag(int shift, int value) {
+        int prev;
+        do {
+            prev = flags;
+            if (((prev >>> shift) & FLAG_MASK) != FLAG_UNKNOWN) {
+                return;
+            }
+        } while (!FLAGS.compareAndSet(this, prev, prev | (value << shift)));
+    }
 
     // -------------------------------------------------------------------------
     // constructors
@@ -267,22 +280,21 @@ class TermImpl implements JTerm {
 
     @Override
     public boolean isRigid() {
-        if (rigid == ThreeValuedTruth.UNKNOWN) {
-            if (!op.isRigid()) {
-                rigid = ThreeValuedTruth.FALSE;
-            } else {
-                ThreeValuedTruth localIsRigid = ThreeValuedTruth.TRUE;
+        int flag = getFlag(SHIFT_RIGID);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = op.isRigid();
+            if (result) {
                 for (int i = 0, n = arity(); i < n; i++) {
                     if (!sub(i).isRigid()) {
-                        localIsRigid = ThreeValuedTruth.FALSE;
+                        result = false;
                         break;
                     }
                 }
-                rigid = localIsRigid;
             }
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_RIGID, flag);
         }
-
-        return rigid == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
 
@@ -537,21 +549,21 @@ class TermImpl implements JTerm {
      */
     @Override
     public boolean containsJavaBlockRecursive() {
-        if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (!javaBlock().isEmpty()) {
-                result = ThreeValuedTruth.TRUE;
-            } else {
+        int flag = getFlag(SHIFT_JAVA_BLOCK);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = !javaBlock().isEmpty();
+            if (!result) {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsJavaBlockRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsJavaBlockRecursive = result;
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_JAVA_BLOCK, flag);
         }
-        return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
     /**
@@ -559,40 +571,40 @@ class TermImpl implements JTerm {
      */
     @Override
     public boolean containsLabelsRecursive() {
-        if (containsLabelsRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (hasLabels()) {
-                result = ThreeValuedTruth.TRUE;
-            } else {
+        int flag = getFlag(SHIFT_LABELS);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = hasLabels();
+            if (!result) {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsLabelsRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsLabelsRecursive = result;
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_LABELS, flag);
         }
-        return containsLabelsRecursive == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
     @Override
     public boolean containsTransformerRecursive() {
-        if (containsTransformerRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (op instanceof Transformer) {
-                result = ThreeValuedTruth.TRUE;
-            } else {
+        int flag = getFlag(SHIFT_TRANSFORMER);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = op instanceof Transformer;
+            if (!result) {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsTransformerRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsTransformerRecursive = result;
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_TRANSFORMER, flag);
         }
-        return containsTransformerRecursive == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
 
