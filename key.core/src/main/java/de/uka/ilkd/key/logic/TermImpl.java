@@ -369,6 +369,11 @@ class TermImpl implements JTerm {
      * @return true iff all (sub)terms carry equal label sets
      */
     private static boolean labelsEqualRecursive(JTerm t1, JTerm t2) {
+        // interned (shared) subterms are reference-identical: prune the whole subtree. This is
+        // the common case, as the term factory interns terms label-sensitively.
+        if (t1 == t2) {
+            return true;
+        }
         final ImmutableArray<TermLabel> labels1 = t1.getLabels();
         final ImmutableArray<TermLabel> labels2 = t2.getLabels();
         if (labels1.size() != labels2.size()) {
