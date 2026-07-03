@@ -411,10 +411,11 @@ public final class JmlTermFactory {
         try {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
             if (result == null) {
-                throw exc.createException0(String.format(
+                String message = String.format(
                     "Operator '%s' is not defined for operands of type '%s' and '%s' (in '%s %s %s').",
                     jmlOperator.getImage(), typeName(left), typeName(right),
-                    describe(left), jmlOperator.getImage(), describe(right)));
+                    describe(left), jmlOperator.getImage(), describe(right));
+                throw exc.createException0(withModeHint(message, jmlOperator));
             }
             return result;
         } catch (SLTranslationException e) {
@@ -422,13 +423,23 @@ public final class JmlTermFactory {
         }
     }
 
+    /**
+     * Appends a spec-math-mode hint to {@code message} when the operator that failed to resolve is
+     * actually available in a different mode (e.g. {@code >>>} is unavailable for {@code \bigint}).
+     */
+    private String withModeHint(String message, JMLOperator op) {
+        String hint = overloadedFunctionHandler.modeHint(op);
+        return hint.isEmpty() ? message : message + "\n" + hint;
+    }
+
     public SLExpression unary(JMLOperator unaryOp, SLExpression arg) {
         try {
             SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
             if (result == null) {
-                throw exc.createException0(String.format(
+                String message = String.format(
                     "Operator '%s' is not defined for an operand of type '%s' (in '%s %s').",
-                    unaryOp.getImage(), typeName(arg), unaryOp.getImage(), describe(arg)));
+                    unaryOp.getImage(), typeName(arg), unaryOp.getImage(), describe(arg));
+                throw exc.createException0(withModeHint(message, unaryOp));
             }
             return result;
         } catch (SLTranslationException e) {

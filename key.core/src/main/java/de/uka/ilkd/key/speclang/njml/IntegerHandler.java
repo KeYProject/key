@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -166,6 +167,33 @@ public class IntegerHandler extends LDTHandler {
 
     public SpecMathMode getSpecMathMode() {
         return this.specMathMode;
+    }
+
+    /**
+     * Determines in which spec math modes the given operator is available for integer operands.
+     * Only used to enrich the error message when a lookup fails in the current mode - e.g. {@code
+     * >>>} is defined for {@code int}/{@code long} but not for {@code \bigint}, so it is
+     * unavailable
+     * in the default bigint mode.
+     *
+     * @param op the operator that could not be resolved
+     * @return the set of spec math modes whose integer operator tables define {@code op}
+     */
+    public EnumSet<SpecMathMode> supportingModes(JMLOperator op) {
+        var modes = EnumSet.noneOf(SpecMathMode.class);
+        // JAVA mode dispatches to the plain int/long tables
+        if (opCategories.get(PrimitiveType.JAVA_INT).containsKey(op)
+                || opCategories.get(PrimitiveType.JAVA_LONG).containsKey(op)) {
+            modes.add(SpecMathMode.JAVA);
+        }
+        // SAFE mode dispatches to the overflow-checked int/long tables
+        if (jmlCheckedIntMap.containsKey(op) || jmlCheckedLongMap.containsKey(op)) {
+            modes.add(SpecMathMode.SAFE);
+        }
+        if (jmlBigintMap.containsKey(op)) {
+            modes.add(SpecMathMode.BIGINT);
+        }
+        return modes;
     }
 
     @Override
