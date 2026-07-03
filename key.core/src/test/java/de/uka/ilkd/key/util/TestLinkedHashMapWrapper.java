@@ -128,9 +128,10 @@ public class TestLinkedHashMapWrapper {
         assertEquals(1, irrelevantTermLabelsMap.size());
 
         // add mappings with irrelevant labels to all maps
-        assertNull(basicMap.put(irrelevantLabelTT, 2),
-            "Nothing should be returned as basicMap should not contain the key");
-        assertEquals(2, basicMap.size());
+        assertEquals(1, basicMap.put(irrelevantLabelTT, 2),
+            "Old value should be returned as term equality (basicMap) now ignores term labels");
+        assertEquals(1, basicMap.size(),
+            "Size should not increase as term equality ignores labels");
 
         assertEquals(1, termLabelsMap.put(irrelevantLabelTT, 2),
             "Old value should be returned as termLabelsMap should already contain the key");
@@ -148,9 +149,10 @@ public class TestLinkedHashMapWrapper {
 
         // add mappings with relevant labels to all maps
 
-        assertNull(basicMap.put(relevantLabelTT, 3),
-            "Nothing should be returned as basicMap should not contain the key");
-        assertEquals(3, basicMap.size());
+        assertEquals(2, basicMap.put(relevantLabelTT, 3),
+            "Old value should be returned as term equality (basicMap) now ignores term labels");
+        assertEquals(1, basicMap.size(),
+            "Size should not increase as term equality ignores labels");
 
         assertEquals(2, termLabelsMap.put(relevantLabelTT, 3),
             "Value 3 should be returned as termLabelsMap was previously updated with irrelevantLabelTT");
