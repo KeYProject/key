@@ -21,11 +21,18 @@ import org.key_project.prover.sequent.Sequent;
  * A {@link TermLabelPolicy} is used by
  * {@link TermLabelManager#instantiateLabels}
  * to decide for each {@link TermLabel} of an old {@link JTerm} if it should be re-added to the new
- * {@link JTerm} or not.
+ * {@link JTerm} or not. Policies are registered per label {@link org.key_project.logic.Name} and
+ * are only asked for labels of that name.
  * </p>
  * <p>
- * For more information about {@link TermLabel}s and how they are maintained during prove read the
- * documentation of interface {@link TermLabel}.
+ * <b>Execution order (part of the contract):</b> within one term creation, policies run
+ * <em>before</em> all {@link TermLabelUpdate}s — first the application-term policies, then the
+ * modality-term policies. The label set produced by the policies is what the updates subsequently
+ * see and may transform. Do not design a label whose update must run before a policy.
+ * </p>
+ * <p>
+ * For more information about {@link TermLabel}s and how they are maintained during proof
+ * construction read the documentation of interface {@link TermLabel}.
  * </p>
  *
  * @author Martin Hentschel

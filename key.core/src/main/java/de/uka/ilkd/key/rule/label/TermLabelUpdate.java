@@ -26,8 +26,14 @@ import org.key_project.prover.sequent.Sequent;
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link JTerm}.
  * </p>
  * <p>
- * For more information about {@link TermLabel}s and how they are maintained during prove read the
- * documentation of interface {@link TermLabel}.
+ * <b>Execution order (part of the contract):</b> updates run <em>after</em> all
+ * {@link TermLabelPolicy} instances; the label set passed to {@code updateLabels} already
+ * contains the taclet-provided labels and the labels kept by the policies. Rule-specific updates
+ * (see {@link #getSupportedRuleNames()}) run before rule-independent ones.
+ * </p>
+ * <p>
+ * For more information about {@link TermLabel}s and how they are maintained during proof
+ * construction read the documentation of interface {@link TermLabel}.
  * </p>
  *
  * @author Martin Hentschel

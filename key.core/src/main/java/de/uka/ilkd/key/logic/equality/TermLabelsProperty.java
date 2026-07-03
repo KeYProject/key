@@ -14,6 +14,13 @@ import org.key_project.logic.op.Modality;
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All term labels are ignored in this equality check.
  * <p>
+ * <b>Note:</b> since the standard term equality {@link Object#equals(Object)} ignores all term
+ * labels as well, this property is equivalent to plain {@code equals} for
+ * {@link de.uka.ilkd.key.logic.JTerm}s — prefer plain {@code equals} in new code. The property is
+ * kept for the generic {@link org.key_project.logic.Term} level and for symmetry with
+ * {@link IrrelevantTermLabelsProperty} (which is <em>not</em> equivalent to {@code equals}: it
+ * keeps proof-relevant labels significant).
+ * <p>
  * The single instance of this property can be accessed through
  * {@link TermLabelsProperty#TERM_LABELS_PROPERTY}.
  *

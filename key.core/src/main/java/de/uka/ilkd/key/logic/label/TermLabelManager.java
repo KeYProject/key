@@ -56,9 +56,16 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * </li>
  * </ul>
  * <p>
+ * The labels of a new {@link JTerm} are computed by {@link #instantiateLabels} in a fixed order
+ * which is part of the contract: taclet-provided labels, then the application-term
+ * {@link TermLabelPolicy} instances, then the modality-term {@link TermLabelPolicy} instances,
+ * then the rule-specific {@link TermLabelUpdate}s and finally the rule-independent
+ * {@link TermLabelUpdate}s. {@link TermLabelRefactoring}s run afterwards on the surrounding
+ * terms, with the scope they request per rule application.
+ * </p>
  * <p>
- * For more information about {@link TermLabel}s and how they are maintained during prove read the
- * documentation of interface {@link TermLabel}.
+ * For more information about {@link TermLabel}s and how they are maintained during proof
+ * construction read the documentation of interface {@link TermLabel}.
  * </p>
  *
  * @author Mattias Ulbrich
