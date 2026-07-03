@@ -76,6 +76,17 @@ public final class JavaInfo {
     private volatile int sortCachedSize = 0;
 
     /**
+     * When {@code true}, registering a new Java type is rejected (enforced in
+     * {@link de.uka.ilkd.key.java.JavaService#readCompilationUnit}). The parallel prover seals the
+     * type model for the duration of a multi-worker run, so a stray lazy type registration on the
+     * proving path fails fast (a loud {@link IllegalStateException}) instead of racing the shared
+     * model. All types are expected to be registered before proving starts -- see the
+     * {@code ProblemInitializer} warm-up that pre-creates the default execution context.
+     * Single-threaded proving never seals, so its behaviour is unchanged.
+     */
+    private volatile boolean typeRegistrationSealed = false;
+
+    /**
      * The default execution context is for the case of program statements on the top level. It is
      * equivalent to a static class belonging the default package. This should only be used when
      * using KeY in academic mode, if the verification conditions are generated they "must" start
@@ -1130,17 +1141,46 @@ public final class JavaInfo {
      *
      * @return the default execution context
      */
-    public ExecutionContext getDefaultExecutionContext() {
+    public synchronized ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
-            var cu = services.getJavaService()
-                    .readCompilationUnit("public class %s { void %s() {} }"
-                            .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
-                                DEFAULT_EXECUTION_CONTEXT_METHOD));
-            final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            // Register the synthetic __Default__ class only if it is not already in the (shared)
+            // Java model. A copied Services shares its JavaService -- which owns the parsed model
+            // --
+            // so once any JavaInfo has registered __Default__ every copy can look it up rather than
+            // re-parse it. Re-parsing per proof registers a type lazily on the proving path, which
+            // races under the parallel prover (and repeats work needlessly). The single, load-time
+            // registration is done by the ProblemInitializer warm-up.
+            KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            if (kjt == null) {
+                services.getJavaService()
+                        .readCompilationUnit("public class %s { void %s() {} }"
+                                .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
+                                    DEFAULT_EXECUTION_CONTEXT_METHOD));
+                kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            }
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableList.nil()), null);
         }
         return defaultExecutionContext;
+    }
+
+    /**
+     * Seals the Java type model: any subsequent attempt to register a new type (via
+     * {@link de.uka.ilkd.key.java.JavaService#readCompilationUnit}) throws. Used by the parallel
+     * prover to fail fast if a lazy type registration reaches the proving path. Idempotent.
+     */
+    public void sealTypeRegistration() {
+        typeRegistrationSealed = true;
+    }
+
+    /** Lifts a {@link #sealTypeRegistration() seal}; the model accepts new types again. */
+    public void unsealTypeRegistration() {
+        typeRegistrationSealed = false;
+    }
+
+    /** @return whether the type model is currently {@link #sealTypeRegistration() sealed} */
+    public boolean isTypeRegistrationSealed() {
+        return typeRegistrationSealed;
     }
 
 
