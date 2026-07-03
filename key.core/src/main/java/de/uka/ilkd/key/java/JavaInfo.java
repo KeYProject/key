@@ -74,6 +74,12 @@ public final class JavaInfo {
 
     private volatile int nameCachedSize = 0;
     private volatile int sortCachedSize = 0;
+    /**
+     * Cached user-facing type view: all types minus {@link KeYJavaType#isInternal() internal} ones.
+     * Rebuilt only when the type set grows (see {@link #getAllKeYJavaTypes(boolean)}).
+     */
+    private volatile Collection<KeYJavaType> userTypesCache = null;
+    private volatile int userTypesCachedSize = 0;
 
     /**
      * When {@code true}, registering a new Java type is rejected (enforced in
@@ -185,6 +191,8 @@ public final class JavaInfo {
             name2KJTCache = null;
             nameCachedSize = 0;
             sortCachedSize = 0;
+            userTypesCache = null;
+            userTypesCachedSize = 0;
         }
     }
 
@@ -295,12 +303,64 @@ public final class JavaInfo {
 
 
     /**
-     * returns all known KeYJavaTypes of the current program type model
+     * Returns the user-facing KeYJavaTypes of the current program type model. Equivalent to
+     * {@link #getAllKeYJavaTypes(boolean) getAllKeYJavaTypes(false)}, i.e. synthetic
+     * {@link KeYJavaType#isInternal() internal} types (such as the {@code __Default__}
+     * execution-context class) are excluded.
      *
-     * @return all known KeYJavaTypes of the current program type model
+     * @return all non-internal KeYJavaTypes of the current program type model
      */
     public Collection<KeYJavaType> getAllKeYJavaTypes() {
-        return kpmi.allTypes();
+        return getAllKeYJavaTypes(false);
+    }
+
+    /**
+     * Returns the KeYJavaTypes of the current program type model.
+     *
+     * @param includeInternal whether to include synthetic, {@link KeYJavaType#isInternal()
+     *        internal}
+     *        types such as the {@code __Default__} default-execution-context class. Pass
+     *        {@code false} (the default of {@link #getAllKeYJavaTypes()}) for user-facing
+     *        enumerations -- proof-obligation/specification browsing, "existing classes" queries --
+     *        so those synthetic types stay hidden without every call site filtering them out.
+     * @return the requested types. The {@code false} result is a cached view rebuilt only when the
+     *         type set grows (mirroring {@link #getTypeByName}); both variants stay O(1) amortized.
+     */
+    public Collection<KeYJavaType> getAllKeYJavaTypes(boolean includeInternal) {
+        if (includeInternal) {
+            return kpmi.allTypes();
+        }
+        Collection<KeYJavaType> cache = userTypesCache;
+        if (cache == null || kpmi.allTypes().size() > userTypesCachedSize) {
+            cache = buildUserTypesCache();
+        }
+        return cache;
+    }
+
+    /**
+     * (Re)builds the cache of user-facing (non-{@link KeYJavaType#isInternal() internal}) types.
+     * Mirrors {@link #buildNameCache()}.
+     *
+     * @return the (re)built cache, published to {@link #userTypesCache}
+     */
+    private Collection<KeYJavaType> buildUserTypesCache() {
+        synchronized (cacheBuildLock) {
+            final Collection<KeYJavaType> all = kpmi.allTypes();
+            // another worker may have (re)built the cache while we waited for the lock
+            if (userTypesCache != null && all.size() <= userTypesCachedSize) {
+                return userTypesCache;
+            }
+            final List<KeYJavaType> user = new ArrayList<>(all.size());
+            for (final KeYJavaType type : all) {
+                if (!type.isInternal()) {
+                    user.add(type);
+                }
+            }
+            final Collection<KeYJavaType> cache = Collections.unmodifiableCollection(user);
+            userTypesCachedSize = all.size();
+            userTypesCache = cache; // publish fully built collection in a single volatile write
+            return cache;
+        }
     }
 
 
@@ -340,7 +400,11 @@ public final class JavaInfo {
         KeYJavaType result = new KeYJavaType(type, sort);
         final ConcurrentHashMap<Type, KeYJavaType> cacheForPut = type2KJTCache;
         if (cacheForPut != null) {
-            cacheForPut.put(type, result);
+            // adopt the winner so concurrent misses converge on a single KeYJavaType instance
+            final KeYJavaType existing = cacheForPut.putIfAbsent(type, result);
+            if (existing != null) {
+                return existing;
+            }
         }
 
         return result;
@@ -1158,6 +1222,12 @@ public final class JavaInfo {
                                     DEFAULT_EXECUTION_CONTEXT_METHOD));
                 kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             }
+            // The synthetic __Default__ class is registered in the (shared) model -- now at load
+            // time via the ProblemInitializer warm-up -- but it is not a user class. Mark it so it
+            // is hidden from user-facing type enumerations (getAllKeYJavaTypes(false)); drop the
+            // user-types cache in case it was built between registering and marking the type.
+            kjt.markInternal();
+            userTypesCache = null;
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableList.nil()), null);
         }
