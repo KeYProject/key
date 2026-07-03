@@ -22,13 +22,12 @@ import org.key_project.util.java.CollectionUtil;
  * The labeled term class is used for terms that have a label attached.
  * </p>
  *
- * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
- * the method {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} can be used to
- * compare terms
- * while ignoring certain
- * given properties. E.g. by using {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the
- * term structures modulo
- * renaming are compared whilst ignoring annotations. *
+ * As for all terms, {@link #equals(Object)} compares the term structure and ignores term labels.
+ * Use {@link #equalsIncludingLabels(Object)} to compare labels as well. The method
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} can be used to compare
+ * terms while ignoring certain given properties, e.g. by using
+ * {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the term structures modulo renaming
+ * are compared.
  *
  * @see JTerm
  * @see TermImpl
@@ -112,43 +111,6 @@ public class LabeledTermImpl extends TermImpl {
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-
-        if (o instanceof final LabeledTermImpl cmp) {
-            if (labels.size() != cmp.labels.size()) {
-                return false;
-            }
-
-            if (!super.equals(o)) {
-                return false;
-            }
-
-            if (labels.size() == cmp.labels.size()) {
-                for (int i = 0, sz = labels.size(); i < sz; i++) {
-                    // this is not optimal, but as long as number of labels limited ok
-                    if (!cmp.labels.contains(labels.get(i))) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int computeHashCode() {
-        int hash = super.computeHashCode();
-        for (int i = 0, sz = labels.size(); i < sz; i++) {
-            hash += 7 * labels.get(i).hashCode();
-        }
-        return hash;
     }
 
     @Override

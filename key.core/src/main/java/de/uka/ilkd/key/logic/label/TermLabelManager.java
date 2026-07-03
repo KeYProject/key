@@ -821,7 +821,7 @@ public class TermLabelManager {
         JTerm newTerm =
             refactorApplicationTerm(state, services, applicationPosInOccurrence, oldTerm,
                 rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
-        if (newTerm != null && !newTerm.equals(oldTerm)) {
+        if (newTerm != null && !newTerm.equalsIncludingLabels(oldTerm)) {
             return replaceTerm(state, applicationPosInOccurrence, newTerm,
                 services.getTermFactory(),
                 refactorings.childAndGrandchildRefactoringsAndParents(), services,
@@ -972,7 +972,8 @@ public class TermLabelManager {
         JTerm newApplicationTerm =
             refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm, refactorings, tf);
-        if (newApplicationTerm != null && !newApplicationTerm.equals(applicationTerm)) {
+        if (newApplicationTerm != null
+                && !newApplicationTerm.equalsIncludingLabels(applicationTerm)) {
             JTerm root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf,
                 refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
@@ -1120,7 +1121,7 @@ public class TermLabelManager {
                 newSubs[childIndex] = newChild;
                 ImmutableArray<JTerm> newSubsImmutable = new ImmutableArray<>(newSubs);
 
-                if (!newSubsImmutable.equals(newTerm.subs())
+                if (!newSubs[childIndex].equalsIncludingLabels(newTerm.sub(childIndex))
                         || !newLabels.equals(newTerm.getLabels())) {
                     newTerm = tf.createTerm(newTerm.op(), newSubsImmutable, newTerm.boundVars(),
                         newLabels);
@@ -1426,7 +1427,7 @@ public class TermLabelManager {
                 newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                     applicationTerm, rule, goal, hint, tacletTerm, sub,
                     allChildAndGrandchildRefactorings);
-                if (!newSubs[i].equals(sub)) {
+                if (!newSubs[i].equalsIncludingLabels(sub)) {
                     changed = true;
                 }
             }
@@ -1513,7 +1514,7 @@ public class TermLabelManager {
                     refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                         applicationTerm, rule, goal, hint, tacletTerm, (JTerm) sfa.formula(),
                         activeRefactorings);
-                if (!sfa.formula().equals(updatedTerm)) {
+                if (!((JTerm) sfa.formula()).equalsIncludingLabels(updatedTerm)) {
                     goal.changeFormula(new SequentFormula(updatedTerm),
                         new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
                 }
@@ -1551,7 +1552,7 @@ public class TermLabelManager {
             JTerm oldSub = term.sub(i);
             newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                 applicationTerm, rule, goal, hint, tacletTerm, oldSub, activeRefactorings);
-            if (!newSubs[i].equals(oldSub)) {
+            if (!newSubs[i].equalsIncludingLabels(oldSub)) {
                 subsChanged = true;
             }
         }

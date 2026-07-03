@@ -125,8 +125,11 @@ public final class TermFactory {
                     : new LabeledTermImpl(op, subs, boundVars, labels, origin));
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
-        // may be different.
-        if (cache != null && !newTerm.containsJavaBlockRecursive()) {
+        // may be different. Terms carrying term labels (directly or in a subterm) are not cached
+        // either: equals() ignores labels, so the cache would conflate label variants and
+        // silently drop labels from newly created terms.
+        if (cache != null && !newTerm.containsJavaBlockRecursive()
+                && !newTerm.containsLabelsRecursive()) {
             JTerm term;
             synchronized (cache) {
                 term = cache.get(newTerm);

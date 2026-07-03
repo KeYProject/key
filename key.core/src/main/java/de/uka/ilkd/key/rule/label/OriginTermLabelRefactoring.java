@@ -10,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.StrictTermKey;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -85,7 +86,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         // cache origins per term to avoid a quadratic recursive collection per rule
         // application
-        final Map<JTerm, Set<Origin>> originsCache =
+        final Map<StrictTermKey, Set<Origin>> originsCache =
             services.getCaches().getSubtermOriginsCache();
         Set<Origin> subtermOrigins = new LinkedHashSet<>();
         for (JTerm sub : term.subs()) {
@@ -135,8 +136,16 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      *         subterms; the returned set is unmodifiable and shared, do not mutate
      */
     @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(JTerm term, Map<JTerm, Set<Origin>> originsCache) {
-        Set<Origin> cached = originsCache.get(term);
+    private Set<Origin> collectSubtermOrigins(JTerm term,
+            Map<StrictTermKey, Set<Origin>> originsCache) {
+        // origins live in term labels: a label-free subtree cannot contribute any
+        if (!term.containsLabelsRecursive()) {
+            return Collections.emptySet();
+        }
+
+        // the cache key must be label-sensitive as the value is derived from the labels
+        final StrictTermKey key = new StrictTermKey(term);
+        Set<Origin> cached = originsCache.get(key);
         if (cached != null) {
             return cached;
         }
@@ -156,7 +165,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         Set<Origin> stored =
             result.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(result);
-        originsCache.put(term, stored);
+        originsCache.put(key, stored);
         return stored;
     }
 

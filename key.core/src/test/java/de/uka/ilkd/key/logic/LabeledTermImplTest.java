@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class LabeledTermImplTest {
 
@@ -40,10 +39,40 @@ public class LabeledTermImplTest {
         JTerm labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
             tf.createTerm(Junctor.FALSE), labels);
 
-        assertNotEquals(labeledTerm, unlabeledTerm,
-            "Labeled and unlabeled terms must not be equal");
-        assertNotEquals(unlabeledTerm, labeledTerm,
-            "Labeled and unlabeled terms must not be equal");
+        // equals ignores term labels ...
+        Assertions.assertEquals(labeledTerm, unlabeledTerm,
+            "equals must ignore term labels");
+        Assertions.assertEquals(unlabeledTerm, labeledTerm,
+            "equals must ignore term labels");
+        Assertions.assertEquals(labeledTerm.hashCode(), unlabeledTerm.hashCode(),
+            "hashCode must ignore term labels");
+        // ... while equalsIncludingLabels does not
+        Assertions.assertFalse(labeledTerm.equalsIncludingLabels(unlabeledTerm),
+            "equalsIncludingLabels must distinguish labeled and unlabeled terms");
+        Assertions.assertFalse(unlabeledTerm.equalsIncludingLabels(labeledTerm),
+            "equalsIncludingLabels must distinguish labeled and unlabeled terms");
+        Assertions.assertTrue(labeledTerm.equalsIncludingLabels(labeledTerm));
+    }
+
+    /**
+     * Labels on subterms must be distinguished by
+     * {@link JTerm#equalsIncludingLabels(Object)}, too.
+     */
+    @Test
+    public void testEqualsLabelOnSubterm() {
+        JTerm labeledSub = tf.createTerm(Junctor.TRUE,
+            new ImmutableArray<>(), null,
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL));
+        JTerm labeledBelow =
+            tf.createTerm(Junctor.AND, labeledSub, tf.createTerm(Junctor.FALSE));
+        JTerm unlabeled =
+            tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
+
+        Assertions.assertTrue(labeledBelow.containsLabelsRecursive());
+        Assertions.assertFalse(unlabeled.containsLabelsRecursive());
+        Assertions.assertEquals(labeledBelow, unlabeled);
+        Assertions.assertFalse(labeledBelow.equalsIncludingLabels(unlabeled));
+        Assertions.assertFalse(unlabeled.equalsIncludingLabels(labeledBelow));
     }
 
     /**

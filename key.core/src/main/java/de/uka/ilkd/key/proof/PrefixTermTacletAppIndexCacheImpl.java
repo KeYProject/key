@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.JTerm;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
@@ -98,7 +100,10 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
                 return false;
             }
 
-            return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
+            // label-sensitive comparison: taclet applicability can depend on term labels
+            // (e.g. TermLabelCondition), so label variants must not share index entries
+            return parent == objKey.parent
+                    && ((JTerm) analysedTerm).equalsIncludingLabels(objKey.analysedTerm);
         }
 
         public int hashCode() {

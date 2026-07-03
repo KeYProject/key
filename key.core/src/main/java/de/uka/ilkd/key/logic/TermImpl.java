@@ -83,6 +83,13 @@ class TermImpl implements JTerm {
     /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
     private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
 
+    /**
+     * This flag indicates that the {@link JTerm} itself or one of its children carries a
+     * {@link TermLabel}. As {@link #equals(Object)} ignores term labels, label-sensitive
+     * consumers (e.g. the term factory cache) use this flag as a cheap guard.
+     */
+    private ThreeValuedTruth containsLabelsRecursive = ThreeValuedTruth.UNKNOWN;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -281,7 +288,8 @@ class TermImpl implements JTerm {
     }
 
     /**
-     * true iff <code>o</code> is syntactically equal to this term
+     * true iff <code>o</code> is syntactically equal to this term; {@link TermLabel}s are
+     * ignored. Use {@link #equalsIncludingLabels(Object)} for a label-sensitive comparison.
      */
     @Override
     public boolean equals(Object o) {
@@ -289,16 +297,65 @@ class TermImpl implements JTerm {
             return true;
         }
 
-        if (o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) {
+        if (!(o instanceof final TermImpl t) || hashCode() != o.hashCode()) {
             return false;
         }
 
-        final TermImpl t = (TermImpl) o;
-
-        return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
+        return op.equals(t.op) && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
                 // TODO (DD): below is no longer necessary
                 && javaBlock().equals(t.javaBlock());
+    }
+
+    /**
+     * true iff <code>o</code> is syntactically equal to this term <em>including</em> all
+     * {@link TermLabel}s attached to this term or any subterm. Labels are compared as sets
+     * (order-insensitive). This is the label-sensitive counterpart of {@link #equals(Object)}
+     * needed by the few consumers which must distinguish label variants (e.g. the term
+     * factory cache and taclet index caches).
+     */
+    @Override
+    public boolean equalsIncludingLabels(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!equals(o)) {
+            return false;
+        }
+        final TermImpl t = (TermImpl) o;
+        if (!containsLabelsRecursive() && !t.containsLabelsRecursive()) {
+            return true;
+        }
+        return labelsEqualRecursive(this, t);
+    }
+
+    /**
+     * Compares the {@link TermLabel}s of two structurally equal terms recursively.
+     *
+     * @param t1 a term
+     * @param t2 a term already known to be equal to {@code t1} modulo term labels
+     * @return true iff all (sub)terms carry equal label sets
+     */
+    private static boolean labelsEqualRecursive(JTerm t1, JTerm t2) {
+        final ImmutableArray<TermLabel> labels1 = t1.getLabels();
+        final ImmutableArray<TermLabel> labels2 = t2.getLabels();
+        if (labels1.size() != labels2.size()) {
+            return false;
+        }
+        for (int i = 0, sz = labels1.size(); i < sz; i++) {
+            if (!labels2.contains(labels1.get(i))) {
+                return false;
+            }
+        }
+        if (!t1.containsLabelsRecursive() && !t2.containsLabelsRecursive()) {
+            return true;
+        }
+        for (int i = 0, ar = t1.arity(); i < ar; i++) {
+            if (!labelsEqualRecursive(t1.sub(i), t2.sub(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -418,6 +475,28 @@ class TermImpl implements JTerm {
             this.containsJavaBlockRecursive = result;
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsLabelsRecursive() {
+        if (containsLabelsRecursive == ThreeValuedTruth.UNKNOWN) {
+            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+            if (hasLabels()) {
+                result = ThreeValuedTruth.TRUE;
+            } else {
+                for (int i = 0, arity = subs.size(); i < arity; i++) {
+                    if (subs.get(i).containsLabelsRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
+                    }
+                }
+            }
+            this.containsLabelsRecursive = result;
+        }
+        return containsLabelsRecursive == ThreeValuedTruth.TRUE;
     }
 
     @Override
