@@ -293,6 +293,17 @@ public final class ProblemInitializer {
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
                 initialFile));
+
+        // Pre-materialise the default execution context (the synthetic __Default__ class) here,
+        // single-threaded, so the matcher never has to register it lazily during proving. Otherwise
+        // the first match of a context-block modality without an explicit execution context would
+        // parse and register __Default__ on the proving path (see
+        // ContextStatementBlock#matchInnerExecutionContext and
+        // JavaInfo#getDefaultExecutionContext),
+        // which races under the parallel prover. Materialising it now keeps the Java type model
+        // fixed once proving starts. Unconditional on purpose: inline-program proofs can need it
+        // even when javaPath is null, and it is a no-op when already created.
+        initConfig.getServices().getJavaInfo().getDefaultExecutionContext();
     }
 
     /**
