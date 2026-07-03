@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @see RunSmallProofsMt2wTest
  */
 @Tag("slow")
+@Tag("owntest")
 @Tag("testRunAllProofs")
 public final class RunSmallProofsMt4wTest {
 
@@ -35,6 +37,7 @@ public final class RunSmallProofsMt4wTest {
 
     private static String prevEnabled;
     private static String prevThreads;
+    private static String settingsSnapshot;
 
     @BeforeAll
     static void enableParallelProver() {
@@ -47,10 +50,16 @@ public final class RunSmallProofsMt4wTest {
             "this suite must genuinely run with " + WORKERS + " workers");
         assertTrue(ParallelProver.effectiveWorkerCount() > 1,
             "an MT suite that degrades to a single worker is not testing anything");
+        // RunAllProofs loads its own KeY settings into the shared ProofSettings.DEFAULT_SETTINGS;
+        // snapshot it so this (NOFORK, in-JVM) suite cannot leak those settings to later tests.
+        settingsSnapshot = ProofSettings.DEFAULT_SETTINGS.settingsToString();
     }
 
     @AfterAll
     static void restoreParallelProver() {
+        if (settingsSnapshot != null) {
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+        }
         restore(ParallelProver.PARALLEL_PROPERTY, prevEnabled);
         restore(ParallelProver.THREADS_PROPERTY, prevThreads);
     }
