@@ -12,7 +12,7 @@ import de.uka.ilkd.key.util.AssertionFailure;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 
 import org.jspecify.annotations.NonNull;
 
@@ -38,8 +38,8 @@ import org.jspecify.annotations.NonNull;
  */
 public class AppliedRuleAppsNameCache {
     /** cache of all applied rules of a node, by rule name and then by application fingerprint */
-    private final LRUCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
-        new LRUCache<>(32);
+    private final ConcurrentLruCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
+        new ConcurrentLruCache<>(32);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();

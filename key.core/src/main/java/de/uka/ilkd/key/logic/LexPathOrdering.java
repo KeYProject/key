@@ -80,7 +80,7 @@ public class LexPathOrdering implements TermOrdering {
      * Comparison-result cache, a thread-safe bounded LRU. A {@link LexPathOrdering} lives in a
      * per-proof strategy cost feature ({@code SmallerThanFeature}) shared across all goals, and the
      * parallel prover evaluates rule-application cost concurrently, so this cache is read and
-     * written by several workers at once. A plain {@code HashMap}/{@code LRUCache} would corrupt
+     * written by several workers at once. A plain {@code HashMap} would corrupt
      * under that (the latter mutates even on {@code get}); {@link ConcurrentLruCache} keeps the LRU
      * bound while being thread-safe. Size tunable via {@code -Dkey.lexpath.cachesize}.
      */
