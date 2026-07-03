@@ -6,6 +6,7 @@ package de.uka.ilkd.key.settings;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,14 +31,23 @@ public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var file = new File(PathConfig.getProofIndependentSettings().toString()
-                .replace(".props", ".json"));
-        if (file.exists()) {
-            DEFAULT_INSTANCE = new ProofIndependentSettings(file);
-        } else {
-            var old = PathConfig.getProofIndependentSettings();
-            DEFAULT_INSTANCE = new ProofIndependentSettings(old.toFile());
+        var write = PathConfig.currentPaths.proofIndependentSettings;
+        var differs = PathConfig.isDifferentReadWriteDirectories();
+
+        // Path to read from
+        var read = differs ? PathConfig.currentPaths.proofIndependentSettings : write;
+
+        // (1)
+        if (!Files.exists(read)) { // change json to props file
+            read =
+                read.getParent().resolve(read.getFileName().toString().replace(".json", ".props"));
         }
+
+        // read from the old/new place
+        DEFAULT_INSTANCE = new ProofIndependentSettings(read.toFile());
+
+        // set the write place
+        DEFAULT_INSTANCE.filename = write.toFile();
     }
 
     private final ProofIndependentSMTSettings smtSettings =
@@ -88,7 +98,7 @@ public class ProofIndependentSettings {
     private void loadSettings() {
         try {
             if (filename.exists()) {
-                if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                if (PathConfig.DISREGARD_SETTINGS) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
                         PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {

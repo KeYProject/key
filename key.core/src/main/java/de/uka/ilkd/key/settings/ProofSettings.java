@@ -38,10 +38,19 @@ public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
     public static final Path PROVER_CONFIG_FILE =
-        PathConfig.getKeyConfigDir().resolve("proof-settings.props");
+        PathConfig.currentPaths.keyConfigDir.resolve("proof-settings.json");
 
-    public static final Path PROVER_CONFIG_FILE_NEW =
-        PathConfig.getKeyConfigDir().resolve("proof-settings.json");
+    private static Path getProofSettingsReadPath() {
+        var newPathJson = List.of(
+            PROVER_CONFIG_FILE,
+            PathConfig.currentPaths.keyConfigDir.resolve("proof-settings.props"),
+            PathConfig.previousPaths.keyConfigDir.resolve("proof-settings.json"),
+            PathConfig.previousPaths.keyConfigDir.resolve("proof-settings.props"));
+        return newPathJson.stream()
+                .filter(Files::exists)
+                .findFirst()
+                .orElse(PROVER_CONFIG_FILE);
+    }
 
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
@@ -146,11 +155,10 @@ public class ProofSettings {
      */
     public void saveSettings() {
         try {
-            if (!Files.exists(PROVER_CONFIG_FILE_NEW)) {
+            if (!Files.exists(PROVER_CONFIG_FILE)) {
                 Files.createDirectories(PROVER_CONFIG_FILE.getParent());
             }
-            try (Writer out =
-                Files.newBufferedWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8)) {
+            try (Writer out = Files.newBufferedWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
             }
         } catch (IOException e) {
@@ -206,18 +214,18 @@ public class ProofSettings {
      * Loads the former settings from configuration file.
      */
     public void loadSettings() {
-        if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-            LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
+        if (PathConfig.DISREGARD_SETTINGS) {
+            LOGGER.warn("The settings in {} are *not* read by system property flag {}.",
+                PROVER_CONFIG_FILE, PathConfig.DISREGARD_SETTINGS_PROPERTY);
         } else {
-            var isOldFormat = !Files.exists(PROVER_CONFIG_FILE_NEW);
-            var fileToUse = isOldFormat ? PROVER_CONFIG_FILE : PROVER_CONFIG_FILE_NEW;
-            try (var in = Files.newBufferedReader(fileToUse, StandardCharsets.UTF_8)) {
-                LOGGER.info("Load proof dependent settings from file {}", fileToUse);
+            var readPath = getProofSettingsReadPath();
+            var isOldFormat = readPath.getFileName().toString().endsWith(".props");
+            try (var in = Files.newBufferedReader(readPath, StandardCharsets.UTF_8)) {
+                LOGGER.info("Load proof dependent settings from file {}", readPath);
+                loadDefaultJSONSettings();
                 if (isOldFormat) {
-                    loadDefaultJSONSettings();
                     loadSettingsFromPropertyStream(in);
                 } else {
-                    loadDefaultJSONSettings();
                     loadSettingsFromJSONStream(in);
                 }
             } catch (IOException e) {

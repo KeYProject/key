@@ -7,7 +7,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -30,31 +29,19 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
 
 /**
  * Class for storing and retrieving {@link KeyStroke}s.
- *
+ * <p>
  * If possible, define the keyboard shortcuts in the static block here. By that, it is easier to
  * detect and prevent possible duplicates. In addition, be careful to avoid combinations that are
  * used by the docking framework, such as Ctrl+E or Ctrl+M.
  *
  * @author Alexander Weigl, Wolfram Pfeifer (overhaul, v2)
- * @version 1 (09.05.19)
  * @version 2 (04.08.23)
  */
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
-    /**
-     * filename of the properties file
-     */
-    public static final String SETTINGS_FILENAME = "keystrokes.properties";
-
-    /**
-     * path of the properties file
-     */
-    public static final Path SETTINGS_FILE =
-        PathConfig.getKeyConfigDir().resolve(SETTINGS_FILENAME);
-    private static final Path SETTINGS_FILE_NEW =
-        PathConfig.getKeyConfigDir().resolve("keystrokes.json");
-
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
+    /// path of the properties file
+    public static final Path SETTINGS_FILE = PathConfig.getSettingsFile("keystrokes.json");
 
     /**
      * singleton instance
@@ -167,17 +154,16 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public static KeyStrokeSettings getInstance() {
-
         if (INSTANCE == null) {
             if (Files.exists(SETTINGS_FILE)) {
                 try {
-                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
-                    return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE_NEW));
+                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE);
+                    return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE));
                 } catch (IOException e) {
-                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                    LOGGER.error("Could not read {}", SETTINGS_FILE, e);
+                    return INSTANCE = new KeyStrokeSettings(new Properties());
                 }
             }
-            return INSTANCE = loadFromConfig();
         }
         return INSTANCE;
     }
@@ -210,22 +196,12 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());
-            try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-                Properties props = new Properties();
-                for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                    props.setProperty(entry.getKey(), entry.getValue().toString());
-                }
-                props.store(writer, "KeY's KeyStrokes");
+            LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
+            try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE)) {
+                var config = new Configuration(properties);
+                config.save(writer, "KeY's KeyStrokes");
+                writer.flush();
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.toAbsolutePath());
-        try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE_NEW)) {
-            var config = new Configuration(properties);
-            config.save(writer, "KeY's KeyStrokes");
-            writer.flush();
         } catch (IOException ex) {
             LOGGER.warn("Failed to save", ex);
         }

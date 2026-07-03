@@ -74,7 +74,7 @@ public class Log {
     }
 
     private static void cleanOldLogFiles() {
-        var logDir = PathConfig.getLogDirectory();
+        var logDir = PathConfig.currentPaths.logDirectory;
         try (var files = Files.list(logDir)) {
             var duration = Duration.of(14, ChronoUnit.DAYS);
             var refDate = Instant.now().minus(duration);
