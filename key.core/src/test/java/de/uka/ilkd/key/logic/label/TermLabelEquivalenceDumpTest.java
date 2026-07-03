@@ -72,10 +72,11 @@ public class TermLabelEquivalenceDumpTest {
 
     /**
      * Term labels that are actually attached during standard (console) proof search and therefore
-     * must be observed while replaying {@link #PROOFS}. Note: {@code postCondition} and
-     * {@code undef} are registered by {@code JavaProfile} but never attached by any rule, so they
-     * are not expected; {@code selfComposedExecution} is information-flow only and {@code Trigger}
-     * is SMT-translation only, so neither is reachable by proof replay.
+     * must be observed while replaying {@link #PROOFS}. Note: {@code postCondition}, {@code undef}
+     * and {@code selfComposedExecution} are attached only by the information-flow module
+     * (key.core.infflow) and {@code Trigger} only by the SMT translation, so none of them is
+     * reachable by replaying standard Java profile proofs; the infflow labels are covered by the
+     * separate testRunAllInfProofs regression instead.
      */
     private static final Set<String> EXPECTED_LABELS = Set.of(
         "origin", "anonHeapFunction", "selectSK", "impl", "SC", "loopScopeIndex");
