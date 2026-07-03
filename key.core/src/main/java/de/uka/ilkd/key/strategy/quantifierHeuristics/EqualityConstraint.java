@@ -22,7 +22,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -859,8 +859,8 @@ public class EqualityConstraint implements Constraint {
 
     // the methods using these caches seem not to be used anymore otherwise refactor and move it
     // into ServiceCaches
-    private static Map<ECPair, Constraint> joinCache = new LRUCache<>(0);
-    private static Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
+    private static Map<ECPair, Constraint> joinCache = new ConcurrentLruCache<>(0);
+    private static Map<ECPair, Constraint> joinCacheOld = new ConcurrentLruCache<>(0);
 
     private static final ECPair ecPair0 = new ECPair(null, null, 0);
 

@@ -25,6 +25,9 @@ import org.key_project.util.collection.ImmutableList;
  * @author Martin Hentschel
  */
 public class DefaultProofControl extends AbstractProofControl {
+    private static final org.slf4j.Logger LOGGER =
+        org.slf4j.LoggerFactory.getLogger(DefaultProofControl.class);
+
     /**
      * The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      */
@@ -68,6 +71,12 @@ public class DefaultProofControl extends AbstractProofControl {
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
             ProverTaskListener ptl) {
+        if (proof.isErroneous()) {
+            // A previous run marked the proof erroneous (an essential proof listener failed); it
+            // may be inconsistent, so no new search is started. The proof can still be saved.
+            LOGGER.warn("Refusing to start auto mode: proof {} is marked erroneous.", proof.name());
+            return;
+        }
         if (!isInAutoMode()) {
             autoModeThread = new AutoModeThread(proof, goals, ptl);
             autoModeThread.start();

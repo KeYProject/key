@@ -99,6 +99,16 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, time,
                 countApplied, srInfo);
             while (!shouldStop) {
+                if (proof.isErroneous()) {
+                    // The proof is flagged as erroneous (an essential proof listener failed --
+                    // possibly during the previous step of this very run): stop before applying
+                    // anything further. The proof refuses new searches but stays saveable.
+                    return new ApplyStrategyInfo<>(
+                        "Proof search stopped: the proof is marked erroneous "
+                            + "(an essential proof listener failed).",
+                        proof, null, srInfo == null ? null : srInfo.getGoal(),
+                        System.currentTimeMillis() - time, countApplied, closedGoals);
+                }
                 var applyAutomaticTime = System.nanoTime();
                 try {
                     srInfo = applyAutomaticRule(goalChooser, stopCondition,

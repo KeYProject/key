@@ -5,6 +5,7 @@ package org.key_project.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -13,13 +14,13 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A thread-safe {@link LRUCache} with <em>exact</em> least-recently-used eviction order.
+ * A thread-safe LRU cache with <em>exact</em> least-recently-used eviction order.
  *
  * <p>
  * This is a single-lock cache: every operation (including {@link #get}, which reorders the access
- * recency) is serialized on the cache instance. That makes it a behaviour-preserving, drop-in
- * replacement for the {@code Collections.synchronizedMap(new LRUCache<>(n))} idiom -- it delegates
- * to exactly that, only behind a named, reusable type with an atomic {@link #computeIfAbsent}.
+ * recency) is serialized on the cache instance. It wraps an access-ordered {@link LinkedHashMap}
+ * with size-bounded eviction in a {@code Collections.synchronizedMap}, behind a named, reusable
+ * type with an atomic {@link #computeIfAbsent}.
  *
  * <p>
  * Use this flavour when the eviction order matters for correctness, i.e. when a cached value
@@ -53,7 +54,13 @@ public final class ConcurrentLruCache<K, V> implements Map<K, V> {
      * @param maxEntries the maximum number of entries before the least recently used one is evicted
      */
     public ConcurrentLruCache(int maxEntries) {
-        this.delegate = Collections.synchronizedMap(new LRUCache<>(maxEntries));
+        this.delegate =
+            Collections.synchronizedMap(new LinkedHashMap<>(maxEntries + 1, 1.0F, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                    return size() > maxEntries;
+                }
+            });
     }
 
     @Override

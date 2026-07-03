@@ -148,6 +148,15 @@ public class Proof implements ProofObject<Goal>, Named {
     private boolean disposed = false;
 
     /**
+     * Set once an {@link EssentialProofListener} failed while handling an event: the step that
+     * fired it may have left the proof or a goal inconsistent, so the running search is stopped
+     * (the provers poll this), no new search may be started, but the proof object stays intact so
+     * the user can still attempt to save it. Volatile: written from the (possibly worker) firing
+     * thread, read by the prover loop(s) and the auto-mode control.
+     */
+    private volatile boolean erroneous = false;
+
+    /**
      * list of rule app listeners
      */
     private final List<RuleAppListener> ruleAppListenerList =
@@ -1156,12 +1165,35 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param notify the notification to deliver to each listener
      * @param <L> the listener type
      */
-    private static <L> void notifyListeners(List<L> listeners, Consumer<L> notify) {
+    /**
+     * Notifies every listener of an event, isolating the proof from a listener that throws.
+     *
+     * <p>
+     * A failing <em>non-essential</em> listener (a pure observer) is logged and unregistered, and
+     * the remaining listeners are still notified: its brokenness cannot corrupt the proof, so the
+     * search continues unaffected.
+     *
+     * <p>
+     * A failing {@link EssentialProofListener} is different: it is part of the proving machinery,
+     * so its failure means the step that just fired this event may already have left the proof or a
+     * goal inconsistent. Continuing to prove would build on a broken state. Such a failure instead
+     * {@linkplain #markErroneous marks the proof erroneous} -- which cooperatively stops the
+     * running search and blocks any new one -- while leaving the proof intact so it can still be
+     * saved. The essential listener is <em>not</em> unregistered (dropping it would merely hide the
+     * problem), and no further listeners are notified for this event.
+     */
+    private <L> void notifyListeners(List<L> listeners, Consumer<L> notify) {
         List<L> broken = null;
         for (L listener : listeners) {
             try {
                 notify.accept(listener);
             } catch (Exception e) {
+                if (listener instanceof EssentialProofListener) {
+                    markErroneous(listener.getClass().getName(), e);
+                    // The proof is now flagged; the prover will stop at its next check and no new
+                    // search can start. Do not touch the remaining listeners for this event.
+                    break;
+                }
                 LOGGER.error("proof listener {} threw while handling an event and will be "
                     + "unregistered to keep the proof consistent", listener.getClass().getName(),
                     e);
@@ -1173,6 +1205,33 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         if (broken != null) {
             listeners.removeAll(broken);
+        }
+    }
+
+    /**
+     * @return whether this proof has been flagged as erroneous because an
+     *         {@link EssentialProofListener} failed (see {@link #notifyListeners}). An erroneous
+     *         proof stops its running search and refuses to start a new one, but may still be
+     *         saved.
+     */
+    @Override
+    public boolean isErroneous() {
+        return erroneous;
+    }
+
+    /**
+     * Flags this proof as {@linkplain #isErroneous() erroneous} after an essential-listener
+     * failure. Idempotent; only the first failure is logged.
+     *
+     * @param listenerName the failing listener's class name (for the log)
+     * @param cause the throwable it raised
+     */
+    private void markErroneous(String listenerName, Throwable cause) {
+        if (!erroneous) {
+            erroneous = true;
+            LOGGER.error("essential proof listener {} failed; the proof search is stopped and the "
+                + "proof is marked erroneous (no further search possible). The proof can still be "
+                + "saved for a later reload attempt.", listenerName, cause);
         }
     }
 
