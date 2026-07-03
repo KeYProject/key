@@ -332,9 +332,8 @@ tasks.register("testRAP", Test) {
     systemProperty 'key.matcher.compiled',
         (project.findProperty('matcher.compiled')
                 ?: System.getProperty('key.matcher.compiled', 'false'))
-    // each fork writes its own statistics file (runStatistics.csv.<pid>.csv) -- concurrent
-    // appends from parallel forks to one file can interleave mid-line
-    systemProperty 'key.rap.stats.perProcess', 'true'
+    // (statistics are always written per-process, <statisticsFile>.<pid>.csv; see
+    // ProveTest.getStatisticsFile -- combine the per-fork files after the run.)
     // set heap size for the test JVM(s) (overridable with -PrapHeap=8g for the large examples)
     minHeapSize = "1g"
     maxHeapSize = (project.findProperty('rapHeap') ?: '3g')
