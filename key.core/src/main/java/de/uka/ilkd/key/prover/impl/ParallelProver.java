@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.Services;
@@ -111,6 +112,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /** Set once a stop condition fires; the first message wins. */
     private volatile @Nullable String stopMessage;
     private volatile boolean stopRequested;
+
+    /**
+     * How long {@link #awaitWorkerTermination} waits for the workers to wind down after a stop. The
+     * stop is cooperative (workers leave their claim loop after the current step), so this is only
+     * a
+     * safety cap to avoid blocking the caller forever should a worker get genuinely stuck.
+     */
+    private static final long WORKER_SHUTDOWN_TIMEOUT_SECONDS = 60;
     private volatile @Nullable Goal nonCloseableGoal;
 
     /**
@@ -259,22 +268,37 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         };
         try (var ignored = proof.suspendNonEssentialListeners(); mtScope) {
             List<Future<?>> futures = new ArrayList<>(workerCount);
-            for (int w = 0; w < workerCount; w++) {
-                final int workerId = w;
-                futures.add(
-                    pool.submit(() -> workerLoop(workerId, scheduler, commitLock, startTime)));
+            try {
+                for (int w = 0; w < workerCount; w++) {
+                    final int workerId = w;
+                    futures.add(
+                        pool.submit(() -> workerLoop(workerId, scheduler, commitLock, startTime)));
+                }
+                for (Future<?> f : futures) {
+                    f.get();
+                }
+            } catch (ExecutionException e) {
+                error = e.getCause() != null ? e.getCause() : e;
+                LOGGER.warn("parallel proof run failed", error);
+            } catch (InterruptedException e) {
+                cancelled = true;
+            } finally {
+                // Stop the workers and WAIT for them to actually finish while the non-essential
+                // (GUI) proof-tree listeners are STILL suspended by the enclosing
+                // try-with-resources -- the inner finally runs before the resource is closed. If we
+                // returned (and let the listeners be re-attached) while a worker was still
+                // mid-step,
+                // that worker would deliver a proofExpanded event into the live Swing proof-tree
+                // model off the EDT and deadlock against it: the EDT holds the AWT tree lock and
+                // wants the GUIProofTreeModel monitor, while the worker holds that monitor and
+                // wants
+                // the AWT tree lock. Setting stopRequested makes the workers leave their claim
+                // loop;
+                // shutdownNow unblocks any parked in the scheduler.
+                stopRequested = true;
+                pool.shutdownNow();
+                awaitWorkerTermination(pool);
             }
-            for (Future<?> f : futures) {
-                f.get();
-            }
-        } catch (ExecutionException e) {
-            error = e.getCause() != null ? e.getCause() : e;
-            LOGGER.warn("parallel proof run failed", error);
-        } catch (InterruptedException e) {
-            cancelled = true;
-            Thread.currentThread().interrupt();
-        } finally {
-            pool.shutdownNow();
         }
 
         // Publish the lock-free counters into the inherited fields for the result.
@@ -294,6 +318,29 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
         return new ApplyStrategyInfo<>(message, proof, error, nonCloseableGoal, time, countApplied,
             closedGoals);
+    }
+
+    /**
+     * Waits for the worker pool to terminate after {@link ExecutorService#shutdownNow()}. The wait
+     * runs with the calling thread's interrupt status cleared (the run is often stopped by
+     * interrupting this very thread, which would otherwise make {@code awaitTermination} return
+     * immediately and defeat the purpose) and restores the status afterwards. The generous timeout
+     * accommodates a worker that is mid-step (e.g. a large taclet match) when asked to stop; the
+     * stop is cooperative, so it returns as soon as the last worker leaves its step.
+     */
+    private void awaitWorkerTermination(ExecutorService pool) {
+        boolean wasInterrupted = Thread.interrupted();
+        try {
+            if (!pool.awaitTermination(WORKER_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                LOGGER.warn("parallel prover workers did not stop within {}s of a stop request",
+                    WORKER_SHUTDOWN_TIMEOUT_SECONDS);
+            }
+        } catch (InterruptedException e) {
+            wasInterrupted = true;
+        }
+        if (wasInterrupted) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /** A single worker: claim goals and process them until the queue is quiescent or stopped. */
