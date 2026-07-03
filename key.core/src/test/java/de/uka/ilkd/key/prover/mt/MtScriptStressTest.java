@@ -13,9 +13,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
@@ -42,6 +45,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @EnabledIfSystemProperty(named = "key.mt.stress", matches = "true")
 public class MtScriptStressTest {
+
+    /**
+     * Loading the quicksort example applies its embedded settings to the global
+     * {@link ProofSettings#DEFAULT_SETTINGS}; snapshot and restore them so they do not leak into
+     * every proof loaded later in the same JVM (and each repetition here starts identically).
+     */
+    private static String settingsSnapshot;
+
+    @BeforeAll
+    static void snapshotSettings() {
+        settingsSnapshot = ProofSettings.DEFAULT_SETTINGS.settingsToString();
+    }
+
+    @AfterAll
+    static void restoreSettings() {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+    }
+
 
     /**
      * Over-subscribed worker count to maximise interleaving (the machine need not have this many).
@@ -80,36 +101,48 @@ public class MtScriptStressTest {
         Path examples = FindResources.getExampleDirectory();
         Path keyFile = examples.resolve("heap/quicksort/sort.key");
         String scriptText = Files.readString(examples.resolve("heap/quicksort/sort.script"));
-        // Save next to sort.key so the proof's relative \javaSource "." resolves on reload.
+        // Save next to sort.key so the proof's relative \javaSource "." resolves on reload. The
+        // file lives in the examples source tree, so the outermost finally must delete it on
+        // EVERY exit path (a step-1 failure used to leak it).
         Path saved = Files.createTempFile(keyFile.getParent(), "mt-sort-proof", ".proof");
-
-        // 1) Produce the proof under the multi-core prover, then save it.
-        System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
-        System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(MT_WORKERS));
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        String prevEnabled = System.getProperty(ParallelProver.PARALLEL_PROPERTY);
+        String prevThreads = System.getProperty(ParallelProver.THREADS_PROPERTY);
         try {
-            Proof proof = env.getLoadedProof();
-            new ProofScriptEngine(proof).execute(env.getUi(),
-                ParsingFacade.parseScript(scriptText));
-            assertTrue(proof.closed(), "the multi-core proof did not close before saving");
-            String status = new ProofSaver(proof, saved).save();
-            assertTrue(status == null || status.isEmpty(),
-                "saving the multi-core proof reported an error: " + status);
-        } finally {
-            System.clearProperty(ParallelProver.PARALLEL_PROPERTY);
-            System.clearProperty(ParallelProver.THREADS_PROPERTY);
-            env.dispose();
-        }
+            // 1) Produce the proof under the multi-core prover, then save it.
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
+            System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(MT_WORKERS));
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+            try {
+                Proof proof = env.getLoadedProof();
+                new ProofScriptEngine(proof).execute(env.getUi(),
+                    ParsingFacade.parseScript(scriptText));
+                assertTrue(proof.closed(), "the multi-core proof did not close before saving");
+                String status = new ProofSaver(proof, saved).save();
+                assertTrue(status == null || status.isEmpty(),
+                    "saving the multi-core proof reported an error: " + status);
+            } finally {
+                env.dispose();
+            }
 
-        // 2) Reload it with the single-core prover; it must load cleanly and still be closed.
-        KeYEnvironment<DefaultUserInterfaceControl> reloadEnv = KeYEnvironment.load(saved);
-        try {
-            Proof reloaded = reloadEnv.getLoadedProof();
-            assertNotNull(reloaded, "reloading the saved multi-core proof produced no proof");
-            assertTrue(reloaded.closed(),
-                "the saved multi-core proof did not reload as a closed proof");
+            // 2) Reload it with the single-core prover; it must load cleanly and still be closed.
+            // Pin the property to false rather than clearing it: with an inherited
+            // -Dkey.prover.parallel=true this phase would otherwise silently run multi-core and
+            // the "reloads single-core" claim would be vacuous.
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "false");
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+            KeYEnvironment<DefaultUserInterfaceControl> reloadEnv = KeYEnvironment.load(saved);
+            try {
+                Proof reloaded = reloadEnv.getLoadedProof();
+                assertNotNull(reloaded, "reloading the saved multi-core proof produced no proof");
+                assertTrue(reloaded.closed(),
+                    "the saved multi-core proof did not reload as a closed proof");
+            } finally {
+                reloadEnv.dispose();
+            }
         } finally {
-            reloadEnv.dispose();
+            restore(ParallelProver.PARALLEL_PROPERTY, prevEnabled);
+            restore(ParallelProver.THREADS_PROPERTY, prevThreads);
             Files.deleteIfExists(saved);
         }
     }
@@ -131,8 +164,12 @@ public class MtScriptStressTest {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
             System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
         } else {
-            System.clearProperty(ParallelProver.PARALLEL_PROPERTY);
+            // Pin the property to false rather than clearing it: with an inherited
+            // -Dkey.prover.parallel=true the "single-core baseline" would otherwise silently run
+            // multi-core, making the MT-vs-SC comparison vacuous.
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "false");
         }
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         try {
             Proof proof = env.getLoadedProof();

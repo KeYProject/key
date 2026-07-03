@@ -149,13 +149,12 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         //
         // create the rule application engine. This macro closes one goal at a time under a tight
-        // per-goal step budget (NUMBER_OF_TRY_STEPS), so it is pinned to the single-threaded
-        // prover:
-        // a single goal offers no parallelism, and several workers exploring its subtree apply
-        // rules
-        // in a less step-efficient order than the single-threaded prover, which can exhaust the
-        // budget before the goal closes (leaving a closable goal pruned). Wide, generously-budgeted
-        // runs keep using the multi-core prover.
+        // per-goal step budget (the numberSteps field, e.g. FullAutoPilotProofMacro's
+        // NUMBER_OF_TRY_STEPS default), so it is pinned to the single-threaded prover: a single
+        // goal offers no parallelism, and several workers exploring its subtree apply rules in a
+        // less step-efficient order than the single-threaded prover, which can exhaust the budget
+        // before the goal closes (leaving a closable goal pruned). Wide, generously-budgeted runs
+        // keep using the multi-core prover.
         final Profile profile = proof.getServices().getProfile();
         final ProverCore<Proof, Goal> applyStrategy = AutoProvers.create(
             profile.<Proof, Goal>getSelectedGoalChooserBuilder().create(), profile, false);

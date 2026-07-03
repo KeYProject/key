@@ -126,9 +126,23 @@ public class MtStopTest {
             assertFalse(driver.isAlive(),
                 "start() did not return within 60s after interrupt (hang)");
 
+            // The interrupted stop must wind down cleanly: a crash on that path surfaced in the
+            // driver thread would otherwise be silently swallowed and the test would still pass.
+            Throwable driverFailure = failure.get();
+            assertTrue(driverFailure == null,
+                "the driver thread failed on the interrupted-stop path: " + driverFailure);
+
             // The invariant: start() must not return until every worker has stopped, otherwise a
             // lingering worker can deliver proof-tree events into the re-attached Swing listeners.
+            // start() waits for pool TERMINATION (all tasks completed), but the last pool thread
+            // can still be an instant away from actually dying, so give the thread-liveness scan a
+            // short grace period before declaring a leak.
             List<String> live = liveWorkerThreads();
+            long liveDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (!live.isEmpty() && System.nanoTime() < liveDeadline) {
+                Thread.sleep(10);
+                live = liveWorkerThreads();
+            }
             assertTrue(live.isEmpty(),
                 "parallel worker(s) still alive after start() returned: " + live);
 

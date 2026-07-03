@@ -8,10 +8,12 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,7 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Concurrency and bound tests for {@link ConcurrentLruCache} and {@link StripedLruCache}.
+ *
+ * <p>
+ * The per-test timeout turns a deadlock or livelock regression in the caches into a test FAILURE
+ * instead of an unbounded {@code Thread.join()} hanging the whole CI run. The tests finish in
+ * seconds; the cap is deliberately generous for slow CI machines.
  */
+@Timeout(value = 5, unit = TimeUnit.MINUTES)
 public class LruCacheConcurrencyTest {
 
     private static final int THREADS = 16;

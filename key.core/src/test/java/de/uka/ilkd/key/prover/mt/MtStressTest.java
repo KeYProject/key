@@ -9,10 +9,13 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -47,14 +50,30 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class MtStressTest {
 
     /**
-     * Step cap for the parallel runs. Generous on purpose: parallel goal-order divergence can make
-     * a
-     * run explore more goals before closing than the single-threaded proof needs, so the proof's
-     * own
-     * (modest) maxSteps would occasionally be exhausted by a perfectly sound parallel run -- a
-     * benign, expected effect, not a bug. A real lost-goal race, in contrast, leaves the proof
-     * saturated-open well below this cap (no rule left to apply), so raising the cap absorbs benign
-     * divergence without masking a race: such a run would still fail {@link Proof#closed()}.
+     * Loading an example applies its embedded settings to the global
+     * {@link ProofSettings#DEFAULT_SETTINGS}; snapshot and restore them so they neither leak into
+     * tests run later in the same JVM nor differ between the repetitions here.
+     */
+    private static String settingsSnapshot;
+
+    @BeforeAll
+    static void snapshotSettings() {
+        settingsSnapshot = ProofSettings.DEFAULT_SETTINGS.settingsToString();
+    }
+
+    @AfterAll
+    static void restoreSettings() {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+    }
+
+
+    /**
+     * Step cap for the parallel runs. Generous on purpose: parallel goal-order divergence can
+     * make a run explore more goals before closing than the single-threaded proof needs, so the
+     * proof's own (modest) maxSteps would occasionally be exhausted by a perfectly sound parallel
+     * run -- a benign, expected effect, not a bug. A real lost-goal race, in contrast, leaves the
+     * proof saturated-open well below this cap (no rule left to apply), so raising the cap absorbs
+     * benign divergence without masking a race: such a run would still fail {@link Proof#closed()}.
      */
     private static final int MAX_STEPS = 200_000;
 
@@ -83,6 +102,7 @@ public class MtStressTest {
         try {
             for (int i = 0; i < reps; i++) {
                 final int rep = i;
+                ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
                 final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
                 try {
                     final Proof proof = env.getLoadedProof();
