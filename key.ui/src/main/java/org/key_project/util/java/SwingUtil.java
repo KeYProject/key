@@ -40,6 +40,7 @@ public final class SwingUtil {
      * @param uri the URI to be displayed in the user's default browser
      */
     public static void browse(URI uri) throws IOException {
+        LOGGER.info("Open {}", uri);
         try {
             Desktop.getDesktop().browse(uri);
         } catch (UnsupportedOperationException e) {

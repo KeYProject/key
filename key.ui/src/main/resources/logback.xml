@@ -13,4 +13,33 @@
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
+
+	<logger name="org.apache.hc.client5.http" level="debug"/>
+
+
+	<!--
+		A logger for development, also print to CONSOLE. This logger is not restricted by any command line options.
+		You should not use this code on the master branch.
+	-->
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%relative] %highlight(%-5level) %cyan(%logger{0}): %msg %n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <logger name="key.devel" level="DEBUG">
+        <appender-ref ref="STDERR"/>
+    </logger>
+
+	<logger name="org.apache.hc.client5.http.headers" level="DEBUG">
+		<appender-ref ref="STDERR"/>
+
+	</logger>
+	<logger name="org.apache.hc.client5.http.wire">
+		<appender-ref ref="STDERR"/>
+
+	</logger>
 </configuration>
