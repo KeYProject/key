@@ -512,35 +512,19 @@ public class TermLabelManager {
     /**
      * Do application term specific stuff.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param newTerm the template for the new {@link JTerm} to create
      * @param newLabels The set accumulating the {@link TermLabel}s to add to the new {@link JTerm}
      *        which should be created.
      */
-    private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Set<TermLabel> newLabels) {
-        if (applicationTerm == null) {
+    private void addLabelsBasedOnApplicationTerm(TermLabelContext context, JTerm newTerm,
+            Set<TermLabel> newLabels) {
+        if (context.applicationTerm() == null) {
             return;
         }
         // Re-add exiting application term labels based on application term policies.
-        performTermLabelPolicies(state, services, applicationPosInOccurrence, applicationTerm, rule,
-            goal, hint, tacletTerm, newTerm, applicationTermPolicyMap, newLabels);
+        performTermLabelPolicies(context, context.applicationTerm(), newTerm,
+            applicationTermPolicyMap, newLabels);
     }
 
     /**
@@ -592,29 +576,28 @@ public class TermLabelManager {
                 || !allRulesUpdates.isEmpty() || currentRuleSpecificUpdates != null)
                         ? TermBuilder.goBelowUpdates(applicationTerm)
                         : null;
+        final TermLabelContext context = new TermLabelContext(state, services,
+            applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint,
+            tacletTerm);
         // Instantiate empty result
         Set<TermLabel> newLabels = new LinkedHashSet<>();
         // Add labels from taclet
         if (tacletTerm != null && tacletTerm.hasLabels()) {
             performTacletTerm(tacletTerm, newLabels);
         }
-        addLabelsBasedOnApplicationTerm(state, services, applicationPosInOccurrence,
-            applicationTerm, rule, goal, hint, tacletTerm, newTerm, newLabels);
+        addLabelsBasedOnApplicationTerm(context, newTerm, newLabels);
         // Re-add exiting modality term labels based on symbolic execution term policies.
         if (modalityTerm != null) {
-            performTermLabelPolicies(state, services, applicationPosInOccurrence, modalityTerm,
-                rule, goal, hint, tacletTerm, newTerm, modalityTermPolicyMap, newLabels);
+            performTermLabelPolicies(context, modalityTerm, newTerm, modalityTermPolicyMap,
+                newLabels);
         }
         // Allow rule specific updater to remove and add labels
         if (currentRuleSpecificUpdates != null) {
-            performUpdater(state, services, applicationPosInOccurrence, applicationTerm,
-                modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, currentRuleSpecificUpdates,
-                newLabels);
+            performUpdater(context, newTerm, currentRuleSpecificUpdates, newLabels);
         }
         // Allow all rule updater to remove and add labels
         if (!allRulesUpdates.isEmpty()) {
-            performUpdater(state, services, applicationPosInOccurrence, applicationTerm,
-                modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, allRulesUpdates, newLabels);
+            performUpdater(context, newTerm, allRulesUpdates, newLabels);
         }
         // Return result
         return new ImmutableArray<>(newLabels.toArray(new TermLabel[0]));
@@ -650,121 +633,46 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, JTerm, JTerm)}
      * </p>
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
+     * @param context the {@link TermLabelContext} of the current rule application
+     * @param sourceTerm the {@link JTerm} whose labels are under consideration (application or
+     *        modality term)
      * @param newTerm the template for the new {@link JTerm} to create
      * @param policies The {@link TermLabelPolicy} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JTerm}.
      */
-    protected void performTermLabelPolicies(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
-            Set<TermLabel> newLabels) {
-        if (applicationTerm.hasLabels() && !policies.isEmpty()) {
-            for (TermLabel label : applicationTerm.getLabels()) {
-                performTermLabelPolicies(state, services, applicationPosInOccurrence,
-                    applicationTerm, rule, goal, hint, tacletTerm, newTerm, policies, newLabels,
-                    label);
+    protected void performTermLabelPolicies(TermLabelContext context, JTerm sourceTerm,
+            JTerm newTerm, Map<Name, TermLabelPolicy> policies, Set<TermLabel> newLabels) {
+        if (sourceTerm.hasLabels() && !policies.isEmpty()) {
+            for (TermLabel label : sourceTerm.getLabels()) {
+                TermLabelPolicy policy = policies.get(label.name());
+                if (policy != null) {
+                    label = policy.keepLabel(context, sourceTerm, newTerm, label);
+                    if (label != null) {
+                        newLabels.add(label);
+                    }
+                }
             }
         }
     }
 
     /**
      * <p>
-     * Performs the given {@link TermLabelPolicy} instances.
+     * Performs the given {@link TermLabelUpdate} instances.
      * </p>
      * <p>
      * This is a helper method of
-     * {@link #performTermLabelPolicies(TermLabelState, Services, PosInOccurrence, JTerm, Rule, Goal, Object, JTerm, JTerm, Map, Set)}
-     * </p>
-     *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
-     * @param newTerm the template for the new {@link JTerm} to create
-     * @param policies The {@link TermLabelPolicy} instances to perform.
-     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JTerm}.
-     * @param label The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
-     */
-    protected void performTermLabelPolicies(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
-            Set<TermLabel> newLabels, TermLabel label) {
-        TermLabelPolicy policy = policies.get(label.name());
-        if (policy != null) {
-            label = policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, newTerm, label);
-            if (label != null) {
-                newLabels.add(label);
-            }
-        }
-    }
-
-    /**
-     * <p>
-     * Performs the given child and grandchild {@link TermLabelUpdate} instances.
-     * </p>
-     * <p>
-     * This is a helper {@link Map} of
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, JTerm, JTerm)}
      * </p>
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param modalityTerm The optional modality {@link JTerm}.
-     * @param rule The {@link Rule} which is applied.
-     * @param ruleApp The {@link RuleApp} which is currently performed.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
-     *        instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
-     *        rules.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param newTerm the template for the new {@link JTerm} to create
+     * @param updater The {@link TermLabelUpdate} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JTerm}.
      */
-    protected void performUpdater(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, JTerm modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
-            JTerm newTerm,
-            ImmutableList<TermLabelUpdate> updater,
-            Set<TermLabel> newLabels) {
+    protected void performUpdater(TermLabelContext context, JTerm newTerm,
+            ImmutableList<TermLabelUpdate> updater, Set<TermLabel> newLabels) {
         for (TermLabelUpdate update : updater) {
-            update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm,
-                modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, newLabels);
+            update.updateLabels(context, newTerm, newLabels);
         }
     }
 
@@ -821,23 +729,21 @@ public class TermLabelManager {
             JTerm tacletTerm) {
         final PosInTerm pos = applicationPosInOccurrence.posInTerm();
         final JTerm oldTerm = (JTerm) pos.getSubTerm(sequentFormula);
+        final TermLabelContext context = new TermLabelContext(state, services,
+            applicationPosInOccurrence, oldTerm, null, rule, null, goal, hint, tacletTerm);
         // Compute active refactorings
-        RefactoringsContainer refactorings = computeRefactorings(state, services,
-            applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
+        RefactoringsContainer refactorings = computeRefactorings(context);
         // Perform refactoring
         JTerm newTerm =
-            refactorApplicationTerm(state, services, applicationPosInOccurrence, oldTerm,
-                rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
+            refactorApplicationTerm(context, refactorings, services.getTermFactory());
         if (newTerm != null && !newTerm.equalsIncludingLabels(oldTerm)) {
-            return replaceTerm(state, applicationPosInOccurrence, newTerm,
+            return replaceTerm(context, applicationPosInOccurrence, newTerm,
                 services.getTermFactory(),
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
-                applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
+                refactorings.childAndGrandchildRefactoringsAndParents());
         } else if (!refactorings.childAndGrandchildRefactoringsAndParents().isEmpty()) {
-            return replaceTerm(state, applicationPosInOccurrence, oldTerm,
+            return replaceTerm(context, applicationPosInOccurrence, oldTerm,
                 services.getTermFactory(),
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
-                applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
+                refactorings.childAndGrandchildRefactoringsAndParents());
         } else {
             return sequentFormula;
         }
@@ -899,13 +805,13 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Goal goal,
             Object hint, Rule rule, JTerm tacletTerm) {
+        final TermLabelContext context = new TermLabelContext(state, services,
+            applicationPosInOccurrence, applicationTerm, null, rule, null, goal, hint, tacletTerm);
         // Compute active refactorings
-        RefactoringsContainer refactorings = computeRefactorings(state, services,
-            applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
+        RefactoringsContainer refactorings = computeRefactorings(context);
         // Refactor application term
         JTerm newApplicationTerm =
-            refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
+            refactorApplicationTerm(context, refactorings, services.getTermFactory());
         return newApplicationTerm != null ? newApplicationTerm : applicationTerm;
     }
 
@@ -971,34 +877,29 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm) {
+        final TermLabelContext context = new TermLabelContext(state, services,
+            applicationPosInOccurrence, applicationTerm, null, rule, null, goal, hint, tacletTerm);
         // Compute active refactorings
-        RefactoringsContainer refactorings = computeRefactorings(state, services,
-            applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
+        RefactoringsContainer refactorings = computeRefactorings(context);
         // Refactor application term
         final TermFactory tf = services.getTermFactory();
-        JTerm newApplicationTerm =
-            refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, refactorings, tf);
+        JTerm newApplicationTerm = refactorApplicationTerm(context, refactorings, tf);
         if (newApplicationTerm != null
                 && !newApplicationTerm.equalsIncludingLabels(applicationTerm)) {
-            JTerm root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf,
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
-                applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
+            JTerm root = replaceTerm(context, applicationPosInOccurrence, newApplicationTerm, tf,
+                refactorings.childAndGrandchildRefactoringsAndParents());
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         } else if (!refactorings.childAndGrandchildRefactoringsAndParents().isEmpty()) {
-            JTerm root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf,
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
-                applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
+            JTerm root = replaceTerm(context, applicationPosInOccurrence, applicationTerm, tf,
+                refactorings.childAndGrandchildRefactoringsAndParents());
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         }
         // Do sequent refactoring if required
         if (!refactorings.sequentRefactorings().isEmpty() && goal != null) {
             Sequent sequent = goal.sequent();
-            refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, sequent.antecedent(), true,
+            refactorSemisequent(context, sequent.antecedent(), true,
                 refactorings.sequentRefactorings());
-            refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, sequent.succedent(), false,
+            refactorSemisequent(context, sequent.succedent(), false,
                 refactorings.sequentRefactorings());
         }
     }
@@ -1065,17 +966,16 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm) {
+        final TermLabelContext context = new TermLabelContext(state, services,
+            applicationPosInOccurrence, applicationTerm, null, rule, null, goal, hint, tacletTerm);
         // Compute active refactorings
-        RefactoringsContainer refactorings = computeRefactorings(state, services,
-            applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
+        RefactoringsContainer refactorings = computeRefactorings(context);
         // Do sequent refactoring if required
         if (!refactorings.sequentRefactorings().isEmpty()) {
             Sequent sequent = goal.sequent();
-            refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, sequent.antecedent(), true,
+            refactorSemisequent(context, sequent.antecedent(), true,
                 refactorings.sequentRefactorings());
-            refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, sequent.succedent(), false,
+            refactorSemisequent(context, sequent.succedent(), false,
                 refactorings.sequentRefactorings());
         }
     }
@@ -1083,32 +983,17 @@ public class TermLabelManager {
     /**
      * Replaces the {@link JTerm} at the specified {@link PosInOccurrence}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param pio The {@link PosInOccurrence} to replace {@link JTerm} at.
      * @param newTerm The new {@link JTerm} to set.
      * @param tf The {@link TermFactory} to use.
-     * @param parentRefactorings The {@link RefactoringsContainer} to consider.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param parentRefactorings The parent {@link TermLabelRefactoring}s to consider.
      * @return The root of the {@link PosInOccurrence} containing the new {@link JTerm} at the
      *         specified {@link PosInOccurrence}.
      */
-    protected JTerm replaceTerm(TermLabelState state,
+    protected JTerm replaceTerm(TermLabelContext context,
             PosInOccurrence pio, JTerm newTerm,
-            TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,
-            Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm) {
+            TermFactory tf, Set<TermLabelRefactoring> parentRefactorings) {
         do {
             if (pio.isTopLevel()) {
                 pio = null;
@@ -1119,8 +1004,7 @@ public class TermLabelManager {
                 newTerm = (JTerm) pio.subTerm();
                 ImmutableArray<TermLabel> newLabels;
                 if (!parentRefactorings.isEmpty()) {
-                    newLabels = performRefactoring(state, services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, newTerm, parentRefactorings);
+                    newLabels = performRefactoring(context, newTerm, parentRefactorings);
                 } else {
                     newLabels = newTerm.getLabels();
                 }
@@ -1139,119 +1023,74 @@ public class TermLabelManager {
     }
 
     /**
-     * Computes the rule-independent {@link TermLabelRefactoring} to consider.
+     * Computes the rule-specific {@link TermLabelRefactoring} to consider.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param refactorings The already accumulated refactorings to be expanded with rule specific
      *        refactorings
      */
-    private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
-            Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+    private void determineAndCollectRuleSpecificRefactorings(TermLabelContext context,
             RefactoringsContainer refactorings) {
+        final Rule rule = context.rule();
         if (rule != null) {
             ImmutableList<TermLabelRefactoring> ruleRefactorings =
                 ruleSpecificRefactorings.get(rule.name());
             if (ruleRefactorings != null) {
                 for (TermLabelRefactoring refactoring : ruleRefactorings) {
-                    RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
-                        applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
-                    if (RefactoringScope.SEQUENT.equals(scope)) {
-                        refactorings.sequentRefactorings.add(refactoring);
-                    } else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
-                        refactorings.belowUpdatesRefactorings.add(refactoring);
-                    } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
-                            .equals(scope)) {
-                        refactorings.childAndGrandchildRefactorings.add(refactoring);
-                    } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
-                            .equals(scope)) {
-                        refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
-                    }
+                    collectRefactoring(context, refactoring, refactorings);
                 }
             }
         }
     }
 
     /**
+     * Sorts the given {@link TermLabelRefactoring} into the bucket of the
+     * {@link RefactoringScope} it requests for the current rule application.
+     *
+     * @param context the {@link TermLabelContext} of the current rule application
+     * @param refactoring the {@link TermLabelRefactoring} to sort in
+     * @param refactorings the accumulated refactorings
+     */
+    private void collectRefactoring(TermLabelContext context, TermLabelRefactoring refactoring,
+            RefactoringsContainer refactorings) {
+        RefactoringScope scope = refactoring.defineRefactoringScope(context);
+        if (RefactoringScope.SEQUENT.equals(scope)) {
+            refactorings.sequentRefactorings.add(refactoring);
+        } else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
+            refactorings.belowUpdatesRefactorings.add(refactoring);
+        } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
+                .equals(scope)) {
+            refactorings.childAndGrandchildRefactorings.add(refactoring);
+        } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
+                .equals(scope)) {
+            refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
+        }
+    }
+
+    /**
      * Computes the rule-independent {@link TermLabelRefactoring} to consider.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param refactorings The already accumulated refactorings to be expanded with rule independent
      *        refactorings
      */
-    private void determineAndRuleIndependentRefactorings(TermLabelState state,
-            Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+    private void determineAndRuleIndependentRefactorings(TermLabelContext context,
             RefactoringsContainer refactorings) {
         for (TermLabelRefactoring refactoring : allRulesRefactorings) {
-            RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
-                applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
-            if (RefactoringScope.SEQUENT.equals(scope)) {
-                refactorings.sequentRefactorings.add(refactoring);
-            } else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
-                refactorings.belowUpdatesRefactorings.add(refactoring);
-            } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
-                    .equals(scope)) {
-                refactorings.childAndGrandchildRefactorings.add(refactoring);
-            } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
-                    .equals(scope)) {
-                refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
-            }
+            collectRefactoring(context, refactoring, refactorings);
         }
     }
 
     /**
      * Computes the {@link TermLabelRefactoring} to consider.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
      */
-    protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+    protected RefactoringsContainer computeRefactorings(TermLabelContext context) {
         final RefactoringsContainer refactorings = new RefactoringsContainer();
-        determineAndCollectRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
-            applicationTerm, rule, goal, hint, tacletTerm, refactorings);
-        determineAndRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
-            applicationTerm, rule, goal, hint, tacletTerm, refactorings);
+        determineAndCollectRuleSpecificRefactorings(context, refactorings);
+        determineAndRuleIndependentRefactorings(context, refactorings);
         return refactorings;
     }
 
@@ -1260,8 +1099,7 @@ public class TermLabelManager {
     }
 
     /**
-     * Utility class used by
-     * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, JTerm, Rule, Goal, Object, JTerm)}
+     * Utility class used by {@link TermLabelManager#computeRefactorings(TermLabelContext)}
      *
      * @param sequentRefactorings The {@link TermLabelRefactoring} for
      *        {@link RefactoringScope#SEQUENT}.
@@ -1300,40 +1138,25 @@ public class TermLabelManager {
     /**
      * Perform below-updates refactoring if required.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
      * @param tf The {@link TermFactory} to create the term.
      * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
-    private JTerm refactorBelowUpdates(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
-            JTerm newApplicationTerm) {
+    private JTerm refactorBelowUpdates(TermLabelContext context,
+            RefactoringsContainer refactorings, TermFactory tf, JTerm newApplicationTerm) {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
             Pair<ImmutableList<JTerm>, JTerm> pair =
                 TermBuilder.goBelowUpdates2(newApplicationTerm);
-            ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
-                applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                pair.second, refactorings.belowUpdatesRefactorings());
+            ImmutableArray<TermLabel> newLabels = performRefactoring(context, pair.second,
+                refactorings.belowUpdatesRefactorings());
             if (newLabels != pair.second.getLabels()) {
                 JTerm newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
                     pair.second.boundVars(), newLabels);
                 newApplicationTerm =
-                    services.getTermBuilder().applyParallel(pair.first, newModality,
+                    context.services().getTermBuilder().applyParallel(pair.first, newModality,
                         newApplicationTerm.getLabels());
             }
         }
@@ -1343,29 +1166,15 @@ public class TermLabelManager {
     /**
      * Do child and grandchild refactoring if required.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
      * @param tf The {@link TermFactory} to create the term.
      * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
-    private JTerm refactorChildrenRecursively(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
-            JTerm newApplicationTerm) {
+    private JTerm refactorChildrenRecursively(TermLabelContext context,
+            RefactoringsContainer refactorings, TermFactory tf, JTerm newApplicationTerm) {
         final Set<TermLabelRefactoring> allChildAndGrandchildRefactorings =
             refactorings.getAllApplicationChildAndGrandchildRefactorings();
         if (!allChildAndGrandchildRefactorings.isEmpty()) {
@@ -1373,9 +1182,8 @@ public class TermLabelManager {
             JTerm[] newSubs = new JTerm[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
                 JTerm sub = newApplicationTerm.sub(i);
-                newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                    applicationTerm, rule, goal, hint, tacletTerm, sub,
-                    allChildAndGrandchildRefactorings);
+                newSubs[i] =
+                    refactorLabelsRecursive(context, sub, allChildAndGrandchildRefactorings);
                 if (!newSubs[i].equalsIncludingLabels(sub)) {
                     changed = true;
                 }
@@ -1391,38 +1199,24 @@ public class TermLabelManager {
     /**
      * Refactors the labels of the application term.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
      * @param tf The {@link TermFactory} to create the term.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
-    protected JTerm refactorApplicationTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
+    protected JTerm refactorApplicationTerm(TermLabelContext context,
+            RefactoringsContainer refactorings, TermFactory tf) {
+        final JTerm applicationTerm = context.applicationTerm();
         if (applicationTerm != null && (!refactorings.childAndGrandchildRefactorings().isEmpty()
                 || !refactorings.belowUpdatesRefactorings().isEmpty())) {
             JTerm newApplicationTerm = applicationTerm;
             // Perform below-updates refactoring
             newApplicationTerm =
-                refactorBelowUpdates(state, services, applicationPosInOccurrence, applicationTerm,
-                    rule, goal, hint, tacletTerm, refactorings, tf, newApplicationTerm);
+                refactorBelowUpdates(context, refactorings, tf, newApplicationTerm);
             // Do child and grandchild refactoring if required
-            newApplicationTerm = refactorChildrenRecursively(state, services,
-                applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                refactorings, tf, newApplicationTerm);
+            newApplicationTerm =
+                refactorChildrenRecursively(context, refactorings, tf, newApplicationTerm);
             return newApplicationTerm;
         } else {
             return null;
@@ -1432,35 +1226,19 @@ public class TermLabelManager {
     /**
      * Performs a {@link TermLabel} refactoring on the given {@link Semisequent}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param semisequent The {@link Semisequent} to refactor.
      * @param inAntec {@code true} antecedent, {@code false} succedent.
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      */
-    protected void refactorSemisequent(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, Semisequent semisequent, boolean inAntec,
-            Set<TermLabelRefactoring> activeRefactorings) {
+    protected void refactorSemisequent(TermLabelContext context, Semisequent semisequent,
+            boolean inAntec, Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
             for (SequentFormula sfa : semisequent) {
                 JTerm updatedTerm =
-                    refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, (JTerm) sfa.formula(),
-                        activeRefactorings);
+                    refactorLabelsRecursive(context, (JTerm) sfa.formula(), activeRefactorings);
                 if (!((JTerm) sfa.formula()).equalsIncludingLabels(updatedTerm)) {
-                    goal.changeFormula(new SequentFormula(updatedTerm),
+                    context.goal().changeFormula(new SequentFormula(updatedTerm),
                         new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
                 }
             }
@@ -1470,41 +1248,25 @@ public class TermLabelManager {
     /**
      * Performs a {@link TermLabel} refactoring recursively on the given {@link JTerm}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param term The {@link JTerm} to refactor.
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The refactored {@link JTerm} in which the {@link TermLabel}s may have changed.
      */
-    protected JTerm refactorLabelsRecursive(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+    protected JTerm refactorLabelsRecursive(TermLabelContext context, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         boolean subsChanged = false;
         JTerm[] newSubs = new JTerm[term.arity()];
         for (int i = 0; i < newSubs.length; i++) {
             JTerm oldSub = term.sub(i);
-            newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                applicationTerm, rule, goal, hint, tacletTerm, oldSub, activeRefactorings);
+            newSubs[i] = refactorLabelsRecursive(context, oldSub, activeRefactorings);
             if (!newSubs[i].equalsIncludingLabels(oldSub)) {
                 subsChanged = true;
             }
         }
         ImmutableArray<TermLabel> newLabels =
-            performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
-                goal, hint, tacletTerm, term, activeRefactorings);
-        return subsChanged || newLabels != term.getLabels() ? services.getTermFactory()
+            performRefactoring(context, term, activeRefactorings);
+        return subsChanged || newLabels != term.getLabels() ? context.services().getTermFactory()
                 .createTerm(term.op(), newSubs, term.boundVars(), newLabels)
                 : term;
     }
@@ -1512,34 +1274,19 @@ public class TermLabelManager {
     /**
      * Computes the new labels as part of the refactoring for the given {@link JTerm}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param term The {@link JTerm} to refactor.
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The new {@link TermLabel} which should be used for the given {@link JTerm}.
      */
-    protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+    protected ImmutableArray<TermLabel> performRefactoring(TermLabelContext context, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
         LabelCollection newLabels = new LabelCollection(term.getLabels());
         // Give all TermLabelInstantiator instances the chance to remove or to
         // add labels from/to the list
         for (TermLabelRefactoring refactoring : activeRefactorings) {
-            refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, term, newLabels);
+            refactoring.refactorLabels(context, term, newLabels);
         }
         if (newLabels.isModified()) {
             return new ImmutableArray<>(newLabels.getLabels());

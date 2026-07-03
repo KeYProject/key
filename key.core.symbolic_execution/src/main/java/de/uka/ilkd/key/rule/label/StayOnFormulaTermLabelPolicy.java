@@ -7,19 +7,15 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
-import org.key_project.prover.rules.Rule;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
@@ -33,10 +29,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * {@inheritDoc}
      */
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
-            JTerm newTerm, TermLabel label) {
+    public TermLabel keepLabel(TermLabelContext context, JTerm sourceTerm, JTerm newTerm,
+            TermLabel label) {
         // Maintain label if new Term is a predicate
         if (TruthValueTracingUtil.isPredicate(newTerm.op())
                 || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
@@ -48,7 +42,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
             Set<String> originalLabelIds = new LinkedHashSet<>();
-            if (hint instanceof TacletLabelHint tacletHint) {
+            if (context.hint() instanceof TacletLabelHint tacletHint) {
                 if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {
                     return null; // Do not label children of if-then-else. They are labeled when a
                                  // rule rewrites them outside of the if-then-else.
@@ -74,7 +68,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                         newLabelIdRequired = true;
                     }
                 } else if (tacletHint.getTerm() != null) {
-                    boolean topLevel = isTopLevel(tacletHint, tacletTerm);
+                    boolean topLevel = isTopLevel(tacletHint, context.tacletTerm());
                     if (!topLevel && !TruthValueTracingUtil.isPredicate(tacletHint.getTerm())) {
                         newLabelIdRequired = true;
                     }
@@ -91,7 +85,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 if (originalLabel != null) {
                     originalLabelIds.add(originalLabel.getId());
                 }
-                int labelSubID = FormulaTermLabel.newLabelSubID(services, mostImportantLabel);
+                int labelSubID =
+                    FormulaTermLabel.newLabelSubID(context.services(), mostImportantLabel);
                 if (!originalLabelIds.isEmpty()) {
                     return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID,
                         originalLabelIds);
@@ -110,13 +105,14 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             JTerm target = newTerm.subs().get(UpdateApplication.targetPos());
             TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
             if (targetLabel instanceof FormulaTermLabel) {
-                if (applicationPosInOccurrence != null) {
-                    JTerm appliationTerm = (JTerm) applicationPosInOccurrence.subTerm();
+                if (context.applicationPosInOccurrence() != null) {
+                    JTerm appliationTerm = (JTerm) context.applicationPosInOccurrence().subTerm();
                     TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setUpdateRefactoringRequired(state, true);
+                        FormulaTermLabelRefactoring.setUpdateRefactoringRequired(context.state(),
+                            true);
                     }
                 }
             }

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.*;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.*;
@@ -28,7 +29,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleAbortException;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -497,18 +497,12 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm) {
+        public RefactoringScope defineRefactoringScope(TermLabelContext context) {
             return scope;
         }
 
         @Override
-        public void refactorLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+        public void refactorLabels(TermLabelContext context, JTerm term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.isModified();
             for (TermLabel label : labels.getLabels()) {
@@ -542,11 +536,7 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public void updateLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, JTerm modalityTerm,
-                org.key_project.prover.rules.Rule rule,
-                RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+        public void updateLabels(TermLabelContext context, JTerm newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);
         }
@@ -556,11 +546,8 @@ public class TestTermLabelManager {
         private final List<TermLabel> log = new LinkedList<>();
 
         @Override
-        public TermLabel keepLabel(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm,
-                JTerm newTerm, TermLabel label) {
+        public TermLabel keepLabel(TermLabelContext context, JTerm sourceTerm, JTerm newTerm,
+                TermLabel label) {
             log.add(label);
             return label;
         }

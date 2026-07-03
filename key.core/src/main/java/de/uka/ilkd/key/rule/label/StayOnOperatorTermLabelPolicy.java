@@ -3,16 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.op.JavaDLOperatorUtil;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.op.Operator;
-import org.key_project.prover.rules.Rule;
-import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link JTerm} has the
@@ -25,12 +21,10 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
      * {@inheritDoc}
      */
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
-            JTerm newTerm, TermLabel label) {
-        return applicationTerm != null
-                && JavaDLOperatorUtil.opEquals(newTerm.op(), applicationTerm.op())
+    public TermLabel keepLabel(TermLabelContext context, JTerm sourceTerm, JTerm newTerm,
+            TermLabel label) {
+        return sourceTerm != null
+                && JavaDLOperatorUtil.opEquals(newTerm.op(), sourceTerm.op())
                         ? label
                         : null;
     }

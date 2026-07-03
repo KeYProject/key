@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -21,19 +20,16 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 import org.key_project.prover.rules.Rule;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * <p>
- * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, JTerm)}
- * to refactor the labels of each visited {@link JTerm}.
+ * A {@link TermLabelRefactoring} is used by {@link TermLabelManager#refactorGoal} to refactor the
+ * labels of each visited {@link JTerm}.
  * </p>
  * <p>
- * For more information about {@link TermLabel}s and how they are maintained during prove read the
- * documentation of interface {@link TermLabel}.
+ * For more information about {@link TermLabel}s and how they are maintained during proof
+ * construction read the documentation of interface {@link TermLabel}.
  * </p>
  *
  * @author Martin Hentschel
@@ -94,47 +90,19 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     /**
      * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @return The required {@link RefactoringScope}.
      */
-    RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm);
+    RefactoringScope defineRefactoringScope(TermLabelContext context);
 
     /**
      * This method is used to refactor the labels of the given {@link JTerm}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *        which defines the {@link JTerm} that is rewritten.
-     * @param applicationTerm The {@link JTerm} defined by the {@link PosInOccurrence} in the
-     *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
-     *        created.
-     * @param tacletTerm The optional taclet {@link JTerm}.
+     * @param context the {@link TermLabelContext} of the current rule application
      * @param term The {@link JTerm} which is now refactored.
      * @param labels The new labels the {@link JTerm} will have after the refactoring.
      */
-    void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels);
+    void refactorLabels(TermLabelContext context, JTerm term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.

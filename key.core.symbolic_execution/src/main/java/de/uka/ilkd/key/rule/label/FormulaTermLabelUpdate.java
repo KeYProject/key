@@ -9,22 +9,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.Rule;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
@@ -48,12 +44,8 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     @Override
-    public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, JTerm modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
-            Set<TermLabel> labels) {
-        if (hint instanceof TacletLabelHint tacletHint) {
+    public void updateLabels(TermLabelContext context, JTerm newTerm, Set<TermLabel> labels) {
+        if (context.hint() instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
                     && (TruthValueTracingUtil.isPredicate(newTerm)
@@ -61,20 +53,22 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                                 newTerm.subs()))) {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
-                        applicationPosInOccurrence, FormulaTermLabel.NAME);
+                        context.applicationPosInOccurrence(), FormulaTermLabel.NAME);
                     if (label instanceof FormulaTermLabel oldLabel) {
-                        int labelSubID = FormulaTermLabel.newLabelSubID(services, oldLabel);
+                        int labelSubID =
+                            FormulaTermLabel.newLabelSubID(context.services(), oldLabel);
                         FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(),
                             labelSubID, Collections.singletonList(oldLabel.getId()));
                         labels.add(newLabel);
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setParentRefactoringRequired(state, true);
+                        FormulaTermLabelRefactoring.setParentRefactoringRequired(context.state(),
+                            true);
                     }
                 }
             }
         }
-        if (ruleApp instanceof TacletApp ta) {
+        if (context.ruleApp() instanceof TacletApp ta) {
             if (ta.assumesInstantionsComplete() && ta.assumesFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
@@ -92,11 +86,12 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                         for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels
                                 .entrySet()) {
                             FormulaTermLabel ifLabel = ifEntry.getValue();
-                            int labelSubID = FormulaTermLabel.newLabelSubID(services, ifLabel);
+                            int labelSubID =
+                                FormulaTermLabel.newLabelSubID(context.services(), ifLabel);
                             FormulaTermLabel newLabel = new FormulaTermLabel(ifLabel.getMajorId(),
                                 labelSubID, Collections.singletonList(ifLabel.getId()));
                             labels.add(newLabel);
-                            FormulaTermLabelRefactoring.addSequentFormulaToRefactor(state,
+                            FormulaTermLabelRefactoring.addSequentFormulaToRefactor(context.state(),
                                 ifEntry.getKey());
                         }
                     }
