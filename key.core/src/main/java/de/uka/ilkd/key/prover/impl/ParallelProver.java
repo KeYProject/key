@@ -163,6 +163,17 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * tests
      * rely on); the setting-derived count is clamped to the available processors.
      */
+    /**
+     * The number of workers a run started now would use (see {@link #resolveWorkerCount()}).
+     * Exposed so tests can assert that a "multi-worker" run really is multi-worker rather than
+     * having silently degraded to a single worker.
+     *
+     * @return the effective worker count for the current settings / system properties
+     */
+    public static int effectiveWorkerCount() {
+        return resolveWorkerCount();
+    }
+
     private static int resolveWorkerCount() {
         String property = System.getProperty(THREADS_PROPERTY);
         if (property != null) {

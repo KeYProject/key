@@ -81,7 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress ]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
         os: [ ubuntu-latest ]
         java: [ 21 ]
     runs-on: ${{ matrix.os }}
