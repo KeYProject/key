@@ -95,11 +95,12 @@ public class ServiceCaches implements SessionCaches {
      *
      * NOTE (multithreading effort, branch bubel/mt-goals): the LRU caches below use
      * ConcurrentLruCache (exact, single-lock) so they are safe under concurrent matching while
-     * preserving EXACT LRU eviction -- behaviour-preserving. The exact flavour is mandatory here
-     * because some of these caches are eviction/history-sensitive (e.g. introductionTimeCache,
-     * whose
-     * value reflects the goal history at first-cache time, and the term interning cache):
-     * approximate/striped eviction was shown to change proofs. The Weak caches stay wrapped in
+     * preserving EXACT LRU eviction -- behaviour-preserving. Exact eviction matters for any cache
+     * whose value could be recomputed differently under a different access order after an eviction
+     * (e.g. the term interning cache); approximate/striped eviction was shown to change proofs.
+     * (introductionTimeCache is NOT such a case: its entry is an operator's introducer depth from
+     * the root, identical for every goal below that introducer, so it is goal-/order-independent --
+     * bypassing it leaves proofs unchanged.) The Weak caches stay wrapped in
      * Collections.synchronizedMap.
      */
     private final Map<JTerm, TermInfo> betaCandidates =
