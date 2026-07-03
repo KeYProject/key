@@ -40,7 +40,6 @@ import org.key_project.util.collection.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
 public final class UseDependencyContractRule implements BuiltInRule, ComplexJustificationable {
@@ -225,7 +224,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), TERM_LABELS_PROPERTY)
+            if (!(candidate.sub(i).equals(focus.sub(i))
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }

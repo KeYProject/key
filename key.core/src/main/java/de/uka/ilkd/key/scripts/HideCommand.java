@@ -23,7 +23,6 @@ import org.key_project.prover.sequent.SequentFormula;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 /**
  * Proof script command to hide formulas from the sequent.
@@ -88,7 +87,7 @@ public class HideCommand extends AbstractCommand {
         for (SequentFormula s : semiseq) {
             Term term = s.formula();
             Term formula = sf.formula();
-            if ((TERM_LABELS_PROPERTY).equalsModThisProperty(term, formula)) {
+            if (term.equals(formula)) {
                 return s;
             }
         }
