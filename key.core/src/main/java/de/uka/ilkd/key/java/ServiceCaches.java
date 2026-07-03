@@ -118,9 +118,11 @@ public class ServiceCaches implements SessionCaches {
     private final Map<org.key_project.logic.Term, ClausesGraph> graphCache = new LRUCache<>(1000);
 
     /**
-     * Cache used by the TermFactory to avoid unnecessary creation of terms
+     * Cache used by the TermFactory to avoid unnecessary creation of terms. Keyed on
+     * {@link StrictTermKey} (label-sensitive equality) so that term labels are preserved and
+     * label variants are interned separately.
      */
-    private final Map<JTerm, JTerm> termCache = new LRUCache<>(20000);
+    private final Map<StrictTermKey, JTerm> termCache = new LRUCache<>(20000);
 
     /**
      * Cache used by TypeComparisonCondition
@@ -216,7 +218,7 @@ public class ServiceCaches implements SessionCaches {
         return graphCache;
     }
 
-    public final Map<JTerm, JTerm> getTermFactoryCache() {
+    public final Map<StrictTermKey, JTerm> getTermFactoryCache() {
         return termCache;
     }
 

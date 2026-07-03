@@ -82,6 +82,12 @@ class TermImpl implements JTerm {
      */
     private int hashcode = -1;
 
+    /**
+     * Cached {@link #labeledHashCode()} value (label-sensitive); only used for terms that
+     * actually carry a label somewhere in their subtree.
+     */
+    private int labeledHashcode = -1;
+
     private Sort sort;
 
     /**
@@ -408,6 +414,33 @@ class TermImpl implements JTerm {
             hashcode = 0;
         }
         return hashcode;
+    }
+
+    @Override
+    public int labeledHashCode() {
+        // no labels anywhere: the label-sensitive hash coincides with the plain one
+        if (!containsLabelsRecursive()) {
+            return hashCode();
+        }
+        if (labeledHashcode == -1) {
+            this.labeledHashcode = computeLabeledHashCode();
+        }
+        return labeledHashcode;
+    }
+
+    /** {@link #hashCode()} refined by the labels of this term and all its subterms. */
+    private int computeLabeledHashCode() {
+        int result = hashCode();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            result = result * 17 + labels.get(i).hashCode();
+        }
+        for (int i = 0, ar = arity(); i < ar; i++) {
+            result = result * 17 + sub(i).labeledHashCode();
+        }
+        if (result == -1) {
+            result = 0;
+        }
+        return result;
     }
 
     @Override

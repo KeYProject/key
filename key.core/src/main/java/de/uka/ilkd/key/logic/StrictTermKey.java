@@ -10,8 +10,9 @@ package de.uka.ilkd.key.logic;
  * distinction via {@link JTerm#equalsIncludingLabels(Object)}.
  *
  * <p>
- * The hash code is the term's (label-agnostic) hash code: label variants collide, which is
- * harmless as {@link #equals(Object)} disambiguates them.
+ * The hash code is the term's {@link JTerm#labeledHashCode() label-sensitive} hash code, so label
+ * variants land in different buckets just as they did when term equality itself was
+ * label-sensitive.
  * </p>
  *
  * @param term the term to use as a label-sensitive key (must not be null)
@@ -24,6 +25,6 @@ public record StrictTermKey(JTerm term) {
 
     @Override
     public int hashCode() {
-        return term.hashCode();
+        return term.labeledHashCode();
     }
 }

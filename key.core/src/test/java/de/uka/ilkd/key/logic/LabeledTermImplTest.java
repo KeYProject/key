@@ -76,6 +76,35 @@ public class LabeledTermImplTest {
     }
 
     /**
+     * A caching {@link TermFactory} must intern labeled terms label-sensitively: two
+     * independently built, label-identical terms are the same object ({@code ==}), while a label
+     * variant and the unlabeled term are kept distinct. This guards the {@code ==} fast paths and
+     * memory sharing for the (very common) labeled terms.
+     */
+    @Test
+    public void testCachedFactoryInternsLabeledTerms() {
+        TermFactory ctf =
+            new TermFactory(new java.util.HashMap<>());
+        ImmutableArray<TermLabel> lbl =
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+
+        JTerm labeled1 = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, lbl);
+        JTerm labeled2 = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, lbl);
+        JTerm unlabeled = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, null);
+
+        Assertions.assertSame(labeled1, labeled2, "identical labeled terms must be interned");
+        Assertions.assertNotSame(labeled1, unlabeled,
+            "labeled and unlabeled variants must not be interned together");
+        Assertions.assertEquals(labeled1.labeledHashCode(), labeled2.labeledHashCode());
+    }
+
+    /**
      * Tests {@link JTerm#hasLabels()}, {@link JTerm#hasLabels()} and
      * {@link JTerm#containsLabel(TermLabel)}.
      */
