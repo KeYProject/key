@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Stack;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
@@ -60,7 +59,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * indicate that a term using these subterms should build a new term instead of using the old
      * one, because one of its subterms has been built, too.
      */
-    private final Stack<Object> subStack; // of Term (and Boolean)
+    private final Deque<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
     private final Deque<JTerm> tacletTermStack = new ArrayDeque<>();
 
@@ -91,7 +90,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
-        subStack = new Stack<>(); // of Term
+        subStack = new ArrayDeque<>(); // of Term
         if (labelHint != null) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -124,7 +123,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = null;
-        subStack = new Stack<>(); // of Term
+        subStack = new ArrayDeque<>(); // of Term
         if (labelHint != null) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -169,7 +168,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.goal = null;
         this.ruleApp = null;
         this.labelHint = null;
-        subStack = new Stack<>();
+        subStack = new ArrayDeque<>();
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
@@ -219,7 +218,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             }
             result[i] = (JTerm) top;
         }
-        if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) {
+        if (newTerm && (subStack.isEmpty() || subStack.peek() != newMarker)) {
             subStack.push(newMarker);
         }
         return result;
@@ -227,7 +226,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
 
     protected void pushNew(Object t) {
-        if (subStack.empty() || subStack.peek() != newMarker) {
+        if (subStack.isEmpty() || subStack.peek() != newMarker) {
             subStack.push(newMarker);
         }
         subStack.push(t);
@@ -360,7 +359,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             // instantiate sub terms
             final JTerm[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
-                    || (!subStack.empty() && subStack.peek() == newMarker)) {
+                    || (!subStack.isEmpty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
                 final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
