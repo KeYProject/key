@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -20,6 +20,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -75,7 +76,17 @@ public class LexPathOrdering implements TermOrdering {
     }
 
 
-    private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();
+    /**
+     * Comparison-result cache, a thread-safe bounded LRU. A {@link LexPathOrdering} lives in a
+     * per-proof strategy cost feature ({@code SmallerThanFeature}) shared across all goals, and the
+     * parallel prover evaluates rule-application cost concurrently, so this cache is read and
+     * written by several workers at once. A plain {@code HashMap}/{@code LRUCache} would corrupt
+     * under that (the latter mutates even on {@code get}); {@link ConcurrentLruCache} keeps the LRU
+     * bound while being thread-safe. Size tunable via {@code -Dkey.lexpath.cachesize}.
+     */
+    private static final int CACHE_SIZE = Integer.getInteger("key.lexpath.cachesize", 10000);
+    private final ConcurrentLruCache<CacheKey, CompRes> cache =
+        new ConcurrentLruCache<>(CACHE_SIZE);
 
 
     private CompRes compareHelp(Term p_a, Term p_b) {
@@ -83,9 +94,6 @@ public class LexPathOrdering implements TermOrdering {
         CompRes res = cache.get(key);
         if (res == null) {
             res = compareHelp2(p_a, p_b);
-            if (cache.size() > 100000) {
-                cache.clear();
-            }
             cache.put(key, res);
         }
         return res;
@@ -248,7 +256,13 @@ public class LexPathOrdering implements TermOrdering {
      * Hashmap from <code>Sort</code> to <code>Integer</code>, storing the lengths of maximal paths
      * from a sort to the top element of the sort lattice.
      */
-    private final WeakHashMap<Sort, Integer> sortDepthCache = new WeakHashMap<>();
+    // Thread-safe: shared via the per-proof cost feature and read/written by parallel workers (see
+    // the comparison cache above). A WeakHashMap even mutates on get (stale-entry expunge), so
+    // plain
+    // concurrent access would corrupt it; the synchronized wrapper makes each op atomic (the
+    // get-then-put is a benign idempotent recompute), keeping the weak-key semantics.
+    private final Map<Sort, Integer> sortDepthCache =
+        Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * @return the length of the longest path from <code>s</code> to the top element of the sort
