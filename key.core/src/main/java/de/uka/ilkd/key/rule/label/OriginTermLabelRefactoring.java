@@ -8,15 +8,15 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.StrictTermKey;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Taclet;
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.logic.Name;
 import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.rules.Rule;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -43,14 +42,13 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @Override
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
-        if (rule instanceof BuiltInRule
-                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+    public RefactoringScope defineRefactoringScope(TermLabelContext context) {
+        if (context.rule() instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(context.rule(), context.goal(),
+                    context.hint())) {
             return RefactoringScope.NONE;
-        } else if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
+        } else if (context.rule() instanceof Taclet
+                && !shouldRefactorOnTaclet((Taclet) context.rule())) {
             return RefactoringScope.NONE;
         } else {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
@@ -58,25 +56,24 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @Override
-    public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
-        if (services.getProof() == null) {
+    public void refactorLabels(TermLabelContext context, JTerm term, LabelCollection labels) {
+        if (context.services().getProof() == null) {
             return;
         }
 
-        if (rule instanceof BuiltInRule
-                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+        if (context.rule() instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(context.rule(), context.goal(),
+                    context.hint())) {
             return;
         }
 
-        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
+        if (context.rule() instanceof Taclet && !shouldRefactorOnTaclet((Taclet) context.rule())) {
             return;
         }
 
         final OriginTermLabel oldLabel = labels.getFirst(OriginTermLabel.class);
 
-        if (services.getTermBuilder().getOriginFactory() == null) {
+        if (context.services().getTermBuilder().getOriginFactory() == null) {
             if (oldLabel != null) {
                 labels.remove(oldLabel);
             }
@@ -85,13 +82,13 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         // cache origins per term to avoid a quadratic recursive collection per rule
         // application
-        final Map<JTerm, Set<Origin>> originsCache =
-            services.getCaches().getSubtermOriginsCache();
+        final Map<StrictTermKey, Set<Origin>> originsCache =
+            context.services().getCaches().getSubtermOriginsCache();
         Set<Origin> subtermOrigins = new LinkedHashSet<>();
         for (JTerm sub : term.subs()) {
             subtermOrigins.addAll(collectSubtermOrigins(sub, originsCache));
         }
-        OriginTermLabelFactory factory = services.getTermBuilder().getOriginFactory();
+        OriginTermLabelFactory factory = context.services().getTermBuilder().getOriginFactory();
         OriginTermLabel newLabel = null;
         if (oldLabel != null) {
             labels.remove(oldLabel);
@@ -105,7 +102,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         if (newLabel != null) {
             final Origin origin = newLabel.getOrigin();
-            if (OriginTermLabel.canAddLabel(term, services)
+            if (OriginTermLabel.canAddLabel(term, context.services())
                     && (!subtermOrigins.isEmpty() || origin.specType != SpecType.NONE)) {
                 labels.add(newLabel);
             }
@@ -135,8 +132,16 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      *         subterms; the returned set is unmodifiable and shared, do not mutate
      */
     @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(JTerm term, Map<JTerm, Set<Origin>> originsCache) {
-        Set<Origin> cached = originsCache.get(term);
+    private Set<Origin> collectSubtermOrigins(JTerm term,
+            Map<StrictTermKey, Set<Origin>> originsCache) {
+        // origins live in term labels: a label-free subtree cannot contribute any
+        if (!term.containsLabelsRecursive()) {
+            return Collections.emptySet();
+        }
+
+        // the cache key must be label-sensitive as the value is derived from the labels
+        final StrictTermKey key = new StrictTermKey(term);
+        Set<Origin> cached = originsCache.get(key);
         if (cached != null) {
             return cached;
         }
@@ -156,7 +161,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         Set<Origin> stored =
             result.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(result);
-        originsCache.put(term, stored);
+        originsCache.put(key, stored);
         return stored;
     }
 

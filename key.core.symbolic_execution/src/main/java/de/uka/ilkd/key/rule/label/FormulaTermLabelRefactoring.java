@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -112,19 +113,17 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
-        if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
+    public RefactoringScope defineRefactoringScope(TermLabelContext context) {
+        if (shouldRefactorSpecificationApplication(context.rule(), context.goal(),
+            context.hint())) {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
-        } else if (isParentRefactoringRequired(state)) {
+        } else if (isParentRefactoringRequired(context.state())) {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS;
-        } else if (isUpdateRefactoringRequired(state)) {
+        } else if (isUpdateRefactoringRequired(context.state())) {
             return RefactoringScope.APPLICATION_BELOW_UPDATES;
-        } else if (containsSequentFormulasToRefactor(state)) {
+        } else if (containsSequentFormulasToRefactor(context.state())) {
             return RefactoringScope.SEQUENT;
-        } else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(hint)) {
+        } else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(context.hint())) {
             return RefactoringScope.APPLICATION_BELOW_UPDATES;
         } else {
             return RefactoringScope.NONE;
@@ -147,20 +146,19 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * {@inheritDoc}
      */
     @Override
-    public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
-        if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
-            refactorSpecificationApplication(term, services, labels, hint);
-        } else if (isParentRefactoringRequired(state)) {
-            refactorInCaseOfNewIdRequired(state, goal, term, services, labels);
-        } else if (isUpdateRefactoringRequired(state)) {
-            refactorBelowUpdates(applicationPosInOccurrence, term, labels);
-        } else if (containsSequentFormulasToRefactor(state)) {
-            refactorSequentFormulas(state, services, term, labels);
-        } else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(hint)) {
-            refactorSubstitution(term, tacletTerm, labels);
+    public void refactorLabels(TermLabelContext context, JTerm term, LabelCollection labels) {
+        if (shouldRefactorSpecificationApplication(context.rule(), context.goal(),
+            context.hint())) {
+            refactorSpecificationApplication(term, context.services(), labels, context.hint());
+        } else if (isParentRefactoringRequired(context.state())) {
+            refactorInCaseOfNewIdRequired(context.state(), context.goal(), term, context.services(),
+                labels);
+        } else if (isUpdateRefactoringRequired(context.state())) {
+            refactorBelowUpdates(context.applicationPosInOccurrence(), term, labels);
+        } else if (containsSequentFormulasToRefactor(context.state())) {
+            refactorSequentFormulas(context.state(), context.services(), term, labels);
+        } else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(context.hint())) {
+            refactorSubstitution(term, context.tacletTerm(), labels);
         }
     }
 

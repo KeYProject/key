@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.StrictTermKey;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
@@ -129,9 +130,11 @@ public class ServiceCaches implements SessionCaches {
     private final Map<org.key_project.logic.Term, ClausesGraph> graphCache = new LRUCache<>(1000);
 
     /**
-     * Cache used by the TermFactory to avoid unnecessary creation of terms
+     * Cache used by the TermFactory to avoid unnecessary creation of terms. Keyed on
+     * {@link StrictTermKey} (label-sensitive equality) so that term labels are preserved and
+     * label variants are interned separately.
      */
-    private final Map<JTerm, JTerm> termCache = new LRUCache<>(20000);
+    private final Map<StrictTermKey, JTerm> termCache = new LRUCache<>(20000);
 
     /**
      * Cache used by TypeComparisonCondition
@@ -174,9 +177,10 @@ public class ServiceCaches implements SessionCaches {
     /**
      * Cache used by {@link de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring}: the
      * origins of a term and all its subterms. Terms are immutable, so the set never
-     * changes for a given term.
+     * changes for a given term. The key is label-sensitive ({@link StrictTermKey}) as the
+     * cached value is derived from the term's labels.
      */
-    private final Map<JTerm, Set<Origin>> subtermOriginsCache = new LRUCache<>(20000);
+    private final Map<StrictTermKey, Set<Origin>> subtermOriginsCache = new LRUCache<>(20000);
 
 
     /**
@@ -194,7 +198,7 @@ public class ServiceCaches implements SessionCaches {
      *
      * @return map from a term to the origins of the term and all its subterms
      */
-    public final Map<JTerm, Set<Origin>> getSubtermOriginsCache() {
+    public final Map<StrictTermKey, Set<Origin>> getSubtermOriginsCache() {
         return subtermOriginsCache;
     }
 
@@ -230,7 +234,7 @@ public class ServiceCaches implements SessionCaches {
         return graphCache;
     }
 
-    public final Map<JTerm, JTerm> getTermFactoryCache() {
+    public final Map<StrictTermKey, JTerm> getTermFactoryCache() {
         return termCache;
     }
 

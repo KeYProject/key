@@ -10,7 +10,6 @@ import org.key_project.util.collection.ImmutableList;
  * Instances of this class provides functionality only if a supported rule is active.
  *
  * @author Martin Hentschel
- * @see ChildTermLabelPolicy
  * @see TermLabelUpdate
  * @see TermLabelRefactoring
  */

@@ -13,7 +13,17 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
- * All irrelevant term labels are ignored in this equality check.
+ * All irrelevant term labels are ignored in this equality check, while labels that are
+ * {@link TermLabel#isProofRelevant() proof relevant} still count.
+ * <p>
+ * This is the middle one of the three label comparison modes: plain
+ * {@link de.uka.ilkd.key.logic.JTerm#equals(Object)} ignores <em>all</em> term labels, this
+ * property ignores only the non-proof-relevant (cosmetic) ones, and
+ * {@link de.uka.ilkd.key.logic.JTerm#equalsIncludingLabels(Object)} respects all labels. Use this
+ * property when a comparison must distinguish, e.g., an {@code anonHeapFunction}-labeled term
+ * from an unlabeled one, but must not be affected by origin labels. It deliberately lives in a
+ * {@link Property} (and not on the term) because it needs label-kind knowledge
+ * ({@code isProofRelevant()}).
  * <p>
  * The single instance of this property can be accessed through
  * {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY}.

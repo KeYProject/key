@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.logic.label.TermLabelContext;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
@@ -18,8 +16,6 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.Rule;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -67,13 +63,10 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      * {@inheritDoc}
      */
     @Override
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
-        if (goal != null) {
-            final String branchLabel = goal.node().getNodeInfo().getBranchLabel();
-            return switch (rule) {
+    public RefactoringScope defineRefactoringScope(TermLabelContext context) {
+        if (context.goal() != null) {
+            final String branchLabel = context.goal().node().getNodeInfo().getBranchLabel();
+            return switch (context.rule()) {
                 case UseOperationContractRule ignored when (branchLabel.startsWith("Pre") ||
                         branchLabel.startsWith("Null reference")) ->
                     RefactoringScope.SEQUENT;
@@ -94,9 +87,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      * {@inheritDoc}
      */
     @Override
-    public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+    public void refactorLabels(TermLabelContext context, JTerm term, LabelCollection labels) {
         labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

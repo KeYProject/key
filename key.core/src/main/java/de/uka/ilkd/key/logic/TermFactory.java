@@ -29,7 +29,7 @@ public final class TermFactory {
 
 
     private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
-    private final Map<JTerm, JTerm> cache;
+    private final Map<StrictTermKey, JTerm> cache;
 
 
     // -------------------------------------------------------------------------
@@ -41,7 +41,7 @@ public final class TermFactory {
         this.cache = null;
     }
 
-    public TermFactory(Map<JTerm, JTerm> cache) {
+    public TermFactory(Map<StrictTermKey, JTerm> cache) {
         this.cache = cache;
     }
 
@@ -119,22 +119,26 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
 
-        final TermImpl newTerm =
-            (labels == null || labels.isEmpty()
-                    ? new TermImpl(op, subs, boundVars)
-                    : new LabeledTermImpl(op, subs, boundVars, labels, origin));
+        final TermImpl newTerm = new TermImpl(op, subs, boundVars, labels);
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
+        //
+        // Labeled terms are cached too: the cache is keyed on StrictTermKey, i.e. label-sensitive
+        // equality, so a term is only shared with a structurally AND label identical one. This
+        // reproduces the interning behaviour from when term equality itself was label-sensitive
+        // (and keeps the == fast paths and memory sharing) while term.equals() stays
+        // label-agnostic for the logic layer.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
+            final StrictTermKey key = new StrictTermKey(newTerm);
             JTerm term;
             synchronized (cache) {
-                term = cache.get(newTerm);
+                term = cache.get(key);
             }
             if (term == null) {
                 term = newTerm.checked();
                 synchronized (cache) {
-                    cache.put(term, term);
+                    cache.put(key, term);
                 }
             }
             return term;

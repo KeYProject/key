@@ -147,7 +147,6 @@ public class JavaProfile extends AbstractProfile {
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
             new OriginTermLabelFactory(), originTermLabelPolicyList,
             null, null,
-            null, null,
             originTermLabelRefactorings, null));
 
         result =

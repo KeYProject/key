@@ -168,19 +168,19 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
 
         ImmutableList<TermLabelConfiguration> result = ImmutableList.nil();
         result = result.prepend(new TermLabelConfiguration(BlockContractValidityTermLabel.NAME,
-            new BlockContractValidityTermLabelFactory(), null, symExcPolicies, null, null, bcUps,
+            new BlockContractValidityTermLabelFactory(), null, symExcPolicies, bcUps,
             bcRefs, null));
         result =
             result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME,
                 new SingletonLabelFactory<>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
-                symExcPolicies, null, null, lbUps, lbRefs, null));
+                symExcPolicies, lbUps, lbRefs, null));
         result = result.prepend(new TermLabelConfiguration(
             SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
             new SingletonLabelFactory<>(
                 SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
-            null, symExcPolicies, null, null, nbUps, nbRefs, null));
+            null, symExcPolicies, nbUps, nbRefs, null));
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,
-            new SymbolicExecutionTermLabelFactory(), null, symExcPolicies, null, null, seUps,
+            new SymbolicExecutionTermLabelFactory(), null, symExcPolicies, seUps,
             seRefs, null));
         if (predicateEvaluationEnabled) {
             ImmutableList<TermLabelPolicy> predPolicies =
@@ -190,7 +190,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
             ImmutableList<TermLabelRefactoring> predRefs = ImmutableList
                     .<TermLabelRefactoring>nil().prepend(new FormulaTermLabelRefactoring());
             result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
-                new FormulaTermLabelFactory(), null, predPolicies, null, null, predUpdates,
+                new FormulaTermLabelFactory(), null, predPolicies, predUpdates,
                 predRefs, new FormulaTermLabelMerger()));
         }
         return result;

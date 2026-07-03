@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class LabeledTermImplTest {
 
@@ -40,10 +39,69 @@ public class LabeledTermImplTest {
         JTerm labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
             tf.createTerm(Junctor.FALSE), labels);
 
-        assertNotEquals(labeledTerm, unlabeledTerm,
-            "Labeled and unlabeled terms must not be equal");
-        assertNotEquals(unlabeledTerm, labeledTerm,
-            "Labeled and unlabeled terms must not be equal");
+        // equals ignores term labels ...
+        Assertions.assertEquals(labeledTerm, unlabeledTerm,
+            "equals must ignore term labels");
+        Assertions.assertEquals(unlabeledTerm, labeledTerm,
+            "equals must ignore term labels");
+        Assertions.assertEquals(labeledTerm.hashCode(), unlabeledTerm.hashCode(),
+            "hashCode must ignore term labels");
+        // ... while equalsIncludingLabels does not
+        Assertions.assertFalse(labeledTerm.equalsIncludingLabels(unlabeledTerm),
+            "equalsIncludingLabels must distinguish labeled and unlabeled terms");
+        Assertions.assertFalse(unlabeledTerm.equalsIncludingLabels(labeledTerm),
+            "equalsIncludingLabels must distinguish labeled and unlabeled terms");
+        Assertions.assertTrue(labeledTerm.equalsIncludingLabels(labeledTerm));
+    }
+
+    /**
+     * Labels on subterms must be distinguished by
+     * {@link JTerm#equalsIncludingLabels(Object)}, too.
+     */
+    @Test
+    public void testEqualsLabelOnSubterm() {
+        JTerm labeledSub = tf.createTerm(Junctor.TRUE,
+            new ImmutableArray<>(), null,
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL));
+        JTerm labeledBelow =
+            tf.createTerm(Junctor.AND, labeledSub, tf.createTerm(Junctor.FALSE));
+        JTerm unlabeled =
+            tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
+
+        Assertions.assertTrue(labeledBelow.containsLabelsRecursive());
+        Assertions.assertFalse(unlabeled.containsLabelsRecursive());
+        Assertions.assertEquals(labeledBelow, unlabeled);
+        Assertions.assertFalse(labeledBelow.equalsIncludingLabels(unlabeled));
+        Assertions.assertFalse(unlabeled.equalsIncludingLabels(labeledBelow));
+    }
+
+    /**
+     * A caching {@link TermFactory} must intern labeled terms label-sensitively: two
+     * independently built, label-identical terms are the same object ({@code ==}), while a label
+     * variant and the unlabeled term are kept distinct. This guards the {@code ==} fast paths and
+     * memory sharing for the (very common) labeled terms.
+     */
+    @Test
+    public void testCachedFactoryInternsLabeledTerms() {
+        TermFactory ctf =
+            new TermFactory(new java.util.HashMap<>());
+        ImmutableArray<TermLabel> lbl =
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+
+        JTerm labeled1 = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, lbl);
+        JTerm labeled2 = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, lbl);
+        JTerm unlabeled = ctf.createTerm(Junctor.AND,
+            new ImmutableArray<>(ctf.createTerm(Junctor.TRUE), ctf.createTerm(Junctor.FALSE)),
+            null, null);
+
+        Assertions.assertSame(labeled1, labeled2, "identical labeled terms must be interned");
+        Assertions.assertNotSame(labeled1, unlabeled,
+            "labeled and unlabeled variants must not be interned together");
+        Assertions.assertEquals(labeled1.labeledHashCode(), labeled2.labeledHashCode());
     }
 
     /**

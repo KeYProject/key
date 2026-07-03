@@ -367,8 +367,10 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 pushNew(resolveSubst(newTerm));
             } else {
                 JTerm t;
-                final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visitedOp,
-                    visited.subs(), visited.boundVars(), visited.getLabels());
+                // The new term is structurally identical to visited (same op, subs, bound
+                // variables and labels), so pass visited itself to the label manager instead
+                // of rebuilding an equal throwaway term for every unchanged node.
+                final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visited);
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                     t = visited;
                 } else {
@@ -389,9 +391,13 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             ImmutableArray<JTerm> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars,
             ImmutableArray<TermLabel> newTermOriginalLabels) {
-        return TermLabelManager.instantiateLabels(termLabelState, services,
-            applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
+        return instantiateLabels(tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
+    }
+
+    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, JTerm newTerm) {
+        return TermLabelManager.instantiateLabels(termLabelState, services,
+            applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm, newTerm);
     }
 
     private Operator handleParametricFunction(ParametricFunctionInstance pfi) {

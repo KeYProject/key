@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -19,12 +21,14 @@ import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
 
 import org.jspecify.annotations.NonNull;
 
 
 /**
- * The currently only class implementing the Term interface. TermFactory should be the only class
+ * The only class implementing the {@link JTerm} interface. A term may carry {@link TermLabel}s;
+ * unlabeled terms share a single empty label array. {@link TermFactory} should be the only class
  * dealing directly with the TermImpl class.
  */
 class TermImpl implements JTerm {
@@ -54,34 +58,68 @@ class TermImpl implements JTerm {
     private final ImmutableArray<JTerm> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
 
+    /**
+     * The labels attached to this term, or the shared {@link #EMPTY_LABEL_LIST} if there are
+     * none. Never {@code null}. Term labels do not participate in {@link #equals(Object)} /
+     * {@link #hashCode()}; use {@link #equalsIncludingLabels(Object)} for a label-sensitive
+     * comparison.
+     */
+    private final ImmutableArray<TermLabel> labels;
+
     // caches
-    private enum ThreeValuedTruth {
-        TRUE, FALSE, UNKNOWN
-    }
 
     private int depth = -1;
-    /**
-     * A cached value for computing the term's rigidness.
-     */
-    private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
 
+    /**
+     * Cached {@link #labeledHashCode()} value (label-sensitive); only used for terms that
+     * actually carry a label somewhere in their subtree.
+     */
+    private int labeledHashcode = -1;
+
     private Sort sort;
 
     /**
-     * This flag indicates that the {@link JTerm} itself or one of its children contains a non-empty
-     * {@link JavaBlock}. {@link JTerm}s which provides a {@link JavaBlock} directly or indirectly
-     * can't be cached because it is possible that the contained meta information inside the
-     * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
+     * Packed lazily-computed tri-state predicates, two bits each (see {@link #FLAG_UNKNOWN} /
+     * {@link #FLAG_FALSE} / {@link #FLAG_TRUE}): rigidness, and whether this term or one of its
+     * children contains a {@link JavaBlock}, a {@link Transformer}, or a {@link TermLabel}.
+     * Written at most once per flag via {@link #FLAGS} CAS so that concurrent computation of
+     * different flags on the same (shared, immutable) term cannot lose updates.
      */
-    private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
+    private volatile int flags = 0;
 
-    /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
-    private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
+    private static final AtomicIntegerFieldUpdater<TermImpl> FLAGS =
+        AtomicIntegerFieldUpdater.newUpdater(TermImpl.class, "flags");
+
+    private static final int FLAG_UNKNOWN = 0;
+    private static final int FLAG_FALSE = 1;
+    private static final int FLAG_TRUE = 2;
+    private static final int FLAG_MASK = 3;
+
+    private static final int SHIFT_RIGID = 0;
+    private static final int SHIFT_JAVA_BLOCK = 2;
+    private static final int SHIFT_TRANSFORMER = 4;
+    private static final int SHIFT_LABELS = 6;
+
+    /** @return the two-bit state of the flag at {@code shift} */
+    private int getFlag(int shift) {
+        return (flags >>> shift) & FLAG_MASK;
+    }
+
+    /** Stores {@code value} into the flag at {@code shift}, unless it has meanwhile been set. */
+    private void setFlag(int shift, int value) {
+        int prev;
+        do {
+            prev = flags;
+            if (((prev >>> shift) & FLAG_MASK) != FLAG_UNKNOWN) {
+                return;
+            }
+        } while (!FLAGS.compareAndSet(this, prev, prev | (value << shift)));
+    }
 
     // -------------------------------------------------------------------------
     // constructors
@@ -98,11 +136,25 @@ class TermImpl implements JTerm {
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars) {
+        this(op, subs, boundVars, null);
+    }
+
+    /**
+     * Constructs a term that may carry term labels.
+     *
+     * @param op the operator of the term
+     * @param subs the sub terms of the constructed term
+     * @param boundVars the bound variables (if applicable)
+     * @param labels the term's labels, or {@code null}/empty for an unlabeled term
+     */
+    public TermImpl(Operator op, ImmutableArray<JTerm> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, ImmutableArray<TermLabel> labels) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
+        this.labels = (labels == null || labels.isEmpty()) ? EMPTY_LABEL_LIST : labels;
     }
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
@@ -228,22 +280,21 @@ class TermImpl implements JTerm {
 
     @Override
     public boolean isRigid() {
-        if (rigid == ThreeValuedTruth.UNKNOWN) {
-            if (!op.isRigid()) {
-                rigid = ThreeValuedTruth.FALSE;
-            } else {
-                ThreeValuedTruth localIsRigid = ThreeValuedTruth.TRUE;
+        int flag = getFlag(SHIFT_RIGID);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = op.isRigid();
+            if (result) {
                 for (int i = 0, n = arity(); i < n; i++) {
                     if (!sub(i).isRigid()) {
-                        localIsRigid = ThreeValuedTruth.FALSE;
+                        result = false;
                         break;
                     }
                 }
-                rigid = localIsRigid;
             }
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_RIGID, flag);
         }
-
-        return rigid == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
 
@@ -281,7 +332,8 @@ class TermImpl implements JTerm {
     }
 
     /**
-     * true iff <code>o</code> is syntactically equal to this term
+     * true iff <code>o</code> is syntactically equal to this term; {@link TermLabel}s are
+     * ignored. Use {@link #equalsIncludingLabels(Object)} for a label-sensitive comparison.
      */
     @Override
     public boolean equals(Object o) {
@@ -289,16 +341,70 @@ class TermImpl implements JTerm {
             return true;
         }
 
-        if (o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) {
+        if (!(o instanceof final TermImpl t) || hashCode() != o.hashCode()) {
             return false;
         }
 
-        final TermImpl t = (TermImpl) o;
-
-        return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
+        return op.equals(t.op) && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
                 // TODO (DD): below is no longer necessary
                 && javaBlock().equals(t.javaBlock());
+    }
+
+    /**
+     * true iff <code>o</code> is syntactically equal to this term <em>including</em> all
+     * {@link TermLabel}s attached to this term or any subterm. Labels are compared as sets
+     * (order-insensitive). This is the label-sensitive counterpart of {@link #equals(Object)}
+     * needed by the few consumers which must distinguish label variants (e.g. the term
+     * factory cache and taclet index caches).
+     */
+    @Override
+    public boolean equalsIncludingLabels(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!equals(o)) {
+            return false;
+        }
+        final TermImpl t = (TermImpl) o;
+        if (!containsLabelsRecursive() && !t.containsLabelsRecursive()) {
+            return true;
+        }
+        return labelsEqualRecursive(this, t);
+    }
+
+    /**
+     * Compares the {@link TermLabel}s of two structurally equal terms recursively.
+     *
+     * @param t1 a term
+     * @param t2 a term already known to be equal to {@code t1} modulo term labels
+     * @return true iff all (sub)terms carry equal label sets
+     */
+    private static boolean labelsEqualRecursive(JTerm t1, JTerm t2) {
+        // interned (shared) subterms are reference-identical: prune the whole subtree. This is
+        // the common case, as the term factory interns terms label-sensitively.
+        if (t1 == t2) {
+            return true;
+        }
+        final ImmutableArray<TermLabel> labels1 = t1.getLabels();
+        final ImmutableArray<TermLabel> labels2 = t2.getLabels();
+        if (labels1.size() != labels2.size()) {
+            return false;
+        }
+        for (int i = 0, sz = labels1.size(); i < sz; i++) {
+            if (!labels2.contains(labels1.get(i))) {
+                return false;
+            }
+        }
+        if (!t1.containsLabelsRecursive() && !t2.containsLabelsRecursive()) {
+            return true;
+        }
+        for (int i = 0, ar = t1.arity(); i < ar; i++) {
+            if (!labelsEqualRecursive(t1.sub(i), t2.sub(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -325,6 +431,33 @@ class TermImpl implements JTerm {
             hashcode = 0;
         }
         return hashcode;
+    }
+
+    @Override
+    public int labeledHashCode() {
+        // no labels anywhere: the label-sensitive hash coincides with the plain one
+        if (!containsLabelsRecursive()) {
+            return hashCode();
+        }
+        if (labeledHashcode == -1) {
+            this.labeledHashcode = computeLabeledHashCode();
+        }
+        return labeledHashcode;
+    }
+
+    /** {@link #hashCode()} refined by the labels of this term and all its subterms. */
+    private int computeLabeledHashCode() {
+        int result = hashCode();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            result = result * 17 + labels.get(i).hashCode();
+        }
+        for (int i = 0, ar = arity(); i < ar; i++) {
+            result = result * 17 + sub(i).labeledHashCode();
+        }
+        if (result == -1) {
+            result = 0;
+        }
+        return result;
     }
 
     @Override
@@ -357,16 +490,22 @@ class TermImpl implements JTerm {
                 sb.append(op()).append("|{").append(javaBlock()).append("}| ");
             }
             sb.append("(").append(sub(0)).append(")");
-            return sb.toString();
         } else {
             sb.append(op().name());
             if (!boundVars.isEmpty()) {
                 sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }
-            if (arity() == 0) {
-                return sb.toString();
+            if (arity() != 0) {
+                sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
             }
-            sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
+        }
+
+        if (hasLabels()) {
+            final String labelsStr =
+                labels.stream().map(TermLabel::toString).collect(Collectors.joining(", "));
+            if (!labelsStr.isEmpty()) {
+                sb.append("<<").append(labelsStr).append(">>");
+            }
         }
 
         return sb.toString();
@@ -380,22 +519,29 @@ class TermImpl implements JTerm {
 
     @Override
     public boolean hasLabels() {
-        return false;
+        return !labels.isEmpty();
     }
 
     @Override
     public boolean containsLabel(TermLabel label) {
+        assert label != null : "Label must not be null";
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            if (label.equals(labels.get(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public TermLabel getLabel(Name termLabelName) {
-        return null;
+        return CollectionUtil.search(labels,
+            element -> Objects.equals(element.name(), termLabelName));
     }
 
     @Override
     public ImmutableArray<TermLabel> getLabels() {
-        return EMPTY_LABEL_LIST;
+        return labels;
     }
 
     /**
@@ -403,40 +549,62 @@ class TermImpl implements JTerm {
      */
     @Override
     public boolean containsJavaBlockRecursive() {
-        if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (!javaBlock().isEmpty()) {
-                result = ThreeValuedTruth.TRUE;
-            } else {
+        int flag = getFlag(SHIFT_JAVA_BLOCK);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = !javaBlock().isEmpty();
+            if (!result) {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsJavaBlockRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsJavaBlockRecursive = result;
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_JAVA_BLOCK, flag);
         }
-        return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsLabelsRecursive() {
+        int flag = getFlag(SHIFT_LABELS);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = hasLabels();
+            if (!result) {
+                for (int i = 0, arity = subs.size(); i < arity; i++) {
+                    if (subs.get(i).containsLabelsRecursive()) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_LABELS, flag);
+        }
+        return flag == FLAG_TRUE;
     }
 
     @Override
     public boolean containsTransformerRecursive() {
-        if (containsTransformerRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (op instanceof Transformer) {
-                result = ThreeValuedTruth.TRUE;
-            } else {
+        int flag = getFlag(SHIFT_TRANSFORMER);
+        if (flag == FLAG_UNKNOWN) {
+            boolean result = op instanceof Transformer;
+            if (!result) {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsTransformerRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsTransformerRecursive = result;
+            flag = result ? FLAG_TRUE : FLAG_FALSE;
+            setFlag(SHIFT_TRANSFORMER, flag);
         }
-        return containsTransformerRecursive == ThreeValuedTruth.TRUE;
+        return flag == FLAG_TRUE;
     }
 
 

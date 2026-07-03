@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelMerger;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -49,21 +48,31 @@ import org.key_project.prover.sequent.SequentFormula;
  * {@link TermLabelManager} provides also the functionality to parse and maintain them during prove.
  * </p>
  * <p>
- * The {@link TermLabelManager} is responsible during prove to maintain term labels.
- * This means that labels of new {@link JTerm}s created during rule application are computed
- * via {@link TermLabelManager#instantiateLabels}
- * and of existing {@link JTerm}s are refactored (added or removed) via
- * {@link TermLabelManager#instantiateLabels}.
+ * The {@link TermLabelManager} is responsible for maintaining term labels during proof
+ * construction. This means that labels of new {@link JTerm}s created during rule application are
+ * computed via {@link TermLabelManager#instantiateLabels} and labels of existing {@link JTerm}s
+ * are refactored (added or removed) via the refactoring methods of {@link TermLabelManager}.
  * </p>
  * <p>
- * Antecedent and succedent of a {@link Sequent} are sets. The equality check if a
- * {@link SequentFormula} is already contained ignores {@link TermLabel}s. To ensure that
- * {@link TermLabel}s are not lost,
+ * <b>Equality:</b> since term labels are not soundness relevant, the standard term equality
+ * {@link JTerm#equals(Object)} (and {@link JTerm#hashCode()}) ignores <em>all</em> term labels:
+ * two terms differing only in labels are the same formula. Code that must distinguish label
+ * variants has two options: {@link JTerm#equalsIncludingLabels(Object)} together with
+ * {@link JTerm#labeledHashCode()} respects all labels (used for term interning and index caches,
+ * see {@link de.uka.ilkd.key.logic.StrictTermKey}), while
+ * {@code equalsModProperty(t, IRRELEVANT_TERM_LABELS_PROPERTY)} ignores only labels that are not
+ * {@link #isProofRelevant() proof relevant}.
+ * </p>
+ * <p>
+ * Antecedent and succedent of a {@link Sequent} are sets. The redundancy check whether a
+ * {@link SequentFormula} is already contained ignores {@link TermLabel}s (consistent with the
+ * standard term equality). To ensure that {@link TermLabel}s are not lost when a formula is
+ * rejected as redundant,
  * {@link TermLabelManager#mergeLabels(de.uka.ilkd.key.java.Services,
  *         de.uka.ilkd.key.logic.SequentChangeInfo)}
  * merges the labels of the existing {@link SequentFormula} with those of the rejected
  * {@link SequentFormula}. How this is done in detail is implemented by a {@link TermLabelMerger}.
- * If no {@link TermLabelMerger} is available, the {@link TermLabel} of the rejected
+ * If no {@link TermLabelMerger} is available, the {@link TermLabel}s of the rejected
  * {@link SequentFormula} are lost.
  * </p>
  * <p>
@@ -108,15 +117,6 @@ import org.key_project.prover.sequent.SequentFormula;
  *          <li>{@code 2 + 3 ~~> 5<>a>>}: A new label has to be added which is not provided by the
  *              rule. Implement a {@link TermLabelUpdate} which adds, sorts or removes
  *              {@link TermLabel} before a new {@link JTerm} is created.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: A direct child of the application {@link JTerm}
- *              {@code a} contains the label before. Use a direct {@link ChildTermLabelPolicy} to
- *              ensure that it is added also to the new term.</li>
- *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 4<<a>>}: A child or grandchild of the application
- *              {@link JTerm} {@code a} contains the label before. Use a direct
- *              {@link ChildTermLabelPolicy} to ensure that it is added also to the new term.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: Implement a {@link TermLabelRefactoring}
- *              which works on {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN} to freely add or
- *              remove {@link TermLabel}s on direct children of the application {@link JTerm}.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 2 * (3<<a>> - 1)}: Implement a
  *              {@link TermLabelRefactoring} which works on
  *              {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE} to freely

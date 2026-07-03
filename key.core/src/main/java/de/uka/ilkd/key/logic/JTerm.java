@@ -119,6 +119,36 @@ public interface JTerm
     boolean containsJavaBlockRecursive();
 
     /**
+     * Checks if this {@link JTerm} or one of its direct or indirect children carries a
+     * {@link TermLabel}. Cached; used as a cheap guard by label-sensitive consumers since
+     * {@link #equals(Object)} ignores term labels.
+     *
+     * @return {@code true} iff a term label occurs anywhere in the term tree
+     */
+    boolean containsLabelsRecursive();
+
+    /**
+     * Checks term equality <em>including</em> {@link TermLabel}s on this term and all subterms
+     * (labels compared as sets). This is the label-sensitive counterpart of
+     * {@link #equals(Object)}.
+     *
+     * @param o the object to compare with
+     * @return {@code true} iff {@code o} is a term syntactically equal to this one with equal
+     *         label sets on all subterms
+     */
+    boolean equalsIncludingLabels(Object o);
+
+    /**
+     * A hash code consistent with {@link #equalsIncludingLabels(Object)}: two terms that are
+     * equal including labels have the same labeled hash code. Cached. This is the label-sensitive
+     * counterpart of {@link #hashCode()} and is used to key the term-factory cache so that label
+     * variants are interned separately (and hence still shared via {@code ==}).
+     *
+     * @return the label-sensitive hash code
+     */
+    int labeledHashCode();
+
+    /**
      * Checks if this {@link JTerm} or one of its direct or indirect children has a
      * {@link de.uka.ilkd.key.logic.op.Transformer} operator. Cached; used by
      * {@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix} to skip the prefix walk in the common

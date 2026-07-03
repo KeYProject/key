@@ -18,7 +18,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
 /**
@@ -235,7 +234,7 @@ public class OpReplacer {
         }
 
         for (SyntaxElement svs : map.keySet()) {
-            if (svs instanceof JTerm t && TERM_LABELS_PROPERTY.equalsModThisProperty(term, t)) {
+            if (svs instanceof JTerm t && term.equals(t)) {
                 return (JTerm) map.get(svs);
             }
         }

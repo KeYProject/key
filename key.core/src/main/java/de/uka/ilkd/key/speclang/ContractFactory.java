@@ -34,7 +34,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 
 /**
@@ -511,9 +510,9 @@ public class ContractFactory {
 
                     // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
+                    // (plain term equality now ignores term labels)
                     if (uniformModifiable.containsKey(h)) {
-                        if (!TERM_LABELS_PROPERTY.equalsModThisProperty(uniformModifiable.get(h),
-                            modifiable2)) {
+                        if (!uniformModifiable.get(h).equals(modifiable2)) {
                             uniformModifiable.remove(h);
                         } else {
                             // merge term labels (in particular origin labels) of both modifiable
