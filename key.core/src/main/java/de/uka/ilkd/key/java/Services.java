@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.LogicServices;
@@ -87,15 +86,19 @@ public class Services implements TermServices, LogicServices, ProofServices {
      */
     private JavaModel javaModel;
 
-    private NameRecorder nameRecorder;
-
     /**
-     * Per-proof allocator of fresh names that are globally unique across worker threads (shared
-     * across this proof's overlay/copy {@link Services}). Used by {@link VariableNameProposer}
-     * while
-     * a multi-threaded run is active so that names stay disjoint without consulting the shared
-     * namespace. See the multithreading effort (branch {@code bubel/mt-goals}).
+     * Records the fresh-name proposals made while a rule is applied, so they can be stored on the
+     * node for reproducible reload. It is <em>per thread</em>: the proposals are recorded during
+     * the rule's compute phase, which -- under the multi-core prover -- runs concurrently on the
+     * workers, so each proving thread (the single single-core thread, or each worker) gets its own
+     * recorder. This makes the recorder prover-agnostic and free of races on a shared field,
+     * without {@link Services} having to know which prover is running. It is an <em>instance</em>
+     * {@link ThreadLocal} (not static), so a nested side proof, which runs on its own
+     * {@link Services}, keeps its own recorder. Lazily created; reset by
+     * {@link #saveNameRecorder(Node)} after each rule application.
      */
+    private ThreadLocal<NameRecorder> nameRecorder =
+        ThreadLocal.withInitial(NameRecorder::new);
 
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
@@ -143,7 +146,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
             this.javaService = javaService.copy(this);
             this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
         }
-        nameRecorder = new NameRecorder();
     }
 
     private Services(Services s) {
@@ -156,6 +158,12 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.counters = s.counters;
         this.specRepos = s.specRepos;
         this.javaModel = s.javaModel;
+        // Share the (per-thread) recorder with the source: an overlay (see getOverlay) is the
+        // services the rule executor works through, and fresh-name proposals set on the base
+        // services -- e.g. by the proof replayer before re-applying a rule -- must be visible and
+        // consumable through it. This mirrors the pre-ThreadLocal field aliasing; per-thread
+        // isolation between proving threads is preserved because it is the ThreadLocal that is
+        // shared, not a recorder instance.
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
@@ -163,8 +171,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.originFactory = s.originFactory;
-        // Share the allocator across all overlay/copy Services of the same proof so that
-        // per-(worker,base) counters stay coherent.
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -207,43 +213,23 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
 
     /**
-     * Per-worker name recorder, used while a goal is being applied off the calling thread (parallel
-     * prover, branch {@code bubel/mt-goals}). The rule executor records fresh-name proposals during
-     * the compute phase, which runs concurrently outside the commit lock; routing those through a
-     * thread-local recorder keeps them off the shared {@link #nameRecorder} field. Bound per worker
-     * by {@link #bindWorkerNameRecorder()} and consulted only while a multi-threaded run is active.
+     * The name recorder for the calling thread (see the {@link #nameRecorder} field).
+     *
+     * @return the calling thread's name recorder
      */
-    private static final ThreadLocal<NameRecorder> WORKER_NAME_RECORDER = new ThreadLocal<>();
-
-    /** Binds a fresh per-worker name recorder to the calling thread. */
-    public static void bindWorkerNameRecorder() {
-        WORKER_NAME_RECORDER.set(new NameRecorder());
-    }
-
-    /** Removes the per-worker name recorder from the calling thread. */
-    public static void unbindWorkerNameRecorder() {
-        WORKER_NAME_RECORDER.remove();
-    }
-
-    private @Nullable NameRecorder activeWorkerNameRecorder() {
-        return ParallelProver.isMultiThreadedRunActive() ? WORKER_NAME_RECORDER.get() : null;
-    }
-
     public NameRecorder getNameRecorder() {
-        NameRecorder worker = activeWorkerNameRecorder();
-        return worker != null ? worker : nameRecorder;
+        return nameRecorder.get();
     }
 
-
+    /**
+     * Stores the calling thread's recorded name proposals on the given node and starts a fresh
+     * recorder for that thread's next rule application.
+     *
+     * @param n the node to store the recorded proposals on
+     */
     public void saveNameRecorder(Node n) {
-        NameRecorder worker = activeWorkerNameRecorder();
-        if (worker != null) {
-            n.setNameRecorder(worker);
-            WORKER_NAME_RECORDER.set(new NameRecorder());
-        } else {
-            n.setNameRecorder(nameRecorder);
-            nameRecorder = new NameRecorder();
-        }
+        n.setNameRecorder(nameRecorder.get());
+        nameRecorder.set(new NameRecorder());
     }
 
 
@@ -294,7 +280,13 @@ public class Services implements TermServices, LogicServices, ProofServices {
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
+        // Detach this instance's recorder from earlier overlays/aliases, keeping the calling
+        // thread's current contents (mirrors the pre-ThreadLocal `nameRecorder =
+        // nameRecorder.copy()`): the copy is the basis of a NEW proof, whose recordings must not
+        // leak into recorders already stored on this services' nodes.
+        NameRecorder detached = nameRecorder.get().copy();
+        nameRecorder = ThreadLocal.withInitial(NameRecorder::new);
+        nameRecorder.set(detached);
         s.setJavaModel(getJavaModel());
         s.originFactory = originFactory;
         return s;
@@ -322,7 +314,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
             new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        s.nameRecorder = nameRecorder.copy();
+        // The copy starts from this thread's current recordings (mirrors the pre-ThreadLocal
+        // `s.nameRecorder = nameRecorder.copy()`).
+        s.nameRecorder.set(nameRecorder.get().copy());
         s.setJavaModel(getJavaModel());
         s.originFactory = originFactory;
         return s;
@@ -346,13 +340,34 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
-    /*
-     * returns an existing named counter, creates a new one otherwise
+    /**
+     * Returns the named proof-global counter, creating it if necessary.
      *
-     * Synchronized so that concurrent workers (multithreading effort) cannot lose a counter
-     * through a racing check-then-put on the shared counters map. The per-counter increment is
-     * atomic (see Counter); this only guards lookup/creation.
+     * <p>
+     * Synchronized so that concurrent workers cannot lose a counter through
+     * a racing check-then-put on the shared counters map. The per-counter increment is atomic (see
+     * {@link Counter}); this only guards lookup/creation.
+     *
+     * @param name the counter's name
+     * @return the (possibly freshly created) counter
+     * @deprecated Do not introduce new proof-global counters; prefer removing the remaining ones. A
+     *             value drawn from such a counter is a function of how many times it has been
+     *             advanced -- i.e. of the whole proof's history, and under the parallel prover of
+     *             the worker schedule -- so any name or id derived from it that becomes part of the
+     *             proof is <em>not</em> reproducible across reload, prune-and-redo or
+     *             multi-threaded
+     *             runs (#3851). Derive names/ids from the goal-local proof state instead: the
+     *             smallest free index against the current namespace (see
+     *             {@link de.uka.ilkd.key.proof.VariableNameProposer},
+     *             {@link de.uka.ilkd.key.logic.VariableNamer}), a content-order number (see
+     *             {@link de.uka.ilkd.key.speclang.ContentOrderNumbering}), or a dedicated field on
+     *             the owning object (as the node serial number is now an
+     *             {@link java.util.concurrent.atomic.AtomicInteger} on
+     *             {@link de.uka.ilkd.key.proof.Proof#getNextNodeSerialNr()}). The only remaining
+     *             callers are the symbolic-execution term-label counters, which are expected to be
+     *             removed together with the {@code key.core.symbolic_execution} package.
      */
+    @Deprecated
     public synchronized Counter getCounter(String name) {
         Counter c = counters.get(name);
         if (c != null) {
@@ -507,7 +522,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         lookup.register(getProof());
         lookup.register(getNamespaces());
         lookup.register(getTermBuilder());
-        lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
         return lookup;
     }

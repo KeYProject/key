@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -450,9 +449,10 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /** A single worker: claim goals and process them until the queue is quiescent or stopped. */
     private void workerLoop(GoalScheduler<Goal> scheduler, Object commitLock,
             long startTime) {
-        // Bind a per-worker name recorder so the rule executor's fresh-name proposals (made in the
-        // lock-free compute phase) do not race on the shared one. Only relevant at >1 worker.
-        Services.bindWorkerNameRecorder();
+        // The rule executor's fresh-name proposals (made in the lock-free compute phase) go through
+        // Services' per-thread name recorder, so this worker records into its own recorder with no
+        // race on a shared one -- see Services#getNameRecorder. No explicit binding is needed: the
+        // recorder is created lazily per thread and this worker pool is created fresh per run.
         try {
             Goal goal;
             while (!stopRequested.get() && (goal = scheduler.claimOrAwait()) != null) {
@@ -485,8 +485,6 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             firstError.compareAndSet(null, t);
             requestStop("Error.", null);
             throw t;
-        } finally {
-            Services.unbindWorkerNameRecorder();
         }
     }
 

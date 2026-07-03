@@ -693,8 +693,8 @@ public final class Goal implements ProofGoal<Goal> {
      * Compute phase of a rule application: run the rule executor (term construction, node
      * splitting)
      * without touching shared proof state. Safe to run concurrently for distinct goals &mdash; it
-     * mutates only this goal's own node subtree, the atomic node counter, the thread-safe strategy
-     * caches, the worker-disjoint name allocator and a per-worker name recorder. The
+     * mutates only this goal's own node subtree, the atomic node counter and the thread-safe
+     * strategy caches. The
      * {@link #commitRuleApp(PendingRuleApp)} step then performs the shared mutation under the
      * prover's commit lock. The plain {@link #apply(RuleApp)} runs the two back to back, so the
      * single-threaded behaviour is unchanged.
@@ -721,7 +721,8 @@ public final class Goal implements ProofGoal<Goal> {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
             // detach the journal: only the success path (via getRuleAppInfo) removes it, so an
-            // aborted application would otherwise leak the listener (inherited by subgoals on split)
+            // aborted application would otherwise leak the listener (inherited by subgoals on
+            // split)
             removeGoalListener(journal);
             return null;
         } catch (IndexOutOfBoundsException e) {

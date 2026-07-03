@@ -66,12 +66,6 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * name of the counter object used for temporary name proposals
-     */
-
-
-
-    /**
      * status of suggestive name proposing
      */
     private static boolean suggestive_off = true;
@@ -577,11 +571,6 @@ public abstract class VariableNamer implements InstantiationProposer {
     // interface: suggestive name proposals
     // (taken from VarNameDeliverer.java, pretty much unchanged)
     // -------------------------------------------------------------------------
-
-    public static void setSuggestiveEnabled(boolean enabled) {
-        suggestive_off = !enabled;
-    }
-
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,

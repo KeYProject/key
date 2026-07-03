@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -63,6 +64,14 @@ public class Proof implements ProofObject<Goal>, Named {
      * The time when the {@link Proof} instance was created.
      */
     private final long creationTime = System.currentTimeMillis();
+
+    /**
+     * Hands out {@link Node#serialNr() node serial numbers} for this proof. Monotonic and never
+     * reused within a session -- pruning leaves gaps, and reloading renumbers contiguously from
+     * zero -- so a node serial is a display/identity tag that never enters a sequent. Atomic so
+     * that nodes created on parallel worker threads still receive distinct serials.
+     */
+    private final AtomicInteger nodeSerialCounter = new AtomicInteger();
 
     /**
      * name of the proof
@@ -465,6 +474,16 @@ public class Proof implements ProofObject<Goal>, Named {
             this.root = root;
             fireProofStructureChanged();
         }
+    }
+
+    /**
+     * Hands out the next serial number for a {@link Node} of this proof. See
+     * {@link #nodeSerialCounter} for the guarantees (monotonic, per-proof, prune leaves gaps).
+     *
+     * @return a fresh node serial number
+     */
+    public int getNextNodeSerialNr() {
+        return nodeSerialCounter.getAndIncrement();
     }
 
 
@@ -1383,9 +1402,10 @@ public class Proof implements ProofObject<Goal>, Named {
             // single-threaded prover.
             if (!closedAtSuspension && !mutedProofCloseEvents && closed()) {
                 ProofTreeEvent event = new ProofTreeEvent(Proof.this);
-                for (ProofTreeListener l : suspendedTreeListeners) {
-                    l.proofClosed(event);
-                }
+                // go through notifyListeners for the same per-listener exception isolation every
+                // other proofClosed dispatch uses; a throwing GUI listener must not escape here and
+                // abort the parallel run's winddown
+                notifyListeners(suspendedTreeListeners, l -> l.proofClosed(event));
             }
         }
     }

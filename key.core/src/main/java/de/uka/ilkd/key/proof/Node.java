@@ -48,8 +48,6 @@ public class Node implements Iterable<Node> {
     private static final String CLOSED_GOAL = "Closed goal";
     private static final String CACHED_GOAL = "Closed goal (via cache)";
 
-    private static final String NODES = "nodes";
-
     /** the proof the node belongs to */
     private final Proof proof;
 
@@ -131,7 +129,7 @@ public class Node implements Iterable<Node> {
      */
     public Node(Proof proof) {
         this.proof = proof;
-        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
+        serialNr = proof.getNextNodeSerialNr();
         nodeInfo = new NodeInfo(this);
     }
 

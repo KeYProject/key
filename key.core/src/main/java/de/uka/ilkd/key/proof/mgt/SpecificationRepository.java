@@ -1052,6 +1052,20 @@ public class SpecificationRepository {
     }
 
     /**
+     * Returns the class axioms declared in (registered for) the given type. This is the group among
+     * which a {@link de.uka.ilkd.key.speclang.ClassAxiomImpl}'s taclet name must be unique; order
+     * is
+     * not significant.
+     *
+     * @param kjt the type
+     * @return the axioms registered for {@code kjt}, or the empty set if none
+     */
+    public synchronized ImmutableSet<ClassAxiom> getClassAxiomsForType(KeYJavaType kjt) {
+        final ImmutableSet<ClassAxiom> own = axioms.get(kjt);
+        return own == null ? DefaultImmutableSet.nil() : own;
+    }
+
+    /**
      * Registers the passed class axiom.
      */
     public void addClassAxiom(ClassAxiom ax) {
@@ -1532,7 +1546,11 @@ public class SpecificationRepository {
      */
     public void addMergeContract(final MergeContract mc) {
         final MergePointStatement mps = mc.getMergePointStatement();
-        mergeContracts.put(mps, getMergeContracts(mps).add(mc));
+        // compute() keeps the read-modify-write atomic on the synchronized map, like the
+        // loop-contract registrations above; a plain get-then-put could lose a concurrent
+        // registration.
+        mergeContracts.compute(mps,
+            (k, set) -> (set == null ? DefaultImmutableSet.<MergeContract>nil() : set).add(mc));
     }
 
     /**
