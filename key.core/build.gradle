@@ -106,45 +106,15 @@ classes.dependsOn << generateSolverPropsList
 
 tasks.withType(Test) {
     enableAssertions = true
-    // The whole suite is pinned to the single-threaded prover in the root build (key.prover.parallel
-    // = false); opt-in parallel tests override it at runtime. The forwarding loop below still lets
-    // the Gradle command line override it (e.g. -Dkey.prover.parallel=true).
-    // Forward the multithreading / parallel-prover properties from the Gradle command line to the
-    // test JVM (Gradle does not propagate -D automatically). Lets one run e.g.
-    //   ./gradlew :key.core:test --tests '*MtSpeedupBenchmark' -Dkey.mt.benchmark=true
-    // or toggle the parallel prover for any test via -Dkey.prover.parallel(.threads).
-    ["key.mt.benchmark", "key.mt.benchmark.threads", "key.mt.benchmark.proofs",
-     "key.mt.benchmark.maxsteps",
-     "key.mt.synth.splits", "key.mt.synth.worksplits", "key.mt.synth.work",
-     "key.mt.synth.linear", "key.mt.synth.loop",
-     "key.mt.jfr.probe", "key.mt.jfr.proof", "key.mt.jfr.workers", "key.mt.jfr.reps",
-     "key.prover.parallel", "key.prover.parallel.threads"].each { p ->
-        if (System.getProperty(p) != null) {
-            systemProperty(p, System.getProperty(p))
-        }
-    }
-    // Record a Flight Recording of the test JVM when -Dkey.mt.jfr=<file> is given. Used to profile
-    // the parallel prover's lock contention and hot paths (see MtJfrProbe).
-    if (System.getProperty("key.mt.jfr") != null) {
-        jvmArgs += ["-XX:StartFlightRecording=filename=${System.getProperty('key.mt.jfr')}," +
-                    "settings=profile,dumponexit=true,disk=true",
-                    "-XX:FlightRecorderOptions=stackdepth=128"]
-    }
-    // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
-    // Other test cases also need "key." prefixed properties
+    // Forward every -Dkey.* system property from the Gradle command line to the test JVM (Gradle
+    // does not propagate -D automatically). This notably carries the parallel-prover switches
+    // key.prover.parallel[.threads]; the root build pins key.prover.parallel=false, so parallel
+    // tests opt in at runtime or via -Dkey.prover.parallel=true. The on-demand benchmarks and
+    // probes instead take their parameters through their own run* tasks below (-P options), so no
+    // key.mt.* properties need to be known by hand.
     systemProperties += System.properties.findAll { it.key.toString().startsWith("key.") }
     if (project.hasProperty("stressHeap")) {
         maxHeapSize = project.property("stressHeap")
-    }
-    if (System.getProperty("key.mt.retention.root") == "true") {
-        jvmArgs += [
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-            "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
-            "--add-opens", "java.base/java.util=ALL-UNNAMED",
-            "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
-            "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
-            "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED"
-        ]
     }
 }
 
@@ -218,6 +188,115 @@ tasks.register('testMtStress', Test) {
         includeTestsMatching "MtScriptStressTest"
         includeTestsMatching "MtDeterminismCiTest"
     }
+}
+
+// -----------------------------------------------------------------------------
+// On-demand parallel-prover benchmarks and probes. They are tagged "performance"
+// (so the normal test/testFast suites skip them) and each has its own task with
+// documented -P options -- all optional, sensible defaults live in the code.
+// Run e.g.:  ./gradlew :key.core:runSpeedupBench -Pworkers=1,2,4,8
+// -----------------------------------------------------------------------------
+
+tasks.register('runSpeedupBench', Test) {
+    group = 'benchmark'
+    description = 'Parallel-prover speedup benchmark on real proofs. ' +
+        'Options: -Pworkers=1,2,4,8  -Pproofs=<comma-separated example paths>  -Pmaxsteps=<n>'
+    filter { includeTestsMatching "MtSpeedupBenchmark" }
+    outputs.upToDateWhen { false }
+    if (project.hasProperty('workers')) {
+        systemProperty('key.mt.benchmark.threads', project.property('workers'))
+    }
+    if (project.hasProperty('proofs')) {
+        systemProperty('key.mt.benchmark.proofs', project.property('proofs'))
+    }
+    if (project.hasProperty('maxsteps')) {
+        systemProperty('key.mt.benchmark.maxsteps', project.property('maxsteps'))
+    }
+}
+
+tasks.register('runSynthBench', Test) {
+    group = 'benchmark'
+    description = 'Synthetic proof-shape speedup benchmark. ' +
+        'Options: -Pworkers=1,2,4,8  -Psplits -Pworksplits -Pwork -Plinear -Ploop (all ints)'
+    filter { includeTestsMatching "MtSyntheticBenchmark" }
+    outputs.upToDateWhen { false }
+    if (project.hasProperty('workers')) {
+        systemProperty('key.mt.benchmark.threads', project.property('workers'))
+    }
+    ['splits', 'worksplits', 'work', 'linear', 'loop'].each { p ->
+        if (project.hasProperty(p)) {
+            systemProperty("key.mt.synth.$p", project.property(p))
+        }
+    }
+}
+
+tasks.register('runVarianceBench', Test) {
+    group = 'benchmark'
+    description = 'Run-to-run proof-size variance probe. ' +
+        'Options: -Pworkers=0,2,4,8  -Preps=<n>  -Pmaxsteps=<n>  -Pproofs=<comma-separated paths>'
+    filter { includeTestsMatching "MtVarianceBenchmark" }
+    outputs.upToDateWhen { false }
+    if (project.hasProperty('workers')) {
+        systemProperty('key.mt.variance.threads', project.property('workers'))
+    }
+    if (project.hasProperty('reps')) {
+        systemProperty('key.mt.variance.reps', project.property('reps'))
+    }
+    if (project.hasProperty('maxsteps')) {
+        systemProperty('key.mt.variance.maxsteps', project.property('maxsteps'))
+    }
+    if (project.hasProperty('proofs')) {
+        systemProperty('key.mt.variance.proofs', project.property('proofs'))
+    }
+}
+
+tasks.register('runJfrProbe', Test) {
+    group = 'benchmark'
+    description = 'Flight-record a clean parallel-prover run of one proof. ' +
+        'Options: -Pproof=<example path>  -Pworkers=<n>  -Preps=<n>  -PjfrFile=<recording.jfr>'
+    filter { includeTestsMatching "MtJfrProbe" }
+    outputs.upToDateWhen { false }
+    if (project.hasProperty('proof')) {
+        systemProperty('key.mt.jfr.proof', project.property('proof'))
+    }
+    if (project.hasProperty('workers')) {
+        systemProperty('key.mt.jfr.workers', project.property('workers'))
+    }
+    if (project.hasProperty('reps')) {
+        systemProperty('key.mt.jfr.reps', project.property('reps'))
+    }
+    def jfrFile = project.findProperty('jfrFile') ?: 'mt-jfr-probe.jfr'
+    jvmArgs += ["-XX:StartFlightRecording=filename=${jfrFile}," +
+                "settings=profile,dumponexit=true,disk=true",
+                "-XX:FlightRecorderOptions=stackdepth=128"]
+}
+
+tasks.register('runRetentionProbe', Test) {
+    group = 'benchmark'
+    description = 'Measure cross-cycle memory retention of load/prove/dispose. ' +
+        'Options: -Pproof=<example path>  -Preps=<n>  -Phisto=true  -Proot=true  -Pdump=<file>'
+    filter { includeTestsMatching "MtRetentionProbe" }
+    outputs.upToDateWhen { false }
+    if (project.hasProperty('proof')) {
+        systemProperty('key.mt.retention.proof', project.property('proof'))
+    }
+    if (project.hasProperty('reps')) {
+        systemProperty('key.mt.retention.reps', project.property('reps'))
+    }
+    ['histo', 'root', 'dump'].each { p ->
+        if (project.hasProperty(p)) {
+            systemProperty("key.mt.retention.$p", project.property(p))
+        }
+    }
+    // HeapRootFinder (root=true) walks the object graph reflectively.
+    jvmArgs += [
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED"
+    ]
 }
 
 //Generation of the three version files within the resources by executing `git'.
@@ -332,9 +411,8 @@ tasks.register("testRAP", Test) {
     systemProperty 'key.matcher.compiled',
         (project.findProperty('matcher.compiled')
                 ?: System.getProperty('key.matcher.compiled', 'false'))
-    // each fork writes its own statistics file (runStatistics.csv.<pid>.csv) -- concurrent
-    // appends from parallel forks to one file can interleave mid-line
-    systemProperty 'key.rap.stats.perProcess', 'true'
+    // (statistics are always written per-process, <statisticsFile>.<pid>.csv; see
+    // ProveTest.getStatisticsFile -- combine the per-fork files after the run.)
     // set heap size for the test JVM(s) (overridable with -PrapHeap=8g for the large examples)
     minHeapSize = "1g"
     maxHeapSize = (project.findProperty('rapHeap') ?: '3g')
