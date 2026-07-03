@@ -720,10 +720,14 @@ public final class Goal implements ProofGoal<Goal> {
         } catch (RuleAbortException rae) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
+            // detach the journal: only the success path (via getRuleAppInfo) removes it, so an
+            // aborted application would otherwise leak the listener (inherited by subgoals on split)
+            removeGoalListener(journal);
             return null;
         } catch (IndexOutOfBoundsException e) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
+            removeGoalListener(journal);
             return null;
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
@@ -789,8 +793,9 @@ public final class Goal implements ProofGoal<Goal> {
             // No global reconciliation is needed afterwards: single-threaded proving also keeps
             // these symbols in the local namespace layers (the flush targets a local copy, not the
             // global Services namespace), so deferral leaves the global namespace identical. Fresh
-            // names are kept globally unique by ParallelNameAllocator, so no flush is needed for
-            // uniqueness either.
+            // names are branch-locally unique by construction (minting searches the goal-local
+            // namespaces, #3851); global uniqueness is not required -- sibling branches reuse
+            // names by design, exactly as in single-threaded proving.
             for (Goal goal : goalList) {
                 goal.node().addLocalProgVars(newProgVars);
                 goal.node().addLocalFunctions(newFunctions);

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.prover.impl.ParallelNameAllocator;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -97,7 +96,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
      * a multi-threaded run is active so that names stay disjoint without consulting the shared
      * namespace. See the multithreading effort (branch {@code bubel/mt-goals}).
      */
-    private final ParallelNameAllocator nameAllocator;
 
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
@@ -146,7 +144,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
             this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
         }
         nameRecorder = new NameRecorder();
-        this.nameAllocator = new ParallelNameAllocator();
     }
 
     private Services(Services s) {
@@ -168,14 +165,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.originFactory = s.originFactory;
         // Share the allocator across all overlay/copy Services of the same proof so that
         // per-(worker,base) counters stay coherent.
-        this.nameAllocator = s.nameAllocator;
-    }
-
-    /**
-     * @return this proof's fresh-name allocator (shared across overlay/copy {@link Services})
-     */
-    public ParallelNameAllocator getNameAllocator() {
-        return nameAllocator;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
