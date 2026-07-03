@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -657,16 +658,15 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // because the surrounding program variables were not needed/visible.
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
             } catch (Exception e1) {
-                // If the real reason is that the Java model itself could not be built - e.g.
-                // a boot/library stub under JavaRedux (or a \bootclasspath/\classpath entry)
-                // does not parse - then this modality's Java block is an innocent bystander:
-                // it merely happens to be the first place that needs the (now unavailable)
-                // Java types. Blaming it with "Could not parse Java block ... java.lang.Math
-                // cannot be found" is misleading. Surface the underlying library-parse failure
-                // directly; it already carries the offending stub file and position.
-                BuildingExceptions libraryFailure = findLibraryParseFailure(e);
-                if (libraryFailure != null) {
-                    throw libraryFailure;
+                // If the real reason is that the Java model itself could not be built - e.g. a
+                // boot/library stub under JavaRedux does not parse, or a \bootclasspath/\classpath
+                // entry is missing - then this modality's Java block is an innocent bystander: it
+                // merely happens to be the first place that needs the (now unavailable) Java types.
+                // Blaming it with "Could not parse Java block ..." is misleading. Surface the
+                // underlying environment-setup failure directly.
+                RuntimeException environmentFailure = findEnvironmentSetupFailure(e);
+                if (environmentFailure != null) {
+                    throw environmentFailure;
                 }
                 // Both attempts failed. Report the failure from the first attempt
                 // (the one with the surrounding program variables in scope); it
@@ -693,22 +693,32 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /**
-     * Walks the cause chain of {@code t} looking for a {@link BuildingExceptions} that was raised
-     * while parsing the special (boot/library) classes, i.e. one whose issues point at an actual
-     * source file on disk (a {@code .java}/{@code .jml} stub) rather than at the in-memory Java
-     * block of a modality. Such a failure means the whole Java model could not be built, so it -
-     * not
-     * the modality that first triggered the model build - is the true cause.
+     * Walks the cause chain of {@code t} looking for a failure that is really about building the
+     * Java model (setting up the environment), not about the modality's in-memory Java block. Such
+     * a failure means the whole model could not be built, so it - not the modality that first
+     * triggered the model build - is the true cause. Two kinds are recognised:
+     * <ul>
+     * <li>a {@link BuildingExceptions} whose issues all point at an actual source file on disk (a
+     * {@code .java}/{@code .jml} stub that does not parse); it already carries file and position,
+     * so
+     * it is surfaced as-is;</li>
+     * <li>an {@link IOException} (a missing {@code \bootclasspath}/{@code \classpath} directory, or
+     * another IO problem while reading the model); it is wrapped so its concrete message is shown
+     * without the "Could not parse Java block" noise.</li>
+     * </ul>
      *
      * @param t the exception caught while reading a Java block
-     * @return the underlying library-parse failure, or {@code null} if the failure is genuinely
-     *         about the Java block itself
+     * @return the exception to surface instead, or {@code null} if the failure is genuinely about
+     *         the Java block itself
      */
-    private static @Nullable BuildingExceptions findLibraryParseFailure(@Nullable Throwable t) {
+    private static @Nullable RuntimeException findEnvironmentSetupFailure(@Nullable Throwable t) {
         for (Throwable c = t; c != null; c = c.getCause()) {
             if (c instanceof BuildingExceptions be && !be.getErrors().isEmpty()
                     && be.getErrors().stream().allMatch(ExpressionBuilder::pointsAtSourceFile)) {
                 return be;
+            }
+            if (c instanceof IOException) {
+                return new BuildingException(c);
             }
         }
         return null;
