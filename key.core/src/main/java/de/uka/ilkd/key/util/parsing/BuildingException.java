@@ -37,6 +37,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
      */
     private final @Nullable String rawMessage;
 
+    /**
+     * A location supplied explicitly (rather than derived from an offending token), e.g. the
+     * {@code \classpath} declaration in a {@code .key} file whose directory does not exist.
+     */
+    private final @Nullable Location explicitLocation;
+
     public BuildingException(ParserRuleContext ctx, String format) {
         this(ctx, format, null);
     }
@@ -45,7 +51,34 @@ public class BuildingException extends RuntimeException implements HasLocation {
         super(e);
         offendingSymbol = null;
         overridePosition = null;
+        explicitLocation = null;
         rawMessage = e == null ? null : e.getMessage();
+    }
+
+    /**
+     * Creates an exception carrying an explicit {@link Location} (file + position), for errors
+     * whose
+     * origin is a declaration in a {@code .key} file rather than an offending parser token - e.g. a
+     * missing {@code \classpath}/{@code \bootclasspath} directory.
+     *
+     * @param location the location (file and position) of the offending declaration
+     * @param message the error message
+     */
+    public BuildingException(Location location, String message) {
+        super(message + locationSuffix(location));
+        offendingSymbol = null;
+        overridePosition = null;
+        explicitLocation = location;
+        rawMessage = message;
+    }
+
+    private static String locationSuffix(@Nullable Location location) {
+        if (location == null || location.getFileURI().isEmpty()
+                || location.getPosition().isNegative()) {
+            return "";
+        }
+        return " at " + location.getFileUri() + ":" + location.getPosition().line() + ":"
+            + location.getPosition().column();
     }
 
     public BuildingException(ParserRuleContext ctx, String message, Throwable e) {
@@ -71,6 +104,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
         super(message + " at " + getPosition(t, overridePosition), e);
         offendingSymbol = t;
         this.overridePosition = overridePosition;
+        this.explicitLocation = null;
         this.rawMessage = message;
     }
 
@@ -106,6 +140,9 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     @Override
     public Location getLocation() {
+        if (explicitLocation != null) {
+            return explicitLocation;
+        }
         if (offendingSymbol != null) {
             URI uri = SourceNames.getURIFromTokenSource(offendingSymbol.getTokenSource());
             Position p = overridePosition != null ? overridePosition
