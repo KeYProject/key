@@ -30,6 +30,8 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -655,6 +657,17 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // because the surrounding program variables were not needed/visible.
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
             } catch (Exception e1) {
+                // If the real reason is that the Java model itself could not be built - e.g.
+                // a boot/library stub under JavaRedux (or a \bootclasspath/\classpath entry)
+                // does not parse - then this modality's Java block is an innocent bystander:
+                // it merely happens to be the first place that needs the (now unavailable)
+                // Java types. Blaming it with "Could not parse Java block ... java.lang.Math
+                // cannot be found" is misleading. Surface the underlying library-parse failure
+                // directly; it already carries the offending stub file and position.
+                BuildingExceptions libraryFailure = findLibraryParseFailure(e);
+                if (libraryFailure != null) {
+                    throw libraryFailure;
+                }
                 // Both attempts failed. Report the failure from the first attempt
                 // (the one with the surrounding program variables in scope); it
                 // usually carries the most meaningful reason. Crucially, embed that
@@ -677,6 +690,37 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return sjb;
+    }
+
+    /**
+     * Walks the cause chain of {@code t} looking for a {@link BuildingExceptions} that was raised
+     * while parsing the special (boot/library) classes, i.e. one whose issues point at an actual
+     * source file on disk (a {@code .java}/{@code .jml} stub) rather than at the in-memory Java
+     * block of a modality. Such a failure means the whole Java model could not be built, so it -
+     * not
+     * the modality that first triggered the model build - is the true cause.
+     *
+     * @param t the exception caught while reading a Java block
+     * @return the underlying library-parse failure, or {@code null} if the failure is genuinely
+     *         about the Java block itself
+     */
+    private static @Nullable BuildingExceptions findLibraryParseFailure(@Nullable Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (c instanceof BuildingExceptions be && !be.getErrors().isEmpty()
+                    && be.getErrors().stream().allMatch(ExpressionBuilder::pointsAtSourceFile)) {
+                return be;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return whether the issue points at a real source file on disk (as opposed to an in-memory
+     *         fragment such as {@code <string>} or {@code memory:/...} used for modality blocks).
+     */
+    private static boolean pointsAtSourceFile(BuildingIssue issue) {
+        String src = issue.sourceName();
+        return src != null && (src.endsWith(".java") || src.endsWith(".jml"));
     }
 
     /**
