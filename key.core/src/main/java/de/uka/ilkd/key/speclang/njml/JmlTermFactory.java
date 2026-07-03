@@ -18,6 +18,7 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -410,10 +411,10 @@ public final class JmlTermFactory {
         try {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
             if (result == null) {
-                throw exc.createException0(
-                    String.format("Cannot resolve JML operation %s %s %s (types %s %s %s).",
-                        left.getTerm(), jmlOperator.getImage(), right.getTerm(), left.getType(),
-                        jmlOperator.getImage(), right.getType()));
+                throw exc.createException0(String.format(
+                    "Operator '%s' is not defined for operands of type '%s' and '%s' (in '%s %s %s').",
+                    jmlOperator.getImage(), typeName(left), typeName(right),
+                    describe(left), jmlOperator.getImage(), describe(right)));
             }
             return result;
         } catch (SLTranslationException e) {
@@ -425,14 +426,33 @@ public final class JmlTermFactory {
         try {
             SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
             if (result == null) {
-                throw exc.createException0(
-                    String.format("Cannot resolve JML operation %s %s (types %s).",
-                        unaryOp.getImage(), arg.getTerm(), arg.getType()));
+                throw exc.createException0(String.format(
+                    "Operator '%s' is not defined for an operand of type '%s' (in '%s %s').",
+                    unaryOp.getImage(), typeName(arg), unaryOp.getImage(), describe(arg)));
             }
             return result;
         } catch (SLTranslationException e) {
             throw exc.createException0("Error while converting a unary expression", e);
         }
+    }
+
+    /**
+     * Renders an operand of a JML operation for a user-facing error message: the readable
+     * (pretty-printed) source expression rather than the internal term representation - e.g.
+     * {@code right + left} and {@code 1} instead of {@code add(right,left)} and {@code Z(1(#))}.
+     */
+    private String describe(SLExpression expr) {
+        if (expr.getTerm() != null) {
+            return LogicPrinter.quickPrintTerm(expr.getTerm(), services);
+        }
+        return typeName(expr);
+    }
+
+    /**
+     * @return the readable name of the operand's type, or {@code "?"} if it is unknown.
+     */
+    private static String typeName(SLExpression expr) {
+        return expr.getType() != null ? expr.getType().getName() : "?";
     }
 
 
