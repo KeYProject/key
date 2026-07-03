@@ -356,6 +356,7 @@ jmlprimary
   | java_math_expression                                                              #primaryJavaMathExpression
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
+  | msetrangeterm                                                                     #pignore8
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
   | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
@@ -417,7 +418,7 @@ sequence
 
 mapExpression: MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE;
 fpOperator: FP_ABS | FP_INFINITE | FP_NAN | FP_NEGATIVE | FP_NICE | FP_NORMAL | FP_POSITIVE | FP_SUBNORMAL;
-quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM | MSET;
+quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
@@ -426,6 +427,7 @@ safe_math_expression: (SAFE_MATH LPAREN expression RPAREN);
 bigint_math_expression: (BIGINT_MATH LPAREN expression RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
+msetrangeterm: LPAREN MSET quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 quantifiedvardecls: typespec quantifiedvariabledeclarator (COMMA quantifiedvariabledeclarator)*;
 boundvarmodifiers: (NON_NULL | NULLABLE);

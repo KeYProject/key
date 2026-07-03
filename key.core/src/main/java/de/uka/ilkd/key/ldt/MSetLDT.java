@@ -8,74 +8,108 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
-import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 public class MSetLDT extends LDT {
 
     public static final Name NAME = new Name("Mset");
 
-    private final JFunction msetRange;
-    private final JFunction msetMul;
-    private final JFunction msetEmpty;
-    private final JFunction msetSingle;
-    private final JFunction msetUnion;
-    private final JFunction msetIntersec;
-    private final JFunction msetSum;
-    private final JFunction msetDiff;
-    private final JFunction msetCard;
+    private final ParametricFunctionDecl msetRange;
+    private final ParametricFunctionDecl msetEmpty;
+    private final ParametricFunctionDecl msetSingle;
+    private final ParametricFunctionDecl msetSum;
+    private final ParametricFunctionDecl msetDiff;
+    private final Function msetCard;
+    private final Function msetMul;
 
     public MSetLDT(TermServices services) {
         super(NAME, services);
         msetMul = addFunction(services, "msetMul");
-        msetEmpty = addFunction(services, "msetEmpty");
-        msetSingle = addFunction(services, "msetSingle");
-        msetUnion = addFunction(services, "msetUnion");
-        msetIntersec = addFunction(services, "msetIntersec");
-        msetSum = addFunction(services, "msetSum");
-        msetDiff = addFunction(services, "msetDiff");
+        msetEmpty = addParametricFunction(services, "msetEmpty");
+        msetSingle = addParametricFunction(services, "msetSingle");
+        msetSum = addParametricFunction(services, "msetSum");
+        msetDiff = addParametricFunction(services, "msetDiff");
         msetCard = addFunction(services, "msetCard");
-        msetRange = addFunction(services, "msetRange");
+        msetRange = addParametricFunction(services, "msetRange");
     }
 
 
-    public JFunction getMsetRange() { return msetRange; }
+    public ParametricFunctionDecl getMsetRange() { return msetRange; }
 
-    public JFunction getMsetMul() {
+    /**
+     * Returns the select function for the given sort.
+     */
+    public ParametricFunctionInstance getMsetRange(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(msetRange,
+                ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+
+    public Function getMsetMul() {
         return msetMul;
     }
 
-    public JFunction getMsetEmpty() {
+    public ParametricFunctionDecl getMsetEmpty() {
         return msetEmpty;
     }
 
-    public JFunction getMsetSingle() {
+    /**
+     * Returns the select function for the given sort.
+     */
+    public ParametricFunctionInstance getMsetEmpty(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(msetEmpty,
+                ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+
+    public ParametricFunctionDecl getMsetSingle() {
         return msetSingle;
     }
 
-    public JFunction getMsetUnion() {
-        return msetUnion;
+    /**
+     * Returns the select function for the given sort.
+     */
+    public ParametricFunctionInstance getMsetSingle(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(msetSingle,
+                ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
-    public JFunction getMsetIntersec() {
-        return msetIntersec;
-    }
-
-    public JFunction getMsetAdd() {
+    public ParametricFunctionDecl getMsetSum() {
         return msetSum;
     }
 
-    public JFunction getMsetRemove() {
+    /**
+     * Returns the select function for the given sort.
+     */
+    public ParametricFunctionInstance getMsetSum(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(msetSum,
+                ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+
+
+    public ParametricFunctionDecl getMsetDiff() {
         return msetDiff;
+    }
+
+    /**
+     * Returns the select function for the given sort.
+     */
+    public ParametricFunctionInstance getMsetDiff(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(msetDiff,
+                ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
     @Override
@@ -103,31 +137,32 @@ public class MSetLDT extends LDT {
 
     @Override
     public JTerm translateLiteral(Literal lit, Services services) {
-        assert lit instanceof EmptySeqLiteral;
-        return services.getTermBuilder().func(msetEmpty);
+        throw new RuntimeException("Not implemented yet");
+//        assert lit instanceof EmptyMSetLiteral;
+//        return services.getTermBuilder().func(msetEmpty, lit.g);
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        if (op instanceof MSetSingle) {
-            return msetSingle;
-        } else if (op instanceof MSetCard) {
-            return msetCard;
-        } else if (op instanceof MSetUnion) {
-            return msetUnion;
-        } else if (op instanceof MSetDiff) {
-            return msetDiff;
-        } else if (op instanceof MSetSum) {
-            return msetSum;
-        } else if (op instanceof MSetIntersect) {
-            return msetIntersec;
-        } else if (op instanceof MSetMul) {
-            return msetMul;
-        }
-
-        assert false;
-        return null;
-
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+        throw new RuntimeException("Not implemented yet");
+        //        if (op instanceof MSetSingle) {
+//            return msetSingle;
+//        } else if (op instanceof MSetCard) {
+//            return msetCard;
+//        } else if (op instanceof MSetUnion) {
+//            return msetUnion;
+//        } else if (op instanceof MSetDiff) {
+//            return msetDiff;
+//        } else if (op instanceof MSetSum) {
+//            return msetSum;
+//        } else if (op instanceof MSetIntersect) {
+//            return msetIntersec;
+//        } else if (op instanceof MSetMul) {
+//            return msetMul;
+//        }
+//
+//        assert false;
+//        return null;
     }
 
     @Override

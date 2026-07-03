@@ -2121,10 +2121,6 @@ public class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
 
-    public JTerm msetEmpty() {
-        return func(services.getTypeConverter().getMSetLDT().getMsetEmpty());
-    }
-
     public JTerm seqSingleton(JTerm x) {
         return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
     }
@@ -2166,6 +2162,16 @@ public class TermBuilder {
 
     public JTerm seqReverse(JTerm s) {
         return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
+    }
+
+    public JTerm msetEmpty(Sort instanceSort) {
+        return func(services.getTypeConverter().getMSetLDT().getMsetEmpty(instanceSort, services));
+    }
+
+    public JTerm msetRange(QuantifiableVariable qv, JTerm left, JTerm right, JTerm supplier, Sort instanceSort) {
+        return func(services.getTypeConverter().getMSetLDT().getMsetRange(instanceSort, services),
+                new JTerm[] { left, right, supplier },
+                new ImmutableArray<>(qv));
     }
 
     // -------------------------------------------------------------------------
@@ -2247,23 +2253,6 @@ public class TermBuilder {
     public JTerm seqDef(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(), new JTerm[] { a, b, t },
             new ImmutableArray<>(qv));
-    }
-
-    public JTerm mset(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
-        return func(services.getTypeConverter().getMSetLDT().getMsetRange(),
-            new JTerm[] { a, b, t },
-            new ImmutableArray<>(qv));
-    }
-
-    public JTerm mset(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t) {
-        final Function mset = services.getNamespaces().functions().lookup("mset");
-        final Iterator<LogicVariable> it = qvs.iterator();
-        JTerm res = func(mset, new JTerm[] { convertToBoolean(range), t },
-            new ImmutableArray<>(it.next()));
-        while (it.hasNext()) {
-            res = func(mset, new JTerm[] { TRUE(), res }, new ImmutableArray<>(it.next()));
-        }
-        return res;
     }
 
     public JTerm values() {
