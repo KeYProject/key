@@ -16,12 +16,13 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * Run-to-run proof-size <b>variance</b> probe for the goal-level parallel prover. Not a correctness
- * gate -- it measures and prints, it asserts nothing. Enable with {@code -Dkey.mt.variance=true}
+ * gate -- it measures and prints, it asserts nothing. Run with
+ * {@code ./gradlew :key.core:runVarianceBench}
  * (skipped otherwise, because it proves the same proof many times and takes minutes).
  *
  * <p>
@@ -36,18 +37,18 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * 10-rep/single-proof {@code ArithVariance} form.
  *
  * <p>
- * Knobs (all {@code key.mt.variance.*}, forwarded to the test JVM by the build's {@code key.*}
- * passthrough): {@code reps} (default 20), {@code threads} (default {@code "0,2,4,8"}),
- * {@code proofs} (comma-separated example-relative paths, default the arith {@code add} proof),
- * {@code maxsteps} (default 200000). Worker counts are capped at the available cores. Run isolated:
+ * Knobs (all optional, passed to the {@code runVarianceBench} task): {@code -Preps} (default 20),
+ * {@code -Pworkers} (default {@code "0,2,4,8"}), {@code -Pproofs} (comma-separated example-relative
+ * paths, default the arith {@code add} proof), {@code -Pmaxsteps} (default 200000). Worker counts
+ * are capped at the available cores. Run isolated:
  *
  * <pre>
- * ./gradlew :key.core:test --tests '*MtVarianceBenchmark' -Dkey.mt.variance=true --rerun-tasks
+ * ./gradlew :key.core:runVarianceBench -Pworkers=0,2,4,8 -Preps=<n>
  * </pre>
  *
  * @author Claude (KeY multithreading effort)
  */
-@EnabledIfSystemProperty(named = "key.mt.variance", matches = "true")
+@Tag("performance")
 public class MtVarianceBenchmark {
 
     private static final String DEFAULT_PROOF = "standard_key/arith/gemplusDecimal/add.key";

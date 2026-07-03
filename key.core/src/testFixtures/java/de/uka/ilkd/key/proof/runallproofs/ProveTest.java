@@ -282,14 +282,11 @@ public class ProveTest {
     protected StatisticsFile getStatisticsFile() throws IOException {
         if (!statisticsFile.isEmpty()) {
             if (statistics == null) {
-                String path = statisticsFile;
-                if (Boolean.getBoolean("key.rap.stats.perProcess")) {
-                    // Under parallel test forks (testRAP) all JVMs share one statistics path;
-                    // concurrent appends from separate processes can interleave mid-line. Give
-                    // each fork its own file (combine/sort them after the run when a single
-                    // listing is wanted).
-                    path = path + "." + ProcessHandle.current().pid() + ".csv";
-                }
+                // Always give each JVM its own statistics file
+                // (<statisticsFile>.<pid>.csv): under parallel test forks (testRAP) concurrent
+                // appends from separate processes to one shared path interleave mid-line. Combine
+                // and sort the per-process files after the run when a single listing is wanted.
+                String path = statisticsFile + "." + ProcessHandle.current().pid() + ".csv";
                 statistics = new StatisticsFile(new File(path));
                 statistics.setUp(false);
             }

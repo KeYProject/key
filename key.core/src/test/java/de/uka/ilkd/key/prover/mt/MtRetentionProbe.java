@@ -16,8 +16,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * Measures whether memory accumulates <em>across</em> repeated load/prove/dispose cycles of the
@@ -32,19 +32,19 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * the
  * live heap. A flat trend means {@code dispose()} releases everything; a rising trend quantifies
  * the
- * leak (MB per proof). With {@code -Dkey.mt.retention.histo=true} it additionally prints, at the
+ * leak (MB per proof). With {@code -Phisto=true} it additionally prints, at the
  * end,
  * the classes whose live-instance count grew the most between an early and the final cycle (a cheap
  * "what is being retained" histogram via the diagnostic command on this JVM).
  *
  * <p>
- * Enable with {@code -Dkey.mt.retention=true}. Knobs: {@code -Dkey.mt.retention.proof} (example
- * relative, default symmArray), {@code -Dkey.mt.retention.reps} (default 12),
- * {@code -Dkey.mt.retention.histo} (default false). Run with a fixed, modest {@code -Xmx} so growth
+ * Run with {@code ./gradlew :key.core:runRetentionProbe}. Knobs: {@code -Pproof} (example
+ * relative, default symmArray), {@code -Preps} (default 12),
+ * {@code -Phisto} (default false). Run with a fixed, modest {@code -Xmx} so growth
  * is visible (e.g. {@code -PstressHeap} on the dedicated task), single-threaded by default.
  *
  */
-@EnabledIfSystemProperty(named = "key.mt.retention", matches = "true")
+@Tag("performance")
 public class MtRetentionProbe {
 
     private static final long MB = 1024 * 1024;
