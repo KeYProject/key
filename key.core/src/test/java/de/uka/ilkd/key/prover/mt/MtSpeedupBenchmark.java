@@ -16,14 +16,15 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * Manual speedup/scaling benchmark for the goal-level parallel prover. <b>Not a correctness
  * gate</b>
- * — it only measures and reports; it asserts nothing. Enable with {@code -Dkey.mt.benchmark=true}
- * (skipped otherwise, because the proofs take minutes).
+ * — it only measures and reports; it asserts nothing. Run with
+ * {@code ./gradlew :key.core:runSpeedupBench} (tagged {@code performance}, so the normal test
+ * suites skip it; the proofs take minutes).
  *
  * <p>
  * For each large real proof it runs single-threaded automatic search (the {@code ApplyStrategy}
@@ -45,20 +46,20 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * cores.
  * </ul>
  *
- * Worker counts come from {@code -Dkey.mt.benchmark.threads} (default {@code 1,2,4,8}); the corpus
- * from {@code -Dkey.mt.benchmark.proofs} (comma-separated example-relative paths) or a built-in
- * default set of large automode proofs.
+ * Worker counts come from {@code -Pworkers} (default {@code 1,2,4,8}); the corpus from
+ * {@code -Pproofs} (comma-separated example-relative paths) or a built-in default set of large
+ * automode proofs. Cap the maximum steps per proof with {@code -Pmaxsteps}.
  *
  * @author Claude (KeY multithreading effort)
  */
-@EnabledIfSystemProperty(named = "key.mt.benchmark", matches = "true")
+@Tag("performance")
 public class MtSpeedupBenchmark {
 
     /**
      * Default corpus: large, automode-closeable, script-free real proofs (a {@code perfTest}-style
      * set). Entries that do not close under pure automode show {@code closed=false} in the table
      * and
-     * are not meaningful speedup entries — curate via {@code -Dkey.mt.benchmark.proofs} as needed.
+     * are not meaningful speedup entries — curate via {@code -Pproofs} as needed.
      */
     private static final String[] DEFAULT_PROOFS = {
         "newBook/09.list_modelfield/ArrayList.remFirst.key",
@@ -170,7 +171,7 @@ public class MtSpeedupBenchmark {
             starter.init(proof);
             // Optional step-budget override: some proofs need more rule applications than the
             // proof's stored strategy budget to close in pure automode
-            // (-Dkey.mt.benchmark.maxsteps).
+            // (-Pmaxsteps).
             String maxStepsProp = System.getProperty("key.mt.benchmark.maxsteps");
             if (maxStepsProp != null && !maxStepsProp.isBlank()) {
                 starter.setMaxRuleApplications(Integer.parseInt(maxStepsProp.trim()));

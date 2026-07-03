@@ -13,8 +13,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * A focused driver that runs <em>only</em> the goal-level parallel prover on a single proof, with
@@ -22,17 +22,18 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * warm-up and no single-threaded baseline, so that a Flight Recording of the test JVM captures the
  * parallel run cleanly. Used to investigate the parallel prover's lock contention/hot paths and the
  * nondeterministic non-closure race (a goal whose {@code next()} returns null spuriously at &gt;1
- * worker). Enable with {@code -Dkey.mt.jfr.probe=true}; record with {@code -Dkey.mt.jfr=<file>}.
+ * worker). Run with {@code ./gradlew :key.core:runJfrProbe} (records to {@code -PjfrFile}, default
+ * mt-jfr-probe.jfr).
  *
  * <p>
- * Knobs: {@code -Dkey.mt.jfr.proof} (example-relative path, default symmArray),
- * {@code -Dkey.mt.jfr.workers} (default 2), {@code -Dkey.mt.jfr.reps} (default 1). Run several reps
+ * Knobs: {@code -Pproof} (example-relative path, default symmArray),
+ * {@code -Pworkers} (default 2), {@code -Preps} (default 1). Run several reps
  * to raise the odds of capturing a failing (non-closing) run; each rep prints
  * closed/open/nodes/reason so the recording can be correlated with an outcome.
  *
  * @author Claude (KeY multithreading effort)
  */
-@EnabledIfSystemProperty(named = "key.mt.jfr.probe", matches = "true")
+@Tag("performance")
 public class MtJfrProbe {
 
     @Test
