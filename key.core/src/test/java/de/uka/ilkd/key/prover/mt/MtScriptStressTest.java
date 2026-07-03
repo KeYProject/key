@@ -13,9 +13,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
@@ -42,6 +45,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @EnabledIfSystemProperty(named = "key.mt.stress", matches = "true")
 public class MtScriptStressTest {
+
+    /**
+     * Loading the quicksort example applies its embedded settings to the global
+     * {@link ProofSettings#DEFAULT_SETTINGS}; snapshot and restore them so they do not leak into
+     * every proof loaded later in the same JVM (and each repetition here starts identically).
+     */
+    private static String settingsSnapshot;
+
+    @BeforeAll
+    static void snapshotSettings() {
+        settingsSnapshot = ProofSettings.DEFAULT_SETTINGS.settingsToString();
+    }
+
+    @AfterAll
+    static void restoreSettings() {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
+    }
+
 
     /**
      * Over-subscribed worker count to maximise interleaving (the machine need not have this many).
@@ -84,6 +105,7 @@ public class MtScriptStressTest {
         Path saved = Files.createTempFile(keyFile.getParent(), "mt-sort-proof", ".proof");
 
         // 1) Produce the proof under the multi-core prover, then save it.
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
         System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
         System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(MT_WORKERS));
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
@@ -102,6 +124,7 @@ public class MtScriptStressTest {
         }
 
         // 2) Reload it with the single-core prover; it must load cleanly and still be closed.
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
         KeYEnvironment<DefaultUserInterfaceControl> reloadEnv = KeYEnvironment.load(saved);
         try {
             Proof reloaded = reloadEnv.getLoadedProof();
@@ -133,6 +156,7 @@ public class MtScriptStressTest {
         } else {
             System.clearProperty(ParallelProver.PARALLEL_PROPERTY);
         }
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         try {
             Proof proof = env.getLoadedProof();

@@ -29,23 +29,32 @@ class ReplacerOfQuanVariablesWithMetavariables {
             DefaultImmutableMap.nilMap();
         Term t = allTerm;
         var op = t.op();
+        int depth = 0;
         while (op instanceof Quantifier) {
             QuantifiableVariable q = t.varsBoundHere(0).get(0);
             Term m;
+            // The name must be derived from the quantified formula: Metavariable.compareTo orders
+            // by name first and only falls back to the (JVM-global) creation serial for equal
+            // names. With one shared name for every metavariable that order was pure creation
+            // order -- under the parallel prover it depended on which goal built its TriggersSet
+            // first, and through the orientation of the unification constraints the chosen
+            // quantifier instances, and thereby the proof, differed from run to run.
+            final Name name = new Name(ARBITRARY_NAME + "_" + depth + "_" + q.name());
             if (op == Quantifier.ALL) {
-                Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
+                Metavariable mv = new Metavariable(name, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                Function f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                Function f = new JFunction(name, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);
             t = t.sub(0);
             op = t.op();
+            depth++;
         }
         return new Substitution(res);
     }
 
-    private final static Name ARBITRARY_NAME = new Name("unifier");
+    private final static String ARBITRARY_NAME = "unifier";
 
 }
