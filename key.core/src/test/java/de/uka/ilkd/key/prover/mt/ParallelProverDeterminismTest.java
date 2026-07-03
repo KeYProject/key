@@ -103,13 +103,22 @@ public class ParallelProverDeterminismTest {
         }
     }
 
-    /** Assert both proof trees applied the same rule at the same position at every tree path. */
+    /**
+     * Assert both proof trees applied the same rule at the same position at every tree path, and
+     * that the resulting sequents are term-identical -- including all fresh names. Name-level
+     * identity holds because every fresh name is a pure function of the goal-local branch state
+     * (#3851); a regression here means some name source became scheduling- or order-dependent
+     * again (historically: per-worker allocator tags, the temporary-name counter behind
+     * block/loop-contract remembrance variables).
+     */
     private static void assertTreesEqual(String proof, Node a, Node b, String path) {
         assertEquals(ruleName(a), ruleName(b),
             proof + ": different rule at tree path [" + path + "]");
         assertEquals(position(a), position(b),
             proof + ": rule " + ruleName(a) + " applied at different positions at tree path ["
                 + path + "]");
+        assertEquals(a.sequent().toString(), b.sequent().toString(),
+            proof + ": sequents differ (incl. names) at tree path [" + path + "]");
         assertEquals(a.childrenCount(), b.childrenCount(),
             proof + ": different branching at tree path [" + path + "]");
         for (int i = 0; i < a.childrenCount(); i++) {
