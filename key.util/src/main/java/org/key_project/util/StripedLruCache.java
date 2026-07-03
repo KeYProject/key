@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * A thread-safe, bounded LRU cache that reduces lock contention by <em>striping</em>: keys are
- * partitioned into independently locked segments, each a small exact {@link LRUCache}. An operation
- * locks only the one segment its key maps to, so concurrent workers touching different segments do
- * not block one another.
+ * partitioned into independently locked segments, each a small exact LRU map. An operation locks
+ * only the one segment its key maps to, so concurrent workers touching different segments do not
+ * block one another.
  *
  * <p>
  * The trade-off is that eviction is exact only <em>within</em> a segment, not globally: the
@@ -30,9 +32,29 @@ import org.jspecify.annotations.Nullable;
  */
 public final class StripedLruCache<K, V> {
 
-    private final LRUCache<K, V>[] segments;
+    private final EvictingMap<K, V>[] segments;
     private final Object[] locks;
     private final int mask;
+
+    /**
+     * Access-ordered, size-bounded map used as one striped segment. Not thread-safe on its own --
+     * {@link StripedLruCache} guards every access with the segment's lock. Kept private so no
+     * non-thread-safe LRU map leaks into the rest of the code base (use {@link ConcurrentLruCache}
+     * or {@link StripedLruCache} instead).
+     */
+    private static final class EvictingMap<K, V> extends LinkedHashMap<K, V> {
+        private final int maxEntries;
+
+        EvictingMap(int maxEntries) {
+            super(maxEntries + 1, 1.0F, true);
+            this.maxEntries = maxEntries;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > maxEntries;
+        }
+    }
 
     /**
      * Creates a striped cache holding at most about {@code maxEntries} entries in total, split over
@@ -48,11 +70,11 @@ public final class StripedLruCache<K, V> {
             n <<= 1;
         }
         this.mask = n - 1;
-        this.segments = new LRUCache[n];
+        this.segments = new EvictingMap[n];
         this.locks = new Object[n];
         final int perSegment = Math.max(1, (maxEntries + n - 1) / n);
         for (int i = 0; i < n; i++) {
-            segments[i] = new LRUCache<>(perSegment);
+            segments[i] = new EvictingMap<>(perSegment);
             locks[i] = new Object();
         }
     }

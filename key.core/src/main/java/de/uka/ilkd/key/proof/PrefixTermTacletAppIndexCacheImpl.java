@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented using a common
- * backend <code>LRUCache</code> (the backend is stored in <code>TermTacletAppIndexCacheSet</code>).
+ * backend cache (a {@code ConcurrentLruCache}, stored in <code>TermTacletAppIndexCacheSet</code>).
  * The backend is accessed in a way that guarantees that two distinct instances of this class never
  * interfere, by choosing cache keys that are specific for a particular instance of
  * <code>PrefixTermTacletAppIndexCacheImpl</code> and cannot be created by other instances. This
- * ensures that it is safe to use one instance of <code>LRUCache</code> for many instances of
+ * ensures that it is safe to use one instance of that backend cache for many instances of
  * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different proof branches,
  * different locations).
  */

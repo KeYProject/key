@@ -163,6 +163,17 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * tests
      * rely on); the setting-derived count is clamped to the available processors.
      */
+    /**
+     * The number of workers a run started now would use (see {@link #resolveWorkerCount()}).
+     * Exposed so tests can assert that a "multi-worker" run really is multi-worker rather than
+     * having silently degraded to a single worker.
+     *
+     * @return the effective worker count for the current settings / system properties
+     */
+    public static int effectiveWorkerCount() {
+        return resolveWorkerCount();
+    }
+
     private static int resolveWorkerCount() {
         String property = System.getProperty(THREADS_PROPERTY);
         if (property != null) {
@@ -372,6 +383,16 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         try {
             Goal goal;
             while (!stopRequested && (goal = scheduler.claimOrAwait()) != null) {
+                if (proof.isErroneous()) {
+                    // An essential proof listener failed on some worker: wind all workers down
+                    // through the regular stop path (the claimed goal is returned below by the
+                    // loop exit; parked workers wake through the scheduler as with any stop).
+                    // Checking a volatile flag once per rule application is free next to the
+                    // step itself; no push notification into the workers is needed.
+                    requestStop("Proof search stopped: an essential proof listener failed.", null);
+                    scheduler.reoffer(goal);
+                    break;
+                }
                 processStep(goal, scheduler, commitLock, startTime);
             }
         } catch (InterruptedException e) {

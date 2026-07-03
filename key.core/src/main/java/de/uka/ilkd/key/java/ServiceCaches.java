@@ -44,7 +44,7 @@ import org.key_project.util.collection.Pair;
  * <p>
  * This is a redesign of the old static caches which were implemented via final static {@link Map}s
  * like
- * {@code private static final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( MAX_TERM_TACLET_APP_INDEX_ENTRIES );}.
+ * {@code private static final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new ConcurrentLruCache<>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);}.
  * </p>
  * <p>
  * The old idea that memory is reused and shared between multiple {@link Proof}s by static variables
