@@ -78,20 +78,24 @@ public class SpecificationRepository {
     private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
         new LinkedHashMap<>();
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
+    // Thread-safe: these spec maps are mutated by meta-construct transforms (e.g. IntroAtPreDefsOp)
+    // during the parallel prover's lock-free computeRuleApp phase; a plain map corrupts under
+    // concurrent put. synchronizedMap keeps insertion order (so proof digests stay deterministic)
+    // while making individual get/put/remove atomic.
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs =
-        new LinkedHashMap<>();
+        Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<BlockContractKey, ImmutableSet<BlockContract>> blockContracts =
-        new LinkedHashMap<>();
+        Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<LoopContractKey, ImmutableSet<LoopContract>> loopContracts =
-        new LinkedHashMap<>();
+        Collections.synchronizedMap(new LinkedHashMap<>());
 
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
      */
     private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>> loopContractsOnLoops =
-        new LinkedHashMap<>();
+        Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts =
-        new LinkedHashMap<>();
+        Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
         new LinkedHashMap<>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
@@ -1610,7 +1614,10 @@ public class SpecificationRepository {
 
 
     // region Support SetStatement and JmlAssert
-    private final Map<Statement, JmlStatementSpec> statementMap = new IdentityHashMap<>();
+    // Thread-safe (see the spec maps above): JmlAssert/SetStatement specs are read+rewritten by
+    // IntroAtPreDefsOp during the parallel prover's lock-free phase. Identity semantics are kept.
+    private final Map<Statement, JmlStatementSpec> statementMap =
+        Collections.synchronizedMap(new IdentityHashMap<>());
 
     public @Nullable JmlStatementSpec getStatementSpec(Statement statement) {
         return statementMap.get(statement);
