@@ -789,8 +789,9 @@ public final class Goal implements ProofGoal<Goal> {
             // No global reconciliation is needed afterwards: single-threaded proving also keeps
             // these symbols in the local namespace layers (the flush targets a local copy, not the
             // global Services namespace), so deferral leaves the global namespace identical. Fresh
-            // names are kept globally unique by ParallelNameAllocator, so no flush is needed for
-            // uniqueness either.
+            // names are branch-locally unique by construction (minting searches the goal-local
+            // namespaces, #3851); global uniqueness is not required -- sibling branches reuse
+            // names by design, exactly as in single-threaded proving.
             for (Goal goal : goalList) {
                 goal.node().addLocalProgVars(newProgVars);
                 goal.node().addLocalFunctions(newFunctions);
