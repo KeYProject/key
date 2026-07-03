@@ -37,7 +37,6 @@ public class VariableNameProposer implements InstantiationProposer {
     private static final String SKOLEMTERM_VARIABLE_NAME_POSTFIX = "_";
     private static final String LABEL_NAME_PREFIX = "_label";
 
-    private static final String GENERALNAMECOUNTER_PREFIX = "GenCnt";
     // private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
 
 
@@ -155,18 +154,16 @@ public class VariableNameProposer implements InstantiationProposer {
 
     public String getNameProposal(String basename, Services services, Node undoAnchor) {
         final NamespaceSet nss = services.getNamespaces();
-        Name l_name;
-        String name = "";
-        do {
-            if (name.length() > 0) {
-                name = basename
-                        + services.getCounter(GENERALNAMECOUNTER_PREFIX + name).getCountPlusPlus();
-            } else {
-                name = basename.length() > 0 ? basename : "gen";
-            }
-            l_name = new Name(name);
-        } while (nss.lookup(l_name) != null);
-
+        final String base = basename.length() > 0 ? basename : "gen";
+        // Pick the smallest free index against the current namespace rather than drawing from a
+        // proof-global counter: the proposed name is then a function of the goal's namespace
+        // occupancy alone, so it is reproducible across prune-and-redo and reload (#3851). The bare
+        // base name is tried first, then base0, base1, ... (This feeds ObtainCommand, whose Skolem
+        // constant enters the proof, so the name has to be reproducible.)
+        String name = base;
+        for (int i = 0; nss.lookup(new Name(name)) != null; i++) {
+            name = base + i;
+        }
         return name;
     }
 
