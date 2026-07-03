@@ -346,13 +346,34 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
-    /*
-     * returns an existing named counter, creates a new one otherwise
+    /**
+     * Returns the named proof-global counter, creating it if necessary.
      *
-     * Synchronized so that concurrent workers (multithreading effort) cannot lose a counter
-     * through a racing check-then-put on the shared counters map. The per-counter increment is
-     * atomic (see Counter); this only guards lookup/creation.
+     * <p>
+     * Synchronized so that concurrent workers (multithreading effort) cannot lose a counter through
+     * a racing check-then-put on the shared counters map. The per-counter increment is atomic (see
+     * {@link Counter}); this only guards lookup/creation.
+     *
+     * @param name the counter's name
+     * @return the (possibly freshly created) counter
+     * @deprecated Do not introduce new proof-global counters; prefer removing the remaining ones. A
+     *             value drawn from such a counter is a function of how many times it has been
+     *             advanced -- i.e. of the whole proof's history, and under the parallel prover of
+     *             the worker schedule -- so any name or id derived from it that becomes part of the
+     *             proof is <em>not</em> reproducible across reload, prune-and-redo or
+     *             multi-threaded
+     *             runs (#3851). Derive names/ids from the goal-local proof state instead: the
+     *             smallest free index against the current namespace (see
+     *             {@link de.uka.ilkd.key.proof.VariableNameProposer},
+     *             {@link de.uka.ilkd.key.logic.VariableNamer}), a content-order number (see
+     *             {@link de.uka.ilkd.key.speclang.ContentOrderNumbering}), or a dedicated field on
+     *             the owning object (as the node serial number is now an
+     *             {@link java.util.concurrent.atomic.AtomicInteger} on
+     *             {@link de.uka.ilkd.key.proof.Proof#getNextNodeSerialNr()}). The only remaining
+     *             callers are the symbolic-execution term-label counters, which are expected to be
+     *             removed together with the {@code key.core.symbolic_execution} package.
      */
+    @Deprecated
     public synchronized Counter getCounter(String name) {
         Counter c = counters.get(name);
         if (c != null) {
