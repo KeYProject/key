@@ -26,8 +26,29 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class LexPathOrdering implements TermOrdering {
 
+    /**
+     * Per-comparison memo, scoped to one top-level {@link #compare(Term, Term)} call. The
+     * recursion of {@link #compareHelp} visits the pair-DAG of the two terms; on large terms with
+     * structural sharing that DAG has far more distinct pairs than the bounded global
+     * {@link #cache} can hold, so the LRU is evicted mid-comparison and memoization collapses --
+     * measured two BILLION compareHelp calls (960M recomputations, 134s) for 1.68M comparisons on
+     * an ips4o goal at 6000 proof steps. An unbounded per-call map restores true DAG complexity
+     * (same run: 92M calls, 7.8s, byte-identical results). ThreadLocal because a LexPathOrdering
+     * instance is shared across parallel-prover workers; the map is reused (cleared) per call, so
+     * small comparisons pay only an empty-map lookup.
+     */
+    private final ThreadLocal<java.util.HashMap<CacheKey, CompRes>> callMemo =
+        ThreadLocal.withInitial(java.util.HashMap::new);
+
     public int compare(Term p_a, Term p_b) {
-        final CompRes res = compareHelp(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        memo.clear(); // scope the memo to this top-level comparison
+        final CompRes res;
+        try {
+            res = compareHelp(p_a, p_b);
+        } finally {
+            memo.clear();
+        }
         if (res.lt()) {
             return -1;
         } else if (res.gt()) {
@@ -90,11 +111,17 @@ public class LexPathOrdering implements TermOrdering {
 
     private CompRes compareHelp(Term p_a, Term p_b) {
         final CacheKey key = new CacheKey(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        final CompRes local = memo.get(key);
+        if (local != null) {
+            return local;
+        }
         CompRes res = cache.get(key);
         if (res == null) {
             res = compareHelp2(p_a, p_b);
             cache.put(key, res);
         }
+        memo.put(key, res);
         return res;
     }
 
