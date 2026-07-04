@@ -175,12 +175,7 @@ public final class PathConfig {
         currentPaths = getWritingPaths(basePath);
         // if the folder does not exist or is empty, use the previous if possible for reading the
         // initial config
-        if (!Files.exists(currentPaths.keyConfigDir)
-                || Files.list(currentPaths.keyConfigDir).count() == 0) {
-            previousPaths = getReadingPath(basePath);
-        } else {
-            previousPaths = currentPaths;
-        }
+        previousPaths = getReadingPath(basePath);
     }
 
     // Resolves the path `<key.home>/v<major>.<minor>` and creates it if necessary.
@@ -201,6 +196,7 @@ public final class PathConfig {
                     .filter(Objects::nonNull)
                     .filter(it -> it.getFileName().toString().matches("v\\d+\\.\\d+"))
                     .filter(Files::isDirectory)
+                    .filter(it -> !Objects.equals(it, currentPaths.keyConfigDir))
                     .filter(it -> {
                         try {
                             return Files.list(it).findAny().isEmpty();
