@@ -738,6 +738,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
         delegateView.getSelectionModel().setSelectionPath(tp);
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
+        // scrollPathToVisible scrolls the viewport via its (blit) scroll mode; together with
+        // validate() - which only re-lays-out, it does not repaint - this can leave stale pixels
+        // behind: ghost or horizontally shifted rows that clear only once the scrollbar is dragged
+        // by hand. This is most visible after auto mode, when the tree caught up with many nodes at
+        // once. Repaint the viewport so the final state is drawn correctly.
+        Container viewport = delegateView.getParent();
+        if (viewport != null) {
+            viewport.repaint();
+        }
         treeSelectionListener.ignoreChange = false;
     }
 
