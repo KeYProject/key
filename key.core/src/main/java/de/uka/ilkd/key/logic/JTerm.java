@@ -119,6 +119,13 @@ public interface JTerm
     boolean containsJavaBlockRecursive();
 
     /**
+     * Hash code modulo bound renaming, computed lazily and cached. Two terms that are equal modulo
+     * renaming share this value, so a mismatch is a cheap proof of inequality (used by
+     * {@code RenamingTermProperty}).
+     */
+    int hashCodeModRenaming();
+
+    /**
      * Checks if this {@link JTerm} or one of its direct or indirect children has a
      * {@link de.uka.ilkd.key.logic.op.Transformer} operator. Cached; used by
      * {@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix} to skip the prefix walk in the common
