@@ -97,6 +97,10 @@ public class ServiceCaches implements SessionCaches {
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
+    /**
+     * the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for Skolem
+     * constants
+     */
     private final LRUCache<Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
 
@@ -206,6 +210,10 @@ public class ServiceCaches implements SessionCaches {
         return ifThenElseMalusCache;
     }
 
+    /**
+     * returns the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for
+     * Skolem constants
+     */
     public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
         return introductionTimeCache;
     }
