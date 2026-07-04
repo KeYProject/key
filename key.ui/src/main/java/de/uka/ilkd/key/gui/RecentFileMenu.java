@@ -186,6 +186,10 @@ public class RecentFileMenu {
      */
     public final void loadFrom(Path filename) {
         try {
+            if (!Files.exists(filename)) {
+                return;
+            }
+
             var file = ParsingFacade.parseConfigurationFile(filename);
             List<Configuration> recent = file.asConfigurationList();
             this.recentFiles.clear();
