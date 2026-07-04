@@ -573,7 +573,21 @@ public class JavaService {
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
+            // The special classes were not fully parsed: do not leave the model marked as
+            // "parsed" (see the RuntimeException branch below for why).
+            mapping.setParsedSpecial(false);
             throw new RuntimeException(e);
+        } catch (RuntimeException | Error e) {
+            // Parsing the special (boot/library) classes failed - e.g. because one of the
+            // stub files under JavaRedux (or a \bootclasspath/\classpath entry) does not
+            // parse. We must NOT keep parsedSpecial == true here: otherwise the half-built
+            // Java model is silently reused, subsequent calls return early (line above),
+            // and every later type lookup - java.lang.Math in the float rules, user types,
+            // ... - fails with a misleading "cannot be found" that hides the real parse
+            // error. Reset the flag and let the actual failure (which points at the
+            // offending stub file) propagate.
+            mapping.setParsedSpecial(false);
+            throw e;
         } finally {
             mapping.setParsingLibraries(false);
         }

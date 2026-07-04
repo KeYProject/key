@@ -641,6 +641,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel = memorizedState.model;
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
+            dropSelectionSilently();
             delegateView.setModel(delegateModel);
             expansionState =
                 new ProofTreeExpansionState(delegateView, memorizedState.expansionState);
@@ -689,11 +690,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
         } else {
             delegateModel = null;
+            dropSelectionSilently();
             delegateView
                     .setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No proof loaded.")));
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
+    }
+
+    /**
+     * Drops the current selection without firing selection events. {@code JTree.setModel} clears
+     * the selection, which makes the tree UI measure -- and thereby render -- the previously
+     * selected paths. Those nodes belong to the outgoing model, whose proof may already have been
+     * disposed while this tab was hidden (the view deliberately stops listening then), so touching
+     * them fails. Swapping in a fresh selection model forgets the stale paths without ever
+     * rendering them.
+     */
+    private void dropSelectionSilently() {
+        final TreeSelectionModel freshSelection = new DefaultTreeSelectionModel();
+        freshSelection.setSelectionMode(delegateView.getSelectionModel().getSelectionMode());
+        delegateView.setSelectionModel(freshSelection);
     }
 
     public void removeProofs(Proof[] ps) {
@@ -738,6 +754,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
         delegateView.getSelectionModel().setSelectionPath(tp);
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
+        // scrollPathToVisible scrolls the viewport via its (blit) scroll mode; together with
+        // validate() - which only re-lays-out, it does not repaint - this can leave stale pixels
+        // behind: ghost or horizontally shifted rows that clear only once the scrollbar is dragged
+        // by hand. This is most visible after auto mode, when the tree caught up with many nodes at
+        // once. Repaint the viewport so the final state is drawn correctly.
+        Container viewport = delegateView.getParent();
+        if (viewport != null) {
+            viewport.repaint();
+        }
         treeSelectionListener.ignoreChange = false;
     }
 
