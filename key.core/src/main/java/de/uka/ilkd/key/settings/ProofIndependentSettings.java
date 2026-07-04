@@ -105,7 +105,7 @@ public class ProofIndependentSettings {
                     load(filename);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Could not load settings from {}", filename, e);
         }
     }

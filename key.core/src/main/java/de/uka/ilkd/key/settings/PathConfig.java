@@ -183,7 +183,7 @@ public final class PathConfig {
         var currentVersion = KeYResourceManager.getManager().getVersion().split("\\.");
         var currentVersionCandidate = "v%s.%s".formatted(currentVersion[0], currentVersion[1]);
         var currentVersionPath = base.resolve(currentVersionCandidate);
-        if (Files.exists(currentVersionPath)) {
+        if (!Files.exists(currentVersionPath)) {
             Files.createDirectories(currentVersionPath);
         }
         return new KeyPaths(currentVersionPath);
@@ -198,8 +198,8 @@ public final class PathConfig {
                     .filter(Files::isDirectory)
                     .filter(it -> !Objects.equals(it, currentPaths.keyConfigDir))
                     .filter(it -> {
-                        try {
-                            return Files.list(it).findAny().isEmpty();
+                        try (Stream<Path> entries = Files.list(it)) {
+                            return entries.findAny().isPresent();
                         } catch (IOException e) {
                             return false;
                         }
@@ -214,6 +214,6 @@ public final class PathConfig {
 
 
     public static boolean isDifferentReadWriteDirectories() {
-        return Objects.equals(currentPaths.keyConfigDir, previousPaths.keyConfigDir);
+        return !Objects.equals(currentPaths.keyConfigDir, previousPaths.keyConfigDir);
     }
 }
