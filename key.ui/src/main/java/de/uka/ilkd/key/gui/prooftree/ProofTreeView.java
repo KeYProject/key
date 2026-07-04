@@ -641,6 +641,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel = memorizedState.model;
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
+            dropSelectionSilently();
             delegateView.setModel(delegateModel);
             expansionState =
                 new ProofTreeExpansionState(delegateView, memorizedState.expansionState);
@@ -689,11 +690,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
         } else {
             delegateModel = null;
+            dropSelectionSilently();
             delegateView
                     .setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No proof loaded.")));
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
+    }
+
+    /**
+     * Drops the current selection without firing selection events. {@code JTree.setModel} clears
+     * the selection, which makes the tree UI measure -- and thereby render -- the previously
+     * selected paths. Those nodes belong to the outgoing model, whose proof may already have been
+     * disposed while this tab was hidden (the view deliberately stops listening then), so touching
+     * them fails. Swapping in a fresh selection model forgets the stale paths without ever
+     * rendering them.
+     */
+    private void dropSelectionSilently() {
+        final TreeSelectionModel freshSelection = new DefaultTreeSelectionModel();
+        freshSelection.setSelectionMode(delegateView.getSelectionModel().getSelectionMode());
+        delegateView.setSelectionModel(freshSelection);
     }
 
     public void removeProofs(Proof[] ps) {
