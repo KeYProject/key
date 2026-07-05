@@ -15,11 +15,12 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.strategy.costbased.CostClassifiable;
+import org.key_project.prover.strategy.costbased.CostLocality;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
-import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.Nullable;
 
@@ -75,14 +76,10 @@ public final class CostReuse {
 
     private CostReuse() {}
 
-    /** Per-class locality decision, cached (class annotations are stable for the JVM run). */
-    private static final Map<Class<?>, Kind> kindCache = new ConcurrentHashMap<>();
+    /** Per-class locality, cached (class annotations are stable for the JVM run). */
+    private static final Map<Class<?>, CostLocality> localityCache = new ConcurrentHashMap<>();
     /** Cached "not eligible for reuse" marker (the map forbids null values). */
     private static final Eligibility INELIGIBLE = new Eligibility(new Feature[0], false);
-
-    private enum Kind {
-        VETO, VOLATILE, STABLE, WEAK_STABLE
-    }
 
     /**
      * How an eligible taclet may reuse its cost.
@@ -133,7 +130,7 @@ public final class CostReuse {
         vetoes.add(NonDuplicateAppFeature.INSTANCE); // top-level veto, applies to every taclet
         final boolean[] local = { true };
         final boolean[] weakStable = { false };
-        final Set<Feature> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<CostClassifiable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         for (RuleSetDispatchFeature d : dispatchers) {
             var rs = taclet.getRuleSets();
             while (!rs.isEmpty()) {
@@ -148,80 +145,46 @@ public final class CostReuse {
     }
 
     /**
-     * Classify a feature; for a transparent composite, recurse into its child features and require
-     * its child term-generators to be local too (see the class comment).
+     * Classify a cost component: for a transparent (STABLE/WEAK_STABLE) composite, recurse into
+     * every child component so it stays local only if they all are (see the class comment).
      */
-    private static void walk(Feature f, Set<Feature> vetoes, boolean[] local, boolean[] weakStable,
-            Set<Feature> seen) {
+    private static void walk(CostClassifiable f, Set<Feature> vetoes, boolean[] local,
+            boolean[] weakStable, Set<CostClassifiable> seen) {
         if (!local[0] || !seen.add(f)) {
             return;
         }
-        final Kind k = kind(f);
-        switch (k) {
-            case VETO -> vetoes.add(f);
+        if (f instanceof AbstractNonDuplicateAppFeature) {
+            // the no-duplicate-application guard: collected as a veto to re-check at reuse time;
+            // it is not a locality, so it neither recurses nor forces non-local.
+            vetoes.add((Feature) f);
+            return;
+        }
+        switch (localityOf(f)) {
             case VOLATILE -> local[0] = false;
-            // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are
-            // local and all its child TERM-GENERATORS are at least as local. WEAK_STABLE
-            // recurses the same way but also records that some part reads the whole find
-            // formula, so reuse is gated on that formula being unchanged (see Eligibility). A
-            // generator is a non-Feature input the recursion would otherwise miss (e.g.
-            // ComprehendedSumFeature sums its body over one).
-            case STABLE, WEAK_STABLE -> {
-                if (k == Kind.WEAK_STABLE) {
-                    weakStable[0] = true;
-                }
-                forEachChild(f, child -> {
-                    if (child instanceof Feature cf) {
-                        walk(cf, vetoes, local, weakStable, seen);
-                    } else { // a TermGenerator (or similar non-Feature input)
-                        final Class<?> gc = child.getClass();
-                        if (gc.isAnnotationPresent(WeakStableCost.class)) {
-                            weakStable[0] = true;
-                        } else if (!isLocal(gc)) {
-                            local[0] = false;
-                        }
-                    }
-                });
+            // Transparent: recurse into every child component -- a Feature, TermGenerator or
+            // ProjectionToTerm, all of which receive the goal -- and stay local only if they all
+            // are. WEAK_STABLE additionally reads the whole find formula, so reuse is gated on
+            // that formula being unchanged (see Eligibility). Children are discovered reflectively
+            // (see forEachChild), so authors annotate locality and never enumerate children.
+            case WEAK_STABLE -> {
+                weakStable[0] = true;
+                forEachChild(f, child -> walk(child, vetoes, local, weakStable, seen));
             }
+            case STABLE -> forEachChild(f, child -> walk(child, vetoes, local, weakStable, seen));
         }
     }
 
-    /**
-     * A non-Feature classifying input (e.g. a TermGenerator) is fully local only if
-     * {@link StableCost}; a {@link WeakStableCost} one (handled by the caller) is weakly local.
-     */
-    private static boolean isLocal(Class<?> c) {
-        return !c.isAnnotationPresent(VolatileCost.class)
-                && c.isAnnotationPresent(StableCost.class);
+    /** The (cached) reuse-locality of a cost component, taken from its class annotation. */
+    private static CostLocality localityOf(CostClassifiable f) {
+        return localityCache.computeIfAbsent(f.getClass(), c -> f.locality());
     }
 
     /**
-     * Classify a feature's class (cached). SOUND-by-construction: a feature is treated as local
-     * ONLY if it is explicitly {@link StableCost}-annotated (its author asserts it depends only on
-     * the app + find subterm, modulo its child features) -- there is no structural "any composite
-     * is transparent" guess. {@link VolatileCost} forces non-local; everything unannotated is
-     * non-local (the safe default).
+     * Apply {@code action} to each {@link CostClassifiable} child (a Feature, TermGenerator or
+     * ProjectionToTerm) held one structural step inside {@code f}.
      */
-    private static Kind kind(Feature f) {
-        return kindCache.computeIfAbsent(f.getClass(), c -> {
-            if (c.isAnnotationPresent(VolatileCost.class)) {
-                return Kind.VOLATILE; // explicit author override wins
-            }
-            if (f instanceof AbstractNonDuplicateAppFeature) {
-                return Kind.VETO;
-            }
-            if (c.isAnnotationPresent(WeakStableCost.class)) {
-                return Kind.WEAK_STABLE;
-            }
-            return c.isAnnotationPresent(StableCost.class) ? Kind.STABLE : Kind.VOLATILE;
-        });
-    }
-
-    /**
-     * Apply {@code action} to each {@link Feature} and {@link TermGenerator} held one structural
-     * step inside {@code f}.
-     */
-    private static void forEachChild(Feature f, java.util.function.Consumer<Object> action) {
+    private static void forEachChild(CostClassifiable f,
+            java.util.function.Consumer<CostClassifiable> action) {
         for (Field fld : allFields(f.getClass())) {
             if (Modifier.isStatic(fld.getModifiers()) || fld.getType().isPrimitive()) {
                 continue;
@@ -234,12 +197,13 @@ public final class CostReuse {
         }
     }
 
-    private static void follow(@Nullable Object o, java.util.function.Consumer<Object> action) {
+    private static void follow(@Nullable Object o,
+            java.util.function.Consumer<CostClassifiable> action) {
         if (o == null) {
             return;
         }
-        if (o instanceof Feature || o instanceof TermGenerator) {
-            action.accept(o);
+        if (o instanceof CostClassifiable cc) {
+            action.accept(cc);
             return;
         }
         Class<?> c = o.getClass();
@@ -257,7 +221,8 @@ public final class CostReuse {
                 follow(e, action);
             }
         }
-        // other object types (TermBuffer, ProjectionToTerm, Name, ...) are NOT traversed
+        // Everything else is not a cost component and is not traversed -- notably TermFeature (its
+        // compute() has no goal, so it is stable by construction), plus Name, RuleAppCost, ...
     }
 
     /**

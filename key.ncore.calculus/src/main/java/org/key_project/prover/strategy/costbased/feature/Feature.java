@@ -6,6 +6,7 @@ package org.key_project.prover.strategy.costbased.feature;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.CostClassifiable;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
@@ -13,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 
 /// A [Feature] is a class that is able to compute the cost of a [RuleApp].
 @FunctionalInterface
-public interface Feature {
+public interface Feature extends CostClassifiable {
 
     /// Evaluate the cost of a [RuleApp].
     ///
