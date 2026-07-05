@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
 
 import org.key_project.logic.Name;
@@ -114,6 +116,12 @@ public final class GeneratedLemma {
      */
     private ProofAggregate createSoundnessProof() {
         final InitConfig poConfig = mainProof.getInitConfig().deepCopy();
+        // The soundness of a generated lemma must be established in the base calculus. If the
+        // main proof runs the one step simplifier in transparent mode, the copied configuration
+        // would too, and the lemma's proof obligation would be discharged by generating and
+        // applying further lemmas — re-doing the very simplification it is meant to justify
+        // (a circular, non-terminating justification). Force the opaque simplifier here.
+        forceOpaqueOneStepSimplification(poConfig);
         final ImmutableSet<Taclet> tacletsToProve = DefaultImmutableSet.<Taclet>nil().add(taclet);
 
         final ProofAggregate po = new ProofObligationCreator().create(tacletsToProve,
@@ -124,5 +132,23 @@ public final class GeneratedLemma {
             env.registerProof(new GeneratedLemmaPO(taclet.name(), po), po);
         }
         return po;
+    }
+
+    /**
+     * Switches the one step simplifier of the given configuration to its opaque mode, so that a
+     * proof run in it does not itself generate lemmas (see {@link #createSoundnessProof()}).
+     */
+    private static void forceOpaqueOneStepSimplification(InitConfig config) {
+        final ProofSettings settings = config.getSettings();
+        if (settings == null) {
+            return;
+        }
+        final StrategyProperties sp =
+            settings.getStrategySettings().getActiveStrategyProperties();
+        if (StrategyProperties.OSS_TRANSPARENT
+                .equals(sp.getProperty(StrategyProperties.OSS_OPTIONS_KEY))) {
+            sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
+            settings.getStrategySettings().setActiveStrategyProperties(sp);
+        }
     }
 }

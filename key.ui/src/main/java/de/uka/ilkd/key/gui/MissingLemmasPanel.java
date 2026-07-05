@@ -36,6 +36,7 @@ public final class MissingLemmasPanel extends JPanel {
     private final JButton proveButton = new JButton("Load selected as side proofs");
     private final JButton selectAllButton = new JButton("Select all");
     private @Nullable Proof proof;
+    private @Nullable Runnable onLoaded;
 
     public MissingLemmasPanel(KeYMediator mediator) {
         super(new BorderLayout());
@@ -76,6 +77,16 @@ public final class MissingLemmasPanel extends JPanel {
         refresh();
     }
 
+    /**
+     * Sets an action to run after lemmas have been loaded as side proofs (e.g. to close the
+     * enclosing dialog).
+     *
+     * @param onLoaded the action, or {@code null} for none
+     */
+    public void setOnLoaded(Runnable onLoaded) {
+        this.onLoaded = onLoaded;
+    }
+
     private void refresh() {
         model.clear();
         if (proof != null) {
@@ -101,13 +112,10 @@ public final class MissingLemmasPanel extends JPanel {
         }
         Proof firstLoaded = null;
         for (final GeneratedLemma lemma : selected) {
-            final boolean alreadyShown = lemma.isSoundnessProofPresent();
+            // creating the soundness proof registers it in the proof environment; the user
+            // interface listens on the environment and adds it to the task tree, so the panel
+            // must not register it a second time (that produced duplicate task-tree entries)
             final ProofAggregate aggregate = lemma.getOrCreateSoundnessProofAggregate();
-            // the soundness proof is registered in the proof environment when created; only add
-            // it to the user interface (task tree) if it is not already there
-            if (!alreadyShown) {
-                mediator.getUI().registerProofAggregate(aggregate);
-            }
             if (firstLoaded == null) {
                 firstLoaded = aggregate.getFirstProof();
             }
@@ -115,9 +123,9 @@ public final class MissingLemmasPanel extends JPanel {
         if (firstLoaded != null) {
             mediator.getSelectionModel().setSelectedProof(firstLoaded);
         }
-        // the listed proofs now exist; drop the ones that are already closed, keep the rest so
-        // the user can continue proving them
-        refresh();
+        if (onLoaded != null) {
+            onLoaded.run();
+        }
     }
 
     private static final class LemmaCellRenderer extends DefaultListCellRenderer {

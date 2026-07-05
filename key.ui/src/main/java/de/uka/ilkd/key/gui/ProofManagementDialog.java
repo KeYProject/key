@@ -197,6 +197,7 @@ public final class ProofManagementDialog extends JDialog {
         // create missing-lemmas panel (shows generated lemmas of the selected proof whose
         // soundness has not yet been established, and lets the user load them as side proofs)
         missingLemmasPanel = new MissingLemmasPanel(mediator);
+        missingLemmasPanel.setOnLoaded(() -> setVisible(false));
 
         // create tabbed pane
         tabbedPane = new JTabbedPane();
