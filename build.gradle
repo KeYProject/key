@@ -12,13 +12,13 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.7.0"
+    alias(libs.plugins.spotless)
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.61"
+    alias(libs.plugins.checkerframework)
 
     // Plugin for publishing via the new Nexus API
-    id "com.vanniktech.maven.publish" version "0.37.0" apply false
+    alias(libs.plugins.maven.publish) apply false
 }
 
 
@@ -65,37 +65,30 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.18")
-        testImplementation("ch.qos.logback:logback-classic:1.5.37")
+        implementation(libs.slf4j.api)
+        testImplementation(libs.logback.classic)
 
 
-        compileOnly("org.jspecify:jspecify:1.0.0")
-        testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.5-eisop1"
-        compileOnly "io.github.eisop:checker-qual:$eisop_version"
-        compileOnly "io.github.eisop:checker-util:$eisop_version"
-        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker:$eisop_version"
+        compileOnly(libs.jspecify)
+        testCompileOnly(libs.jspecify)
+        compileOnly(libs.checkerframework.qual)
+        compileOnly(libs.checkerframework.util)
+        testCompileOnly(libs.checkerframework.qual)
+        checkerFramework(libs.checkerframework.qual)
+        checkerFramework(libs.checkerframework)
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.37")
-        testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation("ch.qos.logback:logback-classic:1.5.37")
-
-        testImplementation(platform("org.junit:junit-bom:6.1.1"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
-        testImplementation ("org.assertj:assertj-core:3.27.7")
-        testImplementation (project(':key.util'))
-        testImplementation (testFixtures(project(":key.util")))
+        testImplementation(platform(libs.junit.bom))
+        testImplementation(libs.junit.jupiter.api)
+        testImplementation(libs.junit.jupiter.params)
+        testRuntimeOnly(libs.junit.jupiter.engine)
+        testRuntimeOnly(libs.junit.platform.launcher)
+        testImplementation(libs.assertj.core)
+        testImplementation(project(':key.util'))
+        testImplementation(testFixtures(project(":key.util")))
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.4")
-
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        testImplementation(libs.jackson.dataformat.yaml)
+        testImplementation(libs.jackson.datatype.jsr310)
     }
 
     tasks.withType(JavaCompile).configureEach {
