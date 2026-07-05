@@ -166,13 +166,18 @@ public class KeYSelectionModel {
     }
 
     /**
-     * returns the goal the selected node belongs to, null if it is an inner node
+     * returns the goal the selected node belongs to, or null if there is no such goal (the selected
+     * node is an inner node, or no proof is loaded at all)
      *
-     * @return the goal the selected node belongs to, null if it is an inner node
+     * @return the selected goal, or null if there is none
      */
     public Goal getSelectedGoal() {
+        // Consistent with getSelectedProof()/getSelectedNode() (both nullable) and with the
+        // documented "null if inner node" contract: return null - rather than throwing - when no
+        // proof is loaded. Callers already null-check this method; throwing here made GUI listeners
+        // that fire during teardown (e.g. InfoView) crash with "No proof loaded.".
         if (proof == null) {
-            throw new IllegalStateException("No proof loaded.");
+            return null;
         }
         if (!goalIsValid) {
             selectedGoal = proof.getOpenGoal(selectedNode);
