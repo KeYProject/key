@@ -197,6 +197,7 @@ public final class ProofManagementDialog extends JDialog {
         // contracts and the generated lemmas it depends on
         lemmaDependencyPanel = new LemmaDependencyPanel(mediator);
         lemmaDependencyPanel.setOnLoaded(() -> setVisible(false));
+        lemmaDependencyPanel.setOnStatusChanged(this::updateGlobalStatus);
         JTabbedPane byProofDetails = new JTabbedPane();
         byProofDetails.addTab("Contracts", contractPanelByProof);
         byProofDetails.addTab("Lemmas", lemmaDependencyPanel);

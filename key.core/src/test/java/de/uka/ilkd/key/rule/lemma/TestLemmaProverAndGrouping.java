@@ -137,6 +137,35 @@ public class TestLemmaProverAndGrouping {
     }
 
     @Test
+    public void testBatchProvingUpdatesStatusWithoutFloodingEnvironment() throws Exception {
+        // Regression for the reported GUI issue: after batch-proving all lemmas, the depending
+        // proof must become CLOSED (not "closed but lemmas left") automatically, and the closed
+        // obligations must not be registered in the environment (no flooding of the task tree).
+        final Path file = TEST_CASE_DIRECTORY
+                .resolve("../../../../../key.ui/examples/standard_key/arith/computation.key");
+
+        try (KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file)) {
+            final Proof proof = transparentClosed(env, 20000);
+            assertEquals(de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED_BUT_LEMMAS_LEFT,
+                proof.mgt().getStatus(),
+                "before proving the lemmas the proof is closed only modulo them");
+            final int proofsBefore = proof.getEnv().getProofs().size();
+
+            final GeneratedLemmaRegistry registry = GeneratedLemmaRegistry.get(proof);
+            final LemmaProver.Result result =
+                LemmaProver.proveAll(registry.getLemmas(), 10000, null);
+            assertTrue(result.remaining().isEmpty(), "all arith lemmas should close");
+
+            // status became CLOSED automatically (no explicit updateProofStatus call here)
+            assertEquals(de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED, proof.mgt().getStatus(),
+                "proving all lemmas must turn the proof status to CLOSED");
+            // no closed obligation was registered in the environment
+            assertEquals(proofsBefore, proof.getEnv().getProofs().size(),
+                "closed obligations must not be registered in the environment");
+        }
+    }
+
+    @Test
     public void testBatchProvingDischargesAndSaves() throws Exception {
         final Path file = TEST_CASE_DIRECTORY
                 .resolve("../../../../../key.ui/examples/standard_key/arith/computation.key");
@@ -156,8 +185,11 @@ public class TestLemmaProverAndGrouping {
             assertFalse(result.proven().isEmpty(), "arith lemmas should close");
             for (final GeneratedLemma lemma : result.proven()) {
                 assertTrue(lemma.isProven());
-                assertSame(proof.getEnv(), lemma.getSoundnessProofIfPresent().getEnv(),
-                    "obligation proof lives in the main proof's environment");
+                // a closed obligation is a certificate and is deliberately NOT registered in the
+                // environment (no flooding of the task tree with closed side proofs)
+                assertFalse(proof.getEnv().getProofs().stream()
+                        .anyMatch(pl -> pl.getFirstProof() == lemma.getSoundnessProofIfPresent()),
+                    "a closed obligation must not be registered in the environment");
             }
             assertTrue(registry.getMissingLemmas().size() <= result.remaining().size(),
                 "proven lemmas leave the missing set");

@@ -59,6 +59,7 @@ public final class LemmaDependencyPanel extends JPanel {
     private final JButton proveAllButton = new JButton("Prove all lemmas...");
     private @Nullable Proof proof;
     private @Nullable Runnable onLoaded;
+    private @Nullable Runnable onStatusChanged;
 
     public LemmaDependencyPanel(KeYMediator mediator) {
         super(new BorderLayout());
@@ -90,6 +91,14 @@ public final class LemmaDependencyPanel extends JPanel {
      */
     public void setOnLoaded(Runnable onLoaded) {
         this.onLoaded = onLoaded;
+    }
+
+    /**
+     * Sets an action to run after the proven status of lemmas may have changed (e.g. to refresh
+     * the enclosing dialog's proof-status display).
+     */
+    public void setOnStatusChanged(Runnable onStatusChanged) {
+        this.onStatusChanged = onStatusChanged;
     }
 
     /**
@@ -168,9 +177,9 @@ public final class LemmaDependencyPanel extends JPanel {
         }
         Proof first = null;
         for (final GeneratedLemma lemma : selected) {
-            // creating the obligation registers it in the environment; the user interface picks
-            // it up via the environment listener, so no explicit UI registration here
-            final Proof po = lemma.getOrCreateSoundnessProof();
+            // register the obligation in the environment so the user can work on it; the user
+            // interface picks it up via the environment listener and adds it to the task tree
+            final Proof po = lemma.registerInEnvironment().getFirstProof();
             if (first == null) {
                 first = po;
             }
@@ -224,6 +233,16 @@ public final class LemmaDependencyPanel extends JPanel {
                         JOptionPane.ERROR_MESSAGE);
                 }
                 refresh();
+                // proving lemmas may have turned the depending proof from "closed but lemmas
+                // left" into "closed". Recompute the status explicitly (robust against the
+                // order in which proof-tree listeners handled the obligation-closed events) and
+                // let the enclosing dialog refresh its status display.
+                if (proof != null) {
+                    proof.mgt().updateProofStatus();
+                }
+                if (onStatusChanged != null) {
+                    onStatusChanged.run();
+                }
             }
         }.execute();
     }

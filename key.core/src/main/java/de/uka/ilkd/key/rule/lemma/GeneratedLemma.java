@@ -47,6 +47,7 @@ public final class GeneratedLemma {
     private final int aggregatedSteps;
     private @Nullable ProofAggregate soundnessProofAggregate;
     private @Nullable Proof soundnessProof;
+    private boolean registeredInEnvironment;
 
     GeneratedLemma(RewriteTaclet taclet, Proof mainProof, Name generatorName,
             int aggregatedSteps) {
@@ -141,24 +142,45 @@ public final class GeneratedLemma {
     }
 
     /**
-     * returns the proof for the soundness proof obligation of the taclet, creating (and, if a
-     * proof environment is present, registering) it on first call
+     * returns the proof for the soundness proof obligation of the taclet, creating it (but
+     * <em>not</em> registering it in the proof environment) on first call
      */
     public synchronized Proof getOrCreateSoundnessProof() {
         return getOrCreateSoundnessProofAggregate().getFirstProof();
     }
 
     /**
-     * returns the proof aggregate for the soundness proof obligation of the taclet, creating
-     * (and, if a proof environment is present, registering in it) it on first call. The
-     * aggregate is what a user interface registers to display and drive the proof.
+     * returns the proof aggregate for the soundness proof obligation of the taclet, creating it
+     * on first call. Creation does <em>not</em> register the obligation in the proof environment
+     * — a batch that proves and closes many obligations should not flood the environment (and a
+     * user interface) with closed side proofs. Registration is an explicit, separate step (see
+     * {@link #registerInEnvironment()}); the main proof's status tracks the obligation through
+     * this lemma regardless of registration.
      */
     public synchronized ProofAggregate getOrCreateSoundnessProofAggregate() {
         if (soundnessProof == null || soundnessProof.isDisposed()) {
             soundnessProofAggregate = createSoundnessProof();
             soundnessProof = soundnessProofAggregate.getFirstProof();
+            registeredInEnvironment = false;
         }
         return soundnessProofAggregate;
+    }
+
+    /**
+     * Registers the soundness proof obligation in the main proof's environment (creating it
+     * first if necessary), so that a user interface listening on the environment displays and
+     * can drive it. Idempotent; does nothing if there is no environment.
+     *
+     * @return the registered aggregate
+     */
+    public synchronized ProofAggregate registerInEnvironment() {
+        final ProofAggregate aggregate = getOrCreateSoundnessProofAggregate();
+        final ProofEnvironment env = mainProof.getEnv();
+        if (env != null && !registeredInEnvironment) {
+            env.registerProof(new GeneratedLemmaPO(taclet.name(), aggregate), aggregate);
+            registeredInEnvironment = true;
+        }
+        return aggregate;
     }
 
     /**
@@ -181,11 +203,6 @@ public final class GeneratedLemma {
 
         final ProofAggregate po = new ProofObligationCreator().create(tacletsToProve,
             new InitConfig[] { poConfig }, DefaultImmutableSet.nil(), List.of());
-
-        final ProofEnvironment env = mainProof.getEnv();
-        if (env != null) {
-            env.registerProof(new GeneratedLemmaPO(taclet.name(), po), po);
-        }
         return po;
     }
 

@@ -66,18 +66,28 @@ public class TestMissingLemmas {
                 "all generated lemmas are initially missing");
             assertFalse(missing.isEmpty());
 
-            // "load as side proof": create the soundness proof aggregate for one lemma; it gets
-            // registered in the target's proof environment
+            // creating the obligation alone does not register it (a batch of closed obligations
+            // must not flood the environment)
             final GeneratedLemma first = missing.get(0);
             assertFalse(first.isSoundnessProofPresent());
-            final ProofAggregate aggregate = first.getOrCreateSoundnessProofAggregate();
-            final Proof soundnessProof = aggregate.getFirstProof();
+            first.getOrCreateSoundnessProofAggregate();
             assertTrue(first.isSoundnessProofPresent());
+            assertFalse(target.getEnv().getProofs().stream()
+                    .anyMatch(pl -> pl.getFirstProof() == first.getSoundnessProofIfPresent()),
+                "creating the obligation must not register it in the environment");
+
+            // "load as side proof": registering surfaces it in the environment
+            final ProofAggregate aggregate = first.registerInEnvironment();
+            final Proof soundnessProof = aggregate.getFirstProof();
             assertSame(target.getEnv(), soundnessProof.getEnv(),
-                "soundness proof must live in the same proof environment as the main proof");
+                "registered soundness proof lives in the main proof's environment");
             assertTrue(target.getEnv().getProofs().stream()
                     .anyMatch(pl -> pl.getFirstProof() == soundnessProof),
-                "soundness proof must be registered in the proof environment");
+                "registered soundness proof must be in the proof environment");
+            // registering again does not duplicate it
+            first.registerInEnvironment();
+            assertEquals(1, target.getEnv().getProofs().stream()
+                    .filter(pl -> pl.getFirstProof() == soundnessProof).count());
 
             // an open (not yet closed) soundness proof still counts as missing
             assertTrue(registry.getMissingLemmas().contains(first),

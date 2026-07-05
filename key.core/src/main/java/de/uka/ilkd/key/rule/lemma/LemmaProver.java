@@ -26,9 +26,12 @@ import org.slf4j.LoggerFactory;
  * that they can be shown to the user for manual completion.
  *
  * <p>
- * The obligation proofs are created in the lemma's proof environment (see
- * {@link GeneratedLemma#getOrCreateSoundnessProofAggregate()}), which surfaces them in an
- * attached user interface. This class does not itself perform any user-interface registration.
+ * Closed obligations are certificates and are deliberately not registered in the proof
+ * environment, so a batch over many obligations does not flood the environment (and an attached
+ * user interface) with closed side proofs; the main proof's status still tracks them through the
+ * lemmas. Obligations that remain open are registered (see
+ * {@link GeneratedLemma#registerInEnvironment()}) so that an attached user interface surfaces
+ * them for manual completion.
  */
 @NullMarked
 public final class LemmaProver {
@@ -84,7 +87,17 @@ public final class LemmaProver {
                             lemma.taclet().name(), e);
                     }
                 }
-                (po.closed() ? proven : remaining).add(lemma);
+                if (po.closed()) {
+                    // a closed obligation is a certificate; it needs no further attention and is
+                    // deliberately not registered in the environment, so a batch that proves many
+                    // obligations does not flood the environment (and a user interface) with
+                    // closed side proofs. The main proof's status still tracks it through the
+                    // lemma. Only obligations that remain open are surfaced for manual work.
+                    proven.add(lemma);
+                } else {
+                    remaining.add(lemma);
+                    lemma.registerInEnvironment();
+                }
 
                 if (saveDir != null) {
                     final Path file = saveDir.resolve(
