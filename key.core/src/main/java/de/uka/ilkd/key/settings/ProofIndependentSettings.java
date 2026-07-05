@@ -32,15 +32,16 @@ public class ProofIndependentSettings {
 
     static {
         var write = PathConfig.currentPaths.proofIndependentSettings;
-        var differs = PathConfig.isDifferentReadWriteDirectories();
+        var read = PathConfig.previousPaths.proofIndependentSettings;
 
-        // Path to read from
-        var read = differs ? PathConfig.currentPaths.proofIndependentSettings : write;
+        if (Files.exists(write)) {
+            read = write;
+        }
 
-        // (1)
-        if (!Files.exists(read)) { // change json to props file
-            read =
-                read.getParent().resolve(read.getFileName().toString().replace(".json", ".props"));
+        // change to props file, if json file does not exists
+        if (!Files.exists(read)) {
+            read = read.getParent()
+                    .resolve(read.getFileName().toString().replace(".json", ".props"));
         }
 
         // read from the old/new place
