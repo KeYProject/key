@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.lemma;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -95,5 +97,35 @@ public final class GeneratedLemmaRegistry {
      */
     public synchronized Collection<GeneratedLemma> getLemmas() {
         return Collections.unmodifiableCollection(lemmas.values());
+    }
+
+    /**
+     * returns the lemmas generated for this proof whose soundness proof obligation has not yet
+     * been discharged — either it has not been created, or it has been created but is not closed.
+     * These are the lemmas that the proof is still closed only modulo (see
+     * {@link de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt}).
+     *
+     * @return the missing lemmas, in generation order
+     */
+    public synchronized List<GeneratedLemma> getMissingLemmas() {
+        final List<GeneratedLemma> missing = new ArrayList<>();
+        for (final GeneratedLemma lemma : lemmas.values()) {
+            if (!lemma.isProven()) {
+                missing.add(lemma);
+            }
+        }
+        return missing;
+    }
+
+    /**
+     * returns the registry of the given proof if one exists, without creating it; used by clients
+     * that only inspect (e.g. the user interface) and must not attach a registry to proofs that
+     * never generated a lemma
+     *
+     * @param proof the proof
+     * @return the registry, or {@code null} if the proof has no generated lemmas
+     */
+    public static @Nullable GeneratedLemmaRegistry getIfPresent(Proof proof) {
+        return proof.lookup(GeneratedLemmaRegistry.class);
     }
 }

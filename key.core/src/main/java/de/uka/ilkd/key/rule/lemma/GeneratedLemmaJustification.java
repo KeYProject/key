@@ -60,8 +60,7 @@ public final class GeneratedLemmaJustification implements RuleJustification {
      * {@link de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt})
      */
     public boolean isProven() {
-        final Proof soundnessProof = lemma.getSoundnessProofIfPresent();
-        return soundnessProof != null && !soundnessProof.isDisposed() && soundnessProof.closed();
+        return lemma.isProven();
     }
 
     @Override

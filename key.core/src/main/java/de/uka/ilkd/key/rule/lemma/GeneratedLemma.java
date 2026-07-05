@@ -37,6 +37,7 @@ public final class GeneratedLemma {
     private final RewriteTaclet taclet;
     private final Proof mainProof;
     private final GeneratedLemmaJustification justification;
+    private @Nullable ProofAggregate soundnessProofAggregate;
     private @Nullable Proof soundnessProof;
 
     GeneratedLemma(RewriteTaclet taclet, Proof mainProof, Name generatorName) {
@@ -71,14 +72,38 @@ public final class GeneratedLemma {
     }
 
     /**
+     * returns true iff the soundness proof obligation has been created and is not disposed
+     */
+    public synchronized boolean isSoundnessProofPresent() {
+        return soundnessProof != null && !soundnessProof.isDisposed();
+    }
+
+    /**
+     * returns true iff the soundness proof obligation has been created and closed
+     */
+    public synchronized boolean isProven() {
+        return isSoundnessProofPresent() && soundnessProof.closed();
+    }
+
+    /**
      * returns the proof for the soundness proof obligation of the taclet, creating (and, if a
      * proof environment is present, registering) it on first call
      */
     public synchronized Proof getOrCreateSoundnessProof() {
+        return getOrCreateSoundnessProofAggregate().getFirstProof();
+    }
+
+    /**
+     * returns the proof aggregate for the soundness proof obligation of the taclet, creating
+     * (and, if a proof environment is present, registering in it) it on first call. The
+     * aggregate is what a user interface registers to display and drive the proof.
+     */
+    public synchronized ProofAggregate getOrCreateSoundnessProofAggregate() {
         if (soundnessProof == null || soundnessProof.isDisposed()) {
-            soundnessProof = createSoundnessProof();
+            soundnessProofAggregate = createSoundnessProof();
+            soundnessProof = soundnessProofAggregate.getFirstProof();
         }
-        return soundnessProof;
+        return soundnessProofAggregate;
     }
 
     /**
@@ -87,7 +112,7 @@ public final class GeneratedLemma {
      * generated taclet itself is not part of that configuration, so it cannot be used to prove
      * itself.
      */
-    private Proof createSoundnessProof() {
+    private ProofAggregate createSoundnessProof() {
         final InitConfig poConfig = mainProof.getInitConfig().deepCopy();
         final ImmutableSet<Taclet> tacletsToProve = DefaultImmutableSet.<Taclet>nil().add(taclet);
 
@@ -98,6 +123,6 @@ public final class GeneratedLemma {
         if (env != null) {
             env.registerProof(new GeneratedLemmaPO(taclet.name(), po), po);
         }
-        return po.getFirstProof();
+        return po;
     }
 }
