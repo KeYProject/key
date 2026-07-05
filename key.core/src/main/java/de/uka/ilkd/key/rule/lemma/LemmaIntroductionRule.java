@@ -9,9 +9,11 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -63,8 +65,41 @@ public abstract class LemmaIntroductionRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
-        return pio != null && generator.isApplicable(goal, pio);
+        return pio != null && generator.isApplicable(goal, pio)
+                && !lemmaAlreadyAvailable(goal, pio);
     }
+
+    /**
+     * Checks whether a lemma taclet of this generator is already available and usable at the
+     * given position. In that case the introduction is not offered again: re-introduction would
+     * be redundant, and — since the introduction step does not change the sequent — automated
+     * application would not terminate without this check.
+     */
+    private boolean lemmaAlreadyAvailable(Goal goal, PosInOccurrence pio) {
+        final var services = goal.proof().getServices();
+        final ImmutableList<NoPosTacletApp> candidates = goal.indexOfTaclets()
+                .getRewriteTaclet(pio, GENERATED_BY_THIS_GENERATOR, services);
+        for (final NoPosTacletApp candidate : candidates) {
+            if (candidate.taclet().assumesSequent().isEmpty()) {
+                return true;
+            }
+            // assumption-carrying lemmas count as available only if their assumptions can
+            // actually be instantiated in the current sequent
+            final TacletApp positioned = candidate.setPosInOccurrence(pio, services);
+            if (positioned != null && (positioned.complete() || !positioned
+                    .findIfFormulaInstantiations(goal.sequent(), services).isEmpty())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private final TacletFilter GENERATED_BY_THIS_GENERATOR = new TacletFilter() {
+        @Override
+        protected boolean filter(org.key_project.prover.rules.Taclet taclet) {
+            return generator.name().toString().equals(taclet.displayName());
+        }
+    };
 
     @Override
     public boolean isApplicableOnSubTerms() {

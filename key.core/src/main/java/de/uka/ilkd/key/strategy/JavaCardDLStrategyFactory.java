@@ -33,6 +33,14 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "larger, but more transparent proof trees, since each<br>"
             + "simplification step is realized in one single rule<br>"
             + "application, with all instantiations clearly visible." + "</html>";
+    public static final String TOOL_TIP_OSS_TRANSPARENT =
+        "<html>" + "One Step Simplification via generated lemma taclets:<br>"
+            + "each aggregated simplification of a formula without modal<br>"
+            + "operators is captured as a taclet that is introduced and<br>"
+            + "then applied, so the performed transformation is inspectable<br>"
+            + "and can be certified by a separate soundness proof.<br>"
+            + "Formulas containing modal operators are still simplified<br>"
+            + "by the ordinary OSS rule." + "</html>";
     public static final String TOOL_TIP_PROOF_SPLITTING_FREE =
         "<html>" + "Split formulas (if-then-else expressions,<br>"
             + "disjunctions in the antecedent, conjunctions in<br>"
@@ -147,7 +155,9 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             new StrategyPropertyValueDefinition(StrategyProperties.OSS_ON, "Enabled",
                 TOOL_TIP_OSS_ON),
             new StrategyPropertyValueDefinition(StrategyProperties.OSS_OFF, "Disabled",
-                TOOL_TIP_OSS_OFF));
+                TOOL_TIP_OSS_OFF),
+            new StrategyPropertyValueDefinition(StrategyProperties.OSS_TRANSPARENT, "Transparent",
+                TOOL_TIP_OSS_TRANSPARENT));
     }
 
     private static OneOfStrategyPropertyDefinition getProofSplitting() {

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
@@ -89,6 +90,9 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     private Feature oneStepSimplificationFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
+        // in transparent mode, the lemma introduction rule takes the simplifier's place on
+        // lemma-eligible formulas and is costed identically
+        filter.addRuleToSet(OssLemmaIntroductionRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -622,6 +626,15 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     @Override
     public boolean isResponsibleFor(BuiltInRule rule) {
-        return rule instanceof OneStepSimplifier;
+        if (rule instanceof OneStepSimplifier) {
+            return true;
+        }
+        // in transparent mode, aggregated simplifications of lemma-eligible formulas are
+        // performed via generated lemma taclets: the strategy applies the introduction rule
+        // (the simplifier itself yields those formulas, see OneStepSimplifier#isApplicable),
+        // and the introduced taclet is then applied through its "concrete" rule set
+        return rule instanceof OssLemmaIntroductionRule
+                && StrategyProperties.OSS_TRANSPARENT.equals(
+                    strategyProperties.getProperty(StrategyProperties.OSS_OPTIONS_KEY));
     }
 }

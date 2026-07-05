@@ -79,7 +79,7 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
             return false;
         }
         final OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
-        return simplifier != null && simplifier.isApplicable(goal, pio)
+        return simplifier != null && simplifier.canSimplify(goal, pio)
                 && !containsModality(pio.sequentFormula().formula());
     }
 
@@ -129,9 +129,10 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
 
     /**
      * returns true iff the term contains a modal operator anywhere; such formulas fall outside
-     * the fragment supported by the taclet soundness proof obligation machinery
+     * the fragment supported by the taclet soundness proof obligation machinery and are
+     * therefore not lemma-eligible
      */
-    static boolean containsModality(Term term) {
+    public static boolean containsModality(Term term) {
         if (term.op() instanceof Modality) {
             return true;
         }

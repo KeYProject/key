@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.lemma.OssLemmaGenerator;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -88,6 +89,14 @@ public final class OneStepSimplifier implements BuiltInRule {
     private TacletIndex[] indices;
     private Map<JTerm, JTerm>[] notSimplifiableCaches;
     private boolean active;
+    /**
+     * In transparent mode (strategy option {@link StrategyProperties#OSS_TRANSPARENT}), the
+     * simplifier machinery stays active but lemma-eligible formulas are not simplified by this
+     * rule; they are handled by
+     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule} instead, so that the
+     * aggregated simplification becomes an inspectable, separately provable taclet.
+     */
+    private boolean transparent;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -538,12 +547,17 @@ public final class OneStepSimplifier implements BuiltInRule {
             settings = ProofSettings.DEFAULT_SETTINGS;
         }
 
-        final boolean newActive = settings.getStrategySettings().getActiveStrategyProperties()
-                .get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+        final Object ossMode = settings.getStrategySettings().getActiveStrategyProperties()
+                .get(StrategyProperties.OSS_OPTIONS_KEY);
+        final boolean newActive = StrategyProperties.OSS_ON.equals(ossMode)
+                || StrategyProperties.OSS_TRANSPARENT.equals(ossMode);
+        final boolean newTransparent = StrategyProperties.OSS_TRANSPARENT.equals(ossMode);
 
-        if (active != newActive || lastProof != proof || // The setting or proof has changed.
-                (isShutdown() && !proof.closed())) { // A closed proof was pruned.
+        if (active != newActive || transparent != newTransparent || lastProof != proof
+        // The setting or proof has changed.
+                || (isShutdown() && !proof.closed())) { // A closed proof was pruned.
             active = newActive;
+            transparent = newTransparent;
             if (active && proof != null && !proof.closed()) {
                 initIndices(proof);
             } else {
@@ -571,8 +585,13 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    /**
+     * Tells whether the simplifier machinery could simplify the formula at the given position,
+     * regardless of the transparent mode partition (see {@link #isApplicable(Goal,
+     * PosInOccurrence)}). This is the applicability notion used by
+     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaGenerator}.
+     */
+    public boolean canSimplify(Goal goal, PosInOccurrence pio) {
         // abort if switched off
         if (!active) {
             return false;
@@ -592,6 +611,17 @@ public final class OneStepSimplifier implements BuiltInRule {
         return applicableTo(goal.proof().getServices(), pio.sequentFormula(),
             pio.isInAntec(), goal,
             null);
+    }
+
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        if (!canSimplify(goal, pio)) {
+            return false;
+        }
+        // in transparent mode, lemma-eligible formulas are handled by the lemma introduction
+        // rule; this rule keeps handling only the formulas outside the lemma fragment
+        return !transparent
+                || OssLemmaGenerator.containsModality(pio.sequentFormula().formula());
     }
 
     @Override

@@ -140,6 +140,17 @@ public final class Main implements Callable<Integer> {
         description = "save all selected contracts for automatic execution")
     private boolean isSaveAllContracts = false;
 
+    /**
+     * If set, batch mode additionally saves each proof in its transparent form: eligible One
+     * Step Simplifier applications are elaborated into generated, separately provable lemma
+     * taclets (introduction plus taclet application).
+     */
+    @Option(names = "--save-transparent",
+        description = "in batch mode, additionally save each proof in its transparent form "
+            + "(<file>.transparent.proof): One Step Simplifier applications on formulas without "
+            + "modal operators are elaborated into generated, separately provable lemma taclets")
+    private boolean isSaveTransparent = false;
+
     @Option(names = "--timeout", paramLabel = "INT",
         description = "timeout for each automatic proof of a problem in ms (default: "
             + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
@@ -350,6 +361,7 @@ public final class Main implements Callable<Integer> {
         } else {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(isSaveAllContracts);
+            ConsoleUserInterfaceControl.setSaveTransparentProofs(isSaveTransparent);
             for (Path f : inputFiles) {
                 ui.loadProblem(f);
             }
