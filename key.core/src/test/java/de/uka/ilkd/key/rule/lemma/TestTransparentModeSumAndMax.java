@@ -74,11 +74,8 @@ public class TestTransparentModeSumAndMax {
                 }
                 if (app.rule() == OssLemmaIntroductionRule.INSTANCE) {
                     intro++;
-                } else if (app instanceof OneStepSimplifierRuleApp ossApp) {
-                    assertTrue(
-                        OssLemmaGenerator.containsModality(
-                            ossApp.posInOccurrence().sequentFormula().formula()),
-                        "opaque simplifier application on a lemma-eligible formula");
+                } else if (app instanceof OneStepSimplifierRuleApp) {
+                    fail("no opaque simplifier application may occur in transparent mode");
                 } else if (app.rule().name().toString().startsWith("ossLemma_")) {
                     lemmaApps++;
                     final RewriteTaclet taclet = (RewriteTaclet) app.rule();

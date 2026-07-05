@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.lemma.OssLemmaGenerator;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -90,11 +89,14 @@ public final class OneStepSimplifier implements BuiltInRule {
     private Map<JTerm, JTerm>[] notSimplifiableCaches;
     private boolean active;
     /**
-     * In transparent mode (strategy option {@link StrategyProperties#OSS_TRANSPARENT}), the
-     * simplifier machinery stays active but lemma-eligible formulas are not simplified by this
-     * rule; they are handled by
-     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule} instead, so that the
-     * aggregated simplification becomes an inspectable, separately provable taclet.
+     * In transparent mode (strategy option {@link StrategyProperties#OSS_TRANSPARENT}), this
+     * rule itself is never applicable and no taclets are taken over from the goals' rule
+     * indices: lemma-eligible formulas are simplified via
+     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule} (an inspectable, separately
+     * provable taclet per aggregated simplification), and all other formulas are simplified by
+     * the ordinary strategy with the individual rules. The simplifier machinery stays active
+     * solely as the computation core of the lemma generator (see
+     * {@link #computeSimplification(Goal, PosInOccurrence, Protocol)}).
      */
     private boolean transparent;
 
@@ -158,7 +160,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
 
             if (accept) {
-                appsTakenOver = appsTakenOver.prepend(app);
+                if (!transparent) {
+                    appsTakenOver = appsTakenOver.prepend(app);
+                }
                 result = result.prepend(tac);
             }
         }
@@ -173,7 +177,10 @@ public final class OneStepSimplifier implements BuiltInRule {
         assert Immutables.isDuplicateFree(result)
                 : "If this fails unexpectedly, add a call to Immutables.removeDuplicates.";
 
-        // remove apps in appsTakenOver from taclet indices of all goals
+        // Remove apps in appsTakenOver from taclet indices of all goals. In transparent mode
+        // nothing is taken over: the captured rule sets remain available to the ordinary
+        // strategy (formulas outside the lemma fragment are simplified by individual, visible
+        // rule applications), and the indices built here serve only the lemma generator.
         for (NoPosTacletApp app : appsTakenOver) {
             for (Goal goal : proof.allGoals()) {
                 goal.ruleAppIndex().removeNoPosTacletApp(app);
@@ -556,12 +563,15 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (active != newActive || transparent != newTransparent || lastProof != proof
         // The setting or proof has changed.
                 || (isShutdown() && !proof.closed())) { // A closed proof was pruned.
+            // restore any taken-over taclets before re-initializing: switching between the
+            // opaque and the transparent mode changes whether the captured rule sets are
+            // removed from the goals' rule indices, and initIndices alone would not rebuild
+            // for an unchanged proof
+            shutdownIndices();
             active = newActive;
             transparent = newTransparent;
             if (active && proof != null && !proof.closed()) {
                 initIndices(proof);
-            } else {
-                shutdownIndices();
             }
         }
     }
@@ -615,13 +625,15 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (!canSimplify(goal, pio)) {
+        // In transparent mode this rule performs no simplification at all: lemma-eligible
+        // formulas are handled by the lemma introduction rule, and all other formulas are
+        // simplified by the ordinary strategy with the individual rules (which stay in the
+        // goals' rule indices, see tacletsForRuleSet). The simplifier machinery remains active
+        // solely as the computation core of the lemma generator.
+        if (transparent) {
             return false;
         }
-        // in transparent mode, lemma-eligible formulas are handled by the lemma introduction
-        // rule; this rule keeps handling only the formulas outside the lemma fragment
-        return !transparent
-                || OssLemmaGenerator.containsModality(pio.sequentFormula().formula());
+        return canSimplify(goal, pio);
     }
 
     @Override

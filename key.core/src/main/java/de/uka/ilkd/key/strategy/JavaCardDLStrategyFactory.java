@@ -39,8 +39,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "operators is captured as a taclet that is introduced and<br>"
             + "then applied, so the performed transformation is inspectable<br>"
             + "and can be certified by a separate soundness proof.<br>"
-            + "Formulas containing modal operators are still simplified<br>"
-            + "by the ordinary OSS rule." + "</html>";
+            + "Formulas containing modal operators are simplified by the<br>"
+            + "ordinary calculus rules in individual, visible steps; the<br>"
+            + "opaque OSS rule is never applied. Proofs are fully<br>"
+            + "transparent but larger and search is slower." + "</html>";
     public static final String TOOL_TIP_PROOF_SPLITTING_FREE =
         "<html>" + "Split formulas (if-then-else expressions,<br>"
             + "disjunctions in the antecedent, conjunctions in<br>"

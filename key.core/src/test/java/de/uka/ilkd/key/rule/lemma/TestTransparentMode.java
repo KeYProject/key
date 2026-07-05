@@ -86,20 +86,18 @@ public class TestTransparentMode {
             final Counts counts = count(proof);
             assertTrue(counts.intro() > 0,
                 "transparent mode should introduce lemma taclets during search");
-            assertEquals(counts.intro(), counts.lemmaApps(),
-                "each introduced lemma is applied exactly once per introduction");
-            // the opaque rule keeps handling only formulas with modal operators
-            final var nodes = proof.root().subtreeIterator();
-            while (nodes.hasNext()) {
-                final Node node = nodes.next();
-                if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
-                    assertTrue(
-                        OssLemmaGenerator.containsModality(
-                            app.posInOccurrence().sequentFormula().formula()),
-                        "opaque simplifier application on a lemma-eligible formula in "
-                            + "transparent mode");
-                }
-            }
+            // most introductions lead to an application; a few lemmas may be obsoleted by an
+            // individual rule step rewriting the formula between introduction and application
+            // (the individual rules compete with the lemma path since they remain available)
+            assertTrue(counts.lemmaApps() > 0);
+            assertTrue(counts.lemmaApps() <= counts.intro());
+            assertTrue(counts.intro() - counts.lemmaApps() <= counts.intro() / 2,
+                "too many introduced lemmas were never applied (intro=" + counts.intro()
+                    + ", applied=" + counts.lemmaApps() + ")");
+            // the opaque rule is never applied in transparent mode: formulas outside the lemma
+            // fragment are simplified by the ordinary strategy in individual, visible steps
+            assertEquals(0, counts.oss(),
+                "no opaque simplifier application may occur in transparent mode");
 
             // the transparent proof saves and replays
             final Path proofFile = Files.createTempFile("transparentMode", ".proof");
