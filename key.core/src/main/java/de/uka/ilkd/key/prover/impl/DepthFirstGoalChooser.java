@@ -73,10 +73,21 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
         nextGoals = ImmutableList.nil();
 
-        // Only consider automatic goals
-        newGoals = newGoals.filter(Goal::isAutomatic);
+        // Locate the split point in selectedList using *all* new goals (see below), but only put
+        // the automatic ones back to work on.
+        final ImmutableList<Goal> automaticNewGoals = newGoals.filter(Goal::isAutomatic);
 
-        // Remove "node" and goals contained within "newGoals"
+        // Remove "node" and the goals contained within "newGoals".
+        //
+        // The split point is the goal the rule was applied to. A splitting rule reuses that goal
+        // object for one of its branches (advancing its node), so it may no longer match by node
+        // ("node == goal.node()") and has to be found by identity among the new goals instead. That
+        // membership test must run against *all* new goals, not only the automatic ones: if the
+        // reused goal was disabled (e.g. proof caching disabled the branch it can close by
+        // reference), filtering it out first hides the split point, so newGoalsInserted stays false
+        // and the *other*, still enabled, new goals are silently dropped from the work list --
+        // which
+        // stops automatic proof search while work remains.
         while (!selectedList.isEmpty()) {
             final @NonNull Goal goal = selectedList.head();
             selectedList = selectedList.tail();
@@ -86,7 +97,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
                 nextGoals = selectedList;
 
                 if (!newGoalsInserted) {
-                    prevGoalList = insertNewGoals(newGoals, prevGoalList);
+                    prevGoalList = insertNewGoals(automaticNewGoals, prevGoalList);
                     newGoalsInserted = true;
                 }
             } else {
