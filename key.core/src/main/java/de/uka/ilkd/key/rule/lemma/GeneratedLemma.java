@@ -5,17 +5,22 @@ package de.uka.ilkd.key.rule.lemma;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -63,6 +68,39 @@ public final class GeneratedLemma {
      */
     public RewriteTaclet taclet() {
         return taclet;
+    }
+
+    /**
+     * returns the name of the generator that produced this lemma
+     */
+    public Name generatorName() {
+        return justification.getGenerator();
+    }
+
+    /**
+     * A key identifying this lemma by its content, independent of the introduction point:
+     * printed find, assumptions (by polarity), and replacewith. Lemmas with the same content key
+     * denote the same simplification and are grouped for display (there may be many, one per
+     * introduction point / branch). Note that content-equal lemmas are still distinct taclets
+     * with their own soundness obligations, since their proof-local symbols may differ.
+     */
+    public String contentKey() {
+        final Services services = mainProof.getServices();
+        final StringBuilder key = new StringBuilder();
+        key.append(OutputStreamProofSaver.printTerm((JTerm) taclet.find(), services));
+        final Sequent assumes = taclet.assumesSequent();
+        for (final var sf : assumes.antecedent()) {
+            key.append("\n<= ")
+                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+        }
+        for (final var sf : assumes.succedent()) {
+            key.append("\n=> ")
+                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+        }
+        final JTerm rw = (JTerm) ((RewriteTacletGoalTemplate) taclet.goalTemplates().head())
+                .replaceWith();
+        key.append("\n~> ").append(OutputStreamProofSaver.printTerm(rw, services));
+        return key.toString();
     }
 
     /**

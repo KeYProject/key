@@ -70,7 +70,7 @@ public final class ProofManagementDialog extends JDialog {
     private JList<ProofWrapper> proofList;
     private ContractSelectionPanel contractPanelByMethod;
     private ContractSelectionPanel contractPanelByProof;
-    private MissingLemmasPanel missingLemmasPanel;
+    private LemmaDependencyPanel lemmaDependencyPanel;
     private JButton startButton;
     private JButton cancelButton;
     private final KeYMediator mediator;
@@ -145,7 +145,7 @@ public final class ProofManagementDialog extends JDialog {
         });
         proofList.addListSelectionListener(e -> {
             updateContractPanel();
-            updateMissingLemmasPanel();
+            updateLemmaDependencyPanel();
         });
 
         // create method list panel, scroll pane
@@ -192,24 +192,26 @@ public final class ProofManagementDialog extends JDialog {
             }
         });
         contractPanelByProof.addListSelectionListener(e -> updateStartButton());
-        listPanelByProof.add(contractPanelByProof);
 
-        // create missing-lemmas panel (shows generated lemmas of the selected proof whose
-        // soundness has not yet been established, and lets the user load them as side proofs)
-        missingLemmasPanel = new MissingLemmasPanel(mediator);
-        missingLemmasPanel.setOnLoaded(() -> setVisible(false));
+        // the right-hand side of the "By Proof" tab shows, for the selected proof, both the
+        // contracts and the generated lemmas it depends on
+        lemmaDependencyPanel = new LemmaDependencyPanel(mediator);
+        lemmaDependencyPanel.setOnLoaded(() -> setVisible(false));
+        JTabbedPane byProofDetails = new JTabbedPane();
+        byProofDetails.addTab("Contracts", contractPanelByProof);
+        byProofDetails.addTab("Lemmas", lemmaDependencyPanel);
+        listPanelByProof.add(byProofDetails);
 
         // create tabbed pane
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
-        tabbedPane.addTab("Missing Lemmas", missingLemmasPanel);
         tabbedPane.addChangeListener(e -> {
             updateStartButton();
             if (proofList.getSelectedIndex() == -1 && proofList.getModel().getSize() > 0) {
                 proofList.setSelectedIndex(0);
             }
-            updateMissingLemmasPanel();
+            updateLemmaDependencyPanel();
         });
         getContentPane().add(tabbedPane);
 
@@ -261,7 +263,7 @@ public final class ProofManagementDialog extends JDialog {
         classTree = null;
         contractPanelByMethod = null;
         contractPanelByProof = null;
-        missingLemmasPanel = null;
+        lemmaDependencyPanel = null;
         startButton = null;
         cancelButton = null;
         // ============================================
@@ -573,8 +575,8 @@ public final class ProofManagementDialog extends JDialog {
         updateStartButton();
     }
 
-    private void updateMissingLemmasPanel() {
-        if (missingLemmasPanel == null) {
+    private void updateLemmaDependencyPanel() {
+        if (lemmaDependencyPanel == null) {
             return;
         }
         final ProofWrapper selected = proofList.getSelectedValue();
@@ -582,7 +584,7 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             proof = mediator.getSelectedProof();
         }
-        missingLemmasPanel.setProof(proof);
+        lemmaDependencyPanel.setProof(proof);
     }
 
     private void updateGlobalStatus() {

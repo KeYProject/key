@@ -157,6 +157,37 @@ public final class GeneratedLemmaRegistry {
     }
 
     /**
+     * groups the generated lemmas by their generator, preserving generation order within each
+     * group
+     *
+     * @return a map from generator name to the lemmas it produced
+     */
+    public synchronized Map<Name, List<GeneratedLemma>> getLemmasByGenerator() {
+        final Map<Name, List<GeneratedLemma>> byGenerator = new LinkedHashMap<>();
+        for (final GeneratedLemma lemma : lemmas.values()) {
+            byGenerator.computeIfAbsent(lemma.generatorName(), k -> new ArrayList<>()).add(lemma);
+        }
+        return byGenerator;
+    }
+
+    /**
+     * groups the given lemmas by their content key (see {@link GeneratedLemma#contentKey()}), so
+     * that lemmas denoting the same simplification (differing only in introduction point and
+     * proof-local symbol renaming) are collapsed. The order of first appearance is preserved.
+     *
+     * @param lemmas the lemmas to group
+     * @return a map from content key to the lemmas sharing it
+     */
+    public static Map<String, List<GeneratedLemma>> groupByContent(
+            Collection<GeneratedLemma> lemmas) {
+        final Map<String, List<GeneratedLemma>> byContent = new LinkedHashMap<>();
+        for (final GeneratedLemma lemma : lemmas) {
+            byContent.computeIfAbsent(lemma.contentKey(), k -> new ArrayList<>()).add(lemma);
+        }
+        return byContent;
+    }
+
+    /**
      * returns the registry of the given proof if one exists, without creating it; used by clients
      * that only inspect (e.g. the user interface) and must not attach a registry to proofs that
      * never generated a lemma
