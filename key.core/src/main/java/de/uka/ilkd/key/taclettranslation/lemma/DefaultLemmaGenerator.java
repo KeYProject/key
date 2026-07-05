@@ -270,6 +270,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 qvars.add(
                     (QuantifiableVariable) getInstantation(taclet, (VariableSV) qvar, services)
                             .op());
+            } else {
+                // A concrete (non-schematic) bound variable, as occurs in taclets generated from
+                // concrete proof formulas: keep it. Without this, a quantified subterm would be
+                // rebuilt with an empty bound-variable list and fail the arity check.
+                qvars.add(qvar);
             }
         }
 

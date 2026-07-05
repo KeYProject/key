@@ -55,12 +55,14 @@ public class TestLemmaSoundnessNonCircular {
             for (final GeneratedLemma lemma : registry.getMissingLemmas()) {
                 final Proof po = lemma.getOrCreateSoundnessProof();
 
-                // the soundness proof runs the opaque simplifier, not the transparent one
-                assertEquals(StrategyProperties.OSS_ON,
+                // the soundness proof runs in the base calculus with the one step simplifier
+                // switched off entirely (not even its opaque mode, which would close the
+                // obligation by the very aggregated simplification under scrutiny)
+                assertEquals(StrategyProperties.OSS_OFF,
                     po.getSettings().getStrategySettings().getActiveStrategyProperties()
                             .getProperty(StrategyProperties.OSS_OPTIONS_KEY),
                     "the soundness proof of " + lemma.taclet().name()
-                        + " must run in the base calculus (opaque OSS)");
+                        + " must run with the one step simplifier disabled");
 
                 new AutomaticProver().start(po, 10000, 60000);
                 assertTrue(po.closed(),

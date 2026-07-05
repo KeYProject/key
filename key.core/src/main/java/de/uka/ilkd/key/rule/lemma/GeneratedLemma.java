@@ -154,12 +154,14 @@ public final class GeneratedLemma {
      */
     private ProofAggregate createSoundnessProof() {
         final InitConfig poConfig = mainProof.getInitConfig().deepCopy();
-        // The soundness of a generated lemma must be established in the base calculus. If the
-        // main proof runs the one step simplifier in transparent mode, the copied configuration
-        // would too, and the lemma's proof obligation would be discharged by generating and
-        // applying further lemmas — re-doing the very simplification it is meant to justify
-        // (a circular, non-terminating justification). Force the opaque simplifier here.
-        forceOpaqueOneStepSimplification(poConfig);
+        // The soundness of a generated lemma must be established in the base calculus, using the
+        // individual rewrite rules the lemma aggregates. The one step simplifier is switched off
+        // entirely for the obligation: not only its transparent mode (which would discharge the
+        // obligation by generating and applying further lemmas — re-doing the very simplification
+        // it must justify, a circular and non-terminating justification), but also its opaque
+        // mode, which performs the same aggregated simplification in one hidden step and would
+        // therefore close the obligation by exactly the transformation under scrutiny.
+        disableOneStepSimplification(poConfig);
         final ImmutableSet<Taclet> tacletsToProve = DefaultImmutableSet.<Taclet>nil().add(taclet);
 
         final ProofAggregate po = new ProofObligationCreator().create(tacletsToProve,
@@ -173,20 +175,17 @@ public final class GeneratedLemma {
     }
 
     /**
-     * Switches the one step simplifier of the given configuration to its opaque mode, so that a
-     * proof run in it does not itself generate lemmas (see {@link #createSoundnessProof()}).
+     * Switches the one step simplifier off in the given configuration, so that the soundness
+     * proof is conducted in the base calculus (see {@link #createSoundnessProof()}).
      */
-    private static void forceOpaqueOneStepSimplification(InitConfig config) {
+    private static void disableOneStepSimplification(InitConfig config) {
         final ProofSettings settings = config.getSettings();
         if (settings == null) {
             return;
         }
         final StrategyProperties sp =
             settings.getStrategySettings().getActiveStrategyProperties();
-        if (StrategyProperties.OSS_TRANSPARENT
-                .equals(sp.getProperty(StrategyProperties.OSS_OPTIONS_KEY))) {
-            sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
-            settings.getStrategySettings().setActiveStrategyProperties(sp);
-        }
+        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
+        settings.getStrategySettings().setActiveStrategyProperties(sp);
     }
 }

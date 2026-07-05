@@ -64,6 +64,51 @@ public class TestLemmaProverAndGrouping {
     }
 
     @Test
+    public void testQuantifierLemmaObligationsGenerateAndClose() throws Exception {
+        // Regression for the DefaultLemmaGenerator bug: taclets whose find/replacewith contain
+        // concrete (non-schematic) quantifiers were rebuilt with an empty bound-variable list and
+        // failed the term arity check during proof-obligation generation. SumAndMax generates
+        // such lemmas. Their obligations must now both generate and close in the base calculus.
+        final Path file = TEST_CASE_DIRECTORY.resolve(
+            "../../../../../key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key");
+
+        try (KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file)) {
+            final Proof proof = transparentClosedSumAndMax(env);
+            final GeneratedLemmaRegistry registry = GeneratedLemmaRegistry.get(proof);
+
+            int quantifierLemmas = 0;
+            for (final GeneratedLemma lemma : registry.getLemmas()) {
+                if (!containsQuantifier((de.uka.ilkd.key.logic.JTerm) lemma.taclet().find())) {
+                    continue;
+                }
+                quantifierLemmas++;
+                // generation must not throw (the bug), and the obligation must close
+                final Proof po = lemma.getOrCreateSoundnessProof();
+                new AutomaticProver().start(po, 12000, 120000);
+                assertTrue(po.closed(),
+                    "quantifier lemma obligation did not close: " + lemma.taclet().name());
+                if (quantifierLemmas >= 3) {
+                    break; // a few are enough for a regression guard
+                }
+            }
+            assertTrue(quantifierLemmas > 0,
+                "SumAndMax should generate lemmas containing quantifiers");
+        }
+    }
+
+    private static boolean containsQuantifier(de.uka.ilkd.key.logic.JTerm t) {
+        if (t.op() instanceof de.uka.ilkd.key.logic.op.Quantifier) {
+            return true;
+        }
+        for (int i = 0; i < t.arity(); i++) {
+            if (containsQuantifier(t.sub(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Test
     public void testContentGroupingCollapsesDuplicates() throws Exception {
         // SumAndMax generates many introduction-point-distinct lemmas that denote the same
         // simplifications: content grouping must collapse them.
