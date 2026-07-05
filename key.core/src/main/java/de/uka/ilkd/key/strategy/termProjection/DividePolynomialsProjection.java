@@ -10,8 +10,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 import org.key_project.logic.Term;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 @StableCost
 public abstract class DividePolynomialsProjection extends AbstractDividePolynomialsProjection {

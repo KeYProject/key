@@ -9,6 +9,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.CostClassifiable;
 import org.key_project.prover.strategy.costbased.MutableState;
 
 import org.jspecify.annotations.NonNull;
@@ -17,7 +18,8 @@ import org.jspecify.annotations.NonNull;
 /// Interface for objects that generate lists/sequences of terms or formulas. This interface is used
 /// in the feature <code>ForEachCP</code> in order to instantiate schema variables with different
 /// terms/formulas.
-public interface TermGenerator<@NonNull Goal extends ProofGoal<@NonNull Goal>> {
+public interface TermGenerator<@NonNull Goal extends ProofGoal<@NonNull Goal>>
+        extends CostClassifiable {
     Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState);
 }
