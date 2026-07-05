@@ -50,8 +50,10 @@ public enum BinaryOperatorKind {
 
     public boolean isBoolean() {
         return switch (this) {
-            case GREATER_OR_EQUALS, NOT_EQUALS, LOGICAL_OR, LOGICAL_AND, EQUALS, LESS_THAN, GREATER_THAN,
-                 SUBTYPE, LESS_OR_EQUALS -> true;
+            case GREATER_OR_EQUALS, NOT_EQUALS, LOGICAL_OR, LOGICAL_AND, EQUALS, LESS_THAN,
+                    GREATER_THAN,
+                    SUBTYPE, LESS_OR_EQUALS ->
+                true;
             default -> false;
         };
     }

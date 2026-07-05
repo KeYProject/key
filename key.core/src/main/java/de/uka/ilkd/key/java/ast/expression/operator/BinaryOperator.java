@@ -66,7 +66,7 @@ public final class BinaryOperator extends Operator {
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
-        if(kind.isBoolean()){
+        if (kind.isBoolean()) {
             return javaServ.getTypeConverter().getBooleanType();
         }
 
