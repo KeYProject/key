@@ -31,7 +31,7 @@ dependencies {
     testFixturesApi(testFixtures(project(":key.util")))
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
 }
 
@@ -99,7 +99,7 @@ classes.dependsOn << generateSMTListings
 classes.dependsOn << generateSolverPropsList
 
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     enableAssertions = true
     // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
     // Other test cases also need "key." prefixed properties
@@ -179,7 +179,7 @@ tasks.register('generateVersionFiles') {
 static def gitRevParse(String args) {
     try {
         return "git rev-parse $args".execute().text.trim()
-    } catch (Exception e) {
+    } catch (Exception ignored) {
         return ""
     }
 }
