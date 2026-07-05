@@ -32,9 +32,13 @@ import org.jspecify.annotations.NullMarked;
  * proof obligation machinery (see
  * {@link de.uka.ilkd.key.taclettranslation.lemma.DefaultLemmaGenerator}): no variable conditions,
  * no metaconstructs, no modalities.</li>
- * <li><b>Determinism:</b> the taclet (in particular its name) must be derived solely from the
- * content of the term at the given position, so that replaying the introducing rule application
- * regenerates an identical taclet.</li>
+ * <li><b>Determinism:</b> replaying the introducing rule application (same node, same sequent)
+ * must regenerate an identical taclet, in particular the identical name. Purely content-derived
+ * names are only sound if the content cannot contain proof-local symbols: formulas on different
+ * branches can be equal in their printed form yet contain distinct program variable or skolem
+ * constant instances sharing the same name. Generators for such content must additionally
+ * qualify the name with a replay-stable introduction-point id (see
+ * {@link de.uka.ilkd.key.proof.Node#getUniqueTacletId()}).</li>
  * </ul>
  */
 @NullMarked

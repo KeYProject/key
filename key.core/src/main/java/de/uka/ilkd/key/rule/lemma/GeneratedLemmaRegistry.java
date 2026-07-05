@@ -15,7 +15,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -34,9 +37,35 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public final class GeneratedLemmaRegistry {
 
+    private static final int VETO_CACHE_SIZE = 1000;
+
     private final Map<Name, GeneratedLemma> lemmas = new LinkedHashMap<>();
 
+    /**
+     * Formulas for which lemma generation turned out not to be worthwhile (the aggregated
+     * transformation is a semantic no-op). Vetoed formulas are not offered for introduction
+     * again: without this, automation would not terminate. The veto is proof-local state — a
+     * JVM-wide cache would leak vetoes into the replay of a reloaded proof, where a formula
+     * vetoed late in the original run (in some branch context) would suppress the replay of an
+     * introduction recorded earlier (in another context).
+     */
+    private final Map<SequentFormula, Boolean> vetoed = new LRUCache<>(VETO_CACHE_SIZE);
+
     private GeneratedLemmaRegistry() {
+    }
+
+    /**
+     * marks the formula as not worth a lemma (see {@link #vetoed})
+     */
+    public synchronized void veto(SequentFormula formula) {
+        vetoed.put(formula, Boolean.TRUE);
+    }
+
+    /**
+     * returns true iff lemma generation has been vetoed for the given formula
+     */
+    public synchronized boolean isVetoed(SequentFormula formula) {
+        return vetoed.get(formula) != null;
     }
 
     /**
@@ -70,6 +99,16 @@ public final class GeneratedLemmaRegistry {
 
         final GeneratedLemma existing = lemmas.get(taclet.name());
         if (existing != null) {
+            // a name hit must mean identical content: formulas on different branches can be
+            // equal in their printed form yet contain distinct proof-local symbol instances,
+            // and handing out a taclet for the wrong instances would produce a rule that never
+            // matches. Generators avoid this by making names unique per introduction where
+            // necessary; this check turns any residual name aliasing into a visible abort.
+            if (!existing.taclet().find().equals(taclet.find())) {
+                throw new RuleAbortException("generated lemma name aliasing: " + taclet.name()
+                    + " already denotes a lemma with different content"
+                    + " (distinct proof-local symbols?)");
+            }
             // pruning removes the justification together with the goal-locally introduced
             // taclet; re-register the identical justification instance in that case
             if (proof.getInitConfig().getJustifInfo()

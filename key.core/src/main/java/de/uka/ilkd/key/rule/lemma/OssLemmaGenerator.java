@@ -22,12 +22,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * Lemma generator capturing an aggregated one-step-simplification as a taclet: for a top level
@@ -78,6 +81,11 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
         if (!pio.isTopLevel()) {
             return false;
         }
+        final GeneratedLemmaRegistry registry =
+            GeneratedLemmaRegistry.getIfPresent(goal.proof());
+        if (registry != null && registry.isVetoed(pio.sequentFormula())) {
+            return false;
+        }
         final OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
         return simplifier != null && simplifier.canSimplify(goal, pio)
                 && !containsModality(pio.sequentFormula().formula());
@@ -94,13 +102,23 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
         final OneStepSimplifier.SimplificationResult result =
             simplifier.computeSimplification(goal, pio, new OneStepSimplifier.Protocol());
         if (result == null) {
-            throw new IllegalStateException("one step simplification of "
+            GeneratedLemmaRegistry.get(goal.proof()).veto(pio.sequentFormula());
+            throw new RuleAbortException("one step simplification of "
                 + pio.sequentFormula().formula()
-                + " failed (is the one step simplifier active for this proof?)");
+                + " produced no result (is the one step simplifier active for this proof?)");
         }
 
         final JTerm find = (JTerm) pio.sequentFormula().formula();
         final JTerm simplified = (JTerm) result.simplified().formula();
+
+        if (RENAMING_TERM_PROPERTY.equalsModThisProperty(find, simplified)) {
+            // the aggregated simplification only shuffles term labels or bound variable names;
+            // a lemma \find(F) \replacewith(F') with F == F' modulo those is worthless and,
+            // under automation, a source of non-termination
+            GeneratedLemmaRegistry.get(goal.proof()).veto(pio.sequentFormula());
+            throw new RuleAbortException(
+                "one step simplification changes " + find + " only up to renaming/term labels");
+        }
 
         ImmutableList<SequentFormula> assumesAntec = ImmutableList.nil();
         ImmutableList<SequentFormula> assumesSucc = ImmutableList.nil();
@@ -113,8 +131,16 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
         }
 
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
+        // the content hash is a human-recognizable prefix only; uniqueness comes from the
+        // introduction node's tree-structural id. Formulas on sibling branches can be equal in
+        // their printed form yet contain distinct proof-local symbol instances (program
+        // variables, skolem constants) sharing the same name, so a purely content-derived name
+        // would alias semantically different lemmas across branches. The node id is
+        // replay-stable (path and introduced-rule count), so replaying the introduction
+        // regenerates the same name.
         tb.setName(MiscTools.toValidTacletName(
-            contentHashName(services, find, assumesAntec, assumesSucc, simplified)));
+            contentHashName(services, find, assumesAntec, assumesSucc, simplified) + "_"
+                + goal.node().getUniqueTacletId()));
         tb.setDisplayName(NAME.toString());
         tb.setFind(find);
         tb.addGoalTerm(simplified);
