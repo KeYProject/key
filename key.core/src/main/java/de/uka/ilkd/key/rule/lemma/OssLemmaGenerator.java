@@ -127,7 +127,11 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
         return tb.getTaclet();
     }
 
-    private static boolean containsModality(Term term) {
+    /**
+     * returns true iff the term contains a modal operator anywhere; such formulas fall outside
+     * the fragment supported by the taclet soundness proof obligation machinery
+     */
+    static boolean containsModality(Term term) {
         if (term.op() instanceof Modality) {
             return true;
         }
