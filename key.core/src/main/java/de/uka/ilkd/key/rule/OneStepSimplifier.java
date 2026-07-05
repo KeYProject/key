@@ -207,15 +207,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             ImmutableList<String> done = ImmutableList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
-                // Sort by name for a deterministic index: the taclets are collected in set
-                // iteration order, and when several rules match at the same position the
-                // simplifier applies the first one found. Without a canonical order, the
-                // aggregated simplification result may differ between proof instances of the
-                // same problem (e.g. between a proof and its replayed or elaborated copy).
-                final ArrayList<Taclet> sorted = new ArrayList<>();
-                taclets.forEach(sorted::add);
-                sorted.sort(Comparator.comparing(t -> t.name().toString()));
-                indices[i] = TacletIndexKit.getKit().createTacletIndex(sorted);
+                indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
                 notSimplifiableCaches[i] = new LRUCache<>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);
