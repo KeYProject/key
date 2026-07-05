@@ -12,10 +12,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
  * Projection for dividing one monomial by another.
  */
+@StableCost
 public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
 
     private final ProjectionToTerm<Goal> dividend, divisor;

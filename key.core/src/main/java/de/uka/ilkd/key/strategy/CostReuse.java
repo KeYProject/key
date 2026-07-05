@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.Nullable;
@@ -133,7 +134,7 @@ public final class CostReuse {
         vetoes.add(NonDuplicateAppFeature.INSTANCE); // top-level veto, applies to every taclet
         final boolean[] local = { true };
         final boolean[] weakStable = { false };
-        final Set<Feature> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         for (RuleSetDispatchFeature d : dispatchers) {
             var rs = taclet.getRuleSets();
             while (!rs.isEmpty()) {
@@ -151,14 +152,14 @@ public final class CostReuse {
      * Classify a feature; for a transparent composite, recurse into its child features and require
      * its child term-generators to be local too (see the class comment).
      */
-    private static void walk(Feature f, Set<Feature> vetoes, boolean[] local, boolean[] weakStable,
-            Set<Feature> seen) {
+    private static void walk(Object f, Set<Feature> vetoes, boolean[] local, boolean[] weakStable,
+            Set<Object> seen) {
         if (!local[0] || !seen.add(f)) {
             return;
         }
         final Kind k = kind(f);
         switch (k) {
-            case VETO -> vetoes.add(f);
+            case VETO -> vetoes.add((Feature) f); // only Features (NonDuplicateApp) ever VETO
             case VOLATILE -> local[0] = false;
             // LOCAL: a leaf is done; a composite stays local iff all its child FEATURES are
             // local and all its child TERM-GENERATORS are at least as local. WEAK_STABLE
@@ -171,8 +172,10 @@ public final class CostReuse {
                     weakStable[0] = true;
                 }
                 forEachChild(f, child -> {
-                    if (child instanceof Feature cf) {
-                        walk(cf, vetoes, local, weakStable, seen);
+                    if (child instanceof Feature || child instanceof ProjectionToTerm) {
+                        // a ProjectionToTerm gets the goal, so it can be volatile; classify it
+                        // (recursively, for composite projections) exactly like a child feature.
+                        walk(child, vetoes, local, weakStable, seen);
                     } else { // a TermGenerator (or similar non-Feature input)
                         final Class<?> gc = child.getClass();
                         if (gc.isAnnotationPresent(WeakStableCost.class)) {
@@ -202,7 +205,7 @@ public final class CostReuse {
      * is transparent" guess. {@link VolatileCost} forces non-local; everything unannotated is
      * non-local (the safe default).
      */
-    private static Kind kind(Feature f) {
+    private static Kind kind(Object f) {
         return kindCache.computeIfAbsent(f.getClass(), c -> {
             if (c.isAnnotationPresent(VolatileCost.class)) {
                 return Kind.VOLATILE; // explicit author override wins
@@ -221,7 +224,7 @@ public final class CostReuse {
      * Apply {@code action} to each {@link Feature} and {@link TermGenerator} held one structural
      * step inside {@code f}.
      */
-    private static void forEachChild(Feature f, java.util.function.Consumer<Object> action) {
+    private static void forEachChild(Object f, java.util.function.Consumer<Object> action) {
         for (Field fld : allFields(f.getClass())) {
             if (Modifier.isStatic(fld.getModifiers()) || fld.getType().isPrimitive()) {
                 continue;
@@ -238,7 +241,7 @@ public final class CostReuse {
         if (o == null) {
             return;
         }
-        if (o instanceof Feature || o instanceof TermGenerator) {
+        if (o instanceof Feature || o instanceof TermGenerator || o instanceof ProjectionToTerm) {
             action.accept(o);
             return;
         }
@@ -257,7 +260,8 @@ public final class CostReuse {
                 follow(e, action);
             }
         }
-        // other object types (TermBuffer, ProjectionToTerm, Name, ...) are NOT traversed
+        // other object types (TermFeature -- stable by interface, its compute() has no goal so it
+        // cannot read volatile state --, Name, RuleAppCost, ...) are NOT traversed
     }
 
     /**

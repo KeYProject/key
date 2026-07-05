@@ -12,7 +12,9 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+@StableCost
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
     private MonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
