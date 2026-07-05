@@ -12,7 +12,7 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.7.0"
+    id "com.diffplug.spotless" version "8.8.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.61"
