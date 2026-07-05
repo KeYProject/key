@@ -669,6 +669,51 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     /**
+     * Result of a one-step-simplification computation performed by
+     * {@link #computeSimplification(Goal, PosInOccurrence, Protocol)}.
+     *
+     * @param simplified the fully simplified sequent formula
+     * @param numAppliedRules the number of rule applications aggregated in the result
+     * @param usedContextFormulas the positions of the context formulas used by replace-known
+     *        steps (the assumptions the result depends on; empty if the simplification is a pure
+     *        equivalence transformation)
+     */
+    public record SimplificationResult(SequentFormula simplified, int numAppliedRules,
+            ImmutableList<PosInOccurrence> usedContextFormulas) {
+    }
+
+    /**
+     * Computes the overall simplification result for the formula at the given position exactly as
+     * an application of this rule would, but without modifying the goal or the proof. This is the
+     * side-effect-free core of the one step simplifier, usable by clients that want to capture
+     * the aggregated transformation in a different form (e.g., as a generated lemma taclet).
+     *
+     * <p>
+     * Requires the simplifier to be active for the goal's proof (see {@link #refreshOSS(Proof)}).
+     *
+     * @param goal the goal whose sequent provides the context formulas for replace-known
+     * @param pos the position of the (top level) formula to simplify
+     * @param protocol if non-null, the performed rule applications are reported to this protocol
+     * @return the simplification result, or {@code null} if the simplifier is not active for this
+     *         proof or the formula cannot be simplified
+     */
+    public synchronized SimplificationResult computeSimplification(Goal goal,
+            PosInOccurrence pos, Protocol protocol) {
+        if (!active || indices == null || goal.proof() != lastProof) {
+            return null;
+        }
+        // a rule app is required for term label instantiation during replace-known
+        final OneStepSimplifierRuleApp ruleApp = createApp(pos, goal.proof().getServices());
+        final Instantiation inst =
+            computeInstantiation(pos, goal.sequent(), protocol, goal, ruleApp);
+        if (inst.getCf() == null || inst.getCf().equals(pos.sequentFormula())) {
+            return null;
+        }
+        return new SimplificationResult(inst.getCf(), inst.getNumAppliedRules(),
+            inst.getIfInsts());
+    }
+
+    /**
      * Gets an immutable set containing all the taclets captured by the OSS.
      *
      * @return the captured taclets (as NoPosTacletApps)
