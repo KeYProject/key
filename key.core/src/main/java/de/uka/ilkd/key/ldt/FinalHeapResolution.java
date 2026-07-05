@@ -48,8 +48,17 @@ public class FinalHeapResolution {
      * @return true if final fields are treated as immutable
      */
     public static boolean isFinalEnabled(ProofSettings settings) {
+        // When the finalFields choice is absent from the settings (e.g. a freshly
+        // created environment, or settings that predate this option), the taclet base
+        // still activates the *declaration default* of the category. That default is
+        // the first option listed in optionsDeclarations.key, which is "immutable"
+        // (see ChoiceFinder#visitChoice, which uses choices.getFirst()). Falling back
+        // to onHeap here would contradict the rules actually applied during symbolic
+        // execution and produce an inconsistent mix of final(o, f) and
+        // select(heap, o, f) for the very same field. The fallback must therefore
+        // match the declaration default.
         return settings.getChoiceSettings().getDefaultChoices()
-                .getOrDefault(SETTING, "")
+                .getOrDefault(SETTING, IMMUTABLE_OPTION)
                 .equals(IMMUTABLE_OPTION);
     }
 
