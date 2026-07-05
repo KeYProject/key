@@ -55,7 +55,15 @@ public class RuleJustificationInfo {
 
     public RuleJustificationInfo copy() {
         RuleJustificationInfo info = new RuleJustificationInfo();
-        info.rule2Justification.putAll(rule2Justification);
+        for (Map.Entry<RuleKey, RuleJustification> entry : rule2Justification.entrySet()) {
+            // proof-local justifications (dynamically introduced rules such as addrule taclets
+            // or generated lemmas) refer to nodes of the proof they were created in; carrying
+            // them into a copied configuration would leave stale entries there that collide
+            // with the rule (re-)introductions of the new proof
+            if (!entry.getValue().isProofLocal()) {
+                info.rule2Justification.put(entry.getKey(), entry.getValue());
+            }
+        }
         return info;
     }
 }

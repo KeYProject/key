@@ -119,6 +119,16 @@ public final class GeneratedLemmaRegistry {
         }
 
         final GeneratedLemma lemma = new GeneratedLemma(taclet, proof, generator.name());
+        // The registry owns the generated-lemma namespace of its proof. A justification entry
+        // for this name that the registry does not know stems from a copied initial
+        // configuration (InitConfig.deepCopy copies the justification map): e.g. when a proof
+        // run in transparent mode is elaborated onto a fresh proof for transparent saving, the
+        // fresh configuration inherits the original run's lemma justifications, and the
+        // elaboration deliberately regenerates the same (replay-stable) names. Such foreign
+        // entries are replaced by this proof's own.
+        if (proof.getInitConfig().getJustifInfo().getJustification(taclet) != null) {
+            proof.getInitConfig().getJustifInfo().removeJustificationFor(taclet);
+        }
         proof.getInitConfig().registerRule(taclet, lemma.justification());
         lemmas.put(taclet.name(), lemma);
         return lemma;

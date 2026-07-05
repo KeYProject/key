@@ -150,7 +150,18 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
             tb.setApplicationRestriction(
                 new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         }
-        return tb.getTaclet();
+        try {
+            return tb.getTaclet();
+        } catch (RuleAbortException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            // taclet construction can be rejected for reasons rooted in taclet wellformedness
+            // checks; a failure must never abort automated proof search, so the formula is
+            // vetoed (no further introduction attempts) and the application aborted cleanly
+            GeneratedLemmaRegistry.get(goal.proof()).veto(pio.sequentFormula());
+            throw new RuleAbortException(
+                "generating a lemma taclet for " + find + " failed: " + e.getMessage());
+        }
     }
 
     /**

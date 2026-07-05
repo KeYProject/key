@@ -7,6 +7,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -53,6 +54,15 @@ public final class TransparentProofSaver {
         final Proof target = new Proof(proof.name().toString(), proof.root().sequent(),
             proof.header(), config.createTacletIndex(), config.createBuiltInRuleIndex(), config);
         try {
+            // proofs for generated proof obligations (e.g. contract POs) reference symbols that
+            // are not part of the problem header but are re-created from the proof obligation on
+            // loading; associate the elaborated proof with the same obligation so that saving
+            // emits the \proofObligation section and the saved file loads
+            final ProofOblInput po =
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            if (po != null) {
+                target.getServices().getSpecificationRepository().registerProof(po, target);
+            }
             // the lemma generator needs an active simplifier on the target proof
             final StrategyProperties sp =
                 target.getSettings().getStrategySettings().getActiveStrategyProperties();

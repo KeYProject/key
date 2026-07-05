@@ -21,6 +21,12 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
     @Override
     public boolean isAxiomJustification() { return isAxiom; }
 
+    @Override
+    public boolean isProofLocal() {
+        // refers to the node of its proof at which the rule was introduced
+        return true;
+    }
+
     public RuleApp motherTaclet() { return node.getAppliedRuleApp(); }
 
     public String toString() {

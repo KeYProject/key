@@ -32,6 +32,13 @@ public final class GeneratedLemmaJustification implements RuleJustification {
         return false;
     }
 
+    @Override
+    public boolean isProofLocal() {
+        // tied to the introducing proof: the lemma and its soundness proof live there, and the
+        // justification is (re-)registered whenever the lemma is introduced
+        return true;
+    }
+
     /**
      * returns the name of the generator that created the justified taclet
      */
