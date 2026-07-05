@@ -12,31 +12,26 @@ dependencies {
     api project(':key.ncore.calculus')
     api project(':key.ncore.compiler')
 
-    antlr4 "org.antlr:antlr4:4.13.2"
-    api "org.antlr:antlr4-runtime:4.13.2"
+    antlr4(libs.antlr4)
+    api(libs.antlr4.runtime)
 
     api project(':key.util')
 
-    // Make Javadoc accessible at runtime
-    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
-    implementation 'com.github.therapi:therapi-runtime-javadoc:0.13.0'
+    api(libs.javaparser.core)
+    api(libs.javaparser.core.serialization)
+    api(libs.javaparser.symbol.solver.core)
 
-    def JP_VERSION = "3.28.0-K13.5"
-    api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
-    api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
-    api "org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION"
-
-    testImplementation("com.google.truth:truth:1.4.5")
+    testImplementation(libs.truth)
     testImplementation(project(":key.core"))
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4'
+    testImplementation(libs.jackson.dataformat.yaml)
 
     // test fixtures
     testFixturesApi(testFixtures(project(":key.util")))
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
 }
 
@@ -104,7 +99,7 @@ classes.dependsOn << generateSMTListings
 classes.dependsOn << generateSolverPropsList
 
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     enableAssertions = true
     // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
     // Other test cases also need "key." prefixed properties
@@ -184,7 +179,7 @@ tasks.register('generateVersionFiles') {
 static def gitRevParse(String args) {
     try {
         return "git rev-parse $args".execute().text.trim()
-    } catch (Exception e) {
+    } catch (Exception ignored) {
         return ""
     }
 }

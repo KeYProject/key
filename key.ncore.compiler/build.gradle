@@ -6,7 +6,7 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
-    implementation('org.jspecify:jspecify:1.0.0')
+    implementation(libs.jspecify)
 }
 
 checkerFramework {
