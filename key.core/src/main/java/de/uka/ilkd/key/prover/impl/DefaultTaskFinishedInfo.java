@@ -135,6 +135,12 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      */
     @Override
     public String toString() {
+        if (proof == null) {
+            // Some tasks finish without an associated proof (e.g. a load that failed before a
+            // proof was created, or a pruning/macro task with none selected). proof is nullable,
+            // so guard against it instead of throwing an NPE from the status-bar update.
+            return "No proof";
+        }
         if (proof.isDisposed()) {
             return "Proof disposed";
         }
