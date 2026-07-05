@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
+import java.nio.file.Path;
 import java.util.Collection;
 
 import de.uka.ilkd.key.rule.Taclet;
@@ -22,7 +23,7 @@ public interface SMTSettings {
     /**
      * The path of the folder, where the smt files are stored temporarily.
      */
-    String getSMTTemporaryFolder();
+    Path getSMTTemporaryFolder();
 
     /**
      * Returns the maximum number of processes that are allowed to run concurrently.

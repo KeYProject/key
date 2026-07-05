@@ -74,7 +74,11 @@ public class RecentFileMenu {
         // menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
 
-        loadFrom(PathConfig.getRecentFileStorage());
+        if (Files.exists(PathConfig.currentPaths.recentFileStorage)) {
+            loadFrom(PathConfig.currentPaths.recentFileStorage);
+        } else {
+            loadFrom(PathConfig.previousPaths.recentFileStorage);
+        }
     }
 
     private void insertFirstEntry(RecentFileEntry entry) {
@@ -182,6 +186,10 @@ public class RecentFileMenu {
      */
     public final void loadFrom(Path filename) {
         try {
+            if (!Files.exists(filename)) {
+                return;
+            }
+
             var file = ParsingFacade.parseConfigurationFile(filename);
             List<Configuration> recent = file.asConfigurationList();
             this.recentFiles.clear();
@@ -230,7 +238,7 @@ public class RecentFileMenu {
     }
 
     public void save() {
-        store(PathConfig.getRecentFileStorage());
+        store(PathConfig.currentPaths.recentFileStorage);
     }
 
     public class RecentFileEntry {

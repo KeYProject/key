@@ -31,9 +31,10 @@ import org.slf4j.LoggerFactory;
  * @version 1 (10.05.19)
  */
 public class ColorSettings {
-    public static final Path SETTINGS_FILE_NEW =
-        PathConfig.getKeyConfigDir().resolve("colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
+
+    public static final Path SETTINGS_FILE_NEW = PathConfig.getSettingsFile("colors.json");
+
 
     private static ColorSettings INSTANCE;
     private final Map<String, Object> properties = new TreeMap<>();
