@@ -44,13 +44,24 @@ public final class GeneratedLemma {
     private final RewriteTaclet taclet;
     private final Proof mainProof;
     private final GeneratedLemmaJustification justification;
+    private final int aggregatedSteps;
     private @Nullable ProofAggregate soundnessProofAggregate;
     private @Nullable Proof soundnessProof;
 
-    GeneratedLemma(RewriteTaclet taclet, Proof mainProof, Name generatorName) {
+    GeneratedLemma(RewriteTaclet taclet, Proof mainProof, Name generatorName,
+            int aggregatedSteps) {
         this.taclet = taclet;
         this.mainProof = mainProof;
         this.justification = new GeneratedLemmaJustification(generatorName, this);
+        this.aggregatedSteps = aggregatedSteps;
+    }
+
+    /**
+     * returns the number of base calculus steps the lemma aggregates (display and measurement
+     * metadata)
+     */
+    public int aggregatedSteps() {
+        return aggregatedSteps;
     }
 
     /**
@@ -87,19 +98,23 @@ public final class GeneratedLemma {
     public String contentKey() {
         final Services services = mainProof.getServices();
         final StringBuilder key = new StringBuilder();
-        key.append(OutputStreamProofSaver.printTerm((JTerm) taclet.find(), services));
+        key.append(OutputStreamProofSaver.printTerm(
+            LemmaTacletGenerator.removeTermLabels((JTerm) taclet.find(), services), services));
         final Sequent assumes = taclet.assumesSequent();
         for (final var sf : assumes.antecedent()) {
-            key.append("\n<= ")
-                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+            key.append("\n<= ").append(OutputStreamProofSaver.printTerm(
+                LemmaTacletGenerator.removeTermLabels((JTerm) sf.formula(), services),
+                services));
         }
         for (final var sf : assumes.succedent()) {
-            key.append("\n=> ")
-                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+            key.append("\n=> ").append(OutputStreamProofSaver.printTerm(
+                LemmaTacletGenerator.removeTermLabels((JTerm) sf.formula(), services),
+                services));
         }
         final JTerm rw = (JTerm) ((RewriteTacletGoalTemplate) taclet.goalTemplates().head())
                 .replaceWith();
-        key.append("\n~> ").append(OutputStreamProofSaver.printTerm(rw, services));
+        key.append("\n~> ").append(OutputStreamProofSaver.printTerm(
+            LemmaTacletGenerator.removeTermLabels(rw, services), services));
         return key.toString();
     }
 

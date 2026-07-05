@@ -95,7 +95,8 @@ public final class GeneratedLemmaRegistry {
     public synchronized GeneratedLemma getOrCreate(Goal goal, PosInOccurrence pio,
             LemmaTacletGenerator generator) {
         final Proof proof = goal.proof();
-        final RewriteTaclet taclet = generator.generate(goal, pio);
+        final LemmaTacletGenerator.GeneratedTaclet generated = generator.generate(goal, pio);
+        final RewriteTaclet taclet = generated.taclet();
 
         final GeneratedLemma existing = lemmas.get(taclet.name());
         if (existing != null) {
@@ -118,7 +119,8 @@ public final class GeneratedLemmaRegistry {
             return existing;
         }
 
-        final GeneratedLemma lemma = new GeneratedLemma(taclet, proof, generator.name());
+        final GeneratedLemma lemma =
+            new GeneratedLemma(taclet, proof, generator.name(), generated.aggregatedSteps());
         // The registry owns the generated-lemma namespace of its proof. A justification entry
         // for this name that the registry does not know stems from a copied initial
         // configuration (InitConfig.deepCopy copies the justification map): e.g. when a proof

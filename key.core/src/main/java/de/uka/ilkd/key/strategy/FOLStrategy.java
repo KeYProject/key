@@ -28,6 +28,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
@@ -81,10 +82,33 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         approvalF = approvalDispatcher;
     }
 
+    /**
+     * The rule sets captured by the one step simplifier. In transparent mode these rules remain
+     * available to the strategy, but on formulas within the lemma fragment (no executable code)
+     * their applications are penalized so that the lemma path — which covers exactly those
+     * formulas with aggregated, separately provable steps — wins the scheduling race. The rules
+     * stay applicable (completeness): they still fire, as a last resort, on formulas the lemma
+     * path does not serve (e.g. vetoed ones).
+     */
+    private static final Set<String> OSS_CAPTURED_RULE_SETS =
+        Set.of("concrete", "concrete_java", "update_elim", "update_apply_on_update",
+            "update_apply", "update_join", "elimQuantifier");
+
+    /**
+     * Deliberately small: the penalty only needs to break the cost tie between the lemma path
+     * (introduction and lemma application at -11000) and the captured rules (concrete at
+     * -11000 plus depth scaling), so that aggregated lemmas win wherever they apply. It must
+     * NOT lift the captured rules above the enlarging/expanding rule band (around -2000):
+     * cost orderings such as "the empty-range rule of a bounded sum is cheaper than its
+     * unrolling rule" encode termination invariants of the strategy, and a large penalty
+     * inverts them (observed as an unbounded bounded-sum descent).
+     */
+    private static final long TRANSPARENT_CAPTURED_PENALTY = 2000;
+
     private Feature setUpGlobalF(RuleSetDispatchFeature d) {
         final Feature oneStepSimplificationF =
             oneStepSimplificationFeature(longConst(-11000));
-        return add(d, oneStepSimplificationF);
+        return add(d, oneStepSimplificationF, transparentCapturedRuleSetPenalty());
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -94,6 +118,31 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         // lemma-eligible formulas and is costed identically
         filter.addRuleToSet(OssLemmaIntroductionRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    private Feature transparentCapturedRuleSetPenalty() {
+        if (!transparentOss()) {
+            return longConst(0);
+        }
+        final RuleFilter capturedRuleSets = rule -> {
+            if (!(rule instanceof de.uka.ilkd.key.rule.Taclet taclet)) {
+                return false;
+            }
+            for (final RuleSet rs : taclet.getRuleSets()) {
+                if (OSS_CAPTURED_RULE_SETS.contains(rs.name().toString())) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        return ConditionalFeature.createConditional(capturedRuleSets,
+            ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
+                longConst(TRANSPARENT_CAPTURED_PENALTY), longConst(0)));
+    }
+
+    private boolean transparentOss() {
+        return StrategyProperties.OSS_TRANSPARENT
+                .equals(strategyProperties.getProperty(StrategyProperties.OSS_OPTIONS_KEY));
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
@@ -108,6 +157,11 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             FindDepthFeature.getInstance();
 
         bindRuleSet(d, "concrete",
+            add(longConst(-11000),
+                ScaleFeature.createScaled(findDepthFeature, 10.0)));
+        // generated lemma taclets (transparent one step simplification) are scheduled exactly
+        // like the simplifications they aggregate
+        bindRuleSet(d, "generatedLemma",
             add(longConst(-11000),
                 ScaleFeature.createScaled(findDepthFeature, 10.0)));
         bindRuleSet(d, "simplify", -4500);
@@ -631,10 +685,8 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         }
         // in transparent mode, aggregated simplifications of lemma-eligible formulas are
         // performed via generated lemma taclets: the strategy applies the introduction rule
-        // (the simplifier itself yields those formulas, see OneStepSimplifier#isApplicable),
-        // and the introduced taclet is then applied through its "concrete" rule set
-        return rule instanceof OssLemmaIntroductionRule
-                && StrategyProperties.OSS_TRANSPARENT.equals(
-                    strategyProperties.getProperty(StrategyProperties.OSS_OPTIONS_KEY));
+        // (the simplifier itself is never applicable then), and the introduced taclet is then
+        // applied through its "generatedLemma" rule set
+        return rule instanceof OssLemmaIntroductionRule && transparentOss();
     }
 }

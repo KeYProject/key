@@ -60,7 +60,7 @@ public final class AddLiteralsLemmaGenerator implements LemmaTacletGenerator {
     }
 
     @Override
-    public RewriteTaclet generate(Goal goal, PosInOccurrence pio) {
+    public GeneratedTaclet generate(Goal goal, PosInOccurrence pio) {
         final Services services = goal.proof().getServices();
         final JTerm find = (JTerm) pio.subTerm();
 
@@ -77,7 +77,10 @@ public final class AddLiteralsLemmaGenerator implements LemmaTacletGenerator {
         tb.setDisplayName(NAME.toString());
         tb.setFind(find);
         tb.addGoalTerm(sum);
-        tb.addRuleSet(new RuleSet(new Name("concrete")));
-        return tb.getTaclet();
+        final RuleSet generatedLemmaRS =
+            services.getNamespaces().ruleSets().lookup(new Name("generatedLemma"));
+        tb.addRuleSet(generatedLemmaRS != null ? generatedLemmaRS
+                : new RuleSet(new Name("generatedLemma")));
+        return new GeneratedTaclet(tb.getTaclet(), 1);
     }
 }

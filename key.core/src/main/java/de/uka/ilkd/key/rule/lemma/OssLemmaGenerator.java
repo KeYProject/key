@@ -92,7 +92,7 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
     }
 
     @Override
-    public RewriteTaclet generate(Goal goal, PosInOccurrence pio) {
+    public GeneratedTaclet generate(Goal goal, PosInOccurrence pio) {
         final Services services = goal.proof().getServices();
         final OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
         if (simplifier == null) {
@@ -144,14 +144,17 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
         tb.setDisplayName(NAME.toString());
         tb.setFind(find);
         tb.addGoalTerm(simplified);
-        tb.addRuleSet(new RuleSet(new Name("concrete")));
+        final RuleSet generatedLemmaRS =
+            services.getNamespaces().ruleSets().lookup(new Name("generatedLemma"));
+        tb.addRuleSet(generatedLemmaRS != null ? generatedLemmaRS
+                : new RuleSet(new Name("generatedLemma")));
         if (!assumesAntec.isEmpty() || !assumesSucc.isEmpty()) {
             tb.setAssumesSequent(JavaDLSequentKit.createSequent(assumesAntec, assumesSucc));
             tb.setApplicationRestriction(
                 new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         }
         try {
-            return tb.getTaclet();
+            return new GeneratedTaclet(tb.getTaclet(), result.numAppliedRules());
         } catch (RuleAbortException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -189,18 +192,23 @@ public final class OssLemmaGenerator implements LemmaTacletGenerator {
     private static String contentHashName(Services services, JTerm find,
             ImmutableList<SequentFormula> assumesAntec, ImmutableList<SequentFormula> assumesSucc,
             JTerm replacewith) {
+        // hashed label-free: label serialization is not canonical (see
+        // LemmaTacletGenerator.removeTermLabels), and names must be reproducible on replay
         final StringBuilder content = new StringBuilder();
-        content.append("find:").append(OutputStreamProofSaver.printTerm(find, services));
+        content.append("find:").append(OutputStreamProofSaver
+                .printTerm(LemmaTacletGenerator.removeTermLabels(find, services), services));
         for (final SequentFormula sf : assumesAntec) {
-            content.append("\nassumeA:")
-                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+            content.append("\nassumeA:").append(OutputStreamProofSaver.printTerm(
+                LemmaTacletGenerator.removeTermLabels((JTerm) sf.formula(), services),
+                services));
         }
         for (final SequentFormula sf : assumesSucc) {
-            content.append("\nassumeS:")
-                    .append(OutputStreamProofSaver.printTerm((JTerm) sf.formula(), services));
+            content.append("\nassumeS:").append(OutputStreamProofSaver.printTerm(
+                LemmaTacletGenerator.removeTermLabels((JTerm) sf.formula(), services),
+                services));
         }
-        content.append("\nreplacewith:")
-                .append(OutputStreamProofSaver.printTerm(replacewith, services));
+        content.append("\nreplacewith:").append(OutputStreamProofSaver.printTerm(
+            LemmaTacletGenerator.removeTermLabels(replacewith, services), services));
 
         try {
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");

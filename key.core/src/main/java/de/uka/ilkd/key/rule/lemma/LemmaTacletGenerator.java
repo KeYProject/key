@@ -59,12 +59,46 @@ public interface LemmaTacletGenerator {
     boolean isApplicable(Goal goal, PosInOccurrence pio);
 
     /**
+     * A generated taclet together with the number of base calculus steps it aggregates (display
+     * and measurement metadata; 1 if the transformation corresponds to a single step).
+     */
+    record GeneratedTaclet(RewriteTaclet taclet, int aggregatedSteps) {
+    }
+
+    /**
+     * Returns the term with all term labels removed (recursively). Name and content-grouping
+     * computations must work on label-free terms: labels are proof metadata whose serialization
+     * is not canonical (e.g. the sub-origins of merged origin labels are collected in identity
+     * order), so label-sensitive names would differ between a proof and its replayed or
+     * elaborated copy.
+     *
+     * @param term the term
+     * @param services services for term construction
+     * @return the term without any labels
+     */
+    static de.uka.ilkd.key.logic.JTerm removeTermLabels(de.uka.ilkd.key.logic.JTerm term,
+            de.uka.ilkd.key.java.Services services) {
+        final de.uka.ilkd.key.logic.JTerm[] subs =
+            new de.uka.ilkd.key.logic.JTerm[term.arity()];
+        boolean changed = term.hasLabels();
+        for (int i = 0; i < term.arity(); i++) {
+            subs[i] = removeTermLabels(term.sub(i), services);
+            changed |= subs[i] != term.sub(i);
+        }
+        if (!changed) {
+            return term;
+        }
+        return services.getTermFactory().createTerm(term.op(), subs, term.boundVars(),
+            null);
+    }
+
+    /**
      * computes the lemma taclet for the term at the given position. The result must be
      * deterministic in the content of the term at the position (see the class-level contract).
      *
      * @param goal the current goal
      * @param pio the position of the term to be transformed
-     * @return the generated taclet
+     * @return the generated taclet with its aggregation count
      */
-    RewriteTaclet generate(Goal goal, PosInOccurrence pio);
+    GeneratedTaclet generate(Goal goal, PosInOccurrence pio);
 }
