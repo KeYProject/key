@@ -20,11 +20,11 @@ import org.jspecify.annotations.Nullable;
 public final class GeneratedLemmaJustification implements RuleJustification {
 
     private final Name generator;
-    private final @Nullable Proof soundnessProof;
+    private final GeneratedLemma lemma;
 
-    public GeneratedLemmaJustification(Name generator, @Nullable Proof soundnessProof) {
+    public GeneratedLemmaJustification(Name generator, GeneratedLemma lemma) {
         this.generator = generator;
-        this.soundnessProof = soundnessProof;
+        this.lemma = lemma;
     }
 
     @Override
@@ -40,17 +40,35 @@ public final class GeneratedLemmaJustification implements RuleJustification {
     }
 
     /**
-     * returns the soundness proof for the justified taclet, or {@code null} if no proof obligation
-     * could be created
+     * returns the justified lemma
+     */
+    public GeneratedLemma getLemma() {
+        return lemma;
+    }
+
+    /**
+     * returns the soundness proof for the justified taclet, or {@code null} if it has not been
+     * created yet
      */
     public @Nullable Proof getSoundnessProof() {
-        return soundnessProof;
+        return lemma.getSoundnessProofIfPresent();
+    }
+
+    /**
+     * returns true iff the soundness proof obligation of the justified taclet has been created
+     * and closed (possibly itself depending on further unproven lemmas, which is tracked by
+     * {@link de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt})
+     */
+    public boolean isProven() {
+        final Proof soundnessProof = lemma.getSoundnessProofIfPresent();
+        return soundnessProof != null && !soundnessProof.isDisposed() && soundnessProof.closed();
     }
 
     @Override
     public String toString() {
+        final Proof soundnessProof = lemma.getSoundnessProofIfPresent();
         return "generated lemma (by " + generator + ", "
-            + (soundnessProof == null ? "no soundness proof"
+            + (soundnessProof == null ? "soundness proof obligation not yet created"
                     : (soundnessProof.closed() ? "proven" : "soundness proof open"))
             + ")";
     }
