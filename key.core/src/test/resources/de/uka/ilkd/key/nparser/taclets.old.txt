@@ -16396,7 +16396,7 @@ simplifySelectOfMemset {
 \find(select<[beta]>(memset(h,s,x),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16408,7 +16408,7 @@ simplifySelectOfMemsetEQ {
 \find(select<[beta]>(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
