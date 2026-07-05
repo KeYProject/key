@@ -87,10 +87,9 @@ import org.slf4j.LoggerFactory;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.*;
-import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.*;
 import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.NEGATIVE;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.*;
 import static java.lang.String.format;
 
 /**
@@ -1775,25 +1774,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case "\\seq_concat" -> SeqConcat;
             case "\\seq_get" -> SeqGet;
             case "\\seq_upd" -> SeqPut;
-            default -> {
-                if (name.startsWith("\\dl_")) {
-                    name = name.substring(4);
-                }
-                Function named =
-                        services.getNamespaces().functions()
-                                .lookup(new org.key_project.logic.Name(name));
-                if (named == null) {
-
-                    yield reportError(n, format(
-                            "In an embedded DL expression, %s is not a known DL function name.", name));
-                }
-                yield new DLEmbeddedExpression(pi, c, (JFunction) named, args);
-
-            }
+            default -> null;
         };
 
         if (fn != null) {
             return new LogicFunctionalOperator(pi, c, fn, args);
+        }
+
+        if (name.startsWith("\\dl_")) {
+            name = name.substring(4);
         }
 
         Function named =

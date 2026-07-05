@@ -304,8 +304,6 @@ public interface Visitor {
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
-    void performActionOnSubtype(Subtype subtype);
-
     void performActionOnBinaryOperator(BinaryOperator op);
 
     void performActionOnUnaryOperator(UnaryOperator op);
