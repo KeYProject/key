@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -205,46 +206,111 @@ public final class LemmaDependencyPanel extends JPanel {
         proveAllButton.setEnabled(false);
         loadButton.setEnabled(false);
         mediator.stopInterface(true);
-        new SwingWorker<LemmaProver.Result, Void>() {
-            @Override
-            protected LemmaProver.Result doInBackground() throws Exception {
-                return LemmaProver.proveAll(lemmas, options.maxSteps(), options.saveDir());
-            }
 
-            @Override
-            protected void done() {
-                mediator.startInterface(true);
-                try {
-                    final LemmaProver.Result result = get();
-                    JOptionPane.showMessageDialog(LemmaDependencyPanel.this,
-                        result.proven().size() + " of " + lemmas.size()
-                            + " lemma(s) proved, " + result.remaining().size()
-                            + " left open"
-                            + (options.saveDir() != null
-                                    ? ", " + result.saved() + " proof(s) saved to "
-                                        + options.saveDir()
-                                    : "")
-                            + ".",
-                        "Prove Lemmas", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception e) {
-                    LOGGER.error("batch proving of lemmas failed", e);
-                    JOptionPane.showMessageDialog(LemmaDependencyPanel.this,
-                        "Batch proving failed:\n" + e.getMessage(), "Prove Lemmas",
-                        JOptionPane.ERROR_MESSAGE);
+        final ProgressDialog progressDialog = new ProgressDialog(lemmas.size());
+        final AtomicBoolean cancelled = new AtomicBoolean(false);
+        progressDialog.onCancel(() -> cancelled.set(true));
+
+        final SwingWorker<LemmaProver.Result, Integer> worker =
+            new SwingWorker<>() {
+                @Override
+                protected LemmaProver.Result doInBackground() throws Exception {
+                    return LemmaProver.proveAll(lemmas, options.maxSteps(), options.saveDir(),
+                        (done, total) -> {
+                            publish(done);
+                            return !cancelled.get();
+                        });
                 }
-                refresh();
-                // proving lemmas may have turned the depending proof from "closed but lemmas
-                // left" into "closed". Recompute the status explicitly (robust against the
-                // order in which proof-tree listeners handled the obligation-closed events) and
-                // let the enclosing dialog refresh its status display.
-                if (proof != null) {
-                    proof.mgt().updateProofStatus();
+
+                @Override
+                protected void process(List<Integer> chunks) {
+                    progressDialog.setProgress(chunks.get(chunks.size() - 1));
                 }
-                if (onStatusChanged != null) {
-                    onStatusChanged.run();
+
+                @Override
+                protected void done() {
+                    progressDialog.dispose();
+                    mediator.startInterface(true);
+                    try {
+                        final LemmaProver.Result result = get();
+                        JOptionPane.showMessageDialog(LemmaDependencyPanel.this,
+                            result.proven().size() + " of " + lemmas.size()
+                                + " lemma(s) proved, " + result.remaining().size()
+                                + " left open"
+                                + (options.saveDir() != null
+                                        ? ", " + result.saved() + " proof(s) saved to "
+                                            + options.saveDir()
+                                        : "")
+                                + ".",
+                            "Prove Lemmas", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception e) {
+                        LOGGER.error("batch proving of lemmas failed", e);
+                        JOptionPane.showMessageDialog(LemmaDependencyPanel.this,
+                            "Batch proving failed:\n" + e.getMessage(), "Prove Lemmas",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    refresh();
+                    // proving lemmas may have turned the depending proof from "closed but lemmas
+                    // left" into "closed". Recompute the status explicitly (robust against the
+                    // order in which proof-tree listeners handled the obligation-closed events)
+                    // and let the enclosing dialog refresh its status display.
+                    if (proof != null) {
+                        proof.mgt().updateProofStatus();
+                    }
+                    if (onStatusChanged != null) {
+                        onStatusChanged.run();
+                    }
                 }
-            }
-        }.execute();
+            };
+        worker.execute();
+        progressDialog.setVisible(true);
+    }
+
+    /** A small modeless progress dialog for the batch proving of lemmas. */
+    private final class ProgressDialog extends JDialog {
+        private static final long serialVersionUID = 1L;
+
+        private final JProgressBar bar;
+        private @Nullable Runnable cancelAction;
+
+        ProgressDialog(int total) {
+            super(SwingUtilities.getWindowAncestor(LemmaDependencyPanel.this), "Proving Lemmas",
+                ModalityType.MODELESS);
+            bar = new JProgressBar(0, total);
+            bar.setStringPainted(true);
+            bar.setString("0 / " + total);
+
+            final JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(e -> {
+                cancel.setEnabled(false);
+                bar.setString("cancelling after current lemma...");
+                if (cancelAction != null) {
+                    cancelAction.run();
+                }
+            });
+
+            final JPanel content = new JPanel(new BorderLayout(8, 8));
+            content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+            content.add(new JLabel("Discharging lemma soundness obligations..."),
+                BorderLayout.NORTH);
+            content.add(bar, BorderLayout.CENTER);
+            final JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            south.add(cancel);
+            content.add(south, BorderLayout.SOUTH);
+            setContentPane(content);
+            setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            pack();
+            setLocationRelativeTo(getOwner());
+        }
+
+        void onCancel(Runnable action) {
+            this.cancelAction = action;
+        }
+
+        void setProgress(int done) {
+            bar.setValue(done);
+            bar.setString(done + " / " + bar.getMaximum());
+        }
     }
 
     private static String truncate(String s) {

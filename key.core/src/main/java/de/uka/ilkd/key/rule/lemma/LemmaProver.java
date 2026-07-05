@@ -48,6 +48,22 @@ public final class LemmaProver {
     public record Result(List<GeneratedLemma> proven, List<GeneratedLemma> remaining, int saved) {
     }
 
+    /**
+     * Notified of the progress of a batch proving run, and asked whether to continue.
+     */
+    @FunctionalInterface
+    public interface ProgressListener {
+        /**
+         * Called after each obligation has been processed.
+         *
+         * @param done the number of obligations processed so far
+         * @param total the total number of obligations
+         * @return {@code true} to continue, {@code false} to stop the batch (the remaining,
+         *         unprocessed lemmas are not counted as {@code remaining} in the result)
+         */
+        boolean progressed(int done, int total);
+    }
+
     private LemmaProver() {
     }
 
@@ -62,9 +78,26 @@ public final class LemmaProver {
      */
     public static Result proveAll(Collection<GeneratedLemma> lemmas, int maxSteps,
             @Nullable Path saveDir) throws Exception {
+        return proveAll(lemmas, maxSteps, saveDir, null);
+    }
+
+    /**
+     * Attempts to discharge the soundness obligations of the given lemmas, reporting progress.
+     *
+     * @param lemmas the lemmas to prove
+     * @param maxSteps the automatic-mode step bound per obligation
+     * @param saveDir if non-null, a directory into which every obligation proof is saved
+     * @param listener if non-null, notified after each obligation and asked whether to continue
+     * @return the outcome
+     * @throws Exception if saving a proof fails
+     */
+    public static Result proveAll(Collection<GeneratedLemma> lemmas, int maxSteps,
+            @Nullable Path saveDir, @Nullable ProgressListener listener) throws Exception {
         final List<GeneratedLemma> proven = new ArrayList<>();
         final List<GeneratedLemma> remaining = new ArrayList<>();
         int saved = 0;
+        int done = 0;
+        final int total = lemmas.size();
 
         if (saveDir != null) {
             Files.createDirectories(saveDir);
@@ -109,6 +142,10 @@ public final class LemmaProver {
                     }
                     saved++;
                 }
+            }
+            done++;
+            if (listener != null && !listener.progressed(done, total)) {
+                break;
             }
         }
         return new Result(proven, remaining, saved);
