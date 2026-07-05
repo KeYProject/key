@@ -323,7 +323,7 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
+    protected PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
             Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
