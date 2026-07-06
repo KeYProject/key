@@ -190,6 +190,10 @@ public final class IconFactory {
      * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
      */
     public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+    /**
+     * Additional horizontal space in pixels for wider auto buttons.
+     */
+    public static final int TOOLBAR_EXTRA_WIDTH = 14;
 
     private IconFactory() {
     }
@@ -393,7 +397,7 @@ public final class IconFactory {
 
     public static Icon iconWithOverlay(Icon baseIcon, String letter) {
         BufferedImage image =
-            new BufferedImage(baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE,
+            new BufferedImage(baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE + 2 * TOOLBAR_EXTRA_WIDTH,
                 baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -401,7 +405,7 @@ public final class IconFactory {
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
         // Draw base icon
-        baseIcon.paintIcon(null, g2d, 0, 0);
+        baseIcon.paintIcon(null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
 
         if (letter == null) {
             return new ImageIcon(image);
@@ -420,7 +424,7 @@ public final class IconFactory {
         // Position letter in bottom-right corner
         int x = baseIcon.getIconWidth() - textWidth;
 
-        g2d.drawString(letter, x + 5, baseIcon.getIconHeight());
+        g2d.drawString(letter, x + TOOLBAR_INDICATOR_EXTRA_SPACE + TOOLBAR_EXTRA_WIDTH, baseIcon.getIconHeight());
         g2d.dispose();
 
         return new ImageIcon(image);

@@ -674,7 +674,7 @@ public final class MainWindow extends JFrame {
         toolBar.setRollover(true);
 
         DropdownSelectionButton autoComp = createAutomationComponent();
-        toolBar.add(createWiderAutoModeButton(autoComp.getActionComponent()));
+        toolBar.add(autoComp.getActionComponent());
         toolBar.add(autoComp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.addSeparator();
