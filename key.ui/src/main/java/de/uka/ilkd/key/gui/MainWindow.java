@@ -674,7 +674,7 @@ public final class MainWindow extends JFrame {
         toolBar.setRollover(true);
 
         DropdownSelectionButton autoComp = createAutomationComponent();
-        toolBar.add(autoComp.getActionComponent());
+        toolBar.add(createWiderAutoModeButton(autoComp.getActionComponent()));
         toolBar.add(autoComp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.addSeparator();
@@ -857,9 +857,7 @@ public final class MainWindow extends JFrame {
         return automationComponent;
     }
 
-    private JComponent createWiderAutoModeButton() {
-        JButton b = new JButton(autoModeAction);
-        b.putClientProperty("hideActionText", Boolean.TRUE);
+    private JComponent createWiderAutoModeButton(JComponent b) {
         // the following rigmarole is to make the button slightly wider
         JPanel p = new JPanel();
         p.setLayout(new GridBagLayout());
