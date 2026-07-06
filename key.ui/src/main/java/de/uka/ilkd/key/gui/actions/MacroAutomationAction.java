@@ -9,6 +9,7 @@ import javax.swing.Icon;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.ui.MediatorProofControl;
 
 /**
  * Automation action that executes a proof macro.
@@ -38,16 +39,21 @@ public class MacroAutomationAction extends AutoModeAction {
         super(mainWindow, icon);
         this.macro = macro;
         setName(macro.getName());
-        setTooltip(macro.getDescription());
+        setTooltip(macro.getDescription() + " (shift-click = run on whole proof)");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         KeYMediator mediator = getMediator();
+        MediatorProofControl proofControl = mediator.getUI().getProofControl();
         if (mediator.isInAutoMode()) {
-            getMediator().getUI().getProofControl().stopAutoMode();
+            proofControl.stopAutoMode();
         } else {
-            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, null);
+            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                proofControl.runMacro(mediator.getSelectedProof().root(), macro, null);
+            } else {
+                proofControl.runMacro(mediator.getSelectedNode(), macro, null);
+            }
         }
     }
 
