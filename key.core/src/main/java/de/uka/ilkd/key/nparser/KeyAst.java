@@ -245,7 +245,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 if (ctx.obtain != null) {
                     KeYJavaType type = io.translateType(ctx.typespec());
                     ProgramElementName name = new ProgramElementName(ctx.var.getText());
-                    collectedVars = collectedVars.prepend(new LocationVariable(name, new TypeRef(type), true));
+                    collectedVars =
+                        collectedVars.prepend(new LocationVariable(name, new TypeRef(type), true));
                 }
                 return null;
             }

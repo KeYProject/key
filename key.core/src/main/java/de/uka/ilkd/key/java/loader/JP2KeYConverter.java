@@ -1491,7 +1491,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     .orElseThrow();
 
             ReferenceTypeImpl refType = new ReferenceTypeImpl(containing.resolve());
-            final ProgramElementName pen = 
+            final ProgramElementName pen =
                 new ProgramElementName(spec.getName().asString(),
                     (String) containing.getFullyQualifiedName().orElseThrow());
 
