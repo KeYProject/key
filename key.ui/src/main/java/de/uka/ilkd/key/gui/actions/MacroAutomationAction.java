@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
@@ -50,9 +51,10 @@ public class MacroAutomationAction extends AutoModeAction {
             proofControl.stopAutoMode();
         } else {
             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                proofControl.runMacro(mediator.getSelectedProof().root(), macro, null);
+                new ProofMacroUserAction(mediator, macro, mediator.getSelectedProof().root(), null)
+                        .actionPerformed(e);
             } else {
-                proofControl.runMacro(mediator.getSelectedNode(), macro, null);
+                new ProofMacroUserAction(mediator, macro, null).actionPerformed(e);
             }
         }
     }
