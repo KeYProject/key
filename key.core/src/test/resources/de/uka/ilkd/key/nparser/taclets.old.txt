@@ -13487,7 +13487,7 @@ multiply_2_inEq0 {
 \assumes ([leq(multFacLeft,multFacRight)]==>[]) 
 \find(leq(multLeft,multRight)==>)
 \add [geq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq1 (multiply_2_inEq1) =========================================
@@ -13495,7 +13495,7 @@ multiply_2_inEq1 {
 \assumes ([geq(multFacLeft,multFacRight)]==>[]) 
 \find(leq(multLeft,multRight)==>)
 \add [leq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq2 (multiply_2_inEq2) =========================================
@@ -13503,7 +13503,7 @@ multiply_2_inEq2 {
 \assumes ([leq(multFacLeft,multFacRight)]==>[]) 
 \find(geq(multLeft,multRight)==>)
 \add [leq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq3 (multiply_2_inEq3) =========================================
@@ -13511,7 +13511,7 @@ multiply_2_inEq3 {
 \assumes ([geq(multFacLeft,multFacRight)]==>[]) 
 \find(geq(multLeft,multRight)==>)
 \add [geq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_distribute_1 (multiply_distribute) =========================================

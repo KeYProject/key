@@ -24,7 +24,10 @@ public class IntegerStrategyFactory implements StrategyFactory {
             <li><tt>/</tt>, <tt>%</tt>, <tt>jdiv</tt>, <tt>jmod</tt>, ...</li>\
             <li><tt>int_RANGE</tt>, <tt>short_MIN</tt>, ...</li>\
             <li><tt>inInt</tt>, <tt>inByte</tt>, ...</li>\
-            <li><tt>addJint</tt>, <tt>mulJshort</tt>, ...</li></ul></html>""";
+            <li><tt>addJint</tt>, <tt>mulJshort</tt>, ...</li></ul>\
+            In addition, inequations are multiplied with each other<br>\
+            where the product is bounded by an existing inequation<br>\
+            (restricted such that termination is guaranteed).</html>""";
     public static final String TOOL_TIP_ARITHMETIC_MODEL_SEARCH = """
             <html>\
             Support for non-linear inequations and model search.<br>In addition, this performs:\
