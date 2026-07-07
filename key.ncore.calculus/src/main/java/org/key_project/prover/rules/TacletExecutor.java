@@ -15,7 +15,6 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -75,7 +74,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                     }
 
                     if (res == null) {
-                        res = ImmutableSLList.nil();
+                        res = ImmutableList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             // noinspection unchecked
                             res = res.prepend(
@@ -106,7 +105,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
         }
 
         if (res == null) {
-            res = ImmutableSLList.nil();
+            res = ImmutableList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 // noinspection unchecked
                 res = res.prepend(SequentChangeInfo.createSequentChangeInfo(p_goal.sequent()));
@@ -325,7 +324,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
             PosInOccurrence applicationPosInOccurrence, MatchResultInfo matchCond, Goal goal,
             App tacletApp, LogicServices services, Object... instantiationInfo) {
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> replacements = ImmutableList.nil();
 
         for (final SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,

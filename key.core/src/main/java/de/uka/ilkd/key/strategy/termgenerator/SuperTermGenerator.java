@@ -23,10 +23,17 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
+// Generates the find's ANCESTOR terms (upwards from the find position). The connectives along the
+// find path are stable for a surviving application, but a generated ancestor term as a whole also
+// carries the siblings of that path, which an independent rewrite can change while the find subterm
+// survives. So a feature summing over these ancestors is fixed only while the find FORMULA is
+// unchanged -- weakly stable, not fully stable.
+@WeakStableCost
 public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
     private final TermFeature cond;

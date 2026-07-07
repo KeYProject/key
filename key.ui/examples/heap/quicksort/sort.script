@@ -1,10 +1,12 @@
 macro "autopilot-prep";
+tryclose;
 
+// assert openGoals == 1;
 
 // proof obligation for seqPerm after 3 method calls
-select formula="{heapAtPre:=heap || exc:=null || heap:=heapAfter_sort_0}
-   seqPerm(seqDef{int u;}(0, array.length, select<[any]>(heap, array, arr(u))),
-           seqDef{int u;}(0, array.length, select<[any]>(heapAtPre, array, arr(u))))";
+// select formula="{heapAtPre:=heap || exc:=null || heap:=heapAfter_sort_0}
+//   seqPerm(seqDef{int u;}(0, array.length, select<[any]>(heap, array, arr(u))),
+//           seqDef{int u;}(0, array.length, select<[any]>(heapAtPre, array, arr(u))))";
 
 macro "simp-upd";
 

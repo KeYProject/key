@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -419,7 +418,7 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
 
         @Override
         public @NonNull Iterator<SequentFormula> iterator() {
-            return ImmutableSLList.<SequentFormula>nil().iterator();
+            return ImmutableList.<SequentFormula>nil().iterator();
         }
     }
 

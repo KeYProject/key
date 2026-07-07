@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -27,7 +26,6 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
@@ -71,8 +69,7 @@ public class TermLabelManager {
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelFactory}.
      */
-    private final Map<Name, TermLabelFactory<?>> factoryMap =
-        new LinkedHashMap<>();
+    private final Map<Name, TermLabelFactory<?>> factoryMap = new LinkedHashMap<>();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied
@@ -121,7 +118,7 @@ public class TermLabelManager {
     /**
      * All rule independent {@link TermLabelUpdate}s.
      */
-    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.nil();
+    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableList.nil();
 
     /**
      * All rule specific {@link TermLabelRefactoring}s.
@@ -133,12 +130,12 @@ public class TermLabelManager {
      * All rule independent {@link TermLabelRefactoring}s.
      */
     private ImmutableList<TermLabelRefactoring> allRulesRefactorings =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
 
     /**
      * The {@link Name}s of all supported {@link TermLabel}s.
      */
-    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.nil();
+    private ImmutableList<Name> supportedTermLabelnames = ImmutableList.nil();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelMerger}.
@@ -264,7 +261,7 @@ public class TermLabelManager {
                     for (Name rule : supportedRules) {
                         ImmutableList<TermLabelUpdate> ruleUpdates = ruleSpecificUpdates.get(rule);
                         if (ruleUpdates == null) {
-                            ruleUpdates = ImmutableSLList.nil();
+                            ruleUpdates = ImmutableList.nil();
                         }
                         ruleUpdates = ruleUpdates.prepend(update);
                         ruleSpecificUpdates.put(rule, ruleUpdates);
@@ -295,7 +292,7 @@ public class TermLabelManager {
                         ImmutableList<TermLabelRefactoring> ruleRefactorings =
                             ruleSpecificRefactorings.get(rule);
                         if (ruleRefactorings == null) {
-                            ruleRefactorings = ImmutableSLList.nil();
+                            ruleRefactorings = ImmutableList.nil();
                         }
                         ruleRefactorings = ruleRefactorings.prepend(refactoring);
                         ruleSpecificRefactorings.put(rule, ruleRefactorings);
@@ -335,7 +332,7 @@ public class TermLabelManager {
         if (manager != null) {
             return manager.getSupportedTermLabelNames();
         } else {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
     }
 
@@ -1493,6 +1490,10 @@ public class TermLabelManager {
         return refactorings;
     }
 
+    public Map<Name, TermLabelFactory<?>> getFactories() {
+        return Collections.unmodifiableMap(factoryMap);
+    }
+
     /**
      * Utility class used by
      * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, JTerm, Rule, Goal, Object, JTerm)}
@@ -2156,10 +2157,55 @@ public class TermLabelManager {
      * @see TermLabel#isProofRelevant()
      */
     public static JTerm removeIrrelevantLabels(JTerm term, TermFactory tf) {
+        // Identity-preserving rebuild: only allocate along paths that actually carry an irrelevant
+        // label, and return the original term unchanged otherwise. The previous implementation
+        // rebuilt the whole term tree on every call (stream().map()/filter().collect() per node),
+        // which was the single biggest allocator during proof search (~20%) even though the vast
+        // majority of subterms have no irrelevant labels and need not change.
+        final ImmutableArray<JTerm> subs = term.subs();
+        final int n = subs.size();
+        JTerm[] newSubs = null; // allocated lazily, only once a sub actually changes
+        for (int i = 0; i < n; i++) {
+            final JTerm oldSub = subs.get(i);
+            final JTerm newSub = removeIrrelevantLabels(oldSub, tf);
+            if (newSub != oldSub && newSubs == null) {
+                newSubs = new JTerm[n];
+                for (int j = 0; j < i; j++) {
+                    newSubs[j] = subs.get(j);
+                }
+            }
+            if (newSubs != null) {
+                newSubs[i] = newSub;
+            }
+        }
+
+        final ImmutableArray<TermLabel> labels = term.getLabels();
+        ImmutableArray<TermLabel> newLabels = labels;
+        if (!labels.isEmpty()) {
+            int relevant = 0;
+            for (int i = 0, sz = labels.size(); i < sz; i++) {
+                if (labels.get(i).isProofRelevant()) {
+                    relevant++;
+                }
+            }
+            if (relevant != labels.size()) {
+                final TermLabel[] kept = new TermLabel[relevant];
+                int k = 0;
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    final TermLabel l = labels.get(i);
+                    if (l.isProofRelevant()) {
+                        kept[k++] = l;
+                    }
+                }
+                newLabels = new ImmutableArray<>(kept);
+            }
+        }
+
+        if (newSubs == null && newLabels == labels) {
+            return term; // no irrelevant label anywhere in this subtree -> no allocation
+        }
         return tf.createTerm(term.op(),
-            new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
-                    .collect(Collectors.toList())),
-            term.boundVars(), new ImmutableArray<>(term.getLabels().stream()
-                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
+            newSubs == null ? subs : new ImmutableArray<>(newSubs),
+            term.boundVars(), newLabels);
     }
 }

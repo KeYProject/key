@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
@@ -23,6 +22,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,30 +5,26 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
 import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.Vocabulary;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
+
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
@@ -51,17 +47,17 @@ public final class ExceptionTools {
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
         Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
-    private ExceptionTools() {}
+    private ExceptionTools() {
+    }
 
     /**
      * Get the throwable's message. This will return a nicer error message for
      * certain ANTLR exceptions.
      *
-     * @param throwable
-     *        a throwable
+     * @param throwable a throwable
      * @return message for the exception
      */
-    public static String getMessage(Throwable throwable) {
+    public static String getMessage(@Nullable Throwable throwable) {
         if (throwable == null) {
             return "";
         } else if (throwable instanceof ParseCancellationException
@@ -115,6 +111,22 @@ public final class ExceptionTools {
         List<PositionedString> result = new ArrayList<>();
         // Search the cause chain for an exception that bundles several located issues.
         for (Throwable e = throwable; e != null; e = e.getCause()) {
+            if (e instanceof ProblemLoaderException ple && !ple.getSubExceptions().isEmpty()) {
+                // e.g. a partial proof replay: report every rule application that failed, led by
+                // the summary, instead of only the first.
+                result.add(new PositionedString(ple.getMessage(), safeLocation(ple)));
+                for (Throwable sub : ple.getSubExceptions()) {
+                    result.add(new PositionedString(subErrorText(sub), safeLocation(sub)));
+                }
+                break;
+            }
+            if (e instanceof SyntaxErrorReporter.ParserException pe && pe.getErrors().size() > 1) {
+                // several syntax errors collected from one file: report each with its own location
+                for (SyntaxErrorReporter.SyntaxError se : pe.getErrors()) {
+                    result.add(new PositionedString(se.getMessage(), se.getLocation()));
+                }
+                break;
+            }
             if (e instanceof BuildingExceptions be) {
                 for (BuildingIssue issue : be.getErrors()) {
                     result.add(issue.asPositionedString());
@@ -151,6 +163,17 @@ public final class ExceptionTools {
         } catch (Exception e) {
             return Location.UNDEFINED;
         }
+    }
+
+    /**
+     * Message for a bundled sub-problem. Prefers the exception's own message (which, for the
+     * replay errors, carries the contextual "Line .., goal .., rule .." text); only when it has
+     * none do we fall back to {@link #getMessage} (which would otherwise unwrap a
+     * {@link ProblemLoaderException} to its cause and drop that context).
+     */
+    private static String subErrorText(Throwable sub) {
+        String own = sub.getMessage();
+        return (own != null && !own.isBlank()) ? own : getMessage(sub);
     }
 
     public static String getNiceMessage(InputMismatchException ime) {
@@ -258,11 +281,9 @@ public final class ExceptionTools {
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
      * Result may be null.
      *
-     * @param exc
-     *        the Throwable to extract the Location from
+     * @param exc the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
-     * @throws MalformedURLException
-     *         if the no URL can be parsed from the String stored inside the
+     * @throws MalformedURLException if the no URL can be parsed from the String stored inside the
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
@@ -313,27 +334,51 @@ public final class ExceptionTools {
      */
     private static @Nullable Location reportLocationFor(InputMismatchException ime) {
         Token offending = ime.getOffendingToken();
-        if (!expectsOnlyClosingToken(ime) || offending == null
-                || !(ime.getInputStream() instanceof TokenStream ts)) {
+        // Single-error path: only redirect to the insertion point when the closing token is the
+        // ONLY expected one (the precise SLL prediction yields such tight expected sets).
+        Position ip = insertionPointFor(ime, true);
+        if (ip == null) {
             return Location.fromToken(offending);
+        }
+        return new Location(SourceNames.getURIFromTokenSource(offending.getTokenSource()), ip);
+    }
+
+    /**
+     * The insertion-point position for a missing closing/terminating token: one past the preceding
+     * token, i.e. the spot where the missing {@code ';'}/{@code ')'}/... belongs (rather than the
+     * next, unexpected token). Returns {@code null} when the heuristic does not apply.
+     *
+     * @param ime the input mismatch
+     * @param onlyClosing if {@code true}, fire only when a closing token is the <em>only</em>
+     *        expected token (precise single-error path); if {@code false}, fire when a closing
+     *        token
+     *        is <em>among</em> the expected ones (multi-error recovery, where LL prediction yields
+     *        a
+     *        broader expected set so the strict check would never match)
+     * @return the 1-based insertion-point position, or {@code null}
+     */
+    public static @Nullable Position insertionPointFor(InputMismatchException ime,
+            boolean onlyClosing) {
+        Token offending = ime.getOffendingToken();
+        boolean applies =
+            onlyClosing ? expectsOnlyClosingToken(ime) : expectedContainsClosingToken(ime);
+        if (!applies || offending == null
+                || !(ime.getInputStream() instanceof TokenStream ts)) {
+            return null;
         }
         // Search backwards for the previous token on the default channel (skip
         // whitespace/comments).
         for (int i = offending.getTokenIndex() - 1; i >= 0; i--) {
             Token prev = ts.get(i);
-            if (prev.getChannel() == Token.DEFAULT_CHANNEL
-                    && prev.getType() != Token.EOF) {
-                URI uri = MiscTools.getURIFromTokenSource(prev.getTokenSource());
+            if (prev.getChannel() == Token.DEFAULT_CHANNEL && prev.getType() != Token.EOF) {
                 String text = prev.getText();
                 int len = text == null ? 1 : Math.max(1, text.length());
                 // 1-based column of the insertion point: one past the last character of the
                 // preceding token (where the missing closing token belongs)
-                int col = prev.getCharPositionInLine() + len + 1;
-                return new Location(uri,
-                    Position.newOneBased(prev.getLine(), col));
+                return Position.newOneBased(prev.getLine(), prev.getCharPositionInLine() + len + 1);
             }
         }
-        return Location.fromToken(offending);
+        return null;
     }
 
     /**
@@ -349,22 +394,21 @@ public final class ExceptionTools {
         return CLOSING_TOKENS.contains(vocabulary.getDisplayName(expected.getMinElement()));
     }
 
-    private static URI parseFileName(String filename) throws MalformedURLException {
-        try {
-            return filename == null ? null : MiscTools.parseURL(filename).toURI();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+    /**
+     * @return true iff a closing/terminating token (see {@link #CLOSING_TOKENS}) is among the
+     *         expected tokens at the error position.
+     */
+    private static boolean expectedContainsClosingToken(InputMismatchException ime) {
+        IntervalSet expected = ime.getExpectedTokens();
+        if (expected == null || expected.isNil()) {
+            return false;
         }
-    }
-
-    // TODO javaparser this was not unused
-    @Nullable
-    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
-        // ANTLR 3 - Recognition Exception.
-        if (exc.input != null) {
-            // ANTLR has 0-based column numbers
-            return new Location(parseFileName(exc.input.getSourceName()), exc.position);
+        Vocabulary vocabulary = ime.getRecognizer().getVocabulary();
+        for (int type : expected.toList()) {
+            if (CLOSING_TOKENS.contains(vocabulary.getDisplayName(type))) {
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 }

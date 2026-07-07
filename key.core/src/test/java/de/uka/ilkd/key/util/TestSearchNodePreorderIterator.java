@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
 
@@ -111,7 +110,7 @@ public class TestSearchNodePreorderIterator {
     protected void assertRoot(Node root) {
         // List children
         NodePreorderIterator iter = new NodePreorderIterator(root);
-        ImmutableList<Node> childList = ImmutableSLList.nil();
+        ImmutableList<Node> childList = ImmutableList.nil();
         while (iter.hasNext()) {
             Node next = iter.next();
             childList = childList.append(next);
@@ -119,7 +118,7 @@ public class TestSearchNodePreorderIterator {
         // Test each child
         while (!childList.isEmpty()) {
             assertPreorder(childList.head(), childList);
-            childList = childList.take(1);
+            childList = childList.tail();
         }
     }
 
@@ -135,7 +134,7 @@ public class TestSearchNodePreorderIterator {
         while (iter.hasNext()) {
             Node previous = iter.next();
             assertEquals(previous, expectedChildList.head());
-            expectedChildList = expectedChildList.take(1); // Remove head
+            expectedChildList = expectedChildList.tail(); // Remove head
         }
         assertTrue(expectedChildList.isEmpty(),
             "Child list still contains " + expectedChildList.size() + " elements.");

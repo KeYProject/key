@@ -32,7 +32,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -170,7 +169,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             result[1] = new StatementBlock(call);
         }
         assert result[1] != null : "null body in method";
-        return ImmutableSLList.<StatementBlock>nil().prepend(result);
+        return ImmutableList.<StatementBlock>nil().prepend(result);
     }
 
     /**

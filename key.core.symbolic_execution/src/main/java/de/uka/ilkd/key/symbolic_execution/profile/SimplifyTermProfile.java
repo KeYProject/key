@@ -17,7 +17,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -61,7 +60,7 @@ public class SimplifyTermProfile extends JavaProfile {
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         ImmutableList<TermLabelPolicy> symExcPolicies =
-            ImmutableSLList.<TermLabelPolicy>nil()
+            ImmutableList.<TermLabelPolicy>nil()
                     .prepend((state, services, applicationPosInOccurrence, applicationTerm, rule,
                             goal, hint, tacletTerm,
                             newTerm, label) -> label);

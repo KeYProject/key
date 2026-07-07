@@ -5,7 +5,8 @@ package de.uka.ilkd.key.util.parsing;
 
 import java.util.List;
 
-import de.uka.ilkd.key.parser.Location;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
 

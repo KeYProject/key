@@ -38,10 +38,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,9 +283,9 @@ public class QueryExpand implements BuiltInRule {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
-        final ImmutableSLList<QuantifiableVariable> instVars;
+        final ImmutableList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
-            instVars = ImmutableSLList.nil();
+            instVars = ImmutableList.nil();
         } else {
             instVars = null;
         }
@@ -684,5 +684,16 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                The QueryExpand rule allows to apply contracts or to symbolically execute a query
+                expression in the logic. It replaces the query expression by a new constant and
+                constructs a box formula in the antecedent 'defining' the constant as the result of
+                a method call. The method call is encoded directly as a method call in the box modality.
+                The query is invoked in a context equal to the container type of the query method.
+                """;
     }
 }

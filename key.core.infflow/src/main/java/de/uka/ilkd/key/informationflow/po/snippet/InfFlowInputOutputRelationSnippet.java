@@ -15,7 +15,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Generate term "self != null".
@@ -97,7 +96,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     private JTerm buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
-        ImmutableList<JTerm> eqAtLocs = ImmutableSLList.nil();
+        ImmutableList<JTerm> eqAtLocs = ImmutableList.nil();
 
         Iterator<JTerm> postExp1It = infFlowSpec1.postExpressions.iterator();
         Iterator<JTerm> postExp2It = infFlowSpec2.postExpressions.iterator();
@@ -123,7 +122,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, JTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<JTerm> newObjEqs = ImmutableSLList.nil();
+        ImmutableList<JTerm> newObjEqs = ImmutableList.nil();
         Iterator<JTerm> newObjects1It = infFlowSpec1.newObjects.iterator();
         Iterator<JTerm> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {

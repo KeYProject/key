@@ -16,9 +16,11 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.logic.IntIterator;
+import org.key_project.prover.rules.matcher.vm.ProgramChildrenMatcher;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * In the DL-formulae description of Taclets the program part can have the following form
@@ -52,7 +54,7 @@ public class ContextStatementBlock extends StatementBlock {
             PositionInfo pi, List<Comment> c,
             ImmutableArray<? extends Statement> body,
             IExecutionContext execContext) {
-        super(pi, c, body, ImmutableSLList.nil());
+        super(pi, c, body, ImmutableList.nil());
         this.executionContext = execContext;
     }
 
@@ -130,6 +132,28 @@ public class ContextStatementBlock extends StatementBlock {
     }
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
+        return match(source, matchCond, null);
+    }
+
+    /**
+     * Matches this context block against the given source. Phases (1) prefix descent to the active
+     * statement, (2) inner execution context matching and (4) completion of the context
+     * instantiation (prefix/suffix positions) are always performed here. Phase (3), the matching of
+     * the active statements (this block's children from the active offset), is delegated to the
+     * supplied {@code activeStatements} matcher when one is given (and the located source position
+     * is a regular child offset); otherwise the built-in {@link #matchChildren} is used. All three
+     * yield identical results; the {@code activeStatements} matcher (a VM sub-program or a compiled
+     * matcher) simply matches the active-statement subtree by direct navigation instead of the
+     * monolithic AST matcher.
+     *
+     * @param source the source to match against
+     * @param matchCond the match conditions found so far
+     * @param activeStatements a matcher for the active statements, or {@code null} to use the
+     *        built-in {@link #matchChildren} for phase (3)
+     * @return the resulting match conditions, or {@code null} if matching fails
+     */
+    public MatchConditions match(SourceData source, MatchConditions matchCond,
+            @Nullable ProgramChildrenMatcher activeStatements) {
         assert getPrefixLength() > 0;
         SourceData newSource = source;
 
@@ -192,8 +216,13 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
 
-        // matching children
-        matchCond = matchChildren(newSource, matchCond, executionContext == null ? 0 : 1);
+        // matching children (the active statements) -- phase (3)
+        final int offset = executionContext == null ? 0 : 1;
+        if (activeStatements != null && newSource.getChildPos() >= 0) {
+            matchCond = matchActiveStatements(newSource, matchCond, activeStatements, offset);
+        } else {
+            matchCond = matchChildren(newSource, matchCond, offset);
+        }
 
         if (matchCond == null) {
             return null;
@@ -203,6 +232,37 @@ public class ContextStatementBlock extends StatementBlock {
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
 
         return matchCond;
+    }
+
+    /**
+     * Phase (3) via a supplied matcher (VM sub-program or compiled): matches the active statements
+     * of this context block (its children from index {@code offset}) against the children of
+     * {@code newSource.getElement()} starting at {@code newSource.getChildPos()}. This mirrors
+     * {@link #matchChildren(SourceData, MatchConditions, int)} for the case where every active
+     * statement consumes exactly one source child (the only case the generator converts -- list
+     * schema variables and other variable-arity constructs keep the interpreter). On success the
+     * source position is advanced exactly as {@code matchChildren} would, so the subsequent
+     * {@link #makeContextInfoComplete} computes the same suffix start.
+     */
+    private @Nullable MatchConditions matchActiveStatements(SourceData newSource,
+            MatchConditions matchCond, ProgramChildrenMatcher activeStatements, int offset) {
+        final int startPos = newSource.getChildPos();
+        // number of active statements to match (each consumes exactly one source child)
+        final int n = getChildCount() - offset;
+        final ProgramElement parent = newSource.getElement();
+        if (!(parent instanceof NonTerminalProgramElement ntParent)
+                || ntParent.getChildCount() < startPos + n) {
+            // not enough source children -> matchChildren would also fail (null source child)
+            return null;
+        }
+        final MatchConditions result = (MatchConditions) activeStatements.matchChildrenFrom(
+            parent, startPos, matchCond, newSource.getServices());
+        if (result == null) {
+            return null;
+        }
+        // advance the source position past the matched children, as matchChildren would
+        newSource.setChildPos(startPos + n);
+        return result;
     }
 
     /**
@@ -295,10 +355,10 @@ public class ContextStatementBlock extends StatementBlock {
             ProgramPrefix currentPrefix = prefix;
             int i = 0;
             while (i <= pos) {
-                final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator();
-                while (it.hasNext()) {
-                    prefixEnd = prefixEnd.down(it.next());
-                }
+                // concatenate this prefix element's active-child position in one step instead of
+                // iterating + a fresh PosInProgram per position (matchPrefixEnd is the dominant
+                // cost of a context match; this avoids an IntIterator and intermediate copies)
+                prefixEnd = prefixEnd.append(currentPrefix.getFirstActiveChildPos());
                 i++;
                 if (i <= pos) {
                     // as fail-fast measure I do not test here using

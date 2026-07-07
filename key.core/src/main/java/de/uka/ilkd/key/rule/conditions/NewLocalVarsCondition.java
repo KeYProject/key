@@ -82,8 +82,8 @@ public class NewLocalVarsCondition implements VariableCondition {
 
         var vars = MiscTools.getLocalOuts(body, services);
         List<VariableDeclaration> decls = new ArrayList<>(vars.size());
-        ImmutableList<JTerm> updatesBefore = ImmutableSLList.nil();
-        ImmutableList<JTerm> updatesFrame = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesBefore = ImmutableList.nil();
+        ImmutableList<JTerm> updatesFrame = ImmutableList.nil();
         var tb = services.getTermBuilder();
         // Names of "before" variables generated within this single application; needed because
         // the new variables are not yet registered in the namespaces while we build them.

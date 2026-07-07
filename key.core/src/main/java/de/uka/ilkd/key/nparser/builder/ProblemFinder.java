@@ -18,7 +18,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -112,7 +112,7 @@ public class ProblemFinder extends ExpressionBuilder {
             return s;
         if (obj instanceof JTerm t)
             return JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t)));
+                    .createSuccSequent(ImmutableList.singleton(new SequentFormula(t)));
         return null;
     }
 

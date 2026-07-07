@@ -74,7 +74,11 @@ public class RecentFileMenu {
         // menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
 
-        loadFrom(PathConfig.getRecentFileStorage());
+        if (Files.exists(PathConfig.currentPaths.recentFileStorage)) {
+            loadFrom(PathConfig.currentPaths.recentFileStorage);
+        } else {
+            loadFrom(PathConfig.previousPaths.recentFileStorage);
+        }
     }
 
     private void insertFirstEntry(RecentFileEntry entry) {
@@ -182,12 +186,20 @@ public class RecentFileMenu {
      */
     public final void loadFrom(Path filename) {
         try {
+            if (!Files.exists(filename)) {
+                return;
+            }
+
             var file = ParsingFacade.parseConfigurationFile(filename);
             List<Configuration> recent = file.asConfigurationList();
             this.recentFiles.clear();
+            this.mostRecentFile = null;
             for (var c : recent) {
                 final var e = new RecentFileEntry(c);
-                if (mostRecentFile != null) {
+                // The list is stored most-recent-first, so the first entry is the most recent.
+                // (Previously this condition was inverted and overwrote mostRecentFile with every
+                // entry, leaving it null after startup -- issue #3711.)
+                if (mostRecentFile == null) {
                     mostRecentFile = e;
                 }
                 recentFiles.add(e);
@@ -226,7 +238,7 @@ public class RecentFileMenu {
     }
 
     public void save() {
-        store(PathConfig.getRecentFileStorage());
+        store(PathConfig.currentPaths.recentFileStorage);
     }
 
     public class RecentFileEntry {

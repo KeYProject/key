@@ -19,7 +19,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -150,7 +150,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                     }
                     subStack.pop();
                     subStack.push(tb.all(
-                        ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
+                        ImmutableList.of(bv), top.sub(0)));
                     return;
                 }
             }

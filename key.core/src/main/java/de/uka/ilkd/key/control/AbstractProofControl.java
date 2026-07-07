@@ -29,7 +29,6 @@ import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -110,7 +109,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
-        ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
+        ImmutableList<BuiltInRule> rules = ImmutableList.nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex()
                 .getBuiltInRules(focusedGoal, pos)) {
@@ -140,7 +139,7 @@ public abstract class AbstractProofControl implements ProofControl {
             return filterTaclet(focusedGoal,
                 focusedGoal.ruleAppIndex().getFindTaclet(TacletFilter.TRUE, pos), pos);
         }
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
     @Override
@@ -151,7 +150,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 focusedGoal.ruleAppIndex().getRewriteTaclet(TacletFilter.TRUE, pos), pos);
         }
 
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
     /**
@@ -162,7 +161,7 @@ public abstract class AbstractProofControl implements ProofControl {
             ImmutableList<NoPosTacletApp> tacletInstances,
             PosInOccurrence pos) {
         HashSet<Taclet> applicableRules = new HashSet<>();
-        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        ImmutableList<TacletApp> result = ImmutableList.nil();
         for (NoPosTacletApp app : tacletInstances) {
             if (isMinimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates = app.findIfFormulaInstantiations(
@@ -330,7 +329,7 @@ public abstract class AbstractProofControl implements ProofControl {
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.nil();
-        ImmutableList<TacletApp> fittingApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> fittingApps = ImmutableList.nil();
         final RuleAppIndex index = goal.ruleAppIndex();
 
         if (pos == null) {
@@ -460,7 +459,7 @@ public abstract class AbstractProofControl implements ProofControl {
     protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name,
             PosInOccurrence pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
-        ImmutableList<BuiltInRule> match = ImmutableSLList.nil();
+        ImmutableList<BuiltInRule> match = ImmutableList.nil();
 
         // get all possible rules for current position in sequent
         ImmutableList<BuiltInRule> list = getBuiltInRule(focusedGoal, pos);
@@ -636,7 +635,7 @@ public abstract class AbstractProofControl implements ProofControl {
             goal.setRuleAppManager(focusManager);
         }
 
-        startAutoMode(goal.proof(), ImmutableSLList.singleton(goal),
+        startAutoMode(goal.proof(), ImmutableList.singleton(goal),
             new FocussedAutoModeTaskListener(goal.proof()));
     }
 

@@ -11,9 +11,9 @@ repositories {
 
 dependencies {
     api project(':key.util')
-    implementation('org.jspecify:jspecify:1.0.0')
-    antlr4 "org.antlr:antlr4:4.13.2"
-    api "org.antlr:antlr4-runtime:4.13.2"
+    implementation(libs.jspecify)
+    antlr4(libs.antlr4)
+    api(libs.antlr4.runtime)
 }
 
 def antlr4OutputKey = String.valueOf(projectDir) + '/build/generated-src/antlr/main/org/key_project/parser'

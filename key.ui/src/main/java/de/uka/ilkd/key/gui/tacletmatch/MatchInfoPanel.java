@@ -28,7 +28,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Overview of how the selected taclet matched the sequent: the schematic find pattern, the concrete
@@ -260,7 +259,7 @@ public class MatchInfoPanel extends JPanel {
         for (SvSpan span : spans) {
             // the initial position table roots the printed term at path [0]; the sub-term path
             // follows below it
-            ImmutableList<Integer> p = ImmutableSLList.<Integer>nil().append(0);
+            ImmutableList<Integer> p = ImmutableList.singleton(0);
             for (int idx : span.path()) {
                 p = p.append(idx);
             }

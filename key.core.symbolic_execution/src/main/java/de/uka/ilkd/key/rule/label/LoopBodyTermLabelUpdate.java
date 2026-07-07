@@ -17,7 +17,6 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_BODY_LABEL} is introduced when a
@@ -31,7 +30,7 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.singleton(WhileInvariantRule.INSTANCE.name());
+        return ImmutableList.singleton(WhileInvariantRule.INSTANCE.name());
     }
 
     /**

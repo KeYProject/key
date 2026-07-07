@@ -5,6 +5,8 @@ package org.key_project.prover.engine;
 
 import org.key_project.prover.proof.ProofObject;
 
+import org.jspecify.annotations.Nullable;
+
 /// An interface that provides information about a task that has finished execution.
 /// This includes various details such as the source of the task, its result, execution time,
 /// the number of applied rules, the number of closed goals, and any associated proof.
@@ -27,6 +29,7 @@ public interface TaskFinishedInfo {
     /// or specific information about the strategy or proof.
     ///
     /// @return The result of the task, which could vary depending on the task's nature.
+    @Nullable
     Object getResult();
 
     /// Retrieves the total time spent to complete the task, measured in milliseconds.
@@ -48,6 +51,7 @@ public interface TaskFinishedInfo {
     /// Retrieves the proof associated with the task.
     ///
     /// @return The proof object related to the task.
+    @Nullable
     ProofObject<?> getProof();
 
 }

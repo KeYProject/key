@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -28,11 +27,11 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         super(modifiers);
         setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            this.depends.put(hName, ImmutableSLList.nil());
+            this.depends.put(hName, ImmutableList.nil());
         }
 
         for (Name heap : heaps) {
-            this.depends.put(heap, ImmutableSLList.singleton(depends));
+            this.depends.put(heap, ImmutableList.singleton(depends));
         }
     }
 

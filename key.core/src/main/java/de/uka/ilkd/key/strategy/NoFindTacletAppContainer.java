@@ -13,8 +13,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
  */
 public class NoFindTacletAppContainer extends TacletAppContainer {
 
-    NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_cost, long p_age) {
-        super(p_app, p_cost, p_age);
+    NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_ageFreeCost,
+            boolean p_ageFreeCostIsRegular, RuleAppCost p_cost, long p_age) {
+        super(p_app, p_ageFreeCost, p_ageFreeCostIsRegular, p_cost, p_age);
     }
 
     /**

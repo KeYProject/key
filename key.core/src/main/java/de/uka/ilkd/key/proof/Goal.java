@@ -39,9 +39,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -79,7 +79,7 @@ public final class Goal implements ProofGoal<Goal> {
      * list of all applied rule applications at this branch
      */
     private ImmutableList<RuleApp> appliedRuleApps =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -133,7 +133,7 @@ public final class Goal implements ProofGoal<Goal> {
             Services services) {
         this.node = node;
         this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
-        this.appliedRuleApps = ImmutableSLList.nil();
+        this.appliedRuleApps = ImmutableList.nil();
         this.goalStrategy = null;
         this.strategyInfos = new MapProperties();
         this.tagManager = new FormulaTagManager(this);
@@ -243,6 +243,15 @@ public final class Goal implements ProofGoal<Goal> {
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex.sequentChanged(sci);
+        // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
+        // assumes-bases on their matching round (see QueueRuleApplicationManager#parkedByOp).
+        RuleApplicationManager<Goal> m = ruleAppManager;
+        while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
+            m = d.getDelegate();
+        }
+        if (m instanceof QueueRuleApplicationManager qm) {
+            qm.sequentChanged(sci);
+        }
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
@@ -543,7 +552,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.nil();
+        ImmutableList<Goal> goalList = ImmutableList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced

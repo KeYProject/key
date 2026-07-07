@@ -17,7 +17,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,8 +66,8 @@ public class TestTermFactory {
 
     @BeforeEach
     public void setUp() {
-        JTerm et_x = new TermImpl(x, new ImmutableArray<>(), null, null);
-        JTerm et_px = new TermImpl(p, new ImmutableArray<>(et_x), null, null);
+        JTerm et_x = new TermImpl(x, new ImmutableArray<>(), null);
+        JTerm et_px = new TermImpl(p, new ImmutableArray<>(et_x), null);
         et1 = et_px;
         TB = TacletForTests.services().getTermBuilder();
         tf = TB.tf();
@@ -130,7 +130,7 @@ public class TestTermFactory {
     @Test
     public void testWithInvalidSubformulae() {
         JTerm invalidBuilt = new TermImpl(p,
-            new ImmutableArray<>(new TermImpl(y, new ImmutableArray<>(), null, null)), null, null);
+            new ImmutableArray<>(new TermImpl(y, new ImmutableArray<>(), null)), null);
         try {
             JTerm t_px_or_py = tf.createTerm(Junctor.OR, invalidBuilt, t1());
         } catch (Exception e) {
@@ -141,27 +141,27 @@ public class TestTermFactory {
     @Test
     public void testConstantTrue() {
         JTerm t_true = tf.createTerm(Junctor.TRUE);
-        assertEquals(t_true, new TermImpl(Junctor.TRUE, new ImmutableArray<>(), null, null));
+        assertEquals(t_true, new TermImpl(Junctor.TRUE, new ImmutableArray<>(), null));
     }
 
     @Test
     public void testQuantifierTerm() {
-        JTerm t_forallx_px = TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x), t1());
+        JTerm t_forallx_px = TB.all(ImmutableList.<QuantifiableVariable>singleton(x), t1());
         assertEquals(t_forallx_px, new TermImpl(Quantifier.ALL, new ImmutableArray<>(t1()),
-            new ImmutableArray<>(x), null));
+            new ImmutableArray<>(x)));
     }
 
     @Test
     public void testJunctorTerm() {
         JTerm t_px_imp_ryw = tf.createTerm(Junctor.IMP, t1(), t2());
         assertEquals(t_px_imp_ryw,
-            new TermImpl(Junctor.IMP, new ImmutableArray<>(t1(), t2()), null, null));
+            new TermImpl(Junctor.IMP, new ImmutableArray<>(t1(), t2()), null));
     }
 
     @Test
     public void testNegationTerm() {
         JTerm t_not_ryw = tf.createTerm(Junctor.NOT, t2());
-        assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new ImmutableArray<>(t2()), null, null));
+        assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new ImmutableArray<>(t2()), null));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class TestTermFactory {
     public void testSubstitutionTerm() {
         JTerm t_x_subst_fy_in_px = TB.subst(WarySubstOp.SUBST, x, t3(), t1());
         assertEquals(new TermImpl(WarySubstOp.SUBST, new ImmutableArray<>(t3(), t1()),
-            new ImmutableArray<>(x), null), t_x_subst_fy_in_px);
+            new ImmutableArray<>(x)), t_x_subst_fy_in_px);
     }
 
 
@@ -221,7 +221,7 @@ public class TestTermFactory {
     public void testQuantifierWithNoBoundSubTerms() {
         JTerm result = null;
         try {
-            result = TB.all(ImmutableSLList.nil(), t1());
+            result = TB.all(ImmutableList.nil(), t1());
         } catch (TermCreationException e) {
         }
         assertEquals(result, t1());

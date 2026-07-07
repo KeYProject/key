@@ -25,7 +25,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

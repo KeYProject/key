@@ -5,21 +5,31 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.RuleContext;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML assert/assume statement.
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
+    private final String optLabel;
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
     private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
-        super(ImmutableSLList.nil(), kind.toString() + " " + clause);
+        this(kind, clause, null, null);
+    }
+
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause,
+            KeyAst.@Nullable JMLProofScript assertionProof, String optLabel) {
+        super(ImmutableList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
+        this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     public KeyAst.Expression getContext() {
@@ -63,6 +73,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         return kind;
     }
 
+    public String getOptLabel() {
+        return optLabel;
+    }
+
     public enum Kind {
         ASSERT("assert"), ASSUME("assume");
 
@@ -76,5 +90,9 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         public String toString() {
             return name;
         }
+    }
+
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
     }
 }

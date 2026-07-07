@@ -10,7 +10,6 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -26,12 +25,12 @@ public abstract class SequentPrintFilter {
     /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.nil();
+    ImmutableList<SequentPrintFilterEntry> antec = ImmutableList.nil();
 
     /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.nil();
+    ImmutableList<SequentPrintFilterEntry> succ = ImmutableList.nil();
 
     /**
      * @return the original sequent
@@ -82,13 +81,13 @@ public abstract class SequentPrintFilter {
      * entries.
      */
     protected void filterIdentity() {
-        antec = ImmutableSLList.nil();
+        antec = ImmutableList.nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             antec = antec.append(new IdentityFilterEntry(it.next()));
         }
 
-        succ = ImmutableSLList.nil();
+        succ = ImmutableList.nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             succ = succ.append(new IdentityFilterEntry(it.next()));

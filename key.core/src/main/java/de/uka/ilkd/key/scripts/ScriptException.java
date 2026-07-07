@@ -3,15 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.Nullable;
 
+/// Base exception for script execution errors.
+/// Carries optional location information pointing to the source of the error in the script.
+///
+/// @author Mattias Ulbrich
 public class ScriptException extends Exception implements HasLocation {
 
     private static final long serialVersionUID = -1200219771837971833L;
 
-    private final Location location;
+    private final @Nullable Location location;
 
     public ScriptException() {
         super();
@@ -23,7 +28,7 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = location;
     }
 
-    public ScriptException(String message, Location location) {
+    public ScriptException(String message, @Nullable Location location) {
         super(message);
         this.location = location;
     }

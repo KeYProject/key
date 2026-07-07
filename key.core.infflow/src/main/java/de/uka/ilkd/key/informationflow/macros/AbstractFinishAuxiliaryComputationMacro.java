@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Map;
-import java.util.Set;
 
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -17,8 +16,6 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
 
@@ -137,13 +134,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
     protected static void addContractApplicationTaclets(Goal initiatingGoal, Proof symbExecProof) {
         final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
         for (final Goal openGoal : openGoals) {
-            final Set<NoPosTacletApp> ruleApps = openGoal.indexOfTaclets().allNoPosTacletApps();
-            for (final NoPosTacletApp ruleApp : ruleApps) {
-                final Taclet t = ruleApp.taclet();
-                if (t.getSurviveSymbExec()) {
-                    initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                }
-            }
+            openGoal.indexOfTaclets()
+                    .allNoPosTacletAppsStream()
+                    .filter(it -> it.taclet().getSurviveSymbExec())
+                    .forEach(it -> initiatingGoal.addTaclet(it.taclet(),
+                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true));
         }
     }
 }

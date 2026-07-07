@@ -5,10 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
@@ -32,6 +29,7 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.lookup.PLookup;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
@@ -40,10 +38,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Alexander Weigl
- * @version 1 (28.03.17)
- */
+/// Maintains the execution state for proof script evaluation.
+/// Holds references to the current proof, goal, abbreviations, and user data.
+/// Also provides type converters for parsing script arguments.
+///
+/// @author Alexander Weigl
+/// @version 1 (28.03.17)
 @NullMarked
 public class EngineState {
     public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);
@@ -60,6 +60,8 @@ public class EngineState {
 
     private @Nullable Goal goal;
     private @Nullable Node lastSetGoalNode;
+
+    private final PLookup userData = new PLookup();
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -78,11 +80,20 @@ public class EngineState {
         this.engine = engine;
     }
 
+    /// add converters for types used in proof scripts,
+    /// add support for parse trees
     private ValueInjector createDefaultValueInjector() {
         var v = ValueInjector.createDefault();
         v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
+        v.addConverter(TermWithHoles.class, ProofScriptExpressionContext.class,
+            it -> TermWithHoles.fromProofScriptExpression(this, it));
+        v.addConverter(TermWithHoles.class, String.class,
+            it -> new TermWithHoles(this.toTerm(it, null)));
+
+        v.addConverter(SequentWithHoles.class, ProofScriptExpressionContext.class,
+            it -> SequentWithHoles.fromParserContext(this, it));
 
         addContextTranslator(v, String.class);
         addContextTranslator(v, JTerm.class);
@@ -143,7 +154,7 @@ public class EngineState {
         return null;
     }
 
-    public void setGoal(Goal g) {
+    public void setGoal(@Nullable Goal g) {
         goal = g;
         lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
     }
@@ -359,7 +370,11 @@ public class EngineState {
         }
     }
 
-    public ExprEvaluator getEvaluator() {
+    ExprEvaluator getEvaluator() {
         return exprEvaluator;
+    }
+
+    public PLookup getUserData() {
+        return userData;
     }
 }

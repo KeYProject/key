@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
@@ -57,7 +57,7 @@ public class ExpressionTranslatorTest {
         JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, SpecMathMode.defaultMode(),
-            ImmutableSLList.nil(), result, exc, new HashMap<>(), new HashMap<>());
+            ImmutableList.nil(), result, exc, new HashMap<>(), new HashMap<>());
         LOGGER.debug("{}", ctx.accept(et));
     }
 }

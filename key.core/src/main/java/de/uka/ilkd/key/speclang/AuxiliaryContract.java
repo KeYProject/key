@@ -44,7 +44,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -913,7 +912,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
             return new OriginalVariables(self, result, exception, atPreVars,
-                ImmutableSLList.nil());
+                ImmutableList.nil());
         }
 
     }

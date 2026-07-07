@@ -36,7 +36,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -612,38 +611,38 @@ public class TestTermLabelManager {
         Profile profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-                ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
+                ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableList.nil();
                 if (applicationTermPolicy != null) {
                     applicationTermPolicies =
                         applicationTermPolicies.prepend(applicationTermPolicy);
                 }
-                ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
+                ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableList.nil();
                 if (modalityTermPolicy != null) {
                     modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
                 }
                 ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies =
-                    ImmutableSLList.nil();
+                    ImmutableList.nil();
                 if (directChildPolicy != null) {
                     directChildTermLabelPolicies =
                         directChildTermLabelPolicies.prepend(directChildPolicy);
                 }
                 ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies =
-                    ImmutableSLList.nil();
+                    ImmutableList.nil();
                 if (childAndGrandchildPolicy != null) {
                     childAndGrandchildTermLabelPolicies =
                         childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
                 }
-                ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
+                ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableList.nil();
                 if (update != null) {
                     termLabelUpdates = termLabelUpdates.prepend(update);
                 }
                 ImmutableList<TermLabelRefactoring> termLabelRefactorings =
-                    ImmutableSLList.nil();
+                    ImmutableList.nil();
                 if (refactoring != null) {
                     termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
                 }
 
-                ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+                ImmutableList<TermLabelConfiguration> result = ImmutableList.nil();
                 result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
                     new LoggingFactory(new Name("ONE")), applicationTermPolicies,
                     modalityTermPolicies, directChildTermLabelPolicies,
@@ -678,7 +677,7 @@ public class TestTermLabelManager {
     private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {
         private final RefactoringScope scope;
 
-        private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+        private ImmutableList<Name> supportedRuleNames = ImmutableList.nil();
 
         public LoggingTermLabelRefactoring(RefactoringScope scope, String... supportedRules) {
             this.scope = scope;
@@ -723,7 +722,7 @@ public class TestTermLabelManager {
     private static class LoggingTermLabelUpdate implements TermLabelUpdate {
         private final TermLabel toAdd;
 
-        private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+        private ImmutableList<Name> supportedRuleNames = ImmutableList.nil();
 
         public LoggingTermLabelUpdate(TermLabel toAdd, String... supportedRules) {
             this.toAdd = toAdd;
@@ -749,7 +748,7 @@ public class TestTermLabelManager {
     }
 
     private static class LoggingChildTermLabelPolicy implements ChildTermLabelPolicy {
-        private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+        private ImmutableList<Name> supportedRuleNames = ImmutableList.nil();
 
         private final List<TermLabel> log = new LinkedList<>();
 

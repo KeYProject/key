@@ -63,7 +63,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * The always used {@link StrategyFactory}.
      */
-    private static final StrategyFactory FACTORY = JavaProfile.DEFAULT;
+    private static final StrategyFactory FACTORY = JavaProfile.getDefault();
 
     /**
      * The {@link StrategySettingsDefinition} of {@link #FACTORY} which defines the UI controls to

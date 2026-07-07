@@ -30,7 +30,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
@@ -51,7 +50,7 @@ public class HelperClassForTests {
         @Override
         public RuleCollection getStandardRules() {
             final var ruleSource = RuleSourceFactory.fromDefaultLocation(ldtFile);
-            return new RuleCollection(ImmutableList.of(ruleSource), ImmutableSLList.nil());
+            return new RuleCollection(ImmutableList.of(ruleSource), ImmutableList.nil());
         }
     };
 

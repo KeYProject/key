@@ -137,6 +137,41 @@ public class OverloadedOperatorHandler {
         return null;
     }
 
+    /**
+     * When {@link #build} could not resolve an operator, this produces a hint for the error message
+     * in case the operator is actually available in a different spec math mode. For instance {@code
+     * >>>} is defined for {@code int}/{@code long} but not for {@code \bigint}, so in the default
+     * bigint mode it fails no matter how the operands are cast - the useful advice is to change the
+     * spec math mode, not the operand types.
+     *
+     * @param op the operator that {@link #build} could not resolve
+     * @return a one-sentence hint, or the empty string when there is nothing useful to add
+     */
+    public String modeHint(JMLOperator op) {
+        SpecMathMode current = integerHandler.getSpecMathMode();
+        EnumSet<SpecMathMode> supporting = integerHandler.supportingModes(op);
+        supporting.remove(current);
+        if (supporting.isEmpty()) {
+            return "";
+        }
+        List<String> modifiers = new ArrayList<>();
+        for (SpecMathMode mode : supporting) {
+            modifiers.add(specMathModifier(mode));
+        }
+        return String.format(
+            "The '%s' operator is not available in the '%s' spec math mode; "
+                + "it is available under %s (set as a class or method modifier).",
+            op.getImage(), specMathModifier(current), String.join(" or ", modifiers));
+    }
+
+    private static String specMathModifier(SpecMathMode mode) {
+        return switch (mode) {
+            case JAVA -> "spec_java_math";
+            case SAFE -> "spec_safe_math";
+            case BIGINT -> "spec_bigint_math";
+        };
+    }
+
 
     public static class SequenceHandler implements JMLOperatorHandler {
         private final SeqLDT ldtSequence;

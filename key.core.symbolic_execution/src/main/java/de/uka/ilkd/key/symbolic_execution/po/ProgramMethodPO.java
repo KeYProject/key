@@ -33,7 +33,6 @@ import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -150,7 +149,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
         MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
         StatementBlock result = new StatementBlock(mbs);
-        return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
+        return ImmutableList.<StatementBlock>nil().prepend(null, result, null, null);
     }
 
     /**
@@ -346,7 +345,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         if (type == null) {
             throw new IOException("Can't find type \"" + className + "\".");
         }
-        ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> parameterTypes = ImmutableList.nil();
         for (String s : types) {
             KeYJavaType paramType = javaInfo.getKeYJavaType(s.trim());
             if (paramType == null) {

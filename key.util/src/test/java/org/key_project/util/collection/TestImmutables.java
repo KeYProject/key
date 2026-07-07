@@ -12,7 +12,7 @@ public class TestImmutables {
 
     @Test
     public void testRemoveDuplicatesLarge() {
-        ImmutableList<Integer> l = ImmutableSLList.nil();
+        ImmutableList<Integer> l = ImmutableList.nil();
         for (int i = 0; i < 100; i++) {
             l = l.prepend((i * 2) % 160);
         }
@@ -44,7 +44,7 @@ public class TestImmutables {
 
         for (int i = 0; i < a.length; i++) {
             ImmutableList<@Nullable String> l =
-                ImmutableSLList.<@Nullable String>nil().prepend(a[i]).reverse();
+                ImmutableList.<@Nullable String>nil().prepend(a[i]).reverse();
 
             assertFalse(Immutables.isDuplicateFree(l));
 
@@ -60,7 +60,7 @@ public class TestImmutables {
     @Test
     public void testRemoveDuplicatesIdentical() {
         String[] a = { "a", "b", "c", "d", "e" };
-        ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a);
+        ImmutableList<String> l = ImmutableList.<String>nil().prepend(a);
 
         ImmutableList<String> cleaned = Immutables.removeDuplicates(l);
 
@@ -75,7 +75,7 @@ public class TestImmutables {
         for (@Nullable
         String[] strings : a) {
             ImmutableList<@Nullable String> l =
-                ImmutableSLList.<@Nullable String>nil().prepend(strings);
+                ImmutableList.<@Nullable String>nil().prepend(strings);
             assertTrue(Immutables.isDuplicateFree(l));
         }
 
@@ -86,7 +86,7 @@ public class TestImmutables {
         for (@Nullable
         String[] strings : b) {
             ImmutableList<@Nullable String> l =
-                ImmutableSLList.<@Nullable String>nil().prepend(strings);
+                ImmutableList.<@Nullable String>nil().prepend(strings);
             assertFalse(Immutables.isDuplicateFree(l));
         }
 
@@ -139,7 +139,7 @@ public class TestImmutables {
     @Test
     public void testEqualityEmpty() {
         ImmutableSet<Object> s1 = DefaultImmutableSet.nil();
-        ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(ImmutableSLList.nil());
+        ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(ImmutableList.nil());
         assertEquals(0, s1.size());
         assertEquals(0, s2.size());
 
@@ -180,7 +180,7 @@ public class TestImmutables {
     public void testFilterStackoverflow() {
         // With the original tail recursive implementation, this would give
         // an overflow --> made it a loop.
-        ImmutableList<Integer> l = ImmutableSLList.nil();
+        ImmutableList<Integer> l = ImmutableList.nil();
         for (int i = 0; i < 1_000_000; i++) {
             l = l.prepend(i);
         }
@@ -200,7 +200,7 @@ public class TestImmutables {
     public void testMapStackoverflow() {
         // With the original tail recursive implementation, this would give
         // an overflow --> made it a loop.
-        ImmutableList<Integer> l = ImmutableSLList.nil();
+        ImmutableList<Integer> l = ImmutableList.nil();
         for (int i = 0; i < 1_000_000; i++) {
             l = l.prepend(i);
         }
@@ -213,7 +213,7 @@ public class TestImmutables {
     public void testExistsStackoverflow() {
         // With a tail recursive implementation, this would give
         // an overflow --> it is a loop.
-        ImmutableList<Integer> l = ImmutableSLList.nil();
+        ImmutableList<Integer> l = ImmutableList.nil();
         for (int i = 0; i < 1_000_000; i++) {
             l = l.prepend(i);
         }

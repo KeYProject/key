@@ -34,7 +34,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -92,7 +91,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
 
     private ImmutableSet<JTerm> addEqualDefs(ImmutableSet<JTerm> terms, Goal g) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
 
         for (SequentFormula cf : g.sequent().antecedent()) {
             final JTerm formula = (JTerm) cf.formula();
@@ -183,7 +182,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {
             return new Pair<>(TB.empty(),
-                ImmutableSLList.nil());
+                ImmutableList.nil());
         } else if (op == heapLDT.getStore()) {
             final JTerm h = heapTerm.sub(0);
             final JTerm o = heapTerm.sub(1);
@@ -416,7 +415,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             selfTerm = focus.sub(target.getHeapCount(services) * target.getStateCount());
         }
 
-        ImmutableList<JTerm> paramTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> paramTerms = ImmutableList.nil();
         for (int i = target.getHeapCount(services) * target.getStateCount()
                 + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
@@ -461,7 +460,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         int heapExprIndex = 0;
         boolean useful = false;
         ImmutableList<PosInOccurrence> ifInsts =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         int hc = 0;
         for (LocationVariable heap : heaps) {
             if (hc >= obsHeapCount) {
@@ -604,5 +603,16 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                                Methods and model fields may be annotated with an accessible clause. This defines a dependency contract describing the heap locations its value may depend on.
+
+                If the heap changes in locations the symbol does not depend on, its value remains unchanged. This rules adds an according implication for a heap-dependent symbol to the sequent's antecedent.
+
+                In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted) to avoid endless loops.</entry>
+                """;
     }
 }

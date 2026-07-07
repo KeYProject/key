@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A contractual agreement about an ObserverFunction.
@@ -330,7 +329,7 @@ public interface Contract extends SpecificationElement {
             this.exception = excVar;
             this.atPres = atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.nil();
+                this.params = ImmutableList.nil();
             } else {
                 this.params = paramVars;
             }

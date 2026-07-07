@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
+import org.key_project.util.parsing.HasLocation;
 
-import de.uka.ilkd.key.parser.Location;
+
+import org.key_project.util.parsing.Location;
 
 
 /**

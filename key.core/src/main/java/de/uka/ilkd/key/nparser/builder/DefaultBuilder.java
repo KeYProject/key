@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -30,10 +32,11 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -251,6 +254,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().choices();
     }
 
+    protected org.key_project.logic.MetaSpace docsSpace() {
+        return namespaces().docs();
+    }
+
+
     @Override
     public String visitString_value(JavaKeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1);
@@ -295,7 +303,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public String visitSimple_ident(JavaKeYParser.Simple_identContext ctx) {
-        return ctx.IDENT().getText();
+        return ctx.getText();
     }
 
     @Override
@@ -372,7 +380,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "Expected %d sort arguments, got only %d",
                 params.size(), ctx.sortId().size());
         }
-        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        ImmutableList<GenericArgument> args = ImmutableList.nil();
         for (int i = params.size() - 1; i >= 0; i--) {
             var arg = ctx.sortId(i);
             var sort = visitSortId(arg);
@@ -461,4 +469,28 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
         return new GenericParameter((GenericSort) paramSort, variance);
     }
+
+
+    protected String processDocumentation(TerminalNode terminalNode) {
+        if (terminalNode != null)
+            return processDocumentation(terminalNode.getSymbol());
+        return null;
+    }
+
+    protected String processDocumentation(List<Token> maindoc) {
+        return maindoc.stream().map(this::processDocumentation).collect(Collectors.joining("\n\n"));
+    }
+
+    protected String processDocumentation(Token doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        var text = doc.getText();
+        int prefix = doc.getCharPositionInLine() + 2;
+        Pattern REMOVE_INDENT = Pattern.compile("^[ ]{1," + prefix + "}", Pattern.MULTILINE);
+        text = text.strip().substring(3, text.length() - 2);
+        return REMOVE_INDENT.matcher(text).replaceAll("").trim();
+    }
+
 }

@@ -29,7 +29,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -66,7 +65,7 @@ public abstract class TacletExecutor
      *         not supported for this kind of taclet
      */
     public ImmutableList<SequentChangeInfo> getResultSequentChanges(Goal goal, RuleApp ruleApp) {
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
     @Override
@@ -154,7 +153,7 @@ public abstract class TacletExecutor
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
 
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> replacements = ImmutableList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
@@ -183,8 +182,8 @@ public abstract class TacletExecutor
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
-            tacletToAdd = tacletToAdd
-                    .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
+            String name = tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId();
+            tacletToAdd = tacletToAdd.setName(name);
 
 
             // the new Taclet may contain variables with a known
@@ -229,7 +228,7 @@ public abstract class TacletExecutor
             LogicServices p_services,
             MatchResultInfo matchCond) {
         final Services services = (Services) p_services;
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
+        ImmutableList<RenamingTable> renamings = ImmutableList.nil();
         for (final SchemaVariable sv : pvs) {
             final LocationVariable inst =
                 (LocationVariable) matchCond.getInstantiations().getInstantiation(sv);

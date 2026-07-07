@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
@@ -20,6 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * <p>
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
+@StableCost
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm<Goal> a, b;
 

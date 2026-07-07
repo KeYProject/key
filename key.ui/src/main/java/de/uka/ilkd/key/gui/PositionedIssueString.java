@@ -5,8 +5,9 @@ package de.uka.ilkd.key.gui;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
 

@@ -6,7 +6,8 @@ package de.uka.ilkd.key.scripts.meta;
 import de.uka.ilkd.key.scripts.ScriptException;
 
 /**
- *
+ * Base exception for errors occurring during value injection into script command parameters.
+ * Thrown when argument injection or validation fails.
  *
  * @author Alexander Weigl
  * @version 1 (02.05.17)
@@ -29,5 +30,14 @@ public class InjectionException extends ScriptException {
      */
     public InjectionException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * An injection exception with a cause to be displayed.
+     *
+     * @param cause the cause of the exception.
+     */
+    public InjectionException(Throwable cause) {
+        super(cause);
     }
 }

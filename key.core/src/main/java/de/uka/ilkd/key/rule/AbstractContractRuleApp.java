@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
@@ -29,7 +28,7 @@ public abstract class AbstractContractRuleApp<T extends BuiltInRule>
 
     protected AbstractContractRuleApp(T rule, @Nullable PosInOccurrence pio,
             @Nullable Contract contract) {
-        this(rule, pio, ImmutableSLList.nil(), contract);
+        this(rule, pio, ImmutableList.nil(), contract);
     }
 
     protected AbstractContractRuleApp(T rule,

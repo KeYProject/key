@@ -16,7 +16,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -91,7 +90,7 @@ public class FocussedBreakpointRuleApplicationManager
     public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

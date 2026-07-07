@@ -55,6 +55,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
+import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -240,6 +241,7 @@ public final class MainWindow extends JFrame {
     private ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
+    private DropdownSelectionButton automationComponent;
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
@@ -283,6 +285,12 @@ public final class MainWindow extends JFrame {
     private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
         new LruCached<>(HTMLSyntaxHighlighter.Args::run);
 
+    /**
+     * List of automation actions for the dropdown button.
+     * To add new automation modes, add them to {@link #createAutomationActions()}.
+     */
+    private final List<Action> automationActions;
+
     /*
      * This class should only be instantiated once!
      */
@@ -325,9 +333,22 @@ public final class MainWindow extends JFrame {
         recentFileMenu = new RecentFileMenu(this);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView(this, mediator);
+        infoView = new InfoView(mediator);
         strategySelectionView = new StrategySelectionView(this, mediator);
         openGoalsView = new GoalList(mediator);
+
+        // Initialize automation actions
+        automationActions = createAutomationActions();
+
+        // Register keyboard shortcut for default automation action (Ctrl+Space)
+        if (!automationActions.isEmpty()) {
+            Action defaultAction = automationActions.get(0);
+            KeyStroke accelerator = (KeyStroke) defaultAction.getValue(Action.ACCELERATOR_KEY);
+            if (accelerator != null) {
+                inputMap.put(accelerator, "defaultAutomation");
+                getRootPane().getActionMap().put("defaultAutomation", defaultAction);
+            }
+        }
 
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -652,7 +673,9 @@ public final class MainWindow extends JFrame {
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
-        toolBar.add(createWiderAutoModeButton());
+        DropdownSelectionButton autoComp = createAutomationComponent();
+        toolBar.add(autoComp.getActionComponent());
+        toolBar.add(autoComp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
@@ -746,6 +769,92 @@ public final class MainWindow extends JFrame {
         updateSMTSelectMenu();
         mediator.addKeYSelectionListener(new DPEnableControl());
         return smtComponent;
+    }
+
+    // @formatter:off
+    /**
+     * Creates the list of automation actions for the dropdown button.
+     * <p>
+     * The first action in the list is the default and will be triggered by the {@code Ctrl+Space}
+     * keyboard shortcut. Actions are displayed in the dropdown menu in the order they are added.
+     * </p>
+     * <p>
+     * To add new automation modes, simply add them to this list. No configuration file or service
+     * loader is needed. For macro-based automations, use {@link MacroAutomationAction}. For custom
+     * behaviors, extend {@link MainWindowAction}.
+     * </p>
+     * <p>
+     * Example:
+     *
+     * <pre>
+     * {@code
+     * actions.add(new MacroAutomationAction(this,
+     *     new YourCustomMacro(),
+     *     "Your Automation Name",
+     *     IconFactory.yourIcon(TOOLBAR_ICON_SIZE)));
+     * }
+     * </pre>
+     * </p>
+     *
+     * @return list of automation actions
+     * @see MacroAutomationAction
+     * @see AutoModeAction
+     */
+    // @formatter:on
+    private List<Action> createAutomationActions() {
+        return List.of(
+            new MacroAutomationAction(this,
+                new DefaultAutoMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "A")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "S")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P"))
+        // when it is finished ... new MacroAutomationAction(this ... ScriptMacro ... "J" (*J*ML
+        // scripts)
+        );
+    }
+
+    /**
+     * Create the automation component dropdown button.
+     * This replaces the old auto mode button with a configurable dropdown selector.
+     *
+     * @return the automation {@link DropdownSelectionButton}
+     */
+    private DropdownSelectionButton createAutomationComponent() {
+        automationComponent = new DropdownSelectionButton(TOOLBAR_ICON_SIZE);
+
+        // Convert list to array
+        Action[] actionArray = automationActions.toArray(new Action[0]);
+
+        // Identity reducer - just return the single selected action
+        Function<Action[], Action> identityReducer = a -> {
+            if (a.length == 0) {
+                return null;
+            }
+            return a[0];
+        };
+
+        // Set items with single selection (maxChoiceAmount = 1)
+        automationComponent.setItems(actionArray, identityReducer, 1);
+
+        // Add change listener to update enabled state based on proof status
+        automationComponent.addListener(e -> {
+            Proof proof = mediator.getSelectedProof();
+            boolean hasProof = proof != null && !proof.closed();
+            automationComponent.setEnabled(hasProof);
+        });
+
+        // Initialize enabled state
+        Proof initialProof = mediator.getSelectedProof();
+        automationComponent.setEnabled(initialProof != null && !initialProof.closed());
+
+        automationComponent.getActionComponent().putClientProperty("hideActionText", Boolean.TRUE);
+        automationComponent.getActionComponent().putClientProperty("isAutoButton", Boolean.TRUE);
+
+        return automationComponent;
     }
 
     private JComponent createWiderAutoModeButton() {
@@ -966,7 +1075,12 @@ public final class MainWindow extends JFrame {
         proof.setMnemonic(KeyEvent.VK_P);
 
         if (selected == null) {
-            proof.add(autoModeAction);
+            JMenu automationMenu = new JMenu("Automation");
+            for (Action action : automationActions) {
+                JMenuItem item = new JMenuItem(action);
+                automationMenu.add(item);
+            }
+            proof.add(automationMenu);
             GoalBackAction goalBack = new GoalBackAction(this, true);
             proof.addMenuListener(new MenuListener() {
                 @Override
@@ -1599,10 +1713,17 @@ public final class MainWindow extends JFrame {
                 Component component = SwingUtilities.getDeepestComponentAt(contentPane,
                     containerPoint.x, containerPoint.y);
 
-                if (eventID == MouseEvent.MOUSE_PRESSED && isLiveComponent(component)) {
-                    currentComponent = component;
-                    dispatchForCurrentComponent(e);
+                if (isLiveComponent(component)) {
+                    if (eventID == MouseEvent.MOUSE_PRESSED) {
+                        currentComponent = component;
+                        dispatchForCurrentComponent(e);
+                    }
+                    glassPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    glassPane.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 }
+
+
             }
         }
 
@@ -1611,8 +1732,8 @@ public final class MainWindow extends JFrame {
             // this is not the most elegant way to identify the right
             // components, but it scales well ;-)
             while (c != null) {
-                if ((c instanceof JComponent)
-                        && AUTO_MODE_TEXT.equals(((JComponent) c).getToolTipText())) {
+                if (c instanceof JComponent jc
+                        && jc.getClientProperty("isAutoButton") == Boolean.TRUE) {
                     return true;
                 }
                 c = c.getParent();

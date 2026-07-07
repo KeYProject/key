@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
 
 import com.github.javaparser.ast.Node;
 
@@ -39,7 +39,7 @@ public class ConvertException extends RuntimeException implements HasLocation {
      * @param node the JavaParser node the conversion failed on
      */
     public ConvertException(String message, Node node) {
-        this(message, Location.fromNode(node));
+        this(message, JavaSourceLocations.locationFromNode(node));
     }
 
     @Override

@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -81,6 +80,15 @@ class TermImpl implements JTerm {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
+    /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
+    private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
+
+    /**
+     * Cached renaming-invariant hashCode ({@link RenamingTermProperty#hashCodeModThisProperty}),
+     * used to fast-reject unequal pairs in equality modulo renaming. {@code 0} = not yet computed.
+     */
+    private int hashcodeModRenaming = 0;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -95,36 +103,13 @@ class TermImpl implements JTerm {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            String origin) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.origin = origin;
     }
-
-    TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
-        this(op, subs, boundVars, "");
-    }
-
-    /**
-     * For which feature is this information needed?
-     * What is the difference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
-     */
-    private final String origin;
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
@@ -439,6 +424,38 @@ class TermImpl implements JTerm {
             this.containsJavaBlockRecursive = result;
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    /**
+     * Renaming-invariant hashCode, computed lazily on first use and cached. Used by
+     * {@link RenamingTermProperty} to fast-reject pairs that cannot be equal modulo renaming.
+     */
+    public int hashCodeModRenaming() {
+        if (hashcodeModRenaming == 0) {
+            final int h = de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY
+                    .hashCodeModThisProperty(this);
+            hashcodeModRenaming = h == 0 ? 1 : h;
+        }
+        return hashcodeModRenaming;
+    }
+
+    @Override
+    public boolean containsTransformerRecursive() {
+        if (containsTransformerRecursive == ThreeValuedTruth.UNKNOWN) {
+            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+            if (op instanceof Transformer) {
+                result = ThreeValuedTruth.TRUE;
+            } else {
+                for (int i = 0, arity = subs.size(); i < arity; i++) {
+                    if (subs.get(i).containsTransformerRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
+                    }
+                }
+            }
+            this.containsTransformerRecursive = result;
+        }
+        return containsTransformerRecursive == ThreeValuedTruth.TRUE;
     }
 
 

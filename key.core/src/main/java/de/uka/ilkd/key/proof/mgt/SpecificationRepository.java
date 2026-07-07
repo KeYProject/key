@@ -165,9 +165,10 @@ public class SpecificationRepository {
         tacletBuilder.setFind(limitedTerm);
         tacletBuilder.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableSLList.nil(), unlimitedTerm));
+                ImmutableList.nil(), unlimitedTerm));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
+        // tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
         return tacletBuilder.getTaclet();
     }
 
@@ -191,9 +192,9 @@ public class SpecificationRepository {
         tacletBuilder.setFind(tb.func(unlimited, subs));
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
         final Sequent addedSeq =
-            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(cf));
+            JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(cf));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
-            ImmutableSLList.nil(), tb.func(unlimited, subs)));
+            ImmutableList.nil(), tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         tacletBuilder.setName(
@@ -260,7 +261,7 @@ public class SpecificationRepository {
 
     private ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingMethods(KeYJavaType kjt,
             IProgramMethod pm) {
-        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableSLList.nil();
+        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableList.nil();
 
         // static methods and constructors are not overriden
         if (pm.isConstructor() || pm.isStatic()) {
@@ -896,23 +897,23 @@ public class SpecificationRepository {
 
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                        kjt, new Private(), null, invDef, selfVar, ImmutableSLList.nil(), null);
+                        kjt, new Private(), null, invDef, selfVar, ImmutableList.nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                    new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
+                    new Private(), null, staticInvDef, null, ImmutableList.nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
                     "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                    new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
+                    new Private(), null, freeInvDef, selfVar, ImmutableList.nil(), null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
                     "Free static class invariant axiom for " + kjt.getFullName(),
                     freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
-                    ImmutableSLList.nil(), null);
+                    ImmutableList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
 
             }
@@ -967,7 +968,7 @@ public class SpecificationRepository {
                     // We need to construct an inheritance chain of contracts
                     // starting at the bottom
                     ImmutableList<FunctionalOperationContract> lookupContracts =
-                        ImmutableSLList.nil();
+                        ImmutableList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
                     List<KeYJavaType> superTypes =
                         services.getJavaInfo().getAllSupertypes(kjt);
@@ -1619,11 +1620,13 @@ public class SpecificationRepository {
      * list of terms, in
      * an immutable fasion. Updates require to create instances.
      * <p>
-     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable
+     * <b>Note:</b> There is an immutability hole in {@link ProgramVariableCollection} due to
+     * mutable
      * {@link Map}
      * <p>
      * For {@link de.uka.ilkd.key.java.ast.statement.JmlAssert} this is the formula behind the
-     * assert.
+     * assert
+     * (Potientially also containing the formulas within the optional proof).
      * For {@link de.uka.ilkd.key.java.ast.statement.SetStatement} this is the target and the value
      * terms.
      * You may want to use the index constant for accessing them:
@@ -1650,7 +1653,7 @@ public class SpecificationRepository {
         }
 
         /**
-         * Retrieve a term with a update to the given {@code self} term.
+         * Retrieve a term with an update to the given {@code self} term.
          *
          * @param services the corresponding services instance
          * @param self a term which describes the {@code self} object aka. this on the current

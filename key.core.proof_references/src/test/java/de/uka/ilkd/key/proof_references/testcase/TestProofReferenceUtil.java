@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesA
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
         doAPITest(TESTCASE_DIRECTORY,
             "/proofReferences/UseOperationContractTest/UseOperationContractTest.java",
             "UseOperationContractTest", "main", true,
-            ImmutableSLList.<IProofReferencesAnalyst>nil().append(
+            ImmutableList.<IProofReferencesAnalyst>nil().append(
                 new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
             new ExpectedProofReferences(IProofReference.INLINE_METHOD,
                 "UseOperationContractTest::main"),
@@ -48,7 +47,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testReferenceComputation_NoAnalysts() throws Exception {
         doAPITest(TESTCASE_DIRECTORY, "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
-            "MethodBodyExpand", "main", false, ImmutableSLList.nil());
+            "MethodBodyExpand", "main", false, ImmutableList.nil());
     }
 
     /**
@@ -57,7 +56,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testReferenceComputation_ContractOnly() throws Exception {
         doAPITest(TESTCASE_DIRECTORY, "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
-            "MethodBodyExpand", "main", false, ImmutableSLList.<IProofReferencesAnalyst>nil()
+            "MethodBodyExpand", "main", false, ImmutableList.<IProofReferencesAnalyst>nil()
                     .append(new ContractProofReferencesAnalyst()));
     }
 
@@ -68,7 +67,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     public void testReferenceComputation_ExpandOnly() throws Exception {
         doAPITest(TESTCASE_DIRECTORY, "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
             "MethodBodyExpand", "main", false,
-            ImmutableSLList.<IProofReferencesAnalyst>nil()
+            ImmutableList.<IProofReferencesAnalyst>nil()
                     .append(new MethodBodyExpandProofReferencesAnalyst()),
             new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"),
             new ExpectedProofReferences(IProofReference.INLINE_METHOD,

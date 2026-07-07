@@ -6,7 +6,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -39,7 +39,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_EXPR;
+import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSERT;
+
 
 /**
  * @author Alexander Weigl
@@ -364,14 +365,14 @@ public class TransformationPipelineServices {
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 
-    public void attachExpr(Node node, @Nullable String spec) {
+    public void attachAssertion(Node node, @Nullable String spec) {
         if (spec == null)
             return;
         PreParser pp = getPreParser();
         ImmutableList<TextualJMLConstruct> specification =
             pp.parseMethodLevel(spec, null, Position.UNDEFINED);
         TextualJMLAssertStatement expr = (TextualJMLAssertStatement) specification.get(0);
-        node.setData(KEY_EXPR, expr.getContext());
+        node.setData(KEY_ASSERT, expr);
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 

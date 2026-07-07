@@ -21,7 +21,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * ProgramTransformers are used to describe schematic transformations that cannot be expressed by
@@ -251,7 +250,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 
     /**
@@ -262,6 +261,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        return ImmutableSLList.nil();
+        return ImmutableList.nil();
     }
 }

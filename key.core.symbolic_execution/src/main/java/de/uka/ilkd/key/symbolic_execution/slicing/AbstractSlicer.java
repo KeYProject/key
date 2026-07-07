@@ -39,7 +39,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
@@ -736,7 +735,7 @@ public abstract class AbstractSlicer {
      * @return The representative alias.
      */
     protected Location normalizeAlias(Services services, Location location, SequentInfo info) {
-        ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
+        ImmutableList<Access> normalizedAccesses = ImmutableList.nil();
         for (Access access : location.getAccesses()) {
             if (access.isArrayIndex()) {
                 access = normalizeArrayIndex(access, info);
@@ -890,7 +889,7 @@ public abstract class AbstractSlicer {
     protected Location toLocation(Services services, ReferencePrefix prefix, ExecutionContext ec,
             ReferencePrefix thisReference) {
         ImmutableList<Access> accesses =
-            toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.nil());
+            toLocationRecursive(services, prefix, ec, thisReference, ImmutableList.nil());
         return new Location(accesses);
     }
 

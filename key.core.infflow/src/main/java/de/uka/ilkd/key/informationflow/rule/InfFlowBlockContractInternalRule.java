@@ -49,7 +49,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -422,7 +421,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -444,7 +443,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The default implementation of {@link IExecutionMethodCall}.
@@ -28,7 +27,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * The up to know discovered {@link IExecutionBaseMethodReturn}s.
      */
-    private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+    private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableList.nil();
 
     /**
      * Constructor.

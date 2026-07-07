@@ -17,7 +17,6 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -32,7 +31,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().prepend(WhileInvariantRule.INSTANCE.name())
+        return ImmutableList.<Name>nil().prepend(WhileInvariantRule.INSTANCE.name())
                 .prepend(BlockContractInternalRule.INSTANCE.name())
                 .prepend(BlockContractExternalRule.INSTANCE.name())
                 .prepend(LoopContractInternalRule.INSTANCE.name())

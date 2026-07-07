@@ -28,7 +28,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A statement indicating a merge point.
@@ -45,7 +44,7 @@ public class MergePointStatement extends JavaStatement
 
     @Override
     public ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return context == null ? ImmutableSLList.nil() : ImmutableList.of(context);
+        return context == null ? ImmutableList.nil() : ImmutableList.of(context);
     }
 
     public MergePointStatement(

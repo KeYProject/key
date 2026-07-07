@@ -6,10 +6,11 @@ package de.uka.ilkd.key.gui.tacletmatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 /**
  * GUI-independent logic for the "type the {@code \assumes} sequent" editor: how the two typed parts

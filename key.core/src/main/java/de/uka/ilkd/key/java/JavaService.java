@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.JPContext;
@@ -36,7 +38,6 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import com.github.javaparser.*;
@@ -192,7 +193,7 @@ public class JavaService {
                 .orElse(new Position(-1, -1));
         return new BuildingIssue(simplifyJavaParserMessage(problem.getVerboseMessage()),
             problem.getCause().orElse(null), false,
-            de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
+            JavaSourceLocations.positionFromJP(loc), source);
     }
 
     /**
@@ -216,13 +217,63 @@ public class JavaService {
             String head = result.substring(0, idx);
             String[] items =
                 result.substring(idx + "expected one of".length()).trim().split("\\s+");
-            final int limit = 6;
-            if (items.length > limit) {
-                result = head + "expected one of "
-                    + String.join(" ", Arrays.copyOf(items, limit)) + " ...";
+            // Drop JavaCard / schema-internal alternatives (e.g. "#abortJavaCardTransaction");
+            // they are noise for ordinary Java source and otherwise crowd out the relevant ones.
+            List<String> relevant = Arrays.stream(items)
+                    .filter(t -> !t.startsWith("\"#"))
+                    .collect(Collectors.toList());
+            if (relevant.isEmpty()) {
+                relevant = Arrays.asList(items);
             }
+            final int limit = 6;
+            String list = relevant.size() > limit
+                    ? String.join(" ", relevant.subList(0, limit)) + " ..."
+                    : String.join(" ", relevant);
+            result = head + "expected one of " + list;
         }
-        return result;
+        return humanizeJavaParserJargon(cleanFoundToken(result));
+    }
+
+    /**
+     * Rewrites JavaParser symbol-solver jargon into the user-facing wording KeY uses elsewhere:
+     * {@code "Unsolved symbol : Foobar"} becomes {@code "Cannot resolve 'Foobar'. No variable,
+     * field, or type with this name is in scope here (check for typos)."}. Text without that jargon
+     * is returned unchanged.
+     *
+     * @param message a message that may contain JavaParser symbol-solver jargon
+     * @return the message with that jargon humanized
+     */
+    public static String humanizeJavaParserJargon(@Nullable String message) {
+        if (message == null) {
+            return "";
+        }
+        return message.replaceAll("Unsolved symbol\\s*:\\s*([A-Za-z_$][\\w$.]*)",
+            "Cannot resolve '$1'. No variable, field, or type with this name is in scope here "
+                + "(check for typos)");
+    }
+
+    /**
+     * The offending token quoted in a JavaParser message can be a multi-line construct (e.g. a
+     * block comment); its raw text - with (escaped) line breaks - makes the message span many
+     * lines. Collapse the internal whitespace of that quoted {@code unexpected "..."} token to
+     * single spaces and shorten it if very long, so the message stays on one readable line.
+     *
+     * @param message a JavaParser message whose lead-in has already been rewritten
+     * @return the message with its offending token collapsed to a single line
+     */
+    private static String cleanFoundToken(String message) {
+        // JavaParser writes the offending token as {@code unexpected "..."} (note: it can use more
+        // than one space); match one-or-more spaces so the token is found and collapsed.
+        Matcher m = Pattern.compile("unexpected\\s+\"(.*?)\"", Pattern.DOTALL).matcher(message);
+        if (!m.find()) {
+            return message;
+        }
+        String token = m.group(1).replaceAll("\\\\[nrt]|\\s+", " ").trim();
+        final int max = 60;
+        if (token.length() > max) {
+            token = token.substring(0, max) + "…";
+        }
+        return message.substring(0, m.start(1)) + token + message.substring(m.end(1));
     }
 
     // region parsing of compilation units
@@ -522,7 +573,21 @@ public class JavaService {
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
+            // The special classes were not fully parsed: do not leave the model marked as
+            // "parsed" (see the RuntimeException branch below for why).
+            mapping.setParsedSpecial(false);
             throw new RuntimeException(e);
+        } catch (RuntimeException | Error e) {
+            // Parsing the special (boot/library) classes failed - e.g. because one of the
+            // stub files under JavaRedux (or a \bootclasspath/\classpath entry) does not
+            // parse. We must NOT keep parsedSpecial == true here: otherwise the half-built
+            // Java model is silently reused, subsequent calls return early (line above),
+            // and every later type lookup - java.lang.Math in the float rules, user types,
+            // ... - fails with a misleading "cannot be found" that hides the real parse
+            // error. Reset the flag and let the actual failure (which points at the
+            // offending stub file) propagate.
+            mapping.setParsedSpecial(false);
+            throw e;
         } finally {
             mapping.setParsingLibraries(false);
         }
@@ -885,7 +950,7 @@ public class JavaService {
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,
             Namespace<SchemaVariable> allowSchemaJava) {
-        ImmutableList<IProgramVariable> pvs = ImmutableSLList.nil();
+        ImmutableList<IProgramVariable> pvs = ImmutableList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
                 pvs = pvs.append(n); // preserve the order (nested namespaces!)

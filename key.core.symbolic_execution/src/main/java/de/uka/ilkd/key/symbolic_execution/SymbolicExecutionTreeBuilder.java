@@ -44,7 +44,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
@@ -306,7 +305,7 @@ public class SymbolicExecutionTreeBuilder {
                 }
             }.run();
             Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(label);
-            methodCallStack.put(root, ImmutableSLList.<Node>nil().append(initialStack));
+            methodCallStack.put(root, ImmutableList.<Node>nil().append(initialStack));
         }
     }
 
@@ -693,7 +692,7 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Contains all {@link Node}s which are closed after a join.
          */
-        private ImmutableList<Node> joinNodes = ImmutableSLList.nil();
+        private ImmutableList<Node> joinNodes = ImmutableList.nil();
 
         /**
          * Constructor.
@@ -1083,10 +1082,10 @@ public class SymbolicExecutionTreeBuilder {
             ImmutableList<Node> stack = findMethodCallStack(methodCallStack, node);
             if (stack != null) {
                 while (stack.size() > currentLevel) {
-                    stack = stack.take(1);
+                    stack = stack.tail();
                 }
             } else {
-                stack = ImmutableSLList.nil();
+                stack = ImmutableList.nil();
             }
             // Add new node to call stack.
             stack = stack.prepend(node);
@@ -1229,10 +1228,10 @@ public class SymbolicExecutionTreeBuilder {
                 }
                 afterBlockMaps.put(node, afterBlockMap);
                 JavaPair secondPair = new JavaPair(stackSize,
-                    ImmutableSLList.<SourceElement>nil().append(sourceElements));
+                    ImmutableList.<SourceElement>nil().append(sourceElements));
                 ImmutableList<IExecutionNode<?>> blockStartList = afterBlockMap.get(secondPair);
                 if (blockStartList == null) {
-                    blockStartList = ImmutableSLList.nil();
+                    blockStartList = ImmutableList.nil();
                 }
                 blockStartList = blockStartList.append(blockStartNode);
                 afterBlockMap.put(secondPair, blockStartList);
@@ -1302,7 +1301,7 @@ public class SymbolicExecutionTreeBuilder {
                     JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
                 return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
                     currentActiveStatement, expectedStackSize,
-                    ImmutableSLList.<SourceElement>nil().append(expectedSourceElements).iterator());
+                    ImmutableList.<SourceElement>nil().append(expectedSourceElements).iterator());
             } else {
                 return true; // No single SE node reached, so allow blocks
             }
@@ -1602,7 +1601,7 @@ public class SymbolicExecutionTreeBuilder {
         Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.id());
         ImmutableList<Node> currentMethodCallStack =
             findMethodCallStack(currentMethodCallStackMap, currentNode);
-        ImmutableList<Node> newMethodCallStack = ImmutableSLList.nil();
+        ImmutableList<Node> newMethodCallStack = ImmutableList.nil();
         Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.id());
         assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
         Iterator<Node> currentIter = currentMethodCallStack.iterator();
@@ -1689,7 +1688,7 @@ public class SymbolicExecutionTreeBuilder {
             Map<Node, ImmutableList<Node>> methodCallStack =
                 getMethodCallStack(node.getAppliedRuleApp());
             ImmutableList<Node> stack = findMethodCallStack(methodCallStack, node);
-            stack = stack.take(stack.size() - size);
+            stack = stack.skip(stack.size() - size);
             Iterator<Node> stackIter = stack.iterator();
             for (int i = 0; i < size; i++) {
                 Node stackEntry = stackIter.next();
@@ -1722,7 +1721,7 @@ public class SymbolicExecutionTreeBuilder {
         if (returnStackSize >= 0) {
             Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(ruleApp);
             ImmutableList<Node> stack = findMethodCallStack(methodCallStack, currentNode);
-            return stack.take(stack.size() - returnStackSize).head();
+            return stack.skip(stack.size() - returnStackSize).head();
         } else {
             return null;
         }

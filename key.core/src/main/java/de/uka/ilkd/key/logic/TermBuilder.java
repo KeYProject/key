@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -253,7 +254,7 @@ public class TermBuilder {
      */
     public ImmutableList<LocationVariable> paramVars(IObserverFunction obs,
             boolean makeNamesUnique) {
-        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
             String name;
@@ -276,7 +277,7 @@ public class TermBuilder {
     public ImmutableList<LocationVariable> paramVars(String postfix, IObserverFunction obs,
             boolean makeNamesUnique) {
         final ImmutableList<LocationVariable> paramVars = paramVars(obs, makeNamesUnique);
-        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (LocationVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(paramVar.name() + postfix);
             LocationVariable formalParamVar =
@@ -416,7 +417,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<JTerm> var(ProgramVariable... vs) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
         }
@@ -424,7 +425,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<JTerm> var(Iterable<? extends ProgramVariable> vs) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
         }
@@ -1056,7 +1057,7 @@ public class TermBuilder {
     }
 
     public JTerm parallel(Iterable<JTerm> lhss, Iterable<JTerm> values) {
-        ImmutableList<JTerm> updates = ImmutableSLList.nil();
+        ImmutableList<JTerm> updates = ImmutableList.nil();
         Iterator<JTerm> lhssIt = lhss.iterator();
         Iterator<JTerm> rhssIt = values.iterator();
         while (lhssIt.hasNext()) {
@@ -1097,7 +1098,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<JTerm> apply(JTerm update, ImmutableList<JTerm> targets) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm target : targets) {
             result = result.append(apply(update, target));
         }
@@ -1125,7 +1126,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<JTerm> applyElementary(JTerm heap, Iterable<JTerm> targets) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm target : targets) {
             result = result.append(apply(elementary(heap), target, null));
         }
@@ -1153,7 +1154,7 @@ public class TermBuilder {
         if (updates.length == 0) {
             return target;
         } else {
-            ImmutableList<JTerm> updateList = ImmutableSLList.<JTerm>nil().append(updates).tail();
+            ImmutableList<JTerm> updateList = ImmutableList.<JTerm>nil().append(updates).tail();
             return apply(updates[0], applySequential(updateList, target), null);
         }
     }
@@ -1293,6 +1294,17 @@ public class TermBuilder {
     public JTerm cTerm(String numberString) {
         return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
             numberTerm(numberString));
+    }
+
+    /**
+     * Create a term representing a real value as {@code \R(unscaledValue, scale)}, i.e.
+     * {@code unscaledValue * 10^(-scale)}. Both operands are unbounded {@code numbers}, so this is
+     * exact for any real literal: it preserves the sign, all fractional digits (including leading
+     * zeros) and the scale, without ever squeezing the value through a bounded {@code int}.
+     */
+    public JTerm rTerm(BigInteger unscaledValue, BigInteger scale) {
+        return func(services.getTypeConverter().getRealLDT().getRealNumberSymbol(),
+            numberTerm(unscaledValue.toString()), numberTerm(scale.toString()));
     }
 
     /**
@@ -1545,7 +1557,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<JTerm> wd(Iterable<JTerm> l) {
-        ImmutableList<JTerm> res = ImmutableSLList.nil();
+        ImmutableList<JTerm> res = ImmutableList.nil();
         for (JTerm t : l) {
             res = res.append(wd(t));
         }
@@ -2026,7 +2038,7 @@ public class TermBuilder {
         final JTerm modifiableAtPre = or.replace(modifiable);
         final JTerm createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
-        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
+        ImmutableList<QuantifiableVariable> quantVars = ImmutableList.nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
         // selects on permission heaps have to be explicitly typed as field type
@@ -2064,7 +2076,7 @@ public class TermBuilder {
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
 
-        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
+        ImmutableList<QuantifiableVariable> quantVars = ImmutableList.nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
 
@@ -2215,7 +2227,7 @@ public class TermBuilder {
         assert s.sort().equals(setLDT.targetSort());
         final Function union = setLDT.getUnion();
         ImmutableSet<JTerm> result = DefaultImmutableSet.nil();
-        ImmutableList<JTerm> workingList = ImmutableSLList.<JTerm>nil().prepend(s);
+        ImmutableList<JTerm> workingList = ImmutableList.<JTerm>nil().prepend(s);
         while (!workingList.isEmpty()) {
             JTerm f = workingList.head();
             workingList = workingList.tail();
@@ -2242,7 +2254,7 @@ public class TermBuilder {
      * Removes leading updates from the passed term.
      */
     public static Pair<ImmutableList<JTerm>, JTerm> goBelowUpdates2(JTerm term) {
-        ImmutableList<JTerm> updates = ImmutableSLList.nil();
+        ImmutableList<JTerm> updates = ImmutableList.nil();
         while (term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
             term = UpdateApplication.getTarget(term);
@@ -2266,7 +2278,7 @@ public class TermBuilder {
      * @return The {@link JTerm} {@link Sort}s.
      */
     public ImmutableList<Sort> getSorts(Iterable<JTerm> terms) {
-        ImmutableList<Sort> result = ImmutableSLList.nil();
+        ImmutableList<Sort> result = ImmutableList.nil();
         for (JTerm t : terms) {
             result = result.append(t.sort());
         }

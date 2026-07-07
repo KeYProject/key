@@ -24,7 +24,6 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 class Instantiation {
@@ -75,7 +74,7 @@ class Instantiation {
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-        ImmutableList<Term> res = ImmutableSLList.nil();
+        ImmutableList<Term> res = ImmutableList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
@@ -150,7 +149,7 @@ class Instantiation {
      */
     private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,
             TermServices services) {
-        ImmutableList<JTerm> assertLits = ImmutableSLList.nil();
+        ImmutableList<JTerm> assertLits = ImmutableList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final var op = atom.op();

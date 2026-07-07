@@ -19,7 +19,6 @@ import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -28,11 +27,13 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
@@ -228,6 +229,22 @@ public class KeYFile implements EnvInput {
     }
 
 
+    /**
+     * Normalizes a path string read from a KeY/proof file so that it can be parsed by
+     * {@link Paths#get(String, String...)} on the current platform. KeY now always writes path
+     * separators as forward slashes, but proofs saved by older versions on Windows may contain
+     * backslashes. On POSIX a backslash is a valid file-name character, so such a path would not be
+     * split into segments and could not be resolved. Converting backslashes to forward slashes is
+     * safe on all platforms (Windows accepts '/' as a separator) and keeps these legacy proofs
+     * loadable.
+     *
+     * @param path the raw path string as stored in the file
+     * @return the path string with backslashes replaced by forward slashes
+     */
+    private static String normalizeStoredPath(String path) {
+        return path.replace('\\', '/');
+    }
+
     @Override
     public Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
@@ -235,14 +252,29 @@ public class KeYFile implements EnvInput {
         if (bootClassPath == null) {
             return null;
         }
-        Path bootClassPathFile = Paths.get(bootClassPath);
+        Path bootClassPathFile = Paths.get(normalizeStoredPath(bootClassPath));
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
             Path parentDirectory = file.file().getParent();
-            bootClassPathFile = parentDirectory.resolve(bootClassPath);
+            bootClassPathFile = parentDirectory.resolve(bootClassPathFile);
         }
-
+        if (!Files.isDirectory(bootClassPathFile)) {
+            // Report the missing directory at the \bootclasspath declaration in the .key file,
+            // rather than letting it surface later as a bare exception with no source location.
+            throw new BuildingException(locationOrUndefined(pi, bootClassPath), String.format(
+                "The \\bootclasspath \"%s\" does not exist or is not a directory.",
+                bootClassPathFile));
+        }
         return bootClassPathFile;
+    }
+
+    /**
+     * @return the location at which {@code path} was declared in this file, or
+     *         {@link Location#UNDEFINED} if it is unknown
+     */
+    private static Location locationOrUndefined(ProblemInformation pi, String path) {
+        Location loc = pi.getPathLocation(path);
+        return loc != null ? loc : Location.UNDEFINED;
     }
 
     protected @NonNull ProblemInformation getProblemInformation() {
@@ -263,9 +295,15 @@ public class KeYFile implements EnvInput {
             if (cp == null) {
                 fileList.add(null);
             } else {
-                var f = Paths.get(cp);
+                var f = Paths.get(normalizeStoredPath(cp));
                 if (!f.isAbsolute()) {
-                    f = parentDirectory.resolve(cp);
+                    f = parentDirectory.resolve(f);
+                }
+                if (!Files.exists(f)) {
+                    // Point at the \classpath declaration in the .key file instead of letting the
+                    // missing directory surface later as a bare, source-less exception.
+                    throw new BuildingException(locationOrUndefined(pi, cp),
+                        String.format("The \\classpath entry \"%s\" does not exist.", f));
                 }
                 fileList.add(f);
             }
@@ -278,6 +316,7 @@ public class KeYFile implements EnvInput {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
+            javaPath = normalizeStoredPath(javaPath);
             Path absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file

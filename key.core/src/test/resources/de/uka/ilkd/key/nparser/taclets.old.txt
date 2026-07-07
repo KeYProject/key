@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 30 08:41:43 CEST 2026
+# Date: Sat Apr 25 17:11:57 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -11641,6 +11641,12 @@ intersectionSetMinusItself_2 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== intro (intro) =========================================
+intro {
+\add [equals(t,sk)]==>[] 
+
+Choices: true}
+-----------------------------------------------------
 == irrflConcrete1 (irrflConcrete1) =========================================
 irrflConcrete1 {
 \find(lt(i,i)==>)
@@ -12185,7 +12191,6 @@ lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(find_term_not_in_assumes, simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
@@ -16391,7 +16396,7 @@ simplifySelectOfMemset {
 \find(select<[beta]>(memset(h,s,x),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16403,7 +16408,7 @@ simplifySelectOfMemsetEQ {
 \find(select<[beta]>(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17991,19 +17996,20 @@ tryCatchThrow {
     #slist1
   }
 ... }}| (post))
-\replacewith(#allmodal ((modal operator))|{{ ..
-  if (#se == null) {
-    try {
-      throw new java.lang.NullPointerException();
-    } catch (#t #v0) {
-      #slist1
-    }
-  } else if (#se instanceof #t) {
+\sameUpdateLevel\add []==>[equals(#se,null)] \replacewith(#allmodal ((modal operator))|{{ ..
+  if (#se instanceof #t) {
     #t #v0;
     #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
+  }
+... }}| (post)) ;
+\add [equals(#se,null)]==>[] \replacewith(#allmodal ((modal operator))|{{ ..
+  try {
+    throw new java.lang.NullPointerException();
+  } catch (#t #v0) {
+    #slist1
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)

@@ -22,7 +22,6 @@ import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -78,15 +77,15 @@ abstract class ReplaceAndRegisterMethod {
 
     final InfFlowSpec replace(InfFlowSpec terms, StateVars origVars, StateVars poVars,
             TermBuilder tb) {
-        ImmutableList<JTerm> resultPreExps = ImmutableSLList.nil();
+        ImmutableList<JTerm> resultPreExps = ImmutableList.nil();
         for (JTerm t : terms.preExpressions) {
             resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<JTerm> resultPostExps = ImmutableSLList.nil();
+        ImmutableList<JTerm> resultPostExps = ImmutableList.nil();
         for (JTerm t : terms.postExpressions) {
             resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<JTerm> resultNewObjecs = ImmutableSLList.nil();
+        ImmutableList<JTerm> resultNewObjecs = ImmutableList.nil();
         for (JTerm t : terms.newObjects) {
             resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
         }

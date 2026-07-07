@@ -17,7 +17,6 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
@@ -31,7 +30,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.singleton(WhileInvariantRule.INSTANCE.name());
+        return ImmutableList.singleton(WhileInvariantRule.INSTANCE.name());
     }
 
     /**

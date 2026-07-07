@@ -5,10 +5,7 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -191,7 +188,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
-                    g = proof.openGoals().head();
+                    try {
+                        g = proof.openGoals().head();
+                    } catch (NoSuchElementException e) {
+                        // all closed
+                    }
                 }
                 mainWindow.getMediator().goalChosen(g);
                 if (inStopAtFirstUncloseableGoalMode(proof)) {
@@ -543,11 +544,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
-                        result.getErrorList().getFirst());
+                        "The proof could only be loaded partially: " + result.getErrorList().size()
+                            + " rule application(s) could not be replayed (see the list below).",
+                        result.getErrorList());
                 }
             }
         }

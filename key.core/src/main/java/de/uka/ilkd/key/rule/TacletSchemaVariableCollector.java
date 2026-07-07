@@ -24,7 +24,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -48,7 +47,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     public TacletSchemaVariableCollector() {
-        varList = ImmutableSLList.nil();
+        varList = ImmutableList.nil();
     }
 
 
@@ -57,7 +56,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      *        constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(@NonNull SVInstantiations svInsts) {
-        varList = ImmutableSLList.nil();
+        varList = ImmutableList.nil();
         instantiations = svInsts;
     }
 

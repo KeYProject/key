@@ -37,7 +37,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 
@@ -304,7 +303,7 @@ public final class WhileInvariantTransformer {
         WhileInvariantTransformation w = new WhileInvariantTransformation(originalLoop, svInst,
             javaInfo == null ? null : javaInfo.getServices());
         w.start();
-        instantiations = ImmutableSLList.nil();
+        instantiations = ImmutableList.nil();
         if (w.innerLabelNeeded()) {
             instantiations = instantiations.prepend(innerLabel);
         }

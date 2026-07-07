@@ -32,7 +32,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -53,7 +52,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
     /// List of all known taclets.
-    private ImmutableList<Taclet> taclets = ImmutableSLList.nil();
+    private ImmutableList<Taclet> taclets = ImmutableList.nil();
 
     /**
      * Map of categories to their default choice. The choices are overridden in activateChoice
@@ -293,7 +292,7 @@ public class InitConfig {
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null ? ImmutableSLList.nil()
+        return (profile == null ? ImmutableList.nil()
                 : profile.getStandardRules().standardBuiltInRules());
     }
 
@@ -507,5 +506,22 @@ public class InitConfig {
     /// profile.
     public boolean isChoiceCategorySet(String category) {
         return activatedChoices.containsKey(category);
+    }
+
+    public List<NoPosTacletApp> filterTaclets(ImmutableSet<NoPosTacletApp> taclets) {
+        var choices = Collections.unmodifiableSet(getActivatedChoices().toSet());
+        return taclets.stream().filter(app -> {
+            var t = app.rule();
+            TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
+            if (t.getChoices().eval(choices)) {
+                if (b != null && b.getGoal2Choices() != null) {
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
+                }
+                if (t != null) {
+                    return true;
+                }
+            }
+            return false;
+        }).toList();
     }
 }

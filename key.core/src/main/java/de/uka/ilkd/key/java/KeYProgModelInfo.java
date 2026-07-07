@@ -20,14 +20,12 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
@@ -645,7 +643,7 @@ public class KeYProgModelInfo {
             rct = rct.getAncestors().get(1).getTypeDeclaration().orElseThrow();
         }
 
-        ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> classList = ImmutableList.nil();
         classList = recFindImplementations(rct, name, jpSignature, classList);
 
         if (!declaresApplicableMethods(rct, name, jpSignature, rct)) {

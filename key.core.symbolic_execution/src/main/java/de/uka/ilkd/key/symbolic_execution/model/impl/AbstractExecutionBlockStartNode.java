@@ -10,7 +10,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Provides a basic implementation of {@link IExecutionBlockStartNode}.
@@ -22,7 +21,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * The up to know discovered completing {@link IExecutionNode}s.
      */
-    private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+    private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableList.nil();
 
     /**
      * Defines if a block is or might be opened.

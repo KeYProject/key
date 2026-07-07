@@ -37,7 +37,6 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
         return NAME;
     }
 
-
     protected static class WdWhileInvariantRuleApplier extends WhileInvariantRuleApplier {
         public WdWhileInvariantRuleApplier(Goal goal, LoopInvariantBuiltInRuleApp<?> ruleApp) {
             super(goal, ruleApp);

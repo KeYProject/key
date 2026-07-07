@@ -28,7 +28,7 @@ import de.uka.ilkd.key.settings.Configuration;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.parsing.Position;
 
 // need to switch spotless off for this comment as it replaces @code with &#64;code
 // spotless:off
@@ -176,7 +176,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         for (LocationVariable x : undeclaredVariables) {
             register(x, services);
         }
-        return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
+        return ImmutableList.<StatementBlock>nil().prepend(null, result, null, null);
     }
 
     /**
@@ -267,7 +267,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The created {@link ImmutableList}.
      */
     protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
-        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (LocationVariable var : c) {
             result = result.append(var);
         }

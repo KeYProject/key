@@ -22,7 +22,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -65,7 +64,7 @@ public class StateVars {
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
 
-        ImmutableList<JTerm> terms = ImmutableSLList.nil();
+        ImmutableList<JTerm> terms = ImmutableList.nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -75,7 +74,7 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<JTerm> allTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> allTerms = ImmutableList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -139,7 +138,7 @@ public class StateVars {
 
     private static ImmutableList<JTerm> copyVariables(ImmutableList<JTerm> ts, String postfix,
             Services services) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
@@ -266,7 +265,7 @@ public class StateVars {
         JTerm mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ? preVars.mbyAtPre
                 : copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<JTerm> localPostVars = ImmutableSLList.nil();
+        ImmutableList<JTerm> localPostVars = ImmutableList.nil();
         Iterator<JTerm> origPreVarsIt = origPreVars.localVars.iterator();
         Iterator<JTerm> localPreVarsIt = preVars.localVars.iterator();
         for (JTerm origPostVar : origPostVars.localVars) {
@@ -362,7 +361,7 @@ public class StateVars {
 
     static <T> ImmutableList<T> ops(ImmutableList<JTerm> terms, Class<T> opClass)
             throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.nil();
+        ImmutableList<T> ops = ImmutableList.nil();
         for (JTerm t : terms) {
             ops = ops.append(t.op(opClass));
         }

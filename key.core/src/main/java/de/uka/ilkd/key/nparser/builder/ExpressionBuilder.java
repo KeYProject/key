@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.literal.RealLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
@@ -30,6 +32,8 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -44,9 +48,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -273,7 +277,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {
-            Function Z = functions().lookup("Z");
+            Function Z = functions().lookup(IntegerLDT.NUMBERS_NAME);
+            final Function realNumbers = functions().lookup(RealLDT.REAL_NUMBERS_NAME);
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
                 // This mimics the old JavaKeYParser behaviour. Unknown if necessary.
@@ -281,6 +286,12 @@ public class ExpressionBuilder extends DefaultBuilder {
                 final JTerm num = result.sub(0);
                 return capsulateTf(ctx,
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
+            } else if (realNumbers != null && result.op() == realNumbers) {
+                final Function neglit = functions().lookup("neglit");
+                final JTerm unscaled = result.sub(0);
+                final JTerm scale = result.sub(1);
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(realNumbers,
+                    getTermFactory().createTerm(neglit, unscaled), scale));
             } else if (result.sort() != JavaDLTheory.FORMULA) {
                 Sort sort = result.sort();
                 if (sort == null) {
@@ -602,7 +613,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
-            var ant = ImmutableSLList.singleton(new SequentFormula(head));
+            var ant = ImmutableList.singleton(new SequentFormula(head));
             return JavaDLSequentKit.createSequent(ant, ss);
         }
         if (head != null && s != null) {
@@ -611,7 +622,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return JavaDLSequentKit.createSequent(newAnt, s.succedent().asList());
         }
         if (ss != null) {
-            return JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ss);
+            return JavaDLSequentKit.createSequent(ImmutableList.nil(), ss);
         }
         assert (false);
         return null;
@@ -621,7 +632,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public ImmutableList<SequentFormula> visitSemisequent(JavaKeYParser.SemisequentContext ctx) {
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
-            ss = ImmutableSLList.nil();
+            ss = ImmutableList.nil();
         }
         JTerm head = accept(ctx.term());
         if (head != null) {
@@ -655,6 +666,16 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // because the surrounding program variables were not needed/visible.
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
             } catch (Exception e1) {
+                // If the real reason is that the Java model itself could not be built - e.g. a
+                // boot/library stub under JavaRedux does not parse, or a \bootclasspath/\classpath
+                // entry is missing - then this modality's Java block is an innocent bystander: it
+                // merely happens to be the first place that needs the (now unavailable) Java types.
+                // Blaming it with "Could not parse Java block ..." is misleading. Surface the
+                // underlying environment-setup failure directly.
+                RuntimeException environmentFailure = findEnvironmentSetupFailure(e);
+                if (environmentFailure != null) {
+                    throw environmentFailure;
+                }
                 // Both attempts failed. Report the failure from the first attempt
                 // (the one with the surrounding program variables in scope); it
                 // usually carries the most meaningful reason. Crucially, embed that
@@ -670,12 +691,54 @@ public class ExpressionBuilder extends DefaultBuilder {
                 String reason = ExceptionTools.getMessages(e).stream()
                         .map(de.uka.ilkd.key.speclang.PositionedString::getText)
                         .collect(Collectors.joining("\n"));
+                reason = JavaService.humanizeJavaParserJargon(reason);
                 throw new BuildingException(t, pos,
                     "Could not parse Java block '" + cleanJava + "':\n" + reason,
                     e);
             }
         }
         return sjb;
+    }
+
+    /**
+     * Walks the cause chain of {@code t} looking for a failure that is really about building the
+     * Java model (setting up the environment), not about the modality's in-memory Java block. Such
+     * a failure means the whole model could not be built, so it - not the modality that first
+     * triggered the model build - is the true cause. Two kinds are recognised:
+     * <ul>
+     * <li>a {@link BuildingExceptions} whose issues all point at an actual source file on disk (a
+     * {@code .java}/{@code .jml} stub that does not parse); it already carries file and position,
+     * so
+     * it is surfaced as-is;</li>
+     * <li>an {@link IOException} (a missing {@code \bootclasspath}/{@code \classpath} directory, or
+     * another IO problem while reading the model); it is wrapped so its concrete message is shown
+     * without the "Could not parse Java block" noise.</li>
+     * </ul>
+     *
+     * @param t the exception caught while reading a Java block
+     * @return the exception to surface instead, or {@code null} if the failure is genuinely about
+     *         the Java block itself
+     */
+    private static @Nullable RuntimeException findEnvironmentSetupFailure(@Nullable Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (c instanceof BuildingExceptions be && !be.getErrors().isEmpty()
+                    && be.getErrors().stream().allMatch(ExpressionBuilder::pointsAtSourceFile)) {
+                return be;
+            }
+            if (c instanceof IOException) {
+                return new BuildingException(c);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return whether the issue points at a real source file on disk (as opposed to an in-memory
+     *         fragment such as {@code <string>} or {@code memory:/...} used for modality blocks).
+     */
+    private static boolean pointsAtSourceFile(BuildingIssue issue) {
+        String src = issue.sourceName();
+        return src != null && (src.endsWith(".java") || src.endsWith(".jml"));
     }
 
     /**
@@ -1702,13 +1765,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitRealLiteral(RealLiteralContext ctx) {
-        String txt = ctx.getText(); // full text of node incl. unary minus.
-        char lastChar = txt.charAt(txt.length() - 1);
-        if (lastChar == 'R' || lastChar == 'r') {
-            semanticError(ctx,
-                "The given float literal does not have a suffix. This is essential to determine its exact meaning. You probably want to add 'r' as a suffix.");
+        // full text incl. an optional leading '-' and the optional 'r'/'R' suffix
+        String txt = ctx.getText();
+        final char last = txt.charAt(txt.length() - 1);
+        if (last == 'r' || last == 'R') {
+            txt = txt.substring(0, txt.length() - 1);
         }
-        throw new Error("not yet implemented");
+        // RealLiteral parses the decimal exactly into (unscaledValue, scale); rTerm wraps it as
+        // __R(unscaledValue, scale) -- the same encoding RealLDT.translateLiteral produces.
+        final RealLiteral real = new RealLiteral(txt);
+        return getServices().getTermBuilder().rTerm(real.getUnscaledValue(), real.getScale());
     }
 
     @Override

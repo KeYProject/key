@@ -24,7 +24,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -155,7 +154,7 @@ public final class SMTFocusResults {
         Arrays.stream(numbers).forEach(unsatCore::add);
 
         ImmutableList<PosInOccurrence> unsatCoreFormulas =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
 
         Semisequent antecedent = goalNode.sequent().antecedent();
         int i = 1;

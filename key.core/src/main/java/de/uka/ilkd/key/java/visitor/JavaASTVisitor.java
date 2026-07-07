@@ -489,6 +489,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnRealLiteral(RealLiteral x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
         doDefaultAction(x);
     }

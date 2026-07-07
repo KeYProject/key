@@ -29,8 +29,31 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         this.Z = numbers.getNumberSymbol();
     }
 
+    /**
+     * if {@code op} is a Skolem constant the returned introduction time is the number of taclets
+     * applied before and including the taclet by which its was introduced. <ctrong>For all other
+     * operators the returned value is -1</strong>
+     *
+     * @param op the Operator whose introduction time is queried
+     * @param goal the Goal whose state is queried
+     * @return the introduction time or -1 if not yet introduced or op is not a Skolem constant
+     */
     protected int introductionTime(Operator op, Goal goal) {
         if (op == add || op == mul || op == Z) {
+            return -1;
+        }
+
+        // A taclet with rule set "polySimp_newSmallSym" introduces its symbol as a SkolemTermSV
+        // instantiation, which is always a skolem-constant function
+        // (TacletApp.createSkolemConstant).
+        // So an op that is not a skolem-constant function can never have been introduced by one:
+        // its time is -1, with no need to scan the applied-rule history. This is what made the
+        // scan a hotspot -- the common monomial atoms (program variables, ordinary functions) are
+        // not skolem constants, yet walked the full O(history) on every compare and, never being
+        // "introduced", were never cached. (A skolem constant from some OTHER rule still walks and
+        // returns -1; only the structurally-impossible ops are short-circuited, so every result is
+        // unchanged.)
+        if (!(op instanceof Function func) || !func.isSkolemConstant()) {
             return -1;
         }
 
@@ -44,8 +67,17 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
         if (res == null) {
             res = introductionTimeHelp(op, goal);
-            synchronized (introductionTimeCache) {
-                introductionTimeCache.put(op, res);
+            // Do NOT cache the "not introduced (yet)" answer (-1): op may be introduced by a later
+            // rule application, after which introductionTimeHelp would find a real time. Caching
+            // the -1 would freeze it, making the value depend on whether op happened to be first
+            // queried before or after its introduction -- i.e. on the access pattern (which
+            // features run, when). That makes term ordering, and hence OneStepSimplifier rewriting,
+            // subtly non-deterministic. A real introduction time, once found, is stable (the
+            // introducing rule stays in the applied-rule prefix), so it is safe to cache.
+            if (res != -1) {
+                synchronized (introductionTimeCache) {
+                    introductionTimeCache.put(op, res);
+                }
             }
         }
 

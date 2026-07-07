@@ -5,10 +5,11 @@ package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;

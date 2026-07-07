@@ -108,8 +108,26 @@ public final class ParsingFacade {
     }
 
 
-    private static JavaKeYParser createParser(CharStream stream) {
+    public static JavaKeYParser createParser(CharStream stream) {
         return createParser(createLexer(stream));
+    }
+
+    /**
+     * Releases the ANTLR prediction (DFA) cache of the KeY parser.
+     * <p>
+     * This cache is built lazily while parsing and held on the generated parser's {@code static}
+     * fields, so it stays resident for the whole JVM -- including during proof search, where it is
+     * not needed (on a large proof it retains ~15-20 MB). It is a pure cache: ANTLR rebuilds it
+     * transparently on the next parse, so dropping it is correctness-safe (one-time re-warm on a
+     * subsequent parse). Intended to be called once a problem/proof has finished loading.
+     */
+    public static void clearParserCaches() {
+        try {
+            new JavaKeYParser(new CommonTokenStream(createLexer(CharStreams.fromString(""))))
+                    .getInterpreter().clearDFA();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not clear parser DFA caches", e);
+        }
     }
 
     public static JavaKeYLexer createLexer(Path file) throws IOException {
@@ -162,12 +180,17 @@ public final class ParsingFacade {
         try {
             ctx = p.file();
         } catch (ParseCancellationException ex) {
-            LOGGER.warn("SLL was not enough");
+            LOGGER.warn("SLL was not enough; retrying with LL and error recovery");
+            // Re-parse with LL prediction and ANTLR's default error recovery so that ALL syntax
+            // errors are collected (the bail strategy above stops at the first). To avoid
+            // regressing the polished single-error message and position, keep the bail-path
+            // exception when recovery finds exactly one error; report the whole list only when
+            // there are several. Zero errors means SLL was merely insufficient and the LL parse
+            // actually succeeded - fall through and return the tree.
             stream.seek(0);
             p = createParser(stream);
-            p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
-            if (p.getErrorReporter().hasErrors()) {
+            if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
             }
         }

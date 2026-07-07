@@ -37,7 +37,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
@@ -784,7 +783,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             JTerm exceptionVar, String name, Services services) {
         // Create parameters for predicate
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-        ImmutableList<JTerm> arguments = ImmutableSLList.nil(); // tb.var(paramVars);
+        ImmutableList<JTerm> arguments = ImmutableList.nil(); // tb.var(paramVars);
         // Method parameters
         for (LocationVariable formalParam : formalParamVars) {
             arguments = arguments.prepend(tb.var(formalParam));
@@ -1010,7 +1009,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<LocationVariable> createFormalParamVars(
             final ImmutableList<LocationVariable> paramVars, final Services proofServices) {
         // create arguments from formal parameters for method call
-        ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> formalParamVars = ImmutableList.nil();
         for (final LocationVariable paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
@@ -1028,7 +1027,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<FunctionalOperationContract> collectLookupContracts(
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()

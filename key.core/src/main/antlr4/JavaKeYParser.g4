@@ -8,6 +8,7 @@ import KeYParser;
 @members {
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+public boolean allowMatchId = false; // used in proof script parsing
 }
 
 options { tokenVocab=JavaKeYLexer; } // use tokens from STLexer.g4
@@ -89,6 +90,7 @@ literals:
   | floatnum
   | string_literal
   | emptyset
+//  | LPAREN {allowMatchId=true;} (term | seq) {allowMatchId=false;} RPAREN
 ;
 
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
@@ -319,3 +321,10 @@ classPaths
 ;
 
 programSource: JAVASOURCE result=oneProgramSource SEMI;
+
+simple_ident
+   :
+     id = IDENT
+   | /*{allowMatchId}?*/ id=MATCH_IDENT
+   ;
+

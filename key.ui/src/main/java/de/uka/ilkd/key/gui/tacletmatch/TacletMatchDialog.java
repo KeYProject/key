@@ -80,8 +80,72 @@ public class TacletMatchDialog extends ApplyTacletDialog {
         pack();
 
         mainWindow.loadPreferences(this);
-        setLocationRelativeTo(parent);
+        positionDialog(parent);
         setVisible(true);
+    }
+
+    /**
+     * where the dialog was last closed, remembered for this session only (deliberately not
+     * persisted: on a restart the main window may sit elsewhere, so a stale absolute position would
+     * be worse than a fresh placement beside the sequent).
+     */
+    private static Point sessionLocation;
+
+    /**
+     * Places the dialog so it does not sit on top of the sequent view. The user frequently needs to
+     * read a variable name off the sequent, or drag a sub-term from it onto a field, so covering it
+     * is exactly what to avoid. Within a session the last position the user moved it to is reused;
+     * otherwise the dialog is put in the free space beside the sequent view, falling back to the
+     * screen edge that leaves the most of the sequent visible. Either way it ends up fully on
+     * screen.
+     */
+    private void positionDialog(MainWindow parent) {
+        Rectangle screen = usableScreen(parent);
+        Point target = sessionLocation != null ? sessionLocation : besideSequent(parent, screen);
+        // keep the window fully on screen (the remembered spot may be off a since-changed screen)
+        int x = Math.max(screen.x, Math.min(target.x, screen.x + screen.width - getWidth()));
+        int y = Math.max(screen.y, Math.min(target.y, screen.y + screen.height - getHeight()));
+        setLocation(x, y);
+    }
+
+    /** a spot beside the sequent view (right, else left, else the roomier screen edge). */
+    private Point besideSequent(MainWindow parent, Rectangle screen) {
+        Rectangle avoid = sequentBoundsOnScreen(parent);
+        int gap = 8;
+        int w = getWidth();
+        int rightX = avoid.x + avoid.width + gap;
+        int leftX = avoid.x - gap - w;
+        int x;
+        if (rightX + w <= screen.x + screen.width) {
+            x = rightX; // free space to the right of the sequent
+        } else if (leftX >= screen.x) {
+            x = leftX; // free space to the left of the sequent
+        } else {
+            // the sequent leaves no room beside it: dock to the edge with more space, so at least
+            // that much of the sequent stays visible
+            int roomRight = screen.x + screen.width - (avoid.x + avoid.width);
+            int roomLeft = avoid.x - screen.x;
+            x = roomRight >= roomLeft ? screen.x + screen.width - w : screen.x;
+        }
+        return new Point(x, avoid.y); // align with the top of the sequent (caller clamps to screen)
+    }
+
+    /** the sequent view's rectangle on screen, or the whole main window if it is not showing. */
+    private Rectangle sequentBoundsOnScreen(MainWindow parent) {
+        Component seq = parent.getGoalView();
+        if (seq != null && seq.isShowing()) {
+            return new Rectangle(seq.getLocationOnScreen(), seq.getSize());
+        }
+        return parent.getBounds();
+    }
+
+    /** the usable bounds (minus taskbar/menubar insets) of the screen the main window is on. */
+    private static Rectangle usableScreen(Window on) {
+        GraphicsConfiguration gc = on.getGraphicsConfiguration();
+        Rectangle b = gc.getBounds();
+        Insets in = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        return new Rectangle(b.x + in.left, b.y + in.top,
+            b.width - in.left - in.right, b.height - in.top - in.bottom);
     }
 
     private void layoutDialog() {
@@ -275,6 +339,8 @@ public class TacletMatchDialog extends ApplyTacletDialog {
 
     @Override
     protected void closeDlg() {
+        // remember the position for the rest of this session; savePreferences persists the size
+        sessionLocation = getLocation();
         if (mainWindow != null) {
             mainWindow.savePreferences(this);
         }

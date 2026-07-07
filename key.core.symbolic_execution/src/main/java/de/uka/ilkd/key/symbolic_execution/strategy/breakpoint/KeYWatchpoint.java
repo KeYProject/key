@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.StatementContainer;
@@ -27,6 +26,7 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
 

@@ -13,11 +13,14 @@ import org.key_project.util.Strings;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * @deprecated weigl: Deprecated in favor of {@link ImmutableList} and the new list and array-based
+ *             implementation.
+ *             Use {@link ImmutableList} and {@link ImmutableList#of(Object[])}.
+ */
+@Deprecated(since = "3.0.0 / June 2026")
 public class ImmutableArray<S extends @Nullable Object>
         implements java.lang.Iterable<S>, java.io.Serializable {
-
-    private static final long serialVersionUID = -9041545065066866250L;
-
     private final S[] content;
 
     /**
@@ -93,7 +96,9 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
 
-    /** @return size of the array */
+    /**
+     * @return size of the array
+     */
     public int size() {
         return content.length;
     }
@@ -206,7 +211,7 @@ public class ImmutableArray<S extends @Nullable Object>
      * @return This element converted to an {@link ImmutableList}.
      */
     public ImmutableList<S> toImmutableList() {
-        ImmutableList<S> ret = ImmutableSLList.nil();
+        ImmutableList<S> ret = ImmutableList.nil();
         for (S s : this) {
             ret = ret.prepend(s);
         }

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,8 +254,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        ImmutableList<KeYJavaType> types = ImmutableSLList.nil();
-
+        ImmutableList<KeYJavaType> types = ImmutableList.nil();
         if (implementing != null) {
             for (int i = implementing.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());

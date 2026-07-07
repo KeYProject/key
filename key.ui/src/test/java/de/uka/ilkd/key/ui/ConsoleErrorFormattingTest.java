@@ -7,9 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
+import org.key_project.util.parsing.Position;
 
 import org.junit.jupiter.api.Test;
 

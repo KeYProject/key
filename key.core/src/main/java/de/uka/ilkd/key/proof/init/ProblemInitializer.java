@@ -629,9 +629,8 @@ public final class ProblemInitializer {
             if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
                 for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
                     final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                    if (pv instanceof LocationVariable) {
-                        heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                            services);
+                    if (pv instanceof LocationVariable lv) {
+                        heapLDT.getFieldSymbolForPV(lv, initConfig.getServices());
                     }
                 }
             }

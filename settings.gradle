@@ -2,11 +2,18 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 //include "recoder"
 
 include "key.util"
 include "key.ncore"
 include 'key.ncore.calculus'
+include 'key.ncore.compiler'
 
 include "key.core"
 //include "key.core.rifl"

@@ -55,6 +55,8 @@ public interface Visitor {
 
     void performActionOnIntLiteral(IntLiteral x);
 
+    void performActionOnRealLiteral(RealLiteral realLiteral);
+
     void performActionOnBooleanLiteral(BooleanLiteral x);
 
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
@@ -423,4 +425,5 @@ public interface Visitor {
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
     void performActionOnSubtype(Subtype subtype);
+
 }

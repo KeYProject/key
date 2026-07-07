@@ -67,7 +67,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -381,7 +380,7 @@ public class IntermediateProofReplayer {
                 // Default exception catcher -- proof should not stop loading
                 // if anything goes wrong, but instead continue with the next
                 // node in the queue.
-                reportError(ERROR_LOADING_PROOF_LINE, throwable);
+                reportError(ERROR_LOADING_PROOF_LINE + "Node " + currNode.serialNr(), throwable);
             }
         }
         if (listener != null) {
@@ -456,9 +455,27 @@ public class IntermediateProofReplayer {
         TacletApp ourApp;
         PosInOccurrence pos = null;
 
-        Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
+        Name nTacletName = new Name(tacletName);
+        Taclet t = proof.getInitConfig().lookupActiveTaclet(nTacletName);
         if (t == null) {
-            ourApp = currGoal.indexOfTaclets().lookup(tacletName);
+            var possibleApps = currGoal.indexOfTaclets().allNoPosTacletAppsStream()
+                    .filter(it -> it.taclet().name().equals(nTacletName))
+                    .toList();
+
+            if (possibleApps.isEmpty()) {
+                ourApp = null;
+            } else if (possibleApps.size() == 1) {
+                ourApp = possibleApps.getFirst();
+            } else {
+                var docs = proof.getServices().getNamespaces().docs();
+                var taclets = possibleApps.stream().map(
+                    it -> it + "\n-- defined at " + docs.findOrigin(it.rule()))
+                        .collect(Collectors.joining("\n---\n"));
+                throw new TacletAppConstructionException(
+                    "There are more than one possible taclet available with name \"" + tacletName
+                        + "\". " +
+                        "Most three similar names are: " + taclets);
+            }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
@@ -502,13 +519,16 @@ public class IntermediateProofReplayer {
             } catch (TacletAppConstructionException e) {
                 throw e;
             } catch (Exception e) {
-                throw new TacletAppConstructionException("Wrong position information: " + pos, e);
+                throw new TacletAppConstructionException(
+                    "Could not reconstruct the rule application: the stored position does not fit "
+                        + "the current sequent (" + pos + ").",
+                    e);
             }
         }
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
                 ifFormulaList
@@ -587,7 +607,7 @@ public class IntermediateProofReplayer {
 
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
-            builtinIfInsts = ImmutableSLList.nil();
+            builtinIfInsts = ImmutableList.nil();
             for (final Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
                 final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
@@ -671,7 +691,11 @@ public class IntermediateProofReplayer {
                 pos = PosInOccurrence
                         .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
             } catch (RuntimeException e) {
-                throw new BuiltInConstructionException("Wrong position information.", e);
+                throw new BuiltInConstructionException(
+                    "Could not reconstruct the rule application: the stored position (formula "
+                        + currFormula + ", term " + currPosInTerm
+                        + ") could not be located in the current sequent.",
+                    e);
             }
         }
 
@@ -828,7 +852,7 @@ public class IntermediateProofReplayer {
 
         }
 
-        ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> joinPartners = ImmutableList.nil();
         for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
             SymbolicExecutionStateWithProgCnt ownSEState =
@@ -858,7 +882,7 @@ public class IntermediateProofReplayer {
      * @param e Error encountered.
      */
     private void reportError(String string, Throwable e) {
-        status = "Errors while reading the proof. Not all branches could be load successfully.";
+        status = "Errors while reading the proof. Not all branches could be loaded successfully.";
         errors.add(new ProblemLoaderException(loader, string, e));
     }
 
@@ -908,9 +932,16 @@ public class IntermediateProofReplayer {
 
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv == null) {
-                // throw new IllegalStateException(
-                // varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
-                LOGGER.error("{} from {} is not in uninsts", varname, app.rule().name());
+                // Tolerated inconsistency: the stored instantiation names a schema variable that is
+                // not among the rule's uninstantiated variables (e.g. a proof saved with a slightly
+                // different version of the rule). We skip this single instantiation and continue
+                // the
+                // replay instead of aborting (this was once a hard IllegalStateException); the skip
+                // is logged so it can be diagnosed if the replay result looks wrong.
+                LOGGER.warn(
+                    "Skipping instantiation \"{}\": schema variable \"{}\" is not among the "
+                        + "uninstantiated variables of rule \"{}\".",
+                    s, varname, app.rule().name());
                 continue;
             }
             final String value = s.substring(eq + 1);
@@ -975,8 +1006,7 @@ public class IntermediateProofReplayer {
                 proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
         } catch (ParserException e) {
-            throw new RuntimeException(
-                "Error while parsing value " + value + "\nVar namespace is: " + varNS + "\n", e);
+            throw new RuntimeException("Error while parsing the value \"" + value + "\".", e);
         }
     }
 

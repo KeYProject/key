@@ -26,7 +26,6 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
 
 /**
@@ -563,7 +562,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             self = null;
         }
         return new OriginalVariables(self, null, null, atPreVars,
-            ImmutableSLList.nil());
+            ImmutableList.nil());
     }
 
 }

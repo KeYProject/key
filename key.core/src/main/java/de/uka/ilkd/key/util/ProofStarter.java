@@ -29,7 +29,6 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +69,7 @@ public class ProofStarter {
         public UserProvidedInput(JTerm formula, ProofEnvironment env) {
             this(
                 JavaDLSequentKit.createSuccSequent(
-                    ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
+                    ImmutableList.<SequentFormula>singleton(new SequentFormula(formula))),
                 env);
         }
 

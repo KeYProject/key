@@ -29,6 +29,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

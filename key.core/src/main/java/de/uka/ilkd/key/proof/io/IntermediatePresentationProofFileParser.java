@@ -16,7 +16,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -173,14 +172,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
                 BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
                 if (builtinInfo.builtinIfInsts == null) {
-                    builtinInfo.builtinIfInsts = ImmutableSLList.nil();
+                    builtinInfo.builtinIfInsts = ImmutableList.nil();
                 }
                 builtinInfo.currIfInstFormula = 0;
                 builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
             }
             case NEW_NAMES -> {
                 final String[] newNames = str.split(",");
-                ruleInfo.currNewNames = ImmutableSLList.nil();
+                ruleInfo.currNewNames = ImmutableList.nil();
                 for (String newName : newNames) {
                     ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newName));
                 }
@@ -208,7 +207,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
                         (Class<? extends AbstractPredicateAbstractionLattice>) Class.forName(str);
                 } catch (ClassNotFoundException e) {
-                    errors.add(e);
+                    errors.add(new IllegalArgumentException(
+                        "Unknown predicate abstraction lattice type \"" + str + "\".", e));
                 }
             }
             case MERGE_ABSTRACTION_PREDICATES ->
@@ -372,8 +372,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected List<String> loadedInsts = null;
-        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
-        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
+        protected ImmutableList<String> ifSeqFormulaList = ImmutableList.nil();
+        protected ImmutableList<String> ifDirectFormulaList = ImmutableList.nil();
 
         public TacletInformation(String ruleName) {
             super(ruleName);

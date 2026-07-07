@@ -2,7 +2,6 @@ parser grammar KeYGlobalDeclParser;
 
 import KeYTacletParser;
 
-options { tokenVocab = KeYLexer; }
 decls
    : (string = programSource // for problems
    | one_include_statement | options_choice | option_decls | sort_decls | prog_var_decls | schema_var_decls | pred_decls | func_decls | transform_decls | datatype_decls | ruleset_decls
@@ -70,20 +69,22 @@ func_decl
 \datatypes {
  \free List = Nil | Cons(any head, List tail);
 }
-*/ datatype_decls
-   : DATATYPES LBRACE datatype_decl* RBRACE
+*/
+datatype_decls
+	 : DATATYPES LBRACE datatype_decl* RBRACE
    ;
 
 datatype_decl
    : doc = DOC_COMMENT?
    // weigl: all datatypes are free!
-   
    // FREE?
    name = simple_ident formal_sort_param_decls? EQUALS datatype_constructor (OR datatype_constructor)* SEMI
    ;
 
 datatype_constructor
-   : name = simple_ident (LPAREN (argSort += sortId argName += simple_ident (COMMA argSort += sortId argName += simple_ident)*)? RPAREN)?
+   :
+      doc=DOC_COMMENT?
+      name = simple_ident (LPAREN (argSort += sortId argName += simple_ident (COMMA argSort += sortId argName += simple_ident)*)? RPAREN)?
    ;
 
 func_decls
@@ -91,7 +92,7 @@ func_decls
    ;
 
 prog_var_decls
-   : PROGRAMVARIABLES LBRACE (kjt = typemapping var_names = simple_ident_comma_list SEMI)* RBRACE
+   : PROGRAMVARIABLES LBRACE (kjt = typemapping var_names = simple_ident_comma_list_with_docs SEMI)* RBRACE
    ;
 
 typemapping
@@ -118,17 +119,18 @@ one_sort_decl
 :
   doc=DOC_COMMENT?
   (
-     GENERIC  sortIds=simple_ident_dots_comma_list
+     GENERIC  sortIds=simple_ident_dots_comma_list_with_docs
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
-    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list_with_docs (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list_with_docs | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
     | ALIAS simple_ident_dots EQUALS sortId SEMI
   )
 ;
 
 parametric_sort_decl
 :
+		DOC_COMMENT?
     simple_ident_dots
     formal_sort_param_decls
 ;
@@ -150,7 +152,7 @@ where_to_bind
    ;
 
 ruleset_decls
-   : HEURISTICSDECL LBRACE (doc += DOC_COMMENT? id += simple_ident SEMI)* RBRACE
+   : HEURISTICSDECL LBRACE (id += simple_ident_with_doc SEMI)* RBRACE
    ;
 
 transform_decl

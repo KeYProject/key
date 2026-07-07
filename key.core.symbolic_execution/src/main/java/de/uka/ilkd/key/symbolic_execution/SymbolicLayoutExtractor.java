@@ -31,7 +31,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 
@@ -761,7 +760,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(
             ImmutableSet<JTerm> appliedCuts) {
-        ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
+        ImmutableList<ISymbolicEquivalenceClass> result = ImmutableList.nil();
         for (JTerm term : appliedCuts) {
             if (Junctor.NOT != term.op()) {
                 assert term.op() == Equality.EQUALS;

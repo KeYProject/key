@@ -21,7 +21,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -208,7 +207,7 @@ public class TacletAppIndex {
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
             PosInOccurrence pos, Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        ImmutableList<TacletApp> result = ImmutableList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
@@ -257,7 +256,7 @@ public class TacletAppIndex {
 
         final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableList.nil();
 
         while (it.hasNext()) {
             final NoPosTacletApp tacletApp = it.next();
@@ -333,6 +332,22 @@ public class TacletAppIndex {
             succIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
     }
 
+    /**
+     * Like {@link #updateIndices(SetRuleFilter)}, but the freshly added taclets are supplied as a
+     * small dedicated index rather than as a membership filter over the full {@link #tacletIndex}.
+     * The re-index walk then sees only those taclets as match candidates -- avoiding the
+     * per-position scan of the full operator bucket through {@link SetRuleFilter#filter} -- while
+     * reusing the identical {@code getList}/match logic, so the resulting apps are unchanged. Used
+     * for the common single-taclet add; the goal's rule filter is still applied (the candidate
+     * filter passed here is {@link TacletFilter#TRUE}).
+     */
+    private void updateIndices(final TacletIndex newTacletsIndex) {
+        antecIndex = antecIndex.addTaclets(TacletFilter.TRUE, getServices(), newTacletsIndex,
+            newRuleListener);
+        succIndex = succIndex.addTaclets(TacletFilter.TRUE, getServices(), newTacletsIndex,
+            newRuleListener);
+    }
+
 
     /**
      * updates the internal caches after a new Taclet with instantiation information has been added
@@ -361,10 +376,18 @@ public class TacletAppIndex {
             return;
         }
 
-        final SetRuleFilter newTaclets = new SetRuleFilter();
-        newTaclets.addRuleToSet(tacletApp.taclet());
+        // Re-index only the freshly added taclet: feed the walk a one-taclet index instead of
+        // filtering the full operator buckets per position (see updateIndices(TacletIndex)). The
+        // single-threaded index is used deliberately -- the multi-threaded matcher only
+        // parallelizes
+        // above 256 taclets, so a one-taclet index always takes its sequential path anyway;
+        // building
+        // the lightweight single-threaded index directly makes that explicit and is robust if that
+        // threshold ever changes.
+        final TacletIndex newTacletsIndex = new SingleThreadedTacletIndex();
+        newTacletsIndex.add(tacletApp);
 
-        updateIndices(newTaclets);
+        updateIndices(newTacletsIndex);
     }
 
     /**

@@ -28,7 +28,7 @@ import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,8 +137,8 @@ public class TestMatchTaclet {
         // therefore no match should be found
 
         Sequent seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(match.sub(0))),
-            ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(match.sub(0))),
+            ImmutableList.nil());
 
         assertEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -148,8 +148,8 @@ public class TestMatchTaclet {
 
         // we bind the free variable now a match should be found
         seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(match)),
-            ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(match)),
+            ImmutableList.nil());
 
         assertNotEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -258,15 +258,15 @@ public class TestMatchTaclet {
         JTerm closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
         JTerm closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
         Sequent seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(closeable_one)),
-            ImmutableSLList.singleton(new SequentFormula(closeable_two)));
+            ImmutableList.singleton(new SequentFormula(closeable_one)),
+            ImmutableList.singleton(new SequentFormula(closeable_two)));
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
         PosInOccurrence pio =
             new PosInOccurrence(new SequentFormula(closeable_two), PosInTerm.getTopLevel(), false);
 
         TacletApp tacletApp =
-            index.getSuccedentTaclet(pio, new IHTacletFilter(true, ImmutableSLList.nil()), services)
+            index.getSuccedentTaclet(pio, new IHTacletFilter(true, ImmutableList.nil()), services)
                     .iterator().next();
         assertTrue(tacletApp.findIfFormulaInstantiations(seq, services).size() > 0,
             "Match should be possible(modulo renaming)");

@@ -42,14 +42,27 @@ public class Filenames {
     /// Computes the relative path of `toFilename` in relation to `origFilename`.
     /// If `origFilename` is already a relative path, it is returned instead. This implementation
     /// relies on [Path].
+    ///
+    /// Path separators in the result are always forward slashes so that the result is portable
+    /// across operating systems. If the two paths reside on different roots (e.g. different drive
+    /// letters on Windows) no relative path exists; in that case the absolute `origFilename` is
+    /// returned, mirroring [org.key_project.util.java.IOUtil#safePathRelativeTo].
     public static String makeFilenameRelative(String origFilename, String toFilename) {
         var file = Paths.get(origFilename);
         if (!file.isAbsolute()) {
-            return file.toString();
+            return toSlashes(file);
         }
 
         var base = Paths.get(toFilename).toAbsolutePath();
-        return base.relativize(file).toString();
+        if (!java.util.Objects.equals(file.getRoot(), base.getRoot())) {
+            // Path.relativize would throw IllegalArgumentException for different roots.
+            return toSlashes(file);
+        }
+        return toSlashes(base.relativize(file));
+    }
+
+    private static String toSlashes(Path path) {
+        return path.toString().replace('\\', '/');
     }
 
 

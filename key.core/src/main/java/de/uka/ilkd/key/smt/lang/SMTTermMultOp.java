@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,8 +20,14 @@ import java.util.List;
 // A more suitable name for this class will be TermMultOp
 public class SMTTermMultOp extends SMTTerm {
 
-    private static HashMap<Op, String> bvSymbols;
-    private static HashMap<Op, String> intSymbols;
+    /*
+     * These tables are built once, fully, and published as immutable maps. They must not be lazily
+     * initialized: a publish-then-populate scheme (assigning an empty map to the field and only
+     * then filling it) can let another thread observe a half-built map and fail with a spurious
+     * "Unknown operator" during concurrent SMT translation.
+     */
+    private static final Map<Op, String> bvSymbols = createBvSymbols();
+    private static final Map<Op, String> intSymbols = createIntSymbols();
 
     public enum OpProperty {
         NONE, LEFTASSOC, RIGHTASSOC, FULLASSOC, CHAINABLE, PAIRWISE
@@ -76,9 +83,9 @@ public class SMTTermMultOp extends SMTTerm {
         };
     }
 
-    private static void initMaps() {
+    private static Map<Op, String> createBvSymbols() {
         // bitvec
-        bvSymbols = new HashMap<>();
+        HashMap<Op, String> bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -111,8 +118,12 @@ public class SMTTermMultOp extends SMTTerm {
         bvSymbols.put(Op.BVSGT, "bvsgt");
         bvSymbols.put(Op.BVSGE, "bvsge");
         bvSymbols.put(Op.BVSDIV, "bvsdiv");
+        return Map.copyOf(bvSymbols);
+    }
+
+    private static Map<Op, String> createIntSymbols() {
         // int
-        intSymbols = new HashMap<>();
+        HashMap<Op, String> intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -126,6 +137,7 @@ public class SMTTermMultOp extends SMTTerm {
         intSymbols.put(Op.REM, "rem");
         intSymbols.put(Op.PLUS, "+");
         intSymbols.put(Op.MINUS, "-");
+        return Map.copyOf(intSymbols);
     }
 
 
@@ -138,9 +150,6 @@ public class SMTTermMultOp extends SMTTerm {
         this.subs = subs;
         for (SMTTerm sub : this.subs) {
             sub.upp = this;
-        }
-        if (bvSymbols == null || intSymbols == null) {
-            initMaps();
         }
     }
 

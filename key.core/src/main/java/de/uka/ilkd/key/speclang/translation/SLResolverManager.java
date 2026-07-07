@@ -18,7 +18,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +33,16 @@ public abstract class SLResolverManager {
     public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     private final KeYJavaType specInClass;
     private final LocationVariable selfVar;
     private final TermBuilder tb;
 
     private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
 
     private ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
 

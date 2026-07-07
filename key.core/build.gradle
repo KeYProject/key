@@ -10,25 +10,29 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
+    api project(':key.ncore.compiler')
 
-    antlr4 "org.antlr:antlr4:4.13.2"
-    api "org.antlr:antlr4-runtime:4.13.2"
+    antlr4(libs.antlr4)
+    api(libs.antlr4.runtime)
 
     api project(':key.util')
 
-    def JP_VERSION = "3.28.0-K13.5"
-    api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
-    api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
-    api "org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION"
+    api(libs.javaparser.core)
+    api(libs.javaparser.core.serialization)
+    api(libs.javaparser.symbol.solver.core)
 
-    testImplementation("com.google.truth:truth:1.4.5")
+    testImplementation(libs.truth)
     testImplementation(project(":key.core"))
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4'
+    testImplementation(libs.jackson.dataformat.yaml)
 
     // test fixtures
     testFixturesApi(testFixtures(project(":key.util")))
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
 }
 
 // The target directory for JavaCC (parser generation)
@@ -95,10 +99,11 @@ classes.dependsOn << generateSMTListings
 classes.dependsOn << generateSolverPropsList
 
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     enableAssertions = true
     // Forward retention-probe knobs (see MtRetentionProbe) to the test JVM.
-    systemProperties += System.properties.findAll { it.key.toString().startsWith("key.mt.retention") }
+    // Other test cases also need "key." prefixed properties
+    systemProperties += System.properties.findAll { it.key.toString().startsWith("key.") }
     if (project.hasProperty("stressHeap")) {
         maxHeapSize = project.property("stressHeap")
     }
@@ -174,7 +179,7 @@ tasks.register('generateVersionFiles') {
 static def gitRevParse(String args) {
     try {
         return "git rev-parse $args".execute().text.trim()
-    } catch (Exception e) {
+    } catch (Exception ignored) {
         return ""
     }
 }
@@ -250,14 +255,20 @@ tasks.register("testRAP", Test) {
     dependsOn('generateRAPUnitTests', 'testClasses')
 
     forkEvery = 1
-    maxParallelForks = 2
+    // run the regression proofs on up to 10 parallel JVMs (overridable with -PrapForks=N)
+    maxParallelForks = (project.findProperty('rapForks') ?: '10') as int
     useJUnitPlatform()
     it.filter {
         it.includeTestsMatching "de.uka.ilkd.key.proof.runallproofs.gen.*"
     }
-    // set heap size for the test JVM(s)
+    // forward the compiled-matcher switch to the (in-process) proof runs in each fork; default
+    // off, enable with -Pmatcher.compiled=true (or -Dkey.matcher.compiled=true)
+    systemProperty 'key.matcher.compiled',
+        (project.findProperty('matcher.compiled')
+                ?: System.getProperty('key.matcher.compiled', 'false'))
+    // set heap size for the test JVM(s) (overridable with -PrapHeap=8g for the large examples)
     minHeapSize = "1g"
-    maxHeapSize = "3g"
+    maxHeapSize = (project.findProperty('rapHeap') ?: '3g')
 
     // set JVM arguments for the test JVM(s)
     //jvmArgs('-XX:MaxPermSize=1g')

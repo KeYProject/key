@@ -24,7 +24,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -78,7 +77,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The up to know discovered completed {@link IExecutionBlockStartNode}s.
      */
-    private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+    private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableList.nil();
 
     /**
      * The already computed block completion conditions.
@@ -95,12 +94,12 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The up to know discovered outgoing links.
      */
-    private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
+    private ImmutableList<IExecutionLink> outgoingLinks = ImmutableList.nil();
 
     /**
      * The up to know discovered incoming links.
      */
-    private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
+    private ImmutableList<IExecutionLink> incomingLinks = ImmutableList.nil();
 
     /**
      * Constructor.

@@ -30,7 +30,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -451,12 +450,12 @@ public class SymbolicLayoutReader {
         /**
          * The objects.
          */
-        private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+        private ImmutableList<ISymbolicObject> objects = ImmutableList.nil();
 
         /**
          * The symbolic equivalence classes.
          */
-        private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
+        private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableList.nil();
 
         /**
          * {@inheritDoc}
@@ -522,12 +521,12 @@ public class SymbolicLayoutReader {
         /**
          * The associations.
          */
-        private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+        private ImmutableList<ISymbolicAssociation> associations = ImmutableList.nil();
 
         /**
          * The values.
          */
-        private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+        private ImmutableList<ISymbolicValue> values = ImmutableList.nil();
 
         /**
          * {@inheritDoc}
@@ -1062,7 +1061,7 @@ public class SymbolicLayoutReader {
          * @param representativeString The representative term.
          */
         public KeYlessEquivalenceClass(String representativeString) {
-            this(ImmutableSLList.nil(), representativeString);
+            this(ImmutableList.nil(), representativeString);
         }
 
         /**

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -150,7 +149,7 @@ public class BasicSnippetData {
         // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs = invariant.getInfFlowSpecs(services);
-        ImmutableList<InfFlowSpec> modifiedSpecs = ImmutableSLList.nil();
+        ImmutableList<InfFlowSpec> modifiedSpecs = ImmutableList.nil();
         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
             ImmutableList<JTerm> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
             ImmutableList<JTerm> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
@@ -234,7 +233,7 @@ public class BasicSnippetData {
 
 
     private ImmutableList<JTerm> toTermList(ImmutableSet<LocationVariable> vars) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

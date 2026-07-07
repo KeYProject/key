@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 
 public class SLTranslationException extends ProofInputException implements HasLocation {

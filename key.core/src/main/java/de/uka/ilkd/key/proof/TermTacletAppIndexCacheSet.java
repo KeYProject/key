@@ -17,7 +17,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
@@ -91,7 +90,7 @@ public class TermTacletAppIndexCacheSet {
      * cache for locations that are below updates, but not below programs or in the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-        new BelowUpdateCache(ImmutableSLList.nil());
+        new BelowUpdateCache(ImmutableList.nil());
 
     /**
      * cache for locations that are below programs, but not in the scope of binders
@@ -111,12 +110,12 @@ public class TermTacletAppIndexCacheSet {
     public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
         assert cache != null;
         this.cache = cache;
-        antecCache = new TopLevelCache(ImmutableSLList.nil(), cache);
-        succCache = new TopLevelCache(ImmutableSLList.nil(), cache);
+        antecCache = new TopLevelCache(ImmutableList.nil(), cache);
+        succCache = new TopLevelCache(ImmutableList.nil(), cache);
         topLevelCacheEmptyPrefix =
-            new TopLevelCache(ImmutableSLList.nil(), cache);
+            new TopLevelCache(ImmutableList.nil(), cache);
         belowProgCacheEmptyPrefix =
-            new BelowProgCache(ImmutableSLList.nil(), cache);
+            new BelowProgCache(ImmutableList.nil(), cache);
     }
 
     ////////////////////////////////////////////////////////////////////////////

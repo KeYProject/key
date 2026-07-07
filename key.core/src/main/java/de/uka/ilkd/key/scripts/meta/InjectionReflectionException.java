@@ -4,6 +4,9 @@
 package de.uka.ilkd.key.scripts.meta;
 
 /**
+ * Exception thrown when reflection errors occur during value injection.
+ * Wraps reflective operation failures that happen while accessing or setting fields.
+ *
  * @author Alexander Weigl
  * @version 1 (02.05.17)
  */

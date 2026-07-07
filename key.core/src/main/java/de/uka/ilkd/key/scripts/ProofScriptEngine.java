@@ -16,62 +16,44 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Mattias Ulbrich
- * @author Alexander Weigl
- */
+/// The central engine for executing proof scripts in KeY.
+/// Manages command registration, loading, and execution on proofs.
+/// Maintains an [EngineState] for tracking execution context.
+///
+/// @author Mattias Ulbrich
+/// @author Alexander Weigl
 public class ProofScriptEngine {
-    private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
 
-    private final List<ScriptCommandAst> script;
-
     /**
-     * The initially selected goal.
+     * The collection of known script commands.
      */
-    private final @Nullable Goal initiallySelectedGoal;
+    private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
     /**
      * The engine state map.
      */
     private EngineState stateMap;
 
-    private @Nullable Consumer<Message> commandMonitor;
 
-    public ProofScriptEngine(Path file) throws IOException {
-        this(ParsingFacade.parseScript(file), null);
+    public ProofScriptEngine(Proof proof) {
+        super();
+        this.stateMap = new EngineState(proof, this);
     }
 
-    public ProofScriptEngine(KeyAst.ProofScript script) {
-        this(script, null);
-    }
 
-    /**
-     * Instantiates a new proof script engine.
-     *
-     * @param script the script
-     * @param initiallySelectedGoal the initially selected goal
-     */
-    public ProofScriptEngine(KeyAst.ProofScript script, Goal initiallySelectedGoal) {
-        this(script.asAst(), initiallySelectedGoal);
-    }
-
-    public ProofScriptEngine(List<ScriptCommandAst> script, Goal initiallySelectedGoal) {
-        this.initiallySelectedGoal = initiallySelectedGoal;
-        this.script = script;
-    }
-
-    private static Map<String, ProofScriptCommand> loadCommands() {
+    public static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
@@ -84,33 +66,8 @@ public class ProofScriptEngine {
         return result;
     }
 
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
-            throws IOException, InterruptedException, ScriptException {
-        stateMap = new EngineState(proof, this);
-
-        if (initiallySelectedGoal != null) {
-            stateMap.setGoal(initiallySelectedGoal);
-        }
-
-        if (script.isEmpty()) { // no commands given, no work to do
-            return;
-        }
-
-        // add the filename (if available) to the statemap.
-        try {
-            URI url = script.getFirst().location().fileUri();
-            stateMap.setBaseFileName(Paths.get(url));
-        } catch (NullPointerException | InvalidPathException ignored) {
-            // weigl: occurs on windows platforms, due to the fact
-            // that the URI contains "<unknown>" from ANTLR4 when read by string
-            // "<" is illegal on windows
-        }
-
-        // add the observer (if installed) to the state map
-        if (commandMonitor != null) {
-            stateMap.setObserver(commandMonitor);
-        }
-        execute(uiControl, script);
+    public void setInitiallySelectedGoal(@Nullable Goal initiallySelectedGoal) {
+        this.stateMap.setGoal(initiallySelectedGoal);
     }
 
     public void execute(AbstractUserInterfaceControl uiControl, ScriptBlock block)
@@ -118,14 +75,35 @@ public class ProofScriptEngine {
         execute(uiControl, block.commands());
     }
 
+    public void execute(AbstractUserInterfaceControl uiControl, Path file)
+            throws ScriptException, InterruptedException, IOException {
+        KeyAst.ProofScript script = ParsingFacade.parseScript(file);
+        execute(uiControl, script);
+    }
+
+    public void execute(AbstractUserInterfaceControl ui, KeyAst.ProofScript script)
+            throws ScriptException, InterruptedException {
+        execute(ui, script.asAst());
+    }
+
     public void execute(AbstractUserInterfaceControl uiControl, List<ScriptCommandAst> commands)
             throws InterruptedException, ScriptException {
-        if (script.isEmpty()) { // no commands given, no work to do
+        if (commands.isEmpty()) { // no commands given, no work to do
             return;
         }
 
-        Location start = script.getFirst().location();
+        Location start = commands.getFirst().location();
         Proof proof = stateMap.getProof();
+
+        // add the filename (if available) to the statemap.
+        try {
+            URI url = commands.getFirst().location().fileUri();
+            stateMap.setBaseFileName(Paths.get(url));
+        } catch (NullPointerException | InvalidPathException ignored) {
+            // weigl: occurs on windows platforms, due to the fact
+            // that the URI contains "<unknown>" from ANTLR4 when read by string
+            // "<" is illegal on windows
+        }
 
         int cnt = 0;
         for (ScriptCommandAst ast : commands) {
@@ -137,15 +115,17 @@ public class ProofScriptEngine {
 
             String cmd = ast.asCommandLine();
 
-            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
-            if (commandMonitor != null && stateMap.isEchoOn()) {
-                commandMonitor.accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
-            }
 
             try {
+                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                if (stateMap.getObserver() != null && stateMap.isEchoOn()) {
+                    stateMap.getObserver()
+                            .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
+                }
+
                 ProofScriptCommand command = COMMANDS.get(name);
                 if (command == null) {
-                    throw new ScriptException("Unknown command " + name + " at " + ast.location());
+                    throw new ScriptException("Unknown command " + name, ast.location());
                 }
 
                 if (stateMap.isEchoOn()) {
@@ -154,6 +134,7 @@ public class ProofScriptEngine {
                 }
                 command.execute(uiControl, ast, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
+                LOGGER.info("done with command {}", cmd);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (ProofAlreadyClosedException e) {
@@ -179,6 +160,9 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
 
+                LOGGER.debug("Commands: {}", commands.stream()
+                        .map(ScriptCommandAst::asCommandLine)
+                        .collect(Collectors.joining("\n")));
 
                 throw new ScriptException(
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
@@ -210,7 +194,7 @@ public class ProofScriptEngine {
      * @param monitor the monitor to set
      */
     public void setCommandMonitor(Consumer<Message> monitor) {
-        this.commandMonitor = monitor;
+        this.stateMap.setObserver(monitor);
     }
 
     public static ProofScriptCommand getCommand(String commandName) {

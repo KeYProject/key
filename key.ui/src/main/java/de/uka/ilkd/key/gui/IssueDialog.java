@@ -31,8 +31,6 @@ import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.ErrorMarkPainter;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -43,6 +41,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +103,9 @@ public final class IssueDialog extends JDialog {
     private final JTextField cTextField = new JTextField();
     private final JTextPane txtSource = new JTextPane();
     private final JTextArea txtStacktrace = new JTextArea();
+
+    /** offset (in the source preview) of the currently selected issue, used for scroll-to-error */
+    private int currentErrorOffset = 0;
 
     private final JList<PositionedIssueString> listWarnings;
 
@@ -310,6 +313,15 @@ public final class IssueDialog extends JDialog {
         pack();
         chkDetails.setSelected(false);
         setLocationRelativeTo(owner);
+        // On the initial show the source preview is finally laid out, so re-run the scroll that was
+        // a no-op during construction (modelToView2D == null before layout). Without this the
+        // selected issue's line is shown only after the user clicks another issue and back.
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                SwingUtilities.invokeLater(IssueDialog.this::scrollToError);
+            }
+        });
     }
 
     // creates stacktrace area, but do not show
@@ -329,9 +341,8 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
         listWarnings
                 .addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
-        // enable/disable "open file" and "show details"
-        listWarnings.addListSelectionListener(
-            e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+        // "Edit File" is (re)bound to the selected issue in updatePreview (so it opens at that
+        // issue's location); here we only manage "show details"
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().getAdditionalInfo().isEmpty()) {
                 chkDetails.setSelected(false);
@@ -537,6 +548,18 @@ public final class IssueDialog extends JDialog {
         fTextField.setEditable(false);
         lTextField.setEditable(false);
         cTextField.setEditable(false);
+        // make the location a clickable link that opens the source at the selected issue
+        fTextField.setForeground(new Color(0x0b, 0x57, 0xd0));
+        fTextField.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        fTextField.setToolTipText("Click to open the source file at this location");
+        fTextField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (btnEditFile.isEnabled()) {
+                    btnEditFile.doClick();
+                }
+            }
+        });
         locPanel.add(fTextField);
         locPanel.add(lTextField);
         locPanel.add(cTextField);
@@ -564,7 +587,7 @@ public final class IssueDialog extends JDialog {
             ((BuildingExceptions) exception).getErrors().forEach(
                 it -> LOGGER.info("Error", it));
         }
-        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
+        IssueDialog dlg = new IssueDialog(parent, "Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
     }
@@ -645,7 +668,10 @@ public final class IssueDialog extends JDialog {
         cTextField.setText("Column: " + pos.column());
         lTextField.setText("Line: " + pos.line());
 
-        btnEditFile.setEnabled(pos != Position.UNDEFINED);
+        // Bind "Edit File" (and the clickable location field) to THIS issue, so jumping to the
+        // source opens at the selected issue rather than the first one reported. The action enables
+        // itself only when the issue carries a usable file location.
+        btnEditFile.setAction(new EditSourceFileAction(this, location, issue.getText()));
 
         if (location.getFileURI().isEmpty()) {
             fTextField.setVisible(false);
@@ -688,26 +714,33 @@ public final class IssueDialog extends JDialog {
                 // ensure that the currently selected problem is shown in view
                 int offset =
                     pos.isNegative() ? 0 : getOffsetFromLineColumn(txtSource.getDocument(), pos);
+                currentErrorOffset = offset;
                 txtSource.setCaretPosition(offset);
                 // setCaretPosition does not scroll the viewport while the dialog is not yet laid
-                // out; scroll to the error explicitly once the layout has settled, so the offending
-                // line is visible (and not left at the top of the file).
-                final int errorOffset = offset;
-                SwingUtilities.invokeLater(() -> {
-                    try {
-                        var rect = txtSource.modelToView2D(errorOffset);
-                        if (rect != null) {
-                            txtSource.scrollRectToVisible(rect.getBounds());
-                        }
-                    } catch (BadLocationException ignore) {
-                        // best effort: leave the view where it is
-                    }
-                });
+                // out; scroll to the error explicitly. On the initial show this still runs before
+                // layout (modelToView2D == null), so the scroll is also re-run from componentShown.
+                SwingUtilities.invokeLater(this::scrollToError);
             } catch (Exception e) {
                 LOGGER.warn("Failed to update preview", e);
             }
         }
         validate();
+    }
+
+    /**
+     * Scrolls the source preview so the currently selected issue ({@link #currentErrorOffset}) is
+     * visible. A no-op while the text pane is not yet laid out ({@code modelToView2D == null}),
+     * which is why it is invoked both from {@link #updatePreview} and on {@code componentShown}.
+     */
+    private void scrollToError() {
+        try {
+            var rect = txtSource.modelToView2D(currentErrorOffset);
+            if (rect != null) {
+                txtSource.scrollRectToVisible(rect.getBounds());
+            }
+        } catch (BadLocationException ignore) {
+            // best effort: leave the view where it is
+        }
     }
 
     private void updateStackTrace(PositionedIssueString issue) {

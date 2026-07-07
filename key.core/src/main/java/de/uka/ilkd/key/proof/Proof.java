@@ -39,11 +39,12 @@ import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -77,19 +78,21 @@ public class Proof implements ProofObject<Goal>, Named {
      * list with prooftree listeners of this proof attention: firing events makes use of array
      * list's random access nature
      */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Proof.class);
+
     private final List<ProofTreeListener> listenerList = new LinkedList<>();
 
     /**
      * list with the open goals of the proof
      */
-    private ImmutableList<Goal> openGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> openGoals = ImmutableList.nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches possible.
      * If the list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
      */
-    private ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> closedGoals = ImmutableList.nil();
 
     /**
      * declarations &c, read from a problem file or otherwise
@@ -250,7 +253,7 @@ public class Proof implements ProofObject<Goal>, Named {
             InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
+                    .createSuccSequent(ImmutableList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
@@ -516,7 +519,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @see Goal#isAutomatic()
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
+        ImmutableList<Goal> enabledGoals = ImmutableList.nil();
         for (Goal g : goals) {
             if (g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
@@ -574,7 +577,7 @@ public class Proof implements ProofObject<Goal>, Named {
         if (b) {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
-            fireProofGoalsAdded(ImmutableSLList.nil());
+            fireProofGoalsAdded(ImmutableList.nil());
         }
     }
 
@@ -687,7 +690,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     void removeOpenGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal openGoal : openGoals()) {
             if (!toBeRemoved.contains(openGoal.node())) {
                 newGoalList = newGoalList.append(openGoal);
@@ -704,7 +707,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param toBeRemoved the goals to remove
      */
     void removeClosedGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal closedGoal : closedGoals) {
             if (!toBeRemoved.contains(closedGoal.node())) {
                 newGoalList = newGoalList.prepend(closedGoal);
@@ -814,9 +817,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofExpanded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofExpanded(e));
         }
     }
 
@@ -826,9 +827,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofIsBeingPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofIsBeingPruned(e));
         }
     }
 
@@ -838,9 +837,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofPruned(e));
         }
     }
 
@@ -851,9 +848,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofStructureChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofStructureChanged(e));
         }
     }
 
@@ -864,9 +859,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalRemoved(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalRemoved(e));
         }
     }
 
@@ -877,9 +870,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsAdded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsAdded(e));
         }
     }
 
@@ -888,7 +879,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * fires the event that new goals have been added to the list of goals
      */
     protected void fireProofGoalsAdded(Goal goal) {
-        fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
+        fireProofGoalsAdded(ImmutableList.<Goal>nil().prepend(goal));
     }
 
 
@@ -898,9 +889,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsChanged(e));
         }
     }
 
@@ -915,9 +904,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofClosed(e);
-            }
+            notifyListeners(listenerList, l -> l.proofClosed(e));
         }
     }
 
@@ -929,9 +916,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireNotesChanged(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.notesChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.notesChanged(e));
         }
     }
 
@@ -982,7 +967,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(Node node) {
+    public @Nullable Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1007,13 +992,27 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the closed goal that belongs to the given node or null if the node is an inner one or
      *         an open goal
      */
-    public Goal getClosedGoal(Node node) {
+    public @Nullable Goal getClosedGoal(Node node) {
         for (final Goal result : closedGoals) {
             if (result.node() == node) {
                 return result;
             }
         }
         return null;
+    }
+
+    /**
+     * Get the goal (open or closed) belonging to the given node if it exists.
+     *
+     * @param node the Node where a corresponding goal is searched
+     * @return the goal that belongs to the given node or null if the node is an inner one
+     */
+    public @Nullable Goal getGoal(Node node) {
+        Goal g = getOpenGoal(node);
+        if (g == null) {
+            g = getClosedGoal(node);
+        }
+        return g;
     }
 
     /**
@@ -1046,7 +1045,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the goals below node that are contained in <code>fromGoals</code>
      */
     private static ImmutableList<Goal> getGoalsBelow(Node node, ImmutableList<Goal> fromGoals) {
-        ImmutableList<Goal> result = ImmutableSLList.nil();
+        ImmutableList<Goal> result = ImmutableList.nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : fromGoals) {
             // if list contains node, remove it to make the list faster later
@@ -1145,13 +1144,44 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * Notifies all {@code listeners} of an event, isolating each callback. A proof listener is a
+     * passive observer; several fire from within a running rule application (e.g.
+     * {@link #fireRuleApplied} is called from {@code Goal.apply}). If a listener throws, that must
+     * not abort the proof search and leave the proof inconsistent. So a throwing listener is logged
+     * and removed from {@code listeners}, and the remaining listeners are still notified. The
+     * caller
+     * must hold the monitor of {@code listeners}.
+     *
+     * @param listeners the listeners to notify (a throwing listener is pruned from this list)
+     * @param notify the notification to deliver to each listener
+     * @param <L> the listener type
+     */
+    private static <L> void notifyListeners(List<L> listeners, Consumer<L> notify) {
+        List<L> broken = null;
+        for (L listener : listeners) {
+            try {
+                notify.accept(listener);
+            } catch (Exception e) {
+                LOGGER.error("proof listener {} threw while handling an event and will be "
+                    + "unregistered to keep the proof consistent", listener.getClass().getName(),
+                    e);
+                if (broken == null) {
+                    broken = new ArrayList<>();
+                }
+                broken.add(listener);
+            }
+        }
+        if (broken != null) {
+            listeners.removeAll(broken);
+        }
+    }
+
+    /**
      * fires the event that a rule has been applied
      */
     protected void fireRuleApplied(ProofEvent p_e) {
         synchronized (ruleAppListenerList) {
-            for (RuleAppListener ral : ruleAppListenerList) {
-                ral.ruleApplied(p_e);
-            }
+            notifyListeners(ruleAppListenerList, ral -> ral.ruleApplied(p_e));
         }
     }
 

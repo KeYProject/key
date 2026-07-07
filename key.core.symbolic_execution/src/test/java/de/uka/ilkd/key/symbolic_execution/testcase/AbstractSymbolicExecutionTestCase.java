@@ -57,6 +57,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

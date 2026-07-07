@@ -29,7 +29,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -84,8 +83,8 @@ public class SVInstantiations
 
     /** creates a new SVInstantiations object with an empty map */
     private SVInstantiations() {
-        genericSortConditions = ImmutableSLList.nil();
-        updateContext = ImmutableSLList.nil();
+        genericSortConditions = ImmutableList.nil();
+        updateContext = ImmutableList.nil();
         map = DefaultImmutableMap.nilMap();
         interesting = DefaultImmutableMap.nilMap();
     }
@@ -424,7 +423,7 @@ public class SVInstantiations
             // avoid unnecessary creation of SVInstantiations
             return this;
         }
-        return new SVInstantiations(map, interesting(), ImmutableSLList.nil(),
+        return new SVInstantiations(map, interesting(), ImmutableList.nil(),
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 

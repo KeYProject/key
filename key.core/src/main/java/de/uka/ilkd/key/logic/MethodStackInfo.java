@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class MethodStackInfo implements NameCreationInfo {
 
@@ -28,7 +27,7 @@ public class MethodStackInfo implements NameCreationInfo {
      * returns the method call stack
      */
     public ImmutableList<IProgramMethod> getMethodStack() {
-        ImmutableList<IProgramMethod> list = ImmutableSLList.nil();
+        ImmutableList<IProgramMethod> list = ImmutableList.nil();
         if (element instanceof ProgramPrefix) {
             final ImmutableArray<ProgramPrefix> prefix =
                 ((ProgramPrefix) element).getPrefixElements();

@@ -50,7 +50,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +126,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     private ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
@@ -146,7 +145,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -162,7 +161,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a list with all implicit fields found in 'list'
      */
     private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         for (Field field : list) {
             if (field.isImplicit()) {
                 result = result.append(field);

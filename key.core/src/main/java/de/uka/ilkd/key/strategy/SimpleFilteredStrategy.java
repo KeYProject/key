@@ -66,7 +66,9 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
             return res;
         }
 
-        long cost = ((de.uka.ilkd.key.proof.Goal) goal).getTime();
+        // The goal-age ordering is added once by RuleAppContainer.withAge; only the age-free
+        // malus remains in the strategy cost.
+        long cost = 0;
         if (app instanceof TacletApp tacletApp && !tacletApp.assumesInstantionsComplete()) {
             cost += IF_NOT_MATCHED_MALUS;
         }

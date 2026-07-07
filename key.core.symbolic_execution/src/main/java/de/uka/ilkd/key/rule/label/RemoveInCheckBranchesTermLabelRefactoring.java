@@ -21,7 +21,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel} in check branches.
@@ -56,7 +55,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.singleton(UseOperationContractRule.INSTANCE.name())
+        return ImmutableList.singleton(UseOperationContractRule.INSTANCE.name())
                 .prepend(WhileInvariantRule.INSTANCE.name())
                 .prepend(BlockContractInternalRule.INSTANCE.name())
                 .prepend(BlockContractExternalRule.INSTANCE.name())

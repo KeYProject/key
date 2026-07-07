@@ -7,6 +7,7 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 
@@ -23,6 +24,19 @@ import org.jspecify.annotations.Nullable;
  *
  * If #2 is not given or not a number, the TryClose macro is applied to all open goals.
  */
+@Documentation(category = "Control", value = """
+        The `tryclose` command attempts to automatically close proof goals using the TryClose macro.
+        It applies automatic proof strategies to discharge open goals.
+
+        The command can target specific branches by number or name, or apply to all open goals.
+        With the `assertClosed` flag, it will fail the script if closure is not achieved.
+
+        #### Usage Examples
+        - `tryclose` - Applies TryClose to all open goals
+        - `tryclose 5` - Tries to close the 5th goal
+        - `tryclose branch` - Applies TryClose to the current branch only
+        - `tryclose assertClosed` - Fails if the goal cannot be closed
+        """)
 public class TryCloseCommand extends AbstractCommand {
     public TryCloseCommand() {
         super(TryCloseArguments.class);
@@ -44,9 +58,9 @@ public class TryCloseCommand extends AbstractCommand {
                 int num = Integer.parseInt(args.branch);
                 ImmutableList<Goal> goals = state().getProof().openEnabledGoals();
                 if (num >= 0) {
-                    target = goals.take(num).head().node();
+                    target = goals.get(num).node();
                 } else {
-                    target = goals.take(goals.size() + num).head().node();
+                    target = goals.get(goals.size() + num).node();
                 }
             } catch (NumberFormatException e) {
                 target = state().getProof().root();
@@ -71,12 +85,15 @@ public class TryCloseCommand extends AbstractCommand {
 
     public static class TryCloseArguments {
         @Option(value = "steps")
+        @Documentation("The maximum number of proof steps to perform")
         public @Nullable Integer steps;
-        @Argument
 
+        @Argument
+        @Documentation("The branch identifier: a number (goal index), 'branch' (current branch), or omitted (all goals)")
         public @Nullable String branch;
 
         @Flag(value = "assertClosed")
+        @Documentation("Fail the script if the target goal cannot be closed")
         public Boolean assertClosed = false;
     }
 }

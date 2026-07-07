@@ -1,12 +1,6 @@
 parser grammar KeYParser;
 
 import KeYGlobalDeclParser;
-@ header
-{
-
-}
-@ members
-{}
 
 options { tokenVocab = KeYLexer; } // use tokens from STLexer.g4
 

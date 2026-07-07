@@ -8,8 +8,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.JavaSourceLocations;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -229,20 +229,19 @@ public final class JMLTransformer extends JavaTransformerAbstract {
 
     private Statement transformAssertStatement(TextualJMLAssertStatement stat) {
         KeyAst.Expression ctx = stat.getContext();
-        de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
+        org.key_project.util.parsing.Position pos = ctx.getStartLocation().getPosition();
         int kind = switch (stat.getKind()) {
             case ASSERT -> KIND_ASSERT;
             case ASSUME -> KIND_ASSUME;
         };
         KeYMarkerStatement stmt = new KeYMarkerStatement(kind);
-        // TODO simulate/ copy token range.
-        stmt.setData(KEY_EXPR, ctx);
+        stmt.setData(KEY_ASSERT, stat);
         return stmt;
     }
 
     private Statement transformSetStatement(TextualJMLSetStatement stat) {
         KeyAst.SetStatementContext ctx = new KeyAst.SetStatementContext(stat.getAssignment());
-        // de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
+        // org.key_project.util.parsing.Position pos = ctx.getStartLocation().getPosition();
         KeYMarkerStatement stmt = new KeYMarkerStatement(KIND_SET);
         // TODO simulate/ copy token range.
         stmt.setData(KEY_ASSIGN, ctx);
@@ -284,8 +283,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 // We might have multiple textual constructs now, because the single comment could
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
 
-                de.uka.ilkd.key.java.Position pos =
-                    de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
+                org.key_project.util.parsing.Position pos =
+                    org.key_project.util.parsing.Position.fromOneZeroBased(1, 0);
                 ImmutableList<TextualJMLConstruct> constructs =
                     pp.parseClassLevel(concatenatedComment, fileName, pos);
                 services.addWarnings(pp.getWarnings());
@@ -393,8 +392,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         var stmts = new ArrayList<>(blockStmt.getStatements());
         var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size() * 2);
 
-        final de.uka.ilkd.key.java.Position pos =
-            de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
+        final org.key_project.util.parsing.Position pos =
+            org.key_project.util.parsing.Position.fromOneZeroBased(1, 0);
 
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);
@@ -408,7 +407,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                         ("Here is something wrong. Your label '%s' is glued to a " +
                             "JML annotation instead of a Java statement. Please consider the use of braces")
                                 .formatted(labeledStmt.getLabel()),
-                        Location.fromNode(inner));
+                        JavaSourceLocations.locationFromNode(inner));
                 }
                 // go into the labled statement
                 stmt = inner;

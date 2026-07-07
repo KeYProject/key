@@ -8,15 +8,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+// @formatter:off
 /**
  * This annotation marks key-value arguments in proof scripts parameter classes.
  * In contrast to a [Flag], an option receives an arbitrary value.
+ *
+ * ## Usage Example
+ * ```java
+ * class Parameters {
+ *   @Option("solver")
+ *   String solver = "z3";
+ * }
+ * ```
  *
  * @author Alexander Weigl
  * @version 1
  * @see Flag
  * @see Argument
  */
+// @formatter:on
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Option {

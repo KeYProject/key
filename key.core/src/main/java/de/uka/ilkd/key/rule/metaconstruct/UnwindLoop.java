@@ -11,7 +11,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
@@ -92,7 +91,7 @@ public class UnwindLoop extends ProgramTransformer {
      */
     @Override
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
+        ImmutableList<SchemaVariable> ret = ImmutableList.nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

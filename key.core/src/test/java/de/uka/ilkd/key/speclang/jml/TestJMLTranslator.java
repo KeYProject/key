@@ -26,7 +26,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -153,9 +152,8 @@ public class TestJMLTranslator {
     @Test
     public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
-        LocationVariable var = new LocationVariable(
-            classPEN, new TypeRef(testClassType));
-        jmlIO.parameters(ImmutableSLList.singleton(var)).parseExpression("(o.i)");
+        LocationVariable var = new LocationVariable(classPEN, new TypeRef(testClassType));
+        jmlIO.parameters(ImmutableList.singleton(var)).parseExpression("(o.i)");
     }
 
     @Test
@@ -170,7 +168,7 @@ public class TestJMLTranslator {
     public void testSimpleQuery() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType, "getOne",
-            ImmutableSLList.nil(), testClassType);
+            ImmutableList.nil(), testClassType);
         JTerm result = jmlIO.parseExpression("this.getOne()");
         assertNotNull(result);
         assertTrue(termContains(result, selfVar));
@@ -321,7 +319,7 @@ public class TestJMLTranslator {
     public void testResultVar() {
         LocationVariable excVar = buildExcVar();
 
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
 
         IProgramMethod pm =
             javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
@@ -369,7 +367,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving1() {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
@@ -384,7 +382,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving2() {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
@@ -399,7 +397,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving3() {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
@@ -414,7 +412,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testStaticQueryResolving() {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
 
         IProgramMethod pm =
             javaInfo.getProgramMethod(testClassType, "staticMethod", signature, testClassType);

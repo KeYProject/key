@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof_references.analyst.*;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -42,7 +41,7 @@ public final class ProofReferenceUtil {
      * The default {@link IProofReferencesAnalyst}s.
      */
     public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS =
-        ImmutableSLList.<IProofReferencesAnalyst>nil().append(
+        ImmutableList.<IProofReferencesAnalyst>nil().append(
             new MethodBodyExpandProofReferencesAnalyst(), new MethodCallProofReferencesAnalyst(),
             new ContractProofReferencesAnalyst(), new ProgramVariableReferencesAnalyst(),
             new ClassAxiomAndInvariantProofReferencesAnalyst());

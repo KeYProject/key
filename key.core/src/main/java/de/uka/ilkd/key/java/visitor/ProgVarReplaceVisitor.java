@@ -34,7 +34,6 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -191,7 +190,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private ImmutableList<JTerm> replaceVariablesInTerms(ImmutableList<JTerm> terms) {
-        ImmutableList<JTerm> res = ImmutableSLList.nil();
+        ImmutableList<JTerm> res = ImmutableList.nil();
         boolean changed = false;
         for (final JTerm term : terms) {
             final JTerm newTerm = replaceVariablesInTerm(term);
@@ -203,7 +202,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<InfFlowSpec> replaceVariablesInTermListTriples(
             ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> res = ImmutableSLList.nil();
+        ImmutableList<InfFlowSpec> res = ImmutableList.nil();
         boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
             final ImmutableList<JTerm> renamedPreExpressions =

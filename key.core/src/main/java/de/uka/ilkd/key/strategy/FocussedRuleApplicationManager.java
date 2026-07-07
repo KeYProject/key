@@ -15,7 +15,6 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
@@ -133,7 +132,7 @@ public class FocussedRuleApplicationManager
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
-        ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
+        ImmutableList<RuleApp> applicableRules = ImmutableList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

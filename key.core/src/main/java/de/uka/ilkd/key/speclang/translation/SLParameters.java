@@ -9,7 +9,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Wraps a list of expressions.
@@ -31,7 +30,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
      * @return the list of types that compose the type signature
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> result = ImmutableList.nil();
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {

@@ -2,7 +2,6 @@ parser grammar KeYTacletParser;
 
 import KeYSequentParser;
 
-options { tokenVocab = KeYLexer; }
 taclet
    : doc = DOC_COMMENT? (LEMMA)? name = IDENT (choices_ = option_list)? LBRACE (form = term | (SCHEMAVAR one_schema_var_decl SEMI)* (ASSUMES LPAREN assumesSeq = seq RPAREN)? (FIND LPAREN find = termorseq RPAREN (SAMEUPDATELEVEL | INSEQUENTSTATE | ANTECEDENTPOLARITY | SUCCEDENTPOLARITY)*)? (VARCOND LPAREN varexplist RPAREN)* goalspecs modifiers) RBRACE
    ;

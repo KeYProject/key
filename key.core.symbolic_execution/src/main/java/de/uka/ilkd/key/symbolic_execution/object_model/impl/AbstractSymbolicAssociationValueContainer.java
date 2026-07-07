@@ -13,7 +13,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValue
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -26,12 +25,12 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * The contained {@link ISymbolicAssociation}s.
      */
-    private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+    private ImmutableList<ISymbolicAssociation> associations = ImmutableList.nil();
 
     /**
      * The contained {@link ISymbolicValue}s.
      */
-    private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+    private ImmutableList<ISymbolicValue> values = ImmutableList.nil();
 
     /**
      * Constructor.

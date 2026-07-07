@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -13,7 +12,6 @@ import org.key_project.logic.LogicServices;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -39,9 +37,10 @@ final class SingleThreadedTacletIndex extends TacletIndex {
         super(tacletSet);
     }
 
-    private SingleThreadedTacletIndex(HashMap<Object, ImmutableList<NoPosTacletApp>> rwList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> antecList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> succList,
+    private SingleThreadedTacletIndex(
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> rwList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> antecList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> succList,
             ImmutableList<NoPosTacletApp> noFindList,
             HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
         super(rwList, antecList, succList, noFindList, partialInstantiatedRuleApps);
@@ -53,11 +52,8 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @SuppressWarnings("unchecked")
     @Override
     public TacletIndex copy() {
-        return new SingleThreadedTacletIndex(
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
+        return new SingleThreadedTacletIndex(rwList.copy(), antecList.copy(), succList.copy(),
+            noFindList, (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**
@@ -67,7 +63,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, LogicServices services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableList.nil();
 
         for (final NoPosTacletApp tacletApp : tacletApps) {
             if (!p_filter.filter(tacletApp.taclet())) {

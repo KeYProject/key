@@ -16,7 +16,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The default implementation of {@link IExecutionStart}.
@@ -28,7 +27,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * The up to know discovered {@link IExecutionTermination}s.
      */
-    private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+    private ImmutableList<IExecutionTermination> terminations = ImmutableList.nil();
 
     /**
      * Constructor.

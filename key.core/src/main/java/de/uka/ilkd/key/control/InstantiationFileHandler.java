@@ -5,6 +5,8 @@ package de.uka.ilkd.key.control;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
@@ -12,19 +14,52 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class InstantiationFileHandler {
-    private static final String INSTANTIATION_DIR =
-        PathConfig.getKeyConfigDir() + File.separator + "instantiations";
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstantiationFileHandler.class);
+
+    private static final Path INSTANTIATION_DIR = getStoragePath();
 
     private static final String SEPARATOR1 = "<<<<<<";
 
     private static final String SEPARATOR2 = ">>>>>>";
 
-    private static final String LINE_END = System.getProperty("line.separator");
+    private static final String LINE_END = System.lineSeparator();
 
     private static final int SAVE_COUNT = 5;
 
-    private static HashMap<String, List<List<String>>> hm;
+
+    private static Map<String, List<List<String>>> hm;
+
+    /// Finds the current place to store used instantiation. If there was a version switch
+    /// (the folder does not exist), this method tries to copy previous instantiations to
+    /// the new directory silently.
+    ///
+    /// It is guaranteed, that the folder exists.
+    private static Path getStoragePath() {
+        Path cur = PathConfig.currentPaths.keyConfigDir.resolve("instantiations");
+        if (Files.exists(cur)) {
+            return cur;
+        }
+
+        Path prev = PathConfig.previousPaths.keyConfigDir.resolve("instantiations");
+        try {
+            Files.createDirectories(cur);
+            try (var files = Files.walk(prev)) {
+                files.forEach(path -> {
+                    try {
+                        Files.copy(path, cur.resolve(path.relativize(prev)));
+                    } catch (IOException ignore) {
+                    }
+                });
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return cur;
+    }
 
     public static boolean hasInstantiationListsFor(Taclet taclet) {
         if (hm == null) {
@@ -44,19 +79,12 @@ public class InstantiationFileHandler {
     }
 
     private static void createHashMap() {
-        File dir = new File(INSTANTIATION_DIR);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        String[] instFiles = dir.list();
-        if (instFiles == null) {
-            hm = new LinkedHashMap<>(0);
-        } else {
-            // Avoid resizing of HashMap
-            hm = new LinkedHashMap<>(instFiles.length + 1, 1);
-            for (String instFile : instFiles) {
-                hm.put(instFile, null);
-            }
+        hm = new TreeMap<>();
+        try (var stream = Files.list(INSTANTIATION_DIR)) {
+            // using a TreeMap here avoids non-determinsm introduce by the file system.
+            stream.forEach(file -> hm.put(file.toString(), null));
+        } catch (IOException e) {
+            LOGGER.warn("Could not read the instantions folder {}", INSTANTIATION_DIR, e);
         }
     }
 

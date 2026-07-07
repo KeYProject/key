@@ -77,9 +77,9 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +212,7 @@ public final class SymbolicExecutionUtil {
             if (openGoals.isEmpty()) {
                 return tb.tt();
             } else {
-                ImmutableList<JTerm> goalImplications = ImmutableSLList.nil();
+                ImmutableList<JTerm> goalImplications = ImmutableList.nil();
                 for (Goal goal : openGoals) {
                     JTerm goalImplication =
                         sequentToImplication(goal.sequent(), goal.proof().getServices());
@@ -255,7 +255,7 @@ public final class SymbolicExecutionUtil {
      * @return The list with all contained {@link JTerm}s.
      */
     public static ImmutableList<JTerm> listSemisequentTerms(Semisequent semisequent) {
-        ImmutableList<JTerm> terms = ImmutableSLList.nil();
+        ImmutableList<JTerm> terms = ImmutableList.nil();
         if (semisequent != null) {
             for (SequentFormula sf : semisequent) {
                 terms = terms.append((JTerm) sf.formula());
@@ -1735,7 +1735,7 @@ public final class SymbolicExecutionUtil {
         if (executionElement != null) {
             return collectGoalsInSubtree(executionElement.getProofNode());
         } else {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
     }
 
@@ -2581,11 +2581,11 @@ public final class SymbolicExecutionUtil {
                 goalTemplate = null;
             } else {
                 goalTemplate = app.taclet().goalTemplates()
-                        .take(app.taclet().goalTemplates().size() - childIndex).head();
+                        .get(app.taclet().goalTemplates().size() - childIndex);
             }
         } else {
             goalTemplate = app.taclet().goalTemplates()
-                    .take(app.taclet().goalTemplates().size() - 1 - childIndex).head();
+                    .get(app.taclet().goalTemplates().size() - 1 - childIndex);
         }
         // Instantiate replace object if required
         if (goalTemplate != null) {
@@ -2631,8 +2631,8 @@ public final class SymbolicExecutionUtil {
                             + " term in branch computation but rule \"" + app + "\" was found.");
                     }
                     // Create new lists
-                    ImmutableList<JTerm> tempAntecedents = ImmutableSLList.nil();
-                    ImmutableList<JTerm> tempSuccedents = ImmutableSLList.nil();
+                    ImmutableList<JTerm> tempAntecedents = ImmutableList.nil();
+                    ImmutableList<JTerm> tempSuccedents = ImmutableList.nil();
                     // Apply updates on antecedents and add result to new antecedents list
                     for (JTerm a : newAntecedents) {
                         tempAntecedents = tempAntecedents
@@ -2706,7 +2706,7 @@ public final class SymbolicExecutionUtil {
         for (final SequentFormula sf : parent) {
             parentSFs.add(sf);
         }
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (final SequentFormula sf : child) {
             if (!parentSFs.contains(sf)) {
                 result = result.append((JTerm) sf.formula());
@@ -2833,7 +2833,7 @@ public final class SymbolicExecutionUtil {
                                               // scenarios in which a precondition or null pointer
                                               // check can't be shown
                 splittingOption, false);
-        ImmutableList<JTerm> goalCondtions = ImmutableSLList.nil();
+        ImmutableList<JTerm> goalCondtions = ImmutableList.nil();
         for (Pair<JTerm, Node> pair : resultValuesAndConditions) {
             JTerm goalCondition = pair.first;
             goalCondition = replaceSkolemConstants(pair.second.sequent(),
@@ -3015,7 +3015,7 @@ public final class SymbolicExecutionUtil {
      * @return The found initial {@link ElementaryUpdate}s.
      */
     public static ImmutableList<JTerm> computeRootElementaryUpdates(Node root) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         Sequent sequent = root.sequent();
         for (SequentFormula sf : sequent.succedent()) {
             JTerm term = (JTerm) sf.formula();
@@ -3037,15 +3037,15 @@ public final class SymbolicExecutionUtil {
             JTerm updateTerm = UpdateApplication.getUpdate(term);
             return collectElementaryUpdates(updateTerm);
         } else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            ImmutableList<JTerm> result = ImmutableSLList.nil();
+            ImmutableList<JTerm> result = ImmutableList.nil();
             for (int i = 0; i < term.arity(); i++) {
                 result = result.prepend(collectElementaryUpdates(term.sub(i)));
             }
             return result;
         } else if (term.op() instanceof ElementaryUpdate) {
-            return ImmutableSLList.<JTerm>nil().prepend(term);
+            return ImmutableList.<JTerm>nil().prepend(term);
         } else {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
     }
 

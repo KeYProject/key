@@ -3,13 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collector;
 
 import org.key_project.util.Strings;
@@ -22,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation allows
  * list sharing of sublists.
- *
+ * <p>
  * The costs of the different operations are O(1) for prepending one element, O(m) for prepending a
  * list with m elements, O(n) for appending an element to this list(size n) O(n) for appending a
  * list with m elements to this list (size n) head() has O(1) tail has O(1) size has O(1) ATTENTION
@@ -30,22 +25,8 @@ import org.slf4j.LoggerFactory;
  * and head with amortized O(1). This will be done later (if necessary).
  */
 @SuppressWarnings({ "unchecked" })
-public abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableList<T> {
-
-    /**
-     * generated serial id
-     */
-    private static final long serialVersionUID = 8717813038177120287L;
-    private static final Logger log = LoggerFactory.getLogger(ImmutableSLList.NIL.class);
-
-    /** the empty list */
-    public static <T extends @Nullable Object> ImmutableSLList<T> nil() {
-        return (ImmutableSLList<T>) NIL.NIL;
-    }
-
-    public static <T extends @Nullable Object> ImmutableSLList<T> singleton(T obj) {
-        return new Cons<>(obj, nil());
-    }
+abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableList<T> {
+    private static final Logger log = LoggerFactory.getLogger(ImmutableSLList.class);
 
     /**
      * Reverses this list (O(N))
@@ -57,51 +38,12 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         ImmutableList<T> rest = this;
-        ImmutableList<T> rev = nil();
+        ImmutableList<T> rev = ImmutableList.nil();
         while (!rest.isEmpty()) {
             rev = rev.prepend(rest.head());
             rest = rest.tail();
         }
         return rev;
-    }
-
-    /**
-     * Convert the list to a Java array (O(n))
-     */
-    @Override
-    public <S extends @Nullable Object> S[] toArray(S[] array) {
-        S[] result;
-        if (array.length < size()) {
-            Class<? extends Object[]> arrayClass = array.getClass();
-            assert arrayClass.isArray()
-                    : "@AssumeAssertion(nullness): This has indeed a component type";
-            result = (S[]) Array.newInstance(arrayClass.getComponentType(), size());
-        } else {
-            result = array;
-        }
-        ImmutableList<T> rest = this;
-        for (int i = 0, sz = size(); i < sz; i++) {
-            result[i] = (S) rest.head();
-            rest = rest.tail();
-        }
-        return result;
-    }
-
-    /**
-     * Convert the list to a Java array (O(n))
-     */
-    @Override
-    public <S extends @Nullable Object> S[] toArray(Class<S> type) {
-        S[] result = (S[]) Array.newInstance(type, size());
-        ImmutableList<T> rest = this;
-        for (int i = 0, sz = size(); i < sz; i++) {
-            // @ assert !rest.isEmpty();
-            T head = rest.head();
-            // Somehow the nullness checker needs this cast to be explicit.
-            result[i] = (S) type.cast(head);
-            rest = rest.tail();
-        }
-        return result;
     }
 
 
@@ -152,14 +94,20 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     }
 
 
-    /**
-     * first <code>n</code> elements of the list are truncated
-     *
-     * @param n an int specifying the number of elements to be truncated
-     * @return IList<T> this list without the first <code>n</code> elements
-     */
     @Override
     public ImmutableList<T> take(int n) {
+        int elems = Math.min(size(), n);
+        List<T> seq = new ArrayList<>(elems);
+        ImmutableList<T> list = this;
+        for (int i = 0; i < elems; i++) {
+            seq.add(list.head());
+            list = tail();
+        }
+        return ImmutableList.fromList(seq);
+    }
+
+    @Override
+    public ImmutableList<T> skip(int n) {
         if (n < 0 || n > size()) {
             throw new IndexOutOfBoundsException(
                 "Unable to take " + n + " elements from list " + this);
@@ -175,18 +123,24 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     }
 
 
-    private static class Cons<S extends @Nullable Object> extends ImmutableSLList<S> {
+    static class Cons<S extends @Nullable Object> extends ImmutableSLList<S> {
 
         /**
          *
          */
         private static final long serialVersionUID = 2377644880764534935L;
 
-        /** the first element */
+        /**
+         * the first element
+         */
         private final S element;
-        /** reference to the next element (equiv.to the tail of list) */
-        private final ImmutableSLList<S> cons;
-        /** size of the list */
+        /**
+         * reference to the next element (equiv.to the tail of list)
+         */
+        private final ImmutableList<S> cons;
+        /**
+         * size of the list
+         */
         private final int size;
 
         /**
@@ -196,7 +150,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          */
         Cons(S element) {
             this.element = element;
-            cons = nil();
+            cons = ImmutableList.nil();
             size = 1;
         }
 
@@ -206,7 +160,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          * @param element a <T> stored in the head element of the list
          * @param cons tail of the list
          */
-        Cons(S element, ImmutableSLList<S> cons) {
+        Cons(S element, ImmutableList<S> cons) {
             this.element = element;
             this.cons = cons;
             size = cons.size() + 1;
@@ -321,16 +275,20 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          */
         @Override
         public ImmutableList<S> append(S... array) {
-            return ((ImmutableList<S>) nil()).prepend(array).prepend(this);
+            return ImmutableList.<S>nil().prepend(array).prepend(this);
         }
 
-        /** @return <T> first element in list */
+        /**
+         * @return <T> first element in list
+         */
         @Override
         public S head() {
             return element;
         }
 
-        /** @return IList<T> tail of the list */
+        /**
+         * @return IList<T> tail of the list
+         */
         @Override
         public ImmutableList<S> tail() {
             return cons;
@@ -356,19 +314,25 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
 
-        /** @return iterator through list */
+        /**
+         * @return iterator through list
+         */
         @Override
         public Iterator<S> iterator() {
             return new SLListIterator<>(this);
         }
 
-        /** @return int the number of elements in list */
+        /**
+         * @return int the number of elements in list
+         */
         @Override
         public int size() {
             return size;
         }
 
-        /** @return boolean true iff. obj in list */
+        /**
+         * @return boolean true iff. obj in list
+         */
         @Override
         public boolean contains(@Nullable Object obj) {
             ImmutableList<S> list = this;
@@ -383,7 +347,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             return false;
         }
 
-        /** @return true iff the list is empty */
+        /**
+         * @return true iff the list is empty
+         */
         @Override
         public boolean isEmpty() {
             return false;
@@ -442,29 +408,35 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             return unmodifiedTail.prepend(res, i - unmodifiedTail.size());
         }
 
-
         @Override
-        public boolean equals(@Nullable Object o) {
-            if (!(o instanceof ImmutableList)) {
-                return false;
-            }
-            final ImmutableList<S> o1 = (ImmutableList<S>) o;
-            if (o1.size() != size()) {
-                return false;
-            }
-
-            final Iterator<S> p = iterator();
-            final Iterator<S> q = o1.iterator();
-            while (p.hasNext()) {
-                S ep = p.next();
-                S eq = q.next();
-                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) {
-                    return false;
-                }
-            }
-            return true;
+        public S get(int idx) {
+            return skip(idx).head();
         }
 
+
+        @Override
+        public final boolean equals(@Nullable Object o) {
+            if (this == o)
+                return true;
+
+            if (o instanceof ImmutableList<?> other) {
+                if (other.size() != size()) {
+                    return false;
+                }
+
+                final Iterator<?> p = iterator();
+                final Iterator<?> q = other.iterator();
+                while (p.hasNext()) {
+                    var ep = p.next();
+                    var eq = q.next();
+                    if (!Objects.equals(ep, eq)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
 
         @Override
         public String toString() {
@@ -472,10 +444,14 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
     }
 
-    /** iterates through a none destructive list */
+    /**
+     * iterates through a none destructive list
+     */
     private static class SLListIterator<T extends @Nullable Object> implements Iterator<T> {
 
-        /** the list of remaining elements */
+        /**
+         * the list of remaining elements
+         */
         private ImmutableList<T> list;
 
         /**
@@ -487,7 +463,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             this.list = list;
         }
 
-        /** @return next element in list */
+        /**
+         * @return next element in list
+         */
         @Override
         public T next() {
             // TODO Perhaps add a RT and throw NuSuchElement to make type checker happy.
@@ -517,7 +495,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     }
 
 
-    private static class NIL<S> extends ImmutableSLList<S> {
+    static class NIL<S> extends ImmutableSLList<S> {
 
         final static ImmutableList<?> NIL = new NIL<>();
 
@@ -536,7 +514,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          * replaced by the singleton.
          */
         private Object readResolve() throws java.io.ObjectStreamException {
-            return nil();
+            return ImmutableList.nil();
         }
 
         @Override
@@ -546,7 +524,12 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public boolean equals(@Nullable Object o) {
-            return o instanceof NIL<?>;
+            if (o == this)
+                return true;
+            if (o instanceof ImmutableList<?> other) {
+                return other.size() == size();
+            }
+            return false;
         }
 
         @Override
@@ -612,9 +595,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public S head() {
-            NoSuchElementException ex = new NoSuchElementException();
-            log.error("head on NIL!", ex);
-            throw ex;
+            throw new NoSuchElementException("No element in NIL()");
         }
 
         @Override
@@ -628,6 +609,11 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
+        public S get(int idx) {
+            throw new NoSuchElementException("No element in NIL()");
+        }
+
+        @Override
         public ImmutableList<S> removeFirst(S obj) {
             return this;
         }
@@ -637,15 +623,20 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             return "[]";
         }
 
-        /** iterates through the a none destructive NIL list */
+        /**
+         * iterates through the a none destructive NIL list
+         */
         private class SLNilListIterator implements Iterator<S> {
 
             /**
              * creates the NIL list iterator
              */
-            public SLNilListIterator() {}
+            public SLNilListIterator() {
+            }
 
-            /** @return next element in list */
+            /**
+             * @return next element in list
+             */
             @Override
             public S next() {
                 throw new NoSuchElementException();
@@ -698,7 +689,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public Function<List<T>, ImmutableList<T>> finisher() {
-            return list -> ImmutableSLList.<T>nil().append(list);
+            return list -> ImmutableList.<T>nil().append(list);
         }
 
         @Override

@@ -23,7 +23,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -53,7 +52,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     ImmutableList<JTerm> createTermSV(ImmutableList<JTerm> ts, String schemaPrefix,
             Services services) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
         }

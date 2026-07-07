@@ -37,7 +37,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -299,7 +298,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
             new TypeRef(containerType), null, false, false));
-        ImmutableList<LocationVariable> varsForCondition = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> varsForCondition = ImmutableList.nil();
         if (getPm() != null) {
             // collect parameter variables
             for (ParameterDeclaration pd : getPm().getParameters()) {
@@ -321,7 +320,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
         List<KeYJavaType> kjts = info.getAllSupertypes(containerType);
-        ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> globalVars = ImmutableList.nil();
         for (KeYJavaType kjtloc : kjts) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {
                 ImmutableList<Field> fields =

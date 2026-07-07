@@ -42,8 +42,8 @@ public class TestJavaDLASTExtensions {
      * its (now no longer hidden) message mentions the unresolvable type.
      */
     private static void assertUnsolvedType(BuildingException ex) {
-        Assertions.assertTrue(ExceptionTools.getMessage(ex).contains("Unsolved symbol"),
-            "the message should expose the unresolved symbol, but was: "
+        Assertions.assertTrue(ExceptionTools.getMessage(ex).contains("Cannot resolve"),
+            "the message should expose the unresolved symbol in user-facing wording, but was: "
                 + ExceptionTools.getMessage(ex));
         boolean hasUnsolvedCause = false;
         for (Throwable c = ex; c != null; c = c.getCause()) {

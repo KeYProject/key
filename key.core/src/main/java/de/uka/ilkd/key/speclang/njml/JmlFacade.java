@@ -3,16 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.io.IOException;
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -37,6 +40,21 @@ public final class JmlFacade {
      */
     public static @NonNull JmlLexer createLexer(@NonNull CharStream stream) {
         return new JmlLexer(stream);
+    }
+
+    /**
+     * Releases the ANTLR prediction (DFA) cache of the JML parser. It is a pure, lazily-built cache
+     * held on the generated parser's static fields, only needed while parsing, not during proof
+     * search; ANTLR rebuilds it transparently on the next parse. See
+     * {@code ParsingFacade.clearParserCaches}.
+     */
+    public static void clearCaches() {
+        try {
+            new JmlParser(new CommonTokenStream(createLexer(CharStreams.fromString(""))))
+                    .getInterpreter().clearDFA();
+        } catch (RuntimeException ignored) {
+            // best-effort cache release; a failure here only forgoes the memory saving
+        }
     }
 
     /**
@@ -113,5 +131,18 @@ public final class JmlFacade {
         JmlParser.ClauseContext ctx = p.clauseEOF().clause();
         p.getErrorReporter().throwException();
         return ctx;
+    }
+
+    // FIXME Make sure this is removed. For testing only!
+    public static void main(String[] args) throws IOException {
+        String input = new String(System.in.readAllBytes());
+        JmlLexer lexer = createLexer(input);
+        for (Token t : lexer.getAllTokens()) {
+            System.out.println(t.getText() + " " + t);
+        }
+        lexer = createLexer(input);
+        var parser = createParser(lexer);
+        var tree = parser.methodlevel_comment();
+        System.out.println(tree.toStringTree(parser));
     }
 }

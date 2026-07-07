@@ -31,7 +31,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Choice;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
@@ -154,7 +153,7 @@ public abstract class AbstractProofReferenceTestCase {
             final ExpectedProofReferences... expectedReferences) {
         return (environment, proof) -> {
             // Compute proof references
-            ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
+            ImmutableList<IProofReferencesAnalyst> analysts = ImmutableList.nil();
             if (analyst != null) {
                 analysts = analysts.append(analyst);
             }

@@ -30,7 +30,6 @@ import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -503,7 +502,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
         }
 
-        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
+        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableList.nil();
         for (LocationVariable heap : heapContext) {
             // weigl: prevent NPE
             JTerm modifiableTerm = modifiables.get(heap);

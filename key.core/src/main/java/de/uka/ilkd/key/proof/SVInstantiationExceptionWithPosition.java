@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.proof;
 
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 

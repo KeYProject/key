@@ -22,7 +22,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ public class TestTacletBuild {
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableSLList.nil(),
+                ImmutableList.nil(),
                 t2));
         boolean thrown = false;
         try {
@@ -86,7 +86,7 @@ public class TestTacletBuild {
             NO_SUBTERMS);
         JTerm t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq =
-            JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
+            JavaDLSequentKit.createSuccSequent(ImmutableList.singleton(new SequentFormula(t1)));
         JTerm t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setAssumesSequent(seq);
@@ -109,7 +109,7 @@ public class TestTacletBuild {
         JTerm t1 = tb.all((QuantifiableVariable) u, A);
         JTerm t2 = tb.ex((QuantifiableVariable) u, A);
         Sequent seq = JavaDLSequentKit
-                .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t2))
+                .createSuccSequent(ImmutableList.singleton(new SequentFormula(t2))
                         .prepend(new SequentFormula(t1)));
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setAssumesSequent(seq);
