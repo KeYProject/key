@@ -73,6 +73,44 @@ public class FindTacletAppContainer extends TacletAppContainer {
         return applicationPosition;
     }
 
+    /**
+     * @return the tag of the formula this container's find position lives in (stable across
+     *         formula modifications; used as part of the queue dedup key)
+     */
+    FormulaTag getPositionTag() {
+        return positionTag;
+    }
+
+    /**
+     * @return the term this container's taclet was matched against at creation time (identity is
+     *         used by the queue dedup to recognise dead, superseded anchors)
+     */
+    org.key_project.logic.Term getFindSubterm() {
+        return applicationPosition.subTerm();
+    }
+
+    /**
+     * @return true iff the underlying taclet has no \assumes sequent, i.e. no if-instantiation
+     *         variants of this container can coexist (precondition for the queue dedup)
+     */
+    boolean hasEmptyAssumes() {
+        return getTacletApp().taclet().assumesSequent().isEmpty();
+    }
+
+    /**
+     * A copy re-tagged to (cached ageFreeCost + NOW): the lazy form of v1's kill-and-rebirth for a
+     * re-reported candidate whose position is unchanged. Same app (the match is unchanged), the
+     * CURRENT tag-resolved position, no {@code computeCost}; the full assumes window (age -1)
+     * like every rebirth.
+     */
+    FindTacletAppContainer retaggedCopy(Goal goal, long tagTime) {
+        final PosInOccurrence cur = getPosInOccurrence(goal);
+        return new FindTacletAppContainer((de.uka.ilkd.key.rule.NoPosTacletApp) getTacletApp(),
+            cur, getAgeFreeCost(), isAgeFreeCostRegular(),
+            getAgeFreeCost().add(
+                org.key_project.prover.strategy.costbased.NumberRuleAppCost.create(tagTime)),
+            goal, -1);
+    }
 
     /**
      * @return true iff the stored rule app is applicable for the given sequent, i.e. if the

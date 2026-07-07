@@ -78,6 +78,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return ageFreeCost;
     }
 
+    boolean isAgeFreeCostRegular() {
+        return ageFreeCostIsRegular;
+    }
+
     protected NoPosTacletApp getTacletApp() {
         return (NoPosTacletApp) getRuleApp();
     }

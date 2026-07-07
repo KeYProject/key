@@ -56,6 +56,12 @@ public class GeneralSettings extends AbstractSettings {
     /** Default worker count when the multi-core prover is first enabled. */
     public static final int PARALLEL_PROVER_THREADS_DEFAULT = 4;
 
+    /**
+     * Whether each goal's rule-application queue is maintained eagerly (the experimental
+     * {@code EagerRuleApplicationManager}) rather than lazily revalidated.
+     */
+    public static final String EAGER_RULE_QUEUE_ENABLED = "EagerRuleApplicationQueueEnabled";
+
     /** Default value for {@link #getJmlEnabledKeys()} */
     public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
 
@@ -110,6 +116,15 @@ public class GeneralSettings extends AbstractSettings {
      */
     private int parallelProverThreadCount = PARALLEL_PROVER_THREADS_DEFAULT;
 
+    /**
+     * Whether each goal maintains its rule-application queue eagerly (identity-anchored candidate
+     * set updated by sequent-change events; {@code EagerRuleApplicationManager}) instead of the
+     * classic lazily revalidating queue. Produces the same proofs but is substantially faster on
+     * large sequents. Experimental, hence opt-in (enable it in the settings, or via
+     * {@code -Dkey.queue.eager=true}); the classic queue is the default.
+     */
+    private boolean eagerRuleQueueEnabled = false;
+
     GeneralSettings() {
         // addSettingsListener(AutoSaver.settingsListener);
     }
@@ -161,6 +176,13 @@ public class GeneralSettings extends AbstractSettings {
      */
     public int getParallelProverThreadCount() {
         return parallelProverThreadCount;
+    }
+
+    /**
+     * @return whether goals use the eagerly maintained rule-application queue
+     */
+    public boolean isEagerRuleQueueEnabled() {
+        return eagerRuleQueueEnabled;
     }
 
     // setter
@@ -216,6 +238,12 @@ public class GeneralSettings extends AbstractSettings {
         var old = parallelProverThreadCount;
         parallelProverThreadCount = Math.max(1, count);
         firePropertyChange(PARALLEL_PROVER_THREADS, old, parallelProverThreadCount);
+    }
+
+    public void setEagerRuleQueueEnabled(boolean b) {
+        var old = eagerRuleQueueEnabled;
+        eagerRuleQueueEnabled = b;
+        firePropertyChange(EAGER_RULE_QUEUE_ENABLED, old, eagerRuleQueueEnabled);
     }
 
     /**
@@ -275,6 +303,11 @@ public class GeneralSettings extends AbstractSettings {
             }
         }
 
+        val = props.getProperty(prefix + EAGER_RULE_QUEUE_ENABLED);
+        if (val != null) {
+            setEagerRuleQueueEnabled(Boolean.parseBoolean(val));
+        }
+
         {
             String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
             if (sysProp != null) {
@@ -311,6 +344,8 @@ public class GeneralSettings extends AbstractSettings {
         props.setProperty(prefix + PARALLEL_PROVER_ENABLED, String.valueOf(parallelProverEnabled));
         props.setProperty(prefix + PARALLEL_PROVER_THREADS,
             String.valueOf(parallelProverThreadCount));
+        props.setProperty(prefix + EAGER_RULE_QUEUE_ENABLED,
+            String.valueOf(eagerRuleQueueEnabled));
         props.setProperty(KEY_JML_ENABLED_KEYS, String.join(",", jmlEnabledKeys));
     }
 
@@ -332,6 +367,7 @@ public class GeneralSettings extends AbstractSettings {
         setParallelProverEnabled(props.getBool(PARALLEL_PROVER_ENABLED, false));
         setParallelProverThreadCount(
             props.getInt(PARALLEL_PROVER_THREADS, PARALLEL_PROVER_THREADS_DEFAULT));
+        setEagerRuleQueueEnabled(props.getBool(EAGER_RULE_QUEUE_ENABLED, false));
 
         var sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
         if (sysProp != null) {
@@ -352,6 +388,7 @@ public class GeneralSettings extends AbstractSettings {
         props.set(ENSURE_SOURCE_CONSISTENCY, ensureSourceConsistency);
         props.set(PARALLEL_PROVER_ENABLED, parallelProverEnabled);
         props.set(PARALLEL_PROVER_THREADS, parallelProverThreadCount);
+        props.set(EAGER_RULE_QUEUE_ENABLED, eagerRuleQueueEnabled);
         props.set(KEY_JML_ENABLED_KEYS, jmlEnabledKeys.stream().toList());
     }
 }

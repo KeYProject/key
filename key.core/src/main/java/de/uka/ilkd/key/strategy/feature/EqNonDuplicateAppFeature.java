@@ -16,6 +16,11 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * Contrary to <code>NonDuplicateAppFeature</code>, this feature is also able to handle failing
  * meta-constructs correctly (these constructs return equal, but not identical formulas in case of a
  * failure), but is less efficient.
+ * <p>
+ * Carries no locality annotation: like every {@link AbstractNonDuplicateAppFeature}, the
+ * classification walk in {@code CostReuse} collects it as a veto to be re-checked at reuse time
+ * instead of classifying it (its verdict depends on the applied-rule history, but only in the
+ * one-way "a duplicate got recorded" direction the veto re-check covers).
  */
 public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 

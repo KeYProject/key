@@ -139,7 +139,10 @@ public final class Goal implements ProofGoal<Goal> {
         this.goalStrategy = null;
         this.strategyInfos = new MapProperties();
         this.tagManager = new FormulaTagManager(this);
-        setRuleAppManager(new QueueRuleApplicationManager());
+        setRuleAppManager(
+            de.uka.ilkd.key.strategy.EagerRuleApplicationManager.isSelected()
+                    ? new de.uka.ilkd.key.strategy.EagerRuleApplicationManager()
+                    : new QueueRuleApplicationManager());
         this.localNamespaces =
             node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
@@ -256,9 +259,10 @@ public final class Goal implements ProofGoal<Goal> {
         getFormulaTagManager().sequentChanged(sci, getTime());
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
-        ruleAppIndex.sequentChanged(sci);
-        // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
-        // assumes-bases on their matching round (see QueueRuleApplicationManager#parkedByOp).
+        // Feed the change to the (possibly delegation-wrapped) queue manager BEFORE the rule-app
+        // index fires its re-reports: v1 only records wake ops here (order-independent), while the
+        // eager manager performs its eager dead-removal and populates the move-cache that the
+        // re-reports arriving from ruleAppIndex.sequentChanged below then consult.
         RuleApplicationManager<Goal> m = ruleAppManager;
         while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
             m = d.getDelegate();
@@ -266,6 +270,7 @@ public final class Goal implements ProofGoal<Goal> {
         if (m instanceof QueueRuleApplicationManager qm) {
             qm.sequentChanged(sci);
         }
+        ruleAppIndex.sequentChanged(sci);
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {

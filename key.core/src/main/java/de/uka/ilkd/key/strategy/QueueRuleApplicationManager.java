@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,8 +19,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.FormulaChangeInfo;
@@ -134,6 +137,33 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      */
     private @Nullable LinkedHashSet<Operator> pendingWakeOps = null;
 
+    /**
+     * Experimental queue dedup (-Dkey.queue.dedup): tracks, per (formula tag, position-in-term,
+     * taclet), the NEWEST index-reported container for taclets without \assumes. When a formula
+     * position is rewritten, the taclet index re-reports the apps along the rebuilt spine; the
+     * previously queued anchors for those positions are dead but sit in the heap until popped,
+     * where each pays a full modification-history validation. With the map, a popped container
+     * that is no longer the newest anchor for its key AND was matched against a different subterm
+     * object is discarded in O(1) -- verdict-equivalent to the validation it replaces, because a
+     * re-report for the same (tag, pit) with a different subterm object means the position was
+     * rebuilt, which is exactly what invalidates the old container.
+     */
+    private static final boolean QUEUE_DEDUP = Boolean.getBoolean("key.queue.dedup");
+
+    private record DedupKey(FormulaTag tag, PosInTerm pit,
+            org.key_project.prover.rules.Rule rule) {
+    }
+
+    private @Nullable HashMap<DedupKey, FindTacletAppContainer> latestAnchor = null;
+
+    private static @Nullable DedupKey dedupKey(RuleAppContainer c) {
+        if (c instanceof FindTacletAppContainer f && f.hasEmptyAssumes()) {
+            return new DedupKey(f.getPositionTag(),
+                f.getApplicationPosition().posInTerm(), f.getTacletApp().rule());
+        }
+        return null;
+    }
+
     @Override
     public void setGoal(Goal p_goal) {
         goal = p_goal;
@@ -148,6 +178,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         previousMinimum = null;
         parkedByOp = null;
         pendingWakeOps = null;
+        latestAnchor = null;
         if (goal != null) {
             goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
         }
@@ -225,7 +256,43 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         }
     }
 
+    private void registerAnchor(RuleAppContainer rac) {
+        if (!QUEUE_DEDUP) {
+            return;
+        }
+        final DedupKey k = dedupKey(rac);
+        if (k != null) {
+            if (latestAnchor == null) {
+                latestAnchor = new HashMap<>();
+            }
+            latestAnchor.put(k, (FindTacletAppContainer) rac);
+        }
+    }
+
+    /**
+     * @return true iff the container was superseded by a newer index report for the same key with
+     *         a different find-subterm, i.e. it is dead and may be dropped without validation
+     */
+    private boolean dedupDiscard(RuleAppContainer c) {
+        if (!QUEUE_DEDUP || latestAnchor == null) {
+            return false;
+        }
+        final DedupKey k = dedupKey(c);
+        if (k == null) {
+            return false;
+        }
+        final FindTacletAppContainer newest = latestAnchor.get(k);
+        if (newest == c) {
+            // being consumed now; a later re-report starts a fresh entry
+            latestAnchor.remove(k);
+            return false;
+        }
+        return newest != null
+                && newest.getFindSubterm() != ((FindTacletAppContainer) c).getFindSubterm();
+    }
+
     private void addRuleApp(RuleAppContainer rac) {
+        registerAnchor(rac);
         var time = System.nanoTime();
         try {
             queue = push(rac, queue);
@@ -410,6 +477,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                 }
             }
 
+            if (dedupDiscard(minRuleAppContainer)) {
+                continue;
+            }
+
             nextRuleApp = minRuleAppContainer.completeRuleApp(goal);
             /*
              * The obtained minimum rule app container was removed from the queue it came from. The
@@ -488,7 +559,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      *         the
      *         active queue
      */
-    private boolean park(TacletAppContainer base) {
+    protected final boolean park(TacletAppContainer base) {
         final List<Operator> ops = assumesWakeOps(base);
         if (ops == null) {
             return false;
@@ -523,11 +594,29 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * insertion order (deterministic) and removed from all their index buckets.
      */
     private void wakeParkedBases() {
-        if (pendingWakeOps == null) {
-            return;
+        final Collection<RuleAppContainer> woken = drainWokenBases();
+        if (woken != null) {
+            var time = System.nanoTime();
+            try {
+                queue = queue.insert(woken.iterator());
+            } finally {
+                PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+            }
         }
+    }
+
+    /**
+     * Collect (and un-park) every parked base waiting on an operator recorded since the last
+     * round; the caller re-inserts them into its active structure. Shared with the v2 manager.
+     *
+     * @return the woken bases in deterministic insertion order, or {@code null} if none
+     */
+    protected final @Nullable Collection<RuleAppContainer> drainWokenBases() {
+        if (pendingWakeOps == null) {
+            return null;
+        }
+        LinkedHashSet<RuleAppContainer> woken = null;
         if (parkedByOp != null && !parkedByOp.isEmpty()) {
-            LinkedHashSet<RuleAppContainer> woken = null;
             for (Operator op : pendingWakeOps) {
                 final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
                 if (bucket != null) {
@@ -541,15 +630,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                 for (RuleAppContainer c : woken) {
                     unindexParked(c);
                 }
-                var time = System.nanoTime();
-                try {
-                    queue = queue.insert(woken.iterator());
-                } finally {
-                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
-                }
             }
         }
         pendingWakeOps.clear();
+        return woken;
     }
 
     /** Remove a woken container from every operator bucket it was parked under. */
@@ -623,13 +707,13 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         recordModifiedWakeOps(sci.modifiedFormulas(false));
     }
 
-    private void recordWakeOps(ImmutableList<SequentFormula> added) {
+    protected final void recordWakeOps(ImmutableList<SequentFormula> added) {
         for (SequentFormula sf : added) {
             recordSpineOps(sf.formula());
         }
     }
 
-    private void recordModifiedWakeOps(ImmutableList<FormulaChangeInfo> modified) {
+    protected final void recordModifiedWakeOps(ImmutableList<FormulaChangeInfo> modified) {
         for (FormulaChangeInfo fci : modified) {
             recordSpineOps(fci.newFormula().formula());
         }
@@ -661,10 +745,23 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     @Override
     public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
+        if (latestAnchor != null) {
+            // goal-local mutable state: copy so split goals supersede independently
+            res.latestAnchor = new HashMap<>(latestAnchor);
+        }
         res.queue = queue;
         res.previousMinimum = previousMinimum;
-        // the parking structures are mutable and goal-local: deep-copy so split goals park/wake
-        // independently (the contained containers and operators are immutable and shared)
+        copyParkingInto(res);
+        return res;
+    }
+
+    /**
+     * Copy the (mutable, goal-local) parking structures into {@code target}: deep-copy so split
+     * goals park/wake independently (the contained containers and operators are immutable and
+     * shared). Used by {@link #clone()} of this class AND of subclasses -- a subclass clone that
+     * forgets this loses every parked base at the first goal split.
+     */
+    protected final void copyParkingInto(QueueRuleApplicationManager target) {
         if (parkedByOp != null) {
             final LinkedHashMap<Operator, Collection<RuleAppContainer>> copy =
                 new LinkedHashMap<>(parkedByOp.size());
@@ -673,12 +770,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                 copy.put(e.getKey(),
                     v instanceof LinkedHashSet ? new LinkedHashSet<>(v) : new ArrayList<>(v));
             }
-            res.parkedByOp = copy;
+            target.parkedByOp = copy;
         }
         if (pendingWakeOps != null) {
-            res.pendingWakeOps = new LinkedHashSet<>(pendingWakeOps);
+            target.pendingWakeOps = new LinkedHashSet<>(pendingWakeOps);
         }
-        return res;
     }
 
 }
