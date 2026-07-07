@@ -26,6 +26,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -205,7 +206,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "order_terms",
             add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
-                monSmallerThan("commEqLeft", "commEqRight", numbers), longConst(-5000)));
+                monSmallerThan("commEqLeft", "commEqRight", numbers),
+                longConst(CostBand.NORMALIZE.cost())));
 
         final TermBuffer equation = new TermBuffer();
         final TermBuffer left = new TermBuffer();
@@ -228,7 +230,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                                         applyTF(right, tf.polynomial),
                                         MonomialsSmallerThanFeature.create(right, left,
                                             numbers)))))))),
-                longConst(-4000)));
+                longConst(LinearEquationCost.APPLY_EQUATIONS)));
 
         final TermBuffer l = new TermBuffer();
         final TermBuffer r = new TermBuffer();
@@ -237,7 +239,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 let(r, instOf("applyEqRight"),
                     add(applyTF(l, tf.nonNegOrNonCoeffMonomial), applyTF(r, tf.polynomial),
                         MonomialsSmallerThanFeature.create(r, l, numbers)))),
-                longConst(-150)));
+                longConst(LinearEquationCost.APPLY_EQ_AND_OR)));
 
         // For taclets that need instantiation, but where the instantiation is
         // deterministic and does not have to be repeated at a later point, we
@@ -270,79 +272,80 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // Buchberger's algorithmus for handling polynomial equations over
         // the integers
 
-        bindRuleSet(d, "polySimp_expand", -4500);
-        bindRuleSet(d, "polySimp_directEquations", -3000);
-        bindRuleSet(d, "polySimp_pullOutGcd", -2250);
-        bindRuleSet(d, "polySimp_leftNonUnit", -2000);
-        bindRuleSet(d, "polySimp_saturate", 0);
+        bindRuleSet(d, "polySimp_expand", CostBand.SIMPLIFY.cost());
+        bindRuleSet(d, "polySimp_directEquations", CostBand.SOLVE.cost());
+        bindRuleSet(d, "polySimp_pullOutGcd", PolynomialCost.PULLOUT_GCD);
+        bindRuleSet(d, "polySimp_leftNonUnit", CostBand.ENLARGE.cost());
+        bindRuleSet(d, "polySimp_saturate", CostBand.DEFAULT.cost());
 
         // Omega test for handling linear arithmetic and inequalities over the
         // integers; cross-multiplication + case distinctions for nonlinear
         // inequalities
 
-        bindRuleSet(d, "inEqSimp_expand", -4400);
-        bindRuleSet(d, "inEqSimp_directInEquations", -2900);
-        bindRuleSet(d, "inEqSimp_propagation", -2400);
-        bindRuleSet(d, "inEqSimp_pullOutGcd", -2150);
-        bindRuleSet(d, "inEqSimp_saturate", -1900);
-        bindRuleSet(d, "inEqSimp_forNormalisation", -1100);
-        bindRuleSet(d, "inEqSimp_special_nonLin", -1400);
+        bindRuleSet(d, "inEqSimp_expand", CostBand.SIMPLIFY.at(100));
+        bindRuleSet(d, "inEqSimp_directInEquations", CostBand.SOLVE.at(100));
+        bindRuleSet(d, "inEqSimp_propagation", LinearInequationCost.PROPAGATION);
+        bindRuleSet(d, "inEqSimp_pullOutGcd", LinearInequationCost.PULLOUT_GCD_CONFLUENT);
+        bindRuleSet(d, "inEqSimp_saturate", LinearInequationCost.SATURATE);
+        bindRuleSet(d, "inEqSimp_forNormalisation", LinearInequationCost.FOR_NORMALISATION);
+        bindRuleSet(d, "inEqSimp_special_nonLin", NonlinearArithmeticCost.DIVIDE_INEQUATION);
 
         if (arith == ArithTreatment.MODEL_SEARCH) {
-            bindRuleSet(d, "inEqSimp_nonLin", IN_EQ_SIMP_NON_LIN_COST);
+            bindRuleSet(d, "inEqSimp_nonLin", NonlinearArithmeticCost.MULTIPLY);
         } else {
             bindRuleSet(d, "inEqSimp_nonLin", inftyConst());
         }
-        bindRuleSet(d, "polyDivision", POLY_DIVISION_COST);
+        bindRuleSet(d, "polyDivision", DivModCost.POLY_DIVISION);
     }
 
     private void setupPolySimp(RuleSetDispatchFeature d, IntegerLDT numbers) {
 
         // category "expansion" (normalising polynomial terms)
 
-        bindRuleSet(d, "polySimp_elimSubNeg", longConst(-120));
+        bindRuleSet(d, "polySimp_elimSubNeg", longConst(PolynomialCost.EXPAND));
 
         bindRuleSet(d, "polySimp_homo",
             add(applyTF("homoRight", add(not(tf.zeroLiteral), tf.polynomial)),
                 or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
                     not(monSmallerThan("homoRight", "homoLeft", numbers))),
-                longConst(-120)));
+                longConst(PolynomialCost.EXPAND)));
 
         bindRuleSet(d, "polySimp_pullOutFactor", add(applyTFNonStrict("pullOutLeft", tf.literal),
-            applyTFNonStrict("pullOutRight", tf.literal), longConst(-120)));
+            applyTFNonStrict("pullOutRight", tf.literal), longConst(PolynomialCost.EXPAND)));
 
-        bindRuleSet(d, "polySimp_elimOneLeft", -120);
+        bindRuleSet(d, "polySimp_elimOneLeft", PolynomialCost.EXPAND);
 
-        bindRuleSet(d, "polySimp_elimOneRight", -120);
+        bindRuleSet(d, "polySimp_elimOneRight", PolynomialCost.EXPAND);
 
         bindRuleSet(d, "polySimp_mulOrder", add(applyTF("commRight", tf.monomial), or(
             applyTF("commLeft", tf.addF),
             add(applyTF("commLeft", tf.atom), atomSmallerThan("commLeft", "commRight", numbers))),
-            longConst(-100)));
+            longConst(PolynomialCost.MUL_ORDER)));
 
         bindRuleSet(d, "polySimp_mulAssoc",
             SumFeature.createSum(applyTF("mulAssocMono0", tf.monomial),
                 applyTF("mulAssocMono1", tf.monomial), applyTF("mulAssocAtom", tf.atom),
-                longConst(-80)));
+                longConst(PolynomialCost.MUL_ASSOC)));
 
         bindRuleSet(d, "polySimp_addOrder",
             SumFeature.createSum(applyTF("commLeft", tf.monomial),
                 applyTF("commRight", tf.polynomial),
-                monSmallerThan("commRight", "commLeft", numbers), longConst(-60)));
+                monSmallerThan("commRight", "commLeft", numbers),
+                longConst(PolynomialCost.ADD_ORDER)));
 
         bindRuleSet(d, "polySimp_addAssoc",
             SumFeature.createSum(applyTF("addAssocPoly0", tf.polynomial),
                 applyTF("addAssocPoly1", tf.polynomial), applyTF("addAssocMono", tf.monomial),
-                longConst(-10)));
+                longConst(PolynomialCost.ADD_ASSOC)));
 
         bindRuleSet(d, "polySimp_dist",
             SumFeature.createSum(applyTF("distSummand0", tf.polynomial),
                 applyTF("distSummand1", tf.polynomial),
-                ifZero(applyTF("distCoeff", tf.monomial), longConst(-15),
+                ifZero(applyTF("distCoeff", tf.monomial), longConst(PolynomialCost.DISTRIBUTE + 20),
                     applyTF("distCoeff", tf.polynomial)),
                 applyTF("distSummand0", tf.polynomial),
 
-                applyTF("distSummand1", tf.polynomial), longConst(-35)));
+                applyTF("distSummand1", tf.polynomial), longConst(PolynomialCost.DISTRIBUTE)));
 
         // category "direct equations"
 
@@ -355,10 +358,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                         ifZero(isInstantiated("sepNegMono"),
                             add(applyTF("sepNegMono", tf.negMonomial),
                                 monSmallerThan("sepResidue", "sepNegMono", numbers))),
-                        longConst(-30)));
+                        longConst(LinearEquationCost.BALANCE)));
 
         bindRuleSet(d, "polySimp_normalise", add(applyTF("invertRight", tf.zeroLiteral),
-            applyTF("invertLeft", tf.negMonomial), longConst(-30)));
+            applyTF("invertLeft", tf.negMonomial), longConst(LinearEquationCost.BALANCE)));
 
         // application of equations: some specialised rules that handle
         // monomials and their coefficients properly
@@ -381,13 +384,15 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             ifZero(MatchedAssumesFeature.INSTANCE, let(focus, FocusProjection.create(0),
                 let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
 
-        bindRuleSet(d, "polySimp_applyEq", add(eqMonomialFeature, longConst(1)));
+        bindRuleSet(d, "polySimp_applyEq",
+            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ)));
 
-        bindRuleSet(d, "polySimp_applyEqRigid", add(eqMonomialFeature, longConst(2)));
+        bindRuleSet(d, "polySimp_applyEqRigid",
+            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ + 1)));
 
         //
         bindRuleSet(d, "defOps_expandModulo",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-600)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(DivModCost.EXPAND_MODULO)));
 
         // category "saturate"
 
@@ -435,8 +440,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                         // no possible division has been found so far
                         add(NotInScopeOfModalityFeature.INSTANCE, ifZero(isReduciblePolyE,
                             // try again later
-                            longConst(-POLY_DIVISION_COST)))))),
-                longConst(100)));
+                            longConst(-DivModCost.POLY_DIVISION)))))),
+                longConst(CostBand.DEFAULT.at(100))));
 
     }
 
@@ -527,14 +532,15 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         // category "expansion" (normalising inequations)
 
-        bindRuleSet(d, "inEqSimp_moveLeft", -90);
+        bindRuleSet(d, "inEqSimp_moveLeft", LinearInequationCost.MOVE_LEFT);
 
-        bindRuleSet(d, "inEqSimp_makeNonStrict", -80);
+        bindRuleSet(d, "inEqSimp_makeNonStrict", LinearInequationCost.MAKE_NON_STRICT);
 
         bindRuleSet(d, "inEqSimp_commute",
             SumFeature.createSum(applyTF("commRight", tf.monomial),
                 applyTF("commLeft", tf.polynomial),
-                monSmallerThan("commLeft", "commRight", numbers), longConst(-40)));
+                monSmallerThan("commLeft", "commRight", numbers),
+                longConst(LinearInequationCost.COMMUTE)));
 
         // this is copied from "polySimp_homo"
         bindRuleSet(d, "inEqSimp_homo",
@@ -559,7 +565,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         // category "saturate"
 
-        bindRuleSet(d, "inEqSimp_antiSymm", longConst(-20));
+        bindRuleSet(d, "inEqSimp_antiSymm", longConst(LinearInequationCost.ANTISYMM));
 
         bindRuleSet(d, "inEqSimp_exactShadow",
             SumFeature.createSum(applyTF("esLeft", tf.nonCoeffMonomial),
@@ -590,9 +596,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     SumFeature.createSum(applyTF("contradRightSmaller", tf.polynomial),
                         applyTF("contradRightBigger", tf.polynomial), PolynomialValuesCmpFeature
                                 .lt(instOf("contradRightSmaller"), instOf("contradRightBigger")))),
-                longConst(-60)));
+                longConst(LinearInequationCost.CONTRAD)));
 
-        bindRuleSet(d, "inEqSimp_strengthen", longConst(-30));
+        bindRuleSet(d, "inEqSimp_strengthen", longConst(LinearInequationCost.STRENGTHEN));
 
         bindRuleSet(d, "inEqSimp_subsumption",
             add(applyTF("subsumLeft", tf.monomial),
@@ -609,10 +615,11 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // category "handling of non-linear inequations"
 
         if (arith == ArithTreatment.MODEL_SEARCH) {
-            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100),
-                AT_COST);
+            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(CostBand.DEFAULT.at(100),
+                AT_COST));
 
-            bindRuleSet(d, "inEqSimp_split_eq", add(TopLevelFindFeature.SUCC, longConst(-100)));
+            bindRuleSet(d, "inEqSimp_split_eq",
+                add(TopLevelFindFeature.SUCC, longConst(NonlinearArithmeticCost.SPLIT_EQ)));
 
             bindRuleSet(d, "inEqSimp_signCases", not(isInstantiated("signCasesLeft")));
         } else if (arith == ArithTreatment.DEF_OPS) {
@@ -780,8 +787,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             ifZero(MatchedAssumesFeature.INSTANCE,
                 SumFeature.createSum(
                     applyTF("multFacLeft", tf.nonNegMonomial),
-                    ifZero(applyTF("multRight", tf.literal), longConst(-100)),
-                    ifZero(applyTF("multFacRight", tf.literal), longConst(-100),
+                    ifZero(applyTF("multRight", tf.literal), longConst(CostBand.DEFAULT.at(-100))),
+                    ifZero(applyTF("multFacRight", tf.literal),
+                        longConst(CostBand.DEFAULT.at(-100)),
                         applyTF("multFacRight", tf.polynomial)),
                     /*
                      * ifZero ( applyTF ( "multRight", tf.literal ), longConst ( -100 ), applyTF (
@@ -800,9 +808,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                             ? ifZero(BranchMultiplicationCountFeature.atMost("multiply_2_inEq",
                                 BRANCH_MULT_CAP), longConst(0), notAllowedF)
                             : longConst(0),
-                    ifZero(exactlyBounded, longConst(0),
+                    ifZero(exactlyBounded, longConst(CostBand.DEFAULT.cost()),
                         onlyExactlyBounded ? notAllowedF
-                                : ifZero(totallyBounded, longConst(100), notAllowedF))
+                                : ifZero(totallyBounded, longConst(CostBand.DEFAULT.at(100)), notAllowedF))
                 /*
                  * ifZero ( partiallyBounded, longConst ( 400 ), notAllowedF ) ) ),
                  */
@@ -839,7 +847,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         setupPullOutGcd(d, "inEqSimp_pullOutGcd_geq", true);
 
         // more efficient (but not confluent) versions for the antecedent
-        bindRuleSet(d, "inEqSimp_pullOutGcd_antec", -10);
+        bindRuleSet(d, "inEqSimp_pullOutGcd_antec",
+            LinearInequationCost.PULLOUT_GCD_ANTEC_NONCONFLUENT);
 
         // category "handling of non-linear inequations"
 
@@ -917,7 +926,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 forEach(atom, SubtermGenerator.leftTraverse(sub(intRel, 0), tf.mulF),
                     SumFeature.createSum(applyTF(atom, add(tf.atom, not(tf.literal))),
                         allowPosNegCaseDistinction(atom), instantiate("signCasesLeft", atom),
-                        longConst(IN_EQ_SIMP_NON_LIN_COST + 200)
+                        longConst(NonlinearArithmeticCost.MULTIPLY + 200)
                     // ,
                     // applyTF ( atom, rec ( any (),
                     // longTermConst ( 5 ) ) )
@@ -929,7 +938,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             SumFeature.createSum(
                 applyTF(intRel, add(or(tf.geqF, tf.leqF), sub(tf.atom, tf.literal))),
                 instantiate("cutFormula", opTerm(tf.eq, sub(intRel, 0), sub(intRel, 1))),
-                longConst(IN_EQ_SIMP_NON_LIN_COST + 300)
+                longConst(NonlinearArithmeticCost.MULTIPLY + 300)
             // ,
             // applyTF ( sub ( intRel, 0 ),
             // rec ( any (), longTermConst ( 5 ) ) )
@@ -939,9 +948,11 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             add(isRootInferenceProducer(intRel),
                 forEach(rootInf, RootsGenerator.create(intRel, getServices()),
                     add(instantiate("cutFormula", rootInf),
-                        ifZero(applyTF(rootInf, op(Junctor.OR)), longConst(50)),
-                        ifZero(applyTF(rootInf, op(Junctor.AND)), longConst(20)))),
-                longConst(IN_EQ_SIMP_NON_LIN_COST)));
+                        ifZero(applyTF(rootInf, op(Junctor.OR)),
+                            longConst(CostBand.DEFAULT.at(50))),
+                        ifZero(applyTF(rootInf, op(Junctor.AND)),
+                            longConst(CostBand.DEFAULT.at(20))))),
+                longConst(NonlinearArithmeticCost.MULTIPLY)));
 
         // noinspection unchecked
         bindRuleSet(d, "cut", oneOf(new Feature[] { strengthening, rootInferences }));
@@ -1017,32 +1028,32 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
                     applyTF("divNum", tf.notContainsDivMod),
                     applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator), longConst(200))));
+                    ifZero(isBelow(ff.modalOperator), longConst(DivModCost.BELOW_MODALITY))));
 
             bindRuleSet(d, "defOps_jdiv",
                 SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
                     applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
                     applyTF("divNum", tf.notContainsDivMod),
                     applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator), longConst(200))));
+                    ifZero(isBelow(ff.modalOperator), longConst(DivModCost.BELOW_MODALITY))));
 
             bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.polynomial), longConst(-5000)));
+                applyTF("divDenom", tf.polynomial), longConst(DivModCost.INLINE)));
 
             setupDefOpsExpandMod(d);
 
-            bindRuleSet(d, "defOps_expandRanges", -8000);
-            bindRuleSet(d, "defOps_expandJNumericOp", -500);
-            bindRuleSet(d, "defOps_modHomoEq", -5000);
+            bindRuleSet(d, "defOps_expandRanges", DivModCost.EXPAND_RANGES);
+            bindRuleSet(d, "defOps_expandJNumericOp", DivModCost.EXPAND_NUMERIC_OP);
+            bindRuleSet(d, "defOps_modHomoEq", DivModCost.MOD_HOMO_EQ);
         } else {
             bindRuleSet(d, "defOps_div", inftyConst());
             bindRuleSet(d, "defOps_jdiv", inftyConst());
 
             bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(-4000)));
+                applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
 
             bindRuleSet(d, "defOps_mod", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(-4000)));
+                applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
 
             bindRuleSet(d, "defOps_expandRanges", inftyConst());
             bindRuleSet(d, "defOps_expandJNumericOp", inftyConst());
@@ -1066,13 +1077,13 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "defOps_mod",
             ifZero(add(applyTF("divNum", tf.literal), applyTF("divDenom", tf.literal)),
-                longConst(-4000),
+                longConst(DivModCost.MOD),
                 SumFeature.createSum(applyTF("divNum", tf.polynomial),
                     applyTF("divDenom", tf.polynomial),
                     ifZero(isBelow(ff.modalOperator), exSubsumedModulus,
                         or(add(applyTF("divNum", tf.notContainsDivMod),
                             applyTF("divDenom", tf.notContainsDivMod)), exSubsumedModulus)),
-                    longConst(-3500))));
+                    longConst(DivModCost.MOD_EXPAND))));
     }
 
     /**
