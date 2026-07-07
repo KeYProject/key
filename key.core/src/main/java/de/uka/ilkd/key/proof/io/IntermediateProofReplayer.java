@@ -249,7 +249,7 @@ public class IntermediateProofReplayer {
                             .getIntermediateRuleApp() instanceof TacletAppIntermediate appInterm) {
 
                         try {
-                            currGoal.apply(constructTacletApp(appInterm, currGoal));
+                            currGoal.apply(constructTacletApp(proof, appInterm, currGoal));
 
                             final Iterator<Node> children = currNode.childrenIterator();
                             final LinkedList<NodeIntermediate> intermChildren =
@@ -439,12 +439,13 @@ public class IntermediateProofReplayer {
     /**
      * Constructs a taclet application from an intermediate one.
      *
+     * @param proof the current proof to operate on
      * @param currInterm The intermediate taclet application to create a "real" application for.
-     * @param currGoal The goal on which to apply the taclet app.
+     * @param currGoal   The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate representation.
      * @throws TacletAppConstructionException In case of an error during construction.
      */
-    private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal)
+    public static TacletApp constructTacletApp(Proof proof, TacletAppIntermediate currInterm, Goal currGoal)
             throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
