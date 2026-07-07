@@ -26,6 +26,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link RuleApplicationManager} that stores possible {@link RuleApp}s
  * in a priority queue. The element with highest priority in the queue can be obtained via
@@ -37,6 +40,8 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueueRuleApplicationManager.class);
+
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
     public static final AtomicLong PERF_PEEK = new AtomicLong();
     public static final AtomicLong PERF_CREATE_CONTAINER = new AtomicLong();
