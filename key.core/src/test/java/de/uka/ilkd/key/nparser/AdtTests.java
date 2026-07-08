@@ -24,14 +24,14 @@ public class AdtTests {
     private static final String EXPECTED_PRED_DEC_SUCC = """
             DT_Nat#Dec_pred#succ {
             \\find(pred(succ(pred_sv)))
-            \\sameUpdateLevel\\replacewith(pred_sv)\s
+            \\replacewith(pred_sv)\s
             \\heuristics(simplify)
             Choices: true}""";
     private static final String EXPECTED_PRED_DECEQ_SUCC = """
             DT_Nat#Dec_pred#succ#EQ {
             \\assumes ([equals(succ(pred_sv),pred_x)]==>[])\s
             \\find(pred(pred_x))
-            \\sameUpdateLevel\\replacewith(pred_sv)\s
+            \\replacewith(pred_sv)\s
             \\heuristics(simplify)
             Choices: true}""";
 

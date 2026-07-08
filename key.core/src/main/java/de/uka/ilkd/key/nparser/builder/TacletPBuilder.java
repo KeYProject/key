@@ -190,9 +190,20 @@ public class TacletPBuilder extends ExpressionBuilder {
         Sequent seq = (find instanceof Sequent s) ? s : null;
 
         var applicationRestriction = ApplicationRestriction.NONE;
-        if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-            applicationRestriction =
-                applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
+        if (ctx.IGNOREUPDATELEVEL().isEmpty()) { // SAME_UPDATE_LEVEL is the default, but only set
+                                                 // when \add or \assumes is present
+            boolean hasAdd = false;
+            if (ctx.goalspecs().goalspecwithoption() != null) {
+                for (var gt : ctx.goalspecs().goalspecwithoption()) {
+                    if (gt.goalspec().addSeq != null) {
+                        hasAdd = true;
+                        break;
+                    }
+                }
+            }
+            if (hasAdd || ctx.assumesSeq != null)
+                applicationRestriction =
+                    applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
         }
         if (!ctx.INSEQUENTSTATE().isEmpty()) {
             applicationRestriction =
