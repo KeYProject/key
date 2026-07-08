@@ -72,7 +72,9 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     public ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
             List<Node> statisticNodes) {
-        this(macro, goals, goals.isEmpty() ? null : goals.head().proof(),
+        this(macro, goals,
+            !goals.isEmpty() ? goals.head().proof()
+                    : (statisticNodes.isEmpty() ? null : statisticNodes.get(0).proof()),
             statisticNodes.isEmpty() ? null : new Statistics(statisticNodes));
     }
 
