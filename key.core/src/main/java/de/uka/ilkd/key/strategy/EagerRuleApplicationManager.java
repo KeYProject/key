@@ -3,17 +3,30 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.RuleApplicationManager;
@@ -51,7 +64,7 @@ import org.jspecify.annotations.Nullable;
  * Assumes-base parking, the round discipline and TOP filtering replicate v1 semantics; the gate
  * ladder (removeDup, gemplus, selA32 rule-trace, RunAllProofs) reproduces v1's proofs exactly.
  */
-public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
+public class EagerRuleApplicationManager implements RuleApplicationManager<Goal> {
 
     /** System property forcing the manager on/off (CI and benchmarks), overriding the setting. */
     public static final String EAGER_QUEUE_PROPERTY = "key.queue.eager";
@@ -155,6 +168,48 @@ public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
     private @Nullable RuleApp nextRuleApp = null;
     private long nextRuleTime = -1;
 
+    // ---- assumes-base parking (eager's OWN copy; v1 keeps its own identical parking, so the two
+    // managers share no parking state -- v1 is untouched, and this copy uses the finer wake key
+    // behind FINE_WAKE). ------------------------------------------------------------------------
+    /**
+     * Parked assumes-incomplete taclet bases, indexed by the concrete top operator(s) of their
+     * {@code \assumes} formulas; woken when a formula they could match is added/modified (see
+     * {@link #park}/{@link #drainWokenBases}). Insertion-ordered for determinism.
+     */
+    private @Nullable LinkedHashMap<Operator, Collection<RuleAppContainer>> parkedByOp = null;
+    /**
+     * Bucket size at which a parking bucket is promoted ArrayList -> LinkedHashSet (O(1) unpark).
+     */
+    private static final int BUCKET_SET_THRESHOLD = 16;
+    /** Top operators of formulas added/modified since the previous round; next round's wake set. */
+    private @Nullable LinkedHashSet<Operator> pendingWakeOps = null;
+
+    /**
+     * Finer parking wake key (default on). The coarse key is the {@code \assumes} formula's top
+     * operator (v1's key); the fine key also folds in structural hashes of the sub-terms the
+     * find-match BOUND, so a base for {@code select(h,o,f)=r} wakes only when a
+     * {@code select(h,o,f)}
+     * -LHS equation changes rather than on every equation -- removing the assumes-churn over-wakes
+     * that made the eager queue slower than v1 on assumes-heavy proofs. Sound (a formula that could
+     * match the assumes always produces the base's key, so a wake is never missed -- only harmless
+     * over-wakes are dropped) but NOT byte-identical to v1: it trades a benign search-order reorder
+     * for the churn cut (below v1 timing on SimplifiedLinkedList.remove).
+     * <p>
+     * A {@code static final} constant so the JIT folds the branch away entirely; flip it to
+     * {@code false} and recompile to get the coarse mode, which reproduces v1 byte-for-byte -- the
+     * on-demand reproduction/trust check for the eager queue. Either way v1/classic is never
+     * touched: this is eager's private parking.
+     */
+    private static final boolean FINE_WAKE = true;
+    private static final long WILDCARD = 0x9E3779B97F4A7C15L; // marks an unbound sub-position
+    private static final long FNV_PRIME = 1099511628211L;
+    /** Depth cap of the structural hash: deeper structure just folds to its operator. */
+    private static final int STRUCT_HASH_DEPTH = 4;
+    /** Fine-wake analogue of {@link #parkedByOp}: bases parked by content key. */
+    private @Nullable LinkedHashMap<Long, Collection<RuleAppContainer>> parkedByKey = null;
+    /** Fine-wake analogue of {@link #pendingWakeOps}. */
+    private @Nullable LinkedHashSet<Long> pendingWakeKeys = null;
+
     /**
      * Completeness safety net: number of EFFECTIVE stall-rescues -- exhausted pop loops where the
      * full re-report reconciliation then DID yield an app, proving a candidate was silently lost.
@@ -176,7 +231,6 @@ public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
     @Override
     public void setGoal(Goal p_goal) {
         goal = p_goal;
-        super.setGoal(p_goal);
     }
 
     @Override
@@ -185,7 +239,13 @@ public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
         pending = null;
         previousMinimum = null;
         nextRuleApp = null;
-        super.clearCache();
+        parkedByOp = null;
+        pendingWakeOps = null;
+        parkedByKey = null;
+        pendingWakeKeys = null;
+        if (goal != null) {
+            goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
+        }
     }
 
     @Override
@@ -201,7 +261,7 @@ public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
         res.programFormulaCount = programFormulaCount;
         // a split changes the branch count -- a global volatile-cost input
         res.costEpoch = costEpoch + 1;
-        // superclass state: parked bases must survive goal splits (losing them silently
+        // eager's own parking state: parked bases must survive goal splits (losing them silently
         // discards every parked candidate on both branches -- the selA32 ladder stall)
         copyParkingInto(res);
         if (active != null) {
@@ -791,5 +851,387 @@ public class EagerRuleApplicationManager extends QueueRuleApplicationManager {
         final RuleApp res = peekNext();
         nextRuleApp = null;
         return res;
+    }
+
+    // =========================================================================================
+    // Assumes-base parking -- eager's OWN copy, decoupled from v1. Two wake keys, selected by the
+    // compile-time FINE_WAKE constant: coarse (v1's \assumes top operator, byte-identical to v1) or
+    // fine (default; top operator folded with structural hashes of the find-BOUND sub-terms, so a
+    // base wakes only when a structurally-matching equation changes). v1/classic keeps its own
+    // identical coarse parking, so the two managers share no state -- v1 is untouched.
+    // =========================================================================================
+
+    /**
+     * Park an assumes-incomplete base, indexing it under the wake key(s) of its {@code \assumes}
+     * formulas so it can be woken when a matching formula appears.
+     *
+     * @return {@code true} if parked; {@code false} if not effectively indexable (an
+     *         unbound-generic
+     *         {@code \assumes} top), in which case the caller keeps it in the active set
+     */
+    private boolean park(TacletAppContainer base) {
+        if (FINE_WAKE) {
+            final List<Long> keys = assumesWakeKeys(base);
+            if (keys == null) {
+                return false;
+            }
+            if (parkedByKey == null) {
+                parkedByKey = new LinkedHashMap<>();
+            }
+            for (Long k : keys) {
+                Collection<RuleAppContainer> bucket = parkedByKey.get(k);
+                if (bucket == null) {
+                    bucket = new ArrayList<>(4);
+                    parkedByKey.put(k, bucket);
+                }
+                bucket.add(base);
+                if (bucket.size() == BUCKET_SET_THRESHOLD && bucket instanceof ArrayList) {
+                    parkedByKey.put(k, new LinkedHashSet<>(bucket));
+                }
+            }
+            return true;
+        }
+        final List<Operator> ops = assumesWakeOps(base);
+        if (ops == null) {
+            return false;
+        }
+        if (parkedByOp == null) {
+            parkedByOp = new LinkedHashMap<>();
+        }
+        for (Operator op : ops) {
+            Collection<RuleAppContainer> bucket = parkedByOp.get(op);
+            if (bucket == null) {
+                bucket = new ArrayList<>(4);
+                parkedByOp.put(op, bucket);
+            }
+            bucket.add(base);
+            if (bucket.size() == BUCKET_SET_THRESHOLD && bucket instanceof ArrayList) {
+                parkedByOp.put(op, new LinkedHashSet<>(bucket));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Collect (and un-park) every parked base waiting on a wake key recorded since the last round;
+     * the caller re-inserts them into the active set.
+     *
+     * @return the woken bases in deterministic insertion order, or {@code null} if none
+     */
+    private @Nullable Collection<RuleAppContainer> drainWokenBases() {
+        if (FINE_WAKE) {
+            if (pendingWakeKeys == null) {
+                return null;
+            }
+            LinkedHashSet<RuleAppContainer> woken = null;
+            if (parkedByKey != null && !parkedByKey.isEmpty()) {
+                for (Long k : pendingWakeKeys) {
+                    final Collection<RuleAppContainer> bucket = parkedByKey.get(k);
+                    if (bucket != null) {
+                        if (woken == null) {
+                            woken = new LinkedHashSet<>();
+                        }
+                        woken.addAll(bucket);
+                    }
+                }
+                if (woken != null) {
+                    for (RuleAppContainer c : woken) {
+                        unindexParked(c);
+                    }
+                }
+            }
+            pendingWakeKeys.clear();
+            return woken;
+        }
+        if (pendingWakeOps == null) {
+            return null;
+        }
+        LinkedHashSet<RuleAppContainer> woken = null;
+        if (parkedByOp != null && !parkedByOp.isEmpty()) {
+            for (Operator op : pendingWakeOps) {
+                final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
+                if (bucket != null) {
+                    if (woken == null) {
+                        woken = new LinkedHashSet<>();
+                    }
+                    woken.addAll(bucket);
+                }
+            }
+            if (woken != null) {
+                for (RuleAppContainer c : woken) {
+                    unindexParked(c);
+                }
+            }
+        }
+        pendingWakeOps.clear();
+        return woken;
+    }
+
+    /** Remove a woken container from every operator/key bucket it was parked under. */
+    private void unindexParked(RuleAppContainer c) {
+        if (!(c instanceof TacletAppContainer tac)) {
+            return;
+        }
+        if (FINE_WAKE) {
+            if (parkedByKey == null) {
+                return;
+            }
+            final List<Long> keys = assumesWakeKeys(tac);
+            if (keys == null) {
+                return;
+            }
+            for (Long k : keys) {
+                final Collection<RuleAppContainer> bucket = parkedByKey.get(k);
+                if (bucket != null) {
+                    bucket.remove(c);
+                    if (bucket.isEmpty()) {
+                        parkedByKey.remove(k);
+                    }
+                }
+            }
+            return;
+        }
+        if (parkedByOp == null) {
+            return;
+        }
+        final List<Operator> ops = assumesWakeOps(tac);
+        if (ops == null) {
+            return;
+        }
+        for (Operator op : ops) {
+            final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
+            if (bucket != null) {
+                bucket.remove(c);
+                if (bucket.isEmpty()) {
+                    parkedByOp.remove(op);
+                }
+            }
+        }
+    }
+
+    /**
+     * The concrete top operator(s) of the {@code \assumes} formulas of the given base, resolved
+     * through the find-match's schema-variable instantiations (v1's coarse wake key), or
+     * {@code null} if the base is not effectively indexable.
+     */
+    private static @Nullable List<Operator> assumesWakeOps(TacletAppContainer base) {
+        final NoPosTacletApp app = base.getTacletApp();
+        final Sequent assumesSeq = app.taclet().assumesSequent();
+        if (assumesSeq.isEmpty()) {
+            return null;
+        }
+        final SVInstantiations insts = app.instantiations();
+        final List<Operator> ops = new ArrayList<>(assumesSeq.size());
+        for (SequentFormula sf : assumesSeq) {
+            Operator op = sf.formula().op();
+            if (op instanceof SchemaVariable sv) {
+                final Object inst = insts.getInstantiation(sv);
+                if (!(inst instanceof JTerm instTerm)) {
+                    return null; // unbound (or non-term) generic top -> not indexable
+                }
+                op = instTerm.op();
+                if (op instanceof SchemaVariable) {
+                    return null; // still schematic -> not indexable
+                }
+            }
+            ops.add(op);
+        }
+        return ops;
+    }
+
+    // ---- fine wake keys (see FINE_WAKE) --------------------------------------------------------
+
+    private static Term stripUpdates(Term t) {
+        Term cur = t;
+        while (cur.op() instanceof UpdateApplication && cur instanceof JTerm jt) {
+            cur = UpdateApplication.getTarget(jt);
+        }
+        return cur;
+    }
+
+    /**
+     * A label-, java-block- and bound-variable-agnostic structural hash: operators along the term
+     * tree only, capped at a small depth. Deliberately COARSER than {@link Term#hashCode()} (which
+     * on this branch still folds label-sensitive sub-hashes): it agrees on at least every pair of
+     * terms the {@code \assumes} matcher treats as equal, so a wake key built from it can only
+     * over-fire a wake (harmless re-park), never MISS one.
+     */
+    private static long structHash(Term t, int depth) {
+        long h = t.op().hashCode();
+        if (depth <= 0) {
+            return h;
+        }
+        for (int i = 0, n = t.arity(); i < n; i++) {
+            h = h * FNV_PRIME + structHash(t.sub(i), depth - 1);
+        }
+        return h;
+    }
+
+    /**
+     * Fine wake keys of a base: for each {@code \assumes} formula, its top operator folded with the
+     * structural hash of each immediate sub-term bound by the find-match (unbound subs = WILDCARD).
+     * Uses the same fold as {@link #recordWakeKeys}, so a changed formula that could match this
+     * assumes produces this key among its wildcard-subset keys.
+     *
+     * @return the keys, or {@code null} if not effectively indexable (unbound-generic top)
+     */
+    private static @Nullable List<Long> assumesWakeKeys(TacletAppContainer base) {
+        final NoPosTacletApp app = base.getTacletApp();
+        final Sequent assumesSeq = app.taclet().assumesSequent();
+        if (assumesSeq.isEmpty()) {
+            return null;
+        }
+        final SVInstantiations insts = app.instantiations();
+        final List<Long> keys = new ArrayList<>(assumesSeq.size());
+        for (SequentFormula sf : assumesSeq) {
+            Term t = stripUpdates(sf.formula());
+            Operator top = t.op();
+            if (top instanceof SchemaVariable sv) {
+                final Object inst = insts.getInstantiation(sv);
+                if (!(inst instanceof JTerm it)) {
+                    return null;
+                }
+                t = stripUpdates(it);
+                top = t.op();
+                if (top instanceof SchemaVariable) {
+                    return null;
+                }
+            }
+            long h = top.hashCode();
+            final int n = t.arity();
+            for (int i = 0; i < n; i++) {
+                final Term sub = t.sub(i);
+                final long sh;
+                if (n > 4) {
+                    // large arity: match recordWakeKeys' all-wildcard fallback exactly (else the
+                    // base's specific key could never appear among the recorded keys -> a MISS)
+                    sh = WILDCARD;
+                } else if (sub.op() instanceof SchemaVariable ssv) {
+                    final Object inst = insts.getInstantiation(ssv);
+                    sh = (inst instanceof JTerm it)
+                            ? structHash(stripUpdates(it), STRUCT_HASH_DEPTH)
+                            : WILDCARD;
+                } else {
+                    // a concrete pattern sub may still hold schema variables -> wildcard
+                    // (conservative: over-wakes, never misses)
+                    sh = WILDCARD;
+                }
+                h = h * FNV_PRIME + sh;
+            }
+            keys.add(h);
+        }
+        return keys;
+    }
+
+    /**
+     * Record the wake keys a changed formula produces: for the update-stripped formula of arity n,
+     * all {@code 2^n} keys obtained by wildcarding each subset of its immediate sub-terms (so a
+     * base
+     * whose bound-sub pattern matches this formula finds its own key). Falls back to the
+     * all-wildcard
+     * (top-op) key for large arities.
+     */
+    private void recordWakeKeys(Term formula) {
+        if (pendingWakeKeys == null) {
+            pendingWakeKeys = new LinkedHashSet<>();
+        }
+        final Term t = stripUpdates(formula);
+        final Operator top = t.op();
+        final int n = t.arity();
+        if (n > 4) {
+            long h = top.hashCode();
+            for (int i = 0; i < n; i++) {
+                h = h * FNV_PRIME + WILDCARD;
+            }
+            pendingWakeKeys.add(h);
+            return;
+        }
+        final long[] subHash = new long[n];
+        for (int i = 0; i < n; i++) {
+            subHash[i] = structHash(stripUpdates(t.sub(i)), STRUCT_HASH_DEPTH);
+        }
+        for (int mask = 0; mask < (1 << n); mask++) {
+            long h = top.hashCode();
+            for (int i = 0; i < n; i++) {
+                final long sh = ((mask >> i) & 1) == 1 ? WILDCARD : subHash[i];
+                h = h * FNV_PRIME + sh;
+            }
+            pendingWakeKeys.add(h);
+        }
+    }
+
+    /**
+     * Record, for the next round's wake-up, the wake key(s) of every formula added or modified by
+     * this sequent change (fine: structural keys; coarse: top operators along the update-prefix
+     * spine -- the assumes matcher strips the update context, so the spine is a sound superset).
+     */
+    private void recordWakeOps(ImmutableList<SequentFormula> added) {
+        for (SequentFormula sf : added) {
+            if (FINE_WAKE) {
+                recordWakeKeys(sf.formula());
+            } else {
+                recordSpineOps(sf.formula());
+            }
+        }
+    }
+
+    private void recordModifiedWakeOps(ImmutableList<FormulaChangeInfo> modified) {
+        for (FormulaChangeInfo fci : modified) {
+            if (FINE_WAKE) {
+                recordWakeKeys(fci.newFormula().formula());
+            } else {
+                recordSpineOps(fci.newFormula().formula());
+            }
+        }
+    }
+
+    /** Add the operators along a formula's update-application spine to {@link #pendingWakeOps}. */
+    private void recordSpineOps(Term formula) {
+        if (pendingWakeOps == null) {
+            pendingWakeOps = new LinkedHashSet<>();
+        }
+        Term t = formula;
+        while (true) {
+            final Operator op = t.op();
+            pendingWakeOps.add(op);
+            if (op instanceof UpdateApplication && t instanceof JTerm jt) {
+                t = UpdateApplication.getTarget(jt);
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Deep-copy the (mutable, goal-local) parking structures into {@code target} so split goals
+     * park/wake independently (contained containers and operators are immutable and shared).
+     */
+    private void copyParkingInto(EagerRuleApplicationManager target) {
+        if (parkedByOp != null) {
+            final LinkedHashMap<Operator, Collection<RuleAppContainer>> copy =
+                new LinkedHashMap<>(parkedByOp.size());
+            for (Map.Entry<Operator, Collection<RuleAppContainer>> e : parkedByOp.entrySet()) {
+                final Collection<RuleAppContainer> v = e.getValue();
+                copy.put(e.getKey(),
+                    v instanceof LinkedHashSet ? new LinkedHashSet<>(v) : new ArrayList<>(v));
+            }
+            target.parkedByOp = copy;
+        }
+        if (pendingWakeOps != null) {
+            target.pendingWakeOps = new LinkedHashSet<>(pendingWakeOps);
+        }
+        if (parkedByKey != null) {
+            final LinkedHashMap<Long, Collection<RuleAppContainer>> copy =
+                new LinkedHashMap<>(parkedByKey.size());
+            for (Map.Entry<Long, Collection<RuleAppContainer>> e : parkedByKey.entrySet()) {
+                final Collection<RuleAppContainer> v = e.getValue();
+                copy.put(e.getKey(),
+                    v instanceof LinkedHashSet ? new LinkedHashSet<>(v) : new ArrayList<>(v));
+            }
+            target.parkedByKey = copy;
+        }
+        if (pendingWakeKeys != null) {
+            target.pendingWakeKeys = new LinkedHashSet<>(pendingWakeKeys);
+        }
     }
 }

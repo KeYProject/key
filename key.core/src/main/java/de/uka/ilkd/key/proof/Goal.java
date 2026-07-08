@@ -267,8 +267,8 @@ public final class Goal implements ProofGoal<Goal> {
         while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
             m = d.getDelegate();
         }
-        if (m instanceof QueueRuleApplicationManager qm) {
-            qm.sequentChanged(sci);
+        if (m != null) {
+            m.sequentChanged(sci);
         }
         ruleAppIndex.sequentChanged(sci);
         var time2 = System.nanoTime();

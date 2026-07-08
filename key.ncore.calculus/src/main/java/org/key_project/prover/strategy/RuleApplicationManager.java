@@ -5,6 +5,7 @@ package org.key_project.prover.strategy;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.SequentChangeInfo;
 
 import org.jspecify.annotations.Nullable;
 
@@ -36,4 +37,10 @@ public interface RuleApplicationManager<G extends @Nullable ProofGoal<G>> extend
     ///
     /// @return copy of this manager
     RuleApplicationManager<G> copy();
+
+    /// Notify the manager that the goal's sequent changed, so it can update its cached rule-app
+    /// candidates before the rule-app index re-reports (e.g. record wake operators for parked
+    /// bases, evict candidates anchored on rebuilt positions). Called by the goal on every sequent
+    /// change. Default: no-op, for managers that keep no such cache.
+    default void sequentChanged(SequentChangeInfo sci) {}
 }
