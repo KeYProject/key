@@ -19,10 +19,6 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     public static final String CATEGORY = "ProofSlicing";
 
     /**
-     * Config key for {@link #alwaysTrack}.
-     */
-    private static final String KEY_ALWAYS_TRACK = "alwaysTrack";
-    /**
      * Config key for {@link #aggressiveDeduplicate}.
      */
     private static final String KEY_AGGRESSIVE_DEDUPLICATE = "aggressiveDeduplicate";
@@ -30,12 +26,6 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * Config key for {@link #dotExecutable}.
      */
     private static final String KEY_DOT_EXECUTABLE = "dotExecutable";
-
-    /**
-     * Always track dependencies config key.
-     */
-    private final PropertyEntry<Boolean> alwaysTrack =
-        createBooleanProperty(KEY_ALWAYS_TRACK, true);
 
     /**
      * Aggressive rule deduplication config key.
@@ -57,14 +47,6 @@ public class SlicingSettings extends AbstractPropertiesSettings {
 
     public SlicingSettings() {
         super(CATEGORY);
-    }
-
-    public boolean getAlwaysTrack() {
-        return alwaysTrack.get();
-    }
-
-    public void setAlwaysTrack(boolean value) {
-        alwaysTrack.set(value);
     }
 
     /**

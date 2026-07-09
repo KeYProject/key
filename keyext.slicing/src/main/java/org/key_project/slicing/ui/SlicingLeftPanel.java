@@ -41,6 +41,7 @@ import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.analysis.AnalysisResults;
+import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
@@ -157,14 +158,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private JPanel timings = null;
 
     /**
-     * Number of nodes in the dependency graph.
-     */
-    private int graphNodesNr = 0;
-    /**
-     * Number of edges in the dependency graph.
-     */
-    private int graphEdgesNr = 0;
-    /**
      * Timer to regularly update dependency graph statistics and other UI state when loading a
      * proof.
      */
@@ -193,9 +186,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         updateUiStateTimer = new Timer(500, e -> {
             var tracker = extension.trackers.get(currentProof);
             if (tracker != null) {
-                graphNodesNr = tracker.getDependencyGraph().countNodes();
-                graphEdgesNr = tracker.getDependencyGraph().countEdges();
-                displayGraphLabels();
+                displayGraphLabels(tracker.getDependencyGraph());
             } else {
                 resetGraphLabels();
             }
@@ -353,6 +344,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
+        var tracker = extension.trackers.get(currentProof);
+        tracker.getDependencyGraph().ensureProofIsTracked(currentProof);
+        displayGraphLabels(tracker.getDependencyGraph());
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
             "Choose filename to save dot file");
         fileChooser.setFileFilter(KeYFileChooser.DOT_FILTER);
@@ -362,7 +356,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             File file = fileChooser.getSelectedFile();
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-                String text = extension.trackers.get(currentProof)
+                String text = tracker
                         .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
                 writer.write(text);
             } catch (IOException e) {
@@ -388,7 +382,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        String text = extension.trackers.get(currentProof)
+        var tracker = extension.trackers.get(currentProof);
+        tracker.getDependencyGraph().ensureProofIsTracked(currentProof);
+        displayGraphLabels(tracker.getDependencyGraph());
+        String text = tracker
                 .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
@@ -486,6 +483,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             resetLabels();
             return;
         }
+        displayGraphLabels(results.dependencyGraph);
         totalSteps.setText("Total steps: " + results.totalSteps);
         usefulSteps.setText("Useful steps: " + results.usefulStepsNr);
         totalBranches.setText("Total branches: " + results.proof.countBranches());
@@ -511,9 +509,15 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: ?");
     }
 
-    private void displayGraphLabels() {
-        graphNodes.setText("Graph nodes: " + graphNodesNr);
-        graphEdges.setText("Graph edges: " + graphEdgesNr);
+    private void displayGraphLabels(DependencyGraph graph) {
+        int graphNodesNr = graph.countNodes();
+        int graphEdgesNr = graph.countEdges();
+        if (graphNodesNr != 0 && graphEdgesNr != 0) {
+            graphNodes.setText("Graph nodes: " + graphNodesNr);
+            graphEdges.setText("Graph edges: " + graphEdgesNr);
+        } else {
+            resetGraphLabels(); // no dependency graph computed yet
+        }
     }
 
     @Override
@@ -545,25 +549,24 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             displayResults(tracker.getAnalysisResults());
         }
         if (tracker.getDependencyGraph() != null) {
-            graphNodesNr = tracker.getDependencyGraph().countNodes();
-            graphEdgesNr = tracker.getDependencyGraph().countEdges();
-            displayGraphLabels();
+            displayGraphLabels(tracker.getDependencyGraph());
         }
     }
 
     /**
-     * Notify the panel that a rule has been applied on the currently opened proof.
+     * Notify the panel that the dependency graph of the provided proof has been updated.
      *
      * @param proof currently opened proof
      */
-    public void ruleAppliedOnProof(Proof proof) {
+    public void dependencyGraphUpdated(Proof proof) {
         currentProof = proof;
         updateUiStateTimer.start();
     }
 
     @Override
     public void proofPruned(ProofTreeEvent e) {
-        ruleAppliedOnProof(e.getSource());
+        // this is called after the dependency graph is updated using proofIsBeingPruned
+        dependencyGraphUpdated(e.getSource());
     }
 
     private void updateUIState() {

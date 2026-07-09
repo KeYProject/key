@@ -136,7 +136,6 @@ public class SlicingExtension implements KeYGuiExtension,
             proof.addProofDisposedListener(this);
             DependencyTracker tracker = new DependencyTracker(proof);
             if (leftPanel != null) {
-                proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof));
                 proof.addProofTreeListener(leftPanel);
                 if (enableSafeModeForNextProof) {
                     SlicingSettingsProvider.getSlicingSettings()
