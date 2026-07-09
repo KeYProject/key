@@ -76,8 +76,8 @@ class TestReferenceSearcher {
             }
 
             // test that copying works
-            foundReference.register(close, ClosedBy.class);
             p.pruneProof(foundReference);
+            foundReference.register(close, ClosedBy.class);
             p.closeGoal(p.getOpenGoal(foundReference));
             assertTrue(p.closed());
             Proof proof = foundReference.proof();
@@ -95,8 +95,8 @@ class TestReferenceSearcher {
             assertEquals(n55.serialNr(), n55Close.node().serialNr());
             assertSame(p2, n55Close.proof());
             int previousTotal = p.countNodes();
-            n55.register(n55Close, ClosedBy.class);
             p.pruneProof(n55);
+            n55.register(n55Close, ClosedBy.class);
             p.closeGoal(p.getOpenGoal(n55));
             assertTrue(p.closed());
             n55.proof().copyCachedGoals(p2, null, null);

@@ -38,8 +38,13 @@ class ProofPruner {
     public ImmutableList<Node> prune(final Node cuttingPoint) {
         // special case: prune cached goal = only need to re-open the final node
         ClosedBy cby = cuttingPoint.lookup(ClosedBy.class);
-        Goal goal = proof.getClosedGoal(cuttingPoint);
-        if (cby != null && goal != null) {
+        if (cby != null) {
+            Goal goal = proof.getClosedGoal(cuttingPoint);
+            if (goal == null) {
+                throw new IllegalStateException("Something went wrong: Node " + cuttingPoint.name()
+                    + " has ClosedBy registered, but no corresponding goal!");
+            }
+
             cuttingPoint.deregister(cby, ClosedBy.class);
             proof.reOpenGoal(goal);
             refreshGoal(goal, cuttingPoint);
