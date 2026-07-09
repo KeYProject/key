@@ -10,7 +10,7 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
-    api project(':key.ncore.compiler')
+    api project(':key.ncore.matcher')
 
     antlr4(libs.antlr4)
     api(libs.antlr4.runtime)

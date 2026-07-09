@@ -13,7 +13,7 @@ dependencyResolutionManagement {
 include "key.util"
 include "key.ncore"
 include 'key.ncore.calculus'
-include 'key.ncore.compiler'
+include 'key.ncore.matcher'
 
 include "key.core"
 //include "key.core.rifl"
