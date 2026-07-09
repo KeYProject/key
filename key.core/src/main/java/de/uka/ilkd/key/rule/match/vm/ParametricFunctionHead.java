@@ -27,18 +27,21 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 
 /**
  * Match head for a {@link ParametricFunctionInstance}: it checks that the operator has the same
- * base
- * and matches the generic arguments (a generic sort, or a concrete argument by identity); the
+ * base and matches the generic arguments (a generic sort, or a concrete argument by identity); the
  * function's subterms are matched by the enclosing
  * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}. Mirrors the
  * parametric-function fragments of the hand-written matchers.
  */
 public final class ParametricFunctionHead implements MatchHead {
 
+    /** the pattern's parametric function; kept for {@link #toString} only. */
+    private final ParametricFunctionInstance pfi;
     private final MatchInstruction similar;
     private final MatchInstruction[] argMatchers;
 
-    private ParametricFunctionHead(MatchInstruction similar, MatchInstruction[] argMatchers) {
+    private ParametricFunctionHead(ParametricFunctionInstance pfi, MatchInstruction similar,
+            MatchInstruction[] argMatchers) {
+        this.pfi = pfi;
         this.similar = similar;
         this.argMatchers = argMatchers;
     }
@@ -61,7 +64,7 @@ public final class ParametricFunctionHead implements MatchHead {
                 argMatchers[i] = getMatchIdentityInstruction(arg);
             }
         }
-        return new ParametricFunctionHead(getSimilarParametricFunctionInstruction(pfi),
+        return new ParametricFunctionHead(pfi, getSimilarParametricFunctionInstruction(pfi),
             argMatchers);
     }
 
@@ -90,5 +93,10 @@ public final class ParametricFunctionHead implements MatchHead {
             }
             return r;
         };
+    }
+
+    @Override
+    public String toString() {
+        return "parametric(" + pfi.name() + ")";
     }
 }

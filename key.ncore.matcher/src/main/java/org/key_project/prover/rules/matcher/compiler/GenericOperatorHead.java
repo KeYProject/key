@@ -37,4 +37,9 @@ public final class GenericOperatorHead implements MatchHead {
         final Operator expected = op;
         return (element, mc, services) -> ((Term) element).op() == expected ? mc : null;
     }
+
+    @Override
+    public String toString() {
+        return op.name().toString();
+    }
 }

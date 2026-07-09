@@ -78,4 +78,9 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
             LogicServices services) {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "matchSV(" + op.name() + ")";
+    }
 }
