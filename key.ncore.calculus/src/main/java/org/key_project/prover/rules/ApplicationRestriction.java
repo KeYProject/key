@@ -72,8 +72,8 @@ public record ApplicationRestriction(int value) {
     @Override
     public String toString() {
         String res = "";
-        if (!matches(SAME_UPDATE_LEVEL)) {
-            res += "\\ignoreUpdateLevel";
+        if (matches(SAME_UPDATE_LEVEL)) {
+            res += "\\sameUpdateLevel";
         }
         if (matches(IN_SEQUENT_STATE)) {
             res += "\\inSequentState";
