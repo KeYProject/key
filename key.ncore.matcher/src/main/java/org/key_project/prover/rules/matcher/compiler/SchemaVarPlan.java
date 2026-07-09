@@ -41,6 +41,11 @@ public final class SchemaVarPlan implements MatchPlan {
 
     @Override
     public void emitInstructions(List<VMInstruction> out) {
+        // The schema-variable instruction matches the whole term at the term node and the sibling
+        // advance skips its entire subtree, bound variables included -- the cursor never descends
+        // here. So, unlike OperatorPlan (whose cursor walks the term's children), no per-bound-var
+        // skips are emitted: they would move the cursor at the SIBLING level, past elements that
+        // do not belong to this pattern.
         final boolean bound = !boundVars.isEmpty();
         if (bound) {
             out.add(binder.binder(boundVars));
@@ -48,9 +53,6 @@ public final class SchemaVarPlan implements MatchPlan {
         out.add(schemaVarInstruction);
         out.add(GotoNextSiblingInstruction.INSTANCE);
         if (bound) {
-            for (int i = 0, n = boundVars.size(); i < n; i++) {
-                out.add(GotoNextSiblingInstruction.INSTANCE);
-            }
             out.add(binder.unbinderInstruction());
         }
     }
