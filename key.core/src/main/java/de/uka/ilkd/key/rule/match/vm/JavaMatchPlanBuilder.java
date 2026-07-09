@@ -48,6 +48,18 @@ public final class JavaMatchPlanBuilder {
     private JavaMatchPlanBuilder() {}
 
     /**
+     * System property ({@code -Dkey.matcher.programInstructions=true}) selecting whether the Java
+     * program of a modality is matched by a sub-program of {@link VMInstruction}s on the
+     * interpreter back-end, instead of the monolithic {@code MatchProgramInstruction} (see
+     * {@code SyntaxElementMatchProgramGenerator}). Default {@code false} keeps the existing
+     * behaviour.
+     * <p>
+     * Read at matcher-construction time (i.e. when the taclet base is loaded) rather than once at
+     * class load, so toggling it and reloading the proof switches the behaviour.
+     */
+    public static final String PROGRAM_INSTRUCTIONS_PROPERTY = "key.matcher.programInstructions";
+
+    /**
      * Builds the interpreter program for {@code pattern} through the match-plan framework, reading
      * the {@code key.matcher.programInstructions} flag.
      *
@@ -55,8 +67,7 @@ public final class JavaMatchPlanBuilder {
      * @return the VM instruction program
      */
     public static VMInstruction[] interpreterProgram(JTerm pattern) {
-        return interpreterProgram(pattern,
-            Boolean.getBoolean(SyntaxElementMatchProgramGenerator.PROGRAM_INSTRUCTIONS_PROPERTY));
+        return interpreterProgram(pattern, Boolean.getBoolean(PROGRAM_INSTRUCTIONS_PROPERTY));
     }
 
     /**
@@ -68,7 +79,7 @@ public final class JavaMatchPlanBuilder {
      */
     public static VMInstruction[] interpreterProgram(JTerm pattern, boolean programInstructions) {
         final List<VMInstruction> out = new ArrayList<>();
-        planOrThrow(pattern, programInstructions).emitInstructions(out);
+        planOrThrow(pattern, programInstructions).emit(out);
         return out.toArray(new VMInstruction[0]);
     }
 
@@ -179,9 +190,9 @@ public final class JavaMatchPlanBuilder {
      */
     private record LabelPlan(MatchInstruction labelInstr, MatchPlan inner) implements MatchPlan {
         @Override
-        public void emitInstructions(List<VMInstruction> out) {
+        public void emit(List<VMInstruction> out) {
             out.add(labelInstr);
-            inner.emitInstructions(out);
+            inner.emit(out);
         }
 
         @Override

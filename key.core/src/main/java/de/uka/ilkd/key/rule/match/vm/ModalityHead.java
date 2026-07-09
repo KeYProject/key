@@ -36,10 +36,14 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  */
 public final class ModalityHead implements MatchHead {
 
+    /** the pattern's modal kind; kept for {@link #toString} only. */
+    private final Modality.Kind patternKind;
     private final MatchInstruction kindInstr;
     private final ProgramMatchHook programHook;
 
-    private ModalityHead(MatchInstruction kindInstr, ProgramMatchHook programHook) {
+    private ModalityHead(Modality.Kind patternKind, MatchInstruction kindInstr,
+            ProgramMatchHook programHook) {
+        this.patternKind = patternKind;
         this.kindInstr = kindInstr;
         this.programHook = programHook;
     }
@@ -61,7 +65,7 @@ public final class ModalityHead implements MatchHead {
         final MatchInstruction kindInstr = mod.kind() instanceof ModalOperatorSV sv
                 ? matchModalOperatorSV(sv)
                 : getMatchIdentityInstruction(mod.kind());
-        return new ModalityHead(kindInstr, hook);
+        return new ModalityHead(mod.kind(), kindInstr, hook);
     }
 
     @Override
@@ -88,5 +92,10 @@ public final class ModalityHead implements MatchHead {
             }
             return programMatch.match(((JTerm) element).javaBlock(), r, services);
         };
+    }
+
+    @Override
+    public String toString() {
+        return "modality(" + patternKind.name() + ", <prog>)";
     }
 }

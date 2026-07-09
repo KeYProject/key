@@ -19,10 +19,9 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * {@code JavaBlock} program of a modality. The interpreter side reuses the generator's converted
  * program instruction ({@link SyntaxElementMatchProgramGenerator#buildProgramInstruction}, falling
  * back to the monolithic {@code MatchProgramInstruction} when conversion is off or unavailable);
- * the
- * compiled side reuses {@link JavaProgramCompiler#compiledProgramMatcher} (context-block phases +
- * generic {@code getChild} navigation + value-leaf / list-SV delegation). Both are lifted verbatim
- * from the hand-written matchers, so the framework reproduces them exactly.
+ * the compiled side reuses {@link JavaProgramCompiler#compiledProgramMatcher} (context-block phases
+ * + generic {@code getChild} navigation + value-leaf / list-SV delegation). Both sides are derived
+ * from the single-source dispatch ({@code JavaProgramMatchPlanBuilder}).
  */
 public final class JavaProgramMatchHook implements ProgramMatchHook {
 

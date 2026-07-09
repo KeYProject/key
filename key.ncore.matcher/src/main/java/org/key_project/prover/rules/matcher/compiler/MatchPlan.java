@@ -17,7 +17,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * dispatch that composes plan nodes for each syntax construct. The point is that each construct is
  * described in exactly one place: a node carries both
  * <ul>
- * <li>{@link #emitInstructions(List)} — the interpreted back-end: it appends the cursor-based
+ * <li>{@link #emit(List)} — the interpreted back-end: it appends the cursor-based
  * {@link VMInstruction}s executed by {@code VMProgramInterpreter}; and</li>
  * <li>{@link #compile()} — the compiled back-end: it builds a cursor-free {@link MatchProgram} that
  * navigates the syntax element directly.</li>
@@ -35,20 +35,19 @@ public interface MatchPlan {
     /**
      * Appends, to {@code out}, the {@link VMInstruction}s matching this (sub)pattern for the
      * cursor-based interpreter. The cursor is expected to point at the element to be matched and,
-     * on
-     * completion of the appended instructions, to have advanced past it (to its next sibling), so
-     * that sibling plans can be appended directly after.
+     * on completion of the appended instructions, to have advanced past it (to its next sibling),
+     * so that sibling plans can be appended directly after.
      *
      * @param out the instruction list being built
      */
-    void emitInstructions(List<VMInstruction> out);
+    void emit(List<VMInstruction> out);
 
     /**
      * Builds the cursor-free compiled matcher for this (sub)pattern. The returned
      * {@link MatchProgram} is applied to the syntax element to be matched (the same element the
      * interpreter's cursor would point at) and returns the extended match result, or {@code null}
-     * on
-     * failure.
+     * on failure. Called at most once per plan, when the taclet's matcher is constructed; it may
+     * allocate and its result is not memoized.
      *
      * @return the compiled matcher for this plan node
      */

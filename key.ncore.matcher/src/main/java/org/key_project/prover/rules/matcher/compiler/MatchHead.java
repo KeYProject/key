@@ -12,8 +12,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * The operator-specific "head" of an {@link OperatorPlan}: it checks the operator of a term and any
  * operator-specific data (e.g. a modal-operator kind, a parametric function's generic arguments,
  * an elementary update's left-hand side), but <em>not</em> the subterms -- those are recursed by
- * the
- * enclosing {@link OperatorPlan}.
+ * the enclosing {@link OperatorPlan}.
  *
  * <p>
  * Generic heads (ordinary operators) live in this module; language-specific heads (modalities,
@@ -34,8 +33,7 @@ public interface MatchHead {
     /**
      * Builds the compiled head check: applied to the term element, it verifies the operator (and
      * head-specific data) and returns the extended match result, or {@code null} on failure. It
-     * does
-     * not recurse into subterms.
+     * does not recurse into subterms.
      *
      * @return the compiled head matcher
      */

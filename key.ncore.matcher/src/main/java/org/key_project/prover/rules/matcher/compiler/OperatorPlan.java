@@ -51,7 +51,7 @@ public final class OperatorPlan implements MatchPlan {
     }
 
     @Override
-    public void emitInstructions(List<VMInstruction> out) {
+    public void emit(List<VMInstruction> out) {
         final boolean bound = !boundVars.isEmpty();
         if (bound) {
             out.add(binder.binder(boundVars));
@@ -60,12 +60,14 @@ public final class OperatorPlan implements MatchPlan {
         out.add(GotoNextInstruction.INSTANCE);
         head.emit(out);
         if (bound) {
+            // the cursor is inside the term (the head advanced past the operator): step over the
+            // bound-variable children to reach the first subterm
             for (int i = 0, n = boundVars.size(); i < n; i++) {
                 out.add(GotoNextSiblingInstruction.INSTANCE);
             }
         }
         for (MatchPlan child : children) {
-            child.emitInstructions(out);
+            child.emit(out);
         }
         if (bound) {
             out.add(binder.unbinderInstruction());
@@ -106,5 +108,11 @@ public final class OperatorPlan implements MatchPlan {
             final @Nullable MatchResultInfo body = core.match(element, bound, services);
             return body == null ? null : binder.unbind(body);
         };
+    }
+
+    @Override
+    public String toString() {
+        return "term(" + head + (boundVars.isEmpty() ? "" : ", bind " + boundVars)
+            + (children.isEmpty() ? "" : ", " + children) + ")";
     }
 }

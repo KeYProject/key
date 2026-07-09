@@ -40,7 +40,7 @@ public final class SchemaVarPlan implements MatchPlan {
     }
 
     @Override
-    public void emitInstructions(List<VMInstruction> out) {
+    public void emit(List<VMInstruction> out) {
         // The schema-variable instruction matches the whole term at the term node and the sibling
         // advance skips its entire subtree, bound variables included -- the cursor never descends
         // here. So, unlike OperatorPlan (whose cursor walks the term's children), no per-bound-var
@@ -73,5 +73,11 @@ public final class SchemaVarPlan implements MatchPlan {
             final @Nullable MatchResultInfo body = core.match(element, bound, services);
             return body == null ? null : binder.unbind(body);
         };
+    }
+
+    @Override
+    public String toString() {
+        return "sv(" + schemaVarInstruction
+            + (boundVars.isEmpty() ? "" : ", bind " + boundVars) + ")";
     }
 }

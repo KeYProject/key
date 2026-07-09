@@ -31,27 +31,15 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 /**
  * Converts the Java program of a modality into VM match-instructions ({@link VMInstruction}s) by
  * direct tree navigation, for the interpreter side of the match-plan framework (used by the Java
- * {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). The term skeleton itself
- * is built by {@link JavaMatchPlanBuilder}; this class only handles the program-element conversion
- * (generic structural elements and non-list program schema variables; anything else is matched by
- * the monolithic {@code MatchProgramInstruction}).
+ * {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). The conversion is off by
+ * default and selected by {@link JavaMatchPlanBuilder#PROGRAM_INSTRUCTIONS_PROPERTY}. The term
+ * skeleton itself is built by {@link JavaMatchPlanBuilder}; this class only handles the
+ * program-element conversion (generic structural elements and non-list program schema variables;
+ * anything else is matched by the monolithic {@code MatchProgramInstruction}).
  *
  * @see org.key_project.prover.rules.matcher.vm.VMProgramInterpreter
  */
 public class SyntaxElementMatchProgramGenerator {
-
-    /**
-     * System property ({@code -Dkey.matcher.programInstructions=true}) selecting whether the Java
-     * program of a modality is matched by a sub-program of {@link VMInstruction}s (a {@link
-     * MatchSubProgramInstruction}) instead of the monolithic {@code MatchProgramInstruction}. Only
-     * patterns built from generic-match element kinds + (non-list) program schema variables are
-     * converted; anything else (context blocks, loops, value literals, list SVs) falls back to the
-     * interpreter. Default {@code false} keeps the existing behaviour.
-     * <p>
-     * Read at matcher-construction time (i.e. when the taclet base is loaded) rather than once at
-     * class load, so toggling it and reloading the proof switches the behaviour.
-     */
-    public static final String PROGRAM_INSTRUCTIONS_PROPERTY = "key.matcher.programInstructions";
 
     /**
      * caches, per program-element class, whether it uses the generic {@code match} (no override).
