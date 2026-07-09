@@ -39,12 +39,12 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      * Behaviour when disposing a proof that is referenced elsewhere.
      */
     private final AbstractPropertiesSettings.PropertyEntry<String> dispose =
-        createStringProperty(DISPOSE_KEY, "");
+        createStringProperty(DISPOSE_KEY, DISPOSE_COPY);
     /**
      * Behaviour when pruning a proof that is referenced elsewhere.
      */
     private final AbstractPropertiesSettings.PropertyEntry<String> prune =
-        createStringProperty(PRUNE_KEY, "");
+        createStringProperty(PRUNE_KEY, PRUNE_COPY);
 
     public ProofCachingSettings() {
         super("ProofCaching");
