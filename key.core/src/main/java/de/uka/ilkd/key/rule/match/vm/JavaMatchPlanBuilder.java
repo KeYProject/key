@@ -140,11 +140,12 @@ public final class JavaMatchPlanBuilder {
         final Operator op = pattern.op();
 
         if (op instanceof SchemaVariable sv) {
-            if (pattern.arity() != 0) {
-                return null; // unusual schema-variable shape
+            if (pattern.arity() != 0 || !pattern.boundVars().isEmpty()) {
+                // unusual schema-variable shape: no taclet produces these (bound variables attach
+                // to binder operators, not schema variables) -- fall back with a clear error
+                return null;
             }
-            return new SchemaVarPlan(getMatchInstructionForSV(sv), pattern.boundVars(),
-                JavaBinderMatcher.INSTANCE);
+            return new SchemaVarPlan(getMatchInstructionForSV(sv));
         }
 
         final MatchHead head = buildHead(pattern, programInstructions);
