@@ -298,7 +298,11 @@ FALSE
    : 'false'
    ;
    // Keywords related to taclets
-   
+
+SAMEUPDATELEVEL
+   : '\\sameUpdateLevel'
+   ;
+
 IGNOREUPDATELEVEL
    : '\\ignoreUpdateLevel'
    ;

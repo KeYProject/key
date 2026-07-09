@@ -190,18 +190,23 @@ public class TacletPBuilder extends ExpressionBuilder {
         Sequent seq = (find instanceof Sequent s) ? s : null;
 
         var applicationRestriction = ApplicationRestriction.NONE;
-        if (ctx.IGNOREUPDATELEVEL().isEmpty()) { // SAME_UPDATE_LEVEL is the default, but only set
-                                                 // when \add or \assumes is present
-            boolean hasAdd = false;
-            if (ctx.goalspecs().goalspecwithoption() != null) {
+        if (!ctx.IGNOREUPDATELEVEL().isEmpty() && !ctx.SAMEUPDATELEVEL().isEmpty()) {
+            semanticError(ctx,
+                "\\sameUpdateLevel and \\ignoreUpdateLevel cannot be set on the same taclet.");
+        }
+        if (ctx.IGNOREUPDATELEVEL().isEmpty() || !ctx.SAMEUPDATELEVEL().isEmpty()) {
+            // SAME_UPDATE_LEVEL is the default, but it's only set automatically when \add or
+            // \assumes is present. It can also be set by hand.
+            boolean sameUpdLvl = ctx.assumesSeq != null || !ctx.SAMEUPDATELEVEL().isEmpty();
+            if (!sameUpdLvl && ctx.goalspecs().goalspecwithoption() != null) {
                 for (var gt : ctx.goalspecs().goalspecwithoption()) {
                     if (gt.goalspec().addSeq != null) {
-                        hasAdd = true;
+                        sameUpdLvl = true;
                         break;
                     }
                 }
             }
-            if (hasAdd || ctx.assumesSeq != null)
+            if (sameUpdLvl)
                 applicationRestriction =
                     applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
         }
