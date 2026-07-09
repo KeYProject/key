@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Jul 09 09:08:23 CEST 2026
+# Date: Thu Jul 09 09:36:44 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -9897,7 +9897,7 @@ hideAuxiliaryEq {
 \find(equals(result,auxiliarySK)==>)
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(result) 
+\sameUpdateLevel\inSequentState\replacewith(result) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq)
@@ -9908,7 +9908,7 @@ hideAuxiliaryEqConcrete {
 \find(equals(auxiliarySK,TRUE)==>)
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(TRUE) 
+\sameUpdateLevel\inSequentState\replacewith(TRUE) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq_const)
@@ -9919,7 +9919,7 @@ hideAuxiliaryEqConcrete2 {
 \find(==>equals(auxiliarySK,TRUE))
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(FALSE) 
+\sameUpdateLevel\inSequentState\replacewith(FALSE) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq_const)
@@ -16498,7 +16498,7 @@ simplifySelectOfAnon {
 \find(equals(select<[beta]>(anon(h,s,h2),o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(anon(h,s,h2),o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16510,7 +16510,7 @@ simplifySelectOfAnonEQ {
 \find(equals(select<[beta]>(EQ,o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16521,7 +16521,7 @@ simplifySelectOfCreate {
 \find(equals(select<[beta]>(create(h,o),o2,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(create(h,o),o2,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16533,7 +16533,7 @@ simplifySelectOfCreateEQ {
 \find(equals(select<[beta]>(EQ,o2,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o2,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16544,7 +16544,7 @@ simplifySelectOfMemset {
 \find(equals(select<[beta]>(memset(h,s,x),o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(memset(h,s,x),o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16556,7 +16556,7 @@ simplifySelectOfMemsetEQ {
 \find(equals(select<[beta]>(EQ,o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16567,7 +16567,7 @@ simplifySelectOfStore {
 \find(equals(select<[beta]>(store(h,o,f,x),o2,f2),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(store(h,o,f,x),o2,f2))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16579,7 +16579,7 @@ simplifySelectOfStoreEQ {
 \find(equals(select<[beta]>(EQ,o2,f2),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o2,f2))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
 \heuristics(simplify_select)

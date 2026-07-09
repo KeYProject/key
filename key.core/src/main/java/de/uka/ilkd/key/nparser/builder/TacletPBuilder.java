@@ -60,6 +60,9 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private boolean axiomMode;
 
+    /// Set to `true` iff we are in an `\addrules` section
+    private boolean addRulesMode;
+
     private final List<Taclet> topLevelTaclets = new ArrayList<>(2048);
 
     /**
@@ -194,10 +197,13 @@ public class TacletPBuilder extends ExpressionBuilder {
             semanticError(ctx,
                 "\\sameUpdateLevel and \\ignoreUpdateLevel cannot be set on the same taclet.");
         }
-        if (ctx.IGNOREUPDATELEVEL().isEmpty() || !ctx.SAMEUPDATELEVEL().isEmpty()) {
+        if (addRulesMode && ctx.IGNOREUPDATELEVEL().isEmpty() || ctx.IGNOREUPDATELEVEL().isEmpty()
+                || !ctx.SAMEUPDATELEVEL().isEmpty()) {
             // SAME_UPDATE_LEVEL is the default, but it's only set automatically when \add or
-            // \assumes is present. It can also be set by hand.
-            boolean sameUpdLvl = ctx.assumesSeq != null || !ctx.SAMEUPDATELEVEL().isEmpty();
+            // \assumes is present, or we are in \addrules and \ignoreUpdateLevel is not set. It can
+            // also be set by hand.
+            boolean sameUpdLvl = addRulesMode && ctx.IGNOREUPDATELEVEL().isEmpty()
+                    || ctx.assumesSeq != null || !ctx.SAMEUPDATELEVEL().isEmpty();
             if (!sameUpdLvl && ctx.goalspecs().goalspecwithoption() != null) {
                 for (var gt : ctx.goalspecs().goalspecwithoption()) {
                     if (gt.goalspec().addSeq != null) {
@@ -820,7 +826,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             addSeq = accept(ctx.add());
         }
         if (ctx.addrules() != null) {
+            boolean oldAddRulesMode = addRulesMode;
+            addRulesMode = true;
             addRList = accept(ctx.addrules()); // modifies goalChoice
+            addRulesMode = oldAddRulesMode;
         }
         if (ctx.addprogvar() != null) {
             addpv = accept(ctx.addprogvar());
