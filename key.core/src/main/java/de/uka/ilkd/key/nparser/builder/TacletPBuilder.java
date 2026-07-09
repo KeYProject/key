@@ -346,8 +346,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setFind(tb.func(function, tb.func(consFn, args)));
         tacletBuilder.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(tb.var(schemaVariables[argIndex])));
-        tacletBuilder.setApplicationRestriction(
-            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addRuleSet(ruleSets().lookup(new Name("simplify")));
 
         return tacletBuilder;

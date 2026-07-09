@@ -31,7 +31,7 @@ public class AdtTests {
             DT_Nat#Dec_pred#succ#EQ {
             \\assumes ([equals(succ(pred_sv),pred_x)]==>[])\s
             \\find(pred(pred_x))
-            \\replacewith(pred_sv)\s
+            \\sameUpdateLevel\\replacewith(pred_sv)\s
             \\heuristics(simplify)
             Choices: true}""";
 
