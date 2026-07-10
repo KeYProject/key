@@ -1,0 +1,43 @@
+{
+  "@context": [
+    "https://doi.org/10.5063/schema/codemeta-2.0",
+    {
+      "hermes": "https://software-metadata.pub/ns/hermes/"
+    }
+  ],
+  "@type": "SoftwareSourceCode",
+  "author": [
+    {
+      "@id": "https://orcid.org/0000-0001-8446-4598",
+      "@type": "Person",
+      "affiliation": {
+        "@type": "Organization",
+        "legalName": "Karlsruhe Institute of Technology"
+      },
+      "familyName": "Weigl",
+      "givenName": "Alexander",
+      "email": "weigl@kit.edu"
+    },
+    {
+      "@type": "Person",
+      "affiliation": {
+        "@type": "Organization",
+        "legalName": "TU Darmstadt"
+      },
+      "familyName": "Bubel",
+      "givenName": "Richard",
+      "email": "bubel@cs.tu-darmstadt.de"
+    }
+  ],
+  "codeRepository": "https://github.com/keyproject/key",
+  "datePublished": "2026-07-01",
+  "keywords": [
+    "Deductive Verification",
+    "Java Verification",
+    "Interactive Theorem Prover"
+  ],
+  "license": "https://spdx.org/licenses/GPL-2.0-only",
+  "name": "KeY",
+  "url": "https://key-project.org/",
+  "version": "3.0.0-dev"
+}
