@@ -34,7 +34,7 @@ final class SymExCost {
     static final long THROWING_PROGRAM_STEP = 500;
 
     /** {@code simplify_prog} step underneath a quantifier / non-atom: mildly dispreferred. */
-    static final long PROGRAM_STEP_UNDER_QUANTIFIER = 200;
+    static final long PROGRAM_STEP_BELOW_QUANTIFIER = 200;
 
     /** Method-body expansion in METHOD_EXPAND mode. */
     static final long METHOD_EXPAND = 100;

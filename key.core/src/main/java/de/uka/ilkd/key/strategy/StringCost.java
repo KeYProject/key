@@ -38,5 +38,5 @@ final class StringCost {
      * Extra penalty for unfolding a string definition below a modal operator: postpone it until
      * the program has been symbolically executed. Shared by the {@code defOps*} rules.
      */
-    static final long BELOW_MODALITY_PENALTY = 500;
+    static final long BELOW_MODALITY = 500;
 }

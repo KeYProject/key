@@ -20,12 +20,6 @@ final class FOLCost {
     private FOLCost() {}
 
     /**
-     * Base cost of applying an equation (applyEq / apply_equations). Deliberately its own band —
-     * <em>not</em> {@code EXECUTE}, which is reserved for symbolic execution.
-     */
-    static final long APPLY_EQUATIONS = -4000;
-
-    /**
      * Distribution / swapping of quantifiers ({@code distrQuantifier}, {@code swapQuantifiers}).
      */
     static final long QUANTIFIER_DISTRIBUTION = -300;
@@ -33,16 +27,11 @@ final class FOLCost {
     /**
      * Restructuring of CNF clauses by associativity / distribution ({@code cnf_orAssoc},
      * {@code cnf_andAssoc}, {@code cnf_dist}); the small {@code ± delta} at the call sites orders
-     * these among themselves.
+     * these among themselves. These are the fine deltas summed on top of the
+     * {@link CombinationCost#CNF_CONVERSION} level via the dual rule-set tags of the
+     * {@code conjNormalForm} taclets.
      */
     static final long CNF_RESTRUCTURE = -35;
-
-    /**
-     * Ordering of formula-normalisation steps in the boolean/CNF area, at one shared priority:
-     * {@code conjNormalForm} (CNF conversion) and {@code apply_equations_andOr} (contextual
-     * equation application inside and/or).
-     */
-    static final long CNF_ORDERING = -150;
 
     /**
      * Defer {@code replace_known_right} when its target is in the consequent of an implication or

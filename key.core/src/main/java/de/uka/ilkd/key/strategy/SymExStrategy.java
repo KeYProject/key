@@ -157,7 +157,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
             ifZero(ThrownExceptionFeature.create(exceptionsWithPenalty, getServices()),
                 longConst(SymExCost.THROWING_PROGRAM_STEP),
                 ifZero(isBelow(add(ff.forF, not(ff.atom))),
-                    longConst(SymExCost.PROGRAM_STEP_UNDER_QUANTIFIER),
+                    longConst(SymExCost.PROGRAM_STEP_BELOW_QUANTIFIER),
                     longConst(SymExCost.PROGRAM_STEP))));
 
         bindRuleSet(d, "simplify_prog_subset", longConst(CostBand.EXECUTE.cost()));

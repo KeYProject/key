@@ -301,7 +301,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             ifZero(
                 add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
-                add(longConst(FOLCost.CNF_ORDERING),
+                add(longConst(CombinationCost.CNF_CONVERSION),
                     ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
                 inftyConst()));
 
@@ -318,7 +318,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             add(let(left, instOf("applyEqLeft"),
                 let(right, instOf("applyEqRight"),
                     TermSmallerThanFeature.create(right, left))),
-                longConst(FOLCost.CNF_ORDERING)));
+                longConst(CombinationCost.CNF_CONVERSION)));
 
         bindRuleSet(d, "distrQuantifier",
             add(or(
@@ -579,7 +579,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                             let(left, sub(equation, 0),
                                 let(right, sub(equation, 1),
                                     TermSmallerThanFeature.create(right, left))))))),
-                longConst(FOLCost.APPLY_EQUATIONS)));
+                longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",
             applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));

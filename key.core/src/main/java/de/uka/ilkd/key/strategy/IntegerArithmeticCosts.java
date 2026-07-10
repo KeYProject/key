@@ -38,24 +38,20 @@ final class PolynomialCost {
 final class LinearEquationCost {
     private LinearEquationCost() {}
 
-    /**
-     * The general {@code apply_equations} rule set (applyEq / applyEqReverse), used to reduce
-     * polynomials. Distinct from {@link #APPLY_EQ}, which is the monomial-specialised polySimp
-     * variant. Its own band, not {@code EXECUTE} (reserved for symbolic execution).
-     * <p>
-     * Step-3 idea: test whether the specialised {@link #APPLY_EQ} is needed at all, or should just
-     * be a small delta that prefers these original {@code apply_equations} rules.
-     * </p>
-     */
-    static final long APPLY_EQUATIONS = -4000;
-    static final long APPLY_EQ_AND_OR = -150;
+    // The base costs of apply_equations / apply_equations_andOr are combination-shared with
+    // FOLStrategy (conflict-dispatched; the Integer halves use the monomial ordering as
+    // demodulation guard): see CombinationCost.ORDERED_REWRITING and
+    // CombinationCost.CNF_CONVERSION.
+
     /** polySimp_balance, polySimp_normalise. */
     static final long BALANCE = -30;
     /**
-     * polySimp_applyEq — the monomial-coefficient-specialised equation application. The rigid
-     * variant polySimp_applyEqRigid is written {@code APPLY_EQ + 1} at the call site; that +1 is
-     * only an (uninteresting) tie-break between the two rules, a step-3 candidate to flatten to a
-     * single cost.
+     * polySimp_applyEq — the monomial-coefficient-specialised equation application (the general
+     * demodulation cost is {@link CombinationCost#ORDERED_REWRITING}). The rigid variant
+     * polySimp_applyEqRigid is written {@code APPLY_EQ + 1} at the call site; that +1 is only an
+     * (uninteresting) tie-break between the two rules, a step-3 candidate to flatten to a single
+     * cost. Step-3 idea: test whether this specialised variant is needed at all, or should just be
+     * a small delta preferring the original {@code apply_equations} rules.
      */
     static final long APPLY_EQ = 1;
 }

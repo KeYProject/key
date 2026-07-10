@@ -297,8 +297,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // needs to be not simplified yet; additional restrictions
             // in isApproved()
             ifZero(applyTF("s", not(rec(any(), SimplifiedSelectTermFeature.create(heapLDT)))),
-                // together with the costs of apply_equations the
-                // resulting costs are about -5700
+                // the applyEq taclet also carries apply_equations, so the dispatch sums the
+                // bindings; the tuned sum is CombinationCost.APPLY_SELECT_EQ_EFFECTIVE
                 longConst(HeapSelectCost.APPLY_SELECT_EQ)));
         bindRuleSet(d, "simplify_select",
             // simplify_select term in pulled out equation (right hand

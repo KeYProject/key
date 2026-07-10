@@ -181,7 +181,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                                         applyTF(right, tf.polynomial),
                                         MonomialsSmallerThanFeature.create(right, left,
                                             numbers)))))))),
-                longConst(LinearEquationCost.APPLY_EQUATIONS)));
+                longConst(CombinationCost.ORDERED_REWRITING)));
 
         final TermBuffer l = new TermBuffer();
         final TermBuffer r = new TermBuffer();
@@ -190,7 +190,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 let(r, instOf("applyEqRight"),
                     add(applyTF(l, tf.nonNegOrNonCoeffMonomial), applyTF(r, tf.polynomial),
                         MonomialsSmallerThanFeature.create(r, l, numbers)))),
-                longConst(LinearEquationCost.APPLY_EQ_AND_OR)));
+                longConst(CombinationCost.CNF_CONVERSION)));
 
         // For taclets that need instantiation, but where the instantiation is
         // deterministic and does not have to be repeated at a later point, we
