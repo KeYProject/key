@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -38,9 +37,10 @@ final class SingleThreadedTacletIndex extends TacletIndex {
         super(tacletSet);
     }
 
-    private SingleThreadedTacletIndex(HashMap<Object, ImmutableList<NoPosTacletApp>> rwList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> antecList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> succList,
+    private SingleThreadedTacletIndex(
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> rwList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> antecList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> succList,
             ImmutableList<NoPosTacletApp> noFindList,
             HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
         super(rwList, antecList, succList, noFindList, partialInstantiatedRuleApps);
@@ -52,11 +52,8 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @SuppressWarnings("unchecked")
     @Override
     public TacletIndex copy() {
-        return new SingleThreadedTacletIndex(
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
+        return new SingleThreadedTacletIndex(rwList.copy(), antecList.copy(), succList.copy(),
+            noFindList, (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**

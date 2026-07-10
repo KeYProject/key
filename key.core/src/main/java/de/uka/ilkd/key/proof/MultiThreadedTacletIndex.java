@@ -46,9 +46,10 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         super();
     }
 
-    private MultiThreadedTacletIndex(HashMap<Object, ImmutableList<NoPosTacletApp>> rwList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> antecList,
-            HashMap<Object, ImmutableList<NoPosTacletApp>> succList,
+    private MultiThreadedTacletIndex(
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> rwList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> antecList,
+            CopyOnWriteIndexMap<Object, ImmutableList<NoPosTacletApp>> succList,
             ImmutableList<NoPosTacletApp> noFindList,
             HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
         super(rwList, antecList, succList, noFindList, partialInstantiatedRuleApps);
@@ -60,11 +61,8 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     @SuppressWarnings("unchecked")
     @Override
     public TacletIndex copy() {
-        return new MultiThreadedTacletIndex(
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
+        return new MultiThreadedTacletIndex(rwList.copy(), antecList.copy(), succList.copy(),
+            noFindList, (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**

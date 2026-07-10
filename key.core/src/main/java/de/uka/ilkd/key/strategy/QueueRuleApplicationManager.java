@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -109,11 +110,23 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * is popped, re-expands to nothing, and is re-parked, exactly as a non-parked base would behave
      * that round. Only <em>missing</em> a wake would diverge, and that cannot happen for an
      * effectively-indexable base.</li>
-     * <li>All structures are insertion-ordered ({@link LinkedHashMap}/{@link LinkedHashSet}) so
-     * parking introduces no non-determinism.</li>
+     * <li>All structures are insertion-ordered ({@link LinkedHashMap}/{@link ArrayList}/
+     * {@link LinkedHashSet}) so parking introduces no non-determinism.</li>
      * </ul>
      */
-    private @Nullable LinkedHashMap<Operator, LinkedHashSet<RuleAppContainer>> parkedByOp = null;
+    // The per-operator buckets are plain ArrayLists, not sets, while small. A base is parked at
+    // most
+    // once per bucket (removed from all its buckets when woken; see unindexParked) and
+    // RuleAppContainer uses identity equality, so there is nothing to de-duplicate -- whereas a set
+    // would spend a whole LinkedHashMap (16-slot table + a 40-byte Entry per element) to hold a
+    // handful of refs. A bucket that grows past {@link #BUCKET_SET_THRESHOLD} is switched to a
+    // LinkedHashSet so the by-value unindexParked stays O(1) (see park).
+    private @Nullable LinkedHashMap<Operator, Collection<RuleAppContainer>> parkedByOp = null;
+    /**
+     * Bucket size at which a per-operator parking bucket is promoted from ArrayList to
+     * LinkedHashSet.
+     */
+    private static final int BUCKET_SET_THRESHOLD = 16;
     /**
      * Top operators (along the update-prefix spine) of formulas added/modified since the previous
      * round; the wake candidates consumed at the start of the next round. Insertion-ordered for
@@ -484,7 +497,22 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             parkedByOp = new LinkedHashMap<>();
         }
         for (Operator op : ops) {
-            parkedByOp.computeIfAbsent(op, k -> new LinkedHashSet<>()).add(base);
+            Collection<RuleAppContainer> bucket = parkedByOp.get(op);
+            if (bucket == null) {
+                bucket = new ArrayList<>(4);
+                parkedByOp.put(op, bucket);
+            }
+            bucket.add(base);
+            // unindexParked removes by value -- O(n) on a list. A few operators can collect
+            // thousands of parked bases (e.g. the update operator on long straight-line proofs),
+            // which would make wake/unpark O(n^2). Once a bucket grows past the threshold, switch
+            // it
+            // to a LinkedHashSet for O(1) removal; small buckets (the vast majority) stay
+            // ArrayLists
+            // for the memory saving. Both preserve insertion order, so the woken set is unchanged.
+            if (bucket.size() == BUCKET_SET_THRESHOLD && bucket instanceof ArrayList) {
+                parkedByOp.put(op, new LinkedHashSet<>(bucket));
+            }
         }
         return true;
     }
@@ -501,7 +529,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         if (parkedByOp != null && !parkedByOp.isEmpty()) {
             LinkedHashSet<RuleAppContainer> woken = null;
             for (Operator op : pendingWakeOps) {
-                final LinkedHashSet<RuleAppContainer> bucket = parkedByOp.get(op);
+                final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
                 if (bucket != null) {
                     if (woken == null) {
                         woken = new LinkedHashSet<>();
@@ -534,7 +562,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             return;
         }
         for (Operator op : ops) {
-            final LinkedHashSet<RuleAppContainer> bucket = parkedByOp.get(op);
+            final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
             if (bucket != null) {
                 bucket.remove(c);
                 if (bucket.isEmpty()) {
@@ -638,10 +666,12 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         // the parking structures are mutable and goal-local: deep-copy so split goals park/wake
         // independently (the contained containers and operators are immutable and shared)
         if (parkedByOp != null) {
-            final LinkedHashMap<Operator, LinkedHashSet<RuleAppContainer>> copy =
+            final LinkedHashMap<Operator, Collection<RuleAppContainer>> copy =
                 new LinkedHashMap<>(parkedByOp.size());
-            for (Map.Entry<Operator, LinkedHashSet<RuleAppContainer>> e : parkedByOp.entrySet()) {
-                copy.put(e.getKey(), new LinkedHashSet<>(e.getValue()));
+            for (Map.Entry<Operator, Collection<RuleAppContainer>> e : parkedByOp.entrySet()) {
+                final Collection<RuleAppContainer> v = e.getValue();
+                copy.put(e.getKey(),
+                    v instanceof LinkedHashSet ? new LinkedHashSet<>(v) : new ArrayList<>(v));
             }
             res.parkedByOp = copy;
         }
