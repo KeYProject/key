@@ -97,7 +97,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
             or(op(seqLDT.getSeqSingleton()), or(anyLiteral, inftyTermConst()))));
 
         Feature belowModOpPenality =
-            ifZero(isBelow(ff.modalOperator), longConst(StringCost.BELOW_MODALITY_PENALTY));
+            ifZero(isBelow(ff.modalOperator), longConst(StringCost.BELOW_MODALITY));
 
         bindRuleSet(d, "defOpsSeqEquality",
             add(NonDuplicateAppModPositionFeature.INSTANCE,

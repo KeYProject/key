@@ -3,6 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+/*
+ * Theory-internal cost constants for the JavaCardDL strategy, grouped per sub-area
+ * (Integer-style, one file per theory): JavaCardDLCost for the axiom / observer /
+ * comprehension / induction reasoning, HeapSelectCost for the pull-out-select pipeline
+ * (a future component strategy of its own; it is kept as a separate holder to pre-stage
+ * that split and moves with it).
+ */
+
 /**
  * JavaCardDL-theory-internal ordering costs, used by {@link JavaCardDLStrategy} (the axiom /
  * observer / comprehension / induction reasoning; the heap/select pipeline has its own
@@ -70,4 +78,54 @@ final class JavaCardDLCost {
 
     /** User taclets set to high priority: mildly preferred. */
     static final long USER_TACLET_HIGH_PRIORITY = -50;
+}
+
+
+/**
+ * Costs of the pull-out-select heap simplification pipeline, used by {@link JavaCardDLStrategy}.
+ * This is the coherent heap/select cluster that is a candidate to be promoted into its own
+ * component strategy later; it is kept in a dedicated holder to pre-stage that split.
+ *
+ * <p>
+ * <b>Combination-relevant, not purely local:</b> this ladder is tuned <em>relative to</em> the
+ * demodulation cost {@link CombinationCost#ORDERED_REWRITING}: {@link #APPLY_SELECT_EQ} is the
+ * JavaCardDL-side remainder of the tuned sum {@link CombinationCost#APPLY_SELECT_EQ_EFFECTIVE}
+ * (the {@code applyEq} taclet carries both rule sets, so the dispatch sums the contributions).
+ * </p>
+ *
+ * <p>
+ * Values are byte-identical to the literals they replace; verify changes with a full runAllProofs
+ * (as for {@link org.key_project.prover.strategy.costbased.CostBand}).
+ * </p>
+ */
+final class HeapSelectCost {
+    private HeapSelectCost() {}
+
+    /** {@code pull_out_select} when the focus select sits below an update (pull it out harder). */
+    static final long PULL_OUT_SELECT_BELOW_UPDATE = -4200;
+
+    /** {@code pull_out_select} otherwise. */
+    static final long PULL_OUT_SELECT = -1900;
+
+    /**
+     * {@code apply_select_eq}: replace a not-yet-simplified select by the skolem constant of its
+     * pull-out. The {@code applyEq} taclet carries both {@code apply_equations} and
+     * {@code apply_select_eq}, so the effective cost is the SUM of the two bindings; the tuned
+     * quantity is {@link CombinationCost#APPLY_SELECT_EQ_EFFECTIVE} and this constant is the
+     * JavaCardDL-side remainder (currently −1700).
+     */
+    static final long APPLY_SELECT_EQ =
+        CombinationCost.APPLY_SELECT_EQ_EFFECTIVE - CombinationCost.ORDERED_REWRITING;
+
+    /** {@code simplify_select}: simplify the select term in the pulled-out equation. */
+    static final long SIMPLIFY_SELECT = -5600;
+
+    /** {@code apply_auxiliary_eq}: replace the skolem constant by its computed value. */
+    static final long APPLY_AUXILIARY_EQ = -5500;
+
+    /** {@code hide_auxiliary_eq}: hide the auxiliary equation once the constant is replaced. */
+    static final long HIDE_AUXILIARY_EQ = -5400;
+
+    /** {@code hide_auxiliary_eq_const}: same, for the constant-valued case. */
+    static final long HIDE_AUXILIARY_EQ_CONST = -500;
 }
