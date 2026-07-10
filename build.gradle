@@ -419,10 +419,7 @@ tasks.register('alldoc', Javadoc){
         group("keyext.ui.testgen", "de.uka.ilkd.key.gui.testgen")
         group("keyext.exploration","org.key_project.exploration")
         group("keyext.caching", "de.uka.ilkd.key.gui.plugins.caching")
-        group("key.core.symbolic_execution",// "de.uka.ilkd.key.proof",
-                "de.uka.ilkd.key.rule.label", "de.uka.ilkd.key.strategy",
-                "de.uka.ilkd.key.symbolic_execution")
-        group("key.core.proof_references", "de.uka.ilkd.key.proof_references")*/
+        */
     }
 }
 
