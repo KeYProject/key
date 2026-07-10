@@ -1,0 +1,162 @@
+# SPDX-FileCopyrightText: 2023 German Aerospace Center (DLR), Forschungszentrum Jülich, Helmholtz-Zentrum Dresden-Rossendorf
+#
+# SPDX-License-Identifier: CC0-1.0
+
+###############################################################################################################
+# TEMPLATE! To use this template, do the following:
+#
+# 1. Copy this file into the .github/workflows/ directory in your repository and remove the 'TEMPLATE_' prefix.
+# 2. Go through the file and carefully adapt to your needs, as marked by an '# ADAPT' comment.
+###############################################################################################################
+
+name: Software Publication
+
+on:
+  # ADAPT
+  # See the events you can react to at https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+  push:
+    branches:
+      - main
+      - weigl/hermes2
+  # NOTE: Do not delete the trigger on closed pull requests, the HERMES workflow needs this.
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  hermes-prepare:
+    name: Prepare Metadata for Curation
+    runs-on: ubuntu-latest
+    # This condition becomes much easier when we only react to push events on the release branch.
+    # We still need to exclude the merge commit push of the post processing PR
+
+    # ADAPT
+    # Depending on the event you react to in the 'on:' section above, you will need to adapt this
+    # to react on the specific events.
+    # NOTE: You will probably still need to keep the exclusion check for commit messages provided by the workflow ('hermes/'/'hermes/post').
+    if: >
+      github.event_name == 'push' && ! (
+        startsWith(github.ref_name, 'hermes/') ||
+        contains(github.event.head_commit.message, 'hermes/post')
+      )
+
+    permissions:
+      contents: write # Allow creation of new branches
+      pull-requests: write # Postprocessing should be able to create a pull request with changes
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - run: pip install hermes
+      - run: pip install git+https://github.com/softwarepub/hermes-plugin-git
+
+      - run: hermes harvest
+      - run: hermes process
+      - run: hermes curate
+
+      - run: |
+          # Cache current branch for PR close job
+          git branch --show-current > .hermes/curate/target_branch
+
+          # Shorten the SHA for the PR title
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c -8)
+          echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
+
+          # Create a curation branch
+          git branch -c "hermes/curate-$SHORT_SHA"
+          git push origin "hermes/curate-$SHORT_SHA"
+
+          # Explicitly add to-be-curated metadata (which is ignored via .gitignore!)
+          git add -f .hermes/curate
+      - uses: peter-evans/create-pull-request@v8
+        with:
+          base: hermes/curate-${{ env.SHORT_SHA }}
+          branch: hermes/curate-result-${{ env.SHORT_SHA }}
+          title: Metadata Curation for Commit ${{ env.SHORT_SHA }}
+          body: |
+            Please carefully review the attached metadata.
+            If you are satisfied with the result, you may merge this PR, which will trigger publication.
+            (Any temporary branches will be cleaned up.)
+          delete-branch: true
+
+  hermes-curate:
+    name: Publish Software with Curated Metadata
+    if: github.event.pull_request.merged == true && startsWith( github.base_ref , 'hermes/curate-')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allow creation of new branches
+      pull-requests: write # Postprocessing should be able to create a pull request with changes
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - run: pip install hermes
+      - run: pip install git+https://github.com/softwarepub/hermes-plugin-git
+
+
+      # ADAPT
+      # If you want to publish artifacts (e.g., a zipped snapshot of your repository),
+      # you can prepare this here.
+      - run: git archive --format zip HEAD  > artifact.zip
+
+      # Run the HERMES deposition and postprocessing steps.
+      # ADAPT
+      # 1. You need to have an authentication token for your target publication platform
+      #    as a GitHub secret in your repository (in this example, this is called ZENODO_SANDBOX).
+      # 2. Adapt the files you want to deposit. In the example, showcase.zip and README.md are deposited alongside the metadata.
+      # 3. Check if you want to run with '--initial', as this may potentially create a completely new record (collection),
+      #    rather than a new version of the same collection!
+      - run: hermes deposit --initial -O invenio_rdm.auth_token ${{ secrets.ZENODO_SANDBOX }} --file artifact.zip --file README.md 
+
+      # ADAPT
+      # Remove this command if you don't want to do any postprocessing
+      - run: hermes postprocess
+
+      # ADAPT
+      # If you don't want to run postprocessing, remove this complete section (next '-run' and 'uses: peter-evans/...' bullets).
+      #
+      # Note 1: We change the base branch here for the PR. This flow runs so far within the "curated-metadata-*" branch,
+      #         but now we want to add the changes done by deposit and post processing to the branch that was initially
+      #         meant to be published using HERMES.
+      # Note 2: The create-pull-request action will NOT inherit the commits we did in the previous job. It will only look at the
+      #         changes within this local workspace we did *now*.
+      - run: echo "TARGET_BRANCH=$(cat .hermes/curate/target_branch)" >> "$GITHUB_ENV"
+      - uses: peter-evans/create-pull-request@v8
+        with:
+          branch: hermes/post-${{ github.run_id }}
+          base: ${{ env.TARGET_BRANCH }}
+          title: Review hermes post-processing results
+          body: |
+            This is an automated pull request created by HERMES post-processing.
+
+            Please carefully review the changes and finally merge them into your
+
+      # Delete all the curation branches
+      - run: |
+          for BRANCH in $(git ls-remote origin 'refs/heads/hermes/curate-*' | cut -f2 | cut -d'/' -f'3-'); do
+            git push origin --delete "$BRANCH"
+          done
+      # TODO: if: failure() --- delete the curation branches when the deposition failed
+
+
+  hermes-cleanup:
+    name: Cleanup aborted curation branches
+    if: github.event.pull_request.merged == false && startsWith( github.base_ref , 'hermes/curate-')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allow creation of new branches
+      pull-requests: write # Postprocessing should be able to create a pull request with changes
+
+    steps:
+      - uses: actions/checkout@v7
+      # Delete all the curation branches
+      - run: |
+          for BRANCH in $(git ls-remote origin 'refs/heads/hermes/curate-*' | cut -f2 | cut -d'/' -f'3-'); do
+            git push origin --delete "$BRANCH"
+          done

@@ -75,3 +75,6 @@ checkstyle-diff.txt
 /key.ncore/src/main/gen/
 /key.ncore/src/main/antlr/KeYLexer.tokens
 /keyext.rusty/src/main/gen/
+# Ignoring all HERMES cache files
+.hermes/
+hermes.log

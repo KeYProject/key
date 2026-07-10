@@ -1,0 +1,32 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: KeY
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Alexander
+    family-names: Weigl
+    email: weigl@kit.edu
+    affiliation: Karlsruhe Institute of Technology
+    orcid: 'https://orcid.org/0000-0001-8446-4598'
+  - given-names: Richard
+    family-names: Bubel
+    email: bubel@cs.tu-darmstadt.de
+    affiliation: TU Darmstadt
+identifiers:
+  - type: url
+    value: 'https://key-project.org/'
+repository-code: 'https://github.com/keyproject/key'
+url: 'https://key-project.org'
+keywords:
+  - Deductive Verification
+  - Java Verification
+  - Interactive Theorem Prover
+license: GPL-2.0-only
+version: 3.0.0-dev
+date-released: '2026-07-01'
+
