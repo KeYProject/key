@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install hermes
-      - run: pip install git+https://github.com/softwarepub/hermes-plugin-git
+      #- run: pip install git+https://github.com/softwarepub/hermes-plugin-git
 
       - run: hermes harvest
       - run: hermes process
