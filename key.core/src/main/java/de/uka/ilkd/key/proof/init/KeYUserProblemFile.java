@@ -237,6 +237,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>
+     * A {@link Profile} passed at construction time is <em>enforced</em>: the {@code \profile}
+     * declaration of the loaded file is not even read then. Pass {@code null} at construction to
+     * respect the file's declaration (with {@link #getDefaultProfile()} as fallback).
+     * </p>
      */
     @Override
     public Profile getProfile() {
