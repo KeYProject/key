@@ -242,7 +242,17 @@ public class EditSourceFileAction extends KeyAction {
             };
             ActionListener reloadAction = event -> {
                 parent.setVisible(false);
-                MainWindow.getInstance().loadProblem(sourceFile);
+                // Reload the original problem (e.g. the .key file together with its \includes),
+                // NOT the edited source file itself. sourceFile is the file the error pointed at
+                // (often a .java source); loading that bare file would drop the problem's includes
+                // and user-defined symbols, so a spec that is actually fine then fails with a
+                // misleading "Unknown escaped symbol ..." Reload the most-recently-opened problem
+                // instead - it is recorded at load start, so it is still available even though the
+                // current load failed - and fall back to the source file only if none is known.
+                var recentFiles = MainWindow.getInstance().getRecentFiles();
+                String mostRecent = recentFiles != null ? recentFiles.getMostRecent() : null;
+                Path problemFile = mostRecent != null ? Paths.get(mostRecent) : sourceFile;
+                MainWindow.getInstance().loadProblem(problemFile);
             };
             saveButton.addActionListener(saveAction);
             reloadButton.addActionListener(event -> {

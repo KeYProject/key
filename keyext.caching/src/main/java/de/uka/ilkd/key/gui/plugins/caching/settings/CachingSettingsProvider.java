@@ -80,7 +80,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
                 When a referenced proof is pruned, this is what happens to
                  all cached branches that reference it.""",
             0, x -> {
-            }, PRUNE_REOPEN, PRUNE_COPY);
+            }, PRUNE_COPY, PRUNE_REOPEN);
     }
 
     @Override

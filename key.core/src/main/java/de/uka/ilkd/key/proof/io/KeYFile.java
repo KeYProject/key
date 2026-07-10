@@ -27,6 +27,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -251,15 +252,29 @@ public class KeYFile implements EnvInput {
         if (bootClassPath == null) {
             return null;
         }
-        bootClassPath = normalizeStoredPath(bootClassPath);
-        Path bootClassPathFile = Paths.get(bootClassPath);
+        Path bootClassPathFile = Paths.get(normalizeStoredPath(bootClassPath));
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
             Path parentDirectory = file.file().getParent();
-            bootClassPathFile = parentDirectory.resolve(bootClassPath);
+            bootClassPathFile = parentDirectory.resolve(bootClassPathFile);
         }
-
+        if (!Files.isDirectory(bootClassPathFile)) {
+            // Report the missing directory at the \bootclasspath declaration in the .key file,
+            // rather than letting it surface later as a bare exception with no source location.
+            throw new BuildingException(locationOrUndefined(pi, bootClassPath), String.format(
+                "The \\bootclasspath \"%s\" does not exist or is not a directory.",
+                bootClassPathFile));
+        }
         return bootClassPathFile;
+    }
+
+    /**
+     * @return the location at which {@code path} was declared in this file, or
+     *         {@link Location#UNDEFINED} if it is unknown
+     */
+    private static Location locationOrUndefined(ProblemInformation pi, String path) {
+        Location loc = pi.getPathLocation(path);
+        return loc != null ? loc : Location.UNDEFINED;
     }
 
     protected @NonNull ProblemInformation getProblemInformation() {
@@ -280,10 +295,15 @@ public class KeYFile implements EnvInput {
             if (cp == null) {
                 fileList.add(null);
             } else {
-                cp = normalizeStoredPath(cp);
-                var f = Paths.get(cp);
+                var f = Paths.get(normalizeStoredPath(cp));
                 if (!f.isAbsolute()) {
-                    f = parentDirectory.resolve(cp);
+                    f = parentDirectory.resolve(f);
+                }
+                if (!Files.exists(f)) {
+                    // Point at the \classpath declaration in the .key file instead of letting the
+                    // missing directory surface later as a bare, source-less exception.
+                    throw new BuildingException(locationOrUndefined(pi, cp),
+                        String.format("The \\classpath entry \"%s\" does not exist.", f));
                 }
                 fileList.add(f);
             }

@@ -87,14 +87,19 @@ public class InfoView extends JSplitPane implements TabPanel {
 
         private void update() {
             SwingUtilities.invokeLater(() -> {
-                if (mediator.getSelectedGoal() != null) {
-                    updateModel(mediator.getSelectedGoal());
+                Goal goal = mediator.getSelectedGoal();
+                if (goal != null) {
+                    updateModel(goal);
                 } else if (mediator.getSelectedProof() != null) {
                     try {
                         updateModel(mediator.getSelectedProof().openGoals().head());
                     } catch (NoSuchElementException ex) {
                         // nothing possible to do
                     }
+                } else {
+                    // No proof loaded (e.g. the last proof was just closed): clear the info tree
+                    // instead of leaving stale content behind.
+                    updateModel(null);
                 }
             });
         }

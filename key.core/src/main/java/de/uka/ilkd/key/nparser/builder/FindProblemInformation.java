@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
 
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
 
@@ -67,12 +69,24 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public String visitBootClassPath(JavaKeYParser.BootClassPathContext ctx) {
-        return accept(ctx.string_value());
+        String value = accept(ctx.string_value());
+        if (value != null) {
+            information.putPathLocation(value, Location.fromToken(ctx.string_value().getStart()));
+        }
+        return value;
     }
 
     @Override
     public List<String> visitClassPaths(JavaKeYParser.ClassPathsContext ctx) {
-        return mapOf(ctx.string_value());
+        List<String> result = new ArrayList<>(ctx.string_value().size());
+        for (var sv : ctx.string_value()) {
+            String value = accept(sv);
+            result.add(value);
+            if (value != null) {
+                information.putPathLocation(value, Location.fromToken(sv.getStart()));
+            }
+        }
+        return result;
     }
 
     @Override

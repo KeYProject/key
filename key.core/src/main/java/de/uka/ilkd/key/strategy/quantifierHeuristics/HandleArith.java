@@ -28,6 +28,22 @@ public class HandleArith {
 
     private HandleArith() {}
 
+    /** The operator of {@code t} after stripping leading negations. */
+    private static Operator strippedOp(JTerm t) {
+        Operator op = t.op();
+        while (op == Junctor.NOT) {
+            t = t.sub(0);
+            op = t.op();
+        }
+        return op;
+    }
+
+    /** Whether {@code t} (ignoring leading negations) is an integer {@code >=} or {@code <=}. */
+    private static boolean isArithComparison(JTerm t, IntegerLDT ig) {
+        final Operator op = strippedOp(t);
+        return op == ig.getGreaterOrEquals() || op == ig.getLessOrEquals();
+    }
+
     /**
      * try to prove atom by using polynomial
      *
@@ -36,6 +52,12 @@ public class HandleArith {
      *         <code>problem</code> if it cann't be proved.
      */
     public static JTerm provedByArith(JTerm problem, Services services) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        if (!isArithComparison(problem, integerLDT) && strippedOp(problem) != Equality.EQUALS) {
+            // neither an (in)equality nor an equality: formatArithTerm yields false and
+            // provedArithEqual returns the problem unchanged -- bail before locking the cache.
+            return problem;
+        }
         final LRUCache<JTerm, JTerm> provedByArithCache =
             services.getCaches().getProvedByArithFstCache();
         JTerm result;
@@ -47,7 +69,6 @@ public class HandleArith {
         }
 
         TermBuilder tb = services.getTermBuilder();
-        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
         final JTerm trueT = tb.tt();
         final JTerm falseT = tb.ff();
@@ -127,6 +148,13 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static JTerm provedByArith(JTerm problem, JTerm axiom, Services services) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        if (!isArithComparison(problem, integerLDT) || !isArithComparison(axiom, integerLDT)) {
+            // not an arithmetic implication: formatArithTerm would yield false for one side and
+            // this method returns the unproved problem -- bail before allocating the key and
+            // taking the cache lock.
+            return problem;
+        }
         final Pair<JTerm, JTerm> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<JTerm, JTerm>, JTerm> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
@@ -139,7 +167,6 @@ public class HandleArith {
         }
 
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final ServiceCaches caches = services.getCaches();
 
         final JTerm cd = formatArithTerm(problem, tb, integerLDT, caches);

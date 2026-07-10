@@ -9,8 +9,12 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+// WeakStable, not Stable: returns the whole find formula (pos.sequentFormula().formula()), i.e.
+// it reads above the find subterm -- valid only while that formula is unchanged.
+@WeakStableCost
 public class FocusFormulaProjection implements ProjectionToTerm<Goal> {
 
     public static final ProjectionToTerm<Goal> INSTANCE = new FocusFormulaProjection();

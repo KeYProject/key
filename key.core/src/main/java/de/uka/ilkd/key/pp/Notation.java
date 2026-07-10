@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
@@ -661,6 +663,46 @@ public abstract class Notation {
             final String number = printNumberTerm(t);
             if (number != null) {
                 sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+    }
+
+
+    /**
+     * The standard concrete syntax for a real literal {@code __R(unscaledValue, scale)}: prints the
+     * value as a decimal with an {@code r} suffix (e.g. {@code 1.25r}), the inverse of what the
+     * term parser accepts.
+     */
+    static final class RealLiteral extends Notation {
+        public RealLiteral() {
+            super(120);
+        }
+
+        public static String printRealTerm(JTerm realTerm) {
+            if (!realTerm.op().name().equals(RealLDT.REAL_NUMBERS_NAME) || realTerm.arity() != 2) {
+                return null;
+            }
+            final String unscaled = NumLiteral.printNumberTerm(realTerm.sub(0));
+            final String scale = NumLiteral.printNumberTerm(realTerm.sub(1));
+            if (unscaled == null || scale == null) {
+                return null;
+            }
+            try {
+                // reuse the literal's own canonical rendering (FQN: the enclosing notation class
+                // shares its simple name with the AST literal)
+                return new de.uka.ilkd.key.java.ast.expression.literal.RealLiteral(
+                    new BigInteger(unscaled), new BigInteger(scale)).getValue() + "r";
+            } catch (NumberFormatException | ArithmeticException e) {
+                return null;
+            }
+        }
+
+        public void print(JTerm t, LogicPrinter sp) {
+            final String real = printRealTerm(t);
+            if (real != null) {
+                sp.printConstant(real);
             } else {
                 sp.printFunctionTerm(t);
             }

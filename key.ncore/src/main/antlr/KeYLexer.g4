@@ -298,10 +298,14 @@ FALSE
    : 'false'
    ;
    // Keywords related to taclets
-   
+
 SAMEUPDATELEVEL
    : '\\sameUpdateLevel'
-   ; // TODO: make default
+   ;
+
+IGNOREUPDATELEVEL
+   : '\\ignoreUpdateLevel'
+   ;
    
 INSEQUENTSTATE
    : '\\inSequentState'

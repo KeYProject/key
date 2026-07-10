@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -230,6 +231,9 @@ public final class Main implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Debug.ENABLE_DEBUG = debug;
+
+        // weigl: the configuration folder is not fixed anymore since v3.0
+        LOGGER.info("The configuration folder is here {}", PathConfig.currentPaths.keyConfigDir);
 
         try {
             // weigl: You can set assertion status via the system class loader,

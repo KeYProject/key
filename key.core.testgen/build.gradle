@@ -2,8 +2,9 @@ description = "Test Case Generation based on proof attempts."
 
 dependencies {
     implementation project(":key.core")
-    implementation("com.squareup:javapoet:1.13.0")
+    testImplementation(testFixtures(project(":key.core")))
 
-    implementation "info.picocli:picocli:4.7.7"
+    implementation(libs.javapoet)
+    implementation(libs.picocli)
 }
 

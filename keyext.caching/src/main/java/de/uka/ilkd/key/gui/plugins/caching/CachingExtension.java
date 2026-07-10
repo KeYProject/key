@@ -146,7 +146,7 @@ public class CachingExtension
         if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
             return;
         }
-        // new global off switch
+        // new global off switch (toolbar)
         if (!getProofCachingEnabled()) {
             return;
         }
