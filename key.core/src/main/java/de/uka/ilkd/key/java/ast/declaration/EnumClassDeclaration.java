@@ -3,57 +3,70 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used for wrapping an enum into a standard class type.
  *
  * <p>
- * In addition the programvariables that represent enum constants are memorized. Thus this class is
+ * In addition, the programvariables that represent enum constants are memorized. Thus this class is
  * able to have queries on the enum constants.
  *
+ * mulbrich: Update 2025 (a mere 19 years later):
+ * Updated from the old heap model to the new one.
+ *
  * @author mulbrich
- * @since 2006-12-10
+ * @since 2006-12-10, updated 2025-10-24 by MU
  */
-
+@NullMarked
 public class EnumClassDeclaration extends ClassDeclaration {
+    public record EnumEntry(String name, int ordinal, IProgramVariable variable) {
+    }
 
     /**
      * store the program variables which represent the enum constants
+     * in a lookup map from name to (ordinal index, program variable)
      */
-    private final List<IProgramVariable> constants = new ArrayList<>();
+    private final ImmutableList<EnumEntry> constants;
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
      * ClassDeclaration but has memory about which fields have been declared as enum constants.
      *
-     * @param children
-     *        children in the ast (members)
-     * @param fullName
-     *        of the class/enum
-     * @param isLibrary
-     *        see class constructor
+     * @param children children in the ast (members)
+     * @param fullName of the class/enum
+     * @param isLibrary see class constructor
+     * @param enumConstantDeclarations the declarations for the enum constants
      */
-    // TODO javaparser
     public EnumClassDeclaration(
-            ExtList children, ProgramElementName fullName, boolean isLibrary
-    /* , List<EnumConstantDeclaration> enumConstantDeclarations */) {
+            ExtList children, ProgramElementName fullName, boolean isLibrary,
+            List<EnumConstantDeclaration> enumConstantDeclarations) {
         super(children, fullName, isLibrary);
 
-        // for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-        // String constName = ecd.getEnumConstantSpecification().getName();
-        // constants.add(findAttr(constName));
-        // }
+        ImmutableList<EnumEntry> seq = ImmutableSLList.nil();
+        int ordinal = 0;
+        for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
+            String constName = ecd.getNameAsString();
+            seq = seq.prepend(new EnumEntry(constName, ordinal, findAttr(constName)));
+            ordinal++;
+        }
+
+        constants = seq;
     }
 
     /*
@@ -64,11 +77,12 @@ public class EnumClassDeclaration extends ClassDeclaration {
      *
      */
     private IProgramVariable findAttr(String fieldName) {
-        String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
+        // TODO String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
+        String completeName = getFullName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
-                if (fs.getName().equals(completeName)) {
+                if (Objects.equals(fs.getName(), completeName)) {
                     return fs.getProgramVariable();
                 }
             }
@@ -81,12 +95,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * is pv a enum constant of THIS enum?
      */
     private boolean isLocalEnumConstant(IProgramVariable pv) {
-        for (IProgramVariable cnst : constants) {
-            if (cnst.equals(pv)) {
-                return true;
-            }
-        }
-        return false;
+        return constants.stream().anyMatch(it -> it.variable.equals(pv));
     }
 
     /**
@@ -98,7 +107,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private int localIndexOf(ProgramVariable pv) {
         for (int i = 0; i < constants.size(); i++) {
-            if (constants.get(i).equals(pv)) {
+            if (constants.get(i).variable.equals(pv)) {
                 return i;
             }
         }
@@ -142,4 +151,15 @@ public class EnumClassDeclaration extends ClassDeclaration {
         }
     }
 
+
+    /**
+     * get the constant with the given name, including its ordinal index.
+     *
+     * @param fieldName the name of the enum constant
+     * @return a pair of (index, program variable) of the enum constant with the given name or null
+     *         if there is no such constant
+     */
+    public @Nullable EnumEntry getConstant(String fieldName) {
+        return constants.stream().filter(it -> it.name == fieldName).findAny().orElse(null);
+    }
 }
