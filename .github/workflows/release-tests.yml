@@ -50,10 +50,7 @@ jobs:
         run: ./gradlew --parallel assemble
 
       - name: Test mandatory modules with Gradle
-        run: ./gradlew test --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test
-
-      - name: Test optional modules with Gradle
-        run: ./gradlew :key.core.symbolic_execution:test -x :key.core.proof_references:test
+        run: ./gradlew test --continue
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
