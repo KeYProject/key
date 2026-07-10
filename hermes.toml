@@ -1,0 +1,9 @@
+[harvest]
+sources = [ "cff", "git",]
+
+[deposit]
+target = "invenio_rdm"
+
+[deposit.invenio_rdm]
+site_url = "https://sandbox.zenodo.org/"
+access_right = "open"

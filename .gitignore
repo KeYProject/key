@@ -78,3 +78,7 @@ checkstyle-diff.txt
 
 # Java Flight Recorder output (e.g. runJfrProbe default mt-jfr-probe.jfr)
 *.jfr
+
+# Ignoring all HERMES cache files
+.hermes/
+hermes.log
