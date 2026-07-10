@@ -3,12 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-
-import de.uka.ilkd.key.settings.Configuration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -24,31 +20,49 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RecentFileMenuTest {
 
     @Test
-    void mostRecentIsFirstEntryAfterLoad(@TempDir Path tmp) throws Exception {
+    void mostRecentFilesTempFilesAreNotReloadedIfNotExisting(@TempDir Path tmp) throws Exception {
         Path fileA = tmp.resolve("A.key");
         Path fileB = tmp.resolve("B.key");
 
-        Path store = tmp.resolve("recent.props");
-        writeRecentFileStore(store, fileA, fileB);
+        // do not create these files.
+
+        RecentFileMenu menu = new RecentFileMenu(null);
+        menu.addRecentFile(fileA.toAbsolutePath().toString(), null, false, null);
+        menu.addRecentFile(fileB.toAbsolutePath().toString(), null, false, null);
+
+        assertEquals(2, menu.getEntries().size(), "There should be two entries. Filtering happens later");
+
+        Path store = tmp.resolve("recent.json");
+        menu.store(store);
 
         // mainWindow is only stored as a field and not used on the loadFrom/getMostRecent path.
-        RecentFileMenu menu = new RecentFileMenu(null);
+        RecentFileMenu menu2 = new RecentFileMenu(null);
         menu.loadFrom(store);
 
-        assertEquals(fileA.toString(), menu.getMostRecent(),
-            "Reload should target the first (most recent) stored entry");
+        assertEquals(menu.getMostRecent(), menu2.getMostRecent());
+        assertEquals(menu.getEntries(), menu2.getEntries());
     }
 
-    /** Writes a recent-files configuration in the same format {@code RecentFileMenu.store} uses. */
-    private static void writeRecentFileStore(Path store, Path... paths) throws Exception {
-        List<Configuration> entries = java.util.Arrays.stream(paths).map(p -> {
-            Configuration c = new Configuration();
-            c.set("path", p.toString());
-            c.set("singleJava", false);
-            return c;
-        }).toList();
-        try (BufferedWriter w = Files.newBufferedWriter(store)) {
-            new Configuration.ConfigurationWriter(w).printValue(entries);
-        }
+    @Test
+    void mostRecentFilesTempFilesAreNotReloadedIfExisting(@TempDir Path tmp) throws Exception {
+        Path fileA = tmp.resolve("A.key");
+        Path fileB = tmp.resolve("B.key");
+
+        Files.createFile(fileA);
+        Files.createFile(fileB);
+
+        RecentFileMenu menu = new RecentFileMenu(null);
+        menu.addRecentFile(fileA.toAbsolutePath().toString(), null, false, null);
+        menu.addRecentFile(fileB.toAbsolutePath().toString(), null, false, null);
+
+        Path store = tmp.resolve("recent.json");
+        menu.store(store);
+
+        // mainWindow is only stored as a field and not used on the loadFrom/getMostRecent path.
+        RecentFileMenu menu2 = new RecentFileMenu(null);
+        menu.loadFrom(store);
+
+        assertEquals(menu.getMostRecent(), menu2.getMostRecent());
+        assertEquals(menu.getEntries(), menu2.getEntries());
     }
 }

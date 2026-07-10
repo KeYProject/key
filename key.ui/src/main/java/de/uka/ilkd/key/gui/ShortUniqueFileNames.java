@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Algorithm to construct short unique file names for a set of paths.
@@ -93,10 +94,10 @@ public final class ShortUniqueFileNames {
      * @param files unique list of files
      * @return named files
      */
-    public static Name[] makeUniqueNames(String[] files) {
-        Name[] names = new Name[files.length];
-        for (int i = 0; i < files.length; i++) {
-            Name entry = new Name(files[i]);
+    public static Name[] makeUniqueNames(List<String> files) {
+        Name[] names = new Name[files.size()];
+        for (int i = 0; i < files.size(); i++) {
+            Name entry = new Name(files.get(i));
             prepareForInsertionOf(names, i, entry);
             names[i] = entry;
         }
