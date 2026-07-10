@@ -346,10 +346,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
 
         bindRuleSet(d, "polySimp_applyEq",
-            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ)));
+            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ_MONOMIAL_TIEBREAK)));
 
         bindRuleSet(d, "polySimp_applyEqRigid",
-            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ + 1)));
+            add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ_MONOMIAL_TIEBREAK + 1)));
 
         //
         bindRuleSet(d, "defOps_expandModulo",

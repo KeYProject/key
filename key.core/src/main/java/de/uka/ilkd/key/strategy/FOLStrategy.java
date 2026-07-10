@@ -43,6 +43,8 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.FOLCost.*;
+
 /// Strategy for general FOL rules. This does not consider other
 /// theories like integers or Java-specific functions.
 ///
@@ -330,30 +332,30 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                     ifZero(FocusInAntecFeature.getInstance(),
                         applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
                         applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
-                longConst(FOLCost.QUANTIFIER_DISTRIBUTION)));
+                longConst(QUANTIFIER_DISTRIBUTION)));
 
         bindRuleSet(d, "swapQuantifiers",
             add(applyTF(FocusProjection.INSTANCE, add(ff.quantifiedClauseSet,
                 EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
-                longConst(FOLCost.QUANTIFIER_DISTRIBUTION)));
+                longConst(QUANTIFIER_DISTRIBUTION)));
 
         // category "conjunctive normal form"
 
         bindRuleSet(d, "cnf_orAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clause),
                 applyTF("assoc1", ff.clause), applyTF("assoc2", ff.literal),
-                longConst(FOLCost.CNF_RESTRUCTURE - 45)));
+                longConst(CNF_RESTRUCTURE - 45)));
 
         bindRuleSet(d, "cnf_andAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clauseSet),
                 applyTF("assoc1", ff.clauseSet), applyTF("assoc2", ff.clause),
-                longConst(FOLCost.CNF_RESTRUCTURE + 25)));
+                longConst(CNF_RESTRUCTURE + 25)));
 
         bindRuleSet(d, "cnf_dist",
             SumFeature.createSum(applyTF("distRight0", ff.clauseSet),
                 applyTF("distRight1", ff.clauseSet), ifZero(applyTF("distLeft", ff.clause),
-                    longConst(FOLCost.CNF_RESTRUCTURE + 20), applyTF("distLeft", ff.clauseSet)),
-                longConst(FOLCost.CNF_RESTRUCTURE)));
+                    longConst(CNF_RESTRUCTURE + 20), applyTF("distLeft", ff.clauseSet)),
+                longConst(CNF_RESTRUCTURE)));
 
         final TermBuffer superFor = new TermBuffer();
         final Feature onlyBelowQuanAndOr =
@@ -375,16 +377,16 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
                 FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
 
-        bindRuleSet(d, "pullOutQuantifierUnifying", FOLCost.PULL_OUT_QUANTIFIER);
+        bindRuleSet(d, "pullOutQuantifierUnifying", PULL_OUT_QUANTIFIER);
 
         bindRuleSet(d, "pullOutQuantifierAll", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.getInstance(), longConst(FOLCost.PULL_OUT_QUANTIFIER),
-                longConst(FOLCost.PULL_OUT_QUANTIFIER_REVERSE))));
+            ifZero(FocusInAntecFeature.getInstance(), longConst(PULL_OUT_QUANTIFIER),
+                longConst(PULL_OUT_QUANTIFIER_REVERSE))));
 
         bindRuleSet(d, "pullOutQuantifierEx", add(pullOutQuantifierAllowed,
             ifZero(FocusInAntecFeature.getInstance(),
-                longConst(FOLCost.PULL_OUT_QUANTIFIER_REVERSE),
-                longConst(FOLCost.PULL_OUT_QUANTIFIER))));
+                longConst(PULL_OUT_QUANTIFIER_REVERSE),
+                longConst(PULL_OUT_QUANTIFIER))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -469,9 +471,9 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         bindRuleSet(d, "replace_known_right",
             add(commonF,
                 ifZero(directlyBelowSymbolAtIndex(Junctor.IMP, 1),
-                    longConst(FOLCost.REPLACE_KNOWN_UNDER_CONNECTIVE),
+                    longConst(REPLACE_KNOWN_UNDER_CONNECTIVE),
                     ifZero(directlyBelowSymbolAtIndex(Equality.EQV, -1),
-                        longConst(FOLCost.REPLACE_KNOWN_UNDER_CONNECTIVE)))));
+                        longConst(REPLACE_KNOWN_UNDER_CONNECTIVE)))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -523,14 +525,14 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                                     // auxiliary variables
                                     rec(any(), not(selectSkolemConstantTermFeature())))),
                                 countOccurrencesInSeq, // standard costs
-                                longConst(FOLCost.CUT_DIRECT_STANDARD)),
+                                longConst(CUT_DIRECT_STANDARD)),
                             SumFeature // check for cuts below quantifiers
                                     .createSum(applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
                                         applyTF(FocusFormulaProjection.INSTANCE,
                                             ff.quantifiedClauseSet),
                                         ifZero(allowQuantifierSplitting(),
                                             longConst(CostBand.DEFAULT.cost()),
-                                            longConst(FOLCost.CUT_DIRECT_STANDARD))))));
+                                            longConst(CUT_DIRECT_STANDARD))))));
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {

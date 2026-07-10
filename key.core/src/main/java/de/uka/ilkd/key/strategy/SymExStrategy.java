@@ -30,6 +30,8 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.SymExCost.*;
+
 /// Strategy for symbolic execution rules.
 ///
 /// Do not create directly. Use [SymExStrategyFactory] instead.
@@ -90,7 +92,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         switch (methProp) {
             case StrategyProperties.METHOD_CONTRACT ->
-                methodSpecF = methodSpecFeature(longConst(SymExCost.METHOD_CONTRACT_PREFERENCE));
+                methodSpecF = methodSpecFeature(longConst(METHOD_CONTRACT_PREFERENCE));
             case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
                 methodSpecFeature(inftyConst());
             default -> {
@@ -124,7 +126,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                 SumFeature.createSum(
                     loopContractExternalFeature(longConst(CostBand.BLOCK_CONTRACT.cost())),
                     loopContractInternalFeature(
-                        longConst(SymExCost.LOOP_CONTRACT_INTERNAL_TIEBREAK)));
+                        longConst(LOOP_CONTRACT_INTERNAL_TIEBREAK)));
             loopBlockApplyHeadFeature =
                 loopContractApplyHead(longConst(CostBand.BLOCK_CONTRACT.cost()));
         } else {
@@ -137,7 +139,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final String mpsProperty =
             strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
         if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
-            mergeRuleF = mergeRuleFeature(longConst(SymExCost.MERGE_RULE));
+            mergeRuleF = mergeRuleFeature(longConst(MERGE_RULE));
         } else {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
@@ -155,19 +157,19 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
 
         bindRuleSet(d, "simplify_prog",
             ifZero(ThrownExceptionFeature.create(exceptionsWithPenalty, getServices()),
-                longConst(SymExCost.THROWING_PROGRAM_STEP),
+                longConst(THROWING_PROGRAM_STEP),
                 ifZero(isBelow(add(ff.forF, not(ff.atom))),
-                    longConst(SymExCost.PROGRAM_STEP_BELOW_QUANTIFIER),
-                    longConst(SymExCost.PROGRAM_STEP))));
+                    longConst(PROGRAM_STEP_BELOW_QUANTIFIER),
+                    longConst(PROGRAM_STEP))));
 
         bindRuleSet(d, "simplify_prog_subset", longConst(CostBand.EXECUTE.cost()));
 
-        bindRuleSet(d, "simplify_expression", SymExCost.PROGRAM_STEP);
+        bindRuleSet(d, "simplify_expression", PROGRAM_STEP);
 
         bindRuleSet(d, "simplify_java", CostBand.SIMPLIFY.cost());
 
-        bindRuleSet(d, "executeIntegerAssignment", SymExCost.PROGRAM_STEP);
-        bindRuleSet(d, "executeDoubleAssignment", SymExCost.PROGRAM_STEP);
+        bindRuleSet(d, "executeIntegerAssignment", PROGRAM_STEP);
+        bindRuleSet(d, "executeDoubleAssignment", PROGRAM_STEP);
 
         final Feature findDepthFeature =
             FindDepthFeature.getInstance();
@@ -190,7 +192,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_expand",
-            useLoopScopeExpand ? longConst(SymExCost.LOOP_SCOPE_EXPAND) : inftyConst());
+            useLoopScopeExpand ? longConst(LOOP_SCOPE_EXPAND) : inftyConst());
 
 
         final String methProp =
@@ -203,9 +205,9 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                  * is disabled. The original cost was 200 and is now increased to 2000 in order to
                  * repress method expansion stronger when method treatment by contracts is chosen.
                  */
-                bindRuleSet(d, "method_expand", longConst(SymExCost.METHOD_EXPAND_REPRESSED));
+                bindRuleSet(d, "method_expand", longConst(METHOD_EXPAND_REPRESSED));
             case StrategyProperties.METHOD_EXPAND ->
-                bindRuleSet(d, "method_expand", longConst(SymExCost.METHOD_EXPAND));
+                bindRuleSet(d, "method_expand", longConst(METHOD_EXPAND));
             case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
             default -> throw new RuntimeException("Unexpected strategy property " + methProp);
         }
@@ -220,12 +222,12 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                  */
                 bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
             case StrategyProperties.MPS_SKIP ->
-                bindRuleSet(d, "merge_point", longConst(SymExCost.MERGE_POINT_SKIP));
+                bindRuleSet(d, "merge_point", longConst(MERGE_POINT_SKIP));
             case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
             default -> throw new RuntimeException("Unexpected strategy property " + mpsProp);
         }
 
-        bindRuleSet(d, "modal_tautology", longConst(SymExCost.MODAL_TAUTOLOGY));
+        bindRuleSet(d, "modal_tautology", longConst(MODAL_TAUTOLOGY));
 
         if (programsToRight) {
             bindRuleSet(d, "boxDiamondConv",
@@ -233,7 +235,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                     new FindPrefixRestrictionFeature(
                         FindPrefixRestrictionFeature.PositionModifier.ALLOW_UPDATE_AS_PARENT,
                         FindPrefixRestrictionFeature.PrefixChecker.ANTEC_POLARITY),
-                    longConst(SymExCost.BOX_DIAMOND_CONV)));
+                    longConst(BOX_DIAMOND_CONV)));
         } else {
             bindRuleSet(d, "boxDiamondConv", inftyConst());
         }
@@ -244,7 +246,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final TermBuffer superFor = new TermBuffer();
         bindRuleSet(d, "split_if",
             add(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                applyTF(superFor, not(ff.program))), longConst(SymExCost.SPLIT_IF)));
+                applyTF(superFor, not(ff.program))), longConst(SPLIT_IF)));
 
         return d;
     }
