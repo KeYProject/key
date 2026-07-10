@@ -104,20 +104,20 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
         bindRuleSet(d, "defOpsSeqEquality",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
                 ifZero(add(applyTF("left", seqLiteral), applyTF("right", seqLiteral)),
-                    longConst(CostBand.DEFER.at(500)), inftyConst()),
+                    CostBand.DEFER.at(500), inftyConst()),
                 belowModOpPenality));
 
         bindRuleSet(d, "defOpsConcat",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
                 ifZero(
                     or(applyTF("leftStr", not(seqLiteral)), applyTF("rightStr", not(seqLiteral))),
-                    longConst(CostBand.DEFER.at(500))
+                    CostBand.DEFER.at(500)
                 // concat is often introduced for construction purposes,
                 // we do not want to use its definition right at the
                 // beginning
                 ), belowModOpPenality));
 
-        bindRuleSet(d, "stringsSimplify", longConst(CostBand.NORMALIZE.cost()));
+        bindRuleSet(d, "stringsSimplify", CostBand.NORMALIZE.cost());
 
         final TermFeature charOrIntLiteral = or(tf.charLiteral, tf.literal,
             or(add(OperatorClassTF.create(ParametricFunctionInstance.class), // XXX:
@@ -131,14 +131,14 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
         bindRuleSet(d, "defOpsReplace", add(NonDuplicateAppModPositionFeature.INSTANCE,
             ifZero(or(applyTF("str", not(seqLiteral)), applyTF("searchChar", not(charOrIntLiteral)),
-                applyTF("replChar", not(charOrIntLiteral))), longConst(CostBand.DEFER.cost()),
+                applyTF("replChar", not(charOrIntLiteral))), CostBand.DEFER.cost(),
                 inftyConst()),
             belowModOpPenality));
 
         bindRuleSet(d, "stringsReduceSubstring",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(CostBand.DEFER.at(-400))));
+            add(NonDuplicateAppModPositionFeature.INSTANCE, CostBand.DEFER.at(-400)));
 
-        bindRuleSet(d, "defOpsStartsEndsWith", longConst(CostBand.DEFER.at(-250)));
+        bindRuleSet(d, "defOpsStartsEndsWith", CostBand.DEFER.at(-250));
 
         bindRuleSet(d, "stringsConcatNotBothLiterals",
             ifZero(MatchedAssumesFeature.INSTANCE, ifZero(
@@ -146,21 +146,21 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
                     applyTF(instOf("rightStr"), seqLiteral)),
                 inftyConst()), inftyConst()));
 
-        bindRuleSet(d, "stringsReduceConcat", longConst(CostBand.DEFER.at(-400)));
+        bindRuleSet(d, "stringsReduceConcat", CostBand.DEFER.at(-400));
 
         bindRuleSet(d, "stringsReduceOrMoveOutsideConcat",
-            ifZero(NonDuplicateAppModPositionFeature.INSTANCE, longConst(CostBand.DEFER.at(300)),
+            ifZero(NonDuplicateAppModPositionFeature.INSTANCE, CostBand.DEFER.at(300),
                 inftyConst()));
 
         bindRuleSet(d, "stringsMoveReplaceInside",
-            ifZero(NonDuplicateAppModPositionFeature.INSTANCE, longConst(CostBand.DEFER.at(-100)),
+            ifZero(NonDuplicateAppModPositionFeature.INSTANCE, CostBand.DEFER.at(-100),
                 inftyConst()));
 
 
-        bindRuleSet(d, "stringsExpandDefNormalOp", longConst(CostBand.DEFER.cost()));
+        bindRuleSet(d, "stringsExpandDefNormalOp", CostBand.DEFER.cost());
 
         bindRuleSet(d, "stringsContainsDefInline", SumFeature
-                .createSum(EqNonDuplicateAppFeature.INSTANCE, longConst(CostBand.DEFER.at(500))));
+                .createSum(EqNonDuplicateAppFeature.INSTANCE, CostBand.DEFER.at(500)));
     }
 
     @Override

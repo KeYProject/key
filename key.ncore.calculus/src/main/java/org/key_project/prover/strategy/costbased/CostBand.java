@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.strategy.costbased;
 
+import org.key_project.prover.strategy.costbased.feature.ConstFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
 /**
  * The shared, cross-theory priority ladder for the cost-based strategies.
  *
@@ -12,8 +15,11 @@ package org.key_project.prover.strategy.costbased;
  * against <em>every other theory</em> — in practice the theories interleave at almost every
  * step. A band is therefore combination-relevant. The fine ordering of rules <em>within</em> a
  * band is expressed as {@code TIER.at(delta)} with a small delta; ordering that is internal to a
- * single theory lives in that theory (e.g. {@code IntegerCost} for the integer (in)equality and
- * division solver steps), not here.
+ * single theory lives in that theory's cost holder (e.g. {@code LinearInequationCost} for the
+ * integer inequation solver steps), not here. Theory-local constants are deliberately
+ * <em>absolute</em> values on the same cost line, not anchored to a band: they order the theory's
+ * own steps among each other and are unaffected when a tier is retuned — retuning a band moves
+ * exactly those rules that were deliberately placed on it.
  * </p>
  *
  * <p>
@@ -78,21 +84,29 @@ public enum CostBand {
     LAST_RESORT(1_000_000);
 
     private final long base;
+    private final Feature costFeature;
 
     CostBand(long base) {
         this.base = base;
+        this.costFeature = ConstFeature.createConst(NumberRuleAppCost.create(base));
     }
 
-    /** The band's cost. */
-    public long cost() {
-        return base;
+    /** The band's cost, as a constant strategy {@link Feature} (ready to use in feature terms). */
+    public Feature cost() {
+        return costFeature;
     }
 
     /**
-     * The band's cost shifted by a small theory-internal ordering delta. Use only for fine
-     * ordering within the band; larger, cross-theory steps deserve their own band.
+     * The band's cost shifted by a small theory-internal ordering delta, as a constant strategy
+     * {@link Feature}. Use only for fine ordering within the band; larger, cross-theory steps
+     * deserve their own band.
      */
-    public long at(long delta) {
-        return base + delta;
+    public Feature at(long delta) {
+        return ConstFeature.createConst(NumberRuleAppCost.create(base + delta));
+    }
+
+    /** The band's raw cost value. */
+    public long value() {
+        return base;
     }
 }
