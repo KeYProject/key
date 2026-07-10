@@ -10,6 +10,10 @@ package de.uka.ilkd.key.strategy;
  * holder is meant to move with its sub-strategy. Cross-theory levels stay in
  * {@link org.key_project.prover.strategy.costbased.CostBand}; only the arithmetic-internal ordering
  * lives here. All values are byte-identical to the literals they replace.
+ *
+ * The file is named after the integer-arithmetic *theory*; a plain "IntegerCost(s)" would suggest
+ * an integer-valued cost type (an implementation of RuleAppCost) rather than a holder of cost
+ * constants.
  */
 
 /** Polynomial normal-form canonicalisation (Buchberger normalisation) — the "basic" substrate. */

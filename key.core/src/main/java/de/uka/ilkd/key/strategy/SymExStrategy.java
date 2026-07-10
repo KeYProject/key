@@ -115,20 +115,20 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final String blockProperty =
             strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
-            blockFeature = blockContractInternalFeature(longConst(CostBand.BLOCK_CONTRACT.cost()));
+            blockFeature = blockContractInternalFeature(CostBand.BLOCK_CONTRACT.cost());
             loopBlockFeature =
-                loopContractInternalFeature(longConst(CostBand.BLOCK_CONTRACT.cost()));
+                loopContractInternalFeature(CostBand.BLOCK_CONTRACT.cost());
             loopBlockApplyHeadFeature =
-                loopContractApplyHead(longConst(CostBand.BLOCK_CONTRACT.cost()));
+                loopContractApplyHead(CostBand.BLOCK_CONTRACT.cost());
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
-            blockFeature = blockContractExternalFeature(longConst(CostBand.BLOCK_CONTRACT.cost()));
+            blockFeature = blockContractExternalFeature(CostBand.BLOCK_CONTRACT.cost());
             loopBlockFeature =
                 SumFeature.createSum(
-                    loopContractExternalFeature(longConst(CostBand.BLOCK_CONTRACT.cost())),
+                    loopContractExternalFeature(CostBand.BLOCK_CONTRACT.cost()),
                     loopContractInternalFeature(
                         longConst(LOOP_CONTRACT_INTERNAL_TIEBREAK)));
             loopBlockApplyHeadFeature =
-                loopContractApplyHead(longConst(CostBand.BLOCK_CONTRACT.cost()));
+                loopContractApplyHead(CostBand.BLOCK_CONTRACT.cost());
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
             loopBlockFeature = loopContractExternalFeature(inftyConst());
@@ -162,7 +162,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                     longConst(PROGRAM_STEP_BELOW_QUANTIFIER),
                     longConst(PROGRAM_STEP))));
 
-        bindRuleSet(d, "simplify_prog_subset", longConst(CostBand.EXECUTE.cost()));
+        bindRuleSet(d, "simplify_prog_subset", CostBand.EXECUTE.cost());
 
         bindRuleSet(d, "simplify_expression", PROGRAM_STEP);
 
@@ -174,7 +174,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final Feature findDepthFeature =
             FindDepthFeature.getInstance();
         bindRuleSet(d, "concrete_java",
-            add(longConst(CostBand.REWRITE.cost()),
+            add(CostBand.REWRITE.cost(),
                 ScaleFeature.createScaled(findDepthFeature, 10.0)));
 
         // taclets for special invariant handling

@@ -158,7 +158,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "order_terms",
             add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
                 monSmallerThan("commEqLeft", "commEqRight", numbers),
-                longConst(CostBand.NORMALIZE.cost())));
+                CostBand.NORMALIZE.cost()));
 
         final TermBuffer equation = new TermBuffer();
         final TermBuffer left = new TermBuffer();
@@ -402,7 +402,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                         add(NotInScopeOfModalityFeature.INSTANCE, ifZero(isReduciblePolyE,
                             // try again later
                             longConst(-DivModCost.POLY_DIVISION)))))),
-                longConst(CostBand.DEFAULT.at(100))));
+                CostBand.DEFAULT.at(100)));
 
     }
 
@@ -576,7 +576,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // category "handling of non-linear inequations"
 
         if (arithNonLinInferences()) {
-            setupMultiplyInequations(d, longConst(CostBand.DEFAULT.at(100)));
+            setupMultiplyInequations(d, CostBand.DEFAULT.at(100));
 
             bindRuleSet(d, "inEqSimp_split_eq",
                 add(TopLevelFindFeature.SUCC, longConst(NonlinearArithmeticCost.SPLIT_EQ)));
@@ -699,9 +699,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             ifZero(MatchedAssumesFeature.INSTANCE,
                 SumFeature.createSum(
                     applyTF("multFacLeft", tf.nonNegMonomial),
-                    ifZero(applyTF("multRight", tf.literal), longConst(CostBand.DEFAULT.at(-100))),
+                    ifZero(applyTF("multRight", tf.literal), CostBand.DEFAULT.at(-100)),
                     ifZero(applyTF("multFacRight", tf.literal),
-                        longConst(CostBand.DEFAULT.at(-100)),
+                        CostBand.DEFAULT.at(-100),
                         applyTF("multFacRight", tf.polynomial)),
                     /*
                      * ifZero ( applyTF ( "multRight", tf.literal ), longConst ( -100 ), applyTF (
@@ -710,8 +710,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                      */
                     not(TermSmallerThanFeature.create(FocusProjection.create(0),
                         AssumptionProjection.create(0))),
-                    ifZero(exactlyBounded, longConst(CostBand.DEFAULT.cost()),
-                        ifZero(totallyBounded, longConst(CostBand.DEFAULT.at(100)), notAllowedF))
+                    ifZero(exactlyBounded, CostBand.DEFAULT.cost(),
+                        ifZero(totallyBounded, CostBand.DEFAULT.at(100), notAllowedF))
                 /*
                  * ifZero ( partiallyBounded, longConst ( 400 ), notAllowedF ) ) ),
                  */
@@ -850,9 +850,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 forEach(rootInf, RootsGenerator.create(intRel, getServices()),
                     add(instantiate("cutFormula", rootInf),
                         ifZero(applyTF(rootInf, op(Junctor.OR)),
-                            longConst(CostBand.DEFAULT.at(50))),
+                            CostBand.DEFAULT.at(50)),
                         ifZero(applyTF(rootInf, op(Junctor.AND)),
-                            longConst(CostBand.DEFAULT.at(20))))),
+                            CostBand.DEFAULT.at(20)))),
                 longConst(NonlinearArithmeticCost.MULTIPLY)));
 
         // noinspection unchecked

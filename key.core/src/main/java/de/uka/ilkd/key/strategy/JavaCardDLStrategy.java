@@ -192,7 +192,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         bindRuleSet(d, "simplify_literals",
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
             // longConst ( 0 ),
-            longConst(CostBand.ELIMINATE.cost()));
+            CostBand.ELIMINATE.cost());
 
         bindRuleSet(d, "nonDuplicateAppCheckEq", EqNonDuplicateAppFeature.INSTANCE);
 
@@ -219,7 +219,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
         switch (queryAxProp) {
             case StrategyProperties.QUERYAXIOM_ON ->
-                bindRuleSet(d, "query_axiom", longConst(CostBand.SOLVE.cost()));
+                bindRuleSet(d, "query_axiom", CostBand.SOLVE.cost());
             case StrategyProperties.QUERYAXIOM_OFF -> bindRuleSet(d, "query_axiom", inftyConst());
             default -> throw new RuntimeException("Unexpected strategy property " + queryAxProp);
         }
@@ -237,7 +237,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         // partial inv axiom
         bindRuleSet(d, "partialInvAxiom",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(CostBand.DEFER_STRONG.cost())));
+                CostBand.DEFER_STRONG.cost()));
 
         // inReachableState
         bindRuleSet(d, "inReachableStateImplication",
@@ -268,7 +268,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             bindRuleSet(d, "auto_induction_lemma", inftyConst());
         }
 
-        bindRuleSet(d, "information_flow_contract_appl", longConst(CostBand.LAST_RESORT.cost()));
+        bindRuleSet(d, "information_flow_contract_appl", CostBand.LAST_RESORT.cost());
 
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON)
                 || strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
