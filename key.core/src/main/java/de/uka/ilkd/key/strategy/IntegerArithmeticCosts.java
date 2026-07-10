@@ -46,14 +46,15 @@ final class LinearEquationCost {
     /** polySimp_balance, polySimp_normalise. */
     static final long BALANCE = -30;
     /**
-     * polySimp_applyEq — the monomial-coefficient-specialised equation application (the general
-     * demodulation cost is {@link CombinationCost#ORDERED_REWRITING}). The rigid variant
-     * polySimp_applyEqRigid is written {@code APPLY_EQ + 1} at the call site; that +1 is only an
-     * (uninteresting) tie-break between the two rules, a step-3 candidate to flatten to a single
-     * cost. Step-3 idea: test whether this specialised variant is needed at all, or should just be
-     * a small delta preferring the original {@code apply_equations} rules.
+     * polySimp_applyEq — a small tie-break rider on top of the general demodulation cost
+     * {@link CombinationCost#ORDERED_REWRITING} (the {@code apply_eq_monomials} taclet carries both
+     * rule sets, so the effective cost is their sum). The rigid variant polySimp_applyEqRigid is
+     * written {@code APPLY_EQ_MONOMIAL_TIEBREAK + 1} at the call site; that +1 is only an
+     * (uninteresting) tie-break between the two rules, a step-3 candidate to flatten. Step-3 idea:
+     * test whether this specialised variant is needed at all, or should just be a small delta
+     * preferring the original {@code apply_equations} rules.
      */
-    static final long APPLY_EQ = 1;
+    static final long APPLY_EQ_MONOMIAL_TIEBREAK = 1;
 }
 
 

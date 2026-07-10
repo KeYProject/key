@@ -30,6 +30,8 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StringCost.*;
+
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
@@ -71,7 +73,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
     private void setUpStringNormalisation(RuleSetDispatchFeature d) {
         // translates an integer into its string representation
-        bindRuleSet(d, "integerToString", StringCost.INTEGER_TO_STRING);
+        bindRuleSet(d, "integerToString", INTEGER_TO_STRING);
 
         // do not convert char to int when inside a string function
         // feature used to recognize if one is inside a string literal
@@ -85,7 +87,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
                 or(op(charListLDT.getClReplace()), op(charListLDT.getClLastIndexOfChar()))));
 
         bindRuleSet(d, "charLiteral_to_intLiteral",
-            ifZero(isBelow(keepChar), inftyConst(), longConst(StringCost.CHAR_TO_INT_LITERAL)));
+            ifZero(isBelow(keepChar), inftyConst(), longConst(CHAR_TO_INT_LITERAL)));
 
         // establish normalform
 
@@ -97,7 +99,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
             or(op(seqLDT.getSeqSingleton()), or(anyLiteral, inftyTermConst()))));
 
         Feature belowModOpPenality =
-            ifZero(isBelow(ff.modalOperator), longConst(StringCost.BELOW_MODALITY));
+            ifZero(isBelow(ff.modalOperator), longConst(BELOW_MODALITY));
 
         bindRuleSet(d, "defOpsSeqEquality",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
@@ -124,7 +126,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
         bindRuleSet(d, "defOpsReplaceInline",
             ifZero(add(applyTF("str", seqLiteral), applyTF("searchChar", charOrIntLiteral),
-                applyTF("replChar", charOrIntLiteral)), longConst(StringCost.REPLACE_INLINE),
+                applyTF("replChar", charOrIntLiteral)), longConst(REPLACE_INLINE),
                 inftyConst()));
 
         bindRuleSet(d, "defOpsReplace", add(NonDuplicateAppModPositionFeature.INSTANCE,
