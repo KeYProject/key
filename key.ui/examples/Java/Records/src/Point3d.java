@@ -1,8 +1,6 @@
-record Point3d(int x, int y, int z) {}
-
-public class Use {
+record Point3d(int x, int y, int z) {
     /*@ normal_behavior ensures true; requires true; */
-    public void m() {
+    public static void m() {
         Point3d p = new Point3d(1, 2, 3);
 
         //boolean b= p.equals(p);
