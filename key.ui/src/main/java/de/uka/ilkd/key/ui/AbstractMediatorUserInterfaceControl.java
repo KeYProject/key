@@ -172,9 +172,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             });
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
-            // it again at the right time
+            // it again at the right time.
             ThreadUtilities.invokeAndWait(() -> {
-                getMediator().initiateAutoMode(info.getProof(), true, false);
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
             });
         }
     }
