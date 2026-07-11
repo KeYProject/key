@@ -148,6 +148,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         // //////////////////////////////////////////////////////////////////////
 
         this.btnGo = new JButton();
+        this.btnGo.putClientProperty("isAutoButton", Boolean.TRUE);
 
         JPanel timeout = createDefaultPanel(components);
 
