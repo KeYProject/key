@@ -76,7 +76,11 @@ public class RecentFileMenu {
 
         // menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
+    }
 
+    /// Loads entries from the current default configuration folder.
+    /// @see PathConfig.KeyPaths#recentFileStorage
+    public void loadEntries() {
         if (Files.exists(PathConfig.currentPaths.recentFileStorage)) {
             loadFrom(PathConfig.currentPaths.recentFileStorage);
         } else {
@@ -111,7 +115,7 @@ public class RecentFileMenu {
         }
     }
 
-    private void addRecentFileNoSave(final String path,
+    void addRecentFileNoSave(final String path,
             @Nullable Profile profile,
             boolean singleJava,
             @Nullable Configuration additionalOption) {
@@ -335,6 +339,36 @@ public class RecentFileMenu {
                 menuItem = new JMenuItem(new RecentFileAction(this));
             }
             return menuItem;
+        }
+
+        @Override
+        public String toString() {
+            return "RecentFileEntry{" +
+                "additionalOption=" + additionalOption +
+                ", path='" + path + '\'' +
+                ", profile='" + profile + '\'' +
+                ", singleJava=" + singleJava +
+                '}';
+        }
+
+        @Override
+        public final boolean equals(Object o) {
+            if (!(o instanceof RecentFileEntry that))
+                return false;
+
+            return singleJava == that.singleJava
+                    && path.equals(that.path)
+                    && Objects.equals(profile, that.profile)
+                    && Objects.equals(additionalOption, that.additionalOption);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = path.hashCode();
+            result = 31 * result + Objects.hashCode(profile);
+            result = 31 * result + Boolean.hashCode(singleJava);
+            result = 31 * result + Objects.hashCode(additionalOption);
+            return result;
         }
     }
 

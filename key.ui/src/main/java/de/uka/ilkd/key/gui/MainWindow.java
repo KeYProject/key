@@ -331,6 +331,8 @@ public final class MainWindow extends JFrame {
 
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
+        // Postpone load for faster UI creation.
+        SwingUtilities.invokeLater(recentFileMenu::loadEntries);
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
