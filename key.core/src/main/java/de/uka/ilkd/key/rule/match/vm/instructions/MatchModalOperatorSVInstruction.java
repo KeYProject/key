@@ -14,6 +14,11 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+/**
+ * Matches a modal-operator schema variable against a concrete Java modality kind: the source kind
+ * must be one of the kinds the schema variable ranges over, and the schema variable is
+ * instantiated with it.
+ */
 public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
     private final Set<JModality.JavaModalityKind> modalityKinds;

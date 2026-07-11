@@ -15,7 +15,11 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * This match instruction implements the matching logic for term labels.
+ * Matches the term labels of a labelled pattern term, in place (the cursor does not move; the
+ * current element is the labelled term itself). Only label <em>schema variables</em> in the
+ * pattern participate: each one is instantiated with the source term's whole label set (or, if
+ * already instantiated, all of its labels must occur on the source term); concrete pattern labels
+ * are ignored. See the in-code TODO for the intended refinement of these semantics.
  */
 public class MatchTermLabelInstruction implements MatchInstruction {
 

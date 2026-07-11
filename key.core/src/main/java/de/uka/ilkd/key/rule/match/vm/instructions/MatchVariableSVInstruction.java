@@ -11,6 +11,11 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+/**
+ * Matches a variable schema variable ({@code \variables}): the source term's operator must be a
+ * quantifiable variable, and it must be the very variable the schema variable is already
+ * instantiated with (or the schema variable is instantiated with it now).
+ */
 public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
 
     protected MatchVariableSVInstruction(VariableSV op) {

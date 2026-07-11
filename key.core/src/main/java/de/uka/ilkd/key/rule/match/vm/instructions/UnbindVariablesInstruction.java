@@ -10,6 +10,11 @@ import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+/**
+ * Closes the binding scope opened by {@link BindVariablesInstruction}: it pops the renaming table
+ * to its previous level. Interpreter-only — the compiled back-end unbinds via
+ * {@code MatchConditions.shrinkRenameTable()} directly.
+ */
 public class UnbindVariablesInstruction implements VMInstruction {
     @Override
     public MatchResultInfo match(PoolSyntaxElementCursor cursor,
