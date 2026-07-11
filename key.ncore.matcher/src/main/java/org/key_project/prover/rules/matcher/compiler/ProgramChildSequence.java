@@ -32,13 +32,20 @@ import org.jspecify.annotations.Nullable;
  */
 public final class ProgramChildSequence {
 
-    /** one pre-compiled child: either a list SV or a fixed child's matcher, never both */
-    private record CompiledChild(@Nullable SchemaVariable listSV, @Nullable MatchProgram matcher) {
+    /** one pre-compiled child: either a list schema variable or a fixed child's matcher */
+    private sealed interface CompiledChild {
         static CompiledChild of(ProgramMatchPlan child) {
             final SchemaVariable sv = child.listSV();
-            return sv != null ? new CompiledChild(sv, null)
-                    : new CompiledChild(null, child.compile());
+            return sv != null ? new ListSVChild(sv) : new FixedChild(child.compile());
         }
+    }
+
+    /** a list-SV child: consumes a greedy run of source children */
+    private record ListSVChild(SchemaVariable listSV) implements CompiledChild {
+    }
+
+    /** a fixed child: matches exactly one source child with its pre-compiled matcher */
+    private record FixedChild(MatchProgram matcher) implements CompiledChild {
     }
 
     private final CompiledChild[] children;
@@ -59,7 +66,7 @@ public final class ProgramChildSequence {
         boolean varArity = false;
         for (int i = 0; i < plans.length; i++) {
             children[i] = CompiledChild.of(plans[i]);
-            varArity |= children[i].listSV() != null;
+            varArity |= children[i] instanceof ListSVChild;
         }
         return new ProgramChildSequence(children, listSVMatcher, varArity);
     }
@@ -84,7 +91,8 @@ public final class ProgramChildSequence {
             MatchResultInfo mc, LogicServices services) {
         MatchResultInfo r = mc;
         for (int i = 0; i < children.length; i++) {
-            r = children[i].matcher().match(parent.getChild(startChild + i), r, services);
+            r = ((FixedChild) children[i]).matcher().match(parent.getChild(startChild + i), r,
+                services);
             if (r == null) {
                 return null;
             }
@@ -102,14 +110,14 @@ public final class ProgramChildSequence {
             LogicServices services) {
         MatchResultInfo r = mc;
         for (final CompiledChild child : children) {
-            if (child.listSV() != null) {
-                r = matchListRun(child.listSV(), source, r, services);
+            if (child instanceof ListSVChild listChild) {
+                r = matchListRun(listChild.listSV(), source, r, services);
             } else {
                 final SyntaxElement sourceChild = source.getSource();
                 if (sourceChild == null) {
                     return null;
                 }
-                r = child.matcher().match(sourceChild, r, services);
+                r = ((FixedChild) child).matcher().match(sourceChild, r, services);
                 if (r != null) {
                     source.next();
                 }
