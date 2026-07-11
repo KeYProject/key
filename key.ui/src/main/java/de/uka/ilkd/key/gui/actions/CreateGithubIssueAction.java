@@ -5,15 +5,14 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBrands;
@@ -24,8 +23,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 
 /**
  * This action allows the creation of Github issues with more ease.
@@ -123,10 +120,10 @@ public class CreateGithubIssueAction extends MainWindowAction {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setEditable(false);
-        
+
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        
+
         JButton copyButton = new JButton("Copy to Clipboard & Open Github");
         copyButton.addActionListener(e -> {
             textArea.selectAll();
@@ -139,19 +136,20 @@ public class CreateGithubIssueAction extends MainWindowAction {
             } catch (IOException ignore) {
             }
         });
-        
+
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> SwingUtilities.getWindowAncestor(closeButton).dispose());
-        
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(copyButton);
         buttonPanel.add(closeButton);
-        
+
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        JOptionPane pane = new JOptionPane(contentPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.NO_OPTION);
+
+        JOptionPane pane =
+            new JOptionPane(contentPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.NO_OPTION);
         JDialog dialog = pane.createDialog(mainWindow, "Generated GitHub Issue Text");
         dialog.setVisible(true);
     }
