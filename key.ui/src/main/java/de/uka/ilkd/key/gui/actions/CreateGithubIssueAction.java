@@ -25,6 +25,8 @@ import de.uka.ilkd.key.util.KeYConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+
 /**
  * This action allows the creation of Github issues with more ease.
  * <p>
@@ -76,10 +78,9 @@ public class CreateGithubIssueAction extends MainWindowAction {
         String java = "";
         Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
         if (proof != null) {
-            File javaSourceLocation = SendFeedbackAction.getJavaSourceLocation(proof);
+            var javaSourceLocation = SendFeedbackAction.getJavaSourceLocation(proof);
             if (javaSourceLocation != null) {
-                Path path = javaSourceLocation.toPath();
-                try (final var walker = Files.walk(path)) {
+                try (final var walker = Files.walk(javaSourceLocation)) {
                     java = walker.map(it -> {
                         try {
                             if (it.getFileName().toString().endsWith(".java")) {
@@ -105,8 +106,53 @@ public class CreateGithubIssueAction extends MainWindowAction {
         try {
             Desktop.getDesktop().browse(uri);
         } catch (IOException e) {
-            LOGGER.error("Could not open browser for URI {}.", uri, e);
+            LOGGER.error("Could not open browser for URI", e);
+            showGeneratedTextDialog(body);
         }
 
+    }
+
+    /**
+     * Shows a dialog with the generated text that can be copied by the user.
+     *
+     * @param text the text to display
+     */
+    private void showGeneratedTextDialog(String text) {
+        JTextArea textArea = new JTextArea(20, 60);
+        textArea.setText(text);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JButton copyButton = new JButton("Copy to Clipboard & Open Github");
+        copyButton.addActionListener(e -> {
+            textArea.selectAll();
+            textArea.copy();
+            textArea.setSelectionStart(0);
+            textArea.setSelectionEnd(0);
+
+            try {
+                Desktop.getDesktop().browse(URI.create(URL));
+            } catch (IOException ignore) {
+            }
+        });
+        
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> SwingUtilities.getWindowAncestor(closeButton).dispose());
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(copyButton);
+        buttonPanel.add(closeButton);
+        
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        JOptionPane pane = new JOptionPane(contentPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.NO_OPTION);
+        JDialog dialog = pane.createDialog(mainWindow, "Generated GitHub Issue Text");
+        dialog.setVisible(true);
     }
 }

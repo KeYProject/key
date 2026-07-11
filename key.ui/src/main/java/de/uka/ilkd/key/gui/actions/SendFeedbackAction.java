@@ -3,24 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.net.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTMLEditorKit;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,19 +14,38 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.parsing.Location;
-
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.HTMLEditorKit;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations: In
  * {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
- *
+ * <p>
  * For a documentation of the backend of the auto-send mechanism, refer to the file key-report.php
  * in the same directory as this file.
  *
@@ -53,8 +54,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SendFeedbackAction extends AbstractAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendFeedbackAction.class);
-
-    private static final long serialVersionUID = 8146108238901822515L;
 
     /*
      * This is the email address to which feedback will be sent.
@@ -78,7 +77,7 @@ public class SendFeedbackAction extends AbstractAction {
      * @param proof the Proof
      * @return the location of the java source code or null if no such exists
      */
-    public static @Nullable File getJavaSourceLocation(Proof proof) {
+    public static @Nullable Path getJavaSourceLocation(Proof proof) {
         KeyAst.@Nullable Declarations header = proof.header();
         if (header == null)
             return null;
@@ -133,7 +132,7 @@ public class SendFeedbackAction extends AbstractAction {
             } catch (Exception e) {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
-                    + e.getMessage() + "\n" + serializeStackTrace(e))
+                        + e.getMessage() + "\n" + serializeStackTrace(e))
                         .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
@@ -151,7 +150,7 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         byte[] retrieveFileData() throws Exception {
             File mostRecentFile = new File(
-                MainWindow.getInstance().getRecentFiles().getMostRecent());
+                    MainWindow.getInstance().getRecentFiles().getMostRecent());
             return Files.readAllBytes(mostRecentFile.toPath());
         }
 
@@ -159,7 +158,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 String file =
-                    MainWindow.getInstance().getRecentFiles().getMostRecent();
+                        MainWindow.getInstance().getRecentFiles().getMostRecent();
                 return file != null && file.length() != 0;
             } catch (Exception e) {
                 return false;
@@ -318,33 +317,33 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                File javaSourceLocation = getJavaSourceLocation(proof);
+                File javaSourceLocation = getJavaSourceLocation(proof).toFile();
                 return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
             }
         }
 
-        private void getJavaFilesRecursively(File directory, List<File> list) {
-            for (File f : directory.listFiles()) {
-                if (f.isDirectory()) {
-                    getJavaFilesRecursively(f, list);
-                } else if (f.getName().endsWith(".java")) {
-                    list.add(f);
-                }
+        private List<Path> getJavaFilesRecursively(Path directory) {
+            try (var stream = Files.walk(directory)) {
+                return stream
+                        .filter(it -> it.toString().endsWith(".java")
+                                || it.toString().endsWith(".jml"))
+                        .toList();
+            } catch (IOException e) {
+                return List.of();
             }
         }
 
         @Override
         void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-            File javaSourceLocation = getJavaSourceLocation(proof);
-            List<File> javaFiles = new LinkedList<>();
-            getJavaFilesRecursively(javaSourceLocation, javaFiles);
-            for (File f : javaFiles) {
+            Path javaSourceLocation = getJavaSourceLocation(proof);
+            List<Path> javaFiles = getJavaFilesRecursively(javaSourceLocation);
+            for (Path f : javaFiles) {
                 stream.putNextEntry(
-                    new ZipEntry("javaSource/" + javaSourceLocation.toURI().relativize(f.toURI())));
-                stream.write(Files.readAllBytes(f.toPath()));
+                        new ZipEntry("javaSource/" + javaSourceLocation.relativize(f)));
+                stream.write(Files.readAllBytes(f));
                 stream.closeEntry();
             }
         }
@@ -369,9 +368,9 @@ public class SendFeedbackAction extends AbstractAction {
             if (answer == JFileChooser.APPROVE_OPTION) {
                 saveMetaDataToFile(jfc.getSelectedFile(), message);
                 JOptionPane.showMessageDialog(parent,
-                    String.format("Your message has been saved to the file %s.\n"
-                        + "If you want to report a bug, you can enclose this file in an\n"
-                        + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
+                        String.format("Your message has been saved to the file %s.\n"
+                                + "If you want to report a bug, you can enclose this file in an\n"
+                                + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
             LOGGER.error("", e);
@@ -382,15 +381,15 @@ public class SendFeedbackAction extends AbstractAction {
     private void sendReport(String message) {
 
         String[] msgs = {
-            // tp.setEditable(false);
-            // tp.setBackground(UIManager.getColor("label.background"));
-            // tp.setEditorKit(new HTMLEditorKit());
-            // tp.setText("<html>" +
-            "The data you have collected and the description text will now be sent via",
-            "https to the server formal.kastel.kit.edu, stored on the server and forwarded",
-            "to the KeY mailing list.", "", "Click OK if you want to send the report now." };
+                // tp.setEditable(false);
+                // tp.setBackground(UIManager.getColor("label.background"));
+                // tp.setEditorKit(new HTMLEditorKit());
+                // tp.setText("<html>" +
+                "The data you have collected and the description text will now be sent via",
+                "https to the server formal.kastel.kit.edu, stored on the server and forwarded",
+                "to the KeY mailing list.", "", "Click OK if you want to send the report now."};
         int answer = JOptionPane.showConfirmDialog(parent, msgs, "Ready to send?",
-            JOptionPane.YES_NO_OPTION);
+                JOptionPane.YES_NO_OPTION);
         if (answer != JOptionPane.YES_OPTION) {
             return;
         }
@@ -402,7 +401,7 @@ public class SendFeedbackAction extends AbstractAction {
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/zip");
             connection.setRequestProperty("KeY-Version",
-                "KeY " + KeYResourceManager.getManager().getVersion());
+                    "KeY " + KeYResourceManager.getManager().getVersion());
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(buffer.toByteArray());
             }
@@ -414,7 +413,7 @@ public class SendFeedbackAction extends AbstractAction {
             } else {
                 String msg = Streams.toString(((HttpURLConnection) connection).getErrorStream());
                 throw new IOException(
-                    "The server responded with an error message (" + responseCode + "): " + msg);
+                        "The server responded with an error message (" + responseCode + "): " + msg);
             }
 
         } catch (Exception e) {
@@ -445,9 +444,9 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private final SendFeedbackItem[] items = { new StacktraceItem(), new FaultyFileItem(),
-        new LastLoadedProblemItem(), new VersionItem(), new SystemPropertiesItem(),
-        new OpenGoalItem(), new OpenProofItem(), new SettingsItem(), new JavaSourceItem() };
+    private final SendFeedbackItem[] items = {new StacktraceItem(), new FaultyFileItem(),
+            new LastLoadedProblemItem(), new VersionItem(), new SystemPropertiesItem(),
+            new OpenGoalItem(), new OpenProofItem(), new SettingsItem(), new JavaSourceItem()};
 
     private final Throwable throwable;
     private final Window parent;
@@ -465,7 +464,7 @@ public class SendFeedbackAction extends AbstractAction {
     private JDialog makeDialog() {
 
         final JDialog dialog = new JDialog(parent, "Report an error to KeY developers",
-            Dialog.ModalityType.DOCUMENT_MODAL);
+                Dialog.ModalityType.DOCUMENT_MODAL);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel right = new JPanel();
@@ -499,8 +498,8 @@ public class SendFeedbackAction extends AbstractAction {
 
         JButton saveFeedbackReportButton = new JButton("Save Feedback...");
         saveFeedbackReportButton.setToolTipText(
-            "<html>Information about current proof state are saved to a file.<br>"
-                + "This file can be also used when reporting a bug via e-mail.");
+                "<html>Information about current proof state are saved to a file.<br>"
+                        + "This file can be also used when reporting a bug via e-mail.");
         saveFeedbackReportButton.addActionListener(e -> {
             saveZIP(bugDescription.getText());
             dialog.dispose();
@@ -509,8 +508,8 @@ public class SendFeedbackAction extends AbstractAction {
         JButton sendFeedbackReportButton = new JButton("Send Feedback...");
         sendFeedbackReportButton
                 .setToolTipText("<html>Information about current proof state are sent via a "
-                    + "secure https connection to the developers.<br>"
-                    + "The receiving server is located at KIT (formal.kastel.kit.edu).");
+                        + "secure https connection to the developers.<br>"
+                        + "The receiving server is located at KIT (formal.kastel.kit.edu).");
         sendFeedbackReportButton.addActionListener(e -> {
             sendReport(bugDescription.getText());
             dialog.dispose();
@@ -529,12 +528,12 @@ public class SendFeedbackAction extends AbstractAction {
         labels.setBackground(UIManager.getColor("Label.background"));
         labels.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         labels.setText(
-            "<html>The report feature can be used to send information about your current state of KeY to report a bug or to ask for advice from the KeY team.<br>"
-                + "You can either store the information in a zip locally (and then e.g. send that via e-mail to "
-                + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
-                + "Please select the information that you want to include from the list on the right.<br>"
-                + "If you send the information directly, <b>please make sure to indicate your e-mail address</b> "
-                + "in the message below such that the team can respond.");
+                "<html>The report feature can be used to send information about your current state of KeY to report a bug or to ask for advice from the KeY team.<br>"
+                        + "You can either store the information in a zip locally (and then e.g. send that via e-mail to "
+                        + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
+                        + "Please select the information that you want to include from the list on the right.<br>"
+                        + "If you send the information directly, <b>please make sure to indicate your e-mail address</b> "
+                        + "in the message below such that the team can respond.");
         Container container = dialog.getContentPane();
         container.setLayout(new BorderLayout());
         container.add(labels, BorderLayout.NORTH);
