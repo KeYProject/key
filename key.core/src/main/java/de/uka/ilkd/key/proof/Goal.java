@@ -16,7 +16,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -774,50 +773,37 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     /*
-     * when the new goals are created during splitting, their namespaces cannot be fixed yet as new
-     * symbols may still be added.
+     * When the new goals are created during splitting, their namespaces cannot be fixed yet as new
+     * symbols may still be added; this finalizes them once the rule application has committed.
      *
-     * Now, remember the freshly created symbols in the nodes and set fresh local namespaces.
+     * The symbols minted by this step are remembered in each new goal's NODE-local storage (which
+     * accumulates down the branch, see Node -- this is also what proof saving/reloading uses), and
+     * each goal's local namespaces are then rebuilt from the immutable shared base plus that
+     * node-local storage: exactly the reconstruction resetLocalSymbols performs on pruning, for
+     * every prover. The shared proof namespace is never touched, so under the parallel prover the
+     * workers' concurrent matching can read it lock-free; fresh names stay branch-locally unique by
+     * construction (minting searches the goal-local namespaces, #3851) -- global uniqueness is not
+     * required, sibling branches reuse names by design.
      *
-     * The
+     * Historically the single-core prover instead layered the namespaces incrementally
+     * (flushToParent plus first-goal-inherits/siblings-copy), with the rebuild used only for the
+     * parallel prover. The two produce the same visible symbols -- the only consumer of the layer
+     * STRUCTURE (CloseAfterMerge, collecting a goal's symbols from its top and parent layers)
+     * sees the full symbol set in both forms -- and every prune already replaced the layered form
+     * with the rebuilt one, so the rebuild is the single battle-tested shape both provers now use.
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
+        // Only program variables and functions are harvested: these are the only namespace kinds
+        // rules register in a goal's local namespaces (logical variables, in particular, are
+        // registered proof-globally or occur only bound inside terms). A rule that registered a
+        // symbol of another kind goal-locally would lose it in the rebuild below.
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
         Collection<Function> newFunctions = localNamespaces.functions().elements();
 
-        if (ParallelProver.isMultiThreadedRunActive()) {
-            // Multithreaded run: do NOT flush new symbols into the shared proof namespace, so it
-            // stays immutable and concurrent matching can read it lock-free. The symbols live in
-            // node-local storage (which accumulates down the branch, see Node), and each goal's
-            // local namespaces are rebuilt from the immutable shared base plus that node-local
-            // storage -- exactly the reconstruction resetLocalSymbols already performs on pruning.
-            // No global reconciliation is needed afterwards: single-threaded proving also keeps
-            // these symbols in the local namespace layers (the flush targets a local copy, not the
-            // global Services namespace), so deferral leaves the global namespace identical. Fresh
-            // names are branch-locally unique by construction (minting searches the goal-local
-            // namespaces, #3851); global uniqueness is not required -- sibling branches reuse
-            // names by design, exactly as in single-threaded proving.
-            for (Goal goal : goalList) {
-                goal.node().addLocalProgVars(newProgVars);
-                goal.node().addLocalFunctions(newFunctions);
-                goal.resetLocalSymbols();
-            }
-            return;
-        }
-
-        localNamespaces.flushToParent();
-
-        boolean first = true;
         for (Goal goal : goalList) {
             goal.node().addLocalProgVars(newProgVars);
             goal.node().addLocalFunctions(newFunctions);
-
-            if (first) {
-                first = false;
-            } else {
-                goal.localNamespaces = localNamespaces.getParent().copy().copyWithParent();
-            }
-
+            goal.resetLocalSymbols();
         }
     }
 

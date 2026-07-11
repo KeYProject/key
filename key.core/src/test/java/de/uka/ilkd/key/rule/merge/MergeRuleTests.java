@@ -6,10 +6,13 @@ package de.uka.ilkd.key.rule.merge;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,12 +21,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -157,6 +164,129 @@ public class MergeRuleTests {
         Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
             "A.differentVarsWithSameName.MPS.cut.closed.proof");
         assertTrue(proof.closed());
+    }
+
+    /**
+     * The merge rule resolves name clashes between the merge participants by minting renamed
+     * symbols (see {@code MergeRuleUtils.renameMergeParticipantOp}); further fresh symbols are
+     * minted by anonymisation. These symbols occur in the merged sequent, so the goal's
+     * namespaces must keep resolving them: both across the rule-application commit (a goal's
+     * namespaces are rebuilt from the shared base plus the node-local symbol storage) and across
+     * pruning (which performs the same rebuild). This test drives the A.java clash scenario
+     * (both branch contracts mint {@code result_0}/{@code exc_0}, of different sorts) LIVE,
+     * without any reload: a reloaded proof would mask a loss because replay re-derives all names
+     * from the saved name recorder.
+     */
+    @Test
+    public void testMergeMintedSymbolsSurviveCommitAndPrune() {
+        // closed-branch pruning must be enabled BEFORE proving: only then does closeGoal record
+        // the closed goals that pruning later reopens
+        final boolean oldNoPruningClosed = GeneralSettings.noPruningClosed;
+        GeneralSettings.noPruningClosed = false;
+        try {
+            doTestMergeMintedSymbolsSurviveCommitAndPrune();
+        } finally {
+            GeneralSettings.noPruningClosed = oldNoPruningClosed;
+        }
+    }
+
+    private void doTestMergeMintedSymbolsSurviveCommitAndPrune() {
+        final Proof proof =
+            loadProof(TEST_RESOURCES_DIR_PREFIX, "A.differentVarsWithSameName.MPS.key");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed(), "automatic strategy should close the A::m proof");
+
+        // locate the merge application
+        Node mergeNode = null;
+        for (Iterator<Node> it = proof.root().subtreeIterator(); it.hasNext();) {
+            final Node n = it.next();
+            if (n.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeNode = n;
+                break;
+            }
+        }
+        Assertions.assertNotNull(mergeNode, "expected a merge rule application in the proof");
+        final Node mergeChild = mergeNode.child(0);
+
+        // The names minted BY the merge application, clash renames among them. The merge
+        // neither records its renames in the name recorder (MergeRule.apply deliberately empties
+        // it mid-apply) nor in the rule app, so identify them semantically: operators occurring
+        // in the merged sequent that occur neither in the merge parent's sequent nor in any
+        // merge partner's sequent were introduced by the merge application itself.
+        final Set<Name> before = new HashSet<>();
+        collectOpNames(mergeNode.sequent(), before);
+        for (MergePartner partner : ((MergeRuleBuiltInRuleApp) mergeNode.getAppliedRuleApp())
+                .getMergePartners()) {
+            collectOpNames(partner.getGoal().node().sequent(), before);
+        }
+        final Set<Name> after = new HashSet<>();
+        collectOpNames(mergeChild.sequent(), after);
+        final Set<Name> minted = new HashSet<>(after);
+        minted.removeAll(before);
+        Assertions.assertFalse(minted.isEmpty(),
+            "the merge should mint symbols that occur in the merged sequent"
+                + " (the A.java scenario forces at least the exc_0 clash renaming)");
+
+        // (a) commit: each minted symbol must be reconstructible from the shared base plus the
+        // node-local symbol storage -- that pair is all a namespace rebuild works from
+        for (Name name : minted) {
+            Assertions.assertTrue(isReconstructible(proof, mergeChild, name),
+                "merge-minted symbol " + name + " occurs in the merged sequent but reaches "
+                    + "neither the node-local symbol storage nor the shared namespaces; "
+                    + "a namespace rebuild loses it");
+        }
+
+        // (b) prune to the merged goal: the rebuilt goal namespaces must still resolve them
+        proof.pruneProof(mergeChild);
+        final Goal prunedGoal = proof.getOpenGoal(mergeChild);
+        Assertions.assertNotNull(prunedGoal, "pruning should reopen the merged goal");
+        for (Name name : minted) {
+            final boolean found =
+                prunedGoal.getLocalNamespaces().functions().lookup(name) != null
+                        || prunedGoal.getLocalNamespaces().programVariables()
+                                .lookup(name) != null;
+            Assertions.assertTrue(found,
+                "merge-minted symbol " + name + " is no longer resolvable after pruning");
+        }
+
+        // (c) and the proof still closes from the pruned state
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed(),
+            "proof should close again after pruning to the merged goal");
+    }
+
+    /**
+     * Collects the names of all operators occurring in the given sequent.
+     */
+    private static void collectOpNames(Sequent sequent, Set<Name> into) {
+        final OpCollector collector = new OpCollector();
+        for (SequentFormula sf : sequent) {
+            sf.formula().execPostOrder(collector);
+        }
+        for (Operator op : collector.ops()) {
+            into.add(op.name());
+        }
+    }
+
+    /**
+     * Checks whether a symbol of the given name would survive a rebuild of a goal's local
+     * namespaces, i.e. whether it is present in the node-local symbol storage of the given node
+     * or in the proof's shared namespaces.
+     */
+    private static boolean isReconstructible(Proof proof, Node node, Name name) {
+        for (var pv : node.getLocalProgVars()) {
+            if (pv.name().equals(name)) {
+                return true;
+            }
+        }
+        for (var fun : node.getLocalFunctions()) {
+            if (fun.name().equals(name)) {
+                return true;
+            }
+        }
+        final var global = proof.getServices().getNamespaces();
+        return global.functions().lookup(name) != null
+                || global.programVariables().lookup(name) != null;
     }
 
     /**
