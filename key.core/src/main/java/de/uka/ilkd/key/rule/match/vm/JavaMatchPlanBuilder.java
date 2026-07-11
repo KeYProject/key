@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.op.Modality;
@@ -17,6 +18,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.GenericOperatorHead;
 import org.key_project.prover.rules.matcher.compiler.MatchHead;
 import org.key_project.prover.rules.matcher.compiler.MatchPlan;
+import org.key_project.prover.rules.matcher.compiler.ModalityHead;
 import org.key_project.prover.rules.matcher.compiler.OperatorPlan;
 import org.key_project.prover.rules.matcher.compiler.SchemaVarPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
@@ -25,7 +27,9 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchIdentityInstruction;
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchInstructionForSV;
+import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchModalOperatorSV;
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchTermLabelSV;
 
 /**
@@ -179,7 +183,15 @@ public final class JavaMatchPlanBuilder {
             return ParametricFunctionHead.of(pfi);
         }
         if (op instanceof Modality mod) {
-            return ModalityHead.of(mod, pattern.javaBlock().program(), programInstructions);
+            final JavaProgramMatchHook hook =
+                JavaProgramMatchHook.of(pattern.javaBlock().program(), programInstructions);
+            if (hook == null) {
+                return null; // the modality's program cannot be matched by the framework
+            }
+            final MatchInstruction kindInstr = mod.kind() instanceof ModalOperatorSV sv
+                    ? matchModalOperatorSV(sv)
+                    : getMatchIdentityInstruction(mod.kind());
+            return new ModalityHead(mod.kind(), kindInstr, hook);
         }
         return new GenericOperatorHead(op);
     }

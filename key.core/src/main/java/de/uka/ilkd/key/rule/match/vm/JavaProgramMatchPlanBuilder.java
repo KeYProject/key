@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchByEqualsInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchContextStatementBlockInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaTypeReferenceInstruction;
 
@@ -50,6 +49,7 @@ import org.key_project.prover.rules.matcher.compiler.ProgramMatchPlan;
 import org.key_project.prover.rules.matcher.compiler.ProgramStructuralPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchByEqualsInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
