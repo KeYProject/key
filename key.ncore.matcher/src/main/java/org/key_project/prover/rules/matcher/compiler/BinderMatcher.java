@@ -11,9 +11,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Language SPI for matching <em>bound variables</em> (the variables introduced by a binder such as
- * a quantifier, a substitution or a {@code let}). This is one of the two axes on which the
- * Java/Rust/Solidity front-ends differ: each binds its own kind of logic / schema variables (e.g.
- * {@code LogicVariable} vs. {@code BoundVariable}) and keeps its own renaming/instantiation state.
+ * a quantifier, a substitution or a {@code let}). Binding is language-specific: each front-end
+ * binds its own kinds of logic and schema variables and keeps its own renaming/instantiation
+ * state.
  *
  * <p>
  * The match-plan framework owns the <em>scaffolding</em> (bind the pattern's bound variables before

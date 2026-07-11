@@ -11,13 +11,13 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 /**
- * Plan for a (sub)pattern that is a schema variable: it matches the whole element via the provided
- * schema-variable {@link MatchInstruction} (which the front-end supplies, since schema-variable
- * kinds are language-specific).
+ * Plan for a (sub)pattern that is a schema variable (a rule's placeholder, instantiated by
+ * matching): it matches the whole element via the provided schema-variable
+ * {@link MatchInstruction} (which the front-end supplies, since schema-variable kinds are
+ * language-specific).
  *
  * <p>
- * Language-agnostic counterpart of the schema-variable branch of the hand-written matchers: the
- * interpreter emission is {@code matchSV + gotoNextSibling}, the compiled emission applies the
+ * The interpreter emission is {@code matchSV + gotoNextSibling}; the compiled matcher applies the
  * schema-variable instruction directly.
  *
  * <p>

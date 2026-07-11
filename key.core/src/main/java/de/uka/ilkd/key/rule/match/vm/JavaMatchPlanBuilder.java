@@ -37,8 +37,8 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * schema-variable instructions, the per-operator head dispatch, the {@link JavaBinderMatcher} and
  * the term-label wrap; the recursion over the pattern and the derivation of both back-ends are
  * inherited from the framework. Describing a construct here gives both back-ends at once -- this
- * is the sole source of truth for find-matching; there is no separate hand-written interpreter
- * generator or compiled matcher to keep in sync.
+ * is the sole source of truth for find-matching; there is no second matcher implementation to
+ * keep in sync.
  *
  * <p>
  * The dispatch covers the whole Java-DL find-taclet base: the FOL term skeleton (schema variables,
@@ -55,8 +55,8 @@ public final class JavaMatchPlanBuilder extends MatchPlanBuilder {
      * System property ({@code -Dkey.matcher.programInstructions=true}) selecting whether the Java
      * program of a modality is matched by a sub-program of {@link VMInstruction}s on the
      * interpreter back-end, instead of the monolithic {@code MatchProgramInstruction} (see
-     * {@code SyntaxElementMatchProgramGenerator}). Default {@code false} keeps the existing
-     * behaviour.
+     * {@code SyntaxElementMatchProgramGenerator}). Default {@code false}: the monolithic
+     * instruction is used.
      * <p>
      * Read at matcher-construction time (i.e. when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches the behaviour.

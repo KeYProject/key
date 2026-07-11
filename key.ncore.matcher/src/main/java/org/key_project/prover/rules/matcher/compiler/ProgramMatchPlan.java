@@ -16,8 +16,8 @@ import org.jspecify.annotations.Nullable;
  * matcher back-ends are derived: {@link #emit} produces the cursor-based interpreter
  * {@link VMInstruction}s and {@link #compile} produces the cursor-free compiled
  * {@link MatchProgram} (direct {@code getChild(i)} navigation). It is the program-AST counterpart
- * of {@link MatchPlan} for terms, so a construct is described once — in a language front-end's
- * dispatch — rather than in two parallel hand-written matchers.
+ * of {@link MatchPlan} for terms: a construct is described once, in a language front-end's
+ * dispatch, and both back-ends follow that one description.
  *
  * <p>
  * "Advance responsibility" follows the same convention in both back-ends: a plan's interpreter

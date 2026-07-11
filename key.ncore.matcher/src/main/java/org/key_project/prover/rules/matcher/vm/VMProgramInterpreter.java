@@ -73,10 +73,8 @@ public class VMProgramInterpreter implements MatchProgram, ProgramChildrenMatche
      * Executes the program against the children of {@code parent} starting at child index
      * {@code startChild}, i.e. the program is interpreted as a sequence of per-child matchers each
      * consuming exactly one child of {@code parent} (advancing via {@code gotoNextSibling}). This
-     * is
-     * used to match the active statements of a context block, where matching does not start at the
-     * root but at a child offset of the located source element (the equivalent of
-     * {@code matchChildren(source, mc, offset)} on the interpreter side).
+     * is used to match the active statements of a context block, where matching does not start at
+     * the root but at a child offset of the located source element.
      * <p>
      * The caller must guarantee that {@code parent} has at least {@code startChild + k} children,
      * where {@code k} is the number of children this program consumes; otherwise the cursor would

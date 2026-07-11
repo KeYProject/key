@@ -26,8 +26,7 @@
  * {@link org.key_project.prover.rules.matcher.compiler.ProgramChildSequence}).
  *
  * <p>
- * A language front-end (Java today; other provers analogously) supplies only what is genuinely its
- * own, each piece small:
+ * A language front-end supplies only what is genuinely its own, each piece small:
  * <ul>
  * <li>a <b>dispatch</b> that walks its pattern syntax and composes the plan nodes — one
  * {@code instanceof} case per construct;</li>

@@ -15,9 +15,8 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * the enclosing {@link OperatorPlan}.
  *
  * <p>
- * Generic heads (ordinary operators) live in this module; language-specific heads (modalities,
- * parametric functions, ...) are supplied by the front-end. A head carries both back-ends, lifted
- * from the corresponding hand-written matcher fragments.
+ * Generic heads (ordinary operators) live in this module; language-specific heads (parametric
+ * functions, updates, ...) are supplied by the front-end. A head carries both back-ends.
  */
 public interface MatchHead {
 

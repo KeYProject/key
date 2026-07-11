@@ -24,10 +24,10 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.gotoNextSiblingInstruction;
 
 /**
- * Match head for an {@link ElementaryUpdate} {@code lhs := value}: it matches the operator and the
- * left-hand side; the value subterm is matched by the enclosing
- * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}. Mirrors the elementary-update
- * fragments of the hand-written interpreter generator and compiled matcher.
+ * Match head for an {@link ElementaryUpdate} {@code lhs := value} (the update operator assigning
+ * a value to a program variable): it matches the operator and the left-hand side; the value
+ * subterm is matched by the enclosing
+ * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}.
  */
 public final class ElementaryUpdateHead implements MatchHead {
 

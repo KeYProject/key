@@ -8,10 +8,9 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 /**
  * Language SPI for matching the <em>program</em> carried by a modality (the {@code \<{ ... }\>} of
- * a symbolic-execution taclet). This is the second of the two axes on which the Java/Rust/Solidity
- * front-ends differ (the first is {@link BinderMatcher}): each has its own program AST -- Java's
- * {@code JavaBlock}/{@code ContextStatementBlock}, Rust's {@code RustyBlock}, Solidity's block --
- * but all are {@link org.key_project.logic.SyntaxElement}s navigated through {@code getChild}.
+ * a symbolic-execution taclet). Each front-end has its own program AST; every program is a
+ * {@link org.key_project.logic.SyntaxElement} navigated through {@code getChild}, but which
+ * constructs exist and how they match is the language's own.
  *
  * <p>
  * A hook is built per modality pattern (it captures that pattern's program) and exposes the program
@@ -22,10 +21,9 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  *
  * <p>
  * The framework owns the surrounding modality skeleton (check the modality, match its kind, then
- * the program, then recurse the subterms); a language plugs in only the divergent program matching
- * here. Java additionally has the rich {@code ContextStatementBlock} prefix/suffix machinery, which
- * is entirely encapsulated behind this hook; Rust and Solidity supply their own simpler block
- * matchers.
+ * the program, then recurse the subterms); a language plugs in only its program matching here.
+ * Everything specific to a language's blocks -- including machinery as involved as a context
+ * block's prefix/suffix bookkeeping -- stays behind this hook.
  */
 public interface ProgramMatchHook {
 

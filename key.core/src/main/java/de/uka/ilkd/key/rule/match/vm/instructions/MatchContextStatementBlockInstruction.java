@@ -19,12 +19,11 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Matches the Java program of a modality whose program is a {@link ContextStatementBlock} (the
- * {@code .. ... } pattern that is ubiquitous in symbolic-execution taclets). The intricate context
+ * {@code .. ... } pattern that is ubiquitous in symbolic-execution taclets). The context
  * bookkeeping (variable-length prefix descent, inner execution context, prefix/suffix positions)
- * is still performed by {@link ContextStatementBlock#match}; only the matching of the active
- * statements is delegated to the supplied VM sub-program, replacing the monolithic
- * {@code MatchProgramInstruction} for that subtree. The current element is the modality's
- * {@link JavaBlock} (as for {@code MatchProgramInstruction}).
+ * is performed by {@link ContextStatementBlock#match}; the active statements are matched by the
+ * supplied VM sub-program. The current element is the modality's {@link JavaBlock} (as for
+ * {@code MatchProgramInstruction}).
  *
  * @see ContextStatementBlock#match(SourceData, MatchConditions, VMProgramInterpreter)
  */
