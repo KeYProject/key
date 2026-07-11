@@ -16,12 +16,12 @@ import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchContextStatementBlockInstruction;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchProgramElementInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSubProgramInstruction;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchProgramElementInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 import org.jspecify.annotations.Nullable;
