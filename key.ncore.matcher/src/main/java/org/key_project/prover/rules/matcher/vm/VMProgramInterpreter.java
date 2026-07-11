@@ -58,15 +58,19 @@ public class VMProgramInterpreter implements MatchProgram, ProgramChildrenMatche
     @Override
     public @Nullable MatchResultInfo match(SyntaxElement toMatch, MatchResultInfo mc,
             LogicServices services) {
-        MatchResultInfo result = mc;
         final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(toMatch);
-        int instrPtr = 0;
-        while (result != null && instrPtr < instruction.length) {
-            result = instruction[instrPtr].match(navi, result, services);
-            instrPtr++;
+        try {
+            MatchResultInfo result = mc;
+            int instrPtr = 0;
+            while (result != null && instrPtr < instruction.length) {
+                result = instruction[instrPtr].match(navi, result, services);
+                instrPtr++;
+            }
+            return result;
+        } finally {
+            // return the cursor to the pool even if an instruction throws
+            navi.release();
         }
-        navi.release();
-        return result;
     }
 
     /**
@@ -93,18 +97,22 @@ public class VMProgramInterpreter implements MatchProgram, ProgramChildrenMatche
             // nothing to match (empty active-statement block) -> succeed unchanged
             return mc;
         }
-        MatchResultInfo result = mc;
         final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(parent);
-        navi.gotoNext(); // descend to the first child of parent
-        for (int i = 0; i < startChild; i++) {
-            navi.gotoNextSibling(); // advance to child number startChild
+        try {
+            navi.gotoNext(); // descend to the first child of parent
+            for (int i = 0; i < startChild; i++) {
+                navi.gotoNextSibling(); // advance to child number startChild
+            }
+            MatchResultInfo result = mc;
+            int instrPtr = 0;
+            while (result != null && instrPtr < instruction.length) {
+                result = instruction[instrPtr].match(navi, result, services);
+                instrPtr++;
+            }
+            return result;
+        } finally {
+            // return the cursor to the pool even if an instruction throws
+            navi.release();
         }
-        int instrPtr = 0;
-        while (result != null && instrPtr < instruction.length) {
-            result = instruction[instrPtr].match(navi, result, services);
-            instrPtr++;
-        }
-        navi.release();
-        return result;
     }
 }
