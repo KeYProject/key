@@ -11,9 +11,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Matches a contiguous run of children of a parent syntax element, starting at a given child index.
- * This is the abstraction used for the active statements of a context block (phase (3) of the
- * context match): the located source element and the offset of the first active statement are
- * provided, and the run of active-statement matchers consumes one child each.
+ * This is the abstraction used for the active statements of a context block: the located source
+ * element and the offset of the first active statement are provided, and the run of
+ * active-statement matchers consumes one child each.
  * <p>
  * It is implemented both by the interpreter ({@link VMProgramInterpreter#matchChildrenFrom}, which
  * navigates the children with a cursor) and by the compiled matcher (which navigates them directly
