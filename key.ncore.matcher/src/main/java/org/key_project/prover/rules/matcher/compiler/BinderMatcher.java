@@ -9,7 +9,8 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * Language SPI for matching <em>bound variables</em> (the variables introduced by a binder such as
+ * Language SPI (service provider interface) for matching <em>bound variables</em> (the variables
+ * introduced by a binder such as
  * a quantifier, a substitution or a {@code let}). Binding is language-specific: each front-end
  * binds its own kinds of logic and schema variables and keeps its own binding state — for example
  * a renaming table with nested scopes, or a counted stack of the variables bound along the current

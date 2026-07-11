@@ -14,7 +14,8 @@ import org.key_project.util.collection.ImmutableArray;
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchAndBindVariables;
 
 /**
- * Java-DL implementation of the {@link BinderMatcher} SPI: bound variables are bound via the
+ * Java-DL implementation of the {@link BinderMatcher} SPI (service provider interface): bound
+ * variables are bound via the
  * {@code matchAndBindVariables} instruction, and the binding scope is closed via
  * {@link MatchConditions#shrinkRenameTable()}. The renaming table is scope-structured — closing
  * pops one scope — so the bound variables themselves are not needed for unbinding.

@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  * term's own bound variables — a concrete {@code LogicVariable} in the pattern by consistent
  * renaming (same sort, same abstract name), a {@code VariableSV} by instantiating it with the
  * source variable. The scope is closed again after the term has been matched
- * ({@code MatchConditions.shrinkRenameTable()}, called through the binder SPI).
+ * ({@code MatchConditions.shrinkRenameTable()}, called through the {@code BinderMatcher}).
  */
 public class BindVariablesInstruction implements MatchInstruction {
 

@@ -23,7 +23,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Java-DL implementation of the {@link ListSVMatcher} SPI: a source child may join a list schema
+ * Java-DL implementation of the {@link ListSVMatcher} SPI (service provider interface): a source
+ * child may join a list schema
  * variable's run if it is admissible for the schema variable's sort
  * ({@code ProgramSVSort.canStandFor}, judged in the execution context recorded with the
  * instantiations), and the collected run is stored as an {@code ImmutableArray} of program
