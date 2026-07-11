@@ -78,11 +78,20 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         final SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
-        if (svSort.canStandFor(instantiationCandidate,
+        if (!svSort.canStandFor(instantiationCandidate,
             instantiations.getExecutionContext(), (Services) services)) {
+            return null;
+        }
+        // A schema variable that is already bound matches a program element again only if the
+        // element IS its binding: the bound program element itself, or -- for a term binding --
+        // the term's operator (so a bound term re-matches only the program variable it consists
+        // of). This is the same rule as in ProgramSV.match, keeping this instruction and the AST
+        // matcher in agreement.
+        final Object instant = instantiations.getInstantiation(op);
+        if (instant == null || instant.equals(instantiationCandidate)
+                || (instant instanceof JTerm t && t.op().equals(instantiationCandidate))) {
             return addInstantiation(instantiationCandidate, matchCond, services);
         }
-
         return null;
     }
 
