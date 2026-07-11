@@ -26,9 +26,9 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * interpreter and the compiler stay in sync by construction.
  *
  * <p>
- * Both emissions are produced at plan-construction time, so neither adds runtime overhead over the
- * hand-written matchers they replace: the interpreter still runs a {@code VMInstruction[]} and the
- * compiler still runs the resulting {@link MatchProgram}.
+ * Both emissions are produced at plan-construction time (when the taclet base is loaded), not
+ * during proof search: matching runs the emitted {@code VMInstruction[]} or the compiled
+ * {@link MatchProgram}, with no plan-tree overhead.
  */
 public interface MatchPlan {
 

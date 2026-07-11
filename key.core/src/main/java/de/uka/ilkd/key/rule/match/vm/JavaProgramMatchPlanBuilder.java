@@ -74,9 +74,9 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * counterpart of {@link JavaMatchPlanBuilder} (which does the same for the first-order term
  * skeleton). On the compiled back-end this dispatch is the <em>whole</em> program matcher: it
  * reads only the structure of pattern and source and never calls an AST
- * {@code match(SourceData, MatchConditions)} method. (The interpreter back-end still has its
- * hand-written conversion, {@code SyntaxElementMatchProgramGenerator}, with the monolithic
- * {@code MatchProgramInstruction} beneath it, until it is retired.)
+ * {@code match(SourceData, MatchConditions)} method. (The interpreter back-end has its own
+ * conversion, {@code SyntaxElementMatchProgramGenerator}, with the monolithic
+ * {@code MatchProgramInstruction} beneath it.)
  *
  * <p>
  * The plans form a small immutable tree that mirrors the pattern, with one node kind per way of

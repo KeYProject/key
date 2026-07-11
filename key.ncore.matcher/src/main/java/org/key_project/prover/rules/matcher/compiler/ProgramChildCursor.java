@@ -15,9 +15,8 @@ import org.jspecify.annotations.Nullable;
  * when a match starts at an element rather than inside one (e.g. an empty block).
  *
  * <p>
- * This is the language-agnostic counterpart of the mutable source cursors the per-language AST
- * matchers use; it navigates purely through {@link SyntaxElement#getChild} /
- * {@link SyntaxElement#getChildCount}.
+ * The cursor navigates purely through {@link SyntaxElement#getChild} /
+ * {@link SyntaxElement#getChildCount}, so it works for any language's program elements.
  */
 public final class ProgramChildCursor {
 

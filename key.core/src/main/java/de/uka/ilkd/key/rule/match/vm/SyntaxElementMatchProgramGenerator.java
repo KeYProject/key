@@ -102,8 +102,8 @@ public class SyntaxElementMatchProgramGenerator {
         // The single-source dispatch first: it derives these interpreter instructions and the
         // compiled step from one description. A variable-arity list SV is compiled-only
         // ({@code interpretable() == false}), so a program containing one falls through to the
-        // legacy logic below (which itself falls back to the monolithic matcher); a construct the
-        // dispatch does not describe falls through the same way (safety net).
+        // per-construct conversion below (which itself falls back to the monolithic matcher); a
+        // construct the dispatch does not describe falls through the same way (safety net).
         final ProgramMatchPlan plan = JavaProgramMatchPlanBuilder.buildProgramPlan(pe);
         if (plan != null && plan.interpretable()) {
             plan.emit(out);

@@ -24,10 +24,9 @@ import org.jspecify.annotations.Nullable;
  * are bound around the whole node via the {@link BinderMatcher}.
  *
  * <p>
- * This is the language-agnostic counterpart of the non-schema-variable branch of the hand-written
- * matchers: the interpreter emission reproduces {@code checkNodeKind(Term) + gotoNext + head +
- * (skip bound variables) + subterms} (wrapped in bind/unbind), and the compiled emission checks the
- * head then recurses the subterms (wrapped in bind/unbind).
+ * The interpreter emission is {@code checkNodeKind(Term) + gotoNext + head +
+ * (skip bound variables) + subterms}; the compiled matcher checks the head and then recurses into
+ * the subterms. When the term binds variables, both back-ends wrap this in bind/unbind.
  */
 public final class OperatorPlan implements MatchPlan {
 
