@@ -14,6 +14,20 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+/**
+ * The <em>monolithic</em> program matcher: matches the Java program of a modality by delegating to
+ * the pattern's own {@code ProgramElement.match(SourceData, MatchConditions)}, which walks the
+ * program AST with its hand-written per-construct match methods. The current element is the
+ * modality's {@link JavaBlock}; the whole program is consumed in this one instruction.
+ *
+ * <p>
+ * This is the legacy counterpart of the single-source program dispatch
+ * ({@code JavaProgramMatchPlanBuilder}) and the ultimate safety net of the interpreter back-end:
+ * it is used for a program the converted instructions do not cover (conversion off — the default —
+ * or a construct outside the dispatch, e.g. a variable-arity list schema variable). It is the main
+ * remaining consumer of the AST {@code match} methods and is intended to be removed together with
+ * them once the interpreter back-end is retired.
+ */
 public class MatchProgramInstruction implements MatchInstruction {
 
     private final ProgramElement pe;

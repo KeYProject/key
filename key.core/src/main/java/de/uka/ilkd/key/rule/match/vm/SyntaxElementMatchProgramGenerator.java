@@ -5,21 +5,17 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.java.ast.ContextStatementBlock;
-import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchContextStatementBlockInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSubProgramInstruction;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.matcher.compiler.ProgramMatchPlan;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchProgramElementInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
@@ -32,19 +28,16 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * Converts the Java program of a modality into VM match-instructions ({@link VMInstruction}s) by
  * direct tree navigation, for the interpreter side of the match-plan framework (used by the Java
  * {@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}). The conversion is off by
- * default and selected by {@link JavaMatchPlanBuilder#PROGRAM_INSTRUCTIONS_PROPERTY}. The term
- * skeleton itself is built by {@link JavaMatchPlanBuilder}; this class only handles the
- * program-element conversion (generic structural elements and non-list program schema variables;
- * anything else is matched by the monolithic {@code MatchProgramInstruction}).
+ * default and selected by {@link JavaMatchPlanBuilder#PROGRAM_INSTRUCTIONS_PROPERTY}; when off (or
+ * for a program the conversion cannot express, e.g. one containing a list schema variable), the
+ * interpreter matches the whole program with the monolithic {@code MatchProgramInstruction}. The
+ * term skeleton itself is built by {@link JavaMatchPlanBuilder}; this class asks the single-source
+ * dispatch ({@link JavaProgramMatchPlanBuilder}) per element first and keeps its own per-construct
+ * conversion only as a safety net beneath it.
  *
  * @see org.key_project.prover.rules.matcher.vm.VMProgramInterpreter
  */
 public class SyntaxElementMatchProgramGenerator {
-
-    /**
-     * caches, per program-element class, whether it uses the generic {@code match} (no override).
-     */
-    private static final Map<Class<?>, Boolean> GENERIC_MATCH = new ConcurrentHashMap<>();
 
     /**
      * Builds the instruction matching the Java program {@code prog} of a modality by direct tree
@@ -101,11 +94,21 @@ public class SyntaxElementMatchProgramGenerator {
      * Appends instructions matching {@code pe} (and its subtree) to {@code out}, mirroring the
      * generic program match (class equality + exact-size child recursion) and reusing the existing
      * program-SV instruction. Returns {@code false} (leaving {@code out} unusable) for any
-     * construct
-     * that is not safe to convert: list schema variables, other schema variables, and element types
-     * that override {@code match} (context blocks, loops, value-checking literals, ...).
+     * construct that is not safe to convert: list schema variables, other schema variables, and
+     * element types that override {@code match} (context blocks, loops, value-checking literals,
+     * ...).
      */
     private static boolean appendProgram(SyntaxElement pe, List<VMInstruction> out) {
+        // The single-source dispatch first: it derives these interpreter instructions and the
+        // compiled step from one description. A variable-arity list SV is compiled-only
+        // ({@code interpretable() == false}), so a program containing one falls through to the
+        // legacy logic below (which itself falls back to the monolithic matcher); a construct the
+        // dispatch does not describe falls through the same way (safety net).
+        final ProgramMatchPlan plan = JavaProgramMatchPlanBuilder.buildProgramPlan(pe);
+        if (plan != null && plan.interpretable()) {
+            plan.emit(out);
+            return true;
+        }
         if (pe instanceof ProgramSV psv) {
             if (psv.isListSV()) {
                 return false; // list SV -> variable block size, leave it to the interpreter
@@ -117,7 +120,8 @@ public class SyntaxElementMatchProgramGenerator {
         if (pe instanceof SchemaVariable) {
             return false; // other schema variables in programs: be safe, fall back
         }
-        if (!(pe instanceof ProgramElement progEl) || !isGenericMatch(progEl)) {
+        if (!(pe instanceof ProgramElement progEl)
+                || !JavaProgramMatchPlanBuilder.isGenericMatch(progEl)) {
             return false; // overrides match (context block, loop, value literal, ...) -> fall back
         }
         final int childCount = pe.getChildCount();
@@ -131,23 +135,4 @@ public class SyntaxElementMatchProgramGenerator {
         return true;
     }
 
-    /**
-     * @return whether the element's class uses the generic
-     *         {@code match(SourceData, MatchConditions)} (declared in {@code JavaProgramElement} or
-     *         {@code JavaNonTerminalProgramElement}: class equality + exact-size child recursion)
-     *         rather than its own override.
-     */
-    static boolean isGenericMatch(ProgramElement pe) {
-        return GENERIC_MATCH.computeIfAbsent(pe.getClass(), c -> {
-            try {
-                final Class<?> declaring =
-                    c.getMethod("match", SourceData.class, MatchConditions.class)
-                            .getDeclaringClass();
-                return declaring == JavaProgramElement.class
-                        || declaring == JavaNonTerminalProgramElement.class;
-            } catch (NoSuchMethodException e) {
-                return false;
-            }
-        });
-    }
 }

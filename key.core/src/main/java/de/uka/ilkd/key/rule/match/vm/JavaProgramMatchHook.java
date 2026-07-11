@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.rule.match.vm;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.logic.JavaBlock;
 
 import org.key_project.prover.rules.matcher.compiler.ProgramMatchHook;
+import org.key_project.prover.rules.matcher.compiler.ProgramMatchPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
@@ -16,12 +18,14 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 
 /**
  * Java-DL implementation of the {@link ProgramMatchHook} program-AST axis: it matches the
- * {@code JavaBlock} program of a modality. The interpreter side reuses the generator's converted
- * program instruction ({@link SyntaxElementMatchProgramGenerator#buildProgramInstruction}, falling
- * back to the monolithic {@code MatchProgramInstruction} when conversion is off or unavailable);
- * the compiled side reuses {@link JavaProgramCompiler#compiledProgramMatcher} (context-block phases
- * + generic {@code getChild} navigation + value-leaf / list-SV delegation). Both sides are derived
- * from the single-source dispatch ({@code JavaProgramMatchPlanBuilder}).
+ * {@code JavaBlock} program of a modality. The compiled side is the single-source dispatch's plan
+ * ({@link JavaProgramMatchPlanBuilder#buildProgramPlan}) and nothing else — it calls no AST
+ * {@code match} method; a program the dispatch does not describe yields no hook, and the taclet
+ * fails to load with the framework's clear error. The interpreter side reuses the generator's
+ * converted program instruction
+ * ({@link SyntaxElementMatchProgramGenerator#buildProgramInstruction},
+ * falling back to the monolithic {@code MatchProgramInstruction} when conversion is off or
+ * unavailable).
  */
 public final class JavaProgramMatchHook implements ProgramMatchHook {
 
@@ -40,16 +44,20 @@ public final class JavaProgramMatchHook implements ProgramMatchHook {
      * @param prog the modality's program pattern
      * @param programInstructions whether the interpreter side converts the program to VM
      *        instructions (otherwise the monolithic {@code MatchProgramInstruction} is used)
-     * @return a hook for {@code prog}, or {@code null} if the compiled side cannot handle the
-     *         program
-     *         (then the enclosing modality falls back to the legacy matcher)
+     * @return a hook for {@code prog}, or {@code null} if the dispatch does not describe the
+     *         program (the enclosing modality then has no head and the taclet fails to load with
+     *         a clear error)
      */
     public static @Nullable JavaProgramMatchHook of(JavaProgramElement prog,
             boolean programInstructions) {
-        final MatchProgram compiled = JavaProgramCompiler.compiledProgramMatcher(prog);
-        if (compiled == null) {
+        final ProgramMatchPlan plan = JavaProgramMatchPlanBuilder.buildProgramPlan(prog);
+        if (plan == null || plan.listSV() != null) {
             return null;
         }
+        // the plan matches the program element; the modality skeleton hands over the JavaBlock
+        final MatchProgram ps = plan.compile();
+        final MatchProgram compiled =
+            (block, mc, services) -> ps.match(((JavaBlock) block).program(), mc, services);
         return new JavaProgramMatchHook(prog, programInstructions, compiled);
     }
 
