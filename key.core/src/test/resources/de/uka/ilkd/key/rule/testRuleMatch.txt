@@ -190,5 +190,15 @@ testInsequentState_2 {
       \replacewith (0 = i ==>)
 };
 
+// A context block with a list statement schema variable DIRECTLY as its active statement.
+// The compiled single-source program dispatch cannot express phase 3 for a variable-arity active
+// statement (phase 3 matches one source child per active statement), so buildProgramPlan returns
+// null for this context block and the matcher falls back to ContextStatementBlock.match.
+// See TestMatchTaclet#testListSVContextFallback.
+TestMatchTaclet_slist_context {
+      \find (\<{.. #slist ...}\>post)
+      \replacewith (\<{.. ...}\>post)
+};
+
 }
 

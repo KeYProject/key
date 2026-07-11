@@ -128,6 +128,22 @@ public class TestMatchTaclet {
 
 
     @Test
+    public void testListSVDirectActiveStatement() {
+        // A context block with a list statement schema variable (#slist) DIRECTLY as its active
+        // statement: the block is variable-arity, so the compiled context match takes its
+        // cursor-walking phase 3 (a greedy list-SV run) instead of the one-child-per-statement
+        // fast path. Also a regression guard for the plan bridges, which must never invoke
+        // ListSVPlan.compile() standalone (it throws).
+        JTerm match = TacletForTests.parseTerm("\\<{ return 1==2; return 1==3; }\\>A");
+        FindTaclet taclet =
+            (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_slist_context").taclet();
+        MatchResultInfo mc =
+            taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services);
+        assertNotNull(mc, "the #slist context taclet should match the whole block");
+    }
+
+
+    @Test
     public void testVarOccursInIfAndAddRule() {
 
         JTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
