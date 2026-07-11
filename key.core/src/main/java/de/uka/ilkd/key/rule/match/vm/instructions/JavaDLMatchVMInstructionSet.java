@@ -17,7 +17,6 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -67,14 +66,6 @@ public final class JavaDLMatchVMInstructionSet {
     public static MatchInstruction matchAndBindVariables(
             ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
-    }
-
-    /**
-     * the parameter is unused (unbinding just pops the renaming scope); kept for call-site symmetry
-     * with {@link #matchAndBindVariables}.
-     */
-    public static VMInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
-        return new UnbindVariablesInstruction();
     }
 
     /**

@@ -6,22 +6,23 @@ package org.key_project.prover.rules.matcher.compiler;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Language SPI for matching <em>bound variables</em> (the variables introduced by a binder such as
  * a quantifier, a substitution or a {@code let}). Binding is language-specific: each front-end
- * binds its own kinds of logic and schema variables and keeps its own renaming/instantiation
- * state.
+ * binds its own kinds of logic and schema variables and keeps its own binding state — for example
+ * a renaming table with nested scopes, or a counted stack of the variables bound along the current
+ * path.
  *
  * <p>
- * The match-plan framework owns the <em>scaffolding</em> (bind the pattern's bound variables before
- * matching the operator and subterms, then unbind afterwards, in both back-ends); a language plugs
- * in the actual binding behaviour here. The {@linkplain #binder(ImmutableArray) binder} matches the
- * pattern's bound variables against the source element's own bound variables and is shared by both
- * back-ends (it is element-based); only the un-binding is back-end specific (an instruction for the
- * interpreter, a direct call for the compiler).
+ * The match-plan framework owns the <em>scaffolding</em>: it binds the pattern's bound variables
+ * before matching the operator and subterms and unbinds them afterwards, on both back-ends. A
+ * language plugs in the two operations here. The {@linkplain #binder(ImmutableArray) binder} is an
+ * element-based instruction (it reads the source element's own bound variables), so both back-ends
+ * apply it as it is; {@link #unbind} reads no element at all — it only transforms the match state
+ * — so the framework calls it directly on the compiled back-end and wraps it into a
+ * cursor-neutral instruction for the interpreter.
  */
 public interface BinderMatcher {
 
@@ -35,17 +36,14 @@ public interface BinderMatcher {
     MatchInstruction binder(ImmutableArray<? extends QuantifiableVariable> boundVars);
 
     /**
-     * The interpreter instruction that pops the binding scope opened by {@link #binder}.
+     * Closes the binding scope opened by {@link #binder} for the same variables. A front-end
+     * whose binding state is scope-structured pops one scope and may ignore {@code boundVars};
+     * one that keeps a counted stack pops {@code boundVars.size()} entries.
      *
-     * @return the un-binding instruction
+     * @param mc the match result after matching the binder's body
+     * @param boundVars the pattern bound variables the scope was opened for
+     * @return the match result with the binding scope closed
      */
-    VMInstruction unbinderInstruction();
-
-    /**
-     * Pops the binding scope opened by {@link #binder} for the compiled back-end.
-     *
-     * @param mc the match result after matching the binder body
-     * @return the match result with the binding scope removed
-     */
-    MatchResultInfo unbind(MatchResultInfo mc);
+    MatchResultInfo unbind(MatchResultInfo mc,
+            ImmutableArray<? extends QuantifiableVariable> boundVars);
 }

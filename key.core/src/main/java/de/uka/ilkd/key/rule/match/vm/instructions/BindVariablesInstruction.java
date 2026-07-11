@@ -22,8 +22,8 @@ import org.key_project.util.collection.ImmutableArray;
  * extends the renaming table and matches the pattern's bound variables pairwise against the source
  * term's own bound variables — a concrete {@code LogicVariable} in the pattern by consistent
  * renaming (same sort, same abstract name), a {@code VariableSV} by instantiating it with the
- * source variable. The scope is closed again by {@link UnbindVariablesInstruction} (interpreter)
- * or {@code MatchConditions.shrinkRenameTable()} (compiled) after the term has been matched.
+ * source variable. The scope is closed again after the term has been matched
+ * ({@code MatchConditions.shrinkRenameTable()}, called through the binder SPI).
  */
 public class BindVariablesInstruction implements MatchInstruction {
 
