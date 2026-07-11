@@ -4,22 +4,20 @@
 package de.uka.ilkd.key.rule.match.vm;
 
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.instructions.UnbindVariablesInstruction;
 
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.BinderMatcher;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchAndBindVariables;
 
 /**
  * Java-DL implementation of the {@link BinderMatcher} SPI: bound variables are bound via the
- * {@code matchAndBindVariables} instruction and the renaming scope is popped via
- * {@link UnbindVariablesInstruction} (interpreter) / {@link MatchConditions#shrinkRenameTable()}
- * (compiled).
+ * {@code matchAndBindVariables} instruction, and the binding scope is closed via
+ * {@link MatchConditions#shrinkRenameTable()}. The renaming table is scope-structured — closing
+ * pops one scope — so the bound variables themselves are not needed for unbinding.
  */
 public final class JavaBinderMatcher implements BinderMatcher {
 
@@ -35,12 +33,8 @@ public final class JavaBinderMatcher implements BinderMatcher {
     }
 
     @Override
-    public VMInstruction unbinderInstruction() {
-        return new UnbindVariablesInstruction();
-    }
-
-    @Override
-    public MatchResultInfo unbind(MatchResultInfo mc) {
+    public MatchResultInfo unbind(MatchResultInfo mc,
+            ImmutableArray<? extends QuantifiableVariable> boundVars) {
         return ((MatchConditions) mc).shrinkRenameTable();
     }
 }

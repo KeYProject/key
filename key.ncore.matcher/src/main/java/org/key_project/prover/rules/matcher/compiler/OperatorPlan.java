@@ -5,6 +5,8 @@ package org.key_project.prover.rules.matcher.compiler;
 
 import java.util.List;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -69,7 +71,7 @@ public final class OperatorPlan implements MatchPlan {
             child.emit(out);
         }
         if (bound) {
-            out.add(binder.unbinderInstruction());
+            out.add(new UnbindInstruction(binder, boundVars));
         }
     }
 
@@ -105,8 +107,24 @@ public final class OperatorPlan implements MatchPlan {
                 return null;
             }
             final @Nullable MatchResultInfo body = core.match(element, bound, services);
-            return body == null ? null : binder.unbind(body);
+            return body == null ? null : binder.unbind(body, boundVars);
         };
+    }
+
+    /**
+     * The interpreter form of {@link BinderMatcher#unbind}: it closes the binding scope and
+     * leaves the cursor untouched. It is a plain cursor-level instruction (not a
+     * {@link MatchInstruction}) because it runs after the binder term's subterms have been
+     * matched, when the cursor has already advanced past the whole term — there is no current
+     * element it could read.
+     */
+    private record UnbindInstruction(BinderMatcher binder,
+            ImmutableArray<? extends QuantifiableVariable> boundVars) implements VMInstruction {
+        @Override
+        public MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo mc,
+                LogicServices services) {
+            return binder.unbind(mc, boundVars);
+        }
     }
 
     @Override
