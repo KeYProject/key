@@ -7,7 +7,8 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 /**
- * Language SPI for matching the <em>program</em> carried by a modality (the {@code \<{ ... }\>} of
+ * Language SPI (service provider interface) for matching the <em>program</em> carried by a
+ * modality (the {@code \<{ ... }\>} of
  * a symbolic-execution taclet). Each front-end has its own program AST; every program is a
  * {@link org.key_project.logic.SyntaxElement} navigated through {@code getChild}, but which
  * constructs exist and how they match is the language's own.

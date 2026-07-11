@@ -65,7 +65,7 @@ public abstract class MatchPlanBuilder {
     /**
      * The language's {@link BinderMatcher}, used for every pattern that binds variables.
      *
-     * @return the binder SPI
+     * @return the language's {@link BinderMatcher}
      */
     protected abstract BinderMatcher binder();
 

@@ -41,7 +41,8 @@ public final class OperatorPlan implements MatchPlan {
      * @param head the operator head (operator + operator-specific checks)
      * @param children one plan per subterm, in order
      * @param boundVars the term's bound variables (possibly empty)
-     * @param binder the binder SPI (used only if {@code boundVars} is non-empty)
+     * @param binder the language's {@link BinderMatcher} (used only if {@code boundVars} is
+     *        non-empty)
      */
     public OperatorPlan(MatchHead head, List<MatchPlan> children,
             ImmutableArray<? extends QuantifiableVariable> boundVars, BinderMatcher binder) {

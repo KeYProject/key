@@ -13,7 +13,8 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Language SPI for matching <em>list program schema variables</em> — schema variables such as
+ * Language SPI (service provider interface) for matching <em>list program schema variables</em> —
+ * schema variables such as
  * {@code #slist} that stand for a run of consecutive statements or expressions rather than exactly
  * one. What a run may contain is language-specific: each front-end decides for itself which
  * program elements a schema variable may stand for, and stores the matched run in its own typed
