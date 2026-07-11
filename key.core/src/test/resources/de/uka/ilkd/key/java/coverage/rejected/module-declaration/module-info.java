@@ -1,0 +1,1 @@
+module coverage.test { }
