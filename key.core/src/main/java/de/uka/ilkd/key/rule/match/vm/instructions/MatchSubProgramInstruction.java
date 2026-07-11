@@ -15,13 +15,11 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Matches the Java program of a modality by running a sub-program of {@code VMInstruction}s over
- * the
- * program tree (with its own cursor), instead of the monolithic {@code MatchProgramInstruction}
- * which delegates to the separate {@code ProgramElement.match} AST matcher. The current element is
- * the modality's {@link JavaBlock} (as for {@code MatchProgramInstruction}); the sub-program runs
- * on
- * its {@code program()}, leaving the outer cursor at the {@code JavaBlock} so the surrounding
- * navigation is unchanged.
+ * the program tree (with its own cursor), instead of the monolithic
+ * {@code MatchProgramInstruction} which delegates to the separate {@code ProgramElement.match} AST
+ * matcher. The current element is the modality's {@link JavaBlock} (as for
+ * {@code MatchProgramInstruction}); the sub-program runs on its {@code program()}, leaving the
+ * outer cursor at the {@code JavaBlock} so the surrounding navigation is unchanged.
  */
 public final class MatchSubProgramInstruction implements MatchInstruction {
 
