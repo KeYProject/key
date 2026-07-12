@@ -61,6 +61,79 @@ namespaces, never from a counter shared by the whole proof. A global counter mak
 names depend on which worker got there first, and reloading a saved proof then fails
 because replay produces different names.
 
+## Restricting a feature to the single-core prover
+
+Sometimes making a feature thread-safe is not worth it (or not possible yet). That is a
+legitimate choice — but it must be *declared*, so the feature runs single-core instead of
+racing. Four mechanisms exist, from coarse to fine. Pick the coarsest one that fits.
+
+**1. Profile level — don't opt in.** A whole profile (calculus + strategy) is kept off the
+multi-core prover by simply not overriding `Profile.supportsParallelAutomode()`: the
+default is `false`, and only `JavaProfile` opts in. Automode for a non-supporting profile
+always runs single-core, whatever the user configured.
+
+```java
+// Profile.java (interface): conservative default, nothing to do for a new profile
+default boolean supportsParallelAutomode() { return false; }
+```
+
+**2. Macro level — `allowParallel()`.** A proof macro whose strategy keeps cross-goal
+state (a step counter over all goals, a stop-flag set by one goal for all others) declares
+itself single-core by overriding one method; the macro machinery then routes it to the
+single-threaded prover. Existing examples: `OneStepProofMacro` (counts steps across
+goals), `AutoMacro`, `FinishSymbolicExecutionUntilMergePointMacro`.
+
+```java
+@Override
+protected boolean allowParallel() {
+    return false; // this macro's strategy shares state across goals
+}
+```
+
+**3. Rule level — refuse applicability during a multi-core run.** A built-in rule that
+cannot run concurrently (it touches other goals than its own) disables itself while a
+multi-core run is active. Existing example: `MergeRule`, which links several goals and
+would need to lock all of them:
+
+```java
+// MergeRule.isApplicable
+if (ParallelProver.isMultiThreadedRunActive()) {
+    return false; // merging links several goals; single-core only
+}
+```
+
+**4. Strategy level — keep the search from waiting for a disabled rule.** Mechanism 3
+alone can stall a proof: if the strategy still *prefers* the disabled rule, goals wait for
+a rule that never fires. Whoever disables a rule must also teach the strategy the
+alternative. Existing example: with merge points set to "merge", the strategy treats them
+as "skip" during a multi-core run (`SymExStrategy`, rule set `merge_point`), so proofs
+pass merge points instead of stalling.
+
+Use `ParallelProver.isMultiThreadedRunActive()` (mechanisms 3 and 4) only as a last
+resort: every such case distinction is a fork in behaviour that tests must cover twice.
+Prefer the declarative switches (1 and 2). Side proofs need no action at all — they always
+run single-core by design.
+
+## Adding an exception to `SharedStateLintTest`
+
+If the linter flags a field that is genuinely safe — for example a flag written only
+before proving starts — allowlist it instead of restructuring:
+
+1. Run `./gradlew :key.core:test --tests '*SharedStateLintTest*'`. The failure message
+   names the field, e.g. `de.uka.ilkd.key.mypackage.MyClass#myTable`.
+2. Open `key.core/src/test/resources/de/uka/ilkd/key/prover/mt/shared-state-allowlist.txt`
+   and add one line: the field id, whitespace, and a justification that names *why no
+   worker thread ever writes it during proof search*:
+
+   ```
+   de.uka.ilkd.key.mypackage.MyClass#myTable   # filled once in the static initializer, read-only afterwards
+   ```
+3. Re-run the test. It fails on stale entries too, so remove the line again if the field
+   ever disappears.
+
+An honest justification is the review contract: "it compiles" is not a reason, "written
+only during single-threaded problem loading" is.
+
 ## When a multi-core CI test fails on your pull request
 
 * `SharedStateLintTest` — you added a static mutable field on the proving path. The

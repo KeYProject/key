@@ -11,7 +11,9 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.ProverCore;
 
 /**
- * Selection seam for the prover used by automatic proof search.
+ * The central place where the prover for automatic proof search is selected (a "seam" in the
+ * sense of Feathers: a place where behavior can be switched without editing the code that uses
+ * it).
  *
  * <p>
  * Returns the {@link ParallelProver} when the multi-core prover is enabled <em>and</em> the proof's
@@ -20,7 +22,6 @@ import org.key_project.prover.engine.ProverCore;
  * instead of constructing {@link ApplyStrategy} directly, so the parallel path can be toggled
  * centrally and the profile guard cannot be bypassed.
  *
- * @author Claude (KeY multithreading effort)
  */
 public final class AutoProvers {
 

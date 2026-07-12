@@ -76,7 +76,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelProver.class);
 
-    /** When {@code true}, the auto-prover selection seam builds a {@link ParallelProver}. */
+    /** When {@code true}, the auto-prover selection point builds a {@link ParallelProver}. */
     public static final String PARALLEL_PROPERTY = "key.prover.parallel";
     /** Number of worker threads. */
     public static final String THREADS_PROPERTY = "key.prover.parallel.threads";

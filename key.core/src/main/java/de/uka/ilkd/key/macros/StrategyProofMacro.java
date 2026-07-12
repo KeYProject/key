@@ -99,7 +99,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
 
         final GoalChooser goalChooser =
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
-        // Route through the selection seam so the macro runs on the multi-core prover when it is
+        // Route through the central prover selection so the macro runs on the multi-core prover
+        // when it is
         // enabled, the proof's profile supports it, and the macro's strategy tolerates concurrent
         // use (see allowParallel()); otherwise the single-threaded ApplyStrategy.
         final ProverCore applyStrategy =
