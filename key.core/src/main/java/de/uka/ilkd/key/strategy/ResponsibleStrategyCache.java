@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
@@ -22,14 +23,21 @@ public class ResponsibleStrategyCache {
         new LinkedHashMap<RuleSet, List<ComponentStrategy>>();
     private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap =
         new LinkedHashMap<RuleSet, List<ComponentStrategy>>();
-    // map rules to the strategies that participate in their cost computations, instantiation or
-    // approval decisions
+    // Map rules to the strategies that participate in their cost computations, instantiation or
+    // approval decisions. These are filled lazily on the first query for a rule. One strategy
+    // object is shared by all goals of a proof, so under the multi-core prover several worker
+    // threads query and fill these maps at the same time; they are therefore concurrent maps
+    // filled through computeIfAbsent (atomic per rule). The responsible-strategy set of a rule is
+    // a pure function of the rule, so the cached value is the same whichever worker computes it --
+    // the result stays reproducible. A plain map here corrupts under concurrent writes and made
+    // the strategy return an inconsistent set between two evaluations of the same feature term,
+    // which broke the BackTrackingManager's determinism check (a worker AssertionError).
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
+        new ConcurrentHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
+        new ConcurrentHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> approvalRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
+        new ConcurrentHashMap<>();
     private final Map<Name, ComponentStrategy> nameToStrategyMap =
         new HashMap<Name, ComponentStrategy>();
 
@@ -79,29 +87,32 @@ public class ResponsibleStrategyCache {
     public LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule,
             List<ComponentStrategy> strategies, StrategyAspect aspect) {
         var ruleToStrategyMap = getRuleToStrategyMap(aspect);
-        LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
-        if (strats == null) {
-            strats = new LinkedHashSet<>();
-            if (rule instanceof BuiltInRule bir) {
+        // computeIfAbsent fills the entry atomically: concurrent workers proving different goals
+        // of the same proof never see a half-built map or overwrite each other. The mapping
+        // function only reads the responsibility maps (built once in the constructor, read-only
+        // afterwards) and the strategies list, so it is a pure function of the rule.
+        return ruleToStrategyMap.computeIfAbsent(rule, r -> {
+            LinkedHashSet<ComponentStrategy> strats = new LinkedHashSet<>();
+            if (r instanceof BuiltInRule bir) {
                 for (var cs : strategies) {
                     if (cs.isResponsibleFor(bir)) {
                         strats.add(cs);
                     }
                 }
             } else {
-                var ruleSets = rule.ruleSets();
+                var ruleSets = r.ruleSets();
                 Map<RuleSet, List<ComponentStrategy>> responsibilityMap =
                     getResponsibilityMap(aspect);
                 while (ruleSets.hasNext()) {
                     var rs = ruleSets.next();
                     List<ComponentStrategy> s = responsibilityMap.get(rs);
-                    if (s != null)
+                    if (s != null) {
                         strats.addAll(s);
+                    }
                 }
             }
-            ruleToStrategyMap.put(rule, strats);
-        }
-        return strats;
+            return strats;
+        });
     }
 
     /// Returns the strategy with the given [Name]
