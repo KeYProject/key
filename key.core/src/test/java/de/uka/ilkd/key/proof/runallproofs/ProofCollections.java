@@ -53,13 +53,105 @@ public class ProofCollections {
             + "\n[Strategy]MaximumNumberOfAutomaticApplications=20000");
 
         var c = new ProofCollection(settings);
+        // Stratified by prover subsystem, so that a change to one of them has a good chance of
+        // being exercised here. Rows are short-to-medium proofs from automaticJavaDL (known
+        // provable); the comment gives nodes/branches from a single-core reference run. The
+        // "branches" number is what matters for the multi-core prover: only proofs with many
+        // simultaneously open goals let several workers interleave.
         var g = c.group("multithreaded_smoke");
-        // small, closes under the multi-core prover (subset of the MT determinism/stress set)
-        g.provable("newBook/09.list_modelfield/ArrayList.remFirst.key");
-        g.provable("standard_key/arith/median.key");
-        g.provable("heap/list/ArrayList_concatenate.key");
-        g.provable("heap/saddleback_search/Saddleback_search.key");
-        g.provable("standard_key/java_dl/symmArray.key");
+        // first-order logic / quantifiers
+        g.provable("standard_key/pred_log/tptp/SYN/SYN036p2.key"); // 1200n 72br
+        g.provable("standard_key/pred_log/tptp/PUZ/PUZ001p1.key"); // 1922n 61br
+        g.provable("standard_key/pred_log/steam1.key"); // 392n 32br
+        g.provable("standard_key/prop_log/allClausesLength5.key"); // 645n 16br
+        g.provable("standard_key/quantifiers/normalisation9.key"); // 45n 1br
+        // integer arithmetic
+        g.provable("standard_key/arith/median.key"); // 14942n 28br
+        g.provable("standard_key/arith/overflow_hija.key"); // 2682n 5br
+        g.provable("standard_key/arith/divisionAssoc.key"); // 816n 5br
+        g.provable("standard_key/arith/check_jmod.key"); // 742n 8br
+        g.provable("standard_key/inEqSimp/quadraticInEq.key"); // 1042n 33br
+        // heap / select-store (fields, arrays)
+        g.provable("heap/simple/select_store.key"); // 12n 1br
+        g.provable("heap/simple/arrays.key"); // 150n 7br
+        g.provable("standard_key/java_dl/arrayMax.key"); // 989n 19br
+        g.provable("heap/simple/object_creation.key"); // 182n 5br
+        g.provable("standard_key/java_dl/symmArray.key"); // 13517n 74br
+        // loop invariants
+        g.provable("heap/simple/loop1.key"); // 114n 3br
+        g.provable("heap/simple/loop2.key"); // 509n 8br
+        g.provable("heap/simple/selection_sort.key"); // 3330n 49br
+        g.provable("standard_key/java_dl/reverseArray2.key"); // 1016n 16br
+        g.provable("heap/saddleback_search/Saddleback_search.key"); // 31630n 143br
+        // method / operation contracts (incl. dependency and model fields)
+        g.provable("heap/simple/operation_contracts.key"); // 842n 22br
+        g.provable("heap/simple/dependency_contracts.key"); // 1057n 43br
+        g.provable("newBook/09.list_modelfield/ArrayList.remFirst.key"); // 2908n 42br
+        g.provable("heap/list/ArrayList_get_dep.key"); // 516n 20br
+        g.provable("heap/model_methods/CellTest_test.key"); // 690n 15br
+        // sequences and strings
+        g.provable("heap/simple/seq.key"); // 595n 6br
+        g.provable("heap/list_seq/ArrayList.contains.key"); // 1458n 19br
+        g.provable("standard_key/strings/stringCompileTimeConstant2.key"); // 922n 23br
+        g.provable("standard_key/strings/concat2.key"); // 55n 1br
+        g.provable("heap/comprehensions/sum1.key"); // 348n 6br
+        // wide splitting (many open goals -> real worker interleaving)
+        g.provable("heap/list/ArrayList_add.key"); // 2844n 115br
+        g.provable("standard_key/java_dl/strassen/strassen.key"); // 1797n 79br
+        g.provable("standard_key/java_dl/switch/large_switch.key"); // 2607n 70br
+        g.provable("heap/javacard/arrayFillNonAtomic.key"); // 2634n 54br
+        g.provable("standard_key/java_dl/polishFlagSort.key"); // 2515n 47br
+        g.provable("heap/list/ArrayList_concatenate.key"); // 12082n 224br
+        // simplification / rewriting
+        g.provable("standard_key/polySimp/simplify8.key"); // 755n 1br
+        g.provable("standard_key/polySimp/simplify19.key"); // 3062n 1br
+        g.provable("standard_key/inEqSimp/division.key"); // 2205n 23br
+        g.provable("standard_key/inEqSimp/simplify5.key"); // 1459n 15br
+        return c;
+    }
+
+    /**
+     * The widest-splitting rows of {@link #smallMultiThreaded()}: proofs with many goals open at
+     * the same time, where the goal scheduling of the multi-core prover actually interleaves.
+     * Used by the 4-worker CI test, which stays small because CI runners only have few cores.
+     * Every row is listed three times: races are timing-dependent, so each extra run is another
+     * chance to hit one.
+     *
+     * @return the splitting-heavy multi-core proof collection
+     * @throws IOException if the KeY settings cannot be read
+     */
+    public static ProofCollection smallMultiThreadedSplitting() throws IOException {
+        var settings = new ProofCollectionSettings(new Date());
+        settings.setBaseDirectory("../key.ui/examples/");
+        settings.setStatisticsFile("build/reports/runallproofs/runStatisticsMt4w.csv");
+        settings.setForkMode(ForkMode.NOFORK);
+        settings.setReloadEnabled(true);
+        settings.setTempDir("build/runallproofs_tmp");
+        settings.setVerboseOutput(true);
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties")
+            + "\n[Strategy]MaximumNumberOfAutomaticApplications=20000");
+
+        var c = new ProofCollection(settings);
+        var g = c.group("multithreaded_splitting");
+        final String[] rows = {
+            "heap/list/ArrayList_add.key", // 115br
+            "standard_key/java_dl/strassen/strassen.key", // 79br
+            "standard_key/pred_log/tptp/SYN/SYN036p2.key", // 72br
+            "standard_key/java_dl/switch/large_switch.key", // 70br
+            "standard_key/pred_log/tptp/PUZ/PUZ001p1.key", // 61br
+            "heap/javacard/arrayFillNonAtomic.key", // 54br
+            "heap/simple/selection_sort.key", // 49br
+            "standard_key/java_dl/polishFlagSort.key", // 47br
+            "heap/simple/dependency_contracts.key", // 43br
+            "newBook/09.list_modelfield/ArrayList.remFirst.key", // 42br
+            "standard_key/inEqSimp/quadraticInEq.key", // 33br
+            "standard_key/pred_log/steam1.key", // 32br
+        };
+        for (int repetition = 0; repetition < 3; repetition++) {
+            for (String row : rows) {
+                g.provable(row);
+            }
+        }
         return c;
     }
 

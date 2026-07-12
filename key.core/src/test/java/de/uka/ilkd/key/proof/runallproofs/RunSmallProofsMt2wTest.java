@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.prover.mt.MtFailureAdvice;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.junit.jupiter.api.AfterAll;
@@ -68,7 +69,16 @@ public final class RunSmallProofsMt2wTest {
     Stream<DynamicTest> data() throws IOException {
         var proofCollection = ProofCollections.smallMultiThreaded();
         proofCollection.getSettings().getStatisticsFile().setUp();
-        return RunAllProofsTest.data(proofCollection);
+        // append the multi-core advice block to every failure, so a developer who has never
+        // worked with the multi-core prover knows what to look for
+        return RunAllProofsTest.data(proofCollection)
+                .map(test -> DynamicTest.dynamicTest(test.getDisplayName(), () -> {
+                    try {
+                        test.getExecutable().execute();
+                    } catch (AssertionError e) {
+                        throw new AssertionError(e.getMessage() + MtFailureAdvice.mtCorpus(), e);
+                    }
+                }));
     }
 
     private static void restore(String key, String value) {

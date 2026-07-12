@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.prover.impl.ParallelProver;
+import de.uka.ilkd.key.prover.mt.MtFailureAdvice;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.junit.jupiter.api.AfterAll;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * four workers are set through {@link ParallelProver#THREADS_PROPERTY}, which is honoured exactly
  * (no clamp to available cores), so the run really is multi-worker even on a single-core runner.
  *
- * @see ProofCollections#smallMultiThreaded()
+ * @see ProofCollections#smallMultiThreadedSplitting()
  * @see RunSmallProofsMt2wTest
  */
 @Tag("slow")
@@ -66,9 +67,18 @@ public final class RunSmallProofsMt4wTest {
 
     @TestFactory
     Stream<DynamicTest> data() throws IOException {
-        var proofCollection = ProofCollections.smallMultiThreaded();
+        var proofCollection = ProofCollections.smallMultiThreadedSplitting();
         proofCollection.getSettings().getStatisticsFile().setUp();
-        return RunAllProofsTest.data(proofCollection);
+        // append the multi-core advice block to every failure, so a developer who has never
+        // worked with the multi-core prover knows what to look for
+        return RunAllProofsTest.data(proofCollection)
+                .map(test -> DynamicTest.dynamicTest(test.getDisplayName(), () -> {
+                    try {
+                        test.getExecutable().execute();
+                    } catch (AssertionError e) {
+                        throw new AssertionError(e.getMessage() + MtFailureAdvice.mtCorpus(), e);
+                    }
+                }));
     }
 
     private static void restore(String key, String value) {
