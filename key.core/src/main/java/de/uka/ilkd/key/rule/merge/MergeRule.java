@@ -592,9 +592,10 @@ public class MergeRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // MergeRule links several goals into one and would therefore need to lock multiple goals
         // at once. That is not yet safe under goal-level concurrency, so the rule is disabled while
-        // a multi-worker parallel run is active (single-threaded proving is unaffected). See the
-        // multithreading effort (branch bubel/mt-goals).
-        if (ParallelProver.isMultiThreadedRunActive()) {
+        // a multi-worker parallel run is active ON THIS PROOF -- single-threaded proving is
+        // unaffected, and so are other proofs in the same JVM (including single-core side proofs
+        // spawned by a worker of a parallel run).
+        if (ParallelProver.isMultiThreadedRunActive(goal.proof())) {
             return false;
         }
         return isOfAdmissibleForm(goal, pio, true);

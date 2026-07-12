@@ -209,7 +209,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                 /*
                  * For this case, we use a special feature, since deleting merge points should only
                  * be done after a merge rule application. EXCEPT during a multi-worker parallel
-                 * run: there the merge rule disables itself (linking several goals would require
+                 * run on this proof: there the merge rule disables itself (linking several goals
+                 * would require
                  * synchronizing a subset of goals across workers), so waiting for a merge would
                  * stall every goal at its merge point forever. The run falls back to the safe
                  * 'skip' treatment and deletes the statement cheaply instead. Decided per cost
@@ -220,7 +221,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                     @Override
                     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
                             PosInOccurrence pos, G goal, MutableState mState) {
-                        return ParallelProver.isMultiThreadedRunActive()
+                        return ParallelProver.isMultiThreadedRunActive(goal.proof())
                                 ? NumberRuleAppCost.create(-5000)
                                 : DeleteMergePointRuleFeature.INSTANCE.computeCost(app, pos, goal,
                                     mState);

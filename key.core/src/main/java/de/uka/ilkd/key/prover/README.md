@@ -97,10 +97,15 @@ would need to lock all of them:
 
 ```java
 // MergeRule.isApplicable
-if (ParallelProver.isMultiThreadedRunActive()) {
+if (ParallelProver.isMultiThreadedRunActive(goal.proof())) {
     return false; // merging links several goals; single-core only
 }
 ```
+
+The marker is scoped **per proof**: several proofs may be processed in parallel in one
+JVM, and only the proof that the multi-worker run actually works on is marked. A proof
+proved single-core at the same time — including a side proof spawned by a worker —
+keeps its full rule set.
 
 **4. Strategy level — keep the search from waiting for a disabled rule.** Mechanism 3
 alone can stall a proof: if the strategy still *prefers* the disabled rule, goals wait for
@@ -109,7 +114,7 @@ alternative. Existing example: with merge points set to "merge", the strategy tr
 as "skip" during a multi-core run (`SymExStrategy`, rule set `merge_point`), so proofs
 pass merge points instead of stalling.
 
-Use `ParallelProver.isMultiThreadedRunActive()` (mechanisms 3 and 4) only as a last
+Use `ParallelProver.isMultiThreadedRunActive(proof)` (mechanisms 3 and 4) only as a last
 resort: every such case distinction is a fork in behaviour that tests must cover twice.
 Prefer the declarative switches (1 and 2). Side proofs need no action at all — they always
 run single-core by design.

@@ -306,11 +306,12 @@ public class TestNamingInvariants {
     @Test
     public void mtNoMintSplitGivesEachSiblingItsOwnNamespaces() throws Exception {
         final KeYEnvironment<?> env = load("skolemSiblings.key");
-        final var scope = ParallelProver.enterMultiThreadedRun();
+        final Proof proof = env.getLoadedProof();
+        final var scope = ParallelProver.enterMultiThreadedRun(proof);
         try {
-            final Proof proof = env.getLoadedProof();
-            assertTrue(ParallelProver.isMultiThreadedRunActive(),
-                "the MT-run marker must be set for adaptNamespacesNewGoals to take the MT branch");
+            assertTrue(ParallelProver.isMultiThreadedRunActive(proof),
+                "the MT-run marker must be set on this proof to reproduce the multi-core "
+                    + "split scenario");
             // andRight is a purely propositional (no-mint) split of the root conjunction
             applyOnFormula(proof, proof.openGoals().head(), "andRight", 1, false);
             final ImmutableList<Goal> goals = proof.openGoals();

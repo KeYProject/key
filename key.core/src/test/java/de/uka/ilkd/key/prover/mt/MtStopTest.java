@@ -48,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * still alive. The fix waits for the pool to terminate while the listeners are still suspended, so
  * the property holds and the GUI listeners are only re-attached once the proof is quiescent.
  *
- * @author Claude (KeY multithreading effort)
  */
 public class MtStopTest {
 
@@ -101,9 +100,10 @@ public class MtStopTest {
 
             // Interrupt only once the parallel run is observably underway, so the stop lands
             // mid-run rather than (on a fast JVM) after the run has already finished -- which would
-            // make the invariant below vacuous. isMultiThreadedRunActive() is a global marker set
-            // for the whole multi-worker run (ParallelProver.enterMultiWorkerRunScope) and cleared
-            // when it ends; it is backed by an AtomicInteger, so polling it from here is race-free.
+            // make the invariant below vacuous. isMultiThreadedRunActive() reports whether any
+            // proof in this JVM has a multi-worker run (ParallelProver.enterMultiWorkerRunScope
+            // registers the proof, the scope's close deregisters it); the registry is a
+            // ConcurrentHashMap, so polling it from here is race-free.
             // JUnit runs these tests sequentially, so no other run can flip the marker
             // concurrently.
             boolean sawRunActive = false;

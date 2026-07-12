@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +28,7 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
+import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
@@ -84,19 +86,41 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /** Names worker thread pools uniquely for debugging/profiling. */
     private static final AtomicInteger POOL_COUNTER = new AtomicInteger();
 
-    /** Number of parallel runs with more than one worker currently in progress (global). */
-    private static final AtomicInteger ACTIVE_MULTI_WORKER_RUNS = new AtomicInteger();
+    /**
+     * The proofs on which a multi-worker parallel run is currently in progress, each with its
+     * nesting depth (defensive: production has at most one automode per proof at a time). Keyed by
+     * proof identity, so concurrent runs on different proofs in one JVM do not see each other:
+     * a proof that is being proved single-core keeps its full rule set even while another proof
+     * runs multi-core, and a single-core side proof spawned by a worker (its own proof object) is
+     * unaffected by the enclosing run.
+     */
+    private static final ConcurrentHashMap<ProofObject<?>, Integer> ACTIVE_MULTI_WORKER_PROOFS =
+        new ConcurrentHashMap<>();
 
     /**
-     * Whether a goal-level parallel run with more than one worker is currently in progress. Rules
-     * that are not yet safe under concurrent goal processing consult this to disable themselves for
-     * the duration; single-threaded proving (and the old main-thread prover) is unaffected.
+     * Whether a goal-level parallel run with more than one worker is currently in progress on the
+     * given proof. Rules that are not yet safe under concurrent goal processing consult this to
+     * disable themselves for the duration; single-threaded proving of this proof (and the old
+     * main-thread prover) is unaffected, as are other proofs in the same JVM.
      *
-     * @return {@code true} iff at least one multi-worker parallel run is active
+     * @param proof the proof to ask about
+     * @return {@code true} iff a multi-worker parallel run is active on {@code proof}
      * @see de.uka.ilkd.key.rule.merge.MergeRule
      */
+    public static boolean isMultiThreadedRunActive(ProofObject<?> proof) {
+        return ACTIVE_MULTI_WORKER_PROOFS.containsKey(proof);
+    }
+
+    /**
+     * Whether a goal-level parallel run with more than one worker is currently in progress on any
+     * proof in this JVM. Prefer {@link #isMultiThreadedRunActive(ProofObject)} wherever a proof is
+     * in reach -- this coarse variant exists for observers without one (e.g. tests polling for a
+     * run to start).
+     *
+     * @return {@code true} iff at least one multi-worker parallel run is active
+     */
     public static boolean isMultiThreadedRunActive() {
-        return ACTIVE_MULTI_WORKER_RUNS.get() > 0;
+        return !ACTIVE_MULTI_WORKER_PROOFS.isEmpty();
     }
 
     /** A closeable scope whose {@link #close()} does not throw a checked exception. */
@@ -106,15 +130,17 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     /**
-     * Marks a multi-worker run as active until the returned handle is closed. Exposed for the
-     * prover's own run scope and for tests of the rules that gate on
-     * {@link #isMultiThreadedRunActive()}.
+     * Marks a multi-worker run on the given proof as active until the returned handle is closed.
+     * Exposed for the prover's own run scope and for tests of the rules that gate on
+     * {@link #isMultiThreadedRunActive(ProofObject)}.
      *
+     * @param proof the proof the run works on
      * @return a {@link RunScope} that clears the marker on close
      */
-    public static RunScope enterMultiThreadedRun() {
-        ACTIVE_MULTI_WORKER_RUNS.incrementAndGet();
-        return ACTIVE_MULTI_WORKER_RUNS::decrementAndGet;
+    public static RunScope enterMultiThreadedRun(ProofObject<?> proof) {
+        ACTIVE_MULTI_WORKER_PROOFS.merge(proof, 1, Integer::sum);
+        return () -> ACTIVE_MULTI_WORKER_PROOFS.compute(proof,
+            (p, depth) -> depth == null || depth <= 1 ? null : depth - 1);
     }
 
     private final int workerCount;
@@ -368,10 +394,10 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     /**
-     * Enters the multi-worker run scope: while more than one worker runs, advertise that a
-     * multi-threaded run is active (so rules not yet safe under concurrency, e.g. MergeRule,
-     * disable
-     * themselves) and seal the Java type model (no new type may be registered while workers prove
+     * Enters the multi-worker run scope: while more than one worker runs, register this proof as
+     * having an active multi-threaded run (so rules not yet safe under concurrency, e.g.
+     * MergeRule, disable themselves on this proof -- other proofs in the JVM are unaffected) and
+     * seal the Java type model (no new type may be registered while workers prove
      * concurrently; types are pre-registered at load time, so a stray lazy registration now fails
      * fast instead of racing the shared model). The returned scope reverses both on close. If
      * sealing throws, the active-run marker is released before propagating, so it never leaks.
@@ -383,7 +409,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             return () -> {
             };
         }
-        final RunScope marker = enterMultiThreadedRun();
+        final RunScope marker = enterMultiThreadedRun(proof);
         try {
             final JavaInfo javaInfo = proof.getServices().getJavaInfo();
             // Materialise the default execution context on this proof's (fresh) JavaInfo before
