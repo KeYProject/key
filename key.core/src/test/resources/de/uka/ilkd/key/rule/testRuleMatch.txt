@@ -136,6 +136,11 @@
   };
 
 
+  // A modality program that is a plain assignment with NO surrounding context block
+  // (no .. / ... markers): the whole program is a StatementBlock matched structurally.
+  TestMatchTaclet_nocontext_fixed_statements { \find (\<{ #slhs1 = #e; }\>post)
+            \replacewith (post) };
+
   TestMatchTaclet_nocontext  { \find (\<{{#slist}}\>post)
             \replacewith (\<{ #slist }\>post) };
 
