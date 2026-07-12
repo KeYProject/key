@@ -392,6 +392,19 @@ public class TestMatchTaclet {
     }
 
     @Test
+    public void testNoContextFixedStatementMatching() {
+        // a modality program that is a plain StatementBlock (no .. / ... context markers) whose
+        // statements are fixed (non-list): the whole block is matched structurally, exact size
+        JTerm match =
+            TacletForTests.parseTerm("\\<{ i = 1; }\\>true ", services, services.getNamespaces());
+        FindTaclet taclet = (FindTaclet) TacletForTests
+                .getTaclet("TestMatchTaclet_nocontext_fixed_statements").taclet();
+        MatchResultInfo mc =
+            (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
+        assertNotNull(mc, "non-context fixed-statement program should match");
+    }
+
+    @Test
     public void testPrefixMatching() {
         JTerm match = TacletForTests.parseTerm("\\<{return;}\\>true ");
         StatementBlock prg = (StatementBlock) match.javaBlock().program();
