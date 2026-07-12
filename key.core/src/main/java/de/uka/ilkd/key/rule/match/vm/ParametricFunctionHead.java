@@ -61,6 +61,8 @@ public final class ParametricFunctionHead implements MatchHead {
             } else if (arg.sort() instanceof ParametricSortInstance) {
                 return null;
             } else {
+                // identity suffices: equal instances intern to one shared object, arguments
+                // included (pinned by ParametricFunctionInterningTest)
                 argMatchers[i] = getMatchIdentityInstruction(arg);
             }
         }
