@@ -10,18 +10,35 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A thread-safe, bounded LRU cache that reduces lock contention by <em>striping</em>: keys are
- * partitioned into independently locked segments, each a small exact LRU map. An operation locks
- * only the one segment its key maps to, so concurrent workers touching different segments do not
- * block one another.
+ * A bounded cache that several threads can use at the same time, built for speed under heavy
+ * concurrent use.
  *
  * <p>
- * The trade-off is that eviction is exact only <em>within</em> a segment, not globally: the
- * least-recently-used entry of the whole cache is not necessarily the next evicted. This is sound
- * only for <em>pure</em> caches, i.e. caches whose value is a function of the key alone, so that
- * eviction can only force a recomputation of the same value and never changes a result. Do not use
- * it for caches whose value depends on when it was first computed (use {@link ConcurrentLruCache}
- * for those).
+ * Vocabulary, in one paragraph: a <em>cache</em> stores results of a computation so they do not
+ * have to be computed again; <em>bounded</em> means it holds at most a fixed number of entries;
+ * when a part of it is full, the entry that has not been used for the longest time is thrown out
+ * (<em>least recently used</em>, LRU, <em>eviction</em>); <em>thread-safe</em> means several
+ * threads may call any method at any time without corrupting the cache -- important in KeY
+ * because the multi-core prover runs proof search on several worker threads that all see the same
+ * cache.
+ *
+ * <p>
+ * A cache with one single lock (like {@link ConcurrentLruCache}) makes every thread wait in line,
+ * even when they ask for completely different keys. This class avoids that by <em>striping</em>:
+ * the keys are split over several independent segments, each with its own lock and its own small
+ * LRU map. A thread only locks the one segment its key belongs to, so threads working on
+ * different segments never wait for each other.
+ *
+ * <p>
+ * The price of striping: there is no single LRU order over the whole cache, only one per segment.
+ * So <em>which</em> entry gets evicted next is not exactly predictable from the outside. That is
+ * harmless exactly when the cached value is a <em>pure function of the key</em> -- same key,
+ * always the same value (example from KeY: "does this term contain a modality?"). Then an early
+ * eviction only means the same value is computed once more; no result ever changes. It is NOT
+ * harmless when the value depends on when it was first stored -- for such caches the eviction
+ * order can change results, and {@link ConcurrentLruCache} (exact, single-lock) must be used.
+ * One-question test: <em>"if this entry were thrown away and computed again later, could the new
+ * value be different?"</em> No &rarr; this class. Yes &rarr; {@link ConcurrentLruCache}.
  *
  * <p>
  * The total capacity is still hard-bounded (each of the {@code stripes} segments holds at most

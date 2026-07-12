@@ -15,23 +15,42 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A thread-safe LRU cache with <em>exact</em> least-recently-used eviction order.
+ * A bounded cache that several threads can use at the same time, with one <em>exact</em>
+ * least-recently-used eviction order.
  *
  * <p>
- * This is a single-lock cache: every operation (including {@link #get}, which reorders the access
- * recency) is serialized on the cache instance. It wraps an access-ordered {@link LinkedHashMap}
- * with size-bounded eviction in a {@code Collections.synchronizedMap}, behind a named, reusable
- * type with an atomic {@link #computeIfAbsent}.
+ * Vocabulary, in one paragraph: a <em>cache</em> stores results of a computation so they do not
+ * have to be computed again; <em>bounded</em> means it holds at most a fixed number of entries;
+ * when it is full and a new entry arrives, the entry that has not been used for the longest time
+ * is thrown out (<em>least recently used</em>, LRU, <em>eviction</em>); <em>thread-safe</em> means
+ * several threads may call any method at any time without corrupting the cache -- important in
+ * KeY because the multi-core prover runs proof search on several worker threads that all see the
+ * same cache.
  *
  * <p>
- * Use this flavour when the eviction order matters for correctness, i.e. when a cached value
- * depends
- * on <em>when</em> it was first computed (KeY has such caches -- e.g. the introduction-time cache,
- * whose value reflects the goal history at first-cache time). For such caches an approximate or
- * striped eviction policy would change proofs, so the exact, fully-serialized order is mandatory.
- * For caches whose value is a pure function of the key (eviction only affects the hit rate, never
- * the result), prefer {@link StripedLruCache}, which trades exact global order for far lower lock
- * contention.
+ * This class achieves thread safety with a single lock: every operation, even a plain
+ * {@link #get} (which counts as a "use" and therefore changes the LRU order), waits for that one
+ * lock. All threads queue up at the same lock, which costs speed but buys one guarantee that
+ * {@link StripedLruCache} cannot give: there is one exact LRU order over <em>all</em> entries, so
+ * <em>which</em> entry is evicted, and when, is fully deterministic.
+ *
+ * <p>
+ * <b>Which of the two caches do I need?</b> Ask: <em>"if this entry were thrown away and computed
+ * again later, could the new value be different?"</em>
+ * <ul>
+ * <li>Yes, the value depends on when it was first stored &rarr; use this class. Example from KeY:
+ * a cache that stores at which proof step a formula was first seen. Recomputing that later would
+ * store a <em>different</em> (later) step, so losing an entry changes results -- eviction must
+ * follow one exact, reproducible order.</li>
+ * <li>No, the value only depends on the key (same key &rarr; always the same value) &rarr; use
+ * {@link StripedLruCache}. Losing an entry there only costs time, never correctness, so it can
+ * drop the single global lock and run much faster under many threads.</li>
+ * </ul>
+ *
+ * <p>
+ * Implementation: an access-ordered {@link LinkedHashMap} with size-bounded eviction, wrapped in
+ * {@code Collections.synchronizedMap}, behind a named, reusable type with an atomic
+ * {@link #computeIfAbsent}.
  *
  * <p>
  * The collection views ({@link #keySet()}, {@link #values()}, {@link #entrySet()}) inherit the
