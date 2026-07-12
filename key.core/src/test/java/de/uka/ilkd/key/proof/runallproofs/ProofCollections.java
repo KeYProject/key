@@ -96,6 +96,11 @@ public class ProofCollections {
         g.provable("standard_key/strings/concat2.key"); // 55n 1br
         g.provable("heap/comprehensions/sum1.key"); // 348n 6br
         // wide splitting (many open goals -> real worker interleaving)
+        g.provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key"); // 3327n;
+                                                                                                // stale
+                                                                                                // dependency-contract
+                                                                                                // step
+                                                                                                // reproducer
         g.provable("heap/list/ArrayList_add.key"); // 2844n 115br
         g.provable("standard_key/java_dl/strassen/strassen.key"); // 1797n 79br
         g.provable("standard_key/java_dl/switch/large_switch.key"); // 2607n 70br
@@ -134,6 +139,9 @@ public class ProofCollections {
         var c = new ProofCollection(settings);
         var g = c.group("multithreaded_splitting");
         final String[] rows = {
+            // reproducer for the stale dependency-contract step (UseDependencyContractApp):
+            // flaked ~2/12 at 4 workers before the graceful-skip fix
+            "performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key",
             "heap/list/ArrayList_add.key", // 115br
             "standard_key/java_dl/strassen/strassen.key", // 79br
             "standard_key/pred_log/tptp/SYN/SYN036p2.key", // 72br
