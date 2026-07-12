@@ -21,9 +21,6 @@ public class OneOfCP implements Feature {
 
     private final Feature[] features;
 
-    private int theChosenOne;
-    private final ChoicePoint cp = new CP();
-
     private OneOfCP(Feature[] features) {
         this.features = features;
     }
@@ -38,11 +35,22 @@ public class OneOfCP implements Feature {
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(cp, this);
-        return features[theChosenOne].computeCost(app, pos, goal, mState);
+        // The chosen branch is kept in the per-evaluation MutableState, not in a field of this
+        // choice point: one strategy (hence one feature tree, hence this OneOfCP) is shared by all
+        // goals, so a field here would be written concurrently by the multi-core prover's workers
+        // -- corrupting which branch is read below. A fresh CP is created per evaluation so its
+        // choose() writes into this evaluation's MutableState (mirroring ForEachCP).
+        manager.passChoicePoint(new CP(mState), this);
+        return features[mState.getChoicePointIndex(this)].computeCost(app, pos, goal, mState);
     }
 
     private final class CP implements ChoicePoint {
+        private final MutableState mState;
+
+        private CP(MutableState mState) {
+            this.mState = mState;
+        }
+
         private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
             private final RuleApp oldApp;
@@ -62,7 +70,7 @@ public class OneOfCP implements Feature {
                 return new CPBranch() {
                     @Override
                     public void choose() {
-                        theChosenOne = chosen;
+                        mState.setChoicePointIndex(OneOfCP.this, chosen);
                     }
 
                     @Override
