@@ -22,6 +22,7 @@ firstTouch/11-StateMerging/README.txt
 
 # Java Features
 Java/Records/README.txt
+Java/Records+CompactConstructor/README.txt
 Java/TextBlockLiterals/README.txt
 
 

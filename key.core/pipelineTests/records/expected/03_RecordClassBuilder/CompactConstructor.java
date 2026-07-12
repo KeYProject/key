@@ -63,10 +63,4 @@ final class Mapping extends Record {
     public final non_null String toString() {
         return "Mapping[" + "from=" + from + "," + "to=" + to + "]";
     }
-
-    Mapping {
-        // compact constructor!
-        from = "abc";
-        to = "def";
-    }
 }
