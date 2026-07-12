@@ -1,0 +1,7 @@
+/* Stand-alone build for the multi-core determinism probe.
+ * It depends on the KeY prover through a composite build, so it always compiles against the
+ * current source in this checkout without being part of KeY's own build. */
+rootProject.name = 'mt-divergence-probe'
+
+// pull in the KeY modules (this directory is <keyRoot>/scripts/tools/mt)
+includeBuild('../../..')
