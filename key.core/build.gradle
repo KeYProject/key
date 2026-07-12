@@ -152,7 +152,12 @@ tasks.register('testMt2w', Test) {
     description = 'Run a small RunAllProofs set on the multi-core prover with 2 workers'
     group = 'verification'
     forkEvery = 1
-    filter { includeTestsMatching "RunSmallProofsMt2wTest" }
+    filter {
+        includeTestsMatching "RunSmallProofsMt2wTest"
+        // proves a corpus slice twice single-core and requires identical proof trees; catches
+        // order-dependence (e.g. HashMap iteration reaching rule selection) without any threading
+        includeTestsMatching "ScDeterminismTest"
+    }
 }
 
 // The 4-worker variant of testMt2w. Kept as its own task so CI can drop it if a runner cannot
