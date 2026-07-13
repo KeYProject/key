@@ -108,7 +108,7 @@ public abstract class AbstractProblemLoader {
      * {@code false} the {@link Profile} specified by the problem file will be used for new proofs
      * (with the default profile as fallback if the file specifies none).
      */
-    private final boolean forceNewProfileOfNewProofs;
+    private boolean forceNewProfileOfNewProofs;
 
     /**
      * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
@@ -836,6 +836,10 @@ public abstract class AbstractProblemLoader {
         this.proofFilename = proofFilename;
     }
 
+    public void forceNewProfileOfNewProofs(boolean forceNewProfileOfNewProofs) {
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
+    }
+
     public boolean isLoadSingleJavaFile() {
         return loadSingleJavaFile;
     }
@@ -857,6 +861,7 @@ public abstract class AbstractProblemLoader {
     public Configuration getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
+
 
 
     public static class ReplayResult {
