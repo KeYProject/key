@@ -19,7 +19,7 @@ public final class TryWithResources {
         }
     }
     
-    static class Resource implements AutoCloseable {
+    static final class Resource implements AutoCloseable {
         /*@ ensures true; requires true; */
         public void use() {
             // use the resource

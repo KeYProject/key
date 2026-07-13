@@ -12,6 +12,12 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
 
    //@ protected nullable ghost String message = null;
    //@ protected nullable ghost Throwable cause = null;
+   //@ protected model \seq suppressedExceptions;
+   //@ protected model \locset suppressedListFootprint;
+   //@ accessible suppressedListFootprint: suppressedListFootprint;
+   //@ accessible suppressedExceptions: suppressedListFootprint;
+   //@ protected invariant \intersect(suppressedListFootprint,\set_union(this.message, this.cause))==\empty;
+
 
    /*@ public normal_behavior
      @    requires true;
@@ -78,4 +84,15 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
    public java.lang.Throwable fillInStackTrace();
 // public java.lang.StackTraceElement[] getStackTrace();
 // public void setStackTrace(java.lang.StackTraceElement[] arg0);
+
+   /// Try-With-Resource
+   /// the helper modifier should not be needed, but otherwise proofs of callers stop because they cannot show the
+   /// throwable invariant
+   /*@ public normal_behavior
+     @ assignable suppressedListFootprint;
+     @ accessible suppressedListFootprint;
+     @ ensures suppressedExceptions == \seq_concat(suppressedExceptions, \seq_singleton(exception));
+    */
+   public /*@ helper @*/ final synchronized void addSuppressed(Throwable exception);
+
 }
