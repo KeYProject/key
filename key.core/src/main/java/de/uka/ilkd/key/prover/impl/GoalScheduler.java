@@ -17,9 +17,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * The design deliberately uses a <strong>single monitor</strong> instead of nested locks, avoiding
- * the lock-ordering fragility that made an earlier (2018) multi-core scheduling attempt
- * unmaintainable. It is decoupled from the prover and parameterized over the goal type so it can
- * be exercised in isolation.
+ * the lock-ordering fragility. It is decoupled from the prover and parameterized over the goal type
+ * so it can be exercised in isolation.
  *
  * <p>
  * Lifecycle of an item:
@@ -29,8 +28,8 @@ import org.jspecify.annotations.Nullable;
  * <li>{@link #claimNext} atomically moves an available goal to <em>in flight</em> and returns it;
  * <li>{@link #complete} marks an in-flight goal done (e.g. closed, or it produced new goals which
  * were offered);
- * <li>the queue is <em>quiescent</em> when nothing is available, in flight, <em>or</em> stalled
- * &mdash; one terminal state of the search. It is <em>not</em> the only one: search also finishes
+ * <li>the queue is <em>quiescent</em> when nothing is available, in flight, <em>or</em> stalled,
+ * one terminal state of the search. It is <em>not</em> the only one: search also finishes
  * when goals remain stalled but no progress can reactivate them (see {@link #claimOrAwait}).
  * </ul>
  *
@@ -42,7 +41,6 @@ import org.jspecify.annotations.Nullable;
  * {@link #isQuiescent()}: a worker may terminate with stalled goals still held.
  *
  * @param <T> the goal type (the prover uses {@code GoalScheduler<Goal>}; tests use tokens)
- * @author Claude (KeY multithreading effort)
  */
 public final class GoalScheduler<T> {
 
@@ -82,8 +80,7 @@ public final class GoalScheduler<T> {
      * Makes {@code goal} available unless it is already available, in flight, or stalled (by
      * identity). A stalled goal is excluded here so admission cannot race the progress-gated
      * reactivation in {@link #claimOrAwait}: it is not lost, {@link #reactivateStalled} still
-     * brings
-     * it back once progress is made.
+     * brings it back once progress is made.
      */
     public synchronized void offer(T goal) {
         if (inFlight.contains(goal) || stalled.contains(goal) || !availableSet.add(goal)) {
@@ -175,8 +172,8 @@ public final class GoalScheduler<T> {
 
     /**
      * Records that the strategy currently offers no rule for {@code goal}: it is set aside
-     * (stalled)
-     * rather than abandoned, to be retried by {@link #claimOrAwait} once other goals make progress.
+     * (stalled) rather than abandoned, to be retried by {@link #claimOrAwait} once other
+     * goals make progress.
      *
      * @param goal the in-flight goal that yielded no rule application
      */
@@ -193,10 +190,9 @@ public final class GoalScheduler<T> {
      * rule
      * application aborted but the goal still has further candidate rules to try: dropping it (via
      * {@link #complete}) would lose the goal and leave the proof open, while {@link #stall}ing
-     * would
-     * defer it to a progress-gated retry. Re-offering makes it available again right away,
-     * mirroring
-     * the single-threaded prover, which simply retries the goal after an aborted application.
+     * would defer it to a progress-gated retry. Re-offering makes it available again right away,
+     * mirroring the single-threaded prover, which simply retries the goal after an aborted
+     * application.
      *
      * @param goal the in-flight goal whose rule application aborted
      */

@@ -47,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * workers; each worker applies rules to its goal and offers the resulting subgoals back to the
  * scheduler. The run finishes when the scheduler becomes quiescent (no goal available and none in
  * flight) or a stop condition fires. Non-proving listeners are suspended for the whole run.
- * Fresh names need no per-worker treatment: minting searches the goal-local
- * namespaces, so a name is a pure function of the branch state, identical no matter which worker
- * processes the goal (#3851).
+ * Fresh names need no per-worker treatment, to find an unused name the goal-local
+ * namespaces are searched, so a name is a pure function of the branch state, identical no matter
+ * which worker processes the goal.
  *
  * <p>
  * <b>Concurrency model.</b> The per-goal rule step splits into a concurrent part and a serialized
@@ -58,12 +58,12 @@ import org.slf4j.LoggerFactory;
  * single {@code commitLock}, so tree mutation stays mutually exclusive. The scheduler hand-off and
  * the run counters (which are atomic) stay outside the lock. Running the executor outside the lock
  * is what makes this faster than single-threaded; it is sound because the shared structures the
- * executor reaches through the {@link org.key_project.logic.Services} were made thread-safe by the
- * shared-state audit (lazy type caches, the specification repository, operator/parametric-function
- * interning, built-in-rule instantiation caches, NodeInfo/RuleJustificationInfo, the
- * OneStepSimplifier, the shared taclet-index cache), and fresh-name minting searches only the
- * goal-local namespaces of the owning worker's goal (branch-state-derived, #3851), never writing
- * to the shared namespace. The equivalence gate ({@code ProofEquivalenceTest}) and the real-proof
+ * executor reaches through the {@link org.key_project.logic.Services} (lazy type caches,
+ * the specification repository, operator/parametric-function interning, built-in-rule instantiation
+ * caches, NodeInfo/RuleJustificationInfo, the OneStepSimplifier, the shared taclet-index cache)
+ * are thread-safe, and the above mentioned fresh-name generation searches only the
+ * goal-local namespaces of the owning worker's goal, never writing to the shared namespace.
+ * The equivalence gate ({@code ProofEquivalenceTest}) and the real-proof
  * gate guard the whole design.
  *
  * <p>
@@ -71,8 +71,6 @@ import org.slf4j.LoggerFactory;
  * single-threaded prover: the parallel engine schedules goals through its {@link GoalScheduler}
  * and does not consult the {@link GoalChooser} it is constructed with (the constructor keeps the
  * parameter for API symmetry with {@code ApplyStrategy}).
- *
- * @author Claude (KeY multithreading effort)
  */
 public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
@@ -167,8 +165,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /**
      * How long {@link #awaitWorkerTermination} waits for the workers to wind down after a stop. The
      * stop is cooperative (workers leave their claim loop after the current step), so this is only
-     * a
-     * safety cap to avoid blocking the caller forever should a worker get genuinely stuck.
+     * a safety cap to avoid blocking the caller forever should a worker get genuinely stuck.
      */
     private static final long WORKER_SHUTDOWN_TIMEOUT_SECONDS = 60;
     private volatile @Nullable Goal nonCloseableGoal;
@@ -222,11 +219,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         String property = System.getProperty(THREADS_PROPERTY);
         if (property != null) {
             try {
+                // any positive thread count set by the system property
+                // is accepted
                 return Math.max(1, Integer.parseInt(property));
             } catch (NumberFormatException e) {
                 return 1;
             }
         }
+        // thread counts provided via setting are capped at number of CPU cores
         int configured = generalSettings().getParallelProverThreadCount();
         return Math.max(1, Math.min(configured, Runtime.getRuntime().availableProcessors()));
     }
@@ -324,8 +324,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
         // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed
         // teardown: the pool is created *inside* this scope so that a failure while entering it
-        // (e.g.
-        // sealing) can never leak the marker or an unshut pool.
+        // (e.g. sealing) can never leak the marker or an unshut pool.
         final RunScope mtScope = enterMultiWorkerRunScope();
         try {
             final int poolId = POOL_COUNTER.incrementAndGet();

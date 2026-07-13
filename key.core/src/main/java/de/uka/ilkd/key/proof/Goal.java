@@ -48,7 +48,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
- * one node -- the root -- that has to be proved. Therefore it is divided up into several sub goals
+ * one node -- the root -- that has to be proved. Therefor it is divided up into several sub goals
  * and so on. A single goal is not divided into sub goals any longer if the contained sequent
  * becomes an axiom. A proof is closed if all leaves are closed. As the calculus works only on the
  * leaves of a tree, the goals are the additional information needed for the proof is only stored at
@@ -776,21 +776,16 @@ public final class Goal implements ProofGoal<Goal> {
      * When the new goals are created during splitting, their namespaces cannot be fixed yet as new
      * symbols may still be added; this finalizes them once the rule application has committed.
      *
-     * The symbols minted by this step are remembered in each new goal's NODE-local storage (which
-     * accumulates down the branch, see Node -- this is also what proof saving/reloading uses), and
+     * The symbols introduced by this step are recorded in each new goal's node-local storage (which
+     * accumulates down the branch, see {@link Node}, this is also what proof saving/reloading
+     * uses), and
      * each goal's local namespaces are then rebuilt from the immutable shared base plus that
-     * node-local storage: exactly the reconstruction resetLocalSymbols performs on pruning, for
-     * every prover. The shared proof namespace is never touched, so under the parallel prover the
+     * node-local storage: exactly the reconstruction resetLocalSymbols performs on pruning.
+     * The shared proof namespace is never modified, so under the parallel prover the
      * workers' concurrent matching can read it lock-free; fresh names stay branch-locally unique by
-     * construction (minting searches the goal-local namespaces, #3851) -- global uniqueness is not
+     * construction (finding unused names searches the goal-local namespaces), global uniqueness is
+     * not
      * required, sibling branches reuse names by design.
-     *
-     * Historically the single-core prover instead layered the namespaces incrementally
-     * (flushToParent plus first-goal-inherits/siblings-copy), with the rebuild used only for the
-     * parallel prover. The two produce the same visible symbols -- the only consumer of the layer
-     * STRUCTURE (CloseAfterMerge, collecting a goal's symbols from its top and parent layers)
-     * sees the full symbol set in both forms -- and every prune already replaced the layered form
-     * with the rebuilt one, so the rebuild is the single battle-tested shape both provers now use.
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         // Only program variables and functions are harvested: these are the only namespace kinds
