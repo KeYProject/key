@@ -20,7 +20,10 @@ def antlr4OutputKey = String.valueOf(projectDir) + '/build/generated-src/antlr/m
 
 tasks.register('runAntlr4Key', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
-    inputs.files "src/main/antlr/KeYLexer.g4", "src/main/antlr/KeYParser.g4"
+    inputs.files "src/main/antlr/KeYLexer.g4", "src/main/antlr/KeYParser.g4",
+            "src/main/antlr/KeYCommonParser.g4", "src/main/antlr/KeYGlobalDeclParser.g4",
+            "src/main/antlr/KeYSequentParser.g4", "src/main/antlr/KeYTacletParser.g4",
+            "src/main/antlr/KeYTermParser.g4"
     outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
     mainClass.set("org.antlr.v4.Tool")

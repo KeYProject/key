@@ -1066,6 +1066,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 LOGGER.debug("delegateModel is null");
                 return;
             }
+            if (e.getSource() != proof) {
+                // Auto mode on a proof this view does not display, e.g. an auxiliary side proof
+                // of the information-flow macros (see #3713). Overwriting modifiedSubtrees with
+                // the foreign proof's goals would feed its nodes into the displayed proof's tree
+                // model in autoModeStopped.
+                return;
+            }
 
             // save goals on which the prover may work
             modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
@@ -1088,7 +1095,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             setProof(mediator.getSelectedProof());
             if (modifiedSubtrees != null) {
                 for (final Node n : modifiedSubtrees) {
-                    if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                    // skip nodes of other proofs: the displayed proof may have changed since the
+                    // subtrees were recorded in autoModeStarted (see #3713)
+                    if (n.proof() == proof
+                            && proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
                         delegateModel.updateTree(n);
                     }
                 }

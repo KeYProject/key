@@ -64,12 +64,6 @@ final class Mapping extends Record {
         return "Mapping[" + "from=" + from + "," + "to=" + to + "]";
     }
 
-    Mapping {
-        // compact constructor!
-        from = "abc";
-        to = "def";
-    }
-
     @javax.annotation.processing.Generated()
     static private boolean $classInitializationInProgress;
 
