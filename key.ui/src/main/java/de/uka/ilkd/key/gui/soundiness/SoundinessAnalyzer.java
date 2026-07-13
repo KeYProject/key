@@ -11,23 +11,17 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.gui.settings.TacletOptionsSettings;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED;
 import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
@@ -40,8 +34,6 @@ import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
  * @since 3.0
  */
 public final class SoundinessAnalyzer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SoundinessAnalyzer.class);
 
     private static final String GENERAL_DISCLAIMER =
         """
@@ -130,9 +122,6 @@ public final class SoundinessAnalyzer {
             html.append("<table>");
             for (TacletOptionEntry entry : tacletOptions) {
                 String choiceText = entry.choice();
-                // int colonIdx = choiceText.indexOf(':');
-                // String displayChoice = colonIdx >= 0 ? choiceText.substring(colonIdx + 1) :
-                // choiceText;
 
                 html.append("<tr class='").append(entry.cssClass()).append("'>");
                 html.append("<td>").append(escapeHtml(choiceText));
@@ -168,39 +157,40 @@ public final class SoundinessAnalyzer {
         }
         html.append("</ul>");
 
-        if (!proofStats.lemmasUsed().isEmpty()) {
-            html.append("<h3>User-Defined Lemmas Used</h3><ul>");
-            for (LemmaUsage lemma : proofStats.lemmasUsed()) {
-                String status =
-                    lemma.proved() ? "proved" : "<span class='incomplete'>not proved</span>";
-                html.append("<li>").append(escapeHtml(lemma.name()))
-                        .append(" (used ").append(lemma.count()).append(" times, ")
-                        .append(status).append(")</li>");
-            }
-            html.append("</ul>");
-        }
-
-        if (!proofStats.assumptionsUsed().isEmpty()) {
-            html.append("<h3 class='unsound'>Assumptions Introduced</h3><ul>");
-            for (AssumptionUsage assumption : proofStats.assumptionsUsed()) {
-                html.append("<li>").append(escapeHtml(assumption.location())).append(": ")
-                        .append(escapeHtml(assumption.formula()));
-                if (assumption.reason() != null && !assumption.reason().isEmpty()) {
-                    html.append(" (").append(escapeHtml(assumption.reason())).append(")");
-                }
-                html.append("</li>");
-            }
-            html.append("</ul>");
-        }
+        // maybe for the future (but lemma/assumption detection is definitively more difficult)
+        // if (!proofStats.lemmasUsed().isEmpty()) {
+        // html.append("<h3>User-Defined Lemmas Used</h3><ul>");
+        // for (LemmaUsage lemma : proofStats.lemmasUsed()) {
+        // String status =
+        // lemma.proved() ? "proved" : "<span class='incomplete'>not proved</span>";
+        // html.append("<li>").append(escapeHtml(lemma.name()))
+        // .append(" (used ").append(lemma.count()).append(" times, ")
+        // .append(status).append(")</li>");
+        // }
+        // html.append("</ul>");
+        // }
+        //
+        // if (!proofStats.assumptionsUsed().isEmpty()) {
+        // html.append("<h3 class='unsound'>Assumptions Introduced</h3><ul>");
+        // for (AssumptionUsage assumption : proofStats.assumptionsUsed()) {
+        // html.append("<li>").append(escapeHtml(assumption.location())).append(": ")
+        // .append(escapeHtml(assumption.formula()));
+        // if (assumption.reason() != null && !assumption.reason().isEmpty()) {
+        // html.append(" (").append(escapeHtml(assumption.reason())).append(")");
+        // }
+        // html.append("</li>");
+        // }
+        // html.append("</ul>");
+        // }
 
         html.append("<h3>Rule Applications</h3><ul>")
                 .append("<li>Total steps: ").append(proofStats.totalSteps()).append("</li>")
                 .append("<li>Automated: ").append(proofStats.automatedSteps()).append("</li>")
                 .append("<li>Interactive: ").append(proofStats.interactiveSteps()).append("</li>");
 
-        if (!proofStats.mostUsedRules().isEmpty()) {
-            html.append("<li>Most used rules:<ul>");
-            for (String rule : proofStats.mostUsedRules()) {
+        if (!proofStats.mostUsedInteractiveRules().isEmpty()) {
+            html.append("<li>Most used interactive rules:<ul>");
+            for (String rule : proofStats.mostUsedInteractiveRules()) {
                 html.append("<li>").append(escapeHtml(rule)).append("</li>");
             }
             html.append("</ul></li>");
@@ -250,49 +240,49 @@ public final class SoundinessAnalyzer {
         }
         html.append("</ul></p>");
 
-        /*
-         * // Compartment 5: Source Analysis
-         * html.append("<h2>5. Source Analysis</h2>");
-         * if (sourceStats.javaFileCount() == 0 && sourceStats.keyFileCount() == 0) {
-         * html.append("<p><i>Detailed source analysis not yet implemented.</i></p>");
-         * } else {
-         * html.append("<ul>")
-         * .append("<li>Java files loaded: ").append(sourceStats.javaFileCount()).append("</li>")
-         * .append("<li>Specification (.key) files: ").append(sourceStats.keyFileCount()).append(
-         * "</li>");
-         *
-         * if (!sourceStats.loadedFiles().isEmpty()) {
-         * html.append("<li>Loaded files: ");
-         * for (int i = 0; i < Math.min(10, sourceStats.loadedFiles().size()); i++) {
-         * if (i > 0) html.append(", ");
-         * html.append(escapeHtml(sourceStats.loadedFiles().get(i)));
-         * }
-         * if (sourceStats.loadedFiles().size() > 10) {
-         * html.append(", ...");
-         * }
-         * html.append("</li>");
-         * }
-         *
-         * if (sourceStats.totalMethods() > 0) {
-         * int percentage = (sourceStats.methodsWithContracts() * 100) / sourceStats.totalMethods();
-         * html.append("<li>JML contract coverage: ").append(sourceStats.methodsWithContracts())
-         * .append("/").append(sourceStats.totalMethods()).append(" methods (")
-         * .append(percentage).append("%)</li>");
-         * }
-         *
-         * if (!sourceStats.parseWarnings().isEmpty()) {
-         * html.append("<li>Parse warnings: ").append(sourceStats.parseWarnings().size()).append(
-         * "</li>");
-         * }
-         *
-         * if (!sourceStats.unsupportedFeatures().isEmpty()) {
-         * html.append("<li>Unsupported features: ").append(sourceStats.unsupportedFeatures().size()
-         * ).append("</li>");
-         * }
-         *
-         * html.append("</ul>");
-         * }
-         */
+
+        // Compartment 5: Source Analysis
+        // html.append("<h2>5. Source Analysis</h2>");
+        // if (sourceStats.javaFileCount() == 0 && sourceStats.keyFileCount() == 0) {
+        // html.append("<p><i>Detailed source analysis not yet implemented.</i></p>");
+        // } else {
+        // html.append("<ul>")
+        // .append("<li>Java files loaded: ").append(sourceStats.javaFileCount()).append("</li>")
+        // .append("<li>Specification (.key) files: ").append(sourceStats.keyFileCount()).append(
+        // "</li>");
+        //
+        // if (!sourceStats.loadedFiles().isEmpty()) {
+        // html.append("<li>Loaded files: ");
+        // for (int i = 0; i < Math.min(10, sourceStats.loadedFiles().size()); i++) {
+        // if (i > 0) html.append(", ");
+        // html.append(escapeHtml(sourceStats.loadedFiles().get(i)));
+        // }
+        // if (sourceStats.loadedFiles().size() > 10) {
+        // html.append(", ...");
+        // }
+        // html.append("</li>");
+        // }
+        //
+        // if (sourceStats.totalMethods() > 0) {
+        // int percentage = (sourceStats.methodsWithContracts() * 100) / sourceStats.totalMethods();
+        // html.append("<li>JML contract coverage: ").append(sourceStats.methodsWithContracts())
+        // .append("/").append(sourceStats.totalMethods()).append(" methods (")
+        // .append(percentage).append("%)</li>");
+        // }
+        //
+        // if (!sourceStats.parseWarnings().isEmpty()) {
+        // html.append("<li>Parse warnings: ").append(sourceStats.parseWarnings().size()).append(
+        // "</li>");
+        // }
+        //
+        // if (!sourceStats.unsupportedFeatures().isEmpty()) {
+        // html.append("<li>Unsupported features: ").append(sourceStats.unsupportedFeatures().size()
+        // ).append("</li>");
+        // }
+        //
+        // html.append("</ul>");
+        // }
+
 
         html.append("</body></html>");
         return html.toString();
@@ -336,39 +326,35 @@ public final class SoundinessAnalyzer {
         List<GeneralKeYWarning> warnings = new ArrayList<>();
 
         // this seems not really relevant
-        /*
-         * long maxMemory = Runtime.getRuntime().maxMemory();
-         * if (maxMemory < 1024 * 1024 * 1024) {
-         * warnings.add(new GeneralKeYWarning(
-         * GeneralKeYWarning.Level.CRITICAL,
-         * "Memory",
-         * "Very limited memory available (" + (maxMemory / 1024 / 1024) + " MB)",
-         * "Increase heap size with -Xmx flag (e.g., -Xmx4g)"
-         * ));
-         * } else if (maxMemory < 2L * 1024 * 1024 * 1024) {
-         * warnings.add(new GeneralKeYWarning(
-         * GeneralKeYWarning.Level.WARNING,
-         * "Memory",
-         * "Limited memory available (" + (maxMemory / 1024 / 1024) + " MB)",
-         * "Consider increasing heap size with -Xmx flag for large proofs"
-         * ));
-         * }
-         */
+        // long maxMemory = Runtime.getRuntime().maxMemory();
+        // if (maxMemory < 1024 * 1024 * 1024) {
+        // warnings.add(new GeneralKeYWarning(
+        // GeneralKeYWarning.Level.CRITICAL,
+        // "Memory",
+        // "Very limited memory available (" + (maxMemory / 1024 / 1024) + " MB)",
+        // "Increase heap size with -Xmx flag (e.g., -Xmx4g)"
+        // ));
+        // } else if (maxMemory < 2L * 1024 * 1024 * 1024) {
+        // warnings.add(new GeneralKeYWarning(
+        // GeneralKeYWarning.Level.WARNING,
+        // "Memory",
+        // "Limited memory available (" + (maxMemory / 1024 / 1024) + " MB)",
+        // "Consider increasing heap size with -Xmx flag for large proofs"
+        // ));
+        // }
 
         // this is by the taclet settings section
-        /*
-         * ChoiceSettings choiceSettings = proof.getSettings().getChoiceSettings();
-         * Map<String, String> choices = choiceSettings.getDefaultChoices();
-         *
-         * if ("initialisation:disableStaticInitialisation".equals(choices.get("initialisation"))) {
-         * warnings.add(new GeneralKeYWarning(
-         * GeneralKeYWarning.Level.CRITICAL,
-         * "Static Initialization",
-         * "Static constructors are not analyzed",
-         * "Enable static initialization for complete verification (may increase complexity)"
-         * ));
-         * }
-         */
+        // ChoiceSettings choiceSettings = proof.getSettings().getChoiceSettings();
+        // Map<String, String> choices = choiceSettings.getDefaultChoices();
+        //
+        // if ("initialisation:disableStaticInitialisation".equals(choices.get("initialisation"))) {
+        // warnings.add(new GeneralKeYWarning(
+        // GeneralKeYWarning.Level.CRITICAL,
+        // "Static Initialization",
+        // "Static constructors are not analyzed",
+        // "Enable static initialization for complete verification (may increase complexity)"
+        // ));
+        // }
 
         GeneralSettings generalSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -389,18 +375,17 @@ public final class SoundinessAnalyzer {
         }
 
         // this is not really relevant (proof status can be seen easily in the GUI)
-        /*
-         * StrategySettings strategySettings = proof.getSettings().getStrategySettings();
-         * int maxSteps = strategySettings.getMaxSteps();
-         * if (maxSteps > 0 && maxSteps < 100000) {
-         * warnings.add(new GeneralKeYWarning(
-         * GeneralKeYWarning.Level.WARNING,
-         * "Proof Search",
-         * "Automated proof search limited to " + maxSteps + " steps",
-         * "Increase step limit for more complex proofs"
-         * ));
-         * }
-         */
+        // StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+        // int maxSteps = strategySettings.getMaxSteps();
+        // if (maxSteps > 0 && maxSteps < 100000) {
+        // warnings.add(new GeneralKeYWarning(
+        // GeneralKeYWarning.Level.WARNING,
+        // "Proof Search",
+        // "Automated proof search limited to " + maxSteps + " steps",
+        // "Increase step limit for more complex proofs"
+        // ));
+        // }
+
 
         return warnings;
     }
@@ -483,90 +468,25 @@ public final class SoundinessAnalyzer {
     }
 
     private static ProofStats analyzeProofTree(Proof proof) {
-        int totalGoals = 0;
-        int closedGoals = 0;
-        int openGoals = 0;
-        int cachedGoals = 0;
 
-        List<LemmaUsage> lemmasUsed = new ArrayList<>();
-        List<AssumptionUsage> assumptionsUsed = new ArrayList<>();
-        int interactiveSteps = 0;
-        int automatedSteps = 0;
+        Statistics stats = proof.getStatistics();
+        int totalGoals = proof.allGoals().size();
+        int closedGoals = proof.closedGoals().size();
+        int openGoals = proof.openGoals().size();
+        int cachedGoals = proof.closedGoals().stream()
+                .filter(g -> g.node().lookup(ClosedBy.class) != null).toList().size();
+        int interactiveSteps = stats.interactiveSteps;
+        int totalSteps = stats.totalRuleApps;
 
-        Map<String, Integer> ruleUsageCount = new HashMap<>();
-
-        Set<Node> openGoalNodes = new HashSet<>();
-        for (de.uka.ilkd.key.proof.Goal goal : proof.openGoals()) {
-            openGoalNodes.add(goal.node());
-        }
-
-        Iterator<Node> nodeIterator = proof.root().subtreeIterator();
-        while (nodeIterator.hasNext()) {
-            Node node = nodeIterator.next();
-
-            boolean isOpenGoal = openGoalNodes.contains(node);
-            if (isOpenGoal) {
-                openGoals++;
-                totalGoals++;
-            } else {
-                closedGoals++;
-                totalGoals++;
-
-                if (node.lookup(ClosedBy.class) != null) {
-                    cachedGoals++;
-                }
-            }
-
-            RuleApp app = node.getAppliedRuleApp();
-            if (app != null) {
-                String ruleName = app.rule().name().toString();
-                ruleUsageCount.put(ruleName, ruleUsageCount.getOrDefault(ruleName, 0) + 1);
-
-                if (app instanceof TacletApp tacletApp) {
-                    Taclet taclet = tacletApp.rule();
-
-                    if (taclet.name().toString().contains("lemma") ||
-                            taclet.name().toString().contains("Lemma")) {
-                        String lemmaName = taclet.name().toString();
-                        boolean alreadyTracked =
-                            lemmasUsed.stream().anyMatch(l -> l.name().equals(lemmaName));
-                        if (!alreadyTracked) {
-                            lemmasUsed.add(new LemmaUsage(lemmaName, false, 1));
-                        }
-                    }
-
-                    if (ruleName.contains("assume") || ruleName.contains("Assume")) {
-                        assumptionsUsed.add(new AssumptionUsage(
-                            node.sequent().toString(),
-                            "Goal " + node.serialNr(),
-                            "User assumption"));
-                    }
-                }
-
-                if (isOpenGoal) {
-                    for (de.uka.ilkd.key.proof.Goal goal : proof.openGoals()) {
-                        if (goal.node() == node && goal.isAutomatic()) {
-                            automatedSteps++;
-                            break;
-                        }
-                    }
-                } else {
-                    interactiveSteps++;
-                }
-            }
-        }
-
-        List<String> mostUsedRules = ruleUsageCount.entrySet().stream()
+        List<String> mostUsedRules = stats.getInteractiveAppsDetails().entrySet()
+                .stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(5)
                 .map(entry -> entry.getKey() + " (" + entry.getValue() + ")")
                 .collect(Collectors.toList());
 
-        return new ProofStats(
-            totalGoals, closedGoals, openGoals, cachedGoals,
-            lemmasUsed, assumptionsUsed,
-            automatedSteps + interactiveSteps, automatedSteps, interactiveSteps,
-            mostUsedRules);
+        return new ProofStats(totalGoals, closedGoals, openGoals, cachedGoals, totalSteps,
+            totalSteps - interactiveSteps, interactiveSteps, mostUsedRules);
     }
 
     private record GeneralKeYWarning(Level level, String category, String userMessage,
@@ -595,16 +515,18 @@ public final class SoundinessAnalyzer {
     }
 
     private record ProofStats(int totalGoals, int closedGoals, int openGoals, int cachedGoals,
-            List<LemmaUsage> lemmasUsed, List<AssumptionUsage> assumptionsUsed,
+            /* List<LemmaUsage> lemmasUsed, List<AssumptionUsage> assumptionsUsed, */
             int totalSteps, int automatedSteps, int interactiveSteps,
-            List<String> mostUsedRules) {
+            List<String> mostUsedInteractiveRules) {
     }
 
-    private record LemmaUsage(String name, boolean proved, int count) {
-    }
-
-    private record AssumptionUsage(String formula, String location, String reason) {
-    }
+    /*
+     * private record LemmaUsage(String name, boolean proved, int count) {
+     * }
+     *
+     * private record AssumptionUsage(String formula, String location, String reason) {
+     * }
+     */
 
     private record DependencyStats(ProofStatus status, List<Contract> closed, List<Contract> open) {
     }
