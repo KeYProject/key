@@ -67,6 +67,7 @@ public class OpenFileAction extends MainWindowAction {
             var selectedProfile = options.getSelectedProfile();
             var additionalProfileOptions = options.getAdditionalProfileOptions();
             mainWindow.loadProblem(file, pl -> {
+                pl.forceNewProfileOfNewProofs(selectedProfile != null);
                 pl.setProfileOfNewProofs(selectedProfile);
                 pl.setAdditionalProfileOptions(additionalProfileOptions);
                 pl.setLoadSingleJavaFile(options.isOnlyLoadSingleJavaFile());
