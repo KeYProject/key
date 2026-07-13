@@ -26,6 +26,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.soundiness.SoundinessDialog;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -289,6 +290,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
             JPanel buttonPane = new JPanel();
             JPanel buttonPane2 = new JPanel();
+            JPanel buttonPane3 = new JPanel();
 
             JButton okButton = new JButton("Close");
             okButton.addActionListener(event -> dispose());
@@ -316,16 +318,15 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
 
-            // spotless:off
             JButton soundinessButton = new JButton("Show Soundiness Report");
             soundinessButton.setIcon(IconFactory.WARNING_UNSOUND.get());
             soundinessButton.addActionListener(e -> {
-                de.uka.ilkd.key.gui.soundiness.SoundinessDialog dialog = 
-                    new de.uka.ilkd.key.gui.soundiness.SoundinessDialog(mainWindow, proof);
+                SoundinessDialog dialog = new SoundinessDialog(mainWindow, proof);
                 dialog.setVisible(true);
             });
-            buttonPane2.add(soundinessButton);
-            
+            buttonPane3.add(soundinessButton);
+
+            // spotless:off
             /*
             if (proof.closedGoals().stream()
                     .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
@@ -366,6 +367,7 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonsPane.add(Box.createVerticalGlue());
             buttonsPane.add(buttonPane);
             buttonsPane.add(buttonPane2);
+            buttonsPane.add(buttonPane3);
             add(buttonsPane, BorderLayout.PAGE_END);
 
             pack();

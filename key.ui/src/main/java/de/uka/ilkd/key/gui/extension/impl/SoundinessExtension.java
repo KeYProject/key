@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 /**
  * Extension that adds soundiness report functionality to the UI.
  * Adds context menu item to proof list and enables soundiness analysis.
- * 
+ *
  * @author opencode
  * @since 2.13
  */
@@ -25,14 +25,14 @@ import de.uka.ilkd.key.proof.Proof;
     description = "Provides soundiness analysis for proofs showing assumptions, unsound choices, and verification limitations.",
     experimental = false,
     optional = true,
-    priority = 1000
-)
+    priority = 1000)
 public class SoundinessExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
-    
+
     @Override
-    public <T> List<javax.swing.Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind, T underlyingObject) {
+    public <T> List<javax.swing.Action> getContextActions(KeYMediator mediator,
+            ContextMenuKind<T> kind, T underlyingObject) {
         List<javax.swing.Action> actions = new ArrayList<>();
-        
+
         // Add to proof list context menu
         if (kind == ContextMenuKind.PROOF_LIST && underlyingObject instanceof Proof) {
             MainWindow mainWindow = MainWindow.getInstance();
@@ -40,7 +40,7 @@ public class SoundinessExtension implements KeYGuiExtension, KeYGuiExtension.Con
                 actions.add(new ShowSoundinessAction(mainWindow));
             }
         }
-        
+
         return actions;
     }
 }
