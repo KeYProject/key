@@ -37,7 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Goal-level parallel prover. Enabled via the general settings (the prover-mode preference, also
+ * Goal-level parallel prover: Proof-search is done in parallel where each worker is assigned
+ * it own goal (exclusively) owned.
+ * <p>
+ * Enabled via the general settings (the prover-mode preference, also
  * toggled from the status-line indicator); the {@code -Dkey.prover.parallel} system property,
  * when set, transiently overrides that preference in either direction (see {@link #isEnabled()}).
  *
@@ -58,10 +61,10 @@ import org.slf4j.LoggerFactory;
  * single {@code commitLock}, so tree mutation stays mutually exclusive. The scheduler hand-off and
  * the run counters (which are atomic) stay outside the lock. Running the executor outside the lock
  * is what makes this faster than single-threaded; it is sound because the shared structures the
- * executor reaches through the {@link org.key_project.logic.Services} (lazy type caches,
+ * executor reaches through the {@link de.uka.ilkd.key.java.Services} (lazy type caches,
  * the specification repository, operator/parametric-function interning, built-in-rule instantiation
  * caches, NodeInfo/RuleJustificationInfo, the OneStepSimplifier, the shared taclet-index cache)
- * are thread-safe, and the above mentioned fresh-name generation searches only the
+ * are thread-safe, and the above-mentioned fresh-name generation searches only the
  * goal-local namespaces of the owning worker's goal, never writing to the shared namespace.
  * The equivalence gate ({@code ProofEquivalenceTest}) and the real-proof
  * gate guard the whole design.
