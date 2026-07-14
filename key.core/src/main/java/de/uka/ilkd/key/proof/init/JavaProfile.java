@@ -18,6 +18,8 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.lemma.AddLiteralsLemmaIntroductionRule;
+import de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
@@ -180,7 +182,9 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
                 .prepend(JmlAssertRule.ASSUME_INSTANCE)
                 .prepend(SetStatementRule.INSTANCE)
-                .prepend(ObserverToUpdateRule.INSTANCE);
+                .prepend(ObserverToUpdateRule.INSTANCE)
+                .prepend(AddLiteralsLemmaIntroductionRule.INSTANCE)
+                .prepend(OssLemmaIntroductionRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!

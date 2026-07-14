@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.lemma.TransparentProofSaver;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -429,6 +430,16 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
+    /**
+     * If set, {@link #saveProof(Object, Proof, Path)} additionally saves each proof in its
+     * transparent form (see {@link de.uka.ilkd.key.rule.lemma.TransparentProofSaver}).
+     */
+    private static volatile boolean saveTransparentProofs = false;
+
+    public static void setSaveTransparentProofs(boolean value) {
+        saveTransparentProofs = value;
+    }
+
     public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
@@ -465,6 +476,21 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         } catch (IOException e) {
             LOGGER.error("Failed to write proof stats", e);
+        }
+
+        if (saveTransparentProofs) {
+            final Path transparentFile = Path.of(baseName + ".transparent.proof");
+            try {
+                final TransparentProofSaver.Result stats =
+                    TransparentProofSaver.save(proof, transparentFile);
+                LOGGER.info(
+                    "Transparent proof saved to {}: {} simplifier application(s) elaborated "
+                        + "into {} lemma(s), {} copied unchanged",
+                    transparentFile, stats.elaborated(), stats.lemmas(), stats.copiedOss());
+            } catch (Exception e) {
+                LOGGER.error("Failed to save transparent proof", e);
+                return false;
+            }
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof

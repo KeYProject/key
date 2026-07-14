@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -75,6 +76,14 @@ public class BoundUniquenessChecker {
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             for (int j = 0, sz = t.varsBoundHere(i).size(); j < sz; j++) {
                 final QuantifiableVariable qv = t.varsBoundHere(i).get(j);
+                if (!(qv instanceof VariableSV)) {
+                    // the uniqueness restriction is about schema variables (see class comment):
+                    // a doubly bound schema variable would have to match the same quantified
+                    // variable everywhere and the taclet would almost never apply. Concrete
+                    // bound variables, as they occur in taclets generated from proof formulas,
+                    // may legitimately be bound several times (they stem from the same sequent).
+                    continue;
+                }
                 if (boundVars.contains(qv)) {
                     return false;
                 } else {

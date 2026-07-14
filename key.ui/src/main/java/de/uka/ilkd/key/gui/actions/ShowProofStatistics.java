@@ -311,12 +311,18 @@ public class ShowProofStatistics extends MainWindowAction {
             JButton saveBundleButton = new JButton("Save proof bundle");
             saveBundleButton
                     .addActionListener(e -> mainWindow.getUserInterface().saveProofBundle(proof));
+            JButton saveTransparentButton = new JButton("Save transparent proof");
+            saveTransparentButton.setToolTipText("Save the proof with One Step Simplification "
+                + "steps elaborated into generated, separately provable lemma taclets.");
+            saveTransparentButton.addActionListener(
+                e -> SaveTransparentProofAction.saveTransparent(mainWindow, proof, this));
 
             buttonPane.add(okButton);
             buttonPane.add(csvButton);
             buttonPane.add(htmlButton);
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
+            buttonPane2.add(saveTransparentButton);
 
             JButton soundinessButton = new JButton("Show Soundiness Report");
             soundinessButton.setIcon(IconFactory.WARNING_UNSOUND.get());

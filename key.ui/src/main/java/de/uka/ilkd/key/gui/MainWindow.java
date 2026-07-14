@@ -989,6 +989,7 @@ public final class MainWindow extends JFrame {
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
         fileMenu.add(saveBundleAction);
+        fileMenu.add(new SaveTransparentProofAction(this));
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
@@ -1106,6 +1107,7 @@ public final class MainWindow extends JFrame {
             proof.add(goalBack);
             proof.add(new PruneProofAction(this));
         }
+        proof.add(new SaveTransparentProofAction(this, selected));
         proof.add(new AbandonTaskAction(this, selected));
         if (selected == null) {
             proof.addSeparator();

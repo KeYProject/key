@@ -70,6 +70,7 @@ public final class ProofManagementDialog extends JDialog {
     private JList<ProofWrapper> proofList;
     private ContractSelectionPanel contractPanelByMethod;
     private ContractSelectionPanel contractPanelByProof;
+    private LemmaDependencyPanel lemmaDependencyPanel;
     private JButton startButton;
     private JButton cancelButton;
     private final KeYMediator mediator;
@@ -142,7 +143,10 @@ public final class ProofManagementDialog extends JDialog {
                 return result;
             }
         });
-        proofList.addListSelectionListener(e -> updateContractPanel());
+        proofList.addListSelectionListener(e -> {
+            updateContractPanel();
+            updateLemmaDependencyPanel();
+        });
 
         // create method list panel, scroll pane
         JPanel listPanelByMethod = new JPanel();
@@ -188,7 +192,16 @@ public final class ProofManagementDialog extends JDialog {
             }
         });
         contractPanelByProof.addListSelectionListener(e -> updateStartButton());
-        listPanelByProof.add(contractPanelByProof);
+
+        // the right-hand side of the "By Proof" tab shows, for the selected proof, both the
+        // contracts and the generated lemmas it depends on
+        lemmaDependencyPanel = new LemmaDependencyPanel(mediator);
+        lemmaDependencyPanel.setOnLoaded(() -> setVisible(false));
+        lemmaDependencyPanel.setOnStatusChanged(this::updateGlobalStatus);
+        JTabbedPane byProofDetails = new JTabbedPane();
+        byProofDetails.addTab("Contracts", contractPanelByProof);
+        byProofDetails.addTab("Lemmas", lemmaDependencyPanel);
+        listPanelByProof.add(byProofDetails);
 
         // create tabbed pane
         tabbedPane = new JTabbedPane();
@@ -199,6 +212,7 @@ public final class ProofManagementDialog extends JDialog {
             if (proofList.getSelectedIndex() == -1 && proofList.getModel().getSize() > 0) {
                 proofList.setSelectedIndex(0);
             }
+            updateLemmaDependencyPanel();
         });
         getContentPane().add(tabbedPane);
 
@@ -250,6 +264,7 @@ public final class ProofManagementDialog extends JDialog {
         classTree = null;
         contractPanelByMethod = null;
         contractPanelByProof = null;
+        lemmaDependencyPanel = null;
         startButton = null;
         cancelButton = null;
         // ============================================
@@ -559,6 +574,18 @@ public final class ProofManagementDialog extends JDialog {
             }
         }
         updateStartButton();
+    }
+
+    private void updateLemmaDependencyPanel() {
+        if (lemmaDependencyPanel == null) {
+            return;
+        }
+        final ProofWrapper selected = proofList.getSelectedValue();
+        Proof proof = selected != null ? selected.proof : null;
+        if (proof == null) {
+            proof = mediator.getSelectedProof();
+        }
+        lemmaDependencyPanel.setProof(proof);
     }
 
     private void updateGlobalStatus() {

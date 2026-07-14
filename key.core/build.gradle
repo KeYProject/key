@@ -280,3 +280,17 @@ tasks.register("testRAP", Test) {
 sourceSets.test.java.srcDirs(rapDir)
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key)
+
+// Measurement probe for the lemma reuse potential of One Step Simplifier applications
+// (see de.uka.ilkd.key.rule.lemma.OssLemmaReuseProbe). Not part of the regular test suite.
+tasks.register('runOssReuseProbe', Test) {
+    group = "verification"
+    description = "Measures potential lemma reuse of OSS applications on example proofs."
+    useJUnitPlatform { includeTags 'performance' }
+    filter { includeTestsMatching "de.uka.ilkd.key.rule.lemma.OssLemmaReuseProbe" }
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty "key.disregardSettings", "true"
+    maxHeapSize = "4g"
+    testLogging.showStandardStreams = true
+}

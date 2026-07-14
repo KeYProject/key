@@ -71,6 +71,13 @@ public final class StrategyProperties extends Properties {
     public static final String OSS_OPTIONS_KEY = "OSS_OPTIONS_KEY";
     public static final String OSS_ON = "OSS_ON";
     public static final String OSS_OFF = "OSS_OFF";
+    /**
+     * One step simplification in transparent mode: aggregated simplifications of formulas
+     * without modal operators are performed via generated, separately provable lemma taclets
+     * (see {@link de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule}) instead of the opaque
+     * built-in rule; formulas outside that fragment are still simplified by the built-in rule.
+     */
+    public static final String OSS_TRANSPARENT = "OSS_TRANSPARENT";
 
     public static final String QUANTIFIERS_OPTIONS_KEY = "QUANTIFIERS_OPTIONS_KEY";
     public static final String QUANTIFIERS_NONE = "QUANTIFIERS_NONE";
@@ -168,7 +175,8 @@ public final class StrategyProperties extends Properties {
         MPS_SKIP, MPS_NONE, DEP_OPTIONS_KEY, DEP_ON, DEP_OFF, QUERY_OPTIONS_KEY, QUERY_ON,
         QUERY_RESTRICTED, QUERY_OFF, QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
         NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS,
-        NON_LIN_ARITH_COMPLETION, OSS_OPTIONS_KEY, OSS_ON, OSS_OFF, QUANTIFIERS_OPTIONS_KEY,
+        NON_LIN_ARITH_COMPLETION, OSS_OPTIONS_KEY, OSS_ON, OSS_OFF, OSS_TRANSPARENT,
+        QUANTIFIERS_OPTIONS_KEY,
         QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS,
         QUANTIFIERS_INSTANTIATE, VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
         CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE, AUTO_INDUCTION_OPTIONS_KEY,

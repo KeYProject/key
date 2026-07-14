@@ -305,7 +305,52 @@ public class TaskTree extends JPanel {
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         ContextMenuKind.PROOF_LIST, p, mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
+                } else if (selPath != null
+                        && selPath.getLastPathComponent() instanceof EnvNode envNode) {
+                    delegateView.setSelectionPath(selPath);
+                    final JPopupMenu menu = new JPopupMenu();
+                    final JMenuItem abandonAll = new JMenuItem("Abandon All Proofs of Environment");
+                    abandonAll.setToolTipText(
+                        "Drop every proof loaded in this environment at once.");
+                    abandonAll.addActionListener(ev -> abandonEnvironment(envNode));
+                    menu.add(abandonAll);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
                 }
+            }
+        }
+    }
+
+    /**
+     * Abandons (disposes) all proofs of the given environment node after confirmation. Useful
+     * to clean up an environment that accumulated many proofs at once (e.g. lemma side proofs
+     * loaded in bulk) without abandoning them one by one.
+     *
+     * @param envNode the environment node whose proofs to abandon
+     */
+    private void abandonEnvironment(EnvNode envNode) {
+        // collect the proofs first: disposing a proof removes its node from the tree, which
+        // would otherwise invalidate an in-progress traversal of the environment's children
+        final List<Proof> proofs = new LinkedList<>();
+        for (int i = 0, n = envNode.getChildCount(); i < n; i++) {
+            if (envNode.getChildAt(i) instanceof TaskTreeNode taskNode) {
+                for (final Proof p : taskNode.allProofs()) {
+                    proofs.add(p);
+                }
+            }
+        }
+        if (proofs.isEmpty()) {
+            return;
+        }
+        if (!mediator.getUI().confirmTaskRemoval(
+            "Abandon all " + proofs.size() + " proof(s) of this environment?")) {
+            return;
+        }
+        if (mediator.isInAutoMode()) {
+            mediator.getUI().getProofControl().stopAutoMode();
+        }
+        for (final Proof p : proofs) {
+            if (!p.isDisposed()) {
+                p.dispose();
             }
         }
     }

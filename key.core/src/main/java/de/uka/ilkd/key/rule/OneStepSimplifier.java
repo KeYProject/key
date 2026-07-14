@@ -88,6 +88,17 @@ public final class OneStepSimplifier implements BuiltInRule {
     private TacletIndex[] indices;
     private Map<JTerm, JTerm>[] notSimplifiableCaches;
     private boolean active;
+    /**
+     * In transparent mode (strategy option {@link StrategyProperties#OSS_TRANSPARENT}), this
+     * rule itself is never applicable and no taclets are taken over from the goals' rule
+     * indices: lemma-eligible formulas are simplified via
+     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaIntroductionRule} (an inspectable, separately
+     * provable taclet per aggregated simplification), and all other formulas are simplified by
+     * the ordinary strategy with the individual rules. The simplifier machinery stays active
+     * solely as the computation core of the lemma generator (see
+     * {@link #computeSimplification(Goal, PosInOccurrence, Protocol)}).
+     */
+    private boolean transparent;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -149,7 +160,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
 
             if (accept) {
-                appsTakenOver = appsTakenOver.prepend(app);
+                if (!transparent) {
+                    appsTakenOver = appsTakenOver.prepend(app);
+                }
                 result = result.prepend(tac);
             }
         }
@@ -164,7 +177,10 @@ public final class OneStepSimplifier implements BuiltInRule {
         assert Immutables.isDuplicateFree(result)
                 : "If this fails unexpectedly, add a call to Immutables.removeDuplicates.";
 
-        // remove apps in appsTakenOver from taclet indices of all goals
+        // Remove apps in appsTakenOver from taclet indices of all goals. In transparent mode
+        // nothing is taken over: the captured rule sets remain available to the ordinary
+        // strategy (formulas outside the lemma fragment are simplified by individual, visible
+        // rule applications), and the indices built here serve only the lemma generator.
         for (NoPosTacletApp app : appsTakenOver) {
             for (Goal goal : proof.allGoals()) {
                 goal.ruleAppIndex().removeNoPosTacletApp(app);
@@ -538,16 +554,24 @@ public final class OneStepSimplifier implements BuiltInRule {
             settings = ProofSettings.DEFAULT_SETTINGS;
         }
 
-        final boolean newActive = settings.getStrategySettings().getActiveStrategyProperties()
-                .get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+        final Object ossMode = settings.getStrategySettings().getActiveStrategyProperties()
+                .get(StrategyProperties.OSS_OPTIONS_KEY);
+        final boolean newActive = StrategyProperties.OSS_ON.equals(ossMode)
+                || StrategyProperties.OSS_TRANSPARENT.equals(ossMode);
+        final boolean newTransparent = StrategyProperties.OSS_TRANSPARENT.equals(ossMode);
 
-        if (active != newActive || lastProof != proof || // The setting or proof has changed.
-                (isShutdown() && !proof.closed())) { // A closed proof was pruned.
+        if (active != newActive || transparent != newTransparent || lastProof != proof
+        // The setting or proof has changed.
+                || (isShutdown() && !proof.closed())) { // A closed proof was pruned.
+            // restore any taken-over taclets before re-initializing: switching between the
+            // opaque and the transparent mode changes whether the captured rule sets are
+            // removed from the goals' rule indices, and initIndices alone would not rebuild
+            // for an unchanged proof
+            shutdownIndices();
             active = newActive;
+            transparent = newTransparent;
             if (active && proof != null && !proof.closed()) {
                 initIndices(proof);
-            } else {
-                shutdownIndices();
             }
         }
     }
@@ -571,8 +595,13 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    /**
+     * Tells whether the simplifier machinery could simplify the formula at the given position,
+     * regardless of the transparent mode partition (see {@link #isApplicable(Goal,
+     * PosInOccurrence)}). This is the applicability notion used by
+     * {@link de.uka.ilkd.key.rule.lemma.OssLemmaGenerator}.
+     */
+    public boolean canSimplify(Goal goal, PosInOccurrence pio) {
         // abort if switched off
         if (!active) {
             return false;
@@ -592,6 +621,19 @@ public final class OneStepSimplifier implements BuiltInRule {
         return applicableTo(goal.proof().getServices(), pio.sequentFormula(),
             pio.isInAntec(), goal,
             null);
+    }
+
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        // In transparent mode this rule performs no simplification at all: lemma-eligible
+        // formulas are handled by the lemma introduction rule, and all other formulas are
+        // simplified by the ordinary strategy with the individual rules (which stay in the
+        // goals' rule indices, see tacletsForRuleSet). The simplifier machinery remains active
+        // solely as the computation core of the lemma generator.
+        if (transparent) {
+            return false;
+        }
+        return canSimplify(goal, pio);
     }
 
     @Override
@@ -666,6 +708,51 @@ public final class OneStepSimplifier implements BuiltInRule {
     @Override
     public String toString() {
         return displayName();
+    }
+
+    /**
+     * Result of a one-step-simplification computation performed by
+     * {@link #computeSimplification(Goal, PosInOccurrence, Protocol)}.
+     *
+     * @param simplified the fully simplified sequent formula
+     * @param numAppliedRules the number of rule applications aggregated in the result
+     * @param usedContextFormulas the positions of the context formulas used by replace-known
+     *        steps (the assumptions the result depends on; empty if the simplification is a pure
+     *        equivalence transformation)
+     */
+    public record SimplificationResult(SequentFormula simplified, int numAppliedRules,
+            ImmutableList<PosInOccurrence> usedContextFormulas) {
+    }
+
+    /**
+     * Computes the overall simplification result for the formula at the given position exactly as
+     * an application of this rule would, but without modifying the goal or the proof. This is the
+     * side-effect-free core of the one step simplifier, usable by clients that want to capture
+     * the aggregated transformation in a different form (e.g., as a generated lemma taclet).
+     *
+     * <p>
+     * Requires the simplifier to be active for the goal's proof (see {@link #refreshOSS(Proof)}).
+     *
+     * @param goal the goal whose sequent provides the context formulas for replace-known
+     * @param pos the position of the (top level) formula to simplify
+     * @param protocol if non-null, the performed rule applications are reported to this protocol
+     * @return the simplification result, or {@code null} if the simplifier is not active for this
+     *         proof or the formula cannot be simplified
+     */
+    public synchronized SimplificationResult computeSimplification(Goal goal,
+            PosInOccurrence pos, Protocol protocol) {
+        if (!active || indices == null || goal.proof() != lastProof) {
+            return null;
+        }
+        // a rule app is required for term label instantiation during replace-known
+        final OneStepSimplifierRuleApp ruleApp = createApp(pos, goal.proof().getServices());
+        final Instantiation inst =
+            computeInstantiation(pos, goal.sequent(), protocol, goal, ruleApp);
+        if (inst.getCf() == null || inst.getCf().equals(pos.sequentFormula())) {
+            return null;
+        }
+        return new SimplificationResult(inst.getCf(), inst.getNumAppliedRules(),
+            inst.getIfInsts());
     }
 
     /**
