@@ -1,0 +1,96 @@
+\profile "Java Profile";
+
+\settings {
+    "Choice" : {
+        "JavaCard" : "JavaCard:on",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:on",
+        "bigint" : "bigint:on",
+        "finalFields" : "finalFields:immutable",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "modelFields" : "modelFields:showSatisfiability",
+        "moreSeqRules" : "moreSeqRules:off",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on"
+    },
+    "Labels" : {
+        "UseOriginLabels" : true
+    },
+    "NewSMT" : {
+        
+    },
+    "SMTSettings" : {
+        "SelectedTaclets" : [
+            
+        ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+    },
+    "Strategy" : {
+        "ActiveStrategy" : "Modular JavaDL Strategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : {
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "TRIGGERS_OPTIONS_KEY" : "TRIGGERS_FULL",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+        }
+    }
+} 
+
+
+
+\proofObligation 
+// 
+{
+    "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+    "name" : "selectOfStoreSameLoc"
+}
+
+\proof {
+(keyLog "0" (keyUser "bubel" ) (keyVersion "40f2ff40876dc6765d47e8d8cd9ca970f14235f7"))
+
+(autoModeTime "23")
+
+(branch "dummy ID"
+(rule "eqSymm" (formula "1"))
+(rule "ifthenelse_negated" (formula "1") (term "0"))
+(rule "pullOutSelect" (formula "1") (term "1") (inst "selectSK=f_f_0:beta"))
+(rule "simplifySelectOfStore" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "ifthenelse_negated" (formula "1") (term "0"))
+(rule "close" (formula "2") (ifseqformula "1"))
+)
+}
