@@ -58,10 +58,11 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 public class VMTacletMatcher implements TacletMatcher {
 
     /**
-     * System property ({@code -Dkey.matcher.interpreter=true}) forcing the legacy cursor-based
-     * interpreter find-matcher. The cursor-free compiled matcher is the default; this is mainly for
-     * headless / CI A/B comparison. In the GUI use the {@link #INTERPRETER_MATCHER_FEATURE} feature
-     * flag instead.
+     * System property ({@code -Dkey.matcher.interpreter=true}): the single switch between the two
+     * back-ends. It forces the legacy cursor-based interpreter for all of a taclet's matching (its
+     * find pattern and its {@code \assumes} formulas alike); the cursor-free compiled matcher is
+     * the default. Mainly for headless / CI A/B comparison; in the GUI use the
+     * {@link #INTERPRETER_MATCHER_FEATURE} feature flag instead.
      * <p>
      * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches matchers.
@@ -69,25 +70,18 @@ public class VMTacletMatcher implements TacletMatcher {
     public static final String INTERPRETER_MATCHER_PROPERTY = "key.matcher.interpreter";
 
     /**
-     * Feature flag (Settings &rarr; Feature Flags, persistent) forcing the legacy interpreter
-     * find-matcher, the GUI-friendly equivalent of {@link #INTERPRETER_MATCHER_PROPERTY}. The
-     * compiled matcher is the default; activate this to fall back to the interpreter. Like the
-     * property it is read per taclet at construction time, so it takes effect for newly loaded
-     * proofs (or after reloading the current one) -- hence {@code restartRequired = true}.
+     * Feature flag (Settings &rarr; Feature Flags, persistent), the GUI-friendly equivalent of
+     * {@link #INTERPRETER_MATCHER_PROPERTY}: it forces the legacy interpreter for all of a taclet's
+     * matching (find and {@code \assumes}). The compiled matcher is the default; activate this to
+     * fall back to the interpreter. Like the property it is read per taclet at construction time,
+     * so it takes effect for newly loaded proofs (or after reloading the current one) -- hence
+     * {@code restartRequired = true}.
      */
     public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
         FeatureSettings.createFeature("MATCHER_INTERPRETER",
             "Use the legacy interpreter taclet find-matcher instead of the compiled one "
                 + "(reload the proof to apply).",
             true);
-
-    /**
-     * System property ({@code -Dkey.matcher.interpreterAssumes=true}) forcing the interpreter for
-     * {@code \assumes} formula matching even when the compiled find-matcher is selected. The
-     * compiled matcher (incl. the Java program of a modality) is used for assumes by default; this
-     * is mainly for headless A/B comparison of the compiled-assumes extension.
-     */
-    public static final String INTERPRETER_ASSUMES_PROPERTY = "key.matcher.interpreterAssumes";
 
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
@@ -146,14 +140,12 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = null;
         }
 
-        // The taclet's \assumes formulas use the same back-end as the find: when the compiled
-        // matcher is selected they are compiled too (cursor-free, including the Java program of a
-        // modality), unless -Dkey.matcher.interpreterAssumes forces the interpreter for them.
-        final boolean assumesInterpreter =
-            useInterpreter || Boolean.getBoolean(INTERPRETER_ASSUMES_PROPERTY);
+        // The taclet's \assumes formulas use the same back-end as the find, chosen by the one
+        // switch above: with the compiled matcher they are compiled too (cursor-free, including
+        // the Java program of a modality), with the interpreter they are interpreted.
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
-                matchProgramFor((JTerm) sf.formula(), assumesInterpreter));
+                matchProgramFor((JTerm) sf.formula(), useInterpreter));
         }
     }
 
