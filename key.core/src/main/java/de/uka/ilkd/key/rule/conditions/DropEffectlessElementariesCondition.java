@@ -162,9 +162,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             LogicServices services) {
         SVInstantiations svInst =
             (SVInstantiations) mc.getInstantiations();
-        JTerm uInst = (JTerm) svInst.getInstantiation(u);
-        JTerm xInst = (JTerm) svInst.getInstantiation(x);
-        JTerm resultInst = (JTerm) svInst.getInstantiation(result);
+        JTerm uInst = svInst.getInstantiation(u);
+        JTerm xInst = svInst.getInstantiation(x);
+        JTerm resultInst = svInst.getInstantiation(result);
         if (uInst == null || xInst == null) {
             return mc;
         }
