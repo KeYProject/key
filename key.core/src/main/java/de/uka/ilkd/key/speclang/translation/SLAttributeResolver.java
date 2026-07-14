@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
@@ -14,6 +17,7 @@ import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
@@ -133,7 +137,20 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     JTerm attributeTerm;
-                    if (attribute.isStatic()) {
+                    if (attribute.isModel()) {
+                        List<LocationVariable> heaps = new ArrayList<>();
+                        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
+                            heaps.add(h);
+                        }
+                        JTerm[] subs = new JTerm[fieldSymbol.arity()];
+                        for (int j = 0; j < heaps.size(); j++) {
+                            subs[j] = services.getTermBuilder().var(heaps.get(j));
+                        }
+                        if (!attribute.isStatic()) {
+                            subs[heaps.size()] = recTerm;
+                        }
+                        attributeTerm = services.getTermBuilder().func(fieldSymbol, subs);
+                    } else if (attribute.isStatic()) {
                         if (attribute.isFinal() && FinalHeapResolution.recallIsFinalEnabled()) {
                             attributeTerm = services.getTermBuilder()
                                     .staticFinalDot(attribute.sort(), fieldSymbol);
