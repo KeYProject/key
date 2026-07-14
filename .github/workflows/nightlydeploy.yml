@@ -53,7 +53,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete nightly --yes --cleanup-tag 
+          gh release delete KEY-3.0.0-rc --yes --cleanup-tag 
 
 
       - name: Create nightly release
@@ -61,9 +61,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create --generate-notes --title "Nightly Release" \
+          gh release create --generate-notes --title "KeY-3.0.0-rc" \
              --prerelease --notes-start-tag KEY-2.12.3 \
-             nightly key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
+             KEY-3.0.0-rc key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
 
 
       - name: Upload to MAVEN CENTRAL SNAPSHOT repository
