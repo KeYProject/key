@@ -30,7 +30,6 @@ the feature under test (verified by loading each and inspecting the error):
 | `local-class` | `Unsupported element: LocalClassDeclarationStmt` |
 | `static-import` | `Unsupported element: ImportDeclaration` (the `static` import) |
 | `annotation-declaration` | `Unsupported element: AnnotationDeclaration` (the `@interface`) |
-| `multi-catch` | `Unsupported element: UnionType` |
 | `lambda` | `Unsupported element: LambdaExpr` |
 | `method-reference` | `Unsupported element: MethodReferenceExpr` |
 | `instanceof-pattern` | `Unsupported element: TypePatternExpr` (the bound pattern) |

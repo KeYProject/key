@@ -12,11 +12,9 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
 
    //@ protected nullable ghost String message = null;
    //@ protected nullable ghost Throwable cause = null;
-   //@ protected model \seq suppressedExceptions;
-   //@ protected model \locset suppressedListFootprint;
-   //@ accessible suppressedListFootprint: suppressedListFootprint;
-   //@ accessible suppressedExceptions: suppressedListFootprint;
-   //@ protected invariant \intersect(suppressedListFootprint,\set_union(this.message, this.cause))==\empty;
+
+   //@ protected ghost \seq suppressedExceptions;
+   //@ protected ghost \locset suppressedListFootprint;
 
 
    /*@ public normal_behavior
@@ -90,7 +88,6 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
    /// throwable invariant
    /*@ public normal_behavior
      @ assignable suppressedListFootprint;
-     @ accessible suppressedListFootprint;
      @ ensures suppressedExceptions == \seq_concat(suppressedExceptions, \seq_singleton(exception));
     */
    public /*@ helper @*/ final synchronized void addSuppressed(Throwable exception);
