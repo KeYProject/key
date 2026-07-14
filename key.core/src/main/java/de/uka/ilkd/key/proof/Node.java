@@ -64,7 +64,7 @@ public class Node implements Iterable<Node> {
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
-    private RuleApp appliedRuleApp;
+    private @Nullable RuleApp appliedRuleApp;
 
     private NameRecorder nameRecorder;
 
@@ -221,7 +221,8 @@ public class Node implements Iterable<Node> {
         return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    /// Get the applied rule (null for open/closed goals).
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 

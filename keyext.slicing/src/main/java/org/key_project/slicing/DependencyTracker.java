@@ -12,18 +12,11 @@ import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.BranchLocation;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
-import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
-import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
-import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
-import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
@@ -44,16 +37,13 @@ import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.IdentityHashSet;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-/**
- * Tracks proof steps as they are applied on the proof.
- * Each proof step is recorded in the dependency graph ({@link DependencyGraph}).
- *
- * @author Arne Keller
- */
-public class DependencyTracker implements RuleAppListener, ProofTreeListener {
+/// Constructs the [DependencyGraph] based on a proof's nodes.
+/// Also provides a wrapper around the [DependencyAnalyzer].
+///
+/// @author Arne Keller
+public class DependencyTracker implements ProofTreeListener {
     /**
      * The proof this tracker monitors.
      */
@@ -73,16 +63,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
-    /**
-     * Set once tracking failed with an exception (after which {@link Proof} unregisters this
-     * tracker, see {@link #ruleApplied(ProofEvent)}). The dependency graph is then incomplete, so
-     * {@link #analyze} no longer returns results.
-     */
-    private boolean trackingDisabled = false;
 
     /**
      * Construct a new tracker for a proof.
-     * This tracker is added as a RuleAppListener and ProofTreeListener to the proof.
+     * This tracker is added as a ProofTreeListener to the proof.
+     * If the proof already contains some nodes, they are added to the dependency graph.
      *
      * @param proof the proof to track
      */
@@ -90,15 +75,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         this.proof = proof;
         proof.addProofTreeListener(this);
         proof.register(this, DependencyTracker.class);
-        // skip further tracking if disabled
-        if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
-            return;
-        }
         // exotic use case: registering a dependency tracker after the proof is loaded
         if (proof.countNodes() > 1) {
             graph.ensureProofIsTracked(proof);
         }
-        proof.addRuleAppListener(this);
     }
 
     /**
@@ -182,25 +162,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     /**
-     * Get all formulas removed by the provided rule application, i.e. all formulas not present
-     * in the replacement nodes.
+     * Get all formulas removed by the preceding rule application, i.e. all formulas not present
+     * in the provided node compared to the parent node.
      *
-     * @param ruleAppInfo some rule application
+     * @param node the proof step
      * @return formulas removed by that rule application
      */
-    private Set<PosInOccurrence> formulasRemovedBy(
-            RuleAppInfo ruleAppInfo) {
-        Set<PosInOccurrence> removed = new HashSet<>();
-        for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
-            newNode.getNodeChanges().forEachRemaining(nodeChange -> {
-                if (nodeChange instanceof NodeChangeRemoveFormula) {
-                    removed.add(nodeChange.getPos());
-                }
-            });
-        }
-        return removed;
-    }
-
     private Set<PosInOccurrence> formulasRemovedBy(Node node) {
         Set<PosInOccurrence> removed = new HashSet<>();
         // compare parent sequent to new sequent
@@ -225,26 +192,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Get the formulas added by this rule application. Each returned pair is one formula
      * and the ID of the branch it is added to (-1 if the node doesn't branch).
      *
-     * @param ruleAppInfo rule application info
+     * @param node the proof step
      * @return formulas added
      */
-    private List<Pair<PosInOccurrence, Integer>> outputsOfNode(
-            RuleAppInfo ruleAppInfo) {
-        List<Pair<PosInOccurrence, Integer>> outputs =
-            new ArrayList<>();
-        int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
-        for (NodeReplacement b : ruleAppInfo.getReplacementNodes()) {
-            int id = ruleAppInfo.getReplacementNodes().size() > 1 ? sibling : -1;
-            b.getNodeChanges().forEachRemaining(c -> {
-                if (c instanceof NodeChangeAddFormula) {
-                    outputs.add(new Pair<>(c.getPos(), id));
-                }
-            });
-            sibling--;
-        }
-        return outputs;
-    }
-
     private List<Pair<PosInOccurrence, Integer>> outputsOfNode(
             Node node) {
         List<Pair<PosInOccurrence, Integer>> outputs =
@@ -268,110 +218,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return outputs;
     }
 
-    @Override
-    public void ruleApplied(ProofEvent e) {
-        if (trackingDisabled) {
-            return;
-        }
-        try {
-            trackRuleApplication(e);
-        } catch (RuntimeException ex) {
-            // Proof.fireRuleApplied isolates listeners: it logs this failure and unregisters the
-            // tracker, so a tracking error cannot break the ongoing proof search. Here we only
-            // record that tracking became incomplete, so that a later analyze() does not return a
-            // slice computed from the partial dependency graph; then rethrow for the proof to
-            // handle.
-            trackingDisabled = true;
-            analysisResults = null;
-            throw ex;
-        }
-    }
-
-    private void trackRuleApplication(ProofEvent e) {
-        if (e.getSource() != proof) {
-            throw new IllegalStateException(
-                "dependency tracker received rule application on wrong proof");
-        }
-        RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
-        RuleApp ruleApp = ruleAppInfo.getRuleApp();
-        ImmutableList<Goal> goalList = e.getNewGoals();
-        Node n = ruleAppInfo.getOriginalNode();
-
-        // outputs: new graph nodes
-        List<GraphNode> output = new ArrayList<>();
-
-        // record any rules added by this rule application
-        for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
-            for (NoPosTacletApp newRule : newNode.getNode().getLocalIntroducedRules()) {
-                final var justification =
-                    newNode.getNode().proof().getInitConfig().getJustifInfo()
-                            .getJustification(newRule.taclet());
-                if (justification instanceof RuleJustificationByAddRules justAddRule &&
-                        justAddRule.node() == n) {
-                    AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
-                    output.add(ruleNode);
-                    dynamicRules.put(newRule.rule(), ruleNode);
-                }
-            }
-        }
-
-        // record removed (replaced) input formulas
-        // (these are the same for each new branch)
-        Set<PosInOccurrence> removed = formulasRemovedBy(ruleAppInfo);
-
-        // inputs: (graph node, whether that graph node was replaced)
-        List<Pair<GraphNode, Boolean>> input = inputsOfNode(n, removed);
-
-        // Newly created sequent formulas and the index of the branch they are created in.
-        // If no new branches are created, use index -1.
-        List<Pair<PosInOccurrence, Integer>> outputs =
-            outputsOfNode(ruleAppInfo);
-
-        for (Pair<PosInOccurrence, Integer> out : outputs) {
-            BranchLocation loc = n.getBranchLocation();
-            if (out.second != -1) {
-                // this is a branching proof step: set correct branch location of new formulas
-                loc = loc.append(new Pair<>(n, out.second));
-            }
-            TrackedFormula formula = new TrackedFormula(
-                out.first.sequentFormula(),
-                loc,
-                out.first.isInAntec(),
-                proof.getServices());
-            output.add(formula);
-        }
-
-        // add closed goals to output nodes
-        if (goalList.isEmpty() || (ruleApp instanceof TacletApp tacletApp &&
-                tacletApp.taclet().closeGoal())) {
-            // closed goal is always the next node
-            // (or the current node, if the goal was closed by SMT)
-            Node closedGoal = n.childrenCount() > 0 ? n.child(0) : n;
-            output.add(
-                new ClosedGoal(closedGoal.serialNr(), n.getBranchLocation()));
-        }
-
-        n.register(new DependencyNodeData(
-            input,
-            output,
-            ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
-
-        // add pseudo nodes so the rule application is always included in the graph
-        if (input.isEmpty()) {
-            input.add(new Pair<>(new PseudoInput(), true));
-        }
-        if (output.isEmpty()) {
-            output.add(new PseudoOutput());
-        }
-
-        // add new edges to graph
-        graph.addRuleApplication(n, input, output);
-    }
-
     /**
      * Track the specified node.
-     * Either this method or {@link #ruleApplied(ProofEvent)} needs to be called to track
-     * a node in the dependency graph.
+     * To fully construct the dependency graph for a proof, this method must be called with each
+     * node of the proof in order of application (!)
      *
      * @param n the node
      */
@@ -380,6 +230,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             throw new IllegalStateException("dependency tracker received node of wrong proof");
         }
         RuleApp ruleApp = n.getAppliedRuleApp();
+        if (ruleApp == null) {
+            return; // closed goal (always tracked as part of the previous node)
+        }
         var goalList = n.children();
 
         // outputs: new graph nodes
@@ -495,10 +348,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return analysis results (null if proof is not closed)
      */
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
-        if (trackingDisabled) {
-            // the dependency graph is incomplete after a tracking failure; do not return a slice
-            return null;
-        }
         if (analysisResults != null
                 && analysisResults.didDependencyAnalysis == doDependencyAnalysis
                 && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps

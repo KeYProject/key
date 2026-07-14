@@ -69,10 +69,13 @@ public class DependencyGraph {
             throw new IllegalStateException("tried to use DependencyGraph with wrong proof");
         }
         DependencyTracker tracker = p.lookup(DependencyTracker.class);
+        if (tracker == null) {
+            throw new IllegalStateException("proof is missing dependency tracker");
+        }
         var nodeIterator = p.root().subtreeIterator();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
-            if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) {
+            if (edgeDataReversed.containsKey(node)) {
                 continue;
             }
             tracker.trackNode(node);
