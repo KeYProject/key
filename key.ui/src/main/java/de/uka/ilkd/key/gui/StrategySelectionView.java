@@ -4,10 +4,14 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import javax.swing.*;
+import javax.swing.plaf.basic.ComboPopup;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -20,7 +24,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.StrategyPresetsSettings;
+import de.uka.ilkd.key.settings.StrategyPresetsSettings.StrategyPreset;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -91,6 +98,48 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * should be activated again.
      */
     private boolean predefChanged = true;
+
+    /**
+     * Set while the preset combo box is being rebuilt or reselected programmatically. Guards the
+     * combo box listeners so that they do not (re-)apply a preset in reaction to our own changes.
+     */
+    private boolean adjustingPresetCombo = false;
+
+    /**
+     * One-shot guard spanning a delete-via-"x" interaction. The popup commits its selection on
+     * mouse release <em>after</em> our press handler has already deleted the preset; this flag
+     * keeps
+     * that trailing commit from applying a preset. Reset on the next idle EDT cycle.
+     */
+    private boolean suppressPresetApply = false;
+
+    /**
+     * The combo box popup list, cached once the delete handler is installed, so the delete action
+     * can keep the popup selection aligned with the combo box.
+     */
+    private JList<?> presetPopupList;
+
+    /**
+     * Width (in pixels) of the clickable delete zone drawn at the right edge of user-defined preset
+     * rows in the combo box popup.
+     */
+    private static final int PRESET_DELETE_ZONE_WIDTH = 26;
+
+    /**
+     * Colour of the "x" delete affordance while its zone is hovered.
+     */
+    private static final Color PRESET_DELETE_ACTIVE_COLOR = new Color(0xCC, 0x33, 0x33);
+
+    /**
+     * Whether the mouse handler for the preset combo box popup has already been installed. The
+     * popup list only exists once the popup has been shown for the first time.
+     */
+    private boolean presetDeleteHandlerInstalled = false;
+
+    /**
+     * Index of the combo box popup row whose delete zone is currently hovered, or {@code -1}.
+     */
+    private int presetDeleteRolloverIndex = -1;
 
     /**
      * Observe changes on {@link #mediator}.
@@ -399,55 +448,375 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     private JPanel createDefaultPanel(StrategySelectionComponents components) {
         final JPanel panel = new JPanel();
 
-        final JButton defaultButton = new JButton("Choose Predef");
+        final JButton defaultButton = new JButton("Apply");
+        // Keep the button compact: trim the internal padding a little.
+        defaultButton.setMargin(new Insets(2, 8, 2, 8));
         components.setDefaultButton(defaultButton);
 
-        final String[] existingPredefs = new String[1 + DEFINITION.getFurtherDefaults().size()];
-
-        existingPredefs[0] = "Defaults";
-
-        int i = 1;
-        for (StrategySettingsDefinition.StrategySettingEntry furtherDefault : DEFINITION
-                .getFurtherDefaults()) {
-            existingPredefs[i] = furtherDefault.name();
-            i++;
-        }
-
-        final JComboBox<String> strategyPredefSettingsCmb = new JComboBox<>(existingPredefs);
-        strategyPredefSettingsCmb.setSelectedIndex(0);
+        final JComboBox<PresetEntry> strategyPredefSettingsCmb = new JComboBox<>();
+        strategyPredefSettingsCmb.setRenderer(new PresetListCellRenderer());
         components.setPredefsChoiceCmb(strategyPredefSettingsCmb);
 
-        defaultButton.addActionListener(e -> {
-            int newMaxSteps = 0;
-            StrategyProperties newProps = null;
+        // "Choose Predef" applies the currently selected preset.
+        defaultButton.addActionListener(e -> applySelectedPreset());
 
-            final int selIndex = strategyPredefSettingsCmb.getSelectedIndex();
-            if (selIndex == 0) {
-                newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
-                newProps =
-                    DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
-            } else {
-                var chosenDefault = DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                newMaxSteps = chosenDefault.order();
-                newProps = chosenDefault.factory().createDefaultStrategyProperties();
+        // Selecting an entry in the combo box applies it immediately, unless we are rebuilding the
+        // model ourselves (adding, deleting or renaming a preset must not change the live
+        // settings).
+        strategyPredefSettingsCmb.addActionListener(e -> {
+            if (!adjustingPresetCombo && !suppressPresetApply) {
+                applySelectedPreset();
             }
-
-            mediator.getSelectedProof().getSettings().getStrategySettings()
-                    .setMaxSteps(newMaxSteps);
-            updateStrategySettings(JAVACARDDL_STRATEGY_NAME, newProps);
-
-            predefChanged = false;
-            refresh(mediator.getSelectedProof());
-
         });
 
-        strategyPredefSettingsCmb
-                .addItemListener(e -> defaultButton.getActionListeners()[0].actionPerformed(null));
+        // Clicking the small "x" on a user-defined row inside the popup deletes that preset.
+        installPresetDeleteHandler(strategyPredefSettingsCmb);
 
+        // Adjacent menu button offering save / stash / rename.
+        final JButton presetMenuButton = createPresetMenuButton();
+        components.setPresetMenuButton(presetMenuButton);
+
+        rebuildPresetCombo(null);
+
+        // Lay the row out as [gear] [combo] [Apply] and give the two buttons the same height as
+        // the combo box so the row is flush instead of vertically staggered.
+        int rowHeight = strategyPredefSettingsCmb.getPreferredSize().height;
+        setPreferredHeight(presetMenuButton, rowHeight);
+        setPreferredHeight(defaultButton, rowHeight);
+
+        panel.add(presetMenuButton);
         panel.add(strategyPredefSettingsCmb);
         panel.add(defaultButton);
 
         return panel;
+    }
+
+    /**
+     * Fixes the preferred height of the given component while keeping its preferred width, so it
+     * can
+     * be aligned in height with a neighbouring component.
+     */
+    private static void setPreferredHeight(JComponent comp, int height) {
+        Dimension pref = comp.getPreferredSize();
+        comp.setPreferredSize(new Dimension(pref.width, height));
+    }
+
+    /**
+     * @return the proof-independent settings storing the user-defined strategy presets
+     */
+    private static StrategyPresetsSettings getPresetsSettings() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getStrategyPresetsSettings();
+    }
+
+    /**
+     * Builds the list of combo box entries: the built-in "Defaults", the further built-in presets
+     * defined by the profile, followed by the user-defined presets.
+     */
+    private List<PresetEntry> buildPresetEntries() {
+        List<PresetEntry> entries = new ArrayList<>();
+        entries.add(PresetEntry.defaults());
+        for (StrategySettingsDefinition.StrategySettingEntry e : DEFINITION.getFurtherDefaults()) {
+            entries.add(PresetEntry.builtIn(e));
+        }
+        for (StrategyPreset p : getPresetsSettings().getPresets()) {
+            entries.add(PresetEntry.user(p));
+        }
+        return entries;
+    }
+
+    /**
+     * Rebuilds the preset combo box model from the built-in and stored presets without touching the
+     * live strategy settings.
+     *
+     * @param selectName the name of the preset to select afterwards, or {@code null} to select the
+     *        first entry ("Defaults")
+     */
+    private void rebuildPresetCombo(String selectName) {
+        JComboBox<PresetEntry> combo = components.getStrategyPredefSettingsCmb();
+        if (combo == null) {
+            return;
+        }
+        List<PresetEntry> entries = buildPresetEntries();
+        adjustingPresetCombo = true;
+        try {
+            combo.setModel(new DefaultComboBoxModel<>(entries.toArray(new PresetEntry[0])));
+            PresetEntry toSelect = null;
+            if (selectName != null) {
+                for (PresetEntry e : entries) {
+                    if (e.name().equals(selectName)) {
+                        toSelect = e;
+                        break;
+                    }
+                }
+            }
+            if (toSelect == null && !entries.isEmpty()) {
+                toSelect = entries.get(0);
+            }
+            combo.setSelectedItem(toSelect);
+        } finally {
+            adjustingPresetCombo = false;
+        }
+    }
+
+    /**
+     * Applies the preset currently selected in the combo box to the active proof.
+     */
+    private void applySelectedPreset() {
+        if (mediator == null || mediator.getSelectedProof() == null) {
+            return;
+        }
+        PresetEntry entry =
+            (PresetEntry) components.getStrategyPredefSettingsCmb().getSelectedItem();
+        if (entry == null) {
+            return;
+        }
+        mediator.getSelectedProof().getSettings().getStrategySettings()
+                .setMaxSteps(entry.maxSteps());
+        predefChanged = false;
+        updateStrategySettings(JAVACARDDL_STRATEGY_NAME, entry.properties());
+    }
+
+    /**
+     * Captures the strategy properties currently reflected by the UI. Starts from the complete
+     * active properties of the proof and overlays the values shown by the option controls, so that
+     * unsaved manual edits are included while properties without a control keep their value.
+     */
+    private StrategyProperties currentStrategyProperties() {
+        StrategyProperties base = mediator.getSelectedProof().getSettings().getStrategySettings()
+                .getActiveStrategyProperties();
+        StrategyProperties displayed = getProperties();
+        for (String key : displayed.stringPropertyNames()) {
+            base.setProperty(key, displayed.getProperty(key));
+        }
+        return base;
+    }
+
+    /**
+     * @return the maximal number of rule applications currently configured for the active proof
+     */
+    private int currentMaxSteps() {
+        return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
+    }
+
+    /**
+     * @param name a candidate preset name
+     * @return {@code true} if the name is used by a built-in preset (and thus reserved)
+     */
+    private boolean isBuiltInName(String name) {
+        if ("Defaults".equals(name)) {
+            return true;
+        }
+        for (StrategySettingsDefinition.StrategySettingEntry e : DEFINITION.getFurtherDefaults()) {
+            if (e.name().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private JButton createPresetMenuButton() {
+        final JButton button = new JButton("⚙");
+        // The gear is a Unicode glyph; enlarge it relative to the default font so it reads well.
+        button.setFont(button.getFont().deriveFont(button.getFont().getSize2D() + 6f));
+        button.setMargin(new Insets(2, 8, 2, 8));
+        button.setToolTipText("Save, stash or rename presets");
+        button.addActionListener(e -> showPresetMenu(button));
+        return button;
+    }
+
+    private void showPresetMenu(JComponent invoker) {
+        final boolean hasProof = mediator != null && mediator.getSelectedProof() != null;
+        final PresetEntry selected =
+            (PresetEntry) components.getStrategyPredefSettingsCmb().getSelectedItem();
+
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem saveAs = new JMenuItem("Save current as…");
+        saveAs.setEnabled(hasProof);
+        saveAs.addActionListener(e -> saveCurrentAs());
+        menu.add(saveAs);
+
+        JMenuItem stash = new JMenuItem("Stash current");
+        stash.setToolTipText("Save the current settings to the reusable \"Stash\" preset");
+        stash.setEnabled(hasProof);
+        stash.addActionListener(e -> stashCurrent());
+        menu.add(stash);
+
+        menu.addSeparator();
+
+        JMenuItem rename = new JMenuItem("Rename selected…");
+        rename.setEnabled(selected != null && selected.userDefined());
+        rename.addActionListener(e -> renameSelected());
+        menu.add(rename);
+
+        menu.show(invoker, 0, invoker.getHeight());
+    }
+
+    private void saveCurrentAs() {
+        if (mediator == null || mediator.getSelectedProof() == null) {
+            return;
+        }
+        Object input = JOptionPane.showInputDialog(this, "Preset name:", "Save strategy preset",
+            JOptionPane.PLAIN_MESSAGE, null, null, "");
+        if (input == null) {
+            return;
+        }
+        String name = input.toString().trim();
+        if (name.isEmpty()) {
+            return;
+        }
+        if (isBuiltInName(name)) {
+            JOptionPane.showMessageDialog(this,
+                "\"" + name + "\" is the name of a built-in preset. Please choose another name.",
+                "Save strategy preset", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        StrategyPresetsSettings settings = getPresetsSettings();
+        if (settings.contains(name)) {
+            int choice = JOptionPane.showConfirmDialog(this,
+                "A preset named \"" + name + "\" already exists. Overwrite it?",
+                "Overwrite strategy preset", JOptionPane.YES_NO_OPTION);
+            if (choice != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+        settings.saveOrUpdate(
+            new StrategyPreset(name, currentMaxSteps(), currentStrategyProperties()));
+        rebuildPresetCombo(name);
+    }
+
+    private void stashCurrent() {
+        if (mediator == null || mediator.getSelectedProof() == null) {
+            return;
+        }
+        getPresetsSettings().stash(currentMaxSteps(), currentStrategyProperties());
+        rebuildPresetCombo(StrategyPresetsSettings.STASH_NAME);
+    }
+
+    private void renameSelected() {
+        PresetEntry selected =
+            (PresetEntry) components.getStrategyPredefSettingsCmb().getSelectedItem();
+        if (selected == null || !selected.userDefined()) {
+            return;
+        }
+        Object input = JOptionPane.showInputDialog(this, "New name:", "Rename strategy preset",
+            JOptionPane.PLAIN_MESSAGE, null, null, selected.name());
+        if (input == null) {
+            return;
+        }
+        String newName = input.toString().trim();
+        if (newName.isEmpty() || newName.equals(selected.name())) {
+            return;
+        }
+        if (isBuiltInName(newName)) {
+            JOptionPane.showMessageDialog(this,
+                "\"" + newName + "\" is the name of a built-in preset. Please choose another name.",
+                "Rename strategy preset", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (getPresetsSettings().contains(newName)) {
+            JOptionPane.showMessageDialog(this,
+                "A preset named \"" + newName + "\" already exists.",
+                "Rename strategy preset", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        getPresetsSettings().rename(selected.name(), newName);
+        rebuildPresetCombo(newName);
+    }
+
+    private void deleteUserPreset(PresetEntry entry) {
+        if (entry == null || !entry.userDefined()) {
+            return;
+        }
+        JComboBox<PresetEntry> combo = components.getStrategyPredefSettingsCmb();
+        PresetEntry selected = (PresetEntry) combo.getSelectedItem();
+        String keepSelected =
+            (selected != null && !selected.name().equals(entry.name())) ? selected.name() : null;
+        getPresetsSettings().remove(entry.name());
+        rebuildPresetCombo(keepSelected);
+        // Keep the popup list's selection aligned with the combo box so that a trailing
+        // mouse-release commit (if any) re-selects the same entry instead of an arbitrary row.
+        if (presetPopupList != null) {
+            presetPopupList.setSelectedIndex(combo.getSelectedIndex());
+        }
+    }
+
+    /**
+     * Installs, lazily on first popup opening, a mouse handler on the combo box popup list that
+     * deletes a user-defined preset when its trailing "x" is clicked and highlights the delete zone
+     * on hover.
+     */
+    private void installPresetDeleteHandler(JComboBox<PresetEntry> combo) {
+        combo.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+                if (presetDeleteHandlerInstalled) {
+                    return;
+                }
+                var child = combo.getUI().getAccessibleChild(combo, 0);
+                if (child instanceof ComboPopup popup) {
+                    attachPresetDeleteMouseListener(combo, popup.getList());
+                    presetDeleteHandlerInstalled = true;
+                } else {
+                    LOGGER.warn("Could not install preset delete handler: unexpected popup {}",
+                        child);
+                }
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
+                presetDeleteRolloverIndex = -1;
+            }
+
+            @Override
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
+                presetDeleteRolloverIndex = -1;
+            }
+        });
+    }
+
+    private void attachPresetDeleteMouseListener(JComboBox<PresetEntry> combo, JList<?> list) {
+        presetPopupList = list;
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int index = list.locationToIndex(e.getPoint());
+                if (index < 0) {
+                    return;
+                }
+                Object value = list.getModel().getElementAt(index);
+                Rectangle bounds = list.getCellBounds(index, index);
+                if (value instanceof PresetEntry entry && entry.userDefined() && bounds != null
+                        && e.getX() >= bounds.x + bounds.width - PRESET_DELETE_ZONE_WIDTH) {
+                    e.consume();
+                    presetDeleteRolloverIndex = -1;
+                    // Guard against the popup's trailing mouse-release committing a selection.
+                    suppressPresetApply = true;
+                    combo.setPopupVisible(false);
+                    deleteUserPreset(entry);
+                    SwingUtilities.invokeLater(() -> suppressPresetApply = false);
+                }
+            }
+        });
+        list.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int index = list.locationToIndex(e.getPoint());
+                int rollover = -1;
+                if (index >= 0) {
+                    Object value = list.getModel().getElementAt(index);
+                    Rectangle bounds = list.getCellBounds(index, index);
+                    if (value instanceof PresetEntry entry && entry.userDefined() && bounds != null
+                            && e.getX() >= bounds.x + bounds.width - PRESET_DELETE_ZONE_WIDTH) {
+                        rollover = index;
+                    }
+                }
+                if (rollover != presetDeleteRolloverIndex) {
+                    presetDeleteRolloverIndex = rollover;
+                    list.repaint();
+                }
+            }
+        });
     }
 
     public void setMediator(KeYMediator mediator) {
@@ -494,6 +863,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         } else {
             components.getDefaultButton().setEnabled(false);
             components.getStrategyPredefSettingsCmb().setEnabled(false);
+            if (components.getPresetMenuButton() != null) {
+                components.getPresetMenuButton().setEnabled(false);
+            }
         }
     }
 
@@ -508,6 +880,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         }
         components.getDefaultButton().setEnabled(enable);
         components.getStrategyPredefSettingsCmb().setEnabled(enable);
+        if (components.getPresetMenuButton() != null) {
+            components.getPresetMenuButton().setEnabled(enable);
+        }
         for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons().entrySet()) {
             for (JRadioButton button : entry.getValue()) {
                 button.setEnabled(enable);
@@ -583,6 +958,125 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     /**
+     * A single entry of the preset combo box: either the built-in "Defaults", one of the profile's
+     * further built-in presets, or a user-defined preset. User-defined entries can be deleted and
+     * renamed; built-in entries cannot.
+     */
+    private static final class PresetEntry {
+        private final String name;
+        private final boolean userDefined;
+        private final int maxSteps;
+        private final Supplier<StrategyProperties> properties;
+
+        private PresetEntry(String name, boolean userDefined, int maxSteps,
+                Supplier<StrategyProperties> properties) {
+            this.name = name;
+            this.userDefined = userDefined;
+            this.maxSteps = maxSteps;
+            this.properties = properties;
+        }
+
+        static PresetEntry defaults() {
+            return new PresetEntry("Defaults", false, DEFINITION.getDefaultMaxRuleApplications(),
+                () -> DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties());
+        }
+
+        static PresetEntry builtIn(StrategySettingsDefinition.StrategySettingEntry e) {
+            return new PresetEntry(e.name(), false, e.order(),
+                () -> e.factory().createDefaultStrategyProperties());
+        }
+
+        static PresetEntry user(StrategyPreset preset) {
+            return new PresetEntry(preset.name(), true, preset.maxSteps(), preset::properties);
+        }
+
+        String name() {
+            return name;
+        }
+
+        boolean userDefined() {
+            return userDefined;
+        }
+
+        int maxSteps() {
+            return maxSteps;
+        }
+
+        StrategyProperties properties() {
+            return properties.get();
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
+     * Renders the preset combo box rows. User-defined rows show a trailing "x" delete affordance,
+     * and a separator line marks the transition from the built-in presets to the user-defined ones.
+     */
+    private final class PresetListCellRenderer implements ListCellRenderer<PresetEntry> {
+        private final JPanel panel = new JPanel(new BorderLayout());
+        private final JLabel nameLabel = new JLabel();
+        private final JLabel deleteLabel = new JLabel("✕", SwingConstants.CENTER);
+
+        PresetListCellRenderer() {
+            panel.setOpaque(true);
+            nameLabel.setOpaque(false);
+            nameLabel.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 4));
+            deleteLabel.setOpaque(false);
+            panel.add(nameLabel, BorderLayout.CENTER);
+            panel.add(deleteLabel, BorderLayout.EAST);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends PresetEntry> list,
+                PresetEntry value, int index, boolean isSelected, boolean cellHasFocus) {
+            Color bg = isSelected ? list.getSelectionBackground() : list.getBackground();
+            Color fg = isSelected ? list.getSelectionForeground() : list.getForeground();
+            panel.setBackground(bg);
+            nameLabel.setFont(list.getFont());
+            nameLabel.setForeground(fg);
+            nameLabel.setText(value == null ? "" : value.name());
+
+            boolean showDelete = value != null && value.userDefined() && index >= 0;
+            deleteLabel.setPreferredSize(
+                new Dimension(showDelete ? PRESET_DELETE_ZONE_WIDTH : 0, 0));
+            if (showDelete) {
+                deleteLabel.setText("✕");
+                deleteLabel.setFont(list.getFont());
+                boolean rollover = index == presetDeleteRolloverIndex;
+                deleteLabel.setForeground(
+                    rollover ? PRESET_DELETE_ACTIVE_COLOR : blend(fg, bg, 0.45f));
+            } else {
+                deleteLabel.setText("");
+            }
+
+            boolean separator = false;
+            if (index > 0 && value != null && value.userDefined()) {
+                Object prev = list.getModel().getElementAt(index - 1);
+                separator = (prev instanceof PresetEntry pe) && !pe.userDefined();
+            }
+            Color sepColor = UIManager.getColor("Separator.foreground");
+            if (sepColor == null) {
+                sepColor = blend(fg, bg, 0.6f);
+            }
+            panel.setBorder(
+                separator ? BorderFactory.createMatteBorder(1, 0, 0, 0, sepColor) : null);
+            return panel;
+        }
+    }
+
+    private static Color blend(Color a, Color b, float ratioB) {
+        float ratioA = 1f - ratioB;
+        return new Color(
+            Math.round(a.getRed() * ratioA + b.getRed() * ratioB),
+            Math.round(a.getGreen() * ratioA + b.getGreen() * ratioB),
+            Math.round(a.getBlue() * ratioA + b.getBlue() * ratioB));
+    }
+
+    /**
      * Provided via {@link StrategySelectionView} for direct access
      * to created user interface components.
      *
@@ -610,7 +1104,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * The {@link JComboBox} for choosing a predefined value set.
          */
-        private JComboBox<String> strategyPredefSettingsCmb;
+        private JComboBox<PresetEntry> strategyPredefSettingsCmb;
+
+        /**
+         * The menu button offering save / stash / rename actions for presets.
+         */
+        private JButton presetMenuButton;
 
         /**
          * Returns the {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
@@ -675,7 +1174,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * @return The {@link JComboBox} for choosing a predefined value set.
          */
-        public JComboBox<String> getStrategyPredefSettingsCmb() {
+        public JComboBox<PresetEntry> getStrategyPredefSettingsCmb() {
             return strategyPredefSettingsCmb;
         }
 
@@ -685,8 +1184,24 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * @param strategyPredefSettingsCmb The {@link JComboBox} for choosing a predefined value
          *        set.
          */
-        public void setPredefsChoiceCmb(JComboBox<String> strategyPredefSettingsCmb) {
+        public void setPredefsChoiceCmb(JComboBox<PresetEntry> strategyPredefSettingsCmb) {
             this.strategyPredefSettingsCmb = strategyPredefSettingsCmb;
+        }
+
+        /**
+         * @return the menu button offering save / stash / rename actions
+         */
+        public JButton getPresetMenuButton() {
+            return presetMenuButton;
+        }
+
+        /**
+         * Sets the menu button offering save / stash / rename actions.
+         *
+         * @param presetMenuButton the menu button
+         */
+        public void setPresetMenuButton(JButton presetMenuButton) {
+            this.presetMenuButton = presetMenuButton;
         }
 
         /**

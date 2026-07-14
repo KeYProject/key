@@ -59,6 +59,7 @@ public class ProofIndependentSettings {
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
     private final FeatureSettings featureSettings = new FeatureSettings();
+    private final StrategyPresetsSettings strategyPresetsSettings = new StrategyPresetsSettings();
 
     private File filename;
 
@@ -75,6 +76,7 @@ public class ProofIndependentSettings {
         addSettings(generalSettings);
         addSettings(viewSettings);
         addSettings(featureSettings);
+        addSettings(strategyPresetsSettings);
     }
 
     private ProofIndependentSettings(File filename) {
@@ -191,6 +193,10 @@ public class ProofIndependentSettings {
 
     public FeatureSettings getFeatureSettings() {
         return featureSettings;
+    }
+
+    public StrategyPresetsSettings getStrategyPresetsSettings() {
+        return strategyPresetsSettings;
     }
 
     /**
