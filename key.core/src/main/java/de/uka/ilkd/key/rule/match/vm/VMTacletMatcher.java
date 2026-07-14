@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
-import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -61,27 +60,14 @@ public class VMTacletMatcher implements TacletMatcher {
      * System property ({@code -Dkey.matcher.interpreter=true}): the single switch between the two
      * back-ends. It forces the legacy cursor-based interpreter for all of a taclet's matching (its
      * find pattern and its {@code \assumes} formulas alike); the cursor-free compiled matcher is
-     * the default. Mainly for headless / CI A/B comparison; in the GUI use the
-     * {@link #INTERPRETER_MATCHER_FEATURE} feature flag instead.
+     * the default. Which back-end matches taclets is a core setting, so it is a plain system
+     * property (not a {@code FeatureSettings} feature, which are for optional extensions and would
+     * be switched on en masse by {@code --experimental}).
      * <p>
      * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches matchers.
      */
     public static final String INTERPRETER_MATCHER_PROPERTY = "key.matcher.interpreter";
-
-    /**
-     * Feature flag (Settings &rarr; Feature Flags, persistent), the GUI-friendly equivalent of
-     * {@link #INTERPRETER_MATCHER_PROPERTY}: it forces the legacy interpreter for all of a taclet's
-     * matching (find and {@code \assumes}). The compiled matcher is the default; activate this to
-     * fall back to the interpreter. Like the property it is read per taclet at construction time,
-     * so it takes effect for newly loaded proofs (or after reloading the current one) -- hence
-     * {@code restartRequired = true}.
-     */
-    public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
-        FeatureSettings.createFeature("MATCHER_INTERPRETER",
-            "Use the legacy interpreter taclet find-matcher instead of the compiled one "
-                + "(reload the proof to apply).",
-            true);
 
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
@@ -124,10 +110,9 @@ public class VMTacletMatcher implements TacletMatcher {
 
         // both back-ends are derived from the unified match-plan framework (one dispatch per
         // construct, see JavaMatchPlanBuilder); the compiled matcher is the default, the
-        // interpreter is used only when explicitly selected (property/feature flag) or as the
-        // automatic fallback for a pattern the compiler does not handle
-        final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY)
-                || FeatureSettings.isFeatureActivated(INTERPRETER_MATCHER_FEATURE);
+        // interpreter is used only when explicitly selected (property) or as the automatic
+        // fallback for a pattern the compiler does not handle
+        final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY);
 
         if (taclet instanceof final FindTaclet findTaclet) {
             findExp = findTaclet.find();
