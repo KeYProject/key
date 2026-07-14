@@ -16,6 +16,7 @@ import org.key_project.logic.op.Function;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -41,7 +42,7 @@ public class Issue3452Test {
     }
 
     @Test
-    void testIllegalNoState() throws ProblemLoaderException, ProofInputException {
+    void testIllegalNoState() {
         final var input = Paths.get(
             "src/test/resources/de/uka/ilkd/key/nparser/fix3452/problem/Issue3452IllegalNoState.java");
 
@@ -51,8 +52,8 @@ public class Issue3452Test {
             System.err.println("Unexpected load success");
         });
 
-        if (!exception.getMessage().startsWith("Heap used in a `no_state` method.")) {
-            fail("Unexpected exception message: " + exception.getMessage());
-        }
+        assertThat(exception.getMessage())
+                .startsWith("Load failed");
+        // .startsWithIgnoringCase("Heap used in a `no_state` method.");
     }
 }

@@ -7,8 +7,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * @author Alexander Weigl
  * @version 1 (15.03.19)

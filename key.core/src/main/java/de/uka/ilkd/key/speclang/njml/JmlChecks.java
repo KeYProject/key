@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -53,7 +53,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
         return warnings;
     }
 
-    protected void addWarning(@NonNull ParserRuleContext ctx, @NonNull String text) {
+    protected void addWarning(ParserRuleContext ctx, String text) {
         PositionedString ps = new PositionedString(text, Location.fromToken(ctx.start));
         warnings.add(ps);
     }

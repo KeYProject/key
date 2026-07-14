@@ -14,7 +14,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -67,10 +67,10 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         Namespace<@NonNull Function> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedFunctions = getDefinedFunctions();
 
-        Map<String, String> definedSortDependingFunctions = new HashMap<>();
-        definedSortDependingFunctions.put("select", "select");
-        definedSortDependingFunctions.put("cast", "cast");
-        definedSortDependingFunctions.put("seqGet", "seqGet");
+        Map<String, String> definedParametricFunctions = new HashMap<>();
+        definedParametricFunctions.put("select", "select");
+        definedParametricFunctions.put("cast", "cast");
+        definedParametricFunctions.put("seqGet", "seqGet");
 
         for (String name : definedFunctions.keySet()) {
             Function function = functionNamespace.lookup(name);
@@ -79,12 +79,12 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         }
 
         for (Function function : functionNamespace.elements()) {
-            if (!(function instanceof SortDependingFunction))
+            if (!(function instanceof ParametricFunctionInstance))
                 continue;
             String funName = function.name().toString().split("::")[1];
-            for (String name : definedSortDependingFunctions.keySet()) {
+            for (String name : definedParametricFunctions.keySet()) {
                 if (funName.equals(name)) {
-                    supportedOperators.put(function, definedSortDependingFunctions.get(name));
+                    supportedOperators.put(function, definedParametricFunctions.get(name));
                 }
             }
         }
@@ -143,9 +143,9 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        if (term.op() instanceof SortDependingFunction) {
-            return SortDependingFunctionHandler.getSortDependingFunctionRef(trans, term,
-                (SortDependingFunction) term.op(),
+        if (term.op() instanceof ParametricFunctionInstance pfi) {
+            return ParametricFunctionHandler.getParametricFunctionRef(trans, term,
+                pfi,
                 supportedOperators.get(term.op()));
         }
         return UninterpretedSymbolsHandler.getFunctionRef(trans, term, (SortedOperator) term.op(),

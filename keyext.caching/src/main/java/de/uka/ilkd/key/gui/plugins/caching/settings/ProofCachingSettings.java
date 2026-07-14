@@ -5,8 +5,6 @@ package de.uka.ilkd.key.gui.plugins.caching.settings;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Settings for the proof caching functionality.
  *
@@ -41,12 +39,12 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      * Behaviour when disposing a proof that is referenced elsewhere.
      */
     private final AbstractPropertiesSettings.PropertyEntry<String> dispose =
-        createStringProperty(DISPOSE_KEY, "");
+        createStringProperty(DISPOSE_KEY, DISPOSE_COPY);
     /**
      * Behaviour when pruning a proof that is referenced elsewhere.
      */
     private final AbstractPropertiesSettings.PropertyEntry<String> prune =
-        createStringProperty(PRUNE_KEY, "");
+        createStringProperty(PRUNE_KEY, PRUNE_COPY);
 
     public ProofCachingSettings() {
         super("ProofCaching");
@@ -65,7 +63,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
         this.enabled.set(enabled);
     }
 
-    public @NonNull String getDispose() {
+    public String getDispose() {
         return dispose.get();
     }
 
@@ -75,7 +73,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @param operation the operation
      */
-    public void setDispose(@NonNull String operation) {
+    public void setDispose(String operation) {
         dispose.set(operation);
     }
 
@@ -84,7 +82,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @return either an empty string, {@link #PRUNE_REOPEN} or {@link #PRUNE_COPY}
      */
-    public @NonNull String getPrune() {
+    public String getPrune() {
         return prune.get();
     }
 
@@ -94,7 +92,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @param operation the operation
      */
-    public void setPrune(@NonNull String operation) {
+    public void setPrune(String operation) {
         prune.set(operation);
     }
 }

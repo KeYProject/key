@@ -41,7 +41,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -332,7 +331,7 @@ public class MergeRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
-        ImmutableList<JTerm> newElementaryUpdates = ImmutableSLList.nil();
+        ImmutableList<JTerm> newElementaryUpdates = ImmutableList.nil();
 
         // New constraints on introduced Skolem constants
         JTerm newAdditionalConstraints = null;
@@ -680,7 +679,7 @@ public class MergeRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> potentialPartners = ImmutableList.nil();
 
         for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {

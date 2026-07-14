@@ -4,16 +4,8 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -149,14 +141,15 @@ public class MasterHandler {
             for (SMTHandler smtHandler : handlers) {
                 Capability response = smtHandler.canHandle(problem);
                 switch (response) {
-                case YES_THIS_INSTANCE -> {
-                    // handle this but do not cache.
-                    return smtHandler.handle(this, problem);
-                }
-                case YES_THIS_OPERATOR -> {
-                    // handle it and cache it for future instances of the op.
-                    handlerMap.put(problem.op(), smtHandler);
-                    return smtHandler.handle(this, problem);
+                    case YES_THIS_INSTANCE -> {
+                        // handle this but do not cache.
+                        return smtHandler.handle(this, problem);
+                    }
+                    case YES_THIS_OPERATOR -> {
+                        // handle it and cache it for future instances of the op.
+                        handlerMap.put(problem.op(), smtHandler);
+                        return smtHandler.handle(this, problem);
+                    }
                 }
                 }
             }

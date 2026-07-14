@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -73,7 +73,7 @@ public class PositionedLabeledString extends PositionedString {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }

@@ -17,12 +17,12 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -38,8 +38,8 @@ public class TermLabelMenu extends JMenu {
     private static final long serialVersionUID = 1L;
     private final TermLabelVisibilityManager visibleTermLabels = new TermLabelVisibilityManager();
     private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<>();
-    private final @NonNull MainWindow mainWindow;
-    private final @NonNull DisplayLabelsCheckBox displayLabelsCheckBox;
+    private final MainWindow mainWindow;
+    private final DisplayLabelsCheckBox displayLabelsCheckBox;
 
     /**
      * Observes changes on {@link #visibleTermLabels}.
@@ -63,7 +63,7 @@ public class TermLabelMenu extends JMenu {
              * Change font style for TermLabelCheckBox instances when the selected node changes.
              */
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 Set<Name> labelNames =
                     getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
@@ -114,7 +114,7 @@ public class TermLabelMenu extends JMenu {
              * This function only has effect if the Profile gets changed.
              */
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 rebuildMenu();
             }
         });

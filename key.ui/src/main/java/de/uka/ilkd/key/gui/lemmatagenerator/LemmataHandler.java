@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +30,6 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +61,7 @@ public class LemmataHandler implements TacletFilter {
         println("Start problem creation:");
         println(options.toString());
 
-        Path file = new File(options.getPathOfRuleFile()).toPath();
+        Path file = options.getPathOfRuleFile();
         Collection<Path> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
@@ -125,7 +123,7 @@ public class LemmataHandler implements TacletFilter {
         loader.start();
     }
 
-    private @NonNull Collection<Path> createFilesForAxioms(@NonNull Collection<String> filenames) {
+    private Collection<Path> createFilesForAxioms(Collection<String> filenames) {
         Collection<Path> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(Paths.get(filename));
@@ -153,7 +151,7 @@ public class LemmataHandler implements TacletFilter {
         }
     }
 
-    private void saveProof(@NonNull Proof p) {
+    private void saveProof(Proof p) {
         ProofSaver saver =
             new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();

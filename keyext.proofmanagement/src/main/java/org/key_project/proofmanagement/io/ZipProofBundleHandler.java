@@ -14,9 +14,6 @@ import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.util.java.IOUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file
  * (usually the file extension will be "zproof").
@@ -31,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class ZipProofBundleHandler extends ProofBundleHandler {
     /** path of the actual proof bundle file */
-    private final @NonNull Path zipPath;
+    private final Path zipPath;
 
     /** indicates if the close() method has already been called */
     private boolean closed = false;
@@ -45,7 +42,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     private final Path tmpDir;
 
     /**  */
-    private final @NonNull DirectoryProofBundleHandler dbh;
+    private final DirectoryProofBundleHandler dbh;
 
     /**
      * Create a new ZipProofBundleHandler for the zipped bundle with the given path.
@@ -53,7 +50,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
      * @param zipPath the path of the zip (usually, the file extension is "zproof")
      * @throws IOException if an I/O error occurs
      */
-    ZipProofBundleHandler(@NonNull Path zipPath) throws IOException {
+    ZipProofBundleHandler(Path zipPath) throws IOException {
         this.zipPath = zipPath;
         // fs = FileSystems.newFileSystem(zipPath, null);
 
@@ -65,17 +62,17 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
 
     // IMPORTANT: get... methods return paths to unzipped files!
     @Override
-    public @NonNull String getBundleName() {
+    public String getBundleName() {
         return zipPath.getFileName().toString();
     }
 
     @Override
-    public @NonNull Path getBundlePath() {
+    public Path getBundlePath() {
         return zipPath.toAbsolutePath().normalize();
     }
 
     @Override
-    public @NonNull Path relativize(@NonNull Path path) {
+    public Path relativize(Path path) {
         // we might need both cases
         if (path.startsWith(zipPath)) {
             return zipPath.relativize(path);
@@ -85,33 +82,38 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public @NonNull List<Path> getProofFiles() throws ProofManagementException {
+    public List<Path> getProofFiles() throws ProofManagementException {
         // return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
         return dbh.getProofFiles();
     }
 
     @Override
-    public @NonNull List<Path> getKeYFiles() throws IOException {
+    public List<Path> getKeYFiles() throws IOException {
         // return getFiles(fs.getPath("/"), ProofBundleHandler.KEY_MATCHER);
         return dbh.getKeYFiles();
     }
 
     @Override
-    public @NonNull List<Path> getSourceFiles() throws IOException {
+    public List<Path> getSourceFiles() throws IOException {
         // return getFiles(fs.getPath("/src"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getSourceFiles();
     }
 
     @Override
-    public @NonNull List<Path> getClasspathFiles() throws IOException {
+    public List<Path> getClasspathFiles() throws IOException {
         // return getFiles(fs.getPath("/classpath"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getClasspathFiles();
     }
 
     @Override
-    public @Nullable Path getBootclasspath() throws IOException {
+    public Path getBootclasspath() throws IOException {
         // return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
         return dbh.getBootclasspath();
+    }
+
+    @Override
+    public Path getTopLevelProjectFile() {
+        return dbh.getTopLevelProjectFile();
     }
 
     @Override
@@ -127,7 +129,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public @NonNull Path getPath(@NonNull String entryName) {
+    public Path getPath(String entryName) {
         // return fs.getPath(pathString);
         return dbh.getPath(entryName);
     }

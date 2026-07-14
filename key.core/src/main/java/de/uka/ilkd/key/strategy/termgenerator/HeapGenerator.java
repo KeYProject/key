@@ -19,8 +19,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * The heap generator returns an iterator over all terms of sort heap that
  * <ol>
@@ -41,7 +39,7 @@ public class HeapGenerator implements TermGenerator<Goal> {
     }
 
     @Override
-    public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();

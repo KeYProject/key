@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
@@ -29,7 +29,6 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -38,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
-public class KeYEnvironment<U extends UserInterfaceControl> {
+public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
@@ -86,8 +85,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param initConfig The loaded project.
      * @param proofScript add an optional proof script
      */
-    public KeYEnvironment(@NonNull U ui, InitConfig initConfig, @Nullable Proof loadedProof,
-            @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
+    public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
+            @Nullable ProofScript proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -236,8 +235,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
-            @Nullable List<Path> includes,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -263,11 +261,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
-            @Nullable Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
-            @Nullable List<Path> includes,
-            @Nullable Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
+            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
             ruleCompletionHandler,
@@ -295,11 +291,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
-            @Nullable List<Path> includes,
-            @Nullable Properties poPropertiesToForce,
-            @Nullable RuleCompletionHandler ruleCompletionHandler,
-            @Nullable Consumer<Proof> callbackProofLoaded,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
+            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
+            Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs)
             throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
@@ -345,7 +339,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      */
     public List<Contract> getProofContracts() {
         var proofContracts = new ArrayList<Contract>();
-        Set<KeYJavaType> kjts = getJavaInfo().getAllKeYJavaTypes();
+        var kjts = getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
@@ -360,5 +354,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             }
         }
         return proofContracts;
+    }
+
+    @Override
+    public void close() throws Exception {
+        dispose();
     }
 }

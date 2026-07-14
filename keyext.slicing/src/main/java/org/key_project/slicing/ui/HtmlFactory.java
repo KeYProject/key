@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Utility class to generate HTML tables for UI purposes.
  *
@@ -108,7 +106,7 @@ public final class HtmlFactory {
         return htmlContent;
     }
 
-    private static @NonNull String escapeText(@NonNull String text) {
+    private static String escapeText(String text) {
         return text
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")

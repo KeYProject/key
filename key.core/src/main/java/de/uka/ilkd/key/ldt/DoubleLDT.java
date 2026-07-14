@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.Negative;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 
@@ -159,27 +159,27 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     @Override
     public @Nullable Function getFunctionFor(String op, Services services) {
         return switch (op) {
-        case "gt" -> getGreaterThan();
-        case "geq" -> getGreaterOrEquals();
-        case "lt" -> getLessThan();
-        case "leq" -> getLessOrEquals();
-        case "div" -> getDiv();
-        case "mul" -> getMul();
-        case "add" -> getAdd();
-        case "sub" -> getSub();
-        case "neg" -> getNeg();
+            case "gt" -> getGreaterThan();
+            case "geq" -> getGreaterOrEquals();
+            case "lt" -> getLessThan();
+            case "leq" -> getLessOrEquals();
+            case "div" -> getDiv();
+            case "mul" -> getMul();
+            case "add" -> getAdd();
+            case "sub" -> getSub();
+            case "neg" -> getNeg();
 
-        // Floating point extensions with "\fp_"
-        case "nan" -> getIsNaN();
-        case "zero" -> getIsZero();
-        case "infinite" -> getIsInfinite();
-        case "nice" -> getIsNice();
-        case "abs" -> getAbs();
-        case "negative" -> getIsNegative();
-        case "positive" -> getIsPositive();
-        case "subnormal" -> getIsSubnormal();
-        case "normal" -> getIsNormal();
-        default -> null;
+            // Floating point extensions with "\fp_"
+            case "nan" -> getIsNaN();
+            case "zero" -> getIsZero();
+            case "infinite" -> getIsInfinite();
+            case "nice" -> getIsNice();
+            case "abs" -> getAbs();
+            case "negative" -> getIsNegative();
+            case "positive" -> getIsPositive();
+            case "subnormal" -> getIsSubnormal();
+            case "normal" -> getIsNormal();
+            default -> null;
         };
     }
 

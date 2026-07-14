@@ -13,24 +13,27 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
+/**
+ * A trigger built from several uni-trigger {@link #elements} that, taken together, bind all
+ * universal variables of a clause. A match requires matching every element and merging their
+ * substitutions into one that is consistent and total on {@link #clauseVariables}.
+ */
 class MultiTrigger implements Trigger {
 
-    private final ImmutableSet<Trigger> triggers;
+    /** The uni-trigger elements that jointly have to cover {@link #clauseVariables}. */
+    private final ImmutableSet<Trigger> elements;
 
-    private final ImmutableSet<QuantifiableVariable> qvs;
+    /** The universal variables of the clause this multi-trigger must bind. */
+    private final ImmutableSet<QuantifiableVariable> clauseVariables;
 
     private final Term clause;
 
-    MultiTrigger(ImmutableSet<Trigger> triggers, ImmutableSet<QuantifiableVariable> qvs,
+    MultiTrigger(ImmutableSet<Trigger> elements, ImmutableSet<QuantifiableVariable> clauseVariables,
             Term clause) {
-        this.triggers = triggers;
-        this.qvs = qvs;
+        this.elements = elements;
+        this.clauseVariables = clauseVariables;
         this.clause = clause;
     }
 
@@ -38,84 +41,91 @@ class MultiTrigger implements Trigger {
     public @NonNull ImmutableSet<Substitution> getSubstitutionsFromTerms(
             ImmutableSet<Term> targetTerms,
             Services services) {
-        ImmutableList<Substitution> res = ImmutableSLList.nil();
+        ImmutableList<Substitution> total = ImmutableList.nil();
 
-        ImmutableSet<Substitution> mulsubs =
-            setMultiSubstitution(triggers.iterator(), targetTerms, services);
+        final ImmutableSet<Substitution> combined =
+            combineElementSubstitutions(elements.iterator(), targetTerms, services);
 
-        for (Substitution sub : mulsubs) {
-            if (sub.isTotalOn(qvs)) {
-                res = res.prepend(sub);
+        for (Substitution sub : combined) {
+            if (sub.isTotalOn(clauseVariables)) {
+                total = total.prepend(sub);
             }
         }
 
-        return DefaultImmutableSet.fromImmutableList(res);
+        return DefaultImmutableSet.fromImmutableList(total);
     }
 
-    /** help function for getMultiSubstitution */
-    private ImmutableSet<Substitution> setMultiSubstitution(@NonNull Iterator<? extends Trigger> ts,
-            ImmutableSet<Term> terms, Services services) {
-        ImmutableList<Substitution> res = ImmutableSLList.nil();
-        if (ts.hasNext()) {
-            ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(terms, services);
-            ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms, services);
-            if (nextSubs.isEmpty()) {
-                return subi;
-            } else if (subi.isEmpty()) {
-                return nextSubs;
+    /**
+     * Matches every remaining element against the target terms and combines the per-element
+     * substitution sets by taking the cross product and merging each compatible pair (incompatible
+     * pairs are dropped). Used by {@link #getSubstitutionsFromTerms}.
+     */
+    private ImmutableSet<Substitution> combineElementSubstitutions(
+            Iterator<? extends Trigger> remainingElements, ImmutableSet<Term> terms,
+            Services services) {
+        ImmutableList<Substitution> result = ImmutableList.nil();
+        if (remainingElements.hasNext()) {
+            ImmutableSet<Substitution> headSubs =
+                remainingElements.next().getSubstitutionsFromTerms(terms, services);
+            ImmutableSet<Substitution> tailSubs =
+                combineElementSubstitutions(remainingElements, terms, services);
+            if (tailSubs.isEmpty()) {
+                return headSubs;
+            } else if (headSubs.isEmpty()) {
+                return tailSubs;
             }
-            for (Substitution sub0 : nextSubs) {
-                for (Substitution subiSub : subi) {
-                    final Substitution sub1 = unifySubstitution(sub0, subiSub);
-                    if (sub1 != null) {
-                        res = res.prepend(sub1);
+            for (Substitution tailSub : tailSubs) {
+                for (Substitution headSub : headSubs) {
+                    final Substitution merged = mergeIfCompatible(tailSub, headSub);
+                    if (merged != null) {
+                        result = result.prepend(merged);
                     }
                 }
 
             }
         }
-        return DefaultImmutableSet.fromImmutableList(res);
+        return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /**
-     * unify two substitution, if same variable are bound with same term return a new substitution
-     * with all universal quantifiable variables in two substituition, otherwise return null
+     * Merges two substitutions: if they bind every shared variable to the same term, returns a new
+     * substitution containing all bindings of both; otherwise (a conflicting binding) returns
+     * {@code null}.
      */
-    private @Nullable Substitution unifySubstitution(@NonNull Substitution sub0,
-            @NonNull Substitution sub1) {
-        final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
-        ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
+    private Substitution mergeIfCompatible(Substitution left, Substitution right) {
+        final ImmutableMap<QuantifiableVariable, Term> rightMap = right.getVarMap();
+        ImmutableMap<QuantifiableVariable, Term> mergedMap = rightMap;
 
-        for (final ImmutableMapEntry<QuantifiableVariable, Term> en : sub0.getVarMap()) {
-            QuantifiableVariable key = en.key();
-            Term value = en.value();
-            if (varMap1.containsKey(key)) {
-                if (!(varMap1.get(key).equals(value))) {
+        for (final ImmutableMapEntry<QuantifiableVariable, Term> entry : left.getVarMap()) {
+            QuantifiableVariable key = entry.key();
+            Term value = entry.value();
+            if (rightMap.containsKey(key)) {
+                if (!(rightMap.get(key).equals(value))) {
                     return null;
                 }
             }
-            resMap = resMap.put(key, value);
+            mergedMap = mergedMap.put(key, value);
         }
-        return new Substitution(resMap);
+        return new Substitution(mergedMap);
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
-        if (!(arg0 instanceof MultiTrigger a)) {
+    public boolean equals(Object other) {
+        if (!(other instanceof MultiTrigger otherTrigger)) {
             return false;
         }
 
-        return a.triggers.equals(triggers);
+        return otherTrigger.elements.equals(elements);
     }
 
     @Override
     public int hashCode() {
-        return triggers.hashCode();
+        return elements.hashCode();
     }
 
     @Override
     public String toString() {
-        return String.valueOf(triggers);
+        return String.valueOf(elements);
     }
 
     @Override

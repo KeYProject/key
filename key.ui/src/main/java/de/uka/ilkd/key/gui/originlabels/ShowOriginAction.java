@@ -15,9 +15,6 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *
@@ -27,7 +24,7 @@ public class ShowOriginAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4557953425770258852L;
 
-    private final @NonNull PosInSequent pos;
+    private final PosInSequent pos;
 
     /**
      * Creates a new {@link ShowOriginAction}.

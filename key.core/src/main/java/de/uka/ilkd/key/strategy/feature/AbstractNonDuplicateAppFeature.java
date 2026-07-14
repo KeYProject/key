@@ -22,9 +22,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
     protected AbstractNonDuplicateAppFeature() {}
@@ -89,8 +86,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         return equalInterestingInsts(newApp.instantiations(), cmp.instantiations());
     }
 
-    private boolean equalInterestingInsts(@NonNull SVInstantiations inst0,
-            @NonNull SVInstantiations inst1) {
+    private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
         if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
         }
@@ -100,8 +96,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 
-    private boolean subset(@NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
-            @NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
+    private boolean subset(ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
@@ -125,15 +121,22 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean noDuplicateFindTaclet(@NonNull TacletApp app,
-            PosInOccurrence pos,
-            @NonNull Goal goal) {
+    protected boolean noDuplicateFindTaclet(TacletApp app,
+            PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
-        List<RuleApp> apps = cache.get(node, app.rule().name());
+        // A duplicate must agree on the focus term up to term labels (every comparePio variant,
+        // including the modulo-position one, implies this), so it shares the candidate's focus-term
+        // fingerprint and can only be in that bucket. A find-less application (pos == null) lands
+        // in
+        // bucket 0, where all find-less applications of this name live (a taclet name is either
+        // find
+        // or find-less, never both).
+        final int fingerprint = pos == null ? 0 : pos.subTerm().hashCode();
+        List<RuleApp> apps = cache.get(node, app.rule().name(), fingerprint);
 
-        // Check all rules with this name
+        // Check all rules with this name in the same fingerprint bucket
         for (RuleApp a : apps) {
             if (sameApplication(a, app, pos)) {
                 return false;

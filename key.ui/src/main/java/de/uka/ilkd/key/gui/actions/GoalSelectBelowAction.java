@@ -22,7 +22,7 @@ public final class GoalSelectBelowAction extends MainWindowAction {
      *
      * @param mainWindow the main window this action belongs to
      */
-    public GoalSelectBelowAction(@NonNull MainWindow mainWindow) {
+    public GoalSelectBelowAction(MainWindow mainWindow) {
         super(mainWindow, true);
         setName("Select Goal Below");
         setIcon(IconFactory.selectGoalBelow(MainWindow.TOOLBAR_ICON_SIZE));

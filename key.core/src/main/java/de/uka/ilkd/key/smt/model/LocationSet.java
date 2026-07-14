@@ -82,8 +82,7 @@ public class LocationSet {
     /**
      * Location sets with equal names are equal.
      */
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (o instanceof LocationSet ls) {
             return ls.name.equals(name);
         }

@@ -17,8 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Table showing the results of searching for proof references.
  *
@@ -32,7 +30,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
     /**
      * List of open and closed goals in the selected proof.
      */
-    private final @NonNull List<Goal> goals;
+    private final List<Goal> goals;
 
     /**
      * Construct a new table.
@@ -40,7 +38,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
      * @param proof proof to analyze
      * @param mediator the mediator
      */
-    public ReferenceSearchTable(@NonNull Proof proof, KeYMediator mediator) {
+    public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
         this.goals = proof.allGoals().stream()
                 .filter(g -> !g.node().isClosed() || g.node().lookup(ClosedBy.class) != null)
@@ -51,7 +49,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
     }
 
     @Override
-    public @NonNull Dimension getPreferredSize() {
+    public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
         return new Dimension(d.width + 100, d.height);
     }
@@ -77,21 +75,21 @@ class ReferenceSearchTable extends JTable implements TableModel {
     }
 
     @Override
-    public @NonNull String getColumnName(int column) {
+    public String getColumnName(int column) {
         return switch (column) {
-        case 0 -> "Goal";
-        case 1 -> "Reference";
-        default -> "??";
+            case 0 -> "Goal";
+            case 1 -> "Reference";
+            default -> "??";
         };
     }
 
     @Override
-    public @NonNull Class<?> getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return String.class;
     }
 
     @Override
-    public @NonNull Object getValueAt(int row, int column) {
+    public Object getValueAt(int row, int column) {
         if (column == 0) {
             return String.valueOf(goals.get(row).node().serialNr());
         } else {
@@ -113,7 +111,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
     }
 
     @Override
-    public void tableChanged(@NonNull TableModelEvent e) {
+    public void tableChanged(TableModelEvent e) {
         if (e.getType() == TableModelEvent.UPDATE) {
             this.repaint();
 

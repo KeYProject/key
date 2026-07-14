@@ -45,7 +45,7 @@
   \forall Seq s;
     (   lt(i, Z(0(#)))
       | geq(i, seqLen(s))
-     -> any::seqGet(s, i)<<Trigger>> = seqGetOutside)
+     -> seqGet<[any]>(s, i)<<Trigger>> = seqGetOutside)
 
 }
 
@@ -60,7 +60,7 @@
 (rule "cut" (inst "cutFormula=(  s_0
  = seqDef{int i;}(Z(0(#)),
                   seqLen(s_0),
-                  any::seqGet(s_0, i)))<<origin(\"User_Interaction @ node 2 (cut)\",\"[]\")>>") (userinteraction))
+                  seqGet<[any]>(s_0, i)))<<origin(\"User_Interaction @ node 2 (cut)\",\"[]\")>>") (userinteraction))
 (branch "CUT: s_0 = seqDef{int i;}(0, s_0.length, s_0[i]) TRUE"
    (rule "applyEqRigid" (formula "2") (term "0,0,1") (ifseqformula "1") (userinteraction))
    (rule "getOfSeqDef" (formula "2") (term "0,1") (userinteraction))

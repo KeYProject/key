@@ -7,16 +7,16 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param outerLabel the ProgramElementName of the outer label
      * @param innerLabel the ProgramElementName of the inner label
      */
-    public WhileInvariantTransformation(@NonNull ProgramElement root, ProgramElementName outerLabel,
+    public WhileInvariantTransformation(
+            ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
             ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
             ProgramVariable rtrn, ProgramVariable returnExpr,

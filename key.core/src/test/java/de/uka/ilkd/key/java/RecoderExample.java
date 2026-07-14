@@ -4,13 +4,11 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.ExtList;
@@ -28,8 +26,10 @@ public class RecoderExample {
     /**
      * this method is used to create the part of the AST representing an if-then statement.
      *
-     * @param expr the Expression that is the condition of the if part
-     * @param prg the JavaStatement after 'then'
+     * @param expr
+     *        the Expression that is the condition of the if part
+     * @param prg
+     *        the JavaStatement after 'then'
      * @return the If Statement with condition expr and 'then' part prg
      */
     public If createIfThen(Expression expr, JavaStatement prg) {
@@ -42,7 +42,8 @@ public class RecoderExample {
     /**
      * transformates a "while(expr) {prg;}" to "if (exr) then {prg;}"
      *
-     * @param _while the while-loop to transform
+     * @param _while
+     *        the while-loop to transform
      * @return the transformed AST
      */
     public ExtList transform(While _while) {
@@ -57,7 +58,8 @@ public class RecoderExample {
     /**
      * transforms all while statements in a statement block to the wanted "if-then-while" statement
      *
-     * @param prg the Statementblock to be transformed
+     * @param prg
+     *        the Statementblock to be transformed
      */
     public StatementBlock transform(StatementBlock prg) {
         ExtList newBody = new ExtList();
@@ -78,9 +80,9 @@ public class RecoderExample {
     public static void main(String[] args) {
         System.out.println("Starting...");
         RecoderExample ex = new RecoderExample();
-        Recoder2KeY c2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
+        JavaService c2k = TacletForTests.services().getJavaService();
         String prg = "{ int i=0; while (i<5) { i++;} }";
-        JavaBlock block = c2k.readBlock(prg, c2k.createEmptyContext());
+        JavaBlock block = c2k.readBlock(prg, c2k.createEmptyContext(), null);
         System.out.println("Read Original:\n" + block);
         System.out.println("Transforming...");
         System.out.println("Transformed:\n"

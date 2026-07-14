@@ -3,114 +3,151 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
-import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 /**
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public static @NonNull List<Arguments> data() throws IOException, URISyntaxException {
-        URL url = TestProofScriptCommand.class.getResource("cases");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
+
+    private static final String ONLY_CASES = System.getProperty("key.testProofScript.only");
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProofScriptCommand.class);
+
+    public record TestInstance(
+            String name,
+            String key,
+            String script,
+            @Nullable String exception,
+            String[] goals,
+            Integer selectedGoal) {
+    }
+
+    public static List<Arguments> data() throws IOException, URISyntaxException {
+        var folder = Paths.get("src/test/resources/de/uka/ilkd/key/scripts/cases")
+                .toAbsolutePath();
+
+        Predicate<Path> filter;
+        if (ONLY_CASES != null && !ONLY_CASES.isEmpty()) {
+            // if ONLY_CASES is set, only run those cases (comma separated)
+            Set<String> only = Set.of(ONLY_CASES.split(" *, *"));
+            filter = p -> only.contains(
+                p.getFileName().toString().substring(0, p.getFileName().toString().length() - 4));
+        } else {
+            filter = p -> true;
         }
 
-        if (!url.getProtocol().equals("file")) {
-            throw new IOException("Resource should be a file URL not " + url);
-        }
+        try (var walker = Files.walk(folder)) {
+            List<Path> files =
+                walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
+            var objectMapper = new ObjectMapper(new YAMLFactory());
+            objectMapper.findAndRegisterModules();
 
-        Path directory = Paths.get(url.toURI());
-        assertTrue(Files.isDirectory(directory));
-        try (var s = Files.list(directory)) {
-            return s.map(f -> Arguments.of(f.getFileName().toString(), f))
-                    .collect(Collectors.toList());
+            List<Arguments> args = new ArrayList<>(files.size());
+            for (Path path : files) {
+                if (!filter.test(path)) {
+                    continue;
+                }
+                try {
+                    TestInstance instance =
+                        objectMapper.readValue(path.toFile(), TestInstance.class);
+                    var name = instance.name == null ? path.getFileName().toString().substring(0,
+                        path.getFileName().toString().length() - 4) : instance.name;
+                    args.add(Arguments.of(instance, name));
+                } catch (Exception e) {
+                    System.out.println(path);
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+            return args;
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("data")
-    void testProofScript(String name, @NonNull Path path) throws Exception {
-
-        BufferedReader reader = Files.newBufferedReader(path);
-        LineProperties props = new LineProperties();
-        props.read(reader);
-
-        List<String> lines = new ArrayList<>(props.getLines("KeY"));
+    void testProofScript(TestInstance data, String name) throws Exception {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
-        Files.write(tmpKey, lines);
+        LOGGER.info("Testing {} using file {}", name, tmpKey);
+        Files.writeString(tmpKey, data.key());
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(props.get("script"));
-        ProofScriptEngine pse = new ProofScriptEngine(script);
+        KeyAst.ProofScript script = ParsingFacade.parseScript(data.script());
+        ProofScriptEngine pse = new ProofScriptEngine(proof);
 
+        boolean hasException = data.exception() != null;
         try {
-            pse.execute(env.getUi(), proof);
+            pse.execute(env.getUi(), script);
         } catch (ScriptException ex) {
-            assertTrue(props.containsKey("exception"),
+            ex.printStackTrace();
+            assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
             String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
-            Assertions.assertTrue(msg.startsWith(props.get("exception").trim()),
-                "Unexpected exception: " + ex.getMessage() + "\n expected: "
-                    + props.get("exception").trim());
+            assertThat(msg)
+                    .containsIgnoringWhitespaces(data.exception.trim())
+                    .as("Unexpected exception: %s\n expected: %s",
+                        ex.getMessage(), data.exception.trim());
             return;
         }
 
-        Assertions.assertFalse(props.containsKey("exception"),
+        Assertions.assertFalse(hasException,
             "exception would have been expected");
 
-        ImmutableList<Goal> goals = proof.openGoals();
-        if (props.containsKey("goals")) {
-            int expected = Integer.parseInt(props.get("goals").trim());
+        if (data.goals() != null) {
+            ImmutableList<Goal> goals = proof.openGoals();
+            int expected = data.goals().length;
             Assertions.assertEquals(expected, goals.size());
-        }
 
+            for (String expectedGoal : data.goals()) {
+                assertThat(normaliseSpace(goals.head().toString())).isEqualTo(expectedGoal);
+                goals = goals.tail();
+            }
 
-        int no = 1;
-        while (props.containsKey("goal " + no)) {
-            String expected = props.get("goal " + no).trim();
-            Assertions.assertEquals(expected, goals.head().toString().trim(), "goal " + no);
-            goals = goals.tail();
-            no++;
+            if (data.selectedGoal() != null) {
+                Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
+                assertThat(normaliseSpace(goal.toString()))
+                        .isEqualTo(data.goals()[data.selectedGoal()]);
+            }
         }
+    }
 
-        if (props.containsKey("selected")) {
-            Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
-            String expected = props.get("selected").trim();
-            Assertions.assertEquals(expected, goal.toString().trim());
-        }
+    // For some layout reasons the toString may add linebreaks and spaces
+    private static String normaliseSpace(String str) {
+        return str.replaceAll("\\s+", " ").trim();
     }
 
 }

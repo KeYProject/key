@@ -9,8 +9,6 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-import org.jspecify.annotations.NonNull;
-
 public interface KeYToolbarExtensionAdapter extends KeYGuiExtension.Toolbar {
     /**
      * @param mainWindow

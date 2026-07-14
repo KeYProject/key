@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,7 +11,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -18,10 +22,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.gui.sourceview.JavaDocument.JML_COLOR;
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
@@ -71,8 +75,8 @@ public class HTMLSyntaxHighlighter {
 
     private final static String[] DYNAMIC_LOGIC_KEYWORDS =
         { "\\forall", "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum", "bsum",
-            "\\in", "exactInstance", "wellFormed", "measuredByEmpty", "<created>", "<inv>", "\\cup",
-            "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
+            "\\in", "instance", "exactInstance", "wellFormed", "measuredByEmpty", "<created>",
+            "$inv", "\\cup", "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
 
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
         concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), input -> Pattern.quote((String) input));
@@ -136,21 +140,85 @@ public class HTMLSyntaxHighlighter {
         "<span class=\"sequent_arrow_highlight\">$1</span>";
 
 
+    private static final StyleSheet light = new StyleSheet();
+    private static final StyleSheet dark = new StyleSheet();
+
+    private static final ColorSettings.ColorProperty PROP_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]prop_logic_color", "",
+            Color.black, Color.white);
+
+    private static final ColorSettings.ColorProperty DYN_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]dyn_logic_color", "",
+            new Color(0, 0, 16 * 13),
+            new Color(150, 150, 250));
+
+    private static final ColorSettings.ColorProperty JAVA_COLOR = JavaDocument.JAVA_KEYWORD_COLOR;
+    private static final ColorSettings.ColorProperty COMMENT_COLOR = JavaDocument.COMMENT_COLOR;
+    private static final ColorSettings.ColorProperty JML_COLOR = JavaDocument.JML_KEYWORD_COLOR;
+
+    private static final ColorSettings.ColorProperty PROG_VAR_COLOR =
+        ColorSettings.define("[sequentView]prog_var_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+    private static final ColorSettings.ColorProperty SEQUENT_ARROW_COLOR =
+        ColorSettings.define("[sequentView]sequent_arrow_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+
+    static {
+        final var lightString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getLightValue().getRGB() & 0xFFFFFF);
+        light.addRule(lightString);
+
+        final var darkString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF);
+        dark.addRule(darkString);
+    }
+
+
     /**
      * Adds CSS rules to the given document.
      *
      * @param document The {@link HTMLDocument}
      */
-    public static void addCSSRulesTo(@NonNull HTMLDocument document) {
-        document.getStyleSheet().addRule("""
-                .prop_logic_highlight { color: #000000; font-weight: bold; }
-                .dynamic_logic_highlight { color: #0000C0; font-weight: bold; }
-                .java_highlight { color: #7F0055; font-weight: bold; }
-                .progvar_highlight { color: #6A3E3E; }
-                .comment_highlight { color: #3F7F5F; }
-                .jml_highlight { color: #5553c2; }
-                .sequent_arrow_highlight { color: #000000; font-size: 1.7em }
-                """);
+    public static void addCSSRulesTo(HTMLDocument document) {
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
+            document.getStyleSheet().removeStyleSheet(light);
+            document.getStyleSheet().addStyleSheet(dark);
+        } else {
+            document.getStyleSheet().removeStyleSheet(dark);
+            document.getStyleSheet().addStyleSheet(light);
+        }
     }
 
     /**
@@ -162,7 +230,7 @@ public class HTMLSyntaxHighlighter {
      *        highlighting.
      * @return A HTML version of the input String with added syntax highlighting.
      */
-    public static String process(@NonNull String plainTextString, @NonNull Node displayedNode) {
+    public static String process(String plainTextString, Node displayedNode) {
         try {
             // NOTE: Highlighting program variables is the most expensive operation.
             // There are at least two options to do this:
@@ -213,8 +281,8 @@ public class HTMLSyntaxHighlighter {
      * @param programVariables The program variables to highlight.
      * @return The input String augmented by syntax highlighting tags.
      */
-    private static @NonNull String addSyntaxHighlighting(String htmlString,
-            @NonNull Iterable<? extends IProgramVariable> programVariables) {
+    private static String addSyntaxHighlighting(String htmlString,
+            Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString = PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString)
                 .replaceAll(PROP_LOGIC_KEYWORDS_REPLACEMENT);
@@ -263,7 +331,7 @@ public class HTMLSyntaxHighlighter {
      * @param plainTextString The String to transform.
      * @return A HTML-compatible version of plainTextString.
      */
-    public static @NonNull String toHTML(@NonNull String plainTextString) {
+    public static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
     }
 
@@ -275,7 +343,7 @@ public class HTMLSyntaxHighlighter {
      * @param strings Strings to concatenate.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(@NonNull String delim, @NonNull Iterable<?> strings) {
+    private static String concat(String delim, Iterable<?> strings) {
         return concat(delim, strings, Object::toString);
     }
 
@@ -289,8 +357,8 @@ public class HTMLSyntaxHighlighter {
      *        performed.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(@NonNull String delim, @NonNull Iterable<?> strings,
-            @NonNull StringTransformer strTransformer) {
+    private static String concat(String delim, Iterable<?> strings,
+            StringTransformer strTransformer) {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
         for (Object str : strings) {
@@ -323,7 +391,7 @@ public class HTMLSyntaxHighlighter {
      */
     public static final class Args {
         /** The node */
-        public final @NonNull WeakReference<Node> node;
+        public final WeakReference<Node> node;
         /** The printed node */
         public final String text;
         /** whether to use html highlighting */
@@ -336,7 +404,7 @@ public class HTMLSyntaxHighlighter {
         }
 
         @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }

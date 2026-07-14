@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -34,7 +34,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * <p>
@@ -58,7 +58,9 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
-public final class LoopContractExternalRule extends AbstractLoopContractRule {
+@NullMarked
+public final class LoopContractExternalRule extends AbstractLoopContractRule
+        implements ComplexJustificationable {
 
     /**
      * The only instance of this class.
@@ -179,16 +181,15 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopContractExternalBuiltInRuleApp(this, pos);
+    public LoopContractExternalBuiltInRuleApp<?> createApp(PosInOccurrence pos,
+            TermServices services) {
+        return new LoopContractExternalBuiltInRuleApp<>(this, pos);
     }
 
     @Override
     public boolean isApplicable(final Goal goal,
             final PosInOccurrence occurrence) {
-        if (InfFlowCheckInfo.isInfFlow(goal)) {
-            return false;
-        } else if (occursNotAtTopLevelInSuccedent(occurrence)) {
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         } else if (Transformer.inTransformer(occurrence)) {
             return false;
@@ -213,11 +214,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+    public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
-        LoopContractExternalBuiltInRuleApp application =
-            (LoopContractExternalBuiltInRuleApp) ruleApp;
+        LoopContractExternalBuiltInRuleApp<?> application =
+            (LoopContractExternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);

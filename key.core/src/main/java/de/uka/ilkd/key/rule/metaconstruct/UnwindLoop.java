@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
@@ -31,7 +28,13 @@ import org.jspecify.annotations.NonNull;
  *
  * <pre>
  * {@code
- * if (i<10) l1:{ l2:{ i++; } while (i<10) { i++; } }
+ * if (i < 10)
+ *     l1: {
+ *         l2: {
+ *             i++;
+ *         }
+ *         while (i < 10) { i++; }
+ *     }
  * }
  * </pre>
  *
@@ -57,8 +60,8 @@ public class UnwindLoop extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-            @NonNull SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
         if (!(pe instanceof LoopStatement originalLoop)) {
             return new ProgramElement[] { pe };
         }
@@ -87,8 +90,8 @@ public class UnwindLoop extends ProgramTransformer {
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+        ImmutableList<SchemaVariable> ret = ImmutableList.nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

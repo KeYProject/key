@@ -6,14 +6,14 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
@@ -32,7 +32,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -166,7 +165,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             result[1] = new StatementBlock(call);
         }
         assert result[1] != null : "null body in method";
-        return ImmutableSLList.<StatementBlock>nil().prepend(result);
+        return ImmutableList.<StatementBlock>nil().prepend(result);
     }
 
     /**

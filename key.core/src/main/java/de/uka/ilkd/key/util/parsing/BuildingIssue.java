@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -16,8 +17,6 @@ import org.jspecify.annotations.Nullable;
 
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
         Position position, @Nullable String sourceName) {
-
-    private static final URI URI_UNKNOWN = URI.create("file:unknown");
 
     public static BuildingIssue createError(String message, @Nullable ParserRuleContext token,
             @Nullable Throwable cause) {
@@ -49,12 +48,23 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
         return fromToken(message, true, token, cause);
     }
 
-    public PositionedString asPositionedString() {
-        try {
-            final var fileUri = sourceName != null ? new URI(sourceName) : URI_UNKNOWN;
-            return new PositionedString(message, new Location(fileUri, position));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+    /**
+     * The source location of this issue (file + position). The file may be absent if the source
+     * cannot be resolved to a URL; the position may be {@link Position#UNDEFINED}.
+     */
+    public Location getLocation() {
+        URI uri = null;
+        if (sourceName != null) {
+            try {
+                uri = MiscTools.parseURL(sourceName).toURI();
+            } catch (Exception e) {
+                uri = null;
+            }
         }
+        return new Location(uri, position);
+    }
+
+    public PositionedString asPositionedString() {
+        return new PositionedString(message, getLocation());
     }
 }

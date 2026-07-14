@@ -51,7 +51,7 @@ cut '\forall int v_iv; \forall Seq s;
      (\forall int idx; (0 <= idx & idx < v_iv 
        ->   0 <= (int)s[idx]
        & (int)s[idx] < seqLen(s) 
-       & int::instance(s[idx]) = TRUE)))';
+       & instance<[int]>(s[idx]) = TRUE)))';
 rule allRight;
 rule impRight;
 rule andLeft;
@@ -128,7 +128,7 @@ rule impLeft;
 rule hide_right formula='
     0 <= (int)(s_1[idx_2])
  & (int)(s_1[idx_2]) < s_1.length
- & int::instance(s_1[idx_2]) = TRUE';
+ & instance<[int]>(s_1[idx_2]) = TRUE';
 rule andRight;
 tryclose branch;
 tryclose branch;
@@ -163,7 +163,7 @@ rule hide_left formula='
    (   0 <= idx & idx < v_iv_1
     ->   0 <= (int)(seqRemove(s_1, jv_0)[idx])
        & (int)(seqRemove(s_1, jv_0)[idx]) < seqRemove(s_1, jv_0).length
-       & int::instance(seqRemove(s_1, jv_0)[idx]) = TRUE)';
+       & instance<[int]>(seqRemove(s_1, jv_0)[idx]) = TRUE)';
 cut 'idx_2!=jv_0';
 tryclose branch;
 rule hide_right formula='jv_0 < idx_2';

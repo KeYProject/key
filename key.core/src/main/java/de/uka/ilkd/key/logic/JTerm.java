@@ -16,7 +16,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -108,7 +107,6 @@ public interface JTerm
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
-    @Nullable
     TermLabel getLabel(Name termLabelName);
 
     /**
@@ -121,7 +119,19 @@ public interface JTerm
     boolean containsJavaBlockRecursive();
 
     /**
-     * Returns a human-readable source of this term. For example the filename with line and offset.
+     * Hash code modulo bound renaming, computed lazily and cached. Two terms that are equal modulo
+     * renaming share this value, so a mismatch is a cheap proof of inequality (used by
+     * {@code RenamingTermProperty}).
      */
-    default @Nullable String getOrigin() { return null; }
+    int hashCodeModRenaming();
+
+    /**
+     * Checks if this {@link JTerm} or one of its direct or indirect children has a
+     * {@link de.uka.ilkd.key.logic.op.Transformer} operator. Cached; used by
+     * {@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix} to skip the prefix walk in the common
+     * transformer-free case.
+     *
+     * @return {@code true} iff a transformer occurs anywhere in the term tree
+     */
+    boolean containsTransformerRecursive();
 }

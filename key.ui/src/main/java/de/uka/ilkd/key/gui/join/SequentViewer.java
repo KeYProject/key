@@ -12,9 +12,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 
 import org.key_project.prover.sequent.Sequent;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 public class SequentViewer extends JTextPane {
 

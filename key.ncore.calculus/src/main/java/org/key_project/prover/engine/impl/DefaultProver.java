@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
@@ -157,11 +158,13 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
         while ((g = goalChooser.getNextGoal()) != null) {
             if (!stopCondition.isGoalAllowed(g, maxApplications, timeout, startTime,
                 countApplied)) {
-                return new SingleRuleApplicationInfo(stopCondition.getGoalNotAllowedMessage(
-                    g, maxApplications, timeout, startTime, countApplied), g, null);
+                final var message = stopCondition.getGoalNotAllowedMessage(
+                    g, maxApplications, timeout, startTime, countApplied);
+
+                return new SingleRuleApplicationInfo(message, g, null);
             }
 
-            app = g.getRuleAppManager().next();
+            app = Objects.requireNonNull(g.getRuleAppManager()).next();
 
             app = updateBuiltInRuleIndex(g, app);
 

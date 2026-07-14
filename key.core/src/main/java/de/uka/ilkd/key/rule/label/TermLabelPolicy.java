@@ -15,8 +15,6 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
-import org.jspecify.annotations.Nullable;
-
 
 /**
  * <p>
@@ -59,7 +57,6 @@ public interface TermLabelPolicy {
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
-    @Nullable
     TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,

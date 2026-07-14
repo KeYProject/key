@@ -8,7 +8,7 @@ package de.uka.ilkd.key.smt.lang;
 /**
  *
  *
- * @authors Aboubakr Achraf El Ghazi and Fikri Kabakcha
+ * @author Aboubakr Achraf El Ghazi, Fikri Kabakcha
  *
  */
 public class SMTSort {
@@ -206,7 +206,7 @@ public class SMTSort {
 
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object that) {
+    public boolean equals(Object that) {
         if (this == that) {
             return true;
         }

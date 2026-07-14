@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -17,33 +17,33 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-public class UseDependencyContractApp extends AbstractContractRuleApp {
+public class UseDependencyContractApp<T extends UseDependencyContractRule>
+        extends AbstractContractRuleApp<T> {
 
     private final PosInOccurrence step;
     private List<LocationVariable> heapContext;
 
-    public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio) {
         this(builtInRule, pio, null, null);
     }
 
-    public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
+    public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio,
             Contract instantiation, PosInOccurrence step) {
-        this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
+        this(builtInRule, pio, ImmutableList.nil(), instantiation, step);
     }
 
-    public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,
+    public UseDependencyContractApp(UseDependencyContractRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts, Contract contract,
             PosInOccurrence step) {
-        super(rule, pio, ifInsts, contract);
+        // weigl: why is this unchecked cast needed?
+        super((T) rule, pio, ifInsts, contract);
         this.step = step;
-
     }
 
-    public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
-        return new UseDependencyContractApp(rule(), newPos, ifInsts, instantiation, step);
+    public UseDependencyContractApp<T> replacePos(PosInOccurrence newPos) {
+        return new UseDependencyContractApp<>(rule(), newPos, ifInsts, instantiation, step);
     }
 
     public boolean isSufficientlyComplete() {
@@ -59,7 +59,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);
         PosInOccurrence l_step =
-            UseDependencyContractRule.findStepInIfInsts(steps, this, services);
+            UseDependencyContractRule.findStepInIfInsts(steps, this);
         assert l_step != null;/*
                                * : "The strategy failed to properly " +
                                * "instantiate the base heap!\n" + "at: " +
@@ -74,24 +74,20 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         return step;
     }
 
-    public UseDependencyContractApp setStep(PosInOccurrence p_step) {
+    public UseDependencyContractApp<T> setStep(PosInOccurrence p_step) {
         assert this.step == null;
-        return new UseDependencyContractApp(rule(), posInOccurrence(), assumesInsts(),
+        return new UseDependencyContractApp<>(rule(), posInOccurrence(), assumesInsts(),
             instantiation,
             p_step);
     }
 
     @Override
-    public UseDependencyContractApp setContract(Contract contract) {
-        return new UseDependencyContractApp(builtInRule, posInOccurrence(), ifInsts, contract,
+    public UseDependencyContractApp<T> setContract(Contract contract) {
+        return new UseDependencyContractApp<>(rule(), posInOccurrence(), ifInsts, contract,
             step);
     }
 
-    public UseDependencyContractRule rule() {
-        return (UseDependencyContractRule) super.rule();
-    }
-
-    public UseDependencyContractApp tryToInstantiate(Goal goal) {
+    public UseDependencyContractApp<T> tryToInstantiate(Goal goal) {
         if (heapContext == null) {
             heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
         }

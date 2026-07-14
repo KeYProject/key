@@ -29,7 +29,7 @@ public class NotificationManager {
     /** true if we are currently in automode */
     private boolean autoMode = false;
 
-    private final @NonNull NotificationListener notificationListener;
+    private final NotificationListener notificationListener;
 
     public void setDefaultNotification(JFrame comp) {
         notificationTasks.clear();

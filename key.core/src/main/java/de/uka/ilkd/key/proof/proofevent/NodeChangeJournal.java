@@ -17,10 +17,8 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -39,7 +37,7 @@ public class NodeChangeJournal implements GoalListener {
      * This is a map storing the leaves that are currently below the original node, and all changes
      * applied to each of them
      */
-    private @NonNull ImmutableMap<@NonNull Node, NodeChangesHolder> changes =
+    private ImmutableMap<@NonNull Node, NodeChangesHolder> changes =
         DefaultImmutableMap.nilMap();
 
     /**
@@ -56,8 +54,8 @@ public class NodeChangeJournal implements GoalListener {
      * Create an RuleAppInfo object containing all changes stored within this object; remove all
      * listeners
      */
-    public @NonNull RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
-        ImmutableList<NodeReplacement> nrs = ImmutableSLList.nil();
+    public RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
+        ImmutableList<NodeReplacement> nrs = ImmutableList.nil();
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
             final Node newNode = entry.key();
@@ -82,7 +80,7 @@ public class NodeChangeJournal implements GoalListener {
      * informs the listener about a change that occured to the sequent of goal
      */
     @Override
-    public void sequentChanged(@NonNull Goal source, SequentChangeInfo sci) {
+    public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
         if (nc != null) {

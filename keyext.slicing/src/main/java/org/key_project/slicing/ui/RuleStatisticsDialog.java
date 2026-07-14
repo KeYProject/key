@@ -17,8 +17,6 @@ import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
  *
@@ -163,7 +161,7 @@ public class RuleStatisticsDialog extends JDialog {
      * @param rules statistics on rule apps (see {@link RuleStatistics})
      * @return HTML
      */
-    private @NonNull String genTable(@NonNull List<RuleStatisticEntry> rules) {
+    private String genTable(List<RuleStatisticEntry> rules) {
         List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
             "Initial useless applications");
 

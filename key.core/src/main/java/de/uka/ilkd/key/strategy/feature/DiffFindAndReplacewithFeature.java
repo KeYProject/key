@@ -13,8 +13,7 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -22,6 +21,9 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * Binary feature that returns zero iff the replacewith- and find-parts of a Taclet are matched to
  * different terms.
  */
+// Stable: compares the find term against the taclet's replacewith template, both fixed for a given
+// rule application.
+@StableCost
 public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
@@ -30,8 +32,7 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 

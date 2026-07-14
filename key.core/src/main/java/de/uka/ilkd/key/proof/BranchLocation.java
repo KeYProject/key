@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -20,7 +19,7 @@ public class BranchLocation {
     /**
      * Branch location of the initial proof branch.
      */
-    public static final BranchLocation ROOT = new BranchLocation(ImmutableSLList.nil());
+    public static final BranchLocation ROOT = new BranchLocation(ImmutableList.nil());
 
     /**
      * List of branch choices (branching nodes and sub-proof indices).

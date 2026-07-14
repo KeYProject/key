@@ -4,14 +4,15 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +33,9 @@ public final class IconFactory {
     public static final IconFontProvider PREVIOUS =
         new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider START =
-        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
+        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN, Color.GREEN.brighter().brighter());
     public static final IconFontProvider STOP =
-        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
+        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED, Color.GREEN.brighter().brighter());
     // an alternative would be TIMES_CIRCLE
     public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES);
     public static final IconFontProvider CONFIGURE_MENU =
@@ -160,23 +161,21 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static final @Nullable Image keyHole = getImage("images/ekey-mono.gif");
-    private static final @Nullable Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static final @Nullable Image keyCachedClosed = getImage("images/closed-cached.png");
-    private static final @Nullable Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static final @Nullable Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static final @Nullable Image keyLogo = getImage("images/key-color.png");
-    private static final @Nullable Image keyLogoShadow = getImage("images/key-shadow.png");
+    private static final Image keyHole = getImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
+    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static final Image keyLogo = getImage("images/key-color.png");
+    private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final @Nullable Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
-    private static final @Nullable Image keyLogoSmall =
-        getImage("images/key-color-icon-square.gif");
-    private static final @Nullable Image oneStepSimplifier =
-        getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
+    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    private static final @Nullable Image junit = getImage("images/toolbar/junit_logo.png");
-    private static final @Nullable Image jml = getImage("images/toolbar/jml.png");
-    private static final @Nullable Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = getImage("images/toolbar/junit_logo.png");
+    private static final Image jml = getImage("images/toolbar/jml.png");
+    private static final Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -186,10 +185,20 @@ public final class IconFactory {
 
     private static final HashMap<String, Icon> cache = new HashMap<>();
 
+    /**
+     * Additional horizontal space in pixels reserved for the overlay letter in
+     * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
+     */
+    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+    /**
+     * Additional horizontal space in pixels for wider auto buttons.
+     */
+    public static final int TOOLBAR_EXTRA_WIDTH = 14;
+
     private IconFactory() {
     }
 
-    public static @Nullable Image getImage(String s) {
+    public static Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
@@ -201,7 +210,7 @@ public final class IconFactory {
      *        this class)
      * @return the newly created image
      */
-    private static @Nullable ImageIcon createImageIcon(String filename) {
+    private static ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = IconFactory.class.getResource(filename);
         if (iconURL == null) {
@@ -214,7 +223,7 @@ public final class IconFactory {
         }
     }
 
-    private static @NonNull ImageIcon scaleIcon(@NonNull Image im, int x, int y) {
+    private static ImageIcon scaleIcon(Image im, int x, int y) {
         if (im.getWidth(null) == x && im.getHeight(null) == y) {
             return new ImageIcon(im);
         }
@@ -222,7 +231,7 @@ public final class IconFactory {
         return new ImageIcon(scaledim);
     }
 
-    public static @NonNull Icon abandon(int x) {
+    public static Icon abandon(int x) {
         return ABANDON.load(x);
     }
 
@@ -313,7 +322,7 @@ public final class IconFactory {
         return scaleIcon(keyHole, x, y);
     }
 
-    public static @NonNull Icon keyHoleClosed(int height) {
+    public static Icon keyHoleClosed(int height) {
         return GOAL_CLOSED.load(height);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
@@ -330,11 +339,11 @@ public final class IconFactory {
         return scaleIcon(keyHoleAlmostClosed, x, y);
     }
 
-    public static @NonNull ImageIcon keyCachedClosed(int x, int y) {
+    public static ImageIcon keyCachedClosed(int x, int y) {
         return scaleIcon(keyCachedClosed, x, y);
     }
 
-    public static @NonNull ImageIcon keyHoleInteractive(int x, int y) {
+    public static ImageIcon keyHoleInteractive(int x, int y) {
         return scaleIcon(keyHoleInteractive, x, y);
     }
 
@@ -368,7 +377,62 @@ public final class IconFactory {
         return AUTO_MODE_STOP.load(size);
     }
 
-    public static @NonNull Icon selectDecProcArrow(int size) {
+    /**
+     * Creates an icon with a play button and a letter overlay.
+     * <p>
+     * Used for automation actions to distinguish different modes visually. The base icon is the
+     * standard green play button ({@link #autoModeStartLogo(int)}), with a bold italic letter
+     * overlaid in the bottom-right corner.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @param letter the letter to overlay (e.g., "R" for Run, "F" for Full, "P" for Prepare), or
+     *        {@code null} for just the play button
+     * @return the composite icon with letter overlay
+     */
+    public static Icon automationWithOverlay(int size, String letter) {
+        Icon baseIcon = autoModeStartLogo(size);
+        return iconWithOverlay(baseIcon, letter);
+    }
+
+    public static Icon iconWithOverlay(Icon baseIcon, String letter) {
+        BufferedImage image =
+            new BufferedImage(
+                baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE + 2 * TOOLBAR_EXTRA_WIDTH,
+                baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+        // Draw base icon
+        baseIcon.paintIcon(null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
+
+        if (letter == null) {
+            return new ImageIcon(image);
+        }
+
+        // Draw letter overlay
+        g2d.setColor(Color.BLACK);
+        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC,
+            (int) (baseIcon.getIconHeight() * 0.9f));
+        g2d.setFont(font);
+
+        FontMetrics fm = g2d.getFontMetrics();
+        int textWidth = fm.stringWidth(letter);
+        int textHeight = fm.getAscent() - fm.getDescent();
+
+        // Position letter in bottom-right corner
+        int x = baseIcon.getIconWidth() - textWidth;
+
+        g2d.drawString(letter, x + TOOLBAR_INDICATOR_EXTRA_SPACE + TOOLBAR_EXTRA_WIDTH,
+            baseIcon.getIconHeight());
+        g2d.dispose();
+
+        return new ImageIcon(image);
+    }
+
+    public static Icon selectDecProcArrow(int size) {
         // return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
         return CONFIGURE_MENU.load(size);
     }
@@ -532,5 +596,33 @@ class DuneColorScheme {
 
     private static @NonNull Color hex(@NonNull String s) {
         return Color.decode(s);
+    }
+}
+
+
+/// An icon that switches between light/dark depending the current [ViewSettings].
+/// @param dark
+/// @param light
+record LightDarkIcon(Icon light, Icon dark) implements Icon {
+    LightDarkIcon {
+        assert (light.getIconHeight() == dark.getIconHeight());
+        assert (light.getIconWidth() == dark.getIconWidth());
+    }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+        var isDarkMode = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode();
+        var icon = isDarkMode ? dark : light;
+        icon.paintIcon(c, g, x, y);
+    }
+
+    @Override
+    public int getIconWidth() {
+        return light.getIconWidth();
+    }
+
+    @Override
+    public int getIconHeight() {
+        return light.getIconHeight();
     }
 }

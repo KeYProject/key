@@ -16,7 +16,6 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -38,9 +37,12 @@ public class FIFOStrategy implements Strategy<Goal> {
      */
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pio, @NonNull Goal goal,
+            PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
-        return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
+        // FIFO ordering is purely the goal age, which RuleAppContainer.withAge adds once per
+        // container, so the age-free strategy cost is zero.
+        return NumberRuleAppCost.getZeroCost();
     }
 
     /**
@@ -60,20 +62,20 @@ public class FIFOStrategy implements Strategy<Goal> {
             RuleAppCostCollector collector) {}
 
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return NAME;
     }
 
-    public static final Strategy INSTANCE = new FIFOStrategy();
+    public static final Strategy<Goal> INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
         @Override
-        public @NonNull Name name() {
+        public Name name() {
             return NAME;
         }
 
         @Override
-        public @NonNull Strategy create(Proof proof, StrategyProperties properties) {
+        public Strategy<Goal> create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }
 

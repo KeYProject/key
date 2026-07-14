@@ -21,7 +21,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 
     private final Proof proof;
 
-    public ShowUsedContractsAction(@NonNull MainWindow mainWindow, Proof proof) {
+    public ShowUsedContractsAction(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Used Contracts");
 

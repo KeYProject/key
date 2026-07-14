@@ -14,16 +14,14 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 public class EmptyEnvInput extends AbstractEnvInput {
 
-    public EmptyEnvInput(@NonNull Profile profile) {
+    public EmptyEnvInput(Profile profile) {
         super("empty dummy environment", null, Collections.emptyList(), null, profile, null);
     }
 
     @Override
-    public @NonNull ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
         return DefaultImmutableSet.nil();
     }
 

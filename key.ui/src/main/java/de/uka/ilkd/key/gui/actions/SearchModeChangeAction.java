@@ -20,10 +20,10 @@ public class SearchModeChangeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002019635814787502L;
     private final SequentViewSearchBar searchBar;
-    private final SequentViewSearchBar.@NonNull SearchMode mode;
+    private final SequentViewSearchBar.SearchMode mode;
 
-    public SearchModeChangeAction(@NonNull MainWindow mainWindow, SequentViewSearchBar searchBar,
-            SequentViewSearchBar.@NonNull SearchMode mode) {
+    public SearchModeChangeAction(MainWindow mainWindow, SequentViewSearchBar searchBar,
+            SequentViewSearchBar.SearchMode mode) {
         super(mainWindow);
         setName(mode.toString());
 

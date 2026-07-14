@@ -17,7 +17,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     @Override
-    public @NonNull List<JComponent> getStatusLineComponents() {
+    public List<JComponent> getStatusLineComponents() {
         return Collections.singletonList(new HeapStatusComponent());
     }
 
@@ -45,7 +44,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
         private final Action actionShowMonitoring = new ShowMonitoringAction();
 
 
-        private @NonNull JPopupMenu createPopupMenu() {
+        private JPopupMenu createPopupMenu() {
             var j = new JPopupMenu("Heap");
             progressBar.addMouseListener(new MouseAdapter() {
                 @Override
@@ -115,7 +114,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
         }
 
         private class ShowMonitoringAction extends KeyAction {
-            private final @Nullable String pathJConsole;
+            private final String pathJConsole;
 
             ShowMonitoringAction() {
                 setName("Open JConsole");

@@ -10,15 +10,14 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This feature checks that the position of application is not contained in the if-formulas. If the
  * rule application is admissible, zero is returned.
  */
+@StableCost
 public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new NoSelfApplicationFeature();
@@ -26,8 +25,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";
 

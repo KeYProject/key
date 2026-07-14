@@ -9,19 +9,23 @@ options { tokenVocab=JmlLexer; }
 @members {
   private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+  private boolean isNextToken(String tokenText) {
+    return _input.LA(1) != Token.EOF && tokenText.equals(_input.LT(1).getText());
+  }
 }
 
+modifiersEOF: modifiers EOF;
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: classlevel_element | modifiers | set_statement;
+classlevel_comment: classlevel_element | modifiers;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
+  : class_invariant     | accessible_clause  | method_specification
   | method_declaration  | field_declaration  | represents_clause
   | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+  | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -152,8 +156,14 @@ name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
 
 field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
-method_declaration: typespec IDENT param_list (method_body|SEMI_TOPLEVEL);
-method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
+method_declaration: typespec IDENT param_list (method_body=mbody_block | SEMI_TOPLEVEL);
+mbody_block: LBRACE mbody_var* mbody_statement RBRACE;
+mbody_statement:
+    RETURN expression SEMI_TOPLEVEL #mbody_return
+  | IF LPAREN expression RPAREN (mbody_statement | mbody_block) ELSE (mbody_statement | mbody_block) #mbody_if
+  ;
+mbody_var: VAR? IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
+
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
 history_constraint: CONSTRAINT expression;
@@ -196,11 +206,34 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT (label=IDENT COLON)? expression | UNREACHABLE) (assertionProof SEMI_TOPLEVEL? | SEMI_TOPLEVEL);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
+
+// --- proof scripts in JML
+assertionProof: BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
+proofCmd:
+    // TODO allow more than one var in obtain
+  { isNextToken("obtain") }? obtain=IDENT typespec var=IDENT
+       ( obtKind=EQUAL_SINGLE expression SEMI
+       | obtKind=SUCH_THAT expression proofCmdSuffix
+       | obtKind=FROM_GOAL SEMI
+       )
+  | cmd=IDENT ( proofArg )* proofCmdSuffix
+  ;
+
+proofCmdSuffix:
+  SEMI | BY ( proofCmd | LBRACE (proofCmd+ | proofCmdCase+) RBRACE )
+  ;
+
+proofCmdCase:
+    CASE ( label=STRING_LITERAL )? COLON ( proofCmd )*
+  | DEFAULT COLON ( proofCmd )*
+  ;
+proofArg: (argLabel=IDENT COLON)? expression;
+// ---
 
 mergeparamsspec:
     MERGE_PARAMS
@@ -369,6 +402,7 @@ jmlprimary
   | SUBSET LPAREN storeref COMMA storeref RPAREN                                     #primarySubset
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
+  | KEY_TERM                                                                         #keyTerm
   ;
 
 sequence
@@ -402,4 +436,3 @@ referencetype: name;
 builtintype: BYTE | SHORT | INT | LONG | BOOLEAN | VOID | BIGINT | REAL | LOCSET | SEQ | FREE;
 name: ident (DOT ident)*;
 quantifiedvariabledeclarator: IDENT dims?;
-

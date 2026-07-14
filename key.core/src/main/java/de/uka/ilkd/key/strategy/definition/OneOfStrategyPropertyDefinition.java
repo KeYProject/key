@@ -7,8 +7,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Defines that a user interface control which edits a single key-value-pair of the
  * {@link StrategyProperties} allows the user to select predefined values. It might be realized via

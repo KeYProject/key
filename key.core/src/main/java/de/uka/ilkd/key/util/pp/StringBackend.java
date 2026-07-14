@@ -12,7 +12,7 @@ import org.jspecify.annotations.NonNull;
  * far.
  */
 public class StringBackend<M> {
-    protected final @NonNull StringBuilder out;
+    protected final StringBuilder out;
 
     /**
      * Create a new StringBackend. This will accumulate output in a fresh, private StringBuffer.
@@ -42,7 +42,7 @@ public class StringBackend<M> {
     }
 
     /** Returns the accumulated output */
-    public @NonNull String result() {
+    public String result() {
         return out.toString();
     }
 }

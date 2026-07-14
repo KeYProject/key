@@ -3,24 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Resolver for attributes (i.e., fields).
@@ -36,7 +37,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     private @Nullable ProgramVariable lookupVisibleAttribute(String name,
             @NonNull KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
-                : "type " + containingType + " is primitive, lookup for " + name;
+                : "type %s is primitive, lookup for %s".formatted(containingType, name);
         final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
         // lookup locally
         for (MemberDeclaration md : td.getMembers()) {
@@ -76,7 +77,6 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     protected SLExpression doResolving(@NonNull SLExpression receiver, @NonNull String name,
             @Nullable SLParameters parameters)
             throws SLTranslationException {
-
         if (parameters != null) {
             return null;
         }
@@ -85,12 +85,12 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         JTerm recTerm = receiver.getTerm();
 
-        // <inv> and <inv_free> are special cases
+        // $inv and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
-        if (name.equals("<inv>") && receiver.isTerm()) {
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_INVARIANT) && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
-        if (name.equals("<inv_free>") && receiver.isTerm()) {
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT) && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
         }
 
@@ -105,11 +105,11 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             while (attribute == null) {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if (attribute == null) {
-                    attribute = lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX + name,
+                    attribute = lookupVisibleAttribute(PipelineConstants.FINAL_VAR_PREFIX + name,
                         containingType);
                 }
                 final LocationVariable et = (LocationVariable) javaInfo
-                        .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                        .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
@@ -139,21 +139,30 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     JTerm attributeTerm;
-                    if (attribute.isStatic()) {
-                        if (attribute.isFinal() &&
-                                FinalHeapResolution.recallIsFinalEnabled()) {
-                            attributeTerm =
-                                services.getTermBuilder().staticFinalDot(attribute.sort(),
-                                    fieldSymbol);
+                    if (attribute.isModel()) {
+                        List<LocationVariable> heaps = new ArrayList<>();
+                        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
+                            heaps.add(h);
+                        }
+                        JTerm[] subs = new JTerm[fieldSymbol.arity()];
+                        for (int j = 0; j < heaps.size(); j++) {
+                            subs[j] = services.getTermBuilder().var(heaps.get(j));
+                        }
+                        if (!attribute.isStatic()) {
+                            subs[heaps.size()] = recTerm;
+                        }
+                        attributeTerm = services.getTermBuilder().func(fieldSymbol, subs);
+                    } else if (attribute.isStatic()) {
+                        if (attribute.isFinal() && FinalHeapResolution.recallIsFinalEnabled()) {
+                            attributeTerm = services.getTermBuilder()
+                                    .staticFinalDot(attribute.sort(), fieldSymbol);
                         } else {
                             attributeTerm =
                                 services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
                         }
-                    } else if (attribute.isFinal() &&
-                            FinalHeapResolution.recallIsFinalEnabled()) {
+                    } else if (attribute.isFinal() && FinalHeapResolution.recallIsFinalEnabled()) {
                         attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
-                            recTerm,
-                            fieldSymbol);
+                            recTerm, fieldSymbol);
                     } else {
                         attributeTerm =
                             services.getTermBuilder().dot(attribute.sort(), recTerm, fieldSymbol);

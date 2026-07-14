@@ -7,12 +7,12 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
@@ -349,6 +349,43 @@ public final class IOUtil {
         }
     }
 
+    public static boolean isFolderInsideJar(Path sourcePath) {
+        return isFolderInsideJar(sourcePath.toString());
+    }
+
+    public static boolean isFolderInsideJar(String sourcePath) {
+        return URL_JAR_FILE.asMatchPredicate().test(sourcePath);
+    }
+
+    /**
+     * Opens a file inside a Jar using NIO. The given path is separated by using the bang "!" sign.
+     * The part before the bang is the path to the Jar. The part behind the bang is the path inside
+     * the Jar.
+     *
+     * @param sourcePath
+     *        a non-null path to file inside a jar file
+     * @return a relative path inside a new "file system"
+     * @throws IOException
+     */
+    public static Path openFileInJar(Path sourcePath) throws IOException {
+        final Map<String, String> env = new HashMap<>();
+        final String[] array = sourcePath.toString().split("!");
+        var fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+        return fs.getPath(array[1]);
+    }
+
+    public static Path openFileInJar(URI location) throws IOException {
+        try {
+            return Paths.get(location); // Try to open the file, using known file systems.
+        } catch (FileSystemNotFoundException e) { // Open a file system if not found.
+            final Map<String, String> env = new HashMap<>();
+            final String[] array = location.toString().split("!");
+            var fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+            return fs.getPath(array[1]);
+        }
+    }
+
+
 
     /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
@@ -681,9 +718,12 @@ public final class IOUtil {
                 String protocol = url.getProtocol();
                 String userInfo = url.getUserInfo();
                 String host = url.getHost();
-                // A '+' in file names is not supported, since it is converted
-                // into a space ('%20') according to the URI standard.
-                String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
+                // URLDecoder decodes the application/x-www-form-urlencoded form, in which a
+                // literal '+' denotes a space. A URL path, however, never uses '+' for a space
+                // (it is percent-encoded as %20), so a '+' here is part of the file name and must
+                // be preserved. Protect it before decoding the remaining percent-escapes.
+                String path =
+                    URLDecoder.decode(url.getPath().replace("+", "%2B"), StandardCharsets.UTF_8);
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
@@ -697,6 +737,40 @@ public final class IOUtil {
             }
         } catch (URISyntaxException e) {
             return null;
+        }
+    }
+
+    public static URL makeMemoryURL(String data) {
+        try {
+            return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)),
+                new MemoryDataHandler(data));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final class MemoryDataHandler extends URLStreamHandler {
+        private final String data;
+
+        public MemoryDataHandler(String data) {
+            this.data = data;
+        }
+
+        @Override
+        protected URLConnection openConnection(URL u) throws IOException {
+            // perhaps check the hash code too?
+            if (!u.getProtocol().equals("memory")) {
+                throw new IOException("Unsupported protocol");
+            }
+            return new URLConnection(u) {
+                @Override
+                public void connect() {}
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(data.getBytes());
+                }
+            };
         }
     }
 
@@ -798,6 +872,8 @@ public final class IOUtil {
         extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
 
+    public static final Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
+
     /**
      * Tries to open a stream with the given file name.
      *
@@ -822,5 +898,21 @@ public final class IOUtil {
     public static String safePath(Path path) {
         var s = path.toString();
         return s.replace('\\', '/');
+    }
+
+
+    /// Returns a string, representing the given path to `source` relatively to `basePath`.
+    /// @param source a path
+    /// @param basePath a directory
+    /// @return a string that is printable (escaped) for KeY files
+    public static String safePathRelativeTo(Path source, Path basePath) {
+        if (Objects.equals(source.getRoot(), basePath.getRoot())) {
+            // required on Windows
+            var abs = source.toAbsolutePath();
+            return safePath(basePath.relativize(abs));
+        } else {
+            // fallback: return absolute path
+            return safePath(source.toAbsolutePath());
+        }
     }
 }

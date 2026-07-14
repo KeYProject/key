@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+
+import com.github.javaparser.ast.Node;
+
 /**
  * This exception class is mainly thrown by Recoder2KeY and its companions.
  *
@@ -12,38 +18,42 @@ package de.uka.ilkd.key.java;
  * This information is then read by the KeYParser to produce helpful error messages.
  *
  */
-public class ConvertException extends RuntimeException {
+public class ConvertException extends RuntimeException implements HasLocation {
+    private final Location location;
+
+    public ConvertException(String message) {
+        super(message);
+        location = Location.UNDEFINED;
+    }
+
+    public ConvertException(String message, Location location) {
+        super(message);
+        this.location = location;
+    }
 
     /**
+     * Create a conversion exception that points to the source location of the given JavaParser
+     * node. This helps the user to locate the origin of the conversion problem in the input file.
      *
+     * @param message the error message
+     * @param node the JavaParser node the conversion failed on
      */
-    private static final long serialVersionUID = 7112945712992241455L;
-
-    public ConvertException(String errmsg) {
-        super(errmsg);
+    public ConvertException(String message, Node node) {
+        this(message, JavaSourceLocations.locationFromNode(node));
     }
 
-    public ConvertException(Throwable pe) {
-        super(pe);
+    @Override
+    public Location getLocation() {
+        return location;
     }
 
-    public ConvertException(String errmsg, Throwable cause) {
-        super(errmsg, cause);
-    }
-
-    public recoder.parser.ParseException parseException() {
-        if (getCause() instanceof recoder.parser.ParseException) {
-            return (recoder.parser.ParseException) getCause();
-        } else {
-            return null;
+    @Override
+    public String getMessage() {
+        // Only append the location if it actually carries information; otherwise the
+        // bare "[<unknown>:??]" suffix just clutters the message.
+        if (location == null || location.equals(Location.UNDEFINED)) {
+            return super.getMessage();
         }
-    }
-
-    public de.uka.ilkd.key.parser.proofjava.ParseException proofJavaException() {
-        if (getCause() instanceof de.uka.ilkd.key.parser.proofjava.ParseException) {
-            return (de.uka.ilkd.key.parser.proofjava.ParseException) getCause();
-        } else {
-            return null;
-        }
+        return super.getMessage() + "\n" + location;
     }
 }

@@ -19,8 +19,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for proof caching.
@@ -28,6 +28,8 @@ import org.jspecify.annotations.Nullable;
  * @author Arne Keller
  */
 public final class ReferenceSearcher {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearcher.class);
+
     private ReferenceSearcher() {
 
     }
@@ -39,8 +41,7 @@ public final class ReferenceSearcher {
      * @param newNode new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
-    public static @Nullable ClosedBy findPreviousProof(@NonNull List<Proof> previousProofs,
-            @NonNull Node newNode) {
+    public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
         if (!suitableForCloseByReference(newNode)) {
@@ -58,10 +59,13 @@ public final class ReferenceSearcher {
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
             Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
             var tacletsOk = true;
-            for (var taclet : tacletIndex.allNoPosTacletApps().stream()
-                    .filter(x -> x.taclet().getOrigin() != null
-                            && x.taclet().getOrigin().contains(proofFile))
-                    .toList()) {
+            final var list = tacletIndex.allNoPosTacletAppsStream()
+                    .filter(x -> {
+                        var origin = p.getServices().getNamespaces().docs().findOrigin(x.taclet());
+                        return origin != null && origin.contains(proofFile);
+                    })
+                    .toList();
+            for (NoPosTacletApp taclet : list) {
                 if (newTaclets.stream().noneMatch(newTaclet -> Objects
                         .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
                     tacletsOk = false;
@@ -95,8 +99,9 @@ public final class ReferenceSearcher {
                     .noneMatch(x -> x.node().lookup(ClosedBy.class) != null)) {
                 try {
                     results = depTracker.analyze(true, false);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
                     // if the analysis for some reason fails, we simply proceed as usual
+                    LOGGER.debug("failed to analyze target proof ", e);
                 }
             }
             while (!nodesToCheck.isEmpty()) {
@@ -149,7 +154,7 @@ public final class ReferenceSearcher {
      * @param subset Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
-    private static boolean containedIn(@NonNull Semisequent superset, @NonNull Semisequent subset) {
+    private static boolean containedIn(Semisequent superset, Semisequent subset) {
         for (SequentFormula sf : subset) {
             boolean found = false;
             for (SequentFormula sf2 : superset) {
@@ -174,7 +179,7 @@ public final class ReferenceSearcher {
      * @param node the node to check
      * @return whether it can be closed by reference
      */
-    public static boolean suitableForCloseByReference(@NonNull Node node) {
+    public static boolean suitableForCloseByReference(Node node) {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {

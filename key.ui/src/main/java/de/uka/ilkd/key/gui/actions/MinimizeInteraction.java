@@ -10,8 +10,6 @@ import java.util.EventObject;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Option to specify all instantiations manually (does not apply to the automatic solver).
  */

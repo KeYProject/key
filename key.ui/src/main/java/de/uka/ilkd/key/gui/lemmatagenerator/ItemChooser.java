@@ -41,7 +41,7 @@ class ItemChooser<T> extends JPanel {
     private JPanel contentPanel;
     private JButton leftButton;
     private JButton rightButton;
-    private @NonNull List<TableItem<T>> items = new LinkedList<>();
+    private List<TableItem<T>> items = new LinkedList<>();
     private final List<ItemFilter<T>> filtersForMovingItems =
         new LinkedList<>();
     private final String searchTitle;

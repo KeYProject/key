@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -41,9 +37,9 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, @Nullable PosInOccurrence pio,
-            RuleAppCost cost,
-            @NonNull Goal goal) {
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
+            PosInOccurrence pio, RuleAppCost cost,
+            Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
         positionTag = pio == null ? null : goal.getFormulaTagManager().getTagForPos(pio.topLevel());
@@ -80,7 +76,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     /**
      * Copied from FindTaclet.
      */
-    private @NonNull PosInOccurrence getPosInOccurrence(@NonNull Goal p_goal) {
+    private PosInOccurrence getPosInOccurrence(Goal p_goal) {
         final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
@@ -101,10 +97,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static @NonNull RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
+    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
             PosInOccurrence pio,
-            @NonNull Goal goal) {
-        final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
+            Goal goal) {
+        final RuleAppCost cost =
+            withAge(goal.getGoalStrategy().computeCost(bir, pio, goal), goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
 
@@ -114,9 +111,10 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static @NonNull ImmutableList<RuleAppContainer> createInitialAppContainers(
-            @NonNull ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, @NonNull Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
+    static ImmutableList<RuleAppContainer> createInitialAppContainers(
+            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
+            Goal goal) {
+        ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
             result = result.prepend(createAppContainer(bir, pio, goal));
@@ -130,16 +128,16 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     @Override
     public @NonNull ImmutableList<RuleAppContainer> createFurtherApps(@NonNull Goal goal) {
         if (!isStillApplicable(goal)) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
-        return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
+        return ImmutableList.<RuleAppContainer>singleton(container);
     }
 
 

@@ -12,8 +12,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 // W I P

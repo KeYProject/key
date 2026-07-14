@@ -13,16 +13,19 @@ import org.jspecify.annotations.NonNull;
  * @author Kai Wallisch
  */
 public class EmptySequent extends SequentView {
-
-    private static final long serialVersionUID = 7572244482555772604L;
-
-    public EmptySequent(@NonNull MainWindow mainWindow) {
+    public EmptySequent(MainWindow mainWindow) {
         super(mainWindow);
         setBackground(INACTIVE_BACKGROUND_COLOR);
     }
 
     @Override
-    public @NonNull String getTitle() {
+    public void updateUI() {
+        super.updateUI();
+        setBackground(INACTIVE_BACKGROUND_COLOR);
+    }
+
+    @Override
+    public String getTitle() {
         return "No proof loaded";
     }
 

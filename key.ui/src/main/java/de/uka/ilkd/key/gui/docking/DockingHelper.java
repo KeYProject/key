@@ -125,7 +125,7 @@ public class DockingHelper {
      * @param mainWindow main window
      * @param panel class name of the panel to show
      */
-    public static void focus(@NonNull MainWindow mainWindow, @NonNull Class<?> panel) {
+    public static void focus(MainWindow mainWindow, Class<?> panel) {
         SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
         if (dockable == null) {
             return;
@@ -196,7 +196,7 @@ public class DockingHelper {
     }
 
     public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
-            @NonNull CDecorateableAction<A> derive, @NonNull Action action) {
+            CDecorateableAction<A> derive, @NonNull Action action) {
         derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         derive.setEnabled(action.isEnabled());
 

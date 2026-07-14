@@ -7,19 +7,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -42,7 +43,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -145,7 +145,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @SuppressWarnings("unchecked")
     private <T> ImmutableList<T> listOf(List<? extends ParserRuleContext> contexts) {
-        ImmutableList<T> seq = ImmutableSLList.nil();
+        ImmutableList<T> seq = ImmutableList.nil();
         for (ParserRuleContext context : contexts) {
             seq = seq.append((T) accept(context));
         }
@@ -226,9 +226,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         LocationVariable permissionHeap = getPermissionHeap();
         if (permissionHeap == null) {
             raiseError("\\permission expression used in a non-permission"
-                + " context and permissions not enabled.", ctx);
+                + " context and permissions not enabled.",
+                ctx);
         }
-        if (!term.op().name().toString().endsWith("::select")) {
+        if (!(term.op() instanceof ParametricFunctionInstance pfi)
+                || pfi.getBase() != services.getTypeConverter().getHeapLDT().getSelect()) {
             raiseError("\\permission expression used with non store-ref" + " expression.", ctx);
         }
         return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(),
@@ -246,7 +248,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     // region expression
-
     @Override
     public KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {
         if (ctx.BYTE() != null) {
@@ -325,7 +326,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<JTerm> visitStoreRefList(JmlParser.StoreRefListContext ctx) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JmlParser.StorerefContext context : ctx.storeref()) {
             result = result.append((JTerm) accept(context));
         }
@@ -359,7 +360,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitCreateLocset(JmlParser.CreateLocsetContext ctx) {
         JmlParser.ExprListContext exprList = ctx.exprList();
         if (exprList == null) {
-            return termFactory.createLocSet(ImmutableSLList.nil());
+            return termFactory.createLocSet(ImmutableList.nil());
         } else {
             return termFactory.createLocSet(requireNonNull(accept(exprList)));
         }
@@ -368,7 +369,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<SLExpression> visitExprList(JmlParser.ExprListContext ctx) {
-        ImmutableList<SLExpression> result = ImmutableSLList.nil();
+        ImmutableList<SLExpression> result = ImmutableList.nil();
         for (JmlParser.ExpressionContext context : ctx.expression()) {
             result = result.append((SLExpression) accept(context));
         }
@@ -630,7 +631,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        final SortDependingFunction f =
+        final ParametricFunctionInstance f =
             services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;
@@ -754,6 +755,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+
+    @Override
+    public SLExpression visitKeyTerm(JmlParser.KeyTermContext ctx) {
+        var key = ctx.KEY_TERM().getText();
+        key = key.substring(1, key.length() - 1);
+        var nss = services.getNamespaces().copyWithParent();
+        nss.programVariables().add(selfVar);
+        nss.programVariables().add(excVar);
+        var keyIO = new KeyIO(services, nss);
+
+        var term = keyIO.parseExpression(key);
+        return new SLExpression(term);
+    }
+
     @Override
     public Object visitMultexpr(JmlParser.MultexprContext ctx) {
         List<SLExpression> exprs = mapOf(ctx.unaryexpr());
@@ -763,7 +778,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression e = exprs.get(i);
             if (result.isType()) {
                 raiseError("Cannot build multiplicative expression from type "
-                    + result.getType().getName() + ".", ctx);
+                    + result.getType().getName() + ".",
+                    ctx);
             }
             if (e.isType()) {
                 raiseError("Cannot multiply by type " + e.getType().getName() + ".", ctx);
@@ -864,7 +880,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
-        String fieldName = "<transactionConditionallyUpdated>";
+        String fieldName = "$transactionConditionallyUpdated";
         return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
     }
 
@@ -882,7 +898,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         if (expr == null) {
             raiseError(
-                format("The fully qualified name '%s' could not be resolved.", fullyQualifiedName),
+                format("Cannot resolve '%s'. No variable, field, model field, or type with this "
+                    + "name is in scope here (check for typos).", fullyQualifiedName),
                 ctx);
         }
         fullyQualifiedName = oldFqName;
@@ -1003,7 +1020,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return lookupIdentifier("<transient>", receiver, null, ctx);
+            return lookupIdentifier("$transient", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
@@ -1094,17 +1111,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ImmutableList<SLExpression> params) {
         // at some point in life, we may want to have a customizable map here.
         return switch (name) {
-        case "\\array2seq" -> termFactory.translateToJDLTerm(name.substring(1), params);
-        case "\\seq_upd" -> termFactory.translateToJDLTerm("seqUpd", params);
-        case "\\seq_put" -> termFactory.translateToJDLTerm("seqUpd", params);
-        default -> throw new IllegalStateException("Unexpected value: " + name);
+            case "\\array2seq" -> termFactory.translateToJDLTerm(name.substring(1), params);
+            case "\\seq_upd" -> termFactory.translateToJDLTerm("seqUpd", params);
+            case "\\seq_put" -> termFactory.translateToJDLTerm("seqUpd", params);
+            default -> throw new IllegalStateException("Unexpected value: " + name);
         };
     }
 
     private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
         ImmutableList<SLExpression> params =
             ctx.param_decl().stream().map(it -> lookupIdentifier(it.p.getText(), null, null, it))
-                    .collect(ImmutableSLList.toImmutableList());
+                    .collect(ImmutableList.collector());
         return getSlParametersWithHeap(params);
     }
 
@@ -1114,7 +1131,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
-        ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
+        ImmutableList<SLExpression> preHeapParams = ImmutableList.nil();
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             JTerm p;
             if (atPres == null || atPres.get(heap) == null) {
@@ -1446,7 +1463,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         assert typ != null;
         JTerm resTerm = tb.equals(
-            tb.var(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
+            tb.var(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, typ)),
             tb.TRUE());
         return new SLExpression(resTerm);
     }
@@ -1522,7 +1539,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
         if (ctx.storeRefUnion() == null) {
-            return new SLExpression(termFactory.createLocSet(ImmutableSLList.nil()));
+            return new SLExpression(termFactory.createLocSet(ImmutableList.nil()));
         }
         JTerm t = accept(ctx.storeRefUnion());
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
@@ -1662,11 +1679,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression e2 = accept(ctx.expression(1));
         SLExpression e3 = accept(ctx.expression(2));
         // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
-        final JTerm minusOne = tb.zTerm("-1");
         assert e2 != null;
         assert e1 != null;
-        JTerm updated = tb.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
-        return new SLExpression(updated);
+        return termFactory.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
     }
 
     @Override
@@ -1680,13 +1695,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final JTerm t2 = e2.getTerm();
         final JTerm t1 = e1.getTerm();
         return switch (ctx.op.getType()) {
-        case JmlLexer.SEQCONCAT -> termFactory.seqConcat(t1, t2);
-        case JmlLexer.SEQGET -> termFactory.seqGet(t1, t2);
-        case JmlLexer.INDEXOF -> termFactory.createIndexOf(t1, t2);
-        default -> {
-            raiseError(ctx, "Unknown operator: %s", ctx.op);
-            yield null;
-        }
+            case JmlLexer.SEQCONCAT -> termFactory.seqConcat(t1, t2);
+            case JmlLexer.SEQGET -> termFactory.seqGet(t1, t2);
+            case JmlLexer.INDEXOF -> termFactory.createIndexOf(t1, t2);
+            default -> {
+                raiseError(ctx, "Unknown operator: %s", ctx.op);
+                yield null;
+            }
         };
     }
 
@@ -1720,32 +1735,32 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert expr != null;
         final JTerm body = expr.getTerm();
         return switch (ctx.quantifier().start.getType()) {
-        case JmlLexer.FORALL ->
-            termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
-                expr.getType());
-        case JmlLexer.EXISTS ->
-            termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
-                expr.getType());
-        case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
-            declVars.second);
-        case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
-            declVars.second);
-        case JmlLexer.NUM_OF -> {
-            KeYJavaType kjtInt =
-                services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-            yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
-                declVars.second, kjtInt);
-        }
-        case JmlLexer.SUM ->
-            termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
-                expr.getType());
-        case JmlLexer.PRODUCT ->
-            termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
-                body, expr.getType());
-        default -> {
-            raiseError(ctx, "Unexpected syntax case.");
-            yield null;
-        }
+            case JmlLexer.FORALL ->
+                termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
+                    expr.getType());
+            case JmlLexer.EXISTS ->
+                termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
+                    expr.getType());
+            case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
+                declVars.second);
+            case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
+                declVars.second);
+            case JmlLexer.NUM_OF -> {
+                KeYJavaType kjtInt =
+                    services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
+                    declVars.second, kjtInt);
+            }
+            case JmlLexer.SUM ->
+                termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
+                    expr.getType());
+            case JmlLexer.PRODUCT ->
+                termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
+                    body, expr.getType());
+            default -> {
+                raiseError(ctx, "Unexpected syntax case.");
+                yield null;
+            }
         };
     }
 
@@ -1753,7 +1768,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitOldexpression(JmlParser.OldexpressionContext ctx) {
         KeYJavaType typ;
         SLExpression result = accept(ctx.expression());
-        @Nullable
         String id = accept(ctx.IDENT());
 
         if (atPres == null || atPres.get(getBaseHeap()) == null) {
@@ -1850,7 +1864,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Pair<KeYJavaType, ImmutableList<LogicVariable>> visitQuantifiedvardecls(
             JmlParser.QuantifiedvardeclsContext ctx) {
-        ImmutableList<LogicVariable> vars = ImmutableSLList.nil();
+        ImmutableList<LogicVariable> vars = ImmutableList.nil();
         KeYJavaType t = accept(ctx.typespec());
         for (JmlParser.QuantifiedvariabledeclaratorContext context : ctx
                 .quantifiedvariabledeclarator()) {
@@ -2011,7 +2025,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
-        ImmutableList<KeYJavaType> typeList = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> typeList = ImmutableList.nil();
         for (JmlParser.ReferencetypeContext context : ctx.referencetype()) {
             typeList = typeList.append((KeYJavaType) accept(context));
         }
@@ -2054,7 +2068,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<String> visitModifiers(JmlParser.ModifiersContext ctx) {
-        mods = ImmutableSLList.nil();
+        mods = ImmutableList.nil();
         return mods;
     }
 
@@ -2122,9 +2136,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ContractClauses.Clauses<LocationVariable, JTerm> free,
             ContractClauses.Clauses<LocationVariable, JTerm> redundantly) {
         switch (subType(type)) {
-        case FREE -> contractClauses.add(free, heap, t);
-        case REDUNDANT -> contractClauses.add(redundantly, heap, t);
-        default -> contractClauses.add(none, heap, t);
+            case FREE -> contractClauses.add(free, heap, t);
+            case REDUNDANT -> contractClauses.add(redundantly, heap, t);
+            default -> contractClauses.add(none, heap, t);
         }
     }
 
@@ -2242,9 +2256,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public InfFlowSpec visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
-        ImmutableList<JTerm> decl = ImmutableSLList.nil();
-        ImmutableList<JTerm> erases = ImmutableSLList.nil();
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
+        ImmutableList<JTerm> decl = ImmutableList.nil();
+        ImmutableList<JTerm> erases = ImmutableList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
 
         ImmutableList<JTerm> sep = accept(ctx.sep);
 
@@ -2260,17 +2274,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
         ImmutableList<JTerm> sep = accept(ctx.sep);
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
         newObs = append(newObs, ctx.newobj);
         return new InfFlowSpec(sep, sep, newObs);
     }
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        ImmutableList<JTerm> decl = ImmutableSLList.nil();
-        ImmutableList<JTerm> erases = ImmutableSLList.nil();
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
-        ImmutableList<JTerm> by = ImmutableSLList.nil();
+        ImmutableList<JTerm> decl = ImmutableList.nil();
+        ImmutableList<JTerm> erases = ImmutableList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
+        ImmutableList<JTerm> by = ImmutableList.nil();
 
         ImmutableList<JTerm> determined = accept(ctx.determined);
 
@@ -2296,8 +2310,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
-        ImmutableList<JTerm> det = append(ImmutableSLList.nil(), ctx.det);
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
+        ImmutableList<JTerm> det = append(ImmutableList.nil(), ctx.det);
         newObs = append(newObs, ctx.newObs);
         return new InfFlowSpec(det, det, newObs);
     }
@@ -2305,7 +2319,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public ImmutableList<JTerm> visitInfflowspeclist(JmlParser.InfflowspeclistContext ctx) {
         if (ctx.NOTHING() != null) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         ImmutableList<SLExpression> seq = accept(ctx.expressionlist());
         assert seq != null;
@@ -2351,7 +2365,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        if (ctx.method_body() == null) {
+        if (ctx.method_body == null) {
             return new SLExpression(tb.tt());
         }
 
@@ -2368,14 +2382,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         ParserRuleContext equal = JmlFacade.parseExpr(ctx.IDENT() + paramsString);
         Object a = accept(equal);
 
-        SLExpression body = accept(ctx.method_body().expression());
+        SLExpression body = accept(ctx.method_body);
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
 
         var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
         boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
         boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
-
 
         if (!applyContainsHeap && bodyContainsHeap) {
             // NOT (no heap in applies --> no heap in body)
@@ -2385,6 +2398,60 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.eq(apply, body);
     }
 
+    @Override
+    public SLExpression visitMbody_return(JmlParser.Mbody_returnContext ctx) {
+        return accept(ctx.expression());
+    }
+
+    @Override
+    public SLExpression visitMbody_block(JmlParser.Mbody_blockContext ctx) {
+        resolverManager.pushLocalVariablesNamespace();
+        List<Pair<LogicVariable, JTerm>> substList = new ArrayList<>();
+        for (JmlParser.Mbody_varContext varCtx : ctx.mbody_var()) {
+            String name = varCtx.IDENT().getText();
+            SLExpression expr = accept(varCtx.expression());
+            JTerm term = expr.getTerm();
+            LogicVariable logVar;
+            Optional<LogicVariable> existingVar = substList.stream()
+                    .map(p -> p.first)
+                    .filter(p -> p.name().toString().equals(name))
+                    .findAny();
+            if (varCtx.VAR() != null) {
+                existingVar.ifPresent(p -> {
+                    raiseError("Variable " + name + " already declared in this block.", ctx);
+                });
+                logVar = new LogicVariable(new Name(name), term.sort());
+                resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar),
+                    javaInfo.getKeYJavaType(term.sort()));
+            } else {
+                logVar = existingVar.orElseThrow(() -> {
+                    raiseError("Assigned variable " + name + " unknown in this block.", varCtx);
+                    return new Error("Unreachable");
+                });
+                if (!term.sort().extendsTrans(logVar.sort())) {
+                    raiseError("Assignment to variable " + name + " with incompatible type.",
+                        varCtx);
+                }
+            }
+            substList.add(new Pair<>(logVar, term));
+        }
+
+        SLExpression stmExpr = accept(ctx.mbody_statement());
+        JTerm term = stmExpr.getTerm();
+        for (Pair<LogicVariable, JTerm> lv : substList.reversed()) {
+            term = tb.subst(lv.first, lv.second, term);
+        }
+        resolverManager.popLocalVariablesNamespace();
+        return new SLExpression(term);
+    }
+
+    @Override
+    public SLExpression visitMbody_if(JmlParser.Mbody_ifContext ctx) {
+        SLExpression cond = accept(ctx.getChild(ParserRuleContext.class, 0));
+        SLExpression then = accept(ctx.getChild(ParserRuleContext.class, 1));
+        SLExpression elze = accept(ctx.getChild(ParserRuleContext.class, 2));
+        return new SLExpression(tb.ife(cond.getTerm(), then.getTerm(), elze.getTerm()));
+    }
 
     @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
@@ -2526,10 +2593,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
             String heapName = ctx.SPECIAL_IDENT(i).getText();
             switch (heapName) {
-            case "<permission>", "<permissions>" -> heaps[i] = getPermissionHeap();
-            case "<savedHeap>", "<saved>" -> heaps[i] = getSavedHeap();
-            case "<heap>" -> heaps[i] = getBaseHeap();
-            default -> heaps[i] = heapLDT.getHeapForName(new Name(heapName));
+                case "<permission>", "<permissions>" -> heaps[i] = getPermissionHeap();
+                case "<savedHeap>", "<saved>" -> heaps[i] = getSavedHeap();
+                case "<heap>" -> heaps[i] = getBaseHeap();
+                default -> heaps[i] = heapLDT.getHeapForName(new Name(heapName));
             }
         }
         return heaps;

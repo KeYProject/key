@@ -18,8 +18,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * The Class ProofScriptInputAction.
  *

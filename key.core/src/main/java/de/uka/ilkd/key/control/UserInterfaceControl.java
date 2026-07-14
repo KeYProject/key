@@ -20,8 +20,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 import org.key_project.prover.engine.ProverTaskListener;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
@@ -76,10 +74,8 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(@Nullable Profile profile, @Nullable Path file,
-            @Nullable List<Path> classPaths,
-            @Nullable Path bootClassPath, @Nullable List<Path> includes,
-            @Nullable Properties poPropertiesToForce,
+    AbstractProblemLoader load(Profile profile, Path file, List<Path> classPaths,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             @Nullable Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 

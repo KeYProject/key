@@ -16,11 +16,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given
@@ -43,11 +39,11 @@ import org.jspecify.annotations.Nullable;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static @NonNull ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableList.nil();
 
     static {
         CONCRETE_RULES =
-            ImmutableSLList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
+            ImmutableList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
                     .prepend(MergeWithPredicateAbstractionFactory.instance())
                     .prepend(MergeIfThenElseAntecedent.instance())
                     .prepend(MergeByIfThenElse.instance());

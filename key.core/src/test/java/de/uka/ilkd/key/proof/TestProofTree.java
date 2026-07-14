@@ -19,7 +19,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,19 +66,19 @@ public class TestProofTree {
         JTerm t_b7 = tf.createTerm(Equality.EQUALS, tf.createTerm(b7), tf.createTerm(b7));
 
         Sequent s1 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b1)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b1)), ImmutableList.nil());
         Sequent s2 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b2)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b2)), ImmutableList.nil());
         Sequent s3 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b3)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b3)), ImmutableList.nil());
         Sequent s4 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b4)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b4)), ImmutableList.nil());
         Sequent s5 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b5)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b5)), ImmutableList.nil());
         Sequent s6 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b6)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b6)), ImmutableList.nil());
         Sequent s7 = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(t_b7)), ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(t_b7)), ImmutableList.nil());
 
         p = new Proof("TestProofTree",
             new InitConfig(new Services(AbstractProfile.getDefaultProfile())));

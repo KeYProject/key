@@ -12,9 +12,7 @@ import org.key_project.prover.rules.RuleApp;
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
-    private final Map<RuleApp, RuleJustificationBySpec> app2Just =
-        new LinkedHashMap<>();
-
+    private final Map<RuleApp, RuleJustificationBySpec> app2Just = new LinkedHashMap<>();
 
     @Override
     public boolean isAxiomJustification() {

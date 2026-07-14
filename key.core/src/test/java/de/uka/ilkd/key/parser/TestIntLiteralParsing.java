@@ -7,13 +7,14 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-import de.uka.ilkd.key.util.RecognitionException;
+
+import org.key_project.util.parsing.RecognitionException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;

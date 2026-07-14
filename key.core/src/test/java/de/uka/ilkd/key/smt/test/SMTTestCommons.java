@@ -19,7 +19,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Tag;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +32,7 @@ public abstract class SMTTestCommons {
     protected static final Path FOLDER = HelperClassForTests.TESTCASE_DIRECTORY
             .resolve("smt")
             .resolve("tacletTranslation");
-    protected static @Nullable ProblemInitializer initializer = null;
+    protected static ProblemInitializer initializer = null;
     protected static final Profile profile = new JavaProfile();
 
     private TermServices services;
@@ -51,9 +50,8 @@ public abstract class SMTTestCommons {
 
     public abstract boolean toolInstalled();
 
-    protected SMTSolverResult.@NonNull ThreeValuedTruth getResult(
-            SMTSolverResult.ThreeValuedTruth expected,
-            @NonNull String filepath)
+    protected SMTSolverResult.ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
+            String filepath)
             throws ProblemLoaderException {
         SmtTestUtils.assumeSmtIsInstalled(toolInstalled());
         return checkFile(expected, filepath).isValid();
@@ -63,12 +61,12 @@ public abstract class SMTTestCommons {
      * check a problem file
      *
      * @param expected the expected result. Needed for setting a shorter timeout for unknown cases
-     * @param filepath the path to the file
+     * @param filepath
+     *        the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected @NonNull SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected,
-            @NonNull String filepath)
+    protected SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, String filepath)
             throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
@@ -82,8 +80,7 @@ public abstract class SMTTestCommons {
         }
     }
 
-    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected,
-            @NonNull Goal g) {
+    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, Goal g) {
         SMTTestSettings settings = new SMTTestSettings();
         if (expected == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
             /*
@@ -98,15 +95,14 @@ public abstract class SMTTestCommons {
         return problem.getFinalResult();
     }
 
-    protected @NonNull KeYEnvironment<?> loadProof(@NonNull String filepath)
-            throws ProblemLoaderException {
+    protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
         return KeYEnvironment.load(Paths.get(filepath), null, null, null);
     }
 
     /**
      * Use this method if you only need taclets for testing.
      */
-    protected @NonNull ProofAggregate parse() {
+    protected ProofAggregate parse() {
         return parse(FOLDER.resolve("dummyFile.key"));
     }
 
@@ -120,10 +116,11 @@ public abstract class SMTTestCommons {
     /**
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
-     * @param file problem file.
-     * @param pro determines the profile that should be used.
+     * @param file
+     *        problem file.
+     * @param pro
+     *        determines the profile that should be used.
      * @return ProofAggregate of the problem file.
-     * @profile determines the profile that should be used.
      */
     protected ProofAggregate parse(Path file, Profile pro) {
         assertTrue(Files.exists(file));

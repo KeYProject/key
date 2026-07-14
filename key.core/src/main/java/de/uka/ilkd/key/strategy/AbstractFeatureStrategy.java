@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -26,12 +28,11 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         implements Strategy<Goal> {
@@ -59,18 +60,18 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature);
     }
 
-    protected @NonNull Feature ifHeuristics(String @NonNull [] heuristics, Feature thenFeature,
+    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature,
             Feature elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
             elseFeature);
     }
 
-    protected @NonNull Feature ifHeuristics(String @NonNull [] names, int priority) {
+    protected Feature ifHeuristics(String[] names, int priority) {
         return ConditionalFeature.createConditional(getFilterFor(names), cost(priority), cost(0));
     }
 
-    protected @NonNull TacletFilter getFilterFor(String @NonNull [] p_names) {
-        ImmutableList<RuleSet> heur = ImmutableSLList.nil();
+    protected TacletFilter getFilterFor(String[] p_names) {
+        ImmutableList<RuleSet> heur = ImmutableList.nil();
         for (int i = 0; i != p_names.length; ++i) {
             heur = heur.prepend(getHeuristic(p_names[i]));
         }
@@ -118,7 +119,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
-            @NonNull RuleAppCostCollector collector) {
+            RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
         final BackTrackingManager btManager = mState.getBacktrackingManager();
         btManager.setup(app);
@@ -135,54 +136,69 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         } while (btManager.backtrack());
     }
 
-    protected abstract @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
-            Goal goal,
-            MutableState mState);
+    /**
+     * returns the service instance for access to {@link de.uka.ilkd.key.ldt.LDT}s
+     *
+     * @return the services for access to the meta logic
+     */
+    protected final Services getServices() {
+        return getProof().getServices();
+    }
 
-    protected @NonNull Feature forEach(TermBuffer<Goal> x, TermGenerator gen, Feature body) {
+    protected final Feature isBelow(TermFeature t) {
+        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
+            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superTerm, t))));
+    }
+
+    protected Feature forEach(TermBuffer<Goal> x, TermGenerator<Goal> gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 
-    protected @NonNull Feature oneOf(Feature[] features) {
+    protected Feature oneOf(Feature[] features) {
         return OneOfCP.create(features);
     }
 
-    protected @NonNull Feature oneOf(Feature feature0, Feature feature1) {
+    protected Feature oneOf(Feature feature0, Feature feature1) {
         // noinspection unchecked
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
-    // it is possible to turn off the method <code>instantiate</code>,
-    // which can be useful in order to use the same feature definitions both for
-    // cost computation and instantiation
-
-    private boolean instantiateActive = false;
+    /// It is possible to turn off the method <code>instantiate</code>,
+    /// which can be useful in order to use the same feature definitions both for
+    /// cost computation and instantiation.
+    ///
+    /// Counts nesting depth of instantiation activation to avoid premature deactivation.
+    private short instantiateActive = 0;
 
     protected void enableInstantiate() {
-        instantiateActive = true;
+        instantiateActive++;
+        assert instantiateActive >= 0 : "overflow occurred";
     }
 
     protected void disableInstantiate() {
-        instantiateActive = false;
+        instantiateActive--;
+        assert instantiateActive >= 0;
     }
 
-    protected @NonNull Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+    protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);
         } else {
             return longConst(0);
         }
     }
 
-    protected @NonNull Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
             return longConst(0);
         }
     }
 
-    protected @NonNull Feature instantiate(@NonNull String sv, ProjectionToTerm<Goal> value) {
+    protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
 }

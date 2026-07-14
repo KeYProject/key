@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.init.loader;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
@@ -32,8 +31,7 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
     @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) throws IOException {
-        String contractName = Objects.requireNonNull(
-            properties.getString("contract"), "No contract name provided");
+        String contractName = properties.getString("contract");
         int proofNum = 0;
         String baseContractName;
         int ind = -1;

@@ -8,6 +8,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Instances of this type accumulate the information for a specific rule application
 /// like application position, instantiations and more.
@@ -44,5 +45,6 @@ public interface RuleApp {
     /// the position where to apply the rule to which this application belongs
     ///
     /// @return the [PosInOccurrence] with the position information
+    @Nullable
     PosInOccurrence posInOccurrence();
 }

@@ -16,9 +16,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 /**
  * Objects of this class represent function and predicate symbols in JavaDL. Note that program
@@ -36,7 +33,7 @@ public class JFunction extends Function implements Sorted, Operator {
     // -------------------------------------------------------------------------
 
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
 
@@ -47,23 +44,22 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
+            ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique,
-            boolean isSkolemConstant) {
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
             boolean unique,
             boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),
@@ -122,7 +118,7 @@ public class JFunction extends Function implements Sorted, Operator {
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {

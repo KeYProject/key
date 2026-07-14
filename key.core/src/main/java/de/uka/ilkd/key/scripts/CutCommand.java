@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
+import java.util.List;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
  * id "#2"
  */
-public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
+public class CutCommand extends AbstractCommand {
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
     public CutCommand() {
@@ -29,51 +29,45 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "cut";
     }
 
+    // From within JML scripts, "assert" is more common than "cut"
     @Override
-    public @NonNull String getDocumentation() {
-        return """
-                CutCommand has as script command name "cut"
-
-                As parameters:
-                * a formula with the id "#2""";
+    public List<String> getAliases() {
+        return List.of(getName(), "assert");
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        execute(state(), args);
     }
 
-    /**
-     * @param uiControl
-     * @param args
-     * @param state
-     * @throws ScriptException
-     * @throws InterruptedException
-     */
-    @Override
-    @SuppressWarnings("override.param.invalid")
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
-            @NonNull EngineState state)
-            throws ScriptException, InterruptedException {
+    static void execute(EngineState state, Parameters args) throws ScriptException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(CUT_TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, args.formula,
-            state.getProof().getServices(), true);
+        var formula =
+            state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
+
+        app = app.addCheckedInstantiation(sv, formula, state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
-    @SuppressWarnings("initialization")
+    @Documentation(category = "Fundamental", value = """
+            The cut command makes a case distinction (a cut) on a formula on the current proof goal.
+            From within JML scripts, the alias 'assert' is more common than using 'cut'.
+            If followed by a `\\by proof` suffix in JML, it refers the sequent where
+            the cut formula is introduced to the succedent (i.e. where it is to be established).
+            """)
     public static class Parameters {
-        @Option("#2")
-        public JTerm formula;
+        @Argument
+        @Documentation("The formula to make the case distinction on.")
+        public @MonotonicNonNull JTerm formula;
     }
 
 }

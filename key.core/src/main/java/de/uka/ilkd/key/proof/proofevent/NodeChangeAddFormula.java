@@ -5,8 +5,6 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * Information about a formula that has been added to a node (the position given is the position of

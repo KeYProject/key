@@ -76,7 +76,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         setHeaderText(getDescription());
         setSubHeaderText(
             "Isabelle settings are stored in: "
-                + IsabelleTranslationSettings.SETTINGS_FILE_NEW.getAbsolutePath());
+                + IsabelleTranslationSettings.SETTINGS_FILE.toAbsolutePath());
         translationPathPanel = createTranslationPathPanel();
         isabellePathPanel = createIsabellePathPanel();
         timeoutField = createTimeoutField();
@@ -191,10 +191,10 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     private String getSolverSupportText() {
         return switch (checkForSupport()) {
-        case NOT_SUPPORTED ->
-            "This version of Isabelle is not supported and is thus unlikely to work.";
-        case SUPPORTED -> "This version of Isabelle is supported.";
-        case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
+            case NOT_SUPPORTED ->
+                "This version of Isabelle is not supported and is thus unlikely to work.";
+            case SUPPORTED -> "This version of Isabelle is supported.";
+            case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
         };
     }
 

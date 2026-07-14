@@ -10,8 +10,6 @@ import de.uka.ilkd.key.gui.SelectionHistory;
 import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Action to show the previously selected proof node.
  *
@@ -31,7 +29,7 @@ public class SelectionBackAction extends MainWindowAction
      * @param mainWindow the main window
      * @param history selection history
      */
-    public SelectionBackAction(@NonNull MainWindow mainWindow, SelectionHistory history) {
+    public SelectionBackAction(MainWindow mainWindow, SelectionHistory history) {
         super(mainWindow);
         this.history = history;
         setName("Back");

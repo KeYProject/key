@@ -3,42 +3,40 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  *
  */
-public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameters> {
+@Deprecated
+public class SchemaVarCommand extends AbstractCommand {
 
     public SchemaVarCommand() {
         super(Parameters.class);
     }
 
-    @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
 
     @Override
-    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+
 
         if (args.type == null || args.var == null) {
             throw new ScriptException("Missing argument: type var");
         }
 
-        AbbrevMap abbrMap = state.getAbbreviations();
+        AbbrevMap abbrMap = state().getAbbreviations();
 
         if (!args.var.matches("@[a-zA-Z0-9_]")) {
             throw new ScriptException("Illegal variable name: " + args.var);
@@ -51,11 +49,11 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
             } else {
-                Sort sort = state.toSort(args.type);
+                Sort sort = state().toSort(args.type);
                 sv = SchemaVariableFactory.createTermSV(schemaVar, sort);
             }
 
-            JTerm term = state.getProof().getServices().getTermFactory().createTerm(sv);
+            JTerm term = state().getProof().getServices().getTermFactory().createTerm(sv);
 
             abbrMap.put(term, args.var, true);
         } catch (Exception e) {
@@ -65,16 +63,21 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "schemaVar";
     }
 
-    @SuppressWarnings("initialization")
+    @Documentation(category = "Internal", value = """
+            Defines a schema variable that can be used in subsequent commands.
+            """)
     public static class Parameters {
-        @Option("#2")
-        public String type;
-        @Option("#3")
-        public String var;
+        @Argument(0)
+        @Documentation("The type of schema variable: 'Formula' or a sort name")
+        public @MonotonicNonNull String type;
+
+        @Argument(1)
+        @Documentation("The name of the schema variable (must start with @)")
+        public @MonotonicNonNull String var;
     }
 
 }

@@ -203,7 +203,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     @Override
-    public @NonNull Iterator<TreePath> iterator() {
+    public Iterator<TreePath> iterator() {
         return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
@@ -300,7 +300,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param tree the JTree to expand
      * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAll(@NonNull JTree tree, @NonNull Predicate<TreePath> filter) {
+    public static void expandAll(JTree tree, Predicate<TreePath> filter) {
         TreeModel data = tree.getModel();
 
         if (data == null) {
@@ -325,8 +325,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param path the root path under which everything should be expanded afterwards
      * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAllBelow(@NonNull JTree tree, @NonNull TreePath path,
-            @NonNull Predicate<TreePath> filter) {
+    public static void expandAllBelow(JTree tree, TreePath path, Predicate<TreePath> filter) {
         // we temporarily remove all expansion listeners (except that which updates the expanded
         // paths set) before expanding
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
@@ -356,9 +355,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * collection of a leave is empty. The extremal paths are stored in the order in which they
      * appear in pre-order in the tree model.
      */
-    private static @NonNull Collection<TreePath> extremalPaths(@NonNull TreeModel data,
-            @NonNull TreePath path,
-            @NonNull Predicate<TreePath> filter) {
+    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path,
+            Predicate<TreePath> filter) {
         LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
         if (data.isLeaf(path.getLastPathComponent())) {
@@ -369,8 +367,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         return result;
     }
 
-    private static void extremalPathsImpl(@NonNull TreeModel data, @NonNull TreePath path,
-            @NonNull Collection<TreePath> result, @NonNull Predicate<TreePath> filter) {
+    private static void extremalPathsImpl(TreeModel data, TreePath path,
+            Collection<TreePath> result, Predicate<TreePath> filter) {
         Object node = path.getLastPathComponent();
 
         boolean hasNonLeafChildren = false;

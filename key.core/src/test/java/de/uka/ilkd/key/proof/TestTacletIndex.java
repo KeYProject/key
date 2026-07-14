@@ -23,7 +23,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,7 +118,7 @@ public class TestTacletIndex {
     @Disabled
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
         JTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");
-        ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
+        ImmutableList<RuleSet> listofHeuristic = ImmutableList.nil();
         listofHeuristic = listofHeuristic.prepend(h3);
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term_p1), PosInTerm.getTopLevel(), true);
@@ -137,7 +136,7 @@ public class TestTacletIndex {
 
         assertTrue(
             isRuleIn(
-                variante_one.getNoFindTaclet(new IHTacletFilter(true, ImmutableSLList.nil()), null),
+                variante_one.getNoFindTaclet(new IHTacletFilter(true, ImmutableList.nil()), null),
                 ruleNoFindNonH1H2H3),
             "Noninteractive nofindrule is not in list, but none of its " + "heuristics is active.");
 
@@ -152,7 +151,7 @@ public class TestTacletIndex {
     @Test
     public void testShownIfHeuristicFits() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
+        ImmutableList<RuleSet> listofHeuristic = ImmutableList.nil();
         listofHeuristic = listofHeuristic.prepend(h3).prepend(h2);
 
         JTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");
@@ -186,7 +185,7 @@ public class TestTacletIndex {
     @Test
     public void testNoMatchingFindRule() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
+        ImmutableList<RuleSet> listofHeuristic = ImmutableList.nil();
 
         JTerm term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 
@@ -222,7 +221,7 @@ public class TestTacletIndex {
 
         JTerm term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
-        ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
+        ImmutableList<RuleSet> listofHeuristic = ImmutableList.nil();
         PosInOccurrence posAntec =
             new PosInOccurrence(new SequentFormula(term_p4), PosInTerm.getTopLevel(), true);
 
@@ -241,7 +240,7 @@ public class TestTacletIndex {
         JTerm term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
         Sequent seq_p5 = JavaDLSequentKit.createAnteSequent(
-            ImmutableSLList.singleton(cfma_p5));
+            ImmutableList.singleton(cfma_p5));
         PosInOccurrence pio_p5 =
             new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
@@ -254,7 +253,7 @@ public class TestTacletIndex {
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
         Sequent seq_p6 = JavaDLSequentKit.createAnteSequent(
-            ImmutableSLList.singleton(cfma_p6));
+            ImmutableList.singleton(cfma_p6));
         PosInOccurrence pio_p6 =
             new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
         appIdx = createGoalFor(seq_p6, ruleIdx);

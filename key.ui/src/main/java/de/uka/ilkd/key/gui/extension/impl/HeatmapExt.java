@@ -37,7 +37,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private HeatmapSettingsAction settingsAction;
 
     @Override
-    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(MainWindow mainWindow) {
         return getActions(mainWindow);
     }
 
@@ -194,7 +194,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();

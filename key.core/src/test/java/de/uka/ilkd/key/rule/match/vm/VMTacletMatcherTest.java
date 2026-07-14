@@ -38,9 +38,9 @@ public class VMTacletMatcherTest {
 
     @BeforeAll
     public static void init() {
-        HelperClassForTests helper = new HelperClassForTests();
-        ProofAggregate pa = helper.parse(
-            new File(HelperClassForTests.TESTCASE_DIRECTORY + "/tacletmatch/tacletMatch1.key"));
+        ProofAggregate pa = HelperClassForTests.parse(
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletmatch")
+                    .resolve("tacletMatch1.key"));
 
         for (int i = 0; i < NR_TACLETS; i++) {
             taclet[i] = pa.getFirstProof().getInitConfig()

@@ -25,7 +25,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
@@ -42,17 +41,17 @@ public final class DefaultTacletSetTranslation
      * Translation of the taclets stored in <code>taclets</code>.
      *
      */
-    private ImmutableList<TacletFormula> translation = ImmutableSLList.nil();
+    private ImmutableList<TacletFormula> translation = ImmutableList.nil();
 
     /**
      * Taclets can not be translated because checking the taclet failed.
      */
-    private ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
+    private ImmutableList<TacletFormula> notTranslated = ImmutableList.nil();
 
     /**
      * If a instantiation failure occurs the returned information is stored in a String.
      */
-    private final ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
+    private final ImmutableList<String> instantiationFailures = ImmutableList.nil();
 
 
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
@@ -95,8 +94,8 @@ public final class DefaultTacletSetTranslation
         }
         translate = false;
         usedSorts.clear();
-        notTranslated = ImmutableSLList.nil();
-        translation = ImmutableSLList.nil();
+        notTranslated = ImmutableList.nil();
+        translation = ImmutableList.nil();
 
         ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
         usedFormulaSorts = (sorts == null ? emptySetSort : sorts);

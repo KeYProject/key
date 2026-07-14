@@ -204,6 +204,6 @@ public interface SolverType {
      * @return the newly created socket
      */
     @NonNull
-    AbstractSolverSocket getSocket(@Nullable ModelExtractor query);
+    AbstractSolverSocket getSocket(ModelExtractor query);
 
 }

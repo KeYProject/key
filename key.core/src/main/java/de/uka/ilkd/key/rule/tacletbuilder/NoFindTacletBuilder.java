@@ -11,8 +11,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * Due to the immutability of {@link Taclet}s, they are created in the parsers using
@@ -34,14 +32,13 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         NoFindTaclet t = new NoFindTaclet(this.name,
-            new TacletApplPart(ifseq,
+            new TacletApplPart(assumesSeq,
                 new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE),
                 varsNew,
                 varsNotFreeIn,
                 varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, prefixBuilder.getPrefixMap(), choices, tacletAnnotations);
-        t.setOrigin(origin);
         return t;
     }
 

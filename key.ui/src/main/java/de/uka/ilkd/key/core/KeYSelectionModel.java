@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -13,7 +16,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
     // the KeYMediator is informed before all
-    private final KeYMediator primary;
+    private final @NonNull KeYMediator primary;
 
     /** the proof to listen to */
     private Proof proof;
@@ -30,23 +32,23 @@ public class KeYSelectionModel {
     /** is the selected node a goal */
     private @Nullable Goal selectedGoal;
     /** the current displayed node */
-    private @Nullable Node selectedNode;
+    private Node selectedNode;
     /**
      * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
      * we are displaying an OSS node.
      */
-    private @Nullable Sequent selectedSequent;
+    private Sequent selectedSequent;
     /**
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private @Nullable RuleApp selectedRuleApp;
+    private RuleApp selectedRuleApp;
     /** the listeners to this model */
-    private final @NonNull List<KeYSelectionListener> listenerList;
+    private final List<KeYSelectionListener> listenerList;
 
     /** cached selected node event */
 
-    public KeYSelectionModel(KeYMediator primary) {
+    public KeYSelectionModel(@NonNull KeYMediator primary) {
         this.primary = primary;
         listenerList = Collections.synchronizedList(new ArrayList<>(5));
         goalIsValid = false;
@@ -101,7 +103,7 @@ public class KeYSelectionModel {
      *
      * @param n the selected node
      */
-    public synchronized void setSelectedNode(@Nullable Node n) {
+    public synchronized void setSelectedNode(Node n) {
         final Node previousSelectedNode = selectedNode;
         // switch proof if needed
         if (n.proof() != getSelectedProof()) {
@@ -120,7 +122,7 @@ public class KeYSelectionModel {
      * @param node selected node
      * @param sequent selected sequent
      */
-    public synchronized void setSelectedSequentAndRuleApp(@NonNull Node node, Sequent sequent,
+    public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
             RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
@@ -140,7 +142,7 @@ public class KeYSelectionModel {
      *
      * @param g the Goal that contains the selected node
      */
-    public synchronized void setSelectedGoal(@NonNull Goal g) {
+    public synchronized void setSelectedGoal(Goal g) {
         final Node previousNode = selectedNode;
         goalIsValid = true;
         selectedGoal = g;
@@ -159,22 +161,27 @@ public class KeYSelectionModel {
         return selectedNode;
     }
 
-    public @Nullable Sequent getSelectedSequent() {
+    public Sequent getSelectedSequent() {
         return selectedSequent;
     }
 
-    public @Nullable RuleApp getSelectedRuleApp() {
+    public RuleApp getSelectedRuleApp() {
         return selectedRuleApp;
     }
 
     /**
-     * returns the goal the selected node belongs to, null if it is an inner node
+     * returns the goal the selected node belongs to, or null if there is no such goal (the selected
+     * node is an inner node, or no proof is loaded at all)
      *
-     * @return the goal the selected node belongs to, null if it is an inner node
+     * @return the selected goal, or null if there is none
      */
-    public @Nullable Goal getSelectedGoal() {
+    public Goal getSelectedGoal() {
+        // Consistent with getSelectedProof()/getSelectedNode() (both nullable) and with the
+        // documented "null if inner node" contract: return null - rather than throwing - when no
+        // proof is loaded. Callers already null-check this method; throwing here made GUI listeners
+        // that fire during teardown (e.g. InfoView) crash with "No proof loaded".
         if (proof == null) {
-            throw new IllegalStateException("No proof loaded.");
+            return null;
         }
         if (!goalIsValid) {
             selectedGoal = proof.getOpenGoal(selectedNode);
@@ -216,34 +223,34 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START -> {
-                    currentPos = POS_LEAVES;
-                    if (selectedNode != null) {
-                        nodeIt = selectedNode.leavesIterator();
-                    } else {
-                        nodeIt = null;
-                    }
-                }
-                case POS_LEAVES -> {
-                    if (nodeIt == null || !nodeIt.hasNext()) {
-                        currentPos = POS_GOAL_LIST;
-                        if (!proof.openGoals().isEmpty()) {
-                            goalIt = proof.openGoals().iterator();
+                    case POS_START -> {
+                        currentPos = POS_LEAVES;
+                        if (selectedNode != null) {
+                            nodeIt = selectedNode.leavesIterator();
                         } else {
-                            goalIt = null;
+                            nodeIt = null;
                         }
-                    } else {
-                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                }
-                case POS_GOAL_LIST -> {
-                    if (goalIt == null || !goalIt.hasNext()) {
-                        // no more items
-                        return;
-                    } else {
-                        nextOne = goalIt.next();
+                    case POS_LEAVES -> {
+                        if (nodeIt == null || !nodeIt.hasNext()) {
+                            currentPos = POS_GOAL_LIST;
+                            if (!proof.openGoals().isEmpty()) {
+                                goalIt = proof.openGoals().iterator();
+                            } else {
+                                goalIt = null;
+                            }
+                        } else {
+                            nextOne = proof.getOpenGoal(nodeIt.next());
+                        }
                     }
-                }
+                    case POS_GOAL_LIST -> {
+                        if (goalIt == null || !goalIt.hasNext()) {
+                            // no more items
+                            return;
+                        } else {
+                            nextOne = goalIt.next();
+                        }
+                    }
                 }
             }
         }
@@ -267,8 +274,8 @@ public class KeYSelectionModel {
     }
 
     /**
-     * selects the first goal in the goal list of proof if available if not it selects a leaf of the
-     * proof tree
+     * selects the first goal in the goal list of proof if available.
+     * If not it selects a leaf of the proof tree
      */
     public void defaultSelection() {
         Goal g = null;
@@ -289,55 +296,7 @@ public class KeYSelectionModel {
         }
     }
 
-    /**
-     * selects the first open goal below the given node <tt>old</tt> if no open goal is available
-     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
-     * proof root is selected.
-     *
-     * @param old the Node to start looking for open goals
-     */
-    // XXX this method is never used
-    public void nearestOpenGoalSelection(@NonNull Node old) {
-        Node n = old;
-        while (n != null && n.isClosed()) {
-            n = n.parent();
-        }
-        if (n == null) {
-            if (proof.find(old)) {
-                setSelectedNode(old);
-            } else {
-                setSelectedNode(proof.root());
-            }
-        } else {
-            final Goal g = getFirstOpenGoalBelow(n);
-            if (g == null || g.node() == null) {
-                setSelectedNode(proof.root());
-            } else {
-                setSelectedGoal(g);
-            }
-        }
-    }
-
-    /**
-     * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
-     * of the subtree starting at <code>n</code> which is not already closed
-     *
-     * @param n the Node where to start from
-     * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
-     *         is not already closed. <code>null</code> is returned if no such goal exists.
-     */
-    private @Nullable Goal getFirstOpenGoalBelow(@NonNull Node n) {
-        final Iterator<Node> it = n.leavesIterator();
-        while (it.hasNext()) {
-            final Node node = it.next();
-            if (!node.isClosed()) {
-                return proof.getOpenGoal(node);
-            }
-        }
-        return null;
-    }
-
-    public void addKeYSelectionListenerChecked(@NonNull KeYSelectionListener listener) {
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
         synchronized (listenerList) {
             if (!listenerList.contains(listener)) {
                 addKeYSelectionListener(listener);

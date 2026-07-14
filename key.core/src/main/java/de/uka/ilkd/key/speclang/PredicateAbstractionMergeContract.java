@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -150,11 +150,11 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private static Class<? extends AbstractPredicateAbstractionLattice> latticeTypeFromString(
             String latticeTypeStr) {
         return switch (latticeTypeStr) {
-        case "simple" -> SimplePredicateAbstractionLattice.class;
-        case "conjunctive" -> ConjunctivePredicateAbstractionLattice.class;
-        case "disjunctive" -> DisjunctivePredicateAbstractionLattice.class;
-        default -> throw new RuntimeException(
-            "PredicateAbstractionMergeContract: Unexpected lattice type: " + latticeTypeStr);
+            case "simple" -> SimplePredicateAbstractionLattice.class;
+            case "conjunctive" -> ConjunctivePredicateAbstractionLattice.class;
+            case "disjunctive" -> DisjunctivePredicateAbstractionLattice.class;
+            default -> throw new RuntimeException(
+                "PredicateAbstractionMergeContract: Unexpected lattice type: " + latticeTypeStr);
         };
     }
 

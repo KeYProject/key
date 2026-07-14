@@ -370,7 +370,7 @@ tryclose branch;
 // established: r3 fixes v_y_0
 // from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and
 // s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0
-cut (int::seqGet(s_0, v_y_0)=v_x_0);
+cut (seqGet<[int]>(s_0, v_y_0)=v_x_0);
 // This corresponds to case B4ii  in the Notes.
 // in the following r4 refers to this instantion
 tryclose branch;
@@ -385,14 +385,14 @@ instantiate hide var=iv with=(jv_1);
 instantiate hide var=jv with=(v_x_0);
 rule impLeft;
 tryclose branch;
-tryclose branch;
+// tryclose branch;
 // established: r4 is permutation
 // established: r4 fixes v_y_0
 // from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and
 // s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0 and  s_0[v_y_0]!=v_x_0;
 // this corresponds to case B4iv in the Notes
 // in the following r5 refers to this instantion
-tryclose branch;
+//tryclose branch;
 // established: r5 is of the correct length
 rule seqNPermSwapNPerm formula=(seqNPerm(s_0));
 instantiate hide var=iv with=(v_x_0);

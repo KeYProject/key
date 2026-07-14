@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Proof;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
-import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,8 +13,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for abstract domain elements in a predicate abstraction lattice.
@@ -32,7 +29,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * abstraction predicates.
      */
     protected AbstractPredicateAbstractionDomainElement(
-            ImmutableSet<AbstractionPredicate> predicates) {
+            final ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }
 

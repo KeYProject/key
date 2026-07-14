@@ -12,8 +12,6 @@ import java.util.Map;
 import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.DirectedGraph;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A directed graph, extended to store equivalence groups of vertices.
  * Equivalence groups are identified using equality modulo proof irrelevancy.
@@ -74,7 +72,7 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         }
     }
 
-    public @NonNull EquivalenceDirectedGraph copy() {
+    public EquivalenceDirectedGraph copy() {
         var g = new EquivalenceDirectedGraph();
         for (var vertex : vertexSet()) {
             g.addVertex(vertex);

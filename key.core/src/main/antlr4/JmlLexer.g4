@@ -7,6 +7,8 @@ lexer grammar JmlLexer;
    // needed for double literals and ".."
    private int _lex_pos;
 
+   private boolean parensEndExpr = false;
+
    private int parenthesisLevel = 0;
    private void incrParen() { parenthesisLevel++;}
    private void decrParen() { parenthesisLevel--;}
@@ -20,6 +22,7 @@ lexer grammar JmlLexer;
    private void decrBracket() { bracketLevel--;}
 
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
+   boolean parensEnd() { return parenthesisLevel == 1 && parensEndExpr; }
 
    private JmlMarkerDecision jmlMarkerDecision = new JmlMarkerDecision(this);
 }
@@ -101,10 +104,12 @@ DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred -> pushMode(expr)
 DETERMINES: 'determines' -> pushMode(expr);
 DIVERGES: 'diverges' Pred -> pushMode(expr);
 //DURATION: 'duration' Pred -> pushMode(expr);
+ELSE: 'else';
 ENSURES: ('ensures' | 'post') (Pfree|Pred) -> pushMode(expr);
 FOR_EXAMPLE: 'for_example' -> pushMode(expr);
 //FORALL: 'forall' -> pushMode(expr); //?
 HELPER: 'helper';
+IF: 'if' { parensEndExpr = true; } -> pushMode(expr);
 IMPLIES_THAT: 'implies_that' -> pushMode(expr);
 IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);
@@ -134,6 +139,7 @@ SEPARATES: 'separates' -> pushMode(expr);
 SET: 'set' -> pushMode(expr);
 SIGNALS: ('signals' Pred | 'exsures' Pred) -> pushMode(expr);
 SIGNALS_ONLY: 'signals_only' Pred -> pushMode(expr);
+VAR: 'var';
 WHEN: 'when' Pred -> pushMode(expr);
 WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
 WRITABLE: 'writable' -> pushMode(expr);
@@ -169,6 +175,8 @@ mode expr;
 /* Java keywords */
 BOOLEAN: 'boolean';
 BYTE: 'byte';
+CASE: 'case';
+DEFAULT: 'default';
 FALSE: 'false';
 INSTANCEOF: 'instanceof';
 INT: 'int';
@@ -238,6 +246,7 @@ FP_SUBNORMAL: '\\fp_subnormal';   //KeY extension, not official JML
 FP_ZERO: '\\fp_zero';   //KeY extension, not official JML
 FREE: '\\free';  //KeY extension, not official JML
 FRESH: '\\fresh';
+FROM_GOAL: '\\from_goal';  //KeY extension, not official JML
 INDEX: '\\index';
 INDEXOF: '\\seq_indexOf';  //KeY extension, not official JML
 INTERSECT: '\\intersect';  //KeY extension, not official JML
@@ -361,9 +370,9 @@ XOR: '^';
 GT: '>';
 LT: '<';
 
-
 LPAREN:               '(' {incrParen();};
-RPAREN:               ')' {decrParen();};
+RPAREN_TOPLEVEL:      {   parensEnd() }? ')' { decrParen(); parensEndExpr = false; } -> type(RPAREN), popMode;
+RPAREN:               { ! parensEnd() }? ')' { decrParen(); };
 LBRACE:               '{' {incrBrace();};
 RBRACE:               '}' {decrBrace();};
 LBRACKET:             '[' {incrBracket();};
@@ -479,6 +488,7 @@ CHAR_LITERAL:
 fragment OCT_CHAR:
         (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
+KEY_TERM : '`' ~([`])* '`';
 STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';

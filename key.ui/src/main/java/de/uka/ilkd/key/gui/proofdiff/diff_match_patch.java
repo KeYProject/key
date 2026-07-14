@@ -295,33 +295,34 @@ public class diff_match_patch {
         Diff thisDiff = pointer.next();
         while (thisDiff != null) {
             switch (thisDiff.operation) {
-            case INSERT:
-                count_insert++;
-                text_insert.append(thisDiff.text);
-                break;
-            case DELETE:
-                count_delete++;
-                text_delete.append(thisDiff.text);
-                break;
-            case EQUAL:
-                // Upon reaching an equality, check for prior redundancies.
-                if (count_delete >= 1 && count_insert >= 1) {
-                    // Delete the offending records and add the merged ones.
-                    pointer.previous();
-                    for (int j = 0; j < count_delete + count_insert; j++) {
+                case INSERT:
+                    count_insert++;
+                    text_insert.append(thisDiff.text);
+                    break;
+                case DELETE:
+                    count_delete++;
+                    text_delete.append(thisDiff.text);
+                    break;
+                case EQUAL:
+                    // Upon reaching an equality, check for prior redundancies.
+                    if (count_delete >= 1 && count_insert >= 1) {
+                        // Delete the offending records and add the merged ones.
                         pointer.previous();
-                        pointer.remove();
+                        for (int j = 0; j < count_delete + count_insert; j++) {
+                            pointer.previous();
+                            pointer.remove();
+                        }
+                        for (Diff newDiff : diff_main(text_delete.toString(),
+                            text_insert.toString(),
+                            false, deadline)) {
+                            pointer.add(newDiff);
+                        }
                     }
-                    for (Diff newDiff : diff_main(text_delete.toString(), text_insert.toString(),
-                        false, deadline)) {
-                        pointer.add(newDiff);
-                    }
-                }
-                count_insert = 0;
-                count_delete = 0;
-                text_delete = new StringBuilder();
-                text_insert = new StringBuilder();
-                break;
+                    count_insert = 0;
+                    count_delete = 0;
+                    text_delete = new StringBuilder();
+                    text_insert = new StringBuilder();
+                    break;
             }
             thisDiff = pointer.hasNext() ? pointer.next() : null;
         }
@@ -486,8 +487,7 @@ public class diff_match_patch {
      * @return An object containing the encoded text1, the encoded text2 and the List of unique
      *         strings. The zeroth element of the List of unique strings is intentionally blank.
      */
-    protected @NonNull LinesToCharsResult diff_linesToChars(@NonNull String text1,
-            @NonNull String text2) {
+    protected LinesToCharsResult diff_linesToChars(String text1, String text2) {
         List<String> lineArray = new ArrayList<>();
         Map<String, Integer> lineHash = new LinkedHashMap<>();
         // e.g. linearray[4] == "Hello\n"
@@ -1136,82 +1136,82 @@ public class diff_match_patch {
         int commonlength;
         while (thisDiff != null) {
             switch (thisDiff.operation) {
-            case INSERT:
-                count_insert++;
-                text_insert += thisDiff.text;
-                prevEqual = null;
-                break;
-            case DELETE:
-                count_delete++;
-                text_delete += thisDiff.text;
-                prevEqual = null;
-                break;
-            case EQUAL:
-                if (count_delete + count_insert > 1) {
-                    boolean both_types = count_delete != 0 && count_insert != 0;
-                    // Delete the offending records.
-                    pointer.previous(); // Reverse direction.
-                    while (count_delete-- > 0) {
-                        pointer.previous();
-                        pointer.remove();
-                    }
-                    while (count_insert-- > 0) {
-                        pointer.previous();
-                        pointer.remove();
-                    }
-                    if (both_types) {
-                        // Factor out any common prefixies.
-                        commonlength = diff_commonPrefix(text_insert, text_delete);
-                        if (commonlength != 0) {
-                            if (pointer.hasPrevious()) {
-                                thisDiff = pointer.previous();
-                                assert thisDiff.operation == Operation.EQUAL
-                                        : "Previous diff should have been an equality.";
-                                thisDiff.text += text_insert.substring(0, commonlength);
-                                pointer.next();
-                            } else {
-                                pointer.add(new Diff(Operation.EQUAL,
-                                    text_insert.substring(0, commonlength)));
-                            }
-                            text_insert = text_insert.substring(commonlength);
-                            text_delete = text_delete.substring(commonlength);
-                        }
-                        // Factor out any common suffixies.
-                        commonlength = diff_commonSuffix(text_insert, text_delete);
-                        if (commonlength != 0) {
-                            thisDiff = pointer.next();
-                            thisDiff.text =
-                                text_insert.substring(text_insert.length() - commonlength)
-                                        + thisDiff.text;
-                            text_insert =
-                                text_insert.substring(0, text_insert.length() - commonlength);
-                            text_delete =
-                                text_delete.substring(0, text_delete.length() - commonlength);
+                case INSERT:
+                    count_insert++;
+                    text_insert += thisDiff.text;
+                    prevEqual = null;
+                    break;
+                case DELETE:
+                    count_delete++;
+                    text_delete += thisDiff.text;
+                    prevEqual = null;
+                    break;
+                case EQUAL:
+                    if (count_delete + count_insert > 1) {
+                        boolean both_types = count_delete != 0 && count_insert != 0;
+                        // Delete the offending records.
+                        pointer.previous(); // Reverse direction.
+                        while (count_delete-- > 0) {
                             pointer.previous();
+                            pointer.remove();
                         }
+                        while (count_insert-- > 0) {
+                            pointer.previous();
+                            pointer.remove();
+                        }
+                        if (both_types) {
+                            // Factor out any common prefixies.
+                            commonlength = diff_commonPrefix(text_insert, text_delete);
+                            if (commonlength != 0) {
+                                if (pointer.hasPrevious()) {
+                                    thisDiff = pointer.previous();
+                                    assert thisDiff.operation == Operation.EQUAL
+                                            : "Previous diff should have been an equality.";
+                                    thisDiff.text += text_insert.substring(0, commonlength);
+                                    pointer.next();
+                                } else {
+                                    pointer.add(new Diff(Operation.EQUAL,
+                                        text_insert.substring(0, commonlength)));
+                                }
+                                text_insert = text_insert.substring(commonlength);
+                                text_delete = text_delete.substring(commonlength);
+                            }
+                            // Factor out any common suffixies.
+                            commonlength = diff_commonSuffix(text_insert, text_delete);
+                            if (commonlength != 0) {
+                                thisDiff = pointer.next();
+                                thisDiff.text =
+                                    text_insert.substring(text_insert.length() - commonlength)
+                                            + thisDiff.text;
+                                text_insert =
+                                    text_insert.substring(0, text_insert.length() - commonlength);
+                                text_delete =
+                                    text_delete.substring(0, text_delete.length() - commonlength);
+                                pointer.previous();
+                            }
+                        }
+                        // Insert the merged records.
+                        if (text_delete.length() != 0) {
+                            pointer.add(new Diff(Operation.DELETE, text_delete));
+                        }
+                        if (text_insert.length() != 0) {
+                            pointer.add(new Diff(Operation.INSERT, text_insert));
+                        }
+                        // Step forward to the equality.
+                        thisDiff = pointer.hasNext() ? pointer.next() : null;
+                    } else if (prevEqual != null) {
+                        // Merge this equality with the previous one.
+                        prevEqual.text += thisDiff.text;
+                        pointer.remove();
+                        thisDiff = pointer.previous();
+                        pointer.next(); // Forward direction
                     }
-                    // Insert the merged records.
-                    if (text_delete.length() != 0) {
-                        pointer.add(new Diff(Operation.DELETE, text_delete));
-                    }
-                    if (text_insert.length() != 0) {
-                        pointer.add(new Diff(Operation.INSERT, text_insert));
-                    }
-                    // Step forward to the equality.
-                    thisDiff = pointer.hasNext() ? pointer.next() : null;
-                } else if (prevEqual != null) {
-                    // Merge this equality with the previous one.
-                    prevEqual.text += thisDiff.text;
-                    pointer.remove();
-                    thisDiff = pointer.previous();
-                    pointer.next(); // Forward direction
-                }
-                count_insert = 0;
-                count_delete = 0;
-                text_delete = "";
-                text_insert = "";
-                prevEqual = thisDiff;
-                break;
+                    count_insert = 0;
+                    count_delete = 0;
+                    text_delete = "";
+                    text_insert = "";
+                    prevEqual = thisDiff;
+                    break;
             }
             thisDiff = pointer.hasNext() ? pointer.next() : null;
         }
@@ -1317,15 +1317,17 @@ public class diff_match_patch {
             String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                     .replace("\n", "&para;<br>");
             switch (aDiff.operation) {
-            case INSERT:
-                html.append("<ins style=\"background:#e6ffe6;\">").append(text).append("</ins>");
-                break;
-            case DELETE:
-                html.append("<del style=\"background:#ffe6e6;\">").append(text).append("</del>");
-                break;
-            case EQUAL:
-                html.append("<span>").append(text).append("</span>");
-                break;
+                case INSERT:
+                    html.append("<ins style=\"background:#e6ffe6;\">").append(text)
+                            .append("</ins>");
+                    break;
+                case DELETE:
+                    html.append("<del style=\"background:#ffe6e6;\">").append(text)
+                            .append("</del>");
+                    break;
+                case EQUAL:
+                    html.append("<span>").append(text).append("</span>");
+                    break;
             }
         }
         return html.toString();
@@ -1375,18 +1377,18 @@ public class diff_match_patch {
         int deletions = 0;
         for (Diff aDiff : diffs) {
             switch (aDiff.operation) {
-            case INSERT:
-                insertions += aDiff.text.length();
-                break;
-            case DELETE:
-                deletions += aDiff.text.length();
-                break;
-            case EQUAL:
-                // A deletion and an insertion is one substitution.
-                levenshtein += Math.max(insertions, deletions);
-                insertions = 0;
-                deletions = 0;
-                break;
+                case INSERT:
+                    insertions += aDiff.text.length();
+                    break;
+                case DELETE:
+                    deletions += aDiff.text.length();
+                    break;
+                case EQUAL:
+                    // A deletion and an insertion is one substitution.
+                    levenshtein += Math.max(insertions, deletions);
+                    insertions = 0;
+                    deletions = 0;
+                    break;
             }
         }
         levenshtein += Math.max(insertions, deletions);
@@ -1405,18 +1407,19 @@ public class diff_match_patch {
         StringBuilder text = new StringBuilder();
         for (Diff aDiff : diffs) {
             switch (aDiff.operation) {
-            case INSERT:
-                text.append("+")
-                        .append(
-                            URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
-                        .append("\t");
-                break;
-            case DELETE:
-                text.append("-").append(aDiff.text.length()).append("\t");
-                break;
-            case EQUAL:
-                text.append("=").append(aDiff.text.length()).append("\t");
-                break;
+                case INSERT:
+                    text.append("+")
+                            .append(
+                                URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+',
+                                    ' '))
+                            .append("\t");
+                    break;
+                case DELETE:
+                    text.append("-").append(aDiff.text.length()).append("\t");
+                    break;
+                case EQUAL:
+                    text.append("=").append(aDiff.text.length()).append("\t");
+                    break;
             }
         }
         String delta = text.toString();
@@ -1451,49 +1454,51 @@ public class diff_match_patch {
             // operation of this token (delete, insert, equality).
             String param = token.substring(1);
             switch (token.charAt(0)) {
-            case '+':
-                // decode would change all "+" to " "
-                param = param.replace("+", "%2B");
-                try {
-                    param = URLDecoder.decode(param, StandardCharsets.UTF_8);
-                } catch (IllegalArgumentException e) {
-                    // Malformed URI sequence.
-                    throw new IllegalArgumentException("Illegal escape in diff_fromDelta: " + param,
-                        e);
-                }
-                diffs.add(new Diff(Operation.INSERT, param));
-                break;
-            case '-':
-                // Fall through.
-            case '=':
-                int n;
-                try {
-                    n = Integer.parseInt(param);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Invalid number in diff_fromDelta: " + param,
-                        e);
-                }
-                if (n < 0) {
+                case '+':
+                    // decode would change all "+" to " "
+                    param = param.replace("+", "%2B");
+                    try {
+                        param = URLDecoder.decode(param, StandardCharsets.UTF_8);
+                    } catch (IllegalArgumentException e) {
+                        // Malformed URI sequence.
+                        throw new IllegalArgumentException(
+                            "Illegal escape in diff_fromDelta: " + param,
+                            e);
+                    }
+                    diffs.add(new Diff(Operation.INSERT, param));
+                    break;
+                case '-':
+                    // Fall through.
+                case '=':
+                    int n;
+                    try {
+                        n = Integer.parseInt(param);
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException(
+                            "Invalid number in diff_fromDelta: " + param,
+                            e);
+                    }
+                    if (n < 0) {
+                        throw new IllegalArgumentException(
+                            "Negative number in diff_fromDelta: " + param);
+                    }
+                    String text;
+                    try {
+                        text = text1.substring(pointer, pointer += n);
+                    } catch (StringIndexOutOfBoundsException e) {
+                        throw new IllegalArgumentException("Delta length (" + pointer
+                            + ") larger than source text length (" + text1.length() + ").", e);
+                    }
+                    if (token.charAt(0) == '=') {
+                        diffs.add(new Diff(Operation.EQUAL, text));
+                    } else {
+                        diffs.add(new Diff(Operation.DELETE, text));
+                    }
+                    break;
+                default:
+                    // Anything else is an error.
                     throw new IllegalArgumentException(
-                        "Negative number in diff_fromDelta: " + param);
-                }
-                String text;
-                try {
-                    text = text1.substring(pointer, pointer += n);
-                } catch (StringIndexOutOfBoundsException e) {
-                    throw new IllegalArgumentException("Delta length (" + pointer
-                        + ") larger than source text length (" + text1.length() + ").", e);
-                }
-                if (token.charAt(0) == '=') {
-                    diffs.add(new Diff(Operation.EQUAL, text));
-                } else {
-                    diffs.add(new Diff(Operation.DELETE, text));
-                }
-                break;
-            default:
-                // Anything else is an error.
-                throw new IllegalArgumentException(
-                    "Invalid diff operation in diff_fromDelta: " + token.charAt(0));
+                        "Invalid diff operation in diff_fromDelta: " + token.charAt(0));
             }
         }
         if (pointer != text1.length()) {
@@ -1666,7 +1671,7 @@ public class diff_match_patch {
      * @param pattern The text to encode.
      * @return Hash of character locations.
      */
-    protected @NonNull Map<Character, Integer> match_alphabet(@NonNull String pattern) {
+    protected Map<Character, Integer> match_alphabet(String pattern) {
         Map<Character, Integer> s = new LinkedHashMap<>();
         char[] char_pattern = pattern.toCharArray();
         for (char c : char_pattern) {
@@ -1815,42 +1820,42 @@ public class diff_match_patch {
             }
 
             switch (aDiff.operation) {
-            case INSERT:
-                patch.diffs.add(aDiff);
-                patch.length2 += aDiff.text.length();
-                postpatch_text = postpatch_text.substring(0, char_count2) + aDiff.text
-                        + postpatch_text.substring(char_count2);
-                break;
-            case DELETE:
-                patch.length1 += aDiff.text.length();
-                patch.diffs.add(aDiff);
-                postpatch_text = postpatch_text.substring(0, char_count2)
-                        + postpatch_text.substring(char_count2 + aDiff.text.length());
-                break;
-            case EQUAL:
-                if (aDiff.text.length() <= 2 * Patch_Margin && !patch.diffs.isEmpty()
-                        && aDiff != diffs.getLast()) {
-                    // Small equality inside a patch.
+                case INSERT:
                     patch.diffs.add(aDiff);
-                    patch.length1 += aDiff.text.length();
                     patch.length2 += aDiff.text.length();
-                }
-
-                if (aDiff.text.length() >= 2 * Patch_Margin) {
-                    // Time for a new patch.
-                    if (!patch.diffs.isEmpty()) {
-                        patch_addContext(patch, prepatch_text);
-                        patches.add(patch);
-                        patch = new Patch();
-                        // Unlike Unidiff, our patch lists have a rolling context.
-                        // http://code.google.com/p/google-diff-match-patch/wiki/Unidiff
-                        // Update prepatch text & pos to reflect the application of the
-                        // just completed patch.
-                        prepatch_text = postpatch_text;
-                        char_count1 = char_count2;
+                    postpatch_text = postpatch_text.substring(0, char_count2) + aDiff.text
+                            + postpatch_text.substring(char_count2);
+                    break;
+                case DELETE:
+                    patch.length1 += aDiff.text.length();
+                    patch.diffs.add(aDiff);
+                    postpatch_text = postpatch_text.substring(0, char_count2)
+                            + postpatch_text.substring(char_count2 + aDiff.text.length());
+                    break;
+                case EQUAL:
+                    if (aDiff.text.length() <= 2 * Patch_Margin && !patch.diffs.isEmpty()
+                            && aDiff != diffs.getLast()) {
+                        // Small equality inside a patch.
+                        patch.diffs.add(aDiff);
+                        patch.length1 += aDiff.text.length();
+                        patch.length2 += aDiff.text.length();
                     }
-                }
-                break;
+
+                    if (aDiff.text.length() >= 2 * Patch_Margin) {
+                        // Time for a new patch.
+                        if (!patch.diffs.isEmpty()) {
+                            patch_addContext(patch, prepatch_text);
+                            patches.add(patch);
+                            patch = new Patch();
+                            // Unlike Unidiff, our patch lists have a rolling context.
+                            // http://code.google.com/p/google-diff-match-patch/wiki/Unidiff
+                            // Update prepatch text & pos to reflect the application of the
+                            // just completed patch.
+                            prepatch_text = postpatch_text;
+                            char_count1 = char_count2;
+                        }
+                    }
+                    break;
             }
 
             // Update the current character count.
@@ -1876,7 +1881,7 @@ public class diff_match_patch {
      * @param patches Array of Patch objects.
      * @return Array of Patch objects.
      */
-    public @NonNull LinkedList<Patch> patch_deepCopy(@NonNull LinkedList<Patch> patches) {
+    public LinkedList<Patch> patch_deepCopy(LinkedList<Patch> patches) {
         LinkedList<Patch> patchesCopy = new LinkedList<>();
         for (Patch aPatch : patches) {
             Patch patchCopy = new Patch();
@@ -2184,8 +2189,7 @@ public class diff_match_patch {
      * @return List of Patch objects.
      * @throws IllegalArgumentException If invalid input.
      */
-    public @NonNull List<Patch> patch_fromText(@NonNull String textline)
-            throws IllegalArgumentException {
+    public List<Patch> patch_fromText(String textline) throws IllegalArgumentException {
         List<Patch> patches = new LinkedList<>();
         if (textline.length() == 0) {
             return patches;
@@ -2350,7 +2354,7 @@ public class diff_match_patch {
      * Class representing one patch operation.
      */
     public static class Patch {
-        public final @NonNull LinkedList<Diff> diffs;
+        public final LinkedList<Diff> diffs;
         public int start1;
         public int start2;
         public int length1;
@@ -2390,15 +2394,15 @@ public class diff_match_patch {
             // Escape the body of the patch with %xx notation.
             for (Diff aDiff : this.diffs) {
                 switch (aDiff.operation) {
-                case INSERT:
-                    text.append('+');
-                    break;
-                case DELETE:
-                    text.append('-');
-                    break;
-                case EQUAL:
-                    text.append(' ');
-                    break;
+                    case INSERT:
+                        text.append('+');
+                        break;
+                    case DELETE:
+                        text.append('-');
+                        break;
+                    case EQUAL:
+                        text.append(' ');
+                        break;
                 }
                 text.append(URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
                         .append("\n");

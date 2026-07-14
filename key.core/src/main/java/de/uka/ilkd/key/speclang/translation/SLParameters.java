@@ -4,14 +4,11 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Wraps a list of expressions.
@@ -32,8 +29,8 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
      * @param services the Services
      * @return the list of types that compose the type signature
      */
-    public @NonNull ImmutableList<KeYJavaType> getSignature(@NonNull Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
+    public ImmutableList<KeYJavaType> getSignature(Services services) {
+        ImmutableList<KeYJavaType> result = ImmutableList.nil();
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {
@@ -49,6 +46,6 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         return result;
     }
 
-    public @NonNull String toString() { return parameters == null ? "" : parameters.toString(); }
+    public String toString() { return parameters == null ? "" : parameters.toString(); }
 
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -16,6 +17,12 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Dominic Steinhoefel
  */
+@Documentation(category = "Control", value = """
+        Reactivates the first open (not necessarily enabled) goal.
+        This can be useful after a 'leave' command to continue
+        working on a complicated proof where 'tryclose' should not
+        apply on certain branches temporarily, but where one still
+        wants to finish the proof.""")
 public class ActivateCommand extends NoArgumentCommand {
     @Override
     public @NonNull String getName() {
@@ -23,13 +30,8 @@ public class ActivateCommand extends NoArgumentCommand {
     }
 
     @Override
-    public @NonNull String getDocumentation() {
-        return "";
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @Nullable Void args,
-            @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
         goal.setEnabled(true);

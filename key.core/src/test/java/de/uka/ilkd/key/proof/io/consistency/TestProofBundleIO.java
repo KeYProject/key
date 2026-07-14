@@ -21,7 +21,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.java.IOUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -165,7 +164,7 @@ public class TestProofBundleIO {
      * @return the loaded proof (currently, only a single proof is supported)
      * @throws ProblemLoaderException if loading fails
      */
-    private @NonNull Proof loadBundle(@NonNull Path p) throws ProblemLoaderException {
+    private Proof loadBundle(Path p) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
         AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
         if (replayResult.hasErrors()) {

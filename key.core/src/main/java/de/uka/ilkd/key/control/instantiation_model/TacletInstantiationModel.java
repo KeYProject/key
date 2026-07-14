@@ -23,7 +23,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.parsing.Position;
 
 public class TacletInstantiationModel {
 
@@ -155,7 +155,7 @@ public class TacletInstantiationModel {
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
         ImmutableList<AssumesFormulaInstantiation> instList =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));

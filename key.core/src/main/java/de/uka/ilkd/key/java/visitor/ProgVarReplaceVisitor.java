@@ -9,10 +9,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -30,10 +34,7 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
@@ -120,7 +121,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node the node described above
+     * @param node
+     *        the node described above
      */
     @Override
     protected void doAction(ProgramElement node) {
@@ -188,7 +190,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private ImmutableList<JTerm> replaceVariablesInTerms(ImmutableList<JTerm> terms) {
-        ImmutableList<JTerm> res = ImmutableSLList.nil();
+        ImmutableList<JTerm> res = ImmutableList.nil();
         boolean changed = false;
         for (final JTerm term : terms) {
             final JTerm newTerm = replaceVariablesInTerm(term);
@@ -200,7 +202,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<InfFlowSpec> replaceVariablesInTermListTriples(
             ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> res = ImmutableSLList.nil();
+        ImmutableList<InfFlowSpec> res = ImmutableList.nil();
         boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
             final ImmutableList<JTerm> renamedPreExpressions =
@@ -608,48 +610,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnSetStatement(final SetStatement x) {
-        /*
-         * var spec =
-         * Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-         * ProgramVariableCollection vars = spec.vars();
-         * Map<LocationVariable, Term> atPres = vars.atPres;
-         * Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
-         * Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
-         * Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
-         *
-         * for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
-         * LocationVariable pv = e.getKey();
-         * final Term t = e.getValue();
-         * if (t == null) {
-         * continue;
-         * }
-         * if (replaceMap.containsKey(pv)) {
-         * newAtPres.remove(pv);
-         * pv = (LocationVariable) replaceMap.get(pv);
-         * newAtPreVars.put(pv, atPreVars.get(e.getKey()));
-         * }
-         * newAtPres.put(pv, replaceVariablesInTerm(t));
-         * }
-         * final ProgramVariableCollection newVars =
-         * new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-         * newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
-         *
-         *
-         * var newTerms = spec.terms().map(this::replaceVariablesInTerm);
-         * var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
-         *
-         * services.getSpecificationRepository().addStatementSpec(x, newSpec);
-         *
-         * /*
-         * if (!newAtPres.equals(vars.atPres)) {
-         * changed();
-         * }
-         * doDefaultAction(x);
-         */
         handleJmlStatements(x, SetStatement::new);
     }
 
-    public <T extends Statement> void handleJmlStatements(@NonNull T x, Function<T, T> cloner) {
+    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(
             services.getSpecificationRepository().getStatementSpec(x));
 

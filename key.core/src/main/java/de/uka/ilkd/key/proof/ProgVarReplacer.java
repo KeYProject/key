@@ -5,10 +5,10 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -124,7 +124,7 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     result = result.replace(sv, newPe, services);
                 }
-            } else if (ie instanceof ListInstantiation list) {
+            } else if (ie instanceof ListInstantiation<?> list) {
                 if (list.getType() != ProgramElement.class) {
                     throw new RuntimeException("Unexpected list instantiation: " + ie);
                 }

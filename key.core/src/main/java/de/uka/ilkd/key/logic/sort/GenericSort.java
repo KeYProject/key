@@ -54,14 +54,8 @@ public final class GenericSort extends SortImpl {
         checkSupersorts();
     }
 
-    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf)
-            throws GenericSupersortException {
-        this(name, ext, oneOf, "", "");
-    }
-
-
     public GenericSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false, "", "");
+        super(name, DefaultImmutableSet.nil(), false);
         this.oneOf = DefaultImmutableSet.nil();
     }
 
@@ -123,6 +117,11 @@ public final class GenericSort extends SortImpl {
             }
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean containsGenericSort() {
         return true;
     }
 }

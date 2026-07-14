@@ -12,15 +12,19 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
  * matched to different members of the sequent. If a taclet has more than one formula in its
  * <tt>\assumes</tt> part, all of the must be matched to different members.
  */
+// Weakly stable: compares the whole find FORMULA (pos.sequentFormula(), by content) to the
+// application's \assumes instantiations. The find can be a proper sub-formula (replace_known's
+// \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula
+// while the find subterm survives. Reusable only while the find formula is unchanged.
+@WeakStableCost
 public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
@@ -29,8 +33,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
     private DiffFindAndIfFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         ImmutableList<AssumesFormulaInstantiation> list = app.assumesFormulaInstantiations();

@@ -15,8 +15,6 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +40,10 @@ public final class DiskFileRepo extends AbstractFileRepo {
     /**
      * Initializes a new empty DiskFileRepo. This creates a new temporary directory.
      *
-     * @param proofName name of the proof (used in the naming of the temporary directory)
-     * @throws IOException if an I/O error occurs, e.g. the user has not the right to create the new
+     * @param proofName
+     *        name of the proof (used in the naming of the temporary directory)
+     * @throws IOException
+     *         if an I/O error occurs, e.g. the user has not the right to create the new
      *         temporary directory
      */
     public DiskFileRepo(String proofName) throws IOException {
@@ -342,7 +342,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
     /**
      * Deletes the temporary directory with all contents (if not already done).
      *
-     * @throws IOException if the directory or one of its files is not accessible
+     * @throws IOException
+     *         if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {

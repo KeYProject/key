@@ -12,9 +12,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * User action that modifies the proof in some way.
  * On undo: prunes proof to previous collection of open goals, selects previously active node.

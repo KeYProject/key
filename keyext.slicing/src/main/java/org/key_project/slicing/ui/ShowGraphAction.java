@@ -11,8 +11,6 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.GraphNode;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Context menu action to display the dependency graph "around" a formula.
  *

@@ -42,7 +42,7 @@ public class ChoiceInformation {
     /**
      * This map contains the default option for every category.
      */
-    private final Map<String, String> defaultOptions = new TreeMap<>();
+    private final Map<String, Choice> defaultOptions = new TreeMap<>();
 
     public ChoiceInformation() {
         this(new Namespace<>());
@@ -68,11 +68,11 @@ public class ChoiceInformation {
         return choices;
     }
 
-    public void setDefaultOption(String category, String choice) {
-        defaultOptions.put(category, category + ":" + choice);
+    public void setDefaultOption(String category, Choice choice) {
+        defaultOptions.put(category, choice);
     }
 
-    public Map<String, String> getDefaultOptions() {
+    public Map<String, Choice> getDefaultOptions() {
         return defaultOptions;
     }
 }

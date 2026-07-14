@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -20,6 +21,9 @@ public final class LogicVariable extends JAbstractSortedOperator
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
+        if (sort instanceof GenericSort) {
+            throw new IllegalArgumentException("Cannot have logic variable of generic sort!");
+        }
         assert sort != JavaDLTheory.FORMULA;
         assert sort != JavaDLTheory.UPDATE;
     }

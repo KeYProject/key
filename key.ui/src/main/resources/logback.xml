@@ -2,10 +2,13 @@
     <!-- disables logback configuration messages on start up, see #1725 -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
+    <!-- allows us to set certain variables, i.e., the log directory / LOG_DIR -->
+    <contextListener class="de.uka.ilkd.key.gui.utilities.LoggerStartupListener"/>
+
     <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${user.home}/.key/logs/key_${timestamp}.log</file>
+        <file>${LOG_DIR}/key_${timestamp}.log</file>
         <append>false</append>
         <encoder>
             <charset>UTF-8</charset>

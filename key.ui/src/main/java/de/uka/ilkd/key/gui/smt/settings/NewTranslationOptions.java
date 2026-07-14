@@ -24,9 +24,6 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
  * of flexibility.
@@ -72,7 +69,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {

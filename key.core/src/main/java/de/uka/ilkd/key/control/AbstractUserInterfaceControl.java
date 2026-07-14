@@ -28,7 +28,6 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,12 +207,8 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(@Nullable Profile profile,
-            @Nullable Path file,
-            @Nullable List<Path> classPath,
-            @Nullable Path bootClassPath,
-            @Nullable List<Path> includes,
-            @Nullable Properties poPropertiesToForce,
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
@@ -236,7 +231,7 @@ public abstract class AbstractUserInterfaceControl
             if (loader != null && loader.getProof() != null) {
                 loader.getProof().dispose();
             }
-            throw new ProblemLoaderException(loader, e);
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 
@@ -257,8 +252,7 @@ public abstract class AbstractUserInterfaceControl
     }
 
     @Override
-    public void loadingStarted(AbstractProblemLoader loader) {
-    }
+    public void loadingStarted(AbstractProblemLoader loader) {}
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,

@@ -131,15 +131,15 @@ public class IsabelleMasterHandler {
             for (IsabelleHandler isabelleHandler : handlers) {
                 IsabelleHandler.Capability response = isabelleHandler.canHandle(problem);
                 switch (response) {
-                case YES_THIS_INSTANCE -> {
-                    // handle this but do not cache.
-                    return isabelleHandler.handle(this, problem);
-                }
-                case YES_THIS_OPERATOR -> {
-                    // handle it and cache it for future instances of the op.
-                    handlerMap.put(problem.op(), isabelleHandler);
-                    return isabelleHandler.handle(this, problem);
-                }
+                    case YES_THIS_INSTANCE -> {
+                        // handle this but do not cache.
+                        return isabelleHandler.handle(this, problem);
+                    }
+                    case YES_THIS_OPERATOR -> {
+                        // handle it and cache it for future instances of the op.
+                        handlerMap.put(problem.op(), isabelleHandler);
+                        return isabelleHandler.handle(this, problem);
+                    }
                 }
             }
             exceptions.add(new IllegalFormulaException(

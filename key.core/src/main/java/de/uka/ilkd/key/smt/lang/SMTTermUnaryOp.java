@@ -141,7 +141,7 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object term) {
+    public boolean equals(Object term) {
         if (term == null) {
             return false;
         }
@@ -199,10 +199,10 @@ public class SMTTermUnaryOp extends SMTTerm {
         }
 
         return switch (operator) {
-        case NOT -> tab + "(not" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        case BVNOT -> tab + "(bvnot" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        case BVNEG -> tab + "(bvneg" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        default -> throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
+            case NOT -> tab + "(not" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+            case BVNOT -> tab + "(bvnot" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+            case BVNEG -> tab + "(bvneg" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+            default -> throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
         };
     }
 

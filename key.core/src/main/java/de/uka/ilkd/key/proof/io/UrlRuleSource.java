@@ -5,8 +5,8 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -25,16 +25,26 @@ public class UrlRuleSource extends RuleSource {
     private final URI uri;
     private final long numberOfBytes;
 
-    UrlRuleSource(final URI url) {
-        long tempSize;
-        this.uri = url;
-        try {
-            var path = Paths.get(url);
-            tempSize = Files.size(path);
-        } catch (IOException e) {
-            tempSize = countBytesByReadingStream();
+    UrlRuleSource(final URL url) {
+        this.url = url;
+        if ("file".equals(url.getProtocol())) {
+            numberOfBytes = fileSizeOrCountStream();
+        } else {
+            numberOfBytes = countBytesByReadingStream();
         }
         numberOfBytes = tempSize;
+    }
+
+    private long fileSizeOrCountStream() {
+        try {
+            // Resolve the file via the URI (like file()) rather than url.getFile(): the latter is
+            // not percent-decoded and keeps the leading '/' of "file:/C:/..." on Windows, so for
+            // paths containing spaces (%20) or on Windows it would point at a non-existent file and
+            // report a length of 0.
+            return Files.size(Paths.get(url.toURI()));
+        } catch (URISyntaxException | IOException e) {
+            return countBytesByReadingStream();
+        }
     }
 
     private long countBytesByReadingStream() {
@@ -59,15 +69,17 @@ public class UrlRuleSource extends RuleSource {
     @Override
     public Path file() {
         try {
+            var uri = url.toURI();
             try {
                 return Paths.get(uri);
             } catch (FileSystemNotFoundException e) {
                 URI rootFs = URI.create(StringUtil.takeUntil(uri.toString(), "!"));
                 String internal = StringUtil.takeAfter(uri.toString(), "!");
+                // keep the file system open.
                 FileSystem zipfs = FileSystems.newFileSystem(rootFs, new HashMap<>());
                 return zipfs.getPath(internal);
             }
-        } catch (IOException e) {
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -9,8 +9,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * creates a menu allowing to choose the external prover to be used

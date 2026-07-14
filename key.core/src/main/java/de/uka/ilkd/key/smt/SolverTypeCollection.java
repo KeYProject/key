@@ -54,8 +54,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 
     }
 
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof SolverTypeCollection stc)) {
             return false;
         }

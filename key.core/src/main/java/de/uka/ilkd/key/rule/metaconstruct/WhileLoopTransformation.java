@@ -8,11 +8,13 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -26,8 +28,6 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +207,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
-    public @Nullable ProgramElement result() {
+    public ProgramElement result() {
         return result;
     }
 

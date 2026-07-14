@@ -3,19 +3,38 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
+import java.util.Arrays;
+import java.util.HashSet;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -56,8 +75,8 @@ public final class HeapLDT extends LDT {
     private final Sort fieldSort;
 
     // select/store
-    private final SortDependingFunction select;
-    private final SortDependingFunction finalFunction;
+    private final ParametricFunctionDecl select;
+    private final ParametricFunctionDecl finalFunction;
     private final Function store;
     private final Function create;
     private final Function anon;
@@ -67,10 +86,10 @@ public final class HeapLDT extends LDT {
     private final Function arr;
     private final Function created;
     private final Function initialized;
-    private final SortDependingFunction classPrepared;
-    private final SortDependingFunction classInitialized;
-    private final SortDependingFunction classInitializationInProgress;
-    private final SortDependingFunction classErroneous;
+    private final ParametricFunctionDecl classPrepared;
+    private final ParametricFunctionDecl classInitialized;
+    private final ParametricFunctionDecl classInitializationInProgress;
+    private final ParametricFunctionDecl classErroneous;
 
     // length
     private final Function length;
@@ -100,26 +119,26 @@ public final class HeapLDT extends LDT {
             services.getNamespaces().programVariables();
 
         fieldSort = sorts.lookup(new Name("Field"));
-        select = addSortDependingFunction(services, SELECT_NAME.toString());
-        finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
+        select = addParametricFunction(services, SELECT_NAME.toString());
+        finalFunction = addParametricFunction(services, FINAL_NAME.toString());
         store = addFunction(services, STORE_NAME.toString());
         create = addFunction(services, "create");
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
         arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::<created>");
-        initialized = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        created = addFunction(services, "java.lang.Object::#$created");
+        initialized = addFunction(services, "java.lang.Object::#$initialized");
+        classPrepared = addParametricFunction(services, "$classPrepared");
+        classInitialized = addParametricFunction(services, "$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addParametricFunction(services, "$classInitializationInProgress");
+        classErroneous = addParametricFunction(services, "$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
         reach = addFunction(services, "reach");
         prec = addFunction(services, "prec");
-        heaps = ImmutableSLList.<LocationVariable>nil()
+        heaps = ImmutableList.<LocationVariable>nil()
                 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
                 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
         if (services instanceof Services s) {
@@ -138,12 +157,16 @@ public final class HeapLDT extends LDT {
 
     private String getFieldSymbolName(LocationVariable fieldPV) {
         if (fieldPV.isImplicit()) {
-            return fieldPV.name().toString();
+            return fieldPV.getProgramElementName().toString().replace(JavaDLFieldNames.SEPARATOR,
+                JavaDLFieldNames.FIELD_INFIX);
         } else {
+            // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
-            int index = fieldPV.toString().indexOf("::");
-            assert index > 0;
-            return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
+            int index = fieldPV.toString().indexOf(JavaDLFieldNames.SEPARATOR);
+            if (index <= 0)
+                return fieldPVName;
+            return fieldPVName.substring(0, index) + JavaDLFieldNames.FIELD_INFIX
+                    + fieldPVName.substring(index + 2);
         }
     }
 
@@ -169,18 +192,16 @@ public final class HeapLDT extends LDT {
      * @return the split field name
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
+        if (symbol instanceof ParametricFunctionInstance pfi) {
+            // e.g., $classErroneous<[A]>
+            return new SplitFieldName(pfi.getArgs().head().sort().toString(),
+                pfi.getBase().name().toString());
+        }
         var name = symbol.name().toString();
-        // check for normal attribute
-        int endOfClassName = name.indexOf("::$");
+
+        int endOfClassName = name.indexOf(JavaDLFieldNames.FIELD_INFIX);
 
         int startAttributeName = endOfClassName + 3;
-
-
-        if (endOfClassName < 0) {
-            // not a normal attribute, maybe an implicit attribute like <created>?
-            endOfClassName = name.indexOf("::<");
-            startAttributeName = endOfClassName + 2;
-        }
 
         if (endOfClassName < 0) {
             return null;
@@ -197,16 +218,12 @@ public final class HeapLDT extends LDT {
      */
     public static String getPrettyFieldName(Named fieldSymbol) {
         String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::");
-        if (index == -1) {
-            return name;
-        } else {
-            String result = name.substring(index + 2);
-            if (result.charAt(0) == '$') {
-                result = result.substring(1);
-            }
-            return result;
+        int index = name.indexOf(JavaDLFieldNames.FIELD_INFIX);
+        if (index >= 0) {
+            return name.substring(index + JavaDLFieldNames.FIELD_INFIX.length());
         }
+
+        return name;
     }
 
 
@@ -214,9 +231,9 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant symbol representing a
      * field.
      */
-    public static String getClassName(Function fieldSymbol) {
+    public static @Nullable String getClassName(Function fieldSymbol) {
         String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::");
+        int index = name.indexOf(JavaDLFieldNames.SEPARATOR);
         if (index == -1) {
             return null;
         } else {
@@ -233,11 +250,44 @@ public final class HeapLDT extends LDT {
     }
 
 
+    public ParametricFunctionDecl getSelect() {
+        return select;
+    }
+
     /**
      * Returns the select function for the given sort.
      */
-    public SortDependingFunction getSelect(Sort instanceSort, TermServices services) {
-        return select.getInstanceFor(instanceSort, services);
+    public ParametricFunctionInstance getSelect(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(select,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+    public @NonNull ParametricFunctionDecl getFinal() {
+        return finalFunction;
+    }
+
+    /**
+     * Returns the function symbol to access final fields for the given instance sort.
+     *
+     * @param instanceSort the sort of the value to be read
+     * @param services the services to find/create the sort-depending function
+     * @return the function symbol to access final fields for the given instance sort
+     */
+    public @NonNull ParametricFunctionInstance getFinal(@NonNull Sort instanceSort,
+            @NonNull Services services) {
+        return ParametricFunctionInstance.get(finalFunction,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+    /**
+     * Check if the given operator is an instance of the "final" function to access final fields.
+     *
+     * @param op the operator to check
+     * @return true if the operator is an instance of the {@code final<[X]>} parametric function
+     */
+    public boolean isFinalOp(org.key_project.logic.op.Operator op) {
+        return op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == finalFunction;
     }
 
     /**
@@ -268,17 +318,17 @@ public final class HeapLDT extends LDT {
      * If the passed operator is an instance of "select", this method returns the sort of the
      * function (identical to its return type); otherwise, returns null.
      */
-    public Sort getSortOfSelect(Operator op) {
+    public Sort getSortOfSelect(org.key_project.logic.op.Operator op) {
         if (isSelectOp(op)) {
-            return ((SortDependingFunction) op).getSortDependingOn();
+            return ((ParametricFunctionInstance) op).getArgs().head().sort();
         } else {
             return null;
         }
     }
 
-    public boolean isSelectOp(Operator op) {
-        return op instanceof SortDependingFunction
-                && ((SortDependingFunction) op).isSimilar(select);
+    public boolean isSelectOp(org.key_project.logic.op.Operator op) {
+        return op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == (select);
     }
 
 
@@ -318,23 +368,27 @@ public final class HeapLDT extends LDT {
 
 
     public Function getClassPrepared(Sort instanceSort, TermServices services) {
-        return classPrepared.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classPrepared,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassInitialized(Sort instanceSort, TermServices services) {
-        return classInitialized.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classInitialized,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassInitializationInProgress(Sort instanceSort,
             TermServices services) {
-        return classInitializationInProgress.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classInitializationInProgress,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassErroneous(Sort instanceSort, TermServices services) {
-        return classErroneous.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classErroneous,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
@@ -401,21 +455,42 @@ public final class HeapLDT extends LDT {
      * to the namespace as a side effect.
      */
     public Function getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
-        assert fieldPV.isMember();
-        assert fieldPV != services.getJavaInfo().getArrayLength();
+        if (!fieldPV.isMember()) {
+            throw new IllegalArgumentException("%s is not a member variable".formatted(fieldPV));
+        }
 
-        final Name name = new Name(getFieldSymbolName(fieldPV));
+        if (fieldPV == services.getJavaInfo().getArrayLength()) {
+            throw new IllegalArgumentException("%s is an array length".formatted(fieldPV));
+        }
+
+        String nameString = getFieldSymbolName(fieldPV);
+        if (fieldPV.isModel()) {
+            assert nameString.contains("::#");
+            nameString = nameString.replace("::#", "::");
+            // HACK: what is the naming convention for implicit model fields
+            // Further: Shouldn't a Transformer insert the invariant model field earlier, so that we
+            // do not need
+            // the methods {@link JavaInfo#getInvProgramVar} and {@link
+            // JavaInfo#getInvFreeProgramVar}
+        }
+        final Name name = new Name(nameString);
         Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
-            int index = name.toString().indexOf("::");
-            assert index > 0;
+            int index = name.toString().indexOf(JavaDLFieldNames.SEPARATOR);
+            if (index <= 0) {
+                throw new IllegalArgumentException(
+                    "Given field %s (resolved to %s) does not contain DOUBLECOLON ::"
+                            .formatted(fieldPV, name));
+            }
             final Name kind = new Name(name.toString().substring(index + 2));
 
-            SortDependingFunction firstInstance =
-                SortDependingFunction.getFirstInstance(kind, services);
-            if (firstInstance != null) {
+            final String nameWithoutFieldPrefix = kind.toString().substring(1); // '#'
+            var firstInstance =
+                services.getNamespaces().parametricFunctions().lookup(nameWithoutFieldPrefix);
+            if (firstInstance != null && firstInstance.sort().extendsTrans(fieldSort)) {
                 Sort sortDependingOn = fieldPV.getContainerType().getSort();
-                result = firstInstance.getInstanceFor(sortDependingOn, services);
+                result = ParametricFunctionInstance.get(firstInstance,
+                    ImmutableList.of(new GenericArgument(sortDependingOn)), services);
             } else {
                 if (fieldPV.isModel()) {
                     int heapCount = 0;
@@ -425,9 +500,26 @@ public final class HeapLDT extends LDT {
                         }
                         heapCount++;
                     }
-                    result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                        fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
-                        fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+
+                    final HashSet<String> invariantFieldNames = new HashSet<>();
+                    invariantFieldNames
+                            .addAll(Arrays.asList(PipelineConstants.IMPLICIT_OBJECT_INVARIANT,
+                                PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT,
+                                PipelineConstants.IMPLICIT_CLASS_INVARIANT,
+                                PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT));
+
+                    // special treatment for invariant
+                    if (fieldPV.isModel() &&
+                            invariantFieldNames
+                                    .contains(fieldPV.getProgramElementName().getProgramName())) {
+                        result = new ObserverFunction(kind.toString(), JavaDLTheory.FORMULA,
+                            null, targetSort(), fieldPV.getContainerType(),
+                            fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+                    } else {
+                        result = new ObserverFunction(kind.toString(), fieldPV.sort(),
+                            fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                            fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+                    }
                 } else {
                     result = new JFunction(name, fieldSort, new Sort[0], null, true);
                 }
@@ -451,21 +543,21 @@ public final class HeapLDT extends LDT {
         if (super.containsFunction(op)) {
             return true;
         }
-        if (op instanceof SortDependingFunction) {
-            return ((SortDependingFunction) op).isSimilar(select);
+        if (op instanceof ParametricFunctionInstance pfi) {
+            return pfi.getBase() == (select);
         }
         return op.isUnique() && op.sort() == getFieldSort();
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+    public boolean isResponsible(Operator op, JTerm left,
             JTerm right,
             Services services, ExecutionContext ec) {
         return false;
@@ -473,7 +565,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -487,7 +579,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -502,8 +594,8 @@ public final class HeapLDT extends LDT {
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        if (t.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) t.op()).isSimilar(select)) {
+        if (t.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == (select)) {
             ProgramVariable heap = (ProgramVariable) children.removeFirst();
             if (heap != getHeap()) {
                 throw new IllegalArgumentException("Can only translate field access to base heap.");
@@ -530,6 +622,4 @@ public final class HeapLDT extends LDT {
         assert false;
         return null;
     }
-
-
 }

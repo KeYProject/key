@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -35,12 +35,8 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
@@ -79,8 +75,7 @@ public abstract class AbstractProofReplayer {
      * @return the new goals added by this rule application
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    protected @Nullable ImmutableList<Goal> reApplyRuleApp(@NonNull Node node,
-            @NonNull Goal openGoal)
+    protected ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
@@ -107,7 +102,7 @@ public abstract class AbstractProofReplayer {
      * @return built-in rule app
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    private IBuiltInRuleApp constructBuiltinApp(@NonNull Node originalStep, @NonNull Goal currGoal)
+    private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         final RuleApp ruleApp = originalStep.getAppliedRuleApp();
         final String ruleName = ruleApp.rule().displayName();
@@ -126,7 +121,7 @@ public abstract class AbstractProofReplayer {
         }
 
         // Load ifInsts, if applicable
-        builtinIfInsts = ImmutableSLList.nil();
+        builtinIfInsts = ImmutableList.nil();
         for (PosInOccurrence oldFormulaPio : RuleAppUtil
                 .assumesInstantiationsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
             PosInOccurrence newFormula =
@@ -139,11 +134,13 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
-            return SMTRuleApp.RULE.createApp(null, proof.getServices());
+        final SMTRule smtRule = SMTRule.INSTANCE;
+
+        if (smtRule.displayName().equals(ruleName)) {
+            return smtRule.createApp(null, proof.getServices());
         }
 
-        IBuiltInRuleApp ourApp = null;
+        IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
         if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
@@ -157,21 +154,18 @@ public abstract class AbstractProofReplayer {
         }
 
         if (currContract != null) {
-            AbstractContractRuleApp contractApp = null;
+            AbstractContractRuleApp<?> contractApp = null;
 
-            BuiltInRule useContractRule;
             if (currContract instanceof OperationContract) {
-                useContractRule = UseOperationContractRule.INSTANCE;
-                contractApp = (((UseOperationContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseOperationContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
             } else {
-                useContractRule = UseDependencyContractRule.INSTANCE;
+                var rule = proof.getServices().getProfile().getUseDependencyContractRule();
                 // copy over the mysterious "step"
                 PosInOccurrence step =
-                    findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                    findInNewSequent(((UseDependencyContractApp<?>) ruleApp).step(),
                         currGoal.sequent());
-                contractApp = (((UseDependencyContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract).setStep(step);
+                contractApp = rule.createApp(pos).setContract(currContract).setStep(step);
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
@@ -216,8 +210,7 @@ public abstract class AbstractProofReplayer {
      * @param currGoal open goal in proof slice
      * @return new taclet app equivalent to {@code originalStep}
      */
-    private @Nullable TacletApp constructTacletApp(@NonNull Node originalStep,
-            @NonNull Goal currGoal) {
+    private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
         TacletApp originalTacletApp = null;
         if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {
             originalTacletApp = tacletApp;
@@ -233,7 +226,9 @@ public abstract class AbstractProofReplayer {
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             // find the correct taclet
-            for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
+            for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
+                    .getPartialInstantiatedApps()) {
+                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
@@ -245,7 +240,8 @@ public abstract class AbstractProofReplayer {
             }
             if (ourApp == null) {
                 throw new IllegalStateException(
-                    "proof replayer failed to find dynamically added taclet");
+                    "proof replayer failed to find dynamically added taclet at original node "
+                        + originalStep.serialNr());
             }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
@@ -269,7 +265,7 @@ public abstract class AbstractProofReplayer {
         ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
             getInterestingInstantiations(instantantions), services);
 
-        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
                 .assumesInstantiationsOfRuleApp(originalTacletApp, originalStep)
                 .stream()
@@ -327,8 +323,8 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private @Nullable PosInOccurrence findInNewSequent(@NonNull PosInOccurrence oldPos,
-            @NonNull Sequent newSequent) {
+    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
+            Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
@@ -347,8 +343,7 @@ public abstract class AbstractProofReplayer {
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */
-    public @NonNull Collection<String> getInterestingInstantiations(
-            @NonNull SVInstantiations inst) {
+    public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
         for (final var pair : inst.interesting()) {

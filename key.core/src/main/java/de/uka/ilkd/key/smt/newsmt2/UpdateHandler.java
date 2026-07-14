@@ -17,8 +17,6 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).
  *

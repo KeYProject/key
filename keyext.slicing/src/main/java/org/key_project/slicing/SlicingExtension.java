@@ -34,7 +34,6 @@ import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Proof slicing extension.
@@ -75,8 +74,12 @@ public class SlicingExtension implements KeYGuiExtension,
      */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public @NonNull List<Action> getContextActions(
-                @NonNull KeYMediator mediator, ContextMenuKind kind, @Nullable PosInSequent pos) {
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                T object) {
+            if (kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
+            }
+            PosInSequent pos = (PosInSequent) object;
 
             DependencyTracker tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
@@ -108,14 +111,14 @@ public class SlicingExtension implements KeYGuiExtension,
     };
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind,
-            @NonNull Object underlyingObject) {
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind,
+            @NonNull T underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
     @Override
-    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 

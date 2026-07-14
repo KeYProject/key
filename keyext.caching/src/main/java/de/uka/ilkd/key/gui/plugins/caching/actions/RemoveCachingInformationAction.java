@@ -10,8 +10,6 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Action to remove caching information on a goal closed by caching.
  *
@@ -26,9 +24,9 @@ public final class RemoveCachingInformationAction extends KeyAction {
     /**
      * The node to apply the action on.
      */
-    private final @NonNull Node node;
+    private final Node node;
 
-    public RemoveCachingInformationAction(KeYMediator mediator, @NonNull Node node) {
+    public RemoveCachingInformationAction(KeYMediator mediator, Node node) {
         this.mediator = mediator;
         this.node = node;
 

@@ -18,8 +18,6 @@ import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This class provides means to run macros with key bindings such that these can be bound to the
  * main window making them independent of any menu.
@@ -55,8 +53,7 @@ public class MacroKeyBinding extends AbstractAction {
         }
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
-            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof())
-                    .actionPerformed(e);
+            new ProofMacroUserAction(mediator, macro, posInOcc).actionPerformed(e);
         }
     }
 

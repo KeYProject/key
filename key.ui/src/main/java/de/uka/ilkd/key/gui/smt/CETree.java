@@ -16,8 +16,6 @@ import de.uka.ilkd.key.smt.model.*;
 
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-
 public class CETree {
     /**
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
@@ -36,7 +34,7 @@ public class CETree {
     /**
      * The SMT model.
      */
-    private final @NonNull Model model;
+    private final Model model;
 
 
 
@@ -143,7 +141,7 @@ public class CETree {
         }
     }
 
-    public static @NonNull List<Pair<String, String>> computeFunctions(@NonNull ObjectVal ov) {
+    public static List<Pair<String, String>> computeFunctions(ObjectVal ov) {
         List<Pair<String, String>> result = new LinkedList<>();
         for (Entry<String, String> e : ov.getFunValues().entrySet()) {
             result.add(new Pair<>(Model.removePipes(e.getKey()), e.getValue()));
@@ -151,7 +149,7 @@ public class CETree {
         return result;
     }
 
-    public static @NonNull List<String> computeArrayFields(@NonNull ObjectVal ov) {
+    public static List<String> computeArrayFields(ObjectVal ov) {
         List<String> result = new LinkedList<>();
         for (int i = 0; i < ov.getLength(); ++i) {
             result.add("[" + i + "]=" + ov.getArrayValue(i));
@@ -184,7 +182,7 @@ public class CETree {
         return result;
     }
 
-    public static @NonNull List<Pair<String, String>> computeFields(@NonNull ObjectVal ov) {
+    public static List<Pair<String, String>> computeFields(ObjectVal ov) {
         List<Pair<String, String>> labels = new ArrayList<>();
 
         for (Entry<String, String> e : ov.getFieldvalues().entrySet()) {
@@ -221,7 +219,7 @@ public class CETree {
         }
     }
 
-    public static @NonNull List<String> computeLocationSetProperties(@NonNull LocationSet ls) {
+    public static List<String> computeLocationSetProperties(LocationSet ls) {
         List<String> result = new LinkedList<>();
         for (int i = 0; i < ls.size(); ++i) {
             Location l = ls.get(i);
@@ -260,7 +258,7 @@ public class CETree {
         }
     }
 
-    public static @NonNull List<String> computeSequenceProperties(@NonNull Sequence s) {
+    public static List<String> computeSequenceProperties(Sequence s) {
         List<String> result = new LinkedList<>();
         result.add("Length=" + s.getLength());
 

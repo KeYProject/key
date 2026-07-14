@@ -5,10 +5,7 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -22,6 +19,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.tacletmatch.TacletMatchDialog;
+import de.uka.ilkd.key.gui.tacletmatch.classic.TacletMatchCompletionDialog;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -95,6 +94,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         };
     }
 
+
+    public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
+        ProblemLoader problemLoader = getProblemLoader(file, null, null, null, getMediator());
+        configure.accept(problemLoader);
+        mainWindow.addRecentFile(file.toAbsolutePath().toString(),
+            problemLoader.getProfileOfNewProofs(),
+            problemLoader.isLoadSingleJavaFile(),
+            problemLoader.getAdditionalProfileOptions());
+        problemLoader.runAsynchronously();
+    }
+
     /**
      * loads the problem or proof from the given file
      *
@@ -102,12 +112,16 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes) {
-        mainWindow.addRecentFile(file.toAbsolutePath().toString());
+    public void loadProblem(Path file, @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes) {
+        mainWindow.addRecentFile(file.toAbsolutePath().toString(), null, false, null);
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
+    }
+
+    public void loadProblem(Path file, Profile profile) {
+        loadProblem(file, (pl) -> pl.setProfileOfNewProofs(profile));
     }
 
     @Override
@@ -117,7 +131,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
-        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString());
+        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString(), null, false, null);
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -174,7 +188,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
-                    g = proof.openGoals().head();
+                    try {
+                        g = proof.openGoals().head();
+                    } catch (NoSuchElementException e) {
+                        // all closed
+                    }
                 }
                 mainWindow.getMediator().goalChosen(g);
                 if (inStopAtFirstUncloseableGoalMode(proof)) {
@@ -193,6 +211,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
+                // Show the macro's aggregate result (total rules applied / goals closed). Without
+                // this the status line keeps whatever the macro's last internal strategy run left
+                // there -- a tiny partial count rather than the whole macro's work.
+                mainWindow.displayResults(info.toString());
                 final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
                         && mainWindow.getMediator().getSelectedProof() == proof) {
@@ -307,7 +329,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        // the redesigned dialog is the default; the classic one is offered as a migration fallback
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isUseClassicTacletDialog()) {
+            new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        } else {
+            new TacletMatchDialog(mainWindow, models, goal, mainWindow.getMediator());
+        }
     }
 
     @Override
@@ -355,7 +383,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
+            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString(), profile,
+                false, null);
         }
         try {
             getMediator().stopInterface(true);
@@ -516,11 +545,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
-                        result.getErrorList().getFirst());
+                        "The proof could only be loaded partially: " + result.getErrorList().size()
+                            + " rule application(s) could not be replayed (see the list below).",
+                        result.getErrorList());
                 }
             }
         }
@@ -594,7 +621,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        IssueDialog.showWarningsIfNecessary(mainWindow, warnings);
+        SwingUtilities.invokeLater(() -> IssueDialog.showWarningsIfNecessary(mainWindow, warnings));
     }
 
     /**
@@ -614,4 +641,5 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);
     }
+
 }

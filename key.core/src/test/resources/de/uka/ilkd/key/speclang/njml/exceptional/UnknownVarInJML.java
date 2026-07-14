@@ -1,5 +1,5 @@
 // exceptionClass: BuildingException
-// msgContains: The fully qualified name 'unknownVar' could not be resolved.
+// msgContains: Cannot resolve 'unknownVar'
 // position: 9/18
 
 

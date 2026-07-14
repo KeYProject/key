@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -25,7 +25,6 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
 
 /**
@@ -449,17 +448,20 @@ public final class LoopSpecImpl implements LoopSpecification {
      * @param services the services object
      * @param usePrettyPrinting determines whether we get pretty or raw text
      * @param useUnicodeSymbols determines whether unicode will be used
+     * @param hidePackagePrefix
      * @return the plain text representation as a string
      */
     public String getPlainText(Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols);
+        return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols,
+            hidePackagePrefix);
     }
 
     @Override
     public String getPlainText(Services services, Iterable<LocationVariable> heapContext,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
 
@@ -467,7 +469,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         for (LocationVariable h : heapContext) {
             if (originalModifiable.get(h) != null) {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifiable.get(h), services,
-                    usePrettyPrinting, useUnicodeSymbols);
+                    usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
                 mods.append("\n").append("mod").append(h == baseHeap ? "" : "[" + h + "]")
                         .append(": ").append(printMods);
             }
@@ -477,7 +479,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         for (LocationVariable h : heapContext) {
             if (originalInvariants.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
-                    usePrettyPrinting, useUnicodeSymbols);
+                    usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
                 invariants.append("\n").append("invariant")
                         .append(h == baseHeap ? "" : "[" + h + "]").append(": ").append(printPosts);
             }
@@ -485,7 +487,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols)
+                    usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix)
                 : ";") + mods;
     }
 
@@ -557,7 +559,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             self = null;
         }
         return new OriginalVariables(self, null, null, atPreVars,
-            ImmutableSLList.nil());
+            ImmutableList.nil());
     }
 
 }

@@ -80,7 +80,7 @@ public final class SupportedTaclets {
         validateSelectionMode((TreeItem) model.getRoot());
     }
 
-    public String @NonNull [] getNamesOfSelectedTaclets() {
+    public String[] getNamesOfSelectedTaclets() {
         List<String> list = new LinkedList<>();
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
@@ -130,7 +130,7 @@ public final class SupportedTaclets {
     /**
     *
     */
-    public @NonNull HashSet<String> getTacletNamesAsHash() {
+    public HashSet<String> getTacletNamesAsHash() {
         HashSet<String> names = new LinkedHashSet<>(tacletNames.keySet());
         return names;
     }
@@ -476,7 +476,7 @@ public final class SupportedTaclets {
         return toString((TreeItem) getTreeModel().getRoot(), s);
     }
 
-    private @NonNull String toString(@NonNull TreeItem node, String s) {
+    private String toString(TreeItem node, String s) {
         StringBuilder result;
 
         result = new StringBuilder("\n" + s + node.toComplexString());
@@ -492,7 +492,7 @@ public final class SupportedTaclets {
      *         method only for testing. It uses only simple data structure, so that the necessary
      *         time is in O(n^2)
      */
-    public @NonNull Collection<String> getMissingTaclets(@NonNull Collection<Taclet> taclets) {
+    public Collection<String> getMissingTaclets(Collection<Taclet> taclets) {
         LinkedList<String> list = new LinkedList<>();
 
         for (String name : this.tacletNames.keySet()) {

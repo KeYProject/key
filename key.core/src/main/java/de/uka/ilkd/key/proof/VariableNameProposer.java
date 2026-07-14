@@ -6,9 +6,9 @@ package de.uka.ilkd.key.proof;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -23,8 +23,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Proposes names for variables (except program variables).
@@ -49,8 +47,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * skolemterm SVs, variable SVs, and labels.
      */
     @Override
-    public @Nullable String getProposal(TacletApp app, SchemaVariable var, Services services,
-            @Nullable Node undoAnchor,
+    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
             return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor,
@@ -141,7 +138,7 @@ public class VariableNameProposer implements InstantiationProposer {
             name = basename + cnt;
             l_name = new Name(name);
             cnt++;
-        } while (nss.lookup(l_name) != null && !previousProposals.contains(name));
+        } while (nss.lookup(l_name) != null || previousProposals.contains(name));
 
 
         return name;

@@ -9,8 +9,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +30,7 @@ public class Z3Test extends SMTSolverTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(Z3Test.class);
     private static final String SOLVER_NAME = "Z3";
 
-    private static final @Nullable SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals(SOLVER_NAME))
             .findFirst().orElse(null);
@@ -43,17 +41,17 @@ public class Z3Test extends SMTSolverTest {
     }
 
     @Override
-    protected @NonNull String getSystemPropertySolverPath() {
+    protected String getSystemPropertySolverPath() {
         return SYSTEM_PROPERTY_SOLVER_PATH;
     }
 
     @Override
-    protected @NonNull String getSolverName() {
+    protected String getSolverName() {
         return SOLVER_NAME;
     }
 
     @Override
-    public @NonNull SolverType getSolverType() {
+    public SolverType getSolverType() {
         SolverType type = Z3_SOLVER;
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
@@ -63,7 +61,7 @@ public class Z3Test extends SMTSolverTest {
     }
 
     @Override
-    protected final @NonNull Stream<Arguments> provideTestData() {
+    protected final Stream<Arguments> provideTestData() {
         return Stream.of(
             Arguments.of(UNKNOWN, "andnot.key"), // timeout expected
             Arguments.of(VALID, "ornot.key"),

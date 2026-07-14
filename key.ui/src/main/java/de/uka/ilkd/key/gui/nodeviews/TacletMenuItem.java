@@ -22,7 +22,6 @@ interface TacletMenuItem {
      *
      * @return the attached Taclet
      */
-    @Nullable
     TacletApp connectedTo();
 
 }

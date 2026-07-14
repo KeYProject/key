@@ -36,11 +36,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -136,7 +133,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Listens to rule application to call {@link #updateNodeLink()}.
      */
-    private @Nullable RuleAppListener ruleAppListener = event -> updateNodeLink();
+    private RuleAppListener ruleAppListener = event -> updateNodeLink();
 
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.
@@ -438,8 +435,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private void buildModel(TreeNode parentNode, @Nullable PosInOccurrence parentPos,
-            @NonNull DefaultTreeModel treeModel) {
+    private void buildModel(TreeNode parentNode,
+            PosInOccurrence parentPos,
+            DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
 
@@ -502,9 +500,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private @NonNull ImmutableList<Integer> getPosTablePath(@Nullable PosInOccurrence pos) {
+    private ImmutableList<Integer> getPosTablePath(
+            PosInOccurrence pos) {
         if (pos == null) {
-            return ImmutableSLList.<Integer>nil().prepend(0);
+            return ImmutableList.<Integer>singleton(0);
         }
 
         InitialPositionTable posTable = view.posTable;
@@ -640,7 +639,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
-        private final @Nullable PosInOccurrence pos;
+        private final PosInOccurrence pos;
         private JTerm term;
 
         private TreeNode(@Nullable PosInOccurrence pos) {
@@ -656,14 +655,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
         private final PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, @NonNull NotationInfo ni,
-                @NonNull Services services) {
+        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni,
+                Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
         }
 
         @Override
-        public void printFilteredSequent(@NonNull SequentPrintFilter filter) {
+        public void printFilteredSequent(SequentPrintFilter filter) {
             try {
                 ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
                 ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
@@ -690,17 +689,18 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private class TermView extends SequentView {
         private static final long serialVersionUID = -8328975160581938309L;
-        private @Nullable InitialPositionTable posTable = new InitialPositionTable();
+        private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(@Nullable PosInOccurrence pos, Node node, @NonNull MainWindow mainWindow) {
+        TermView(PosInOccurrence pos, Node node,
+                MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
 
             final NotationInfo ni = new NotationInfo();
             if (services != null) {
                 ni.refresh(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-                    NotationInfo.DEFAULT_UNICODE_ENABLED);
+                    NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
             }
 
             setLogicPrinter(new TermViewLogicPrinter(pos, ni, services));
@@ -731,7 +731,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         @Override
-        public void setUserSelectionHighlight(@NonNull PosInSequent pis) {
+        public void setUserSelectionHighlight(PosInSequent pis) {
             ImmutableList<Integer> path =
                 getPosTablePath(pis == null ? null : pis.getPosInOccurrence());
             Range range = view.posTable.rangeForPath(path);

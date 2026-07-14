@@ -25,9 +25,6 @@ import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Results of the dependency analysis algorithm.
@@ -39,7 +36,7 @@ public final class AnalysisResults {
     /**
      * The analyzed proof.
      */
-    public final @NonNull Proof proof;
+    public final Proof proof;
     public final DependencyGraph dependencyGraph;
     /**
      * Total amount of rule applications.
@@ -107,7 +104,7 @@ public final class AnalysisResults {
      * @param executionTime timings
      */
     public AnalysisResults(
-            @NonNull Proof proof,
+            Proof proof,
             DependencyGraph dependencyGraph,
             int totalSteps,
             RuleStatistics ruleStatistics,
@@ -160,7 +157,7 @@ public final class AnalysisResults {
      * @param node proof node
      * @return sequent with only useful formulas
      */
-    public @NonNull Sequent reduceSequent(@NonNull Node node) {
+    public Sequent reduceSequent(Node node) {
         final Sequent seq = node.sequent();
         return JavaDLSequentKit.createSequent(reduce(seq.antecedent().asList(), node, true),
             reduce(seq.succedent().asList(), node, false));
@@ -168,7 +165,7 @@ public final class AnalysisResults {
 
     private ImmutableList<SequentFormula> reduce(ImmutableList<SequentFormula> semi, Node node,
             boolean antec) {
-        ImmutableList<SequentFormula> semiList = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> semiList = ImmutableList.nil();
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));

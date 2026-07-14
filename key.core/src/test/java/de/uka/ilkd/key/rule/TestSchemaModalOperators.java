@@ -25,7 +25,6 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.AfterEach;
@@ -51,10 +50,10 @@ public class TestSchemaModalOperators {
 
     private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return ImmutableSLList.singleton(cf0);
+        return ImmutableList.singleton(cf0);
     }
 
     @BeforeEach
@@ -145,7 +144,7 @@ public class TestSchemaModalOperators {
         rtb.setFind(find);
         rtb.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableSLList.nil(),
+                ImmutableList.nil(),
                 replace));
 
         RewriteTaclet t = rtb.getRewriteTaclet();
@@ -172,7 +171,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities2() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal1 = TacletForTests.getRules().lookup("testSchemaModal1");
+        NoPosTacletApp testmodal1 = TacletForTests.lookupTaclet("testSchemaModal1");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal1);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
@@ -207,7 +206,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities3() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal2 = TacletForTests.getRules().lookup("testSchemaModal2");
+        NoPosTacletApp testmodal2 = TacletForTests.lookupTaclet("testSchemaModal2");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal2);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
@@ -238,7 +237,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities4() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal3 = TacletForTests.getRules().lookup("testSchemaModal3");
+        NoPosTacletApp testmodal3 = TacletForTests.lookupTaclet("testSchemaModal3");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal3);
         Goal goal = createGoal(proof[1].root(), tacletIndex);

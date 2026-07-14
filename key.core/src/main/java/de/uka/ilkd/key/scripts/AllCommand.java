@@ -4,60 +4,50 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
-import org.jspecify.annotations.NonNull;
+@Documentation(category = "Control", value = """
+        Executes a given block of script commands on all open goals.
+        The current goal is set to each open goal in turn while executing the block.
+        It expects exactly one positional argument, which is the block to be executed on each goal.
 
-public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
-    private String documentation;
-
+        #### Examples:
+        * `onAll { smt solver="z3"; }`
+        * `onAll { auto; }`
+        """)
+public class AllCommand implements ProofScriptCommand {
     @Override
-    public @NonNull List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
 
     @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Map<String, Object> args,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap) throws ScriptException, InterruptedException {
-        var block = (KeYParser.ProofScriptContext) args.get(ProofScriptEngine.KEY_SUB_SCRIPT);
-
-        if (block == null) {
-            throw new ScriptException("Missing command to apply onAll to");
+        if (args.positionalArgs().size() != 1) {
+            throw new ScriptException(
+                "Invalid number of positional arguments to 'onAll'. Pos. arguments: "
+                    + args.positionalArgs().size());
         }
+
+        var block = stateMap.getValueInjector().convert(
+            args.positionalArgs().getFirst(),
+            ScriptBlock.class);
 
         var proof = stateMap.getProof();
-        // Node selectedNode = state.getSelectedNode();
         for (Goal g : proof.openGoals()) {
-            // if (isBelow(g, selectedNode)) {
             stateMap.setGoal(g);
-            stateMap.getEngine().execute(uiControl, block.proofScriptCommand());
-            // }
+            stateMap.getEngine().execute(uiControl, block);
         }
-        // state.setGoal(selectedNode);
     }
 
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "onAll";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public @NonNull String getDocumentation() {
-        return """
-                Applies the given command to all the open goals.""";
     }
 }

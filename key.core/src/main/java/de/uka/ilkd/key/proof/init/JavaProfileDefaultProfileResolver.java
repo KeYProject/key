@@ -14,7 +14,7 @@ public class JavaProfileDefaultProfileResolver implements DefaultProfileResolver
      */
     @Override
     public String getProfileName() {
-        return JavaProfile.NAME;
+        return JavaProfile.PROFILE_ID;
     }
 
     /**

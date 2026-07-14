@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.RuleKey;
 
 import org.key_project.logic.LogicServices;
@@ -18,8 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 public class RuleJustificationInfo {
 
-    private final Map<RuleKey, @Nullable RuleJustification> rule2Justification =
-        new LinkedHashMap<>();
+    private final Map<RuleKey, RuleJustification> rule2Justification = new LinkedHashMap<>();
 
     public void addJustification(Rule r, @Nullable RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
@@ -30,7 +28,7 @@ public class RuleJustificationInfo {
             for (RuleKey key : rule2Justification.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
                     throw new IllegalArgumentException(
-                        "A rule named " + r.name() + "has already been registered.");
+                        "A rule named " + r.name() + " has already been registered.");
                 }
             }
         } else {
@@ -52,9 +50,6 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
-        if (InfFlowContractAppTaclet.hasType(rule)) {
-            InfFlowContractAppTaclet.unregister(rule.name());
-        }
         rule2Justification.remove(new RuleKey(rule));
     }
 

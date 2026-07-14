@@ -11,17 +11,20 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
-    private @Nullable LabeledParserRuleContext variant = null;
+    private LabeledParserRuleContext variant = null;
     private final ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    public Set<ParserRuleContext> getClauses() {
+        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toSet());
+    }
 
     /**
      * Heap-dependent clauses
@@ -32,7 +35,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
-    public TextualJMLLoopSpec(@NonNull ImmutableList<JMLModifier> modifiers) {
+    public TextualJMLLoopSpec(ImmutableList<JMLModifier> modifiers) {
         super(modifiers);
     }
 
@@ -46,8 +49,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return addClause(clause, null, ctx);
     }
 
-    public @NonNull TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
-            @NonNull LabeledParserRuleContext ctx) {
+    public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
+            LabeledParserRuleContext ctx) {
         if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
         }
@@ -75,7 +78,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignable() {
+    public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ClauseHd.ASSIGNABLE);
     }
 
@@ -83,7 +86,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
     }
 
@@ -91,7 +94,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
         return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
@@ -99,8 +102,24 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignableFree() {
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
         return getList(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
+        return getMap(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
     }
 
     /**
@@ -135,14 +154,14 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                    map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             if (!map.containsKey(h.toString())) {
-                map.put(h.toString(), ImmutableSLList.nil());
+                map.put(h.toString(), ImmutableList.nil());
             }
         }
         return map;
@@ -156,14 +175,14 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                    map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             if (!map.containsKey(h.toString())) {
-                map.put(h.toString(), ImmutableSLList.nil());
+                map.put(h.toString(), ImmutableList.nil());
             }
         }
         return map;
@@ -201,7 +220,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

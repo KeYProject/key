@@ -13,8 +13,6 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 
-import org.jspecify.annotations.NonNull;
-
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
     private static final String infoFileChooserPanel =
@@ -38,8 +36,8 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
                 Be aware of the fact that too many different generic sorts can overwhelm the external solvers. On the other side there are taclets that use a certain amount of different generic sorts (see: taclet selection).
 
                 Rule of thumb: Most of the taclets can be translated by using 2-3 different generic sorts.""";
-    private final @NonNull JTextField fileChooserPanel;
-    private final @NonNull JSpinner maxNumberOfGenerics;
+    private final JTextField fileChooserPanel;
+    private final JSpinner maxNumberOfGenerics;
 
 
     public TacletTranslationOptions() {
@@ -65,7 +63,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     }
 
     @Override
-    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofDependentSMTSettings pdSettings = SettingsManager.getSmtPdSettings(window).clone();
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
         maxNumberOfGenerics.setValue(pdSettings.getMaxGenericSorts());

@@ -12,6 +12,7 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
@@ -21,6 +22,10 @@ import org.jspecify.annotations.NonNull;
  * A feature that computes the sum of the values of a feature term when a given variable ranges over
  * a sequence of terms
  */
+// @StableCost: transparent -- it sums its (recursed) body over a TermGenerator. CostReuse also
+// classifies that generator: it stays local only with a find-local generator (e.g.
+// SuperTermGenerator), and is non-local with a sequent-scanning one (SequentFormulasGenerator).
+@StableCost
 public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
     private final TermBuffer<Goal> var;
@@ -36,7 +41,7 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer<Goal> var,
             TermGenerator<Goal> generator,
             Feature body) {
-        return new ComprehendedSumFeature(var, generator, body);
+        return new ComprehendedSumFeature<>(var, generator, body);
     }
 
     private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator<Goal> generator,
@@ -48,8 +53,7 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
 
     @Override
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal,
-            @NonNull MutableState mState) {
+            PosInOccurrence pos, G goal, MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         final var it = generator.generate(app, pos, (Goal) goal, mState);

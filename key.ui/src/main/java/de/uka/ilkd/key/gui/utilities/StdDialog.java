@@ -11,9 +11,6 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 /**
  * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel. The
@@ -39,7 +36,7 @@ public class StdDialog extends JDialog {
         this(title, null, strut, helpButton);
     }
 
-    public StdDialog(String title, @Nullable JComponent content, int strut, boolean helpButton) {
+    public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));

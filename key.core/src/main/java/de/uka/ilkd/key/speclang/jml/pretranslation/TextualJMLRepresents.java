@@ -17,16 +17,16 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     private final @NonNull LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
-            @NonNull LabeledParserRuleContext represents) {
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
+            LabeledParserRuleContext represents) {
         super(modifiers);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
-            @NonNull LabeledParserRuleContext represents, String name) {
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
+            LabeledParserRuleContext represents, String name) {
         this(modifiers, represents);
         this.name = name;
     }
@@ -42,7 +42,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof TextualJMLRepresents r)) {
             return false;
         }

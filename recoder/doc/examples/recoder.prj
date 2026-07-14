@@ -1,5 +1,0 @@
-#COMPOST Project File
-input.path=../../src/
-output.path=output
-units=all
-java5=true

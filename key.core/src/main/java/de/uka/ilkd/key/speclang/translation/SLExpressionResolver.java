@@ -5,13 +5,13 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -28,8 +28,8 @@ public abstract class SLExpressionResolver {
     protected final @NonNull SLResolverManager manager;
     protected final @NonNull KeYJavaType specInClass;
 
-    protected SLExpressionResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
-            @NonNull KeYJavaType specInClass) {
+    protected SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager,
+            KeYJavaType specInClass) {
         assert javaInfo != null;
         assert manager != null;
         assert specInClass != null;

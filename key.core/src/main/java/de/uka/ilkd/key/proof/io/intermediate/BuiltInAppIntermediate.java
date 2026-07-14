@@ -8,8 +8,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.
  *
@@ -24,13 +22,9 @@ public class BuiltInAppIntermediate extends AppIntermediate {
     private final @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts;
     private final @Nullable ImmutableList<Name> newNames;
 
-    public BuiltInAppIntermediate(
-            String ruleName,
-            Pair<Integer, PosInTerm> pos,
-            @Nullable String contract,
-            @Nullable String modality,
-            @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            @Nullable ImmutableList<Name> newNames) {
+    public BuiltInAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String contract,
+            String modality, ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
+            ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
@@ -40,7 +34,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
     }
 
     @Override
-    public @Nullable String getRuleName() {
+    public String getRuleName() {
         return ruleName;
     }
 

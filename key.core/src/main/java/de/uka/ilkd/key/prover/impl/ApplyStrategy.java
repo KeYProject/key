@@ -17,9 +17,7 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +76,8 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * de.uka.ilkd.key.proof.Goal)
      */
     @Override
-    public synchronized ApplyStrategyInfo<Proof, Goal> start(@NonNull Proof proof, Goal goal) {
-        return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, Goal goal) {
+        return start(proof, ImmutableList.<Goal>nil().prepend(goal));
     }
 
     /*
@@ -89,7 +87,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    public synchronized @NonNull ApplyStrategyInfo<Proof, Goal> start(@NonNull Proof proof,
+    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof,
             ImmutableList<Goal> goals) {
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
@@ -123,8 +121,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * org.key_project.util.collection.ImmutableList, int, long, boolean)
      */
     @Override
-    public synchronized @NonNull ApplyStrategyInfo<Proof, Goal> start(@NonNull Proof proof,
-            ImmutableList<Goal> goals,
+    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
             int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
@@ -142,7 +139,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
             long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
-            public void proofGoalsAdded(@NonNull ProofTreeEvent e) {
+            public void proofGoalsAdded(ProofTreeEvent e) {
                 Iterable<Goal> newGoals = e.getGoals();
                 // Check for a closed goal ...
                 if (!newGoals.iterator().hasNext()) {
@@ -157,8 +154,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         return treeListener;
     }
 
-    private @NonNull ApplyStrategyInfo<Proof, Goal> executeStrategy(
-            @NonNull ProofTreeListener treeListener) {
+    private ApplyStrategyInfo<Proof, Goal> executeStrategy(ProofTreeListener treeListener) {
         assert proof != null;
 
         ProofListener pl = new ProofListener();
@@ -174,7 +170,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         return result;
     }
 
-    private void finishStrategy(@NonNull ApplyStrategyInfo<Proof, Goal> result) {
+    private void finishStrategy(ApplyStrategyInfo<Proof, Goal> result) {
         assert result != null; // CS
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
@@ -189,7 +185,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * @param proof The {@link Proof} for which an {@link GoalChooser} is required.
      * @return The {@link GoalChooser} to use.
      */
-    private GoalChooser<Proof, Goal> getGoalChooserForProof(@Nullable Proof proof) {
+    private GoalChooser<Proof, Goal> getGoalChooserForProof(Proof proof) {
         GoalChooser<Proof, Goal> chooser = null;
         if (proof != null) {
             chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
@@ -248,7 +244,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         final GoalChooser<Proof, Goal> goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.nil());
+            goalChooser.init(null, ImmutableList.nil());
         }
     }
 

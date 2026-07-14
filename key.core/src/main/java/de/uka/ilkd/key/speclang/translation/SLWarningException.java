@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.util.parsing.Location;
 
 
 public class SLWarningException extends SLTranslationException {
@@ -16,11 +15,11 @@ public class SLWarningException extends SLTranslationException {
      */
     private static final long serialVersionUID = 699191378589840435L;
 
-    public SLWarningException(@NonNull String text, @NonNull Location location) {
+    public SLWarningException(String text, Location location) {
         super(text, location);
     }
 
-    public @NonNull PositionedString getWarning() {
+    public PositionedString getWarning() {
         return new PositionedString(getMessage(), location);
     }
 }

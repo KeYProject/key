@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -56,9 +57,9 @@ public class SExprs {
      */
     public static SExpr and(List<SExpr> clauses) {
         return switch (clauses.size()) {
-        case 0 -> TRUE;
-        case 1 -> clauses.get(0);
-        default -> new SExpr("and", Type.BOOL, clauses);
+            case 0 -> TRUE;
+            case 1 -> clauses.get(0);
+            default -> new SExpr("and", Type.BOOL, clauses);
         };
     }
 

@@ -8,8 +8,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * User action for "Apply rules automatically here" (i.e. focussed auto mode).
  *

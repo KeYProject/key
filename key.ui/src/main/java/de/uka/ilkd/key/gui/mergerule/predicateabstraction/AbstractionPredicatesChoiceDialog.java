@@ -42,8 +42,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,8 +66,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private @Nullable Goal goal = null;
 
-    private @Nullable ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
-    private @Nullable ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
+    private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
+    private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
     private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
     private @NonNull Class<? extends AbstractPredicateAbstractionLattice> latticeType =
@@ -789,7 +787,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    static de.uka.ilkd.key.proof.@Nullable Proof loadProof(String proofFileName) {
+    static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
         Path proofFile = Paths.get("examples/", proofFileName);
 
         try {

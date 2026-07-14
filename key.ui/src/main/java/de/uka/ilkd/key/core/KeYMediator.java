@@ -52,7 +52,7 @@ import org.jspecify.annotations.Nullable;
 public class KeYMediator {
 
     /** The user interface */
-    private final @NonNull AbstractMediatorUserInterfaceControl ui;
+    private final AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final @NonNull NotationInfo notationInfo;
@@ -61,15 +61,15 @@ public class KeYMediator {
     private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private final @NonNull KeYMediatorProofListener proofListener;
+    private final KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private final @NonNull KeYMediatorProofTreeListener proofTreeListener;
+    private final KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private final @NonNull KeYSelectionModel keySelectionModel;
+    private final KeYSelectionModel keySelectionModel;
 
     /**
      * Registered proof load listeners.
@@ -222,7 +222,7 @@ public class KeYMediator {
      * @param newProof the proof to select.
      * @param previousProof the previously selected proof
      */
-    void setProof(@Nullable Proof newProof, @Nullable Proof previousProof) {
+    void setProof(Proof newProof, Proof previousProof) {
         if (previousProof == newProof) {
             return;
         }
@@ -533,7 +533,7 @@ public class KeYMediator {
      * @param interactive whether the needed taclet index is for interactove or automatic use
      *        (normally false)
      */
-    public void initiateAutoMode(@NonNull Proof proof, boolean fullStop, boolean interactive) {
+    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
         stopInterface(fullStop);
         getUI().getProofControl().fireAutoModeStarted(new ProofEvent(proof));
         setInteractive(interactive);
@@ -556,8 +556,8 @@ public class KeYMediator {
      *        (normally true)
      * @param selection a Runnable that selects the correct node after unfreezing the interface
      */
-    public void finishAutoMode(@NonNull Proof proof, boolean fullStop, boolean interactive,
-            @Nullable Runnable selection) {
+    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
+            Runnable selection) {
         setInteractive(interactive);
         startInterface(fullStop);
         getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
@@ -651,7 +651,7 @@ public class KeYMediator {
         }
 
         @Override
-        public void proofPruned(final @NonNull ProofTreeEvent e) {
+        public void proofPruned(final ProofTreeEvent e) {
             SwingUtilities.invokeLater(() -> {
                 if (!e.getSource().find(getSelectedNode())) {
                     keySelectionModel.setSelectedNode(e.getNode());
@@ -712,7 +712,7 @@ public class KeYMediator {
         addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 a.setEnabled(e.getSource().getSelectedProof() != null);
             }
         });
@@ -728,7 +728,7 @@ public class KeYMediator {
         addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 a.setEnabled(e.getSource().getSelectedProof() != null);
             }
         });

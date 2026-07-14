@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Sets the behavior if an already closed proof is encountered: Either throw an exception (default
@@ -17,37 +16,47 @@ import org.jspecify.annotations.NonNull;
  * complexity in a try-and-error manner, etc.).
  *
  * @author Dominic Steinhoefel
+ *
+ * @deprecated This should be merged in the {@link SetCommand} with a parameter like "failonclosed".
  */
-public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedCommand.Parameters> {
+@Deprecated
+@Documentation(category = "Control", value = """
+        Controls the behavior when a script encounters an already closed proof.
+
+        When set to "on" (default): Throws a `ProofAlreadyClosedException` if a command attempts
+        to operate on a closed proof. This is the recommended setting for scripts that expect
+        specific proof structures.
+
+        When set to "off": Silently terminates script execution without throwing an exception.
+        Useful for generic scripts that may encounter proofs of varying complexity where premature
+        closure is acceptable.
+        """)
+public class SetFailOnClosedCommand extends AbstractCommand {
     public SetFailOnClosedCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public @NonNull String getName() {
-        return "@failonclosed";
+    public String getName() {
+        return "failonclosed";
     }
 
-    @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
-            @NonNull EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        state().setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
-    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "on".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        @Documentation(value = "'on' or 'off'. Any other value defaults to 'on'.")
+        public @MonotonicNonNull String command;
     }
 
 }

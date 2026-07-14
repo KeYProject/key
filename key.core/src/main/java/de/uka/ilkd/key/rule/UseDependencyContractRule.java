@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -33,16 +34,16 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
-public final class UseDependencyContractRule implements BuiltInRule {
+public final class UseDependencyContractRule implements BuiltInRule, ComplexJustificationable {
 
     public static final UseDependencyContractRule INSTANCE = new UseDependencyContractRule();
 
@@ -90,7 +91,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private ImmutableSet<JTerm> addEqualDefs(ImmutableSet<JTerm> terms, Goal g) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
 
         for (SequentFormula cf : g.sequent().antecedent()) {
             final JTerm formula = (JTerm) cf.formula();
@@ -181,7 +182,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {
             return new Pair<>(TB.empty(),
-                ImmutableSLList.nil());
+                ImmutableList.nil());
         } else if (op == heapLDT.getStore()) {
             final JTerm h = heapTerm.sub(0);
             final JTerm o = heapTerm.sub(1);
@@ -224,7 +225,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), IRRELEVANT_TERM_LABELS_PROPERTY)
+            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), TERM_LABELS_PROPERTY)
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }
@@ -311,9 +312,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
 
-    public static PosInOccurrence findStepInIfInsts(
-            List<PosInOccurrence> steps,
-            UseDependencyContractApp app, TermServices services) {
+    public static @Nullable PosInOccurrence findStepInIfInsts(List<PosInOccurrence> steps,
+            UseDependencyContractApp<?> app) {
         for (PosInOccurrence pio : app.assumesInsts()) {
             if (steps.contains(pio)) {
                 return pio;
@@ -415,7 +415,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             selfTerm = focus.sub(target.getHeapCount(services) * target.getStateCount());
         }
 
-        ImmutableList<JTerm> paramTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> paramTerms = ImmutableList.nil();
         for (int i = target.getHeapCount(services) * target.getStateCount()
                 + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
@@ -460,7 +460,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         int heapExprIndex = 0;
         boolean useful = false;
         ImmutableList<PosInOccurrence> ifInsts =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         int hc = 0;
         for (LocationVariable heap : heaps) {
             if (hc >= obsHeapCount) {
@@ -603,5 +603,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                                Methods and model fields may be annotated with an accessible clause. This defines a dependency contract describing the heap locations its value may depend on.
+
+                If the heap changes in locations the symbol does not depend on, its value remains unchanged. This rules adds an according implication for a heap-dependent symbol to the sequent's antecedent.
+
+                In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted) to avoid endless loops.</entry>
+                """;
     }
 }

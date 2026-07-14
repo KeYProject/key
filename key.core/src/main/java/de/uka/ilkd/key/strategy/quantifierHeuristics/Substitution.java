@@ -15,6 +15,7 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -88,17 +89,85 @@ public class Substitution {
 
     private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
         final ClashFreeSubst subst =
-            new ClashFreeSubst(var,
-                (JTerm) instance, tb);
+            new ClashFreeSubst(var, (JTerm) instance, tb);
         return subst.apply((JTerm) t);
     }
 
     /**
      * Try to apply the substitution to a term, introducing casts if necessary (may never be the
-     * case any more, XXX)
+     * case any more, XXX).
+     * <p>
+     * Fast path: all variables are substituted in a single traversal ({@link #applyGroundOnePass}).
+     * This is sound because the substitution is ground (the instances contain no free variables, so
+     * no capture can happen); shadowing of a substituted variable by a binder inside {@code t} is
+     * respected. If a cast is required (the slow, possibly dead path), it falls back to the
+     * per-variable substitution {@link #applyWithoutCastsPerVar}.
      */
     public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
+        final TermBuilder tb = services.getTermBuilder();
+        try {
+            return applyGroundOnePass((JTerm) t, ImmutableList.nil(), tb);
+        } catch (TermCreationException e) {
+            return applyWithoutCastsPerVar(t, services);
+        }
+    }
+
+    /**
+     * Substitute every variable of {@link #varMap} in a single traversal of {@code t}. A variable
+     * occurrence is replaced unless it is shadowed, i.e. re-bound by a binder above it (tracked in
+     * {@code boundAbove}). Subterms in which no substituted variable occurs free are returned
+     * unchanged.
+     */
+    private JTerm applyGroundOnePass(JTerm t, ImmutableList<QuantifiableVariable> boundAbove,
+            TermBuilder tb) {
+        // Variable leaves (the most common node) are handled directly, without the freeVars
+        // bookkeeping of containsSubstVar.
+        if (t.op() instanceof QuantifiableVariable qv) {
+            final Term inst = varMap.get(qv);
+            return inst != null && !boundAbove.contains(qv) ? (JTerm) inst : t;
+        }
+        if (!containsSubstVar(t)) {
+            return t;
+        }
+        final int arity = t.arity();
+        final JTerm[] newSubs = new JTerm[arity];
+        boolean changed = false;
+        for (int i = 0; i < arity; i++) {
+            final JTerm sub = t.sub(i);
+            ImmutableList<QuantifiableVariable> below = boundAbove;
+            final var boundHere = t.varsBoundHere(i);
+            for (int j = 0; j < boundHere.size(); j++) {
+                below = below.prepend(boundHere.get(j));
+            }
+            newSubs[i] = applyGroundOnePass(sub, below, tb);
+            if (newSubs[i] != sub) {
+                changed = true;
+            }
+        }
+        if (!changed) {
+            return t;
+        }
+        return tb.tf().createTerm(t.op(), newSubs, t.boundVars(), t.getLabels());
+    }
+
+    /** Whether any variable of {@link #varMap} occurs free in {@code t}. */
+    private boolean containsSubstVar(JTerm t) {
+        final ImmutableSet<QuantifiableVariable> free = t.freeVars();
+        if (free.isEmpty()) {
+            return false;
+        }
+        final Iterator<QuantifiableVariable> it = varMap.keyIterator();
+        while (it.hasNext()) {
+            if (free.contains(it.next())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Per-variable substitution (one {@link ClashFreeSubst} pass per variable), with casts. */
+    private Term applyWithoutCastsPerVar(Term t, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         while (it.hasNext()) {

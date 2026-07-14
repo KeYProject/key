@@ -7,11 +7,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.LinkedList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -23,7 +27,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
@@ -34,6 +38,11 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.parsing.Location;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -42,7 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations: In
  * {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
- *
+ * <p>
  * For a documentation of the backend of the auto-send mechanism, refer to the file key-report.php
  * in the same directory as this file.
  *
@@ -51,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SendFeedbackAction extends AbstractAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendFeedbackAction.class);
-
-    private static final long serialVersionUID = 8146108238901822515L;
 
     /*
      * This is the email address to which feedback will be sent.
@@ -68,6 +75,19 @@ public class SendFeedbackAction extends AbstractAction {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    /**
+     * Extracts java source directory from {@link Proof#header()}, if it exists.
+     *
+     * @param proof the Proof
+     * @return the location of the java source code or null if no such exists
+     */
+    public static @Nullable Path getJavaSourceLocation(Proof proof) {
+        KeyAst.@Nullable Declarations header = proof.header();
+        if (header == null)
+            return null;
+        return header.getJavaSourceLocation();
     }
 
     private static abstract class SendFeedbackItem implements ActionListener {
@@ -214,7 +234,7 @@ public class SendFeedbackAction extends AbstractAction {
             Proof proof = mediator.getSelectedProof();
             OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            saver.save(stream);
+            saver.save(Paths.get(".").toAbsolutePath(), stream);
             return stream.toByteArray();
         }
 
@@ -303,33 +323,33 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+                File javaSourceLocation = getJavaSourceLocation(proof).toFile();
                 return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
             }
         }
 
-        private void getJavaFilesRecursively(@NonNull File directory, @NonNull List<File> list) {
-            for (File f : directory.listFiles()) {
-                if (f.isDirectory()) {
-                    getJavaFilesRecursively(f, list);
-                } else if (f.getName().endsWith(".java")) {
-                    list.add(f);
-                }
+        private List<Path> getJavaFilesRecursively(Path directory) {
+            try (var stream = Files.walk(directory)) {
+                return stream
+                        .filter(it -> it.toString().endsWith(".java")
+                                || it.toString().endsWith(".jml"))
+                        .toList();
+            } catch (IOException e) {
+                return List.of();
             }
         }
 
         @Override
         void appendDataToZipOutputStream(@NonNull ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-            File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
-            List<File> javaFiles = new LinkedList<>();
-            getJavaFilesRecursively(javaSourceLocation, javaFiles);
-            for (File f : javaFiles) {
+            Path javaSourceLocation = getJavaSourceLocation(proof);
+            List<Path> javaFiles = getJavaFilesRecursively(javaSourceLocation);
+            for (Path f : javaFiles) {
                 stream.putNextEntry(
-                    new ZipEntry("javaSource/" + javaSourceLocation.toURI().relativize(f.toURI())));
-                stream.write(Files.readAllBytes(f.toPath()));
+                    new ZipEntry("javaSource/" + javaSourceLocation.relativize(f)));
+                stream.write(Files.readAllBytes(f));
                 stream.closeEntry();
             }
         }

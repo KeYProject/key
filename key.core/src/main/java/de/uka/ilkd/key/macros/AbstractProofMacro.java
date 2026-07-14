@@ -12,9 +12,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Takes care of providing the whole ProofMacro interface by only making it necessary to implement
@@ -30,7 +27,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         } else {
             return node.proof().getSubtreeEnabledGoals(node);
         }
@@ -68,8 +65,8 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Node node,
-            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
+            PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

@@ -16,9 +16,6 @@ import java.util.stream.Stream;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * ProofBundleHandler for a directory that respects the bundle file hierarchy.
  *
@@ -70,12 +67,12 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public @NonNull Path relativize(@NonNull Path path) {
+    public Path relativize(Path path) {
         return rootPath.toAbsolutePath().normalize().relativize(path);
     }
 
     @Override
-    public @NonNull List<Path> getProofFiles() throws ProofManagementException {
+    public List<Path> getProofFiles() throws ProofManagementException {
         try {
             return getFiles(rootPath, PROOF_MATCHER);
         } catch (IOException e) {
@@ -85,7 +82,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public @NonNull List<Path> getKeYFiles() throws IOException {
+    public List<Path> getKeYFiles() throws IOException {
         return getFiles(rootPath, KEY_MATCHER);
     }
 
@@ -106,6 +103,15 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
         Path bootclasspath = rootPath.resolve(Paths.get("bootclasspath"));
         if (Files.isDirectory(bootclasspath)) {
             return bootclasspath;
+        }
+        return null;
+    }
+
+    @Override
+    public Path getTopLevelProjectFile() {
+        Path projectFile = rootPath.resolve(Paths.get("project.key"));
+        if (Files.isRegularFile(projectFile)) {
+            return projectFile;
         }
         return null;
     }

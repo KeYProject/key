@@ -9,10 +9,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -32,6 +31,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -141,7 +141,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static @Nullable SourceElement computeActiveStatement(
+    public static SourceElement computeActiveStatement(
             RuleApp ruleApp) {
         SourceElement firstStatement = computeFirstStatement(ruleApp);
         return computeActiveStatement(firstStatement);
@@ -159,7 +159,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
-    public static @Nullable SourceElement computeFirstStatement(
+    public static SourceElement computeFirstStatement(
             RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
@@ -289,6 +289,9 @@ public class NodeInfo {
     public @Nullable String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
+            if (firstStatementString == null) {
+                firstStatementString = String.valueOf(firstStatement);
+            }
             firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }

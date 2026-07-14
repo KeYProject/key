@@ -15,8 +15,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Shows the license dialog.
  * <p>
@@ -48,7 +46,7 @@ public class LicenseAction extends MainWindowAction {
         return scroll;
     }
 
-    private String readStream(@NonNull URL resource, String fallback) {
+    private String readStream(URL resource, String fallback) {
         StringBuilder sb = new StringBuilder();
         try {
             InputStreamReader inp =

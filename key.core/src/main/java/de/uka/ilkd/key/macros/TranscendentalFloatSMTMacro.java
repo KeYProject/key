@@ -6,10 +6,13 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.
@@ -58,7 +61,7 @@ public class TranscendentalFloatSMTMacro extends SequentialProofMacro {
     private static class FullAutoMacro extends StrategyProofMacro {
 
         @Override
-        protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
             return proof.getActiveStrategy();
         }
 

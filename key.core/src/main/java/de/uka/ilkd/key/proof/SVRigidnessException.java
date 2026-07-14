@@ -3,14 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.util.parsing.Position;
 
 public class SVRigidnessException extends SVInstantiationExceptionWithPosition {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -440942650851579438L;
     private final String toInstantiate;
 
     public SVRigidnessException(String toInstantiate, Position position) {

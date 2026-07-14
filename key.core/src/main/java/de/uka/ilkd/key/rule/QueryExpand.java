@@ -6,13 +6,16 @@ package de.uka.ilkd.key.rule;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -35,10 +38,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -278,9 +281,9 @@ public class QueryExpand implements BuiltInRule {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
-        final ImmutableSLList<QuantifiableVariable> instVars;
+        final ImmutableList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
-            instVars = ImmutableSLList.nil();
+            instVars = ImmutableList.nil();
         } else {
             instVars = null;
         }
@@ -679,5 +682,16 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                The QueryExpand rule allows to apply contracts or to symbolically execute a query
+                expression in the logic. It replaces the query expression by a new constant and
+                constructs a box formula in the antecedent 'defining' the constant as the result of
+                a method call. The method call is encoded directly as a method call in the box modality.
+                The query is invoked in a context equal to the container type of the query method.
+                """;
     }
 }

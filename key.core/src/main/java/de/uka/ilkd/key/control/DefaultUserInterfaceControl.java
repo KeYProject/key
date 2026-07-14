@@ -11,8 +11,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * The {@link DefaultUserInterfaceControl} which allows proving in case that no specific user
  * interface is available.

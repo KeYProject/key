@@ -1,6 +1,10 @@
 # KeY -- Deductive Java Program Verifier
 
-[![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQL](https://github.com/KeYProject/key/actions/workflows/codeql.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/codeql.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml) 
+[![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml)
+
+![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20snapshots)
+![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20central)
+
 
 This repository is the home of the interactive theorem prover KeY for formal verification and analysis of Java programs. KeY comes as a standalone GUI application, which allows you to verify the functional correctness of Java programs with respect to formal specifications formulated in the Java Modeling Language JML. Moreover, KeY can also be used as a library e.g. for symbolic program execution, first order reasoning, or test case generation.
 
@@ -113,7 +117,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2024 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2026 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 

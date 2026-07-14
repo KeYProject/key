@@ -13,8 +13,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
-import org.checkerframework.checker.initialization.qual.UnderInitialization;
-
 /**
  * @author Alexander Weigl
  * @version 1 (22.07.19)

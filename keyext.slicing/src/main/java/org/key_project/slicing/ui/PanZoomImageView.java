@@ -15,8 +15,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A simple image view that may be panned and zoomed by the user.
  *

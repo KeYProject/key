@@ -7,8 +7,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.rules.RuleApp;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * An annotated edge representing a chain of real proof nodes.
  *
@@ -43,7 +41,7 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
      *
      * @return label for this edge (to use in DOT export)
      */
-    public @NonNull String getEdgeLabel() {
+    public String getEdgeLabel() {
         var sb = new StringBuilder();
         RuleApp ruleApp1 = initial.getAppliedRuleApp();
         if (ruleApp1 != null) {

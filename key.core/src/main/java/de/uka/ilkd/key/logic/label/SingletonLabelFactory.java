@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A factory for creating singleton {@link TermLabel}.
@@ -33,6 +33,11 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
     public SingletonLabelFactory(@NonNull T singletonLabel) {
         assert singletonLabel != null;
         this.singletonLabel = singletonLabel;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return singletonLabel.getDocumentation();
     }
 
     /**

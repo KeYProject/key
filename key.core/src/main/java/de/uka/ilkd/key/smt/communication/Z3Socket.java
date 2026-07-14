@@ -33,38 +33,39 @@ public class Z3Socket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-        case WAIT_FOR_RESULT -> {
-            if (msg.equals("unsat")) {
-                sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                // TODO: proof production is currently completely disabled, since it does not work
-                // with the legacy Z3 translation (proof-production not enabled) and also not
-                // really needed
-                // pipe.sendMessage("(get-proof)");
-                pipe.sendMessage("(get-unsat-core)");
-                pipe.sendMessage("(exit)");
-                sc.setState(WAIT_FOR_DETAILS);
-            }
-            if (msg.equals("sat")) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                pipe.sendMessage("(get-model)");
-                pipe.sendMessage("(exit)");
-                sc.setState(WAIT_FOR_DETAILS);
+            case WAIT_FOR_RESULT -> {
+                if (msg.equals("unsat")) {
+                    sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+                    // TODO: proof production is currently completely disabled, since it does not
+                    // work
+                    // with the legacy Z3 translation (proof-production not enabled) and also not
+                    // really needed
+                    // pipe.sendMessage("(get-proof)");
+                    pipe.sendMessage("(get-unsat-core)");
+                    pipe.sendMessage("(exit)");
+                    sc.setState(WAIT_FOR_DETAILS);
+                }
+                if (msg.equals("sat")) {
+                    sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                    pipe.sendMessage("(get-model)");
+                    pipe.sendMessage("(exit)");
+                    sc.setState(WAIT_FOR_DETAILS);
 
+                }
+                if (msg.equals("unknown")) {
+                    sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
+                    pipe.sendMessage("(exit)\n");
+                    sc.setState(WAIT_FOR_DETAILS);
+                }
             }
-            if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
-                pipe.sendMessage("(exit)\n");
-                sc.setState(WAIT_FOR_DETAILS);
+            case WAIT_FOR_DETAILS -> {
             }
-        }
-        case WAIT_FOR_DETAILS -> {
-        }
-        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-        // not work in future, it may be that we have to forcibly close the pipe.
-        // if (msg.equals("success")) {
-        // pipe.sendMessage("(exit)");
-        // pipe.close();
-        // }
+            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+            // not work in future, it may be that we have to forcibly close the pipe.
+            // if (msg.equals("success")) {
+            // pipe.sendMessage("(exit)");
+            // pipe.close();
+            // }
         }
     }
 

@@ -59,6 +59,8 @@ This pull request resolves #.
 - I added new test case(s) for new functionality.
 - I have tested the feature as follows: ...
 - I have checked that runtime performance has not deteriorated.
+- For new Gradle modules: I added the Gradle module to the test matrix in
+  `.github/workflows/tests.yml`
 
 ## Additional information and contact(s)
 

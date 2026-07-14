@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -143,7 +142,7 @@ public class MethodlevelTranslatorTest {
 
     }
 
-    private void debugLexer(@NonNull String expr) {
+    private void debugLexer(String expr) {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         DebugJmlLexer.debug(lexer);
     }

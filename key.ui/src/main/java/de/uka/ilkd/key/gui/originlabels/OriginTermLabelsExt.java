@@ -15,7 +15,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.NodeInfoVisualizer;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -27,7 +26,6 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.
@@ -64,7 +62,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(MainWindow mainWindow) {
         List<Action> result = new LinkedList<>();
         result.add(getToggleTrackingAction(mainWindow));
         result.add(getToggleSourceViewHighlightAction(mainWindow));
@@ -74,9 +72,9 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     @Override
     public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Object underlyingObject) {
-        if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
+        if (kind == ContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
-        } else if (kind == DefaultContextMenuKind.PROOF_TREE
+        } else if (kind == ContextMenuKind.PROOF_TREE
                 && underlyingObject instanceof Node node) {
             return NodeInfoVisualizer.getInstances(node).stream().map(OpenVisualizerAction::new)
                     .collect(Collectors.toList());
@@ -138,7 +136,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         private static final long serialVersionUID = -2936000510977056583L;
         /** The visualizer shown by this action. */
-        private final @NonNull NodeInfoVisualizer vis;
+        private final NodeInfoVisualizer vis;
 
         private OpenVisualizerAction(@NonNull NodeInfoVisualizer vis) {
             setName(vis.getLongName());

@@ -18,8 +18,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This class will display line numbers for a related text component. The text component must use
  * the same line height for each line. TextLineNumber supports wrapped lines and will highlight the
@@ -40,7 +38,7 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private final @NonNull JTextComponent component;
+    private final JTextComponent component;
 
     // Properties that can be changed
 

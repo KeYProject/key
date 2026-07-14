@@ -31,4 +31,14 @@ public final class TermLabelSV extends JOperatorSV implements TermLabel {
     public Object getTLChild(int i) {
         throw new IndexOutOfBoundsException();
     }
+
+    @Override
+    public String getMetaKey() {
+        return super.getMetaKey();
+    }
+
+    @Override
+    public Object getTLChild(int i) {
+        throw new IndexOutOfBoundsException();
+    }
 }

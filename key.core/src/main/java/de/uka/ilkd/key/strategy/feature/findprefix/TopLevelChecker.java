@@ -5,8 +5,6 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * Checks, whether the position in occurrence is top level.

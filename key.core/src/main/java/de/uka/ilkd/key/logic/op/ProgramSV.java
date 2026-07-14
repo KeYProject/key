@@ -6,12 +6,14 @@ package de.uka.ilkd.key.logic.op;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
@@ -26,8 +28,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,7 @@ public final class ProgramSV extends JOperatorSV
         return new Comment[0];
     }
 
+
     @Override
     public SourceElement getFirstElement() {
         return this;
@@ -90,11 +93,6 @@ public final class ProgramSV extends JOperatorSV
     @Override
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override
@@ -259,7 +257,7 @@ public final class ProgramSV extends JOperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private @Nullable MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
+    private MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
             MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {

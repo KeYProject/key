@@ -18,8 +18,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
  *
@@ -36,7 +34,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         super();
         setHeaderText("Keyboard Shortcuts");
         setSubHeaderText(
-            "These settings are stored in " + KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
+            "These settings are stored in " + KeyStrokeSettings.SETTINGS_FILE.toAbsolutePath());
         add(new JScrollPane(tblShortcuts));
     }
 
@@ -46,7 +44,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         KeyStrokeSettings settings = KeyStrokeManager.getSettings();
         Properties p = new Properties();
         settings.writeSettings(p);
@@ -183,21 +181,22 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
-            case 0 -> {
-                return actionName.get(rowIndex)
-                        // remove common package prefixes
-                        .replaceAll("([a-z]\\w*\\.)*", "");
-            }
-            case 1 -> {
-                Action a = actions.get(rowIndex);
-                if (a == null) {
-                    return "";
+                case 0 -> {
+                    return actionName.get(rowIndex)
+                            // remove common package prefixes
+                            .replaceAll("([a-z]\\w*\\.)*", "");
                 }
-                Object val = a.getValue(Action.SHORT_DESCRIPTION);
-                return val != null ? val.toString() : "";
-            }
-            case 2 -> {
-                return shortcut.get(rowIndex);
+                case 1 -> {
+                    Action a = actions.get(rowIndex);
+                    if (a == null) {
+                        return "";
+                    }
+                    Object val = a.getValue(Action.SHORT_DESCRIPTION);
+                    return val != null ? val.toString() : "";
+                }
+                case 2 -> {
+                    return shortcut.get(rowIndex);
+                }
             }
             }
             return "";

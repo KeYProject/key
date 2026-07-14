@@ -12,8 +12,6 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * This variable condition checks if given two terms s, t both terms have a different unique symbol

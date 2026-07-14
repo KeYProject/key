@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +100,7 @@ public class RunAllProofsAction extends MainWindowAction {
         super(mainWindow);
 
         Main.ensureExamplesAvailable();
-        exampleDir = Paths.get(Main.getExamplesDir());
+        exampleDir = Main.getExamplesDir();
 
         try {
             files = loadFiles();

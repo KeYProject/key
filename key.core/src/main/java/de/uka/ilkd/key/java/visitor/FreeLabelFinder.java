@@ -3,18 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 
 /**
  * descends recursively a given program and looks for free occurrences of a specified label
  */
 public class FreeLabelFinder {
 
-    public FreeLabelFinder() {
-    }
+    public FreeLabelFinder() {}
 
     public boolean findLabel(Label label, ProgramElement node) {
         if (!(node instanceof LabeledStatement

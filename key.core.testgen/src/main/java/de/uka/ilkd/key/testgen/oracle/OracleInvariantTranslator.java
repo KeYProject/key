@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -20,14 +22,7 @@ import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
-public class OracleInvariantTranslator {
-
-    private final Services services;
-
-    public OracleInvariantTranslator(Services services) {
-        this.services = services;
-    }
-
+public record OracleInvariantTranslator(Services services) {
     public JTerm getInvariantTerm(Sort s) {
         JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
@@ -37,8 +32,7 @@ public class OracleInvariantTranslator {
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
-
-        KeYJavaType kjt = info.getKeYJavaType(s);
+        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(s));
 
         if (!(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration
@@ -74,19 +68,9 @@ public class OracleInvariantTranslator {
                             result = tb.and(result, left);
                         }
                     }
-
-
                 }
-
-
             }
-
         }
-
         return tb.tt();
-
-
-
     }
-
 }

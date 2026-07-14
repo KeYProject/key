@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.literal.FreeLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
@@ -24,6 +25,7 @@ import org.key_project.util.ExtList;
  * @author Daniel Grahl
  *
  */
+@NullMarked
 public final class FreeLDT extends LDT {
 
     public static final Name NAME = new Name("Free");
@@ -46,7 +48,6 @@ public final class FreeLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -64,7 +65,6 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        // TODO Auto-generated method stub
         assert false;
         return null;
     }

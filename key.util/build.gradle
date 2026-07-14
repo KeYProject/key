@@ -1,7 +1,28 @@
+plugins {
+    id 'java-test-fixtures'
+}
+
 description = "Utility library of the key-project"
 
 dependencies {
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation(libs.jspecify)
+
+    // we also export these dependency into src/test/java.
+    testFixturesApi(project(':key.util'))
+
+    testFixturesApi(platform(libs.junit.bom))
+    testFixturesApi(libs.junit.jupiter.api)
+    testFixturesApi(libs.junit.jupiter.params)
+    testFixturesApi(libs.assertj.core)
+    testFixturesApi(libs.jspecify)
+
+    testFixturesApi(libs.logback.classic)
+
+    // test fixtures
+    testFixturesApi(libs.jackson.dataformat.yaml)
+    testFixturesApi(libs.jackson.datatype.jsr310)
+
+    testFixturesCompileOnly(libs.checkerframework.qual)
 }
 
 checkerFramework {
@@ -10,9 +31,9 @@ checkerFramework {
                 "org.checkerframework.checker.nullness.NullnessChecker",
         ]
         extraJavacArgs = [
-                //"-AonlyDefs=^org\\.key_project\\.logic",
+                "-AonlyDefs=^org\\.key_project\\.util",
                 "-Xmaxerrs", "10000",
-                "-Astubs=$rootDir/key.util/src/main/checkerframework${File.pathSeparatorChar}permit-nullness-assertion-exception.astub",
+                "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
                 "-AstubNoWarnIfNotFound",
                 "-Werror",
                 "-Aversion",

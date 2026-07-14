@@ -13,18 +13,17 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 
 /**
  * The command "focus" allows you to select formulas from the current sequent
@@ -40,26 +39,37 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @author Created by sarah on 1/12/17.
  * @author Mattias Ulbrich, 2023
  */
-public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
+public class FocusCommand extends AbstractCommand {
 
     public FocusCommand() {
         super(Parameters.class);
     }
 
+    @Documentation(category = "Fundamental", value = """
+            The command "focus" allows you to select formulas from the current sequent
+            to focus verification on. This means that all other formulas are discarded
+            (i.e. hidden using `hide_right`, `hide_left`).
+
+            Benefits are: The automation is guided into focussing on a relevant set of
+            formulas.
+
+            The selected set of sequent formulas can be regarded as an equivalent to a
+            believed "unsat core" of the sequent.
+
+            #### Examples:
+            - `focus x > 2 ==> x > 1` only keeps the mentioned to formulas in the current goal
+              removing all other formulas that could distract the automation.
+            """)
     static class Parameters {
-        @Option("#2")
-        public Sequent toKeep;
+        @Argument
+        @Documentation("The sequent containing the formulas to keep. It may contain placeholder symbols.")
+        public @MonotonicNonNull SequentWithHoles toKeep;
     }
 
     @Override
-    public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) {
-            throw new ScriptException("Missing 'sequent' argument for focus");
-        }
-
-        Sequent toKeep = s.toKeep;
-
-        hideAll(toKeep);
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var s = state().getValueInjector().inject(new Parameters(), args);
+        hideAll(s.toKeep);
     }
 
     @Override
@@ -73,38 +83,19 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param toKeep sequent containing formulas to keep
      * @throws ScriptException if no goal is currently open
      */
-    private void hideAll(Sequent toKeep) throws ScriptException {
+    private void hideAll(SequentWithHoles toKeep) throws ScriptException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
-        // The formulas to keep in the antecedent
-        ImmutableList<Term> keepAnte = toKeep.antecedent().asList()
-                .map(SequentFormula::formula);
-        ImmutableList<SequentFormula> ante =
-            goal.sequent().antecedent().asList();
-
-        for (SequentFormula seqFormula : ante) {
-            // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
-            if (!keepAnte.exists(
-                it -> {
-                    Term formula = seqFormula.formula();
-                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
-                })) {
+        for (SequentFormula seqFormula : goal.sequent().antecedent().asList()) {
+            if (!toKeep.containsAntecendent(seqFormula)) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
         }
 
-        ImmutableList<Term> keepSucc =
-            toKeep.succedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> succ =
-            goal.sequent().succedent().asList();
-        for (SequentFormula seqFormula : succ) {
-            if (!keepSucc.exists(
-                it -> {
-                    Term formula = seqFormula.formula();
-                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
-                })) {
+        for (SequentFormula seqFormula : goal.sequent().succedent().asList()) {
+            if (!toKeep.containsSuccedent(seqFormula)) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }

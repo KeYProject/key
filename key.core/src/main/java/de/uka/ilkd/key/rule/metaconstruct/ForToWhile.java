@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
@@ -100,8 +97,8 @@ public class ForToWhile extends ProgramTransformer {
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+        ImmutableList<SchemaVariable> ret = ImmutableList.nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

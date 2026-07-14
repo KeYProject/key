@@ -17,8 +17,8 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     private final JmlParser.@NonNull Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(@NonNull ImmutableList<JMLModifier> modifiers,
-            JmlParser.@NonNull Set_statementContext assignment) {
+    public TextualJMLSetStatement(ImmutableList<JMLModifier> modifiers,
+            JmlParser.Set_statementContext assignment) {
         super(modifiers);
         assert assignment != null;
         this.assignment = assignment;
@@ -38,7 +38,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof TextualJMLSetStatement ss)) {
             return false;
         }

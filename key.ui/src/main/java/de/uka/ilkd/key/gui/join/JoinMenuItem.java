@@ -18,8 +18,6 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * The menu item for the "delayed-cut" join rule.
  *
@@ -67,7 +65,7 @@ public class JoinMenuItem extends JMenuItem {
             }
 
             @Override
-            public void endOfJoining(final @NonNull ImmutableList<Goal> goals) {
+            public void endOfJoining(final ImmutableList<Goal> goals) {
                 SwingUtilities.invokeLater(() -> {
                     // This method delegates the request only to the UserInterfaceControl which
                     // implements the functionality.

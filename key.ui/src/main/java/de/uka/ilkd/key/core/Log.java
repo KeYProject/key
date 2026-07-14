@@ -19,7 +19,6 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,23 +55,30 @@ public class Log {
                 .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         if (verbosity != null) {
             Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
+            if (consoleAppender == null) {
+                return;
+            }
             consoleAppender.clearAllFilters();
             var filter = new ThresholdFilter();
             consoleAppender.addFilter(filter);
             switch (verbosity.byteValue()) {
-            case Verbosity.TRACE -> filter.setLevel("TRACE");
-            case Verbosity.DEBUG -> filter.setLevel("DEBUG");
-            case Verbosity.INFO -> filter.setLevel("INFO");
-            case Verbosity.NORMAL -> filter.setLevel("ERROR");
-            case Verbosity.SILENT -> filter.setLevel("OFF");
-            default -> filter.setLevel("WARN");
+                case Verbosity.TRACE -> filter.setLevel("TRACE");
+                case Verbosity.DEBUG -> filter.setLevel("DEBUG");
+                case Verbosity.INFO -> filter.setLevel("INFO");
+                case Verbosity.NORMAL -> filter.setLevel("ERROR");
+                case Verbosity.SILENT -> filter.setLevel("OFF");
+                default -> filter.setLevel("WARN");
             }
             filter.start();
         }
     }
 
     private static void cleanOldLogFiles() {
-        var logDir = PathConfig.getLogDirectory().toPath();
+        var logDir = PathConfig.currentPaths.logDirectory;
+        if (!Files.exists(logDir)) {
+            return;
+        }
+
         try (var files = Files.list(logDir)) {
             var duration = Duration.of(14, ChronoUnit.DAYS);
             var refDate = Instant.now().minus(duration);

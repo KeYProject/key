@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
-import java.net.MalformedURLException;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
-    protected final @NonNull Location location;
+    protected final Location location;
 
-    public SLTranslationException(@NonNull String message, @NonNull Throwable cause,
-            @NonNull Location location) {
+    public SLTranslationException(String message, Throwable cause, Location location) {
         super(message, cause);
         if (location == null) {
             throw new IllegalArgumentException();
@@ -25,21 +22,20 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this.location = location;
     }
 
-    public SLTranslationException(@NonNull String message, @NonNull Location location,
-            @NonNull Throwable cause) {
+    public SLTranslationException(String message, Location location, Throwable cause) {
         this(message, cause, location);
     }
 
-    public SLTranslationException(@NonNull String message, @NonNull Location location) {
+    public SLTranslationException(String message, Location location) {
         this(message, null, location);
     }
 
-    public SLTranslationException(@NonNull String message) {
+    public SLTranslationException(String message) {
         this(message, null, new Location(null, Position.UNDEFINED));
     }
 
     @Override
-    public @Nullable Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         return location;
     }
 }

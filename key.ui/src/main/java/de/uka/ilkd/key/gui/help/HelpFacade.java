@@ -18,8 +18,6 @@ import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Provides the facility to open the documentation at press of F1. The opened page is determined
  * context-sensitive by the current focused component and parent components. Specify the URL via
- * {@HelpInfo}.
+ * {@link HelpInfo}.
  *
  * @author Alexander Weigl
  * @version 1 (10.04.19)
@@ -78,7 +76,7 @@ public class HelpFacade {
      *
      * @param path a valid suffix to the current URI
      */
-    public static void openHelp(@NonNull String path) {
+    public static void openHelp(String path) {
         if (path.startsWith("https://")) {
             openHelpInBrowser(path);
             return;

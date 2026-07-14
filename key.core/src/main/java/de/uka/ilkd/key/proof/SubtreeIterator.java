@@ -6,8 +6,6 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Iterator over subtree. Current implementation iteratively traverses the tree depth-first.
  *

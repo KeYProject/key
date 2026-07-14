@@ -10,10 +10,10 @@ import java.util.Set;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -47,7 +47,6 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -58,9 +57,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     protected abstract Set<String> getAllowedPullOut();
 
     @Override
-    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-            @Nullable ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener)
             throws InterruptedException {
         for (Goal goal : goals) {
             addInvariantFormula(goal);
@@ -91,7 +90,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
@@ -143,10 +143,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     private static void addFormulas(List<SequentFormula> result,
-            Sort sort, ClassAxiom c,
+            KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        JTerm exactInstance = tb.exactInstance(sort, tb.var(o));
+        JTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {

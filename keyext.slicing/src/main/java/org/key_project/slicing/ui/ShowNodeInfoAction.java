@@ -22,8 +22,6 @@ import org.key_project.slicing.graph.DependencyGraph.Edge;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).
  * Used only for debugging purposes.

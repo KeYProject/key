@@ -15,7 +15,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import org.key_project.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -50,7 +49,7 @@ public class OverloadedOperatorHandler {
             this.image = image;
         }
 
-        public static @NonNull JMLOperator get(String image) {
+        public static JMLOperator get(String image) {
             for (JMLOperator value : values()) {
                 if (value.image.equals(image)) {
                     return value;
@@ -96,10 +95,9 @@ public class OverloadedOperatorHandler {
     }
 
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
-    private final @NonNull IntegerHandler integerHandler;
+    private final IntegerHandler integerHandler;
 
-    public OverloadedOperatorHandler(@NonNull Services services,
-            @NonNull SpecMathMode specMathMode) {
+    public OverloadedOperatorHandler(Services services, SpecMathMode specMathMode) {
         this.integerHandler = new IntegerHandler(services, specMathMode);
 
         handlers.add(new BinaryBooleanHandler(services));
@@ -139,6 +137,41 @@ public class OverloadedOperatorHandler {
         return null;
     }
 
+    /**
+     * When {@link #build} could not resolve an operator, this produces a hint for the error message
+     * in case the operator is actually available in a different spec math mode. For instance {@code
+     * >>>} is defined for {@code int}/{@code long} but not for {@code \bigint}, so in the default
+     * bigint mode it fails no matter how the operands are cast - the useful advice is to change the
+     * spec math mode, not the operand types.
+     *
+     * @param op the operator that {@link #build} could not resolve
+     * @return a one-sentence hint, or the empty string when there is nothing useful to add
+     */
+    public String modeHint(JMLOperator op) {
+        SpecMathMode current = integerHandler.getSpecMathMode();
+        EnumSet<SpecMathMode> supporting = integerHandler.supportingModes(op);
+        supporting.remove(current);
+        if (supporting.isEmpty()) {
+            return "";
+        }
+        List<String> modifiers = new ArrayList<>();
+        for (SpecMathMode mode : supporting) {
+            modifiers.add(specMathModifier(mode));
+        }
+        return String.format(
+            "The '%s' operator is not available in the '%s' spec math mode; "
+                + "it is available under %s (set as a class or method modifier).",
+            op.getImage(), specMathModifier(current), String.join(" or ", modifiers));
+    }
+
+    private static String specMathModifier(SpecMathMode mode) {
+        return switch (mode) {
+            case JAVA -> "spec_java_math";
+            case SAFE -> "spec_safe_math";
+            case BIGINT -> "spec_bigint_math";
+        };
+    }
+
 
     public static class SequenceHandler implements JMLOperatorHandler {
         private final @NonNull SeqLDT ldtSequence;
@@ -150,8 +183,7 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
-                @Nullable SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -176,8 +208,7 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
-                @Nullable SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -186,14 +217,14 @@ public class OverloadedOperatorHandler {
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 return switch (op) {
-                case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
-                case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
-                case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
-                case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
-                case LTE -> new SLExpression(tb.subset(l, r));
-                case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
-                case GTE -> new SLExpression(tb.subset(r, l));
-                default -> null;
+                    case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
+                    case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
+                    case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                    case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
+                    case LTE -> new SLExpression(tb.subset(l, r));
+                    case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
+                    case GTE -> new SLExpression(tb.subset(r, l));
+                    default -> null;
                 };
             }
             return null;
@@ -210,8 +241,7 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
-                @NonNull SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean
@@ -219,11 +249,11 @@ public class OverloadedOperatorHandler {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 return switch (op) {
-                case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
-                case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
-                case BITWISE_XOR -> new SLExpression(
-                    tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
-                default -> null;
+                    case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
+                    case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
+                    case BITWISE_XOR -> new SLExpression(
+                        tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
+                    default -> null;
                 };
             }
             return null;

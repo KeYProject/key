@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
 
 /**
  * This program is a little for debugging KeY Lexer.

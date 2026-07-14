@@ -24,8 +24,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,14 +33,7 @@ import org.slf4j.LoggerFactory;
  * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
-
-    private static final long serialVersionUID = 8494000234215913553L;
-
-    // The color constants that used to be here have been moved to SequentView to collect them in
-    // one place.
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
-
 
     // the mediator
     private final @NonNull KeYMediator mediator;
@@ -51,7 +42,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private final @NonNull CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private final @NonNull DragSource dragSource;
+    private final DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
@@ -65,7 +56,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public CurrentGoalView(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
-        setBackground(Color.white);
+
         // disables selection
         setSelectionColor(getBackground());
         listener = new CurrentGoalViewListener(this, getMediator());
@@ -165,7 +156,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
-    @NonNull
     DragSource getDragSource() {
         return dragSource;
     }
@@ -242,7 +232,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      *
      * @return the KeYMediator
      */
-    public @NonNull KeYMediator getMediator() {
+    public KeYMediator getMediator() {
         return mediator;
     }
 
@@ -262,7 +252,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
     }
 
-    public @Nullable PosInSequent getMousePosInSequent() {
+    public PosInSequent getMousePosInSequent() {
         return getPosInSequent(getMousePosition());
     }
 

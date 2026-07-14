@@ -5,27 +5,31 @@ package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Documentation(category = "Control",
+    value = """
+            Leave the current goal as it is. Technically, this
+            marks the current goal to be 'interactive' that is ignored by script commands or calls to automation.""")
 public class LeaveCommand extends NoArgumentCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaveCommand.class.getName());
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "leave";
     }
 
     @Override
-    public @NonNull String getDocumentation() {
+    public String getDocumentation() {
         return "Marks the current goal to be ignored by the macros.";
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Void args,
-            @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         LOGGER.info("Deactivating " + goal.node().serialNr());

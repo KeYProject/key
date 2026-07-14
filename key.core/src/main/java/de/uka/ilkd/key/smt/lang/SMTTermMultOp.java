@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,8 +20,14 @@ import java.util.List;
 // A more suitable name for this class will be TermMultOp
 public class SMTTermMultOp extends SMTTerm {
 
-    private static HashMap<Op, String> bvSymbols;
-    private static HashMap<Op, String> intSymbols;
+    /*
+     * These tables are built once, fully, and published as immutable maps. They must not be lazily
+     * initialized: a publish-then-populate scheme (assigning an empty map to the field and only
+     * then filling it) can let another thread observe a half-built map and fail with a spurious
+     * "Unknown operator" during concurrent SMT translation.
+     */
+    private static final Map<Op, String> bvSymbols = createBvSymbols();
+    private static final Map<Op, String> intSymbols = createIntSymbols();
 
     public enum OpProperty {
         NONE, LEFTASSOC, RIGHTASSOC, FULLASSOC, CHAINABLE, PAIRWISE
@@ -36,49 +43,49 @@ public class SMTTermMultOp extends SMTTerm {
 
         public SMTTerm getIdem() {
             return switch (this) {
-            case AND -> TRUE;
-            case OR -> FALSE;
-            default -> throw new RuntimeException(
-                "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
+                case AND -> TRUE;
+                case OR -> FALSE;
+                default -> throw new RuntimeException(
+                    "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
             };
         }
 
         public Op sign(boolean pol) {
             return switch (this) {
-            case AND -> {
-                if (pol) {
-                    yield this;
+                case AND -> {
+                    if (pol) {
+                        yield this;
+                    }
+                    yield OR;
                 }
-                yield OR;
-            }
-            case OR -> {
-                if (pol) {
-                    yield this;
+                case OR -> {
+                    if (pol) {
+                        yield this;
+                    }
+                    yield AND;
                 }
-                yield AND;
-            }
-            default -> throw new RuntimeException(
-                "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                    + this);
+                default -> throw new RuntimeException(
+                    "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
+                        + this);
             };
         }
     }
 
     public static OpProperty getProperty(SMTTermMultOp.Op op) {
         return switch (op) {
-        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
-        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
-        case IMPLIES -> OpProperty.RIGHTASSOC;
-        case IFF, EQUALS ->
-            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
-        case DISTINCT -> OpProperty.PAIRWISE;
-        default -> OpProperty.NONE;
+            case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+            case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+            case IMPLIES -> OpProperty.RIGHTASSOC;
+            case IFF, EQUALS ->
+                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+            case DISTINCT -> OpProperty.PAIRWISE;
+            default -> OpProperty.NONE;
         };
     }
 
-    private static void initMaps() {
+    private static Map<Op, String> createBvSymbols() {
         // bitvec
-        bvSymbols = new HashMap<>();
+        HashMap<Op, String> bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -111,8 +118,12 @@ public class SMTTermMultOp extends SMTTerm {
         bvSymbols.put(Op.BVSGT, "bvsgt");
         bvSymbols.put(Op.BVSGE, "bvsge");
         bvSymbols.put(Op.BVSDIV, "bvsdiv");
+        return Map.copyOf(bvSymbols);
+    }
+
+    private static Map<Op, String> createIntSymbols() {
         // int
-        intSymbols = new HashMap<>();
+        HashMap<Op, String> intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -126,6 +137,7 @@ public class SMTTermMultOp extends SMTTerm {
         intSymbols.put(Op.REM, "rem");
         intSymbols.put(Op.PLUS, "+");
         intSymbols.put(Op.MINUS, "-");
+        return Map.copyOf(intSymbols);
     }
 
 
@@ -138,9 +150,6 @@ public class SMTTermMultOp extends SMTTerm {
         this.subs = subs;
         for (SMTTerm sub : this.subs) {
             sub.upp = this;
-        }
-        if (bvSymbols == null || intSymbols == null) {
-            initMaps();
         }
     }
 
@@ -211,21 +220,21 @@ public class SMTTermMultOp extends SMTTerm {
     public SMTSort sort() {
 
         return switch (operator) {
-        case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM, BVSDIV -> {
-            // Sanity check
-            if (subs.size() > 1) {
-                if (!subs.get(0).sort().equals(subs.get(1).sort())) {
-                    String error = "Unexpected: binary operation with two diff. arg sorts";
-                    error += "\n";
-                    error += this.toSting() + "\n";
-                    error += "First sort: " + subs.get(0).sort() + "\n";
-                    error += "Second sort: " + subs.get(1).sort() + "\n";
-                    throw new RuntimeException(error);
+            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM, BVSDIV -> {
+                // Sanity check
+                if (subs.size() > 1) {
+                    if (!subs.get(0).sort().equals(subs.get(1).sort())) {
+                        String error = "Unexpected: binary operation with two diff. arg sorts";
+                        error += "\n";
+                        error += this.toSting() + "\n";
+                        error += "First sort: " + subs.get(0).sort() + "\n";
+                        error += "Second sort: " + subs.get(1).sort() + "\n";
+                        throw new RuntimeException(error);
+                    }
                 }
+                yield subs.get(0).sort();
             }
-            yield subs.get(0).sort();
-        }
-        default -> SMTSort.BOOL;
+            default -> SMTSort.BOOL;
         };
     }
 

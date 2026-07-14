@@ -79,7 +79,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
             @Override
             public String visit(Taclet taclet, boolean visitAddrules) {
-
                 if (taclet instanceof RewriteTaclet rwTaclet) {
                     Sequent assumptions = rwTaclet.assumesSequent();
                     var appRestr = rwTaclet.applicationRestriction();
@@ -88,7 +87,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         // any restriction is fine. The polarity switches are equiv
                         // to"inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
-                            + " is neither \\sameUpdateLevel nor \\inSequentState.");
+                            + " has \\ignoreUpdateLevel set or is not set to \\inSequentState.");
                     }
                 }
 

@@ -7,12 +7,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -44,7 +43,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +120,7 @@ public class LogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services The Services object
      */
-    public static LogicPrinter purePrinter(NotationInfo notationInfo, @Nullable Services services) {
+    public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
         return new LogicPrinter(notationInfo, services, PosTableLayouter.pure());
     }
 
@@ -134,10 +132,11 @@ public class LogicPrinter {
     }
 
     public static SequentViewLogicPrinter quickPrinter(Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         }
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
@@ -155,7 +154,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(JTerm t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
     /**
@@ -165,12 +164,15 @@ public class LogicPrinter {
      * @param services services.
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
+     * @param hidePackagePrefix
      * @return the printed term.
      */
     public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
-        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
+        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
+        p.layouter().beginC();
         p.printTerm(t);
+        p.layouter().end();
         return p.result();
     }
 
@@ -183,8 +185,12 @@ public class LogicPrinter {
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
+        // Wrap in an explicit block so the layouter flushes its last pending break; without this
+        // the trailing formula of the semisequent is dropped (issue #243). Mirrors quickPrintTerm.
+        p.layouter().beginC();
         p.printSemisequent(s);
+        p.layouter().end();
         return p.result();
     }
 
@@ -197,7 +203,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSequent(Sequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
         p.printSequent(s);
         return p.result();
     }
@@ -617,7 +623,7 @@ public class LogicPrinter {
     private void printSourceElement(SourceElement element) {
         new PrettyPrinter(layouter, instantiations, services,
             notationInfo.isPrettySyntax(),
-            notationInfo.isUnicodeEnabled()).print(element);
+            notationInfo.isUnicodeEnabled(), notationInfo.isHidePackagePrefix()).print(element);
     }
 
     /**
@@ -688,7 +694,15 @@ public class LogicPrinter {
             layouter.markEndSub();
             layouter.end();
         } catch (UnbalancedBlocksException e) {
+            reset();
             throw new RuntimeException("Unbalanced blocks in pretty printer", e);
+        } catch (RuntimeException | Error e) {
+            // A failure deep in the recursive term printing (e.g. a NullPointerException) unwinds
+            // past the pending end() calls and leaves the layouter with open blocks. Discard the
+            // dirty layouter so that a subsequently reused printer does not fail with a misleading
+            // UnbalancedBlocksException that masks this root cause.
+            reset();
+            throw e;
         }
     }
 
@@ -729,9 +743,19 @@ public class LogicPrinter {
      * @param seq The Sequent to be pretty-printed
      */
     public void printSequent(Sequent seq) {
-        layouter.beginC(0);
-        printSequentInExistingBlock(seq);
-        layouter.end();
+        try {
+            layouter.beginC(0);
+            printSequentInExistingBlock(seq);
+            layouter.end();
+        } catch (UnbalancedBlocksException e) {
+            reset();
+            throw new RuntimeException("Unbalanced blocks in pretty printer", e);
+        } catch (RuntimeException | Error e) {
+            // See printFilteredSequent: discard the layouter left dirty by a printing failure so a
+            // reused printer cannot later fail with a misleading UnbalancedBlocksException.
+            reset();
+            throw e;
+        }
     }
 
     /**
@@ -781,23 +805,31 @@ public class LogicPrinter {
      * @param t the Term to be printed
      */
     public void printTerm(JTerm t) {
+        layouter.beginC();
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            // printTerm is the central recursive method (called once per subterm), so the
+            // notation and the visible-label set are looked up once here instead of up to three
+            // times. getVisibleTermLabels is only consulted when the term actually has labels,
+            // preserving the previous short-circuit (its SequentViewLogicPrinter override
+            // allocates and filters on every call).
+            final Notation notation = notationInfo.getNotation(t.op());
+            final boolean parens = t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+                    && notation.getPriority() < NotationInfo.PRIORITY_ATOM;
+            if (parens) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op()).print(t, this);
-            if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty() && notationInfo
-                    .getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notation.print(t, this);
+            if (parens) {
                 layouter.print(")");
             }
         }
         if (t.hasLabels()) {
             printLabels(t);
         }
+        layouter.end();
     }
 
     /**
@@ -937,23 +969,33 @@ public class LogicPrinter {
         } else {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
-            boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
-                    layouter.print(op.getSortDependingOn().declarationString());
-                    layouter.print("::");
-                    layouter.keyWord(op.getKind().toString());
-                    alreadyPrinted = true;
+            if (t.op() instanceof ParametricFunctionInstance op) {
+                if (op.getBase().name().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
+                        || op.getBase().name().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
+                    isKeyword = true;
                 }
+                name = op.getBase().name().toString();
             }
             if (isKeyword) {
                 layouter.markStartKeyword();
             }
-            if (!alreadyPrinted) {
+            if (isKeyword) {
+                layouter.keyWord(name);
+            } else {
                 layouter.print(name);
             }
             if (isKeyword) {
                 layouter.markEndKeyword();
+            }
+            if (t.op() instanceof ParametricFunctionInstance pfi) {
+                layouter.print("<[");
+                for (int i = 0; i < pfi.getArgs().size(); ++i) {
+                    var arg = pfi.getArgs().get(i);
+                    if (i > 0)
+                        layouter.print(", ");
+                    printSort(arg.sort());
+                }
+                layouter.print("]>");
             }
             if (!t.boundVars().isEmpty()) {
                 layouter.print("{").beginC(0);
@@ -976,12 +1018,27 @@ public class LogicPrinter {
         }
     }
 
+    private void printSort(Sort s) {
+        String sort = s.declarationString();
+        if (notationInfo.isHidePackagePrefix()) {
+            int index = sort.lastIndexOf('.');
+            sort = sort.substring(index + 1);
+        }
+        layouter.print(sort);
+    }
+
     public void printCast(String pre, String post, JTerm t, int ass) {
-        final SortDependingFunction cast = (SortDependingFunction) t.op();
+        final var cast = (ParametricFunctionInstance) t.op();
 
         layouter.startTerm(t.arity());
         layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
+        String sort = cast.getArgs().head().sort().toString();
+        // remove package prefix from sort name
+        if (notationInfo.isHidePackagePrefix()) {
+            int index = sort.lastIndexOf('.');
+            sort = sort.substring(index + 1);
+        }
+        layouter.print(sort);
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }
@@ -990,7 +1047,7 @@ public class LogicPrinter {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation heapNotation) {
-            heapNotation.printEmbeddedHeap(t, this);
+            heapNotation.print(t, this);
             return true;
         } else {
             printTerm(t);
@@ -1002,7 +1059,7 @@ public class LogicPrinter {
         layouter.print(className);
     }
 
-    public void printHeapConstructor(JTerm t, boolean closingBrace) {
+    public void printHeapConstructor(JTerm t) {
         assert t.boundVars().isEmpty();
 
         final HeapLDT heapLDT = getHeapLDT();
@@ -1046,10 +1103,9 @@ public class LogicPrinter {
 
             layouter.print(")]").end();
 
-            if (closingBrace) {
+            if (!hasEmbedded) {
                 layouter.end();
             }
-
         } else {
             printFunctionTerm(t);
         }
@@ -1094,7 +1150,7 @@ public class LogicPrinter {
     }
 
     /*
-     * Print a term of the form: T::seqGet(Seq, int).
+     * Print a term of the form: seqGet<[T]>(Seq, int).
      */
     public void printSeqGet(JTerm t) {
         if (notationInfo.isPrettySyntax()) {
@@ -1171,26 +1227,39 @@ public class LogicPrinter {
             }
 
             // Print class name if the field is static.
-            String fieldName = obs.isStatic() ? HeapLDT.getClassName((Function) t.op()) + "." : "";
-            fieldName += HeapLDT.getPrettyFieldName(t.op());
+            final String typeNamePrefix =
+                obs.isStatic() ? HeapLDT.getClassName((Function) t.op()) + "." : "";
+            String symbolName = HeapLDT.getPrettyFieldName(t.op());
+            if (symbolName.contains(JavaDLFieldNames.SEPARATOR)) {
+                // pretty name was not found (may e.g. be not be a field but a query)
+                symbolName = typeNamePrefix
+                        + symbolName.substring(symbolName.indexOf(JavaDLFieldNames.SEPARATOR) +
+                                JavaDLFieldNames.SEPARATOR.length());
+            }
+
             boolean isKeyword = false;
             if (services != null) {
                 isKeyword = (obs == services.getJavaInfo().getInv());
             }
 
             if (obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
-                JavaInfo javaInfo = services.getJavaInfo();
                 if (t.arity() > 1) {
-                    // in case arity > 1 we assume fieldName refers to a query (method call)
+                    // in case arity > 1 we assume symbolName refers to a query (method call)
                     JTerm object = t.sub(1);
-                    KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     String p;
                     try {
-                        boolean canonical =
-                            obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
-                                    .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
+                        boolean canonical = false;
+                        if (services != null) {
+                            final KeYJavaType keYJavaType =
+                                services.getJavaInfo().getKeYJavaType(object.sort());
+                            canonical =
+                                obs.isStatic() || ((obs instanceof IProgramMethod)
+                                        && services.getJavaInfo()
+                                                .isCanonicalProgramMethod((IProgramMethod) obs,
+                                                    keYJavaType));
+                        }
                         if (canonical) {
-                            p = fieldName;
+                            p = symbolName;
                         } else {
                             p = "(" + t.op() + ")";
                         }
@@ -1202,8 +1271,8 @@ public class LogicPrinter {
                     }
                     layouter.print(p);
                 } else {
-                    // in case arity == 1 we assume fieldName refers to an array
-                    layouter.print(fieldName);
+                    // in case arity == 1 we assume symbolName refers to an array
+                    layouter.print(symbolName);
                 }
 
                 layouter.print("(").beginC(0);
@@ -1221,7 +1290,7 @@ public class LogicPrinter {
                 if (isKeyword) {
                     layouter.markStartKeyword();
                 }
-                layouter.print(fieldName);
+                layouter.print(symbolName);
                 if (isKeyword) {
                     layouter.markEndKeyword();
                 }
@@ -1754,7 +1823,7 @@ public class LogicPrinter {
     protected void maybeParens(JTerm t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
                 && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof JTerm) {
-            t = (JTerm) instantiations.getInstantiation((SchemaVariable) t.op());
+            t = instantiations.getInstantiation((SchemaVariable) t.op());
         }
 
         if (notationInfo.getNotation(t.op()).getPriority() < ass) {
@@ -1827,21 +1896,21 @@ public class LogicPrinter {
         for (int i = 0, sz = text.length(); i < sz; i++) {
             char c = text.charAt(i);
             switch (c) {
-            case '<' -> sb.append("&lt;");
-            case '>' -> sb.append("&gt;");
-            case '&' -> sb.append("&amp;");
-            case '\"' -> sb.append("&quot;");
-            case '\'' -> sb.append("&#039;");
-            case '(' -> sb.append("&#040;");
-            case ')' -> sb.append("&#041;");
-            case '#' -> sb.append("&#035;");
-            case '+' -> sb.append("&#043;");
-            case '-' -> sb.append("&#045;");
-            case '%' -> sb.append("&#037;");
-            case ';' -> sb.append("&#059;");
-            case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
-            case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
-            default -> sb.append(c);
+                case '<' -> sb.append("&lt;");
+                case '>' -> sb.append("&gt;");
+                case '&' -> sb.append("&amp;");
+                case '\"' -> sb.append("&quot;");
+                case '\'' -> sb.append("&#039;");
+                case '(' -> sb.append("&#040;");
+                case ')' -> sb.append("&#041;");
+                case '#' -> sb.append("&#035;");
+                case '+' -> sb.append("&#043;");
+                case '-' -> sb.append("&#045;");
+                case '%' -> sb.append("&#037;");
+                case ';' -> sb.append("&#059;");
+                case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
+                case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
+                default -> sb.append(c);
             }
 
         }

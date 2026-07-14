@@ -160,12 +160,12 @@
  TestMatchTaclet_wrap_blocks { \find ( \<{ {#slist} {#slist1} }\> post )
                     \replacewith ( \<{ {{#slist}} {{#slist1}} }\> post ) };
 
- TestMatchTaclet_wrap_blocks_two_empty_lists { \find ( \<{ {#slist #stmnt_list} {#slist1} }\> post )
+ TestMatchTaclet_wrap_blocks_two_empty_lists { \find ( \<{ {#slist; #stmnt_list;} {#slist1;} }\> post )
                     \replacewith ( \<{ {{#slist}} {{#slist1}} }\> post ) };
 
- TestMatchTaclet_remove_empty_blocks { \find ( \<{.. {{#slist}} {} ...}\>post ) \replacewith ( \<{.. ...}\>true ) };
+ TestMatchTaclet_remove_empty_blocks { \find ( \<{.. {{#slist;}} {} ...}\>post ) \replacewith ( \<{.. ...}\>true ) };
 
- TestMatchTaclet_bug_matching_lists { \find ( \<{.. { int #v0; #slist } {} ...}\> post ) \replacewith ( true ) };
+ TestMatchTaclet_bug_matching_lists { \find ( \<{.. { int #v0; #slist; } {} ...}\> post ) \replacewith ( true ) };
 
  TestMatchTaclet_methodframe {
 		\find (\<{.. method-frame(#ex){return;} ...}\>post)

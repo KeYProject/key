@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -20,6 +18,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -27,8 +26,29 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class LexPathOrdering implements TermOrdering {
 
+    /**
+     * Per-comparison memo, scoped to one top-level {@link #compare(Term, Term)} call. The
+     * recursion of {@link #compareHelp} visits the pair-DAG of the two terms; on large terms with
+     * structural sharing that DAG has far more distinct pairs than the bounded global
+     * {@link #cache} can hold, so the LRU is evicted mid-comparison and memoization collapses --
+     * measured two BILLION compareHelp calls (960M recomputations, 134s) for 1.68M comparisons on
+     * an ips4o goal at 6000 proof steps. An unbounded per-call map restores true DAG complexity
+     * (same run: 92M calls, 7.8s, byte-identical results). ThreadLocal because a LexPathOrdering
+     * instance is shared across parallel-prover workers; the map is reused (cleared) per call, so
+     * small comparisons pay only an empty-map lookup.
+     */
+    private final ThreadLocal<java.util.HashMap<CacheKey, CompRes>> callMemo =
+        ThreadLocal.withInitial(java.util.HashMap::new);
+
     public int compare(Term p_a, Term p_b) {
-        final CompRes res = compareHelp(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        memo.clear(); // scope the memo to this top-level comparison
+        final CompRes res;
+        try {
+            res = compareHelp(p_a, p_b);
+        } finally {
+            memo.clear();
+        }
         if (res.lt()) {
             return -1;
         } else if (res.gt()) {
@@ -75,19 +95,33 @@ public class LexPathOrdering implements TermOrdering {
     }
 
 
-    private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();
+    /**
+     * Cache of comparison results, an LRU bounded at {@link #CACHE_SIZE}. Previously this grew to
+     * 100000 entries and then dropped <em>all</em> of them at once; on long proofs that churns the
+     * cache (every overflow throws away the hot entries too) and averages ~50000 live entries. An
+     * LRU keeps the recently-used ones within a much smaller steady bound. 10000 is well below that
+     * old average (a memory saving) and A/B-safe: on the heaviest LexPath proof (the wide-branching
+     * bike example) shrinking 100000 -> 1000 cost &lt;2% automode time, i.e. the cache barely
+     * helps.
+     * The bound is tunable via {@code -Dkey.lexpath.cachesize}.
+     */
+    private static final int CACHE_SIZE = Integer.getInteger("key.lexpath.cachesize", 10000);
+    private final LRUCache<CacheKey, CompRes> cache = new LRUCache<>(CACHE_SIZE);
 
 
     private CompRes compareHelp(Term p_a, Term p_b) {
         final CacheKey key = new CacheKey(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        final CompRes local = memo.get(key);
+        if (local != null) {
+            return local;
+        }
         CompRes res = cache.get(key);
         if (res == null) {
             res = compareHelp2(p_a, p_b);
-            if (cache.size() > 100000) {
-                cache.clear();
-            }
             cache.put(key, res);
         }
+        memo.put(key, res);
         return res;
     }
 

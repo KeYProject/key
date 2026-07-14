@@ -62,7 +62,6 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
      */
-    @Nullable
     OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**

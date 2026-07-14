@@ -59,7 +59,7 @@
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "t"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "2") (term "1") (inst "#v0=t_1"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "t_1"))
-(rule "methodBodyExpand" (formula "2") (term "1") (newnames "heapBefore_<createObject>,savedHeapBefore_<createObject>"))
+(rule "methodBodyExpand" (formula "2") (term "1") (newnames "heapBefore_$createObject,savedHeapBefore_$createObject"))
 (builtin "One Step Simplification" (formula "2"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "__NEW__"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "2") (term "1") (inst "#v0=t_2"))
@@ -79,10 +79,10 @@
 (rule "assignment" (formula "5") (term "1"))
 (builtin "One Step Simplification" (formula "5"))
 (rule "methodCallWithinClass" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<prepareEnter>,savedHeapBefore_<prepareEnter>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$prepareEnter,savedHeapBefore_$prepareEnter"))
 (builtin "One Step Simplification" (formula "5"))
 (rule "methodCallSuper" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<prepare>,savedHeapBefore_<prepare>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$prepare,savedHeapBefore_$prepare"))
 (builtin "One Step Simplification" (formula "5"))
 (rule "methodCallEmpty" (formula "5") (term "1"))
 (rule "blockEmpty" (formula "5") (term "1"))
@@ -102,10 +102,10 @@
 (rule "blockEmpty" (formula "5") (term "1"))
 (rule "assignment" (formula "5") (term "1"))
 (builtin "One Step Simplification" (formula "5"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<init>,savedHeapBefore_<init>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$init,savedHeapBefore_$init"))
 (builtin "One Step Simplification" (formula "5"))
 (rule "methodCallSuper" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<init>_0,savedHeapBefore_<init>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$init_0,savedHeapBefore_$init"))
 (builtin "One Step Simplification" (formula "5"))
 (rule "methodCallEmpty" (formula "5") (term "1"))
 (rule "blockEmpty" (formula "5") (term "1"))
@@ -330,7 +330,7 @@
          (rule "commute_and" (formula "6") (term "0,2,2,2,0"))
          (rule "commute_and" (formula "6") (term "0,2,2,0"))
          (rule "ifthenelse_split" (formula "6") (term "2,2,2,2,0"))
-         (branch "f_0 = <created> & o_0 = t_2 TRUE"
+         (branch "f_0 = $created & o_0 = t_2 TRUE"
             (rule "andLeft" (formula "1"))
             (rule "replace_known_left" (formula "8") (term "1,0,2,2,0") (ifseqformula "2"))
             (builtin "One Step Simplification" (formula "8") (ifInst ""  (formula "2")) (ifInst ""  (formula "2")) (ifInst ""  (formula "2")))
@@ -343,7 +343,7 @@
             (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
             (rule "close" (formula "6") (ifseqformula "1"))
          )
-         (branch "f_0 = <created> & o_0 = t_2 FALSE"
+         (branch "f_0 = $created & o_0 = t_2 FALSE"
             (rule "ifthenelse_split" (formula "7") (term "2,0"))
             (branch "f_0 = right & o_0 = t_2 TRUE"
                (rule "andLeft" (formula "1"))
@@ -395,7 +395,7 @@
                )
                (branch "f_0 = heights & o_0 = t_2 FALSE"
                   (rule "ifthenelse_split" (formula "9") (term "0"))
-                  (branch "f_0 = <initialized> & o_0 = t_2 TRUE"
+                  (branch "f_0 = $initialized & o_0 = t_2 TRUE"
                      (rule "andLeft" (formula "1"))
                      (rule "eqSymm" (formula "11"))
                      (rule "replace_known_left" (formula "9") (term "1") (ifseqformula "2"))
@@ -423,7 +423,7 @@
                      (rule "eqSymm" (formula "3"))
                      (rule "close" (formula "7") (ifseqformula "3"))
                   )
-                  (branch "f_0 = <initialized> & o_0 = t_2 FALSE"
+                  (branch "f_0 = $initialized & o_0 = t_2 FALSE"
                      (rule "cut_direct" (formula "5") (term "0,0"))
                      (branch "CUT: o_0 = null TRUE"
                         (builtin "One Step Simplification" (formula "6"))

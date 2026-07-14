@@ -13,8 +13,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import org.jspecify.annotations.NonNull;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Loads the last opened file
@@ -56,7 +55,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         setEnabled(true);
     }
 }

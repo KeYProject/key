@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T1> type of first element
  * @param <T2> type of second element
  */
-public class Pair<T1 extends @Nullable Object, T2 extends @Nullable Object> {
+public class Pair<T1, T2> {
     /**
      * First element.
      */
@@ -56,7 +55,10 @@ public class Pair<T1 extends @Nullable Object, T2 extends @Nullable Object> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second);
+        // Same value as Objects.hash(first, second) but without allocating the varargs Object[]
+        // on every call (Pair is heavily used as a hash-map key during proof search).
+        int result = 31 + (first == null ? 0 : first.hashCode());
+        return 31 * result + (second == null ? 0 : second.hashCode());
     }
 
     ///////////////////////////////////////////////////////////

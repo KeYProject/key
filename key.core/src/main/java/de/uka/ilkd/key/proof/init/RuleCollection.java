@@ -12,13 +12,13 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * This class contains the standard rules provided by a profile.
  */
-public record RuleCollection(RuleSource standardTaclets,
+public record RuleCollection(ImmutableList<RuleSource> standardTaclets,
         ImmutableList<BuiltInRule> standardBuiltInRules) {
 
     /**
-     * returns the rule source containg all taclets for this profile
+     * returns the rule source containing all taclets for this profile
      */
-    public RuleSource getTacletBase() { return standardTaclets; }
+    public ImmutableList<RuleSource> getTacletBase() { return standardTaclets; }
 
     /**
      * returns a list of all built in rules to be used

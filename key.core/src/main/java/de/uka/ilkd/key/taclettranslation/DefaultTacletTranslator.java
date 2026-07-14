@@ -22,7 +22,6 @@ import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Translates a rewrite taclet to a formula.
@@ -114,10 +113,10 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         return switch (polarity) {
-        case 0 -> tb.equals(find, replace);
-        case 1 -> tb.imp(replace, find);
-        case -1 -> tb.imp(find, replace);
-        default -> throw new IllegalArgumentException();
+            case 0 -> tb.equals(find, replace);
+            case 1 -> tb.imp(replace, find);
+            case -1 -> tb.imp(find, replace);
+            default -> throw new IllegalArgumentException();
         };
     }
 
@@ -164,7 +163,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
 
         // translate the replace and add patterns of the taclet.
-        ImmutableList<JTerm> list = ImmutableSLList.nil();
+        ImmutableList<JTerm> list = ImmutableList.nil();
 
         for (TacletGoalTemplate template : taclet.goalTemplates()) {
 

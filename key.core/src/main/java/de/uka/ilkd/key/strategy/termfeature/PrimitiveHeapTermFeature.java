@@ -13,8 +13,6 @@ import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 
-import org.jspecify.annotations.NonNull;
-
 
 public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
 
@@ -29,7 +27,7 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(@NonNull Term t, MutableState mState, LogicServices services) {
+    protected boolean filter(Term t, MutableState mState, LogicServices services) {
         // t.op() is the base heap or another primitive heap variable
         boolean isPrimitive = false;
         Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();

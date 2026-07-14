@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.KeYParser.*;
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import java.net.URI;
+
+import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser.*;
+import de.uka.ilkd.key.nparser.JavaKeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
 import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,8 @@ import static org.key_project.util.java.StringUtil.trim;
 ///
 /// @author Alexander Weigl
 /// @version 1 (18.01.25)
-/// @see de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext
-class ExprEvaluator extends KeYParserBaseVisitor<Object> {
+/// @see de.uka.ilkd.key.nparser.JavaKeYParser.ProofScriptExpressionContext
+class ExprEvaluator extends JavaKeYParserBaseVisitor<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprEvaluator.class);
     private final EngineState state;
 
@@ -39,37 +40,43 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public @NonNull Object visitBoolean_literal(@NonNull Boolean_literalContext ctx) {
+    public Object visitProofScriptCodeBlock(ProofScriptCodeBlockContext ctx) {
+        URI uri = KeyAst.ProofScript.getUri(ctx.start);
+        return KeyAst.ProofScript.asAst(uri, ctx);
+    }
+
+    @Override
+    public Object visitBoolean_literal(Boolean_literalContext ctx) {
         return Boolean.parseBoolean(ctx.getText());
     }
 
     @Override
-    public @NonNull Object visitChar_literal(KeYParser.@NonNull Char_literalContext ctx) {
+    public Object visitChar_literal(JavaKeYParser.Char_literalContext ctx) {
         return ctx.getText().charAt(1); // skip "'"
     }
 
     @Override
-    public @NonNull Object visitInteger(@NonNull IntegerContext ctx) {
+    public Object visitInteger(IntegerContext ctx) {
         return Integer.parseInt(ctx.getText());
     }
 
     @Override
-    public @NonNull Object visitFloatLiteral(KeYParser.@NonNull FloatLiteralContext ctx) {
+    public Object visitFloatLiteral(JavaKeYParser.FloatLiteralContext ctx) {
         return Float.parseFloat(ctx.getText());
     }
 
     @Override
-    public @NonNull Object visitDoubleLiteral(@NonNull DoubleLiteralContext ctx) {
+    public Object visitDoubleLiteral(DoubleLiteralContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public @NonNull String visitString_literal(@NonNull String_literalContext ctx) {
+    public String visitString_literal(String_literalContext ctx) {
         return trim(ctx.getText(), '"');
     }
 
     @Override
-    public @NonNull Sequent visitSeq(@NonNull SeqContext ctx) {
+    public Sequent visitSeq(SeqContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
@@ -82,16 +89,16 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public @NonNull Object visitSimple_ident(Simple_identContext ctx) {
+    public Object visitSimple_ident(Simple_identContext ctx) {
         return evaluateExpression(ctx);
     }
 
     @Override
-    public @NonNull Object visitTerm(KeYParser.TermContext ctx) {
+    public Object visitTerm(JavaKeYParser.TermContext ctx) {
         return evaluateExpression(ctx);
     }
 
-    private @NonNull Object evaluateExpression(@NonNull ParserRuleContext ctx) {
+    private Object evaluateExpression(ParserRuleContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
@@ -103,7 +110,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    protected Object aggregateResult(Object aggregate, @Nullable Object nextResult) {
+    protected Object aggregateResult(Object aggregate, Object nextResult) {
         return nextResult == null ? aggregate : nextResult;
     }
 }

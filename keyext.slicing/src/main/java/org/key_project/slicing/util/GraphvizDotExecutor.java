@@ -16,7 +16,6 @@ import javax.swing.*;
 import org.key_project.slicing.SlicingSettings;
 import org.key_project.slicing.SlicingSettingsProvider;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +102,7 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     }
 
     @Override
-    protected @NonNull GraphvizResult doInBackground() {
+    protected GraphvizResult doInBackground() {
         SlicingSettings ss = SlicingSettingsProvider.getSlicingSettings();
         Process process = null;
         try {

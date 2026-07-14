@@ -138,7 +138,7 @@ public class JmlMarkerDecision {
      * @return true whether the given conditions are met and the comment should be considered as
      *         active.
      */
-    public boolean isActiveJmlSpec(@NonNull String foundKeys) {
+    public boolean isActiveJmlSpec(String foundKeys) {
         if (foundKeys.isEmpty()) {
             // a JML annotation with no keys is always included,
             return true;

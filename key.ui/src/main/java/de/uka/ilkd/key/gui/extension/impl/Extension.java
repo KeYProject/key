@@ -10,8 +10,6 @@ import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +19,9 @@ import org.slf4j.LoggerFactory;
  */
 public class Extension<T> implements Comparable<Extension<T>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
-    private final @NonNull Class<T> clazz;
-    private final KeYGuiExtension.@Nullable Info info;
-    private @Nullable T instance = null;
+    private final Class<T> clazz;
+    private final KeYGuiExtension.Info info;
+    private T instance = null;
 
     public Extension(@NonNull Class<T> clazz) {
         this.clazz = clazz;
@@ -87,7 +85,7 @@ public class Extension<T> implements Comparable<Extension<T>> {
 
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

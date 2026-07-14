@@ -107,10 +107,9 @@ public final class SuffixArray {
       @ ensures data[x-1] == \old(data[x]);
 
       @ assignable data[x], data[x-1];
-      @ helper
       @
       @*/
-    private void swap(/*@ nullable */ int[] data, int x) {
+    private /*@ helper @*/ void swap(/*@ nullable */ int[] data, int x) {
         final int y = x-1;
         final int t = data[x];
         data[x] = data[y];

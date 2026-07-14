@@ -7,7 +7,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.html.HTMLDocument;
@@ -33,9 +34,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,20 +43,28 @@ import org.slf4j.LoggerFactory;
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
-    private static final long serialVersionUID = 6867808795064180589L;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
-    public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
+    public static final ColorSettings.ColorProperty PERMANENT_HIGHLIGHT_COLOR =
+        ColorSettings.define("[currentGoal]permaHighlight",
+            "",
+            new Color(110, 85, 181, 76),
+            new Color(210, 185, 201, 200));
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
+        ColorSettings.define("[currentGoal]defaultHighlight", "",
+            new Color(70, 100, 170, 76),
+            new Color(140, 200, 255, 180));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
+        ColorSettings.define("[currentGoal]addtionalHighlight", "",
+            new Color(0, 0, 0, 38),
+            new Color(240, 220, 255, 180));
 
     public static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
+        ColorSettings.define("[currentGoal]updateHighlight", "",
+            new Color(0, 150, 130, 38),
+            new Color(0, 150, 130, 255));
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 255));
@@ -70,8 +77,7 @@ public abstract class SequentView extends JEditorPane {
         "[currentGoal]mouseSelectionColor", "Color of the mouse selection in the sequent view.",
         new Color(230, 230, 230, 255));
 
-    protected static final Color INACTIVE_BACKGROUND_COLOR =
-        new Color(UIManager.getColor("Panel.background").getRGB());
+    protected static Color INACTIVE_BACKGROUND_COLOR = UIManager.getColor("Panel.background");
 
     private static final HighlightPainter MOUSE_SELECTION_PAINTER =
         new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
@@ -81,11 +87,11 @@ public abstract class SequentView extends JEditorPane {
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
 
-    private final @NonNull MainWindow mainWindow;
+    private final MainWindow mainWindow;
 
-    private final @NonNull Cached<String, Void> setTextCache;
+    private final Cached<String, Void> setTextCache;
 
-    public @NonNull MainWindow getMainWindow() {
+    public MainWindow getMainWindow() {
         return mainWindow;
     }
 
@@ -111,17 +117,17 @@ public abstract class SequentView extends JEditorPane {
 
     private final @NonNull ConfigChangeListener configChangeListener;
     protected SequentPrintFilter filter;
-    private @Nullable SequentViewLogicPrinter printer;
+    private SequentViewLogicPrinter printer;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
-    private @Nullable Object defaultHighlight;
+    private Object defaultHighlight;
 
     // the current tag of the highlight
     private @Nullable Object currentHighlight;
 
     // an additional highlight to mark the first active java statement
-    private @Nullable Object additionalJavaHighlight;
+    private Object additionalJavaHighlight;
 
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
@@ -134,7 +140,7 @@ public abstract class SequentView extends JEditorPane {
      */
     private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
 
-    private final @NonNull SequentViewInputListener sequentViewInputListener;
+    private final SequentViewInputListener sequentViewInputListener;
 
     private @Nullable Object userSelectionHighlight = null;
     private @Nullable Range userSelectionHighlightRange = null;
@@ -154,7 +160,7 @@ public abstract class SequentView extends JEditorPane {
                 mainWindow.getMediator().getServices(), getVisibleTermLabels());
 
         setContentType("text/html");
-        HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
+        updateUI();
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -203,7 +209,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     @Override
-    public @Nullable String getToolTipText(@NonNull MouseEvent event) {
+    public @Nullable String getToolTipText(MouseEvent event) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isShowSequentViewTooltips()) {
             return null;
@@ -289,7 +295,7 @@ public abstract class SequentView extends JEditorPane {
      * @param color the Color used to highlight regions of the sequent
      * @return the highlight for the specified color
      */
-    public final @Nullable Object createColorHighlight(Color color) {
+    public final Object createColorHighlight(Color color) {
         Object highlight = null;
         if (!color2Highlight.containsKey(color)) {
             // show highlights above each other
@@ -356,7 +362,7 @@ public abstract class SequentView extends JEditorPane {
     /**
      * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
-    protected synchronized @Nullable PosInSequent getPosInSequent(@Nullable Point p) {
+    protected synchronized @Nullable PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
         if (seqText != null && !seqText.isEmpty()) {
             final InitialPositionTable initialPositionTable = getInitialPositionTable();
@@ -382,7 +388,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @param p The LogicPrinter to be used
      */
-    protected void setLogicPrinter(@NonNull SequentViewLogicPrinter p) {
+    protected void setLogicPrinter(SequentViewLogicPrinter p) {
         if (p.layouter().isPure()) {
             throw new IllegalArgumentException(
                 "Pure printer passed to sequent view which needs position table");
@@ -390,7 +396,7 @@ public abstract class SequentView extends JEditorPane {
         printer = p;
     }
 
-    public String getHighlightedText(@Nullable PosInSequent pos) {
+    public String getHighlightedText(PosInSequent pos) {
         if (pos == null) {
             return "";
         }
@@ -486,7 +492,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @param p the mouse pointer coordinates
      */
-    public void paintHighlights(@NonNull Point p) {
+    public void paintHighlights(Point p) {
         // re-initialize highlights if needed
         if (!Arrays.asList(getHighlighter().getHighlights()).contains(additionalJavaHighlight)) {
             additionalJavaHighlight = createColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
@@ -591,7 +597,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
@@ -607,7 +613,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = getHighlightRange(point);
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
         } catch (BadLocationException e) {
@@ -662,7 +668,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = new Range(pis.getBounds().start(), pis.getBounds().end());
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
@@ -691,10 +697,15 @@ public abstract class SequentView extends JEditorPane {
     @Override
     public void updateUI() {
         super.updateUI();
+        try {
+            HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
+        } catch (ClassCastException ignore) {
+        }
         setFont();
+        INACTIVE_BACKGROUND_COLOR = UIManager.getColor("Panel.background");
     }
 
-    public static int computeLineWidthFor(@NonNull JComponent c) {
+    public static int computeLineWidthFor(JComponent c) {
         // assumes we have a uniform font width
         int maxChars =
             (int) (c.getVisibleRect().getWidth() / c.getFontMetrics(c.getFont()).charWidth('W'));
@@ -703,6 +714,13 @@ public abstract class SequentView extends JEditorPane {
             maxChars -= 1;
         }
         return maxChars;
+    }
+
+    /**
+     * computes the line width
+     */
+    public int computeLineWidth() {
+        return computeLineWidthFor(this);
     }
 
     /**
@@ -748,7 +766,7 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                        ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
                                 .<Integer>nil().prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
                         // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
@@ -767,7 +785,7 @@ public abstract class SequentView extends JEditorPane {
                     form, max_age + 2);
                 if (age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList
+                    ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
                             .<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
@@ -934,7 +952,7 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(@Nullable Node node, @NonNull SequentFormula form,
+    private int computeSeqFormulaAge(Node node, SequentFormula form,
             int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
@@ -946,7 +964,7 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
-    protected void updateSequent(@Nullable Node node) {
+    protected void updateSequent(Node node) {
         var start = System.nanoTime();
         getLogicPrinter().update(getFilter(), getLineWidth());
         String printed = getLogicPrinter().result();
@@ -1064,7 +1082,7 @@ public abstract class SequentView extends JEditorPane {
         }
 
         @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(Object o) {
             if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }

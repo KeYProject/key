@@ -29,7 +29,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -48,15 +48,13 @@ import org.slf4j.LoggerFactory;
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
-    public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
-
-    @Serial
-    private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
     private final static Icon linkedGoalIcon = IconFactory.keyHoleLinked(20, 20);
+
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
+    private static final IconFontProvider GOAL_LIST_ICON =
+        new IconFontProvider(FontAwesomeSolid.FLAG_CHECKERED);
     /**
      * the model used by this view
      */
@@ -118,7 +116,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return GOAL_LIST_ICON;
+        return GOAL_LIST_ICON.get(MainWindow.TAB_ICON_SIZE);
     }
 
     @Override
@@ -230,10 +228,17 @@ public class GoalList extends JList<Goal> implements TabPanel {
                             return false;
                         }
                     }); // do not print term labels
-            sp.printSequent(seq);
-            res = sp.result().replace('\n', ' ');
-            res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
-
+            try {
+                sp.printSequent(seq);
+                // Only read the result once printing has completed: result() returns the raw
+                // backend buffer without flushing, so on a failed print it would yield a
+                // truncated/empty sequent. Read it here on the success path instead.
+                res = sp.result().replace('\n', ' ');
+                res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
+            } catch (Exception ex) {
+                LOGGER.warn("GoalList: Problem printing sequent.", ex);
+                res = "<unable to print sequent>";
+            }
             seqToString.put(seq, res);
         }
         return res;
@@ -561,14 +566,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * focused node has changed
          */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             selectSelectedGoal();
         }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("GoalList: initialize with new proof");
             selectingListModel.setProof(e.getSource().getSelectedProof());
             validate();
@@ -598,8 +603,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * used to prevent the display of goals that appear closed for the present user constraint.
      */
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
-        @Serial
-        private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
          * List of <code>Integer</code> objects that determine the (strictly monotonic) mapping of
@@ -814,7 +817,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // (DS) Also add the serial of the corresponding node to the
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
+
+                // FIXME weigl: disable for UnbalancedParenIssue
                 valueStr = "(#" + ((Goal) value).node().serialNr() + ") " + seqToString(seq);
+                // valueStr = "";
 
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;

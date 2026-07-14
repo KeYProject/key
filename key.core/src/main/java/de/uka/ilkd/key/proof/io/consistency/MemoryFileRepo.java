@@ -20,19 +20,19 @@ import org.jspecify.annotations.Nullable;
 public class MemoryFileRepo extends AbstractFileRepo {
 
     @Override
-    public @Nullable InputStream getInputStream(Path path) {
+    public InputStream getInputStream(Path path) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public @Nullable InputStream getInputStream(RuleSource ruleSource) {
+    public InputStream getInputStream(RuleSource ruleSource) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public @Nullable InputStream getInputStream(URL url) {
+    public InputStream getInputStream(URL url) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -17,7 +17,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -28,12 +27,12 @@ public class Polynomial {
      * The polynomial expression of the BigInteger constant '0'.
      */
     public final static Polynomial ZERO =
-        new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
+        new Polynomial(ImmutableList.nil(), BigInteger.ZERO);
     /**
      * The polynomial expression of the BigInteger constant '1'.
      */
     public final static Polynomial ONE =
-        new Polynomial(ImmutableSLList.nil(), BigInteger.ONE);
+        new Polynomial(ImmutableList.nil(), BigInteger.ONE);
 
     /**
      * The BigInteger constant for the value '-1'.
@@ -75,9 +74,9 @@ public class Polynomial {
 
     public Polynomial multiply(BigInteger c) {
         if (c.signum() == 0) {
-            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
+            return new Polynomial(ImmutableList.nil(), BigInteger.ZERO);
         }
-        ImmutableList<Monomial> newParts = ImmutableSLList.nil();
+        ImmutableList<Monomial> newParts = ImmutableList.nil();
         for (Monomial part : parts) {
             newParts = newParts.prepend(part.multiply(c));
         }
@@ -87,10 +86,10 @@ public class Polynomial {
 
     public Polynomial multiply(Monomial m) {
         if (m.getCoefficient().signum() == 0) {
-            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
+            return new Polynomial(ImmutableList.nil(), BigInteger.ZERO);
         }
 
-        ImmutableList<Monomial> newParts = ImmutableSLList.nil();
+        ImmutableList<Monomial> newParts = ImmutableList.nil();
         for (Monomial part : parts) {
             newParts = newParts.prepend(part.multiply(m));
         }
@@ -268,7 +267,7 @@ public class Polynomial {
 
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
-        public ImmutableList<Monomial> parts = ImmutableSLList.nil();
+        public ImmutableList<Monomial> parts = ImmutableList.nil();
         private final Services services;
         private final TypeConverter tc;
         private final Operator numbers, add;

@@ -19,8 +19,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.Sequent;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +36,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      */
     private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
-    private final @NonNull Collection<TacletAppListItem> insertionTaclets;
+    private final Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
     private final List<ActionListener> listenerList = new LinkedList<>();
     /** the notation info to pretty print the taclet apps */
@@ -277,7 +275,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
             return longDescription();
         }
 
-        public @NonNull String longDescription() {
+        public String longDescription() {
             final LogicPrinter printer = LogicPrinter.purePrinter(notInfo, services);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);

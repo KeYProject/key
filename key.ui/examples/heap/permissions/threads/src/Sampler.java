@@ -44,7 +44,7 @@ public final class Sampler extends ThreadSpec2 {
         ensures this.buffer == b;
         assignable \nothing;
         assignable<permissions> \nothing; @*/
-    /*@ helper @*/ public Sampler(Buffer b) { this.buffer = b; }
+    public /*@ helper @*/ Sampler(Buffer b) { this.buffer = b; }
 }
 
 

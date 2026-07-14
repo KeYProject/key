@@ -11,7 +11,6 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
-import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_COPY;
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_REOPEN;
@@ -52,15 +51,15 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     /**
      * Checkbox for first option.
      */
-    private final @NonNull JCheckBox strategySearch;
+    private final JCheckBox strategySearch;
     /**
      * Combobox for second option (dispose behaviour).
      */
-    private final @NonNull JComboBox<String> disposeOption;
+    private final JComboBox<String> disposeOption;
     /**
      * Combobox for third option (prune behaviour).
      */
-    private final @NonNull JComboBox<String> pruneOption;
+    private final JComboBox<String> pruneOption;
 
     /**
      * Construct a new settings provider.
@@ -81,24 +80,24 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
                 When a referenced proof is pruned, this is what happens to
                  all cached branches that reference it.""",
             0, x -> {
-            }, PRUNE_REOPEN, PRUNE_COPY);
+            }, PRUNE_COPY, PRUNE_REOPEN);
     }
 
     @Override
-    public @NonNull String getDescription() {
+    public String getDescription() {
         return "Proof Caching";
     }
 
     /**
      * @return the settings managed by this provider
      */
-    public static @NonNull ProofCachingSettings getCachingSettings() {
+    public static ProofCachingSettings getCachingSettings() {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(CACHING_SETTINGS);
         return CACHING_SETTINGS;
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofCachingSettings ss = getCachingSettings();
         strategySearch.setSelected(ss.getEnabled());
         disposeOption.setSelectedItem(ss.getDispose());

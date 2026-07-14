@@ -102,7 +102,7 @@ public class SystemInfoAction extends MainWindowAction {
         }
     }
 
-    private @NonNull String formatList(@NonNull List<?> l) {
+    private String formatList(List<?> l) {
         StringBuilder sb = new StringBuilder();
         for (Object o : l) {
             sb.append(o);

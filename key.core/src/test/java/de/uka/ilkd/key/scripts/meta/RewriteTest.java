@@ -42,8 +42,8 @@ public class RewriteTest {
         assertNotNull(env);
 
         Proof p = env.getLoadedProof();
-        ProofScriptEngine engine = new ProofScriptEngine(script);
-        engine.execute(env.getUi(), p);
+        ProofScriptEngine engine = new ProofScriptEngine(p);
+        engine.execute(env.getUi(), script);
 
         String firstOpenGoal = p.openGoals().head().sequent().toString();
         String expectedSequent = "[equals(x,f),equals(x,z)]==>[equals(z,f)]";
@@ -59,8 +59,8 @@ public class RewriteTest {
     @Test
     public void testLessTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        Path script = HelperClassForTests.TESTCASE_DIRECTORY
-                .resolve("scriptCommands/lesstrans.script");
+        Path script =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/lesstrans.script");
         Path keyFile =
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/less_trans.key");
 
@@ -69,8 +69,8 @@ public class RewriteTest {
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         Proof proof = env.getLoadedProof();
-        ProofScriptEngine engine = new ProofScriptEngine(script);
-        engine.execute(env.getUi(), proof);
+        ProofScriptEngine engine = new ProofScriptEngine(proof);
+        engine.execute(env.getUi(), script);
 
         String firstOpenGoal = proof.openGoals().head().sequent().toString();
         String expectedSequent = "[]==>[imp(and(gt(x,f),lt(x,z)),lt(f,z))]";

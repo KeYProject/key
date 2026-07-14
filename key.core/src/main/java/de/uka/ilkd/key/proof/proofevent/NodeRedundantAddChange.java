@@ -5,8 +5,6 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * An instance of this class informs the listerns if a formula has been tried to add to the sequent
  */

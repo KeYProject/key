@@ -5,11 +5,26 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;

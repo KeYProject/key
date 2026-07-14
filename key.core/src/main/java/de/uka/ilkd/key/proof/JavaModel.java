@@ -8,8 +8,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.Includes;
 
 import org.key_project.util.java.IOUtil;
@@ -24,10 +26,10 @@ public final class JavaModel {
     private final @Nullable Path modelDir;
     private final @Nullable String modelTag;
     private final String descr;
-    private final @Nullable List<Path> classPath;
-    private final @Nullable Path bootClassPath;
-    private final @Nullable List<Path> includedFiles;
-    private final @Nullable Path initialFile;
+    private final List<Path> classPath;
+    private final Path bootClassPath;
+    private final List<Path> includedFiles;
+    private final Path initialFile;
 
     public static final JavaModel NO_MODEL = new JavaModel();
 
@@ -36,11 +38,9 @@ public final class JavaModel {
      *
      */
     public static JavaModel createJavaModel(
-            @Nullable Path javaPath,
-            @Nullable List<Path> classPath,
-            @Nullable Path bootClassPath,
-            @Nullable Includes includes,
-            @Nullable Path initialFile) {
+            Path javaPath,
+            List<Path> classPath,
+            Path bootClassPath, Includes includes, Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = NO_MODEL;
@@ -88,19 +88,19 @@ public final class JavaModel {
         return modelTag;
     }
 
-    public @Nullable List<Path> getClassPath() {
+    public List<Path> getClassPath() {
         return classPath;
     }
 
-    public @Nullable Path getBootClassPath() {
+    public Path getBootClassPath() {
         return bootClassPath;
     }
 
-    public @Nullable List<Path> getIncludedFiles() {
+    public List<Path> getIncludedFiles() {
         return includedFiles;
     }
 
-    public @Nullable Path getInitialFile() {
+    public Path getInitialFile() {
         return initialFile;
     }
 
@@ -149,8 +149,10 @@ public final class JavaModel {
     /// if necessary.
     public String asKeyString() {
         return (bootClassPath != null
-                ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
-                : "") +
+                && !Objects.equals(bootClassPath.toAbsolutePath(), Services.getReduxPath())
+                        ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
+                        : "")
+                +
                 (classPath != null && !classPath.isEmpty() ? "\n\\classpath %s;".formatted(
                     classPath.stream().map(IOUtil::safePath)
                             .map("\"%s\""::formatted)

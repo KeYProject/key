@@ -10,7 +10,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed
@@ -20,8 +19,8 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
     @Override
-    public boolean filter(@NonNull TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
-            MutableState mState) {
+    public boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         if (!app.assumesInstantionsComplete()) {
             return true;
         }
@@ -32,7 +31,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio,
-            @NonNull PosInOccurrence oldPio) {
+            PosInOccurrence oldPio) {
         return oldPio.equals(newPio);
     }
 }

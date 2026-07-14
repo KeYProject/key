@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.njml.*;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestJMLPreTranslator {
-    private ImmutableList<TextualJMLConstruct> parseMethodSpec(@NonNull String ms) {
-        return new PreParser(true).parseClassLevel(ms);
+    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
+        return new PreParser().parseClassLevel(ms);
     }
 
     // region lexing

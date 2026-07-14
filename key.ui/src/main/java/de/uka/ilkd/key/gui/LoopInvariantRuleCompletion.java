@@ -5,8 +5,8 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;

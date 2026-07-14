@@ -13,9 +13,6 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
@@ -51,7 +48,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
-    private static @NonNull String versionInfo(String info, String versionString) {
+    private static String versionInfo(String info, String versionString) {
         return info + " " + "(" + versionString + ")";
     }
 
@@ -63,7 +60,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return toDefaultButton;
     }
 
-    private @NonNull String createSupportedVersionText() {
+    private String createSupportedVersionText() {
         return "The following minimal version is supported: "
             + solverType.getMinimumSupportedVersion();
     }
@@ -77,7 +74,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private @Nullable JTextArea createSolverInformation() {
+    private JTextArea createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.isEmpty()) {
             JTextArea solverInfo =
@@ -179,7 +176,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPiSettings().clone());
         return this;
     }

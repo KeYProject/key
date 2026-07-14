@@ -5,17 +5,15 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
@@ -27,22 +25,22 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
+@Documentation(category = "Internal",
+    value = """
+            Saves the instantiation of a schema variable by the last taclet application into an abbreviation for later use.
+            A nice use case is a manual loop invariant rule application, where the newly introduced anonymizing Skolem constants can be saved for later interactive instantiations.
+            As for the let command, it is not allowed to call this command multiple times with the same name argument (all names used for remembering instantiations are "final").
+            """)
+public class SaveInstCommand extends AbstractCommand {
     public SaveInstCommand() {
         super(null);
     }
 
     @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Map<String, Object> args,
-            @NonNull EngineState stateMap) throws ScriptException, InterruptedException {
-
-        AbbrevMap abbrMap = stateMap.getAbbreviations();
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        AbbrevMap abbrMap = state().getAbbreviations();
+        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             final var value = entry.getValue();
             if ("#1".equals(key)) {
@@ -63,7 +61,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
             }
 
             try {
-                var parentNode = stateMap.getFirstOpenAutomaticGoal().node().parent();
+                var parentNode = state().getFirstOpenAutomaticGoal().node().parent();
                 if (parentNode != null) {
                     final RuleApp ruleApp = parentNode.getAppliedRuleApp();
                     if (ruleApp instanceof TacletApp tacletApp) {
@@ -87,7 +85,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "saveInst";
     }
 }

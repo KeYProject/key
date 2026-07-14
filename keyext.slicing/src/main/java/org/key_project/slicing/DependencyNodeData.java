@@ -9,8 +9,6 @@ import java.util.List;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Stores the dependency graph nodes touched by a proof step.
  * Added to a node using {@link de.uka.ilkd.key.proof.Node#register(Object, Class)}.

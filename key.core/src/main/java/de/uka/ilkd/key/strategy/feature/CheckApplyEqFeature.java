@@ -14,15 +14,14 @@ import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
  * rule application must not be one side of an equation that is the instantiation of the first
  * if-formula. If the rule application is admissible, zero is returned.
  */
+@StableCost
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new CheckApplyEqFeature();
@@ -30,8 +29,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     private CheckApplyEqFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Need to know the position of " + "the application of the taclet";
 
         AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();
@@ -43,7 +41,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         ;
     }
 
-    private boolean isNotSelfApplication(@NonNull PosInOccurrence pos,
+    private boolean isNotSelfApplication(PosInOccurrence pos,
             AssumesFormulaInstantiation assumesInstantiation) {
         if (!(assumesInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInstSeq)
                 || assumesInstantiation.getSequentFormula() != pos.sequentFormula()

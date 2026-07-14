@@ -28,7 +28,6 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +48,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     // to make the "No Proof Loaded" header invisible when a proof is loaded
     private JLabel noProofLoadedHeader;
 
-    private @Nullable Proof loadedProof = null;
+    private Proof loadedProof = null;
 
 
     public TacletOptionsSettings() {
@@ -163,8 +162,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static @NonNull List<ChoiceEntry> createChoiceEntries(
-            @Nullable Collection<String> choices) {
+    public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
         if (choices == null) {
             return Collections.emptyList();
         }
@@ -226,7 +224,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(catEntry, new CC().newline());
     }
 
-    protected @NonNull JComponent mkExplanation(@NonNull String explanation) {
+    protected JComponent mkExplanation(String explanation) {
         JTextArea explanationArea = new JTextArea() {
             @Override
             public void setBackground(Color bg) {
@@ -243,8 +241,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @NonNull
-    private JPanel createCollapsableTitlePane(@NonNull JComponent title,
-            @NonNull JComponent child) {
+    private JPanel createCollapsableTitlePane(JComponent title, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel more = new JLabel(IconFactory.TREE_NODE_RETRACTED.get());
@@ -276,8 +273,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return p;
     }
 
-    private @NonNull JRadioButton mkRadioButton(@NonNull ChoiceEntry c,
-            @NonNull ButtonGroup btnGroup) {
+    private JRadioButton mkRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
         Box b = new Box(BoxLayout.X_AXIS);
         JRadioButton button = new JRadioButton(c.choice);
         btnGroup.add(button);
@@ -300,7 +296,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return button;
     }
 
-    private @NonNull JLabel createTitleRow(@NonNull String cat, ChoiceEntry entry) {
+    private JLabel createTitleRow(String cat, ChoiceEntry entry) {
         JLabel lbl = new JLabel(createCatTitleText(cat, entry));
         lbl.setFont(lbl.getFont().deriveFont(14f));
 
@@ -310,7 +306,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return lbl;
     }
 
-    private @NonNull String createCatTitleText(@NonNull String cat, @Nullable ChoiceEntry entry) {
+    private String createCatTitleText(String cat, ChoiceEntry entry) {
         // if no proof is loaded, we do not want to display current settings
         if (warnNoProof) {
             return cat;
@@ -330,8 +326,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param cat The category of the choice
      * @param entry The current choice
      */
-    private void checkForDifferingOptions(@NonNull JLabel lbl, String cat,
-            @Nullable ChoiceEntry entry) {
+    private void checkForDifferingOptions(JLabel lbl, String cat, ChoiceEntry entry) {
         if (loadedProof != null) {
             String choiceOfLoadedProof =
                 loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
@@ -357,7 +352,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         loadedProof = window.getMediator().getSelectedProof();
         warnNoProof = loadedProof == null;
         // this makes the header invisible
@@ -375,7 +370,13 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     @Override
     public void applySettings(MainWindow window) {
-        settings.setDefaultChoices(category2Choice);
+        // Apply to the global default choice settings - that is what (re)loading a problem reads to
+        // build a new proof. When a proof is loaded, getChoiceSettings() hands this panel a
+        // detached
+        // copy initialised from that proof (so it can show the proof's active options), and writing
+        // the edited choices only into that copy silently dropped them: changing e.g. the integer
+        // semantics and reloading kept the old taclet option. Write through to the global settings.
+        ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(category2Choice);
     }
 
     /**
@@ -486,7 +487,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(Object obj) {
             if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()

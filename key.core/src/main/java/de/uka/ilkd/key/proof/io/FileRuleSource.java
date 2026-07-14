@@ -52,11 +52,6 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public URI uri() {
-        return file().toUri();
-    }
-
-    @Override
     public String getExternalForm() {
         try {
             return ruleFile.toUri().toURL().toExternalForm();

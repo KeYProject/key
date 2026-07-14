@@ -6,26 +6,20 @@ package de.uka.ilkd.key.proof.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -33,13 +27,16 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,28 +58,30 @@ public class KeYFile implements EnvInput {
      */
     protected final @Nullable ProgressMonitor monitor;
     private final String name;
-    private final Profile profile;
-    protected @Nullable InitConfig initConfig;
+    protected @Nullable Profile profile;
+    protected InitConfig initConfig;
     private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
-    private @Nullable Includes includes;
+    private Includes includes;
 
     /**
      * The FileRepo that will store the files.
      */
     private @Nullable FileRepo fileRepo;
 
-    /**
-     * creates a new representation for a given file by indicating a name and a RuleSource
-     * representing the physical source of the .key file.
-     */
+    /// creates a new representation for a given file by indicating a name and a RuleSource
+    /// representing the physical source of the .key file.
+    ///
+    /// @param profile if non-null, enforces to use the given profile. Use `null` if the profile
+    /// from the {@link KeYUserProblemFile} or {@link AbstractProfile#getDefaultProfile()} shoudl be
+    /// used.
     public KeYFile(String name, RuleSource file, @Nullable ProgressMonitor monitor,
-            Profile profile) {
+            @Nullable Profile profile) {
         this.name = Objects.requireNonNull(name);
         this.file = Objects.requireNonNull(file);
         this.monitor = monitor;
-        this.profile = Objects.requireNonNull(profile);
+        this.profile = profile;
     }
 
 
@@ -96,8 +95,8 @@ public class KeYFile implements EnvInput {
      * @param profile the profile
      * @param fileRepo the FileRepo which will store the file
      */
-    public KeYFile(String name, RuleSource file, ProgressMonitor monitor, Profile profile,
-            FileRepo fileRepo) {
+    public KeYFile(String name, RuleSource file, @Nullable ProgressMonitor monitor,
+            @Nullable Profile profile, FileRepo fileRepo) {
         this(name, file, monitor, profile);
         this.fileRepo = fileRepo;
     }
@@ -106,7 +105,8 @@ public class KeYFile implements EnvInput {
      * creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      */
-    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
+    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            @Nullable Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -120,7 +120,7 @@ public class KeYFile implements EnvInput {
      * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor, Profile profile,
+    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
@@ -157,8 +157,8 @@ public class KeYFile implements EnvInput {
             } else {
                 return input;
             }
-        } else {
-            return file.getNewStream();
+        } catch (IOException e) {
+            LOGGER.warn("Failed to open new stream", e);
         }
     }
 
@@ -177,10 +177,11 @@ public class KeYFile implements EnvInput {
     protected ProofSettings getPreferences() {
         assert initConfig != null;
         if (initConfig.getSettings() == null) {
-            return readPreferences();
-        } else {
-            return initConfig.getSettings();
+            var settings = readPreferences();
+            initConfig.setSettings(settings);
+            return settings;
         }
+        return initConfig.getSettings();
     }
 
     public @Nullable ProofSettings readPreferences() {
@@ -214,9 +215,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                var inc = ctx.getIncludes(file.file().getParent().toUri());
-                includes = inc;
-                return inc;
+                includes = ctx.getIncludes(file.file().getParent());
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {
@@ -227,6 +226,22 @@ public class KeYFile implements EnvInput {
     }
 
 
+    /**
+     * Normalizes a path string read from a KeY/proof file so that it can be parsed by
+     * {@link Paths#get(String, String...)} on the current platform. KeY now always writes path
+     * separators as forward slashes, but proofs saved by older versions on Windows may contain
+     * backslashes. On POSIX a backslash is a valid file-name character, so such a path would not be
+     * split into segments and could not be resolved. Converting backslashes to forward slashes is
+     * safe on all platforms (Windows accepts '/' as a separator) and keeps these legacy proofs
+     * loadable.
+     *
+     * @param path the raw path string as stored in the file
+     * @return the path string with backslashes replaced by forward slashes
+     */
+    private static String normalizeStoredPath(String path) {
+        return path.replace('\\', '/');
+    }
+
     @Override
     public Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
@@ -234,17 +249,32 @@ public class KeYFile implements EnvInput {
         if (bootClassPath == null) {
             return null;
         }
-        Path bootClassPathFile = Paths.get(bootClassPath);
+        Path bootClassPathFile = Paths.get(normalizeStoredPath(bootClassPath));
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
-            var parentDirectory = file.file().getParent();
-            bootClassPathFile = parentDirectory.resolve(bootClassPath);
+            Path parentDirectory = file.file().getParent();
+            bootClassPathFile = parentDirectory.resolve(bootClassPathFile);
         }
-
+        if (!Files.isDirectory(bootClassPathFile)) {
+            // Report the missing directory at the \bootclasspath declaration in the .key file,
+            // rather than letting it surface later as a bare exception with no source location.
+            throw new BuildingException(locationOrUndefined(pi, bootClassPath), String.format(
+                "The \\bootclasspath \"%s\" does not exist or is not a directory.",
+                bootClassPathFile));
+        }
         return bootClassPathFile;
     }
 
-    protected ProblemInformation getProblemInformation() {
+    /**
+     * @return the location at which {@code path} was declared in this file, or
+     *         {@link Location#UNDEFINED} if it is unknown
+     */
+    private static Location locationOrUndefined(ProblemInformation pi, String path) {
+        Location loc = pi.getPathLocation(path);
+        return loc != null ? loc : Location.UNDEFINED;
+    }
+
+    protected @NonNull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
             KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
@@ -254,17 +284,23 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public List<Path> readClassPath() {
+    public @NonNull List<Path> readClassPath() {
         ProblemInformation pi = getProblemInformation();
-        var parentDirectory = file.file().getParent();
+        Path parentDirectory = file.file().getParent();
         List<Path> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
             if (cp == null) {
                 fileList.add(null);
             } else {
-                var f = Paths.get(cp);
+                var f = Paths.get(normalizeStoredPath(cp));
                 if (!f.isAbsolute()) {
-                    f = parentDirectory.resolve(cp);
+                    f = parentDirectory.resolve(f);
+                }
+                if (!Files.exists(f)) {
+                    // Point at the \classpath declaration in the .key file instead of letting the
+                    // missing directory surface later as a bare, source-less exception.
+                    throw new BuildingException(locationOrUndefined(pi, cp),
+                        String.format("The \\classpath entry \"%s\" does not exist.", f));
                 }
                 fileList.add(f);
             }
@@ -273,19 +309,23 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public @Nullable Path readJavaPath() throws ProofInputException {
+    public Path readJavaPath() throws ProofInputException {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
-            var absFile = Paths.get(javaPath);
+            javaPath = normalizeStoredPath(javaPath);
+            Path absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
-                var parent = file.file().getParent();
+                Path parent = file.file().getParent();
                 absFile = parent.resolve(javaPath);
             }
             if (!Files.exists(absFile)) {
-                throw new ProofInputException(
-                    String.format("Declared Java source %s not found.", javaPath));
+                throw new ProofInputException(String.format(
+                    "The \\javaSource declared in %s could not be found.%n"
+                        + "    declared:    \"%s\"%n"
+                        + "    expected at: %s",
+                    file.file().getFileName(), javaPath, absFile.toAbsolutePath()));
             }
             return absFile.toAbsolutePath();
         }
@@ -328,7 +368,6 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContracts() {
-        assert initConfig != null;
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
@@ -339,7 +378,7 @@ public class KeYFile implements EnvInput {
         return DefaultImmutableSet.nil();
     }
 
-    protected @Nullable ProblemFinder getProblemFinder() {
+    protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             assert initConfig != null;
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
@@ -374,7 +413,7 @@ public class KeYFile implements EnvInput {
      */
     public List<PositionedString> readFuncAndPred() {
         if (file == null) {
-            return null;
+            return Collections.emptyList();
         }
         KeyAst.File ctx = getParseContext();
         assert initConfig != null;
@@ -421,9 +460,9 @@ public class KeYFile implements EnvInput {
         return issues.stream().map(w -> {
             try {
                 return new PositionedString(w.message(),
-                    new Location(file != null ? new URI(file.getExternalForm()) : null,
+                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
                         w.position()));
-            } catch (URISyntaxException e) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         })
@@ -467,7 +506,12 @@ public class KeYFile implements EnvInput {
 
     @Override
     public Profile getProfile() {
-        return profile;
+        return profile == null ? getDefaultProfile() : profile;
+    }
+
+    /// Returns the default profile.
+    public Profile getDefaultProfile() {
+        return AbstractProfile.getDefaultProfile();
     }
 
     @Override

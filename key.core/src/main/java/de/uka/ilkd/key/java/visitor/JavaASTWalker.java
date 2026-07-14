@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 /**
  * walks through a java AST in depth-left-fist-order at default. Implementing method doAction
@@ -26,7 +26,8 @@ public abstract class JavaASTWalker {
     /**
      * create the JavaASTWalker
      *
-     * @param root the ProgramElement where to begin
+     * @param root
+     *        the ProgramElement where to begin
      */
     protected JavaASTWalker(ProgramElement root) {
         this.root = root;
@@ -58,20 +59,40 @@ public abstract class JavaASTWalker {
     /**
      * walks through the AST. While keeping track of the current node
      *
-     * @param node the JavaProgramElement the walker is at
+     * @param node
+     *        the JavaProgramElement the walker is at
      */
     protected void walk(ProgramElement node) {
+        if (done()) {
+            return;
+        }
         if (node instanceof NonTerminalProgramElement nonTerminalNode) {
             depth++;
-            for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
-                if (nonTerminalNode.getChildAt(i) != null) {
-                    walk(nonTerminalNode.getChildAt(i));
+            final int childCount = nonTerminalNode.getChildCount();
+            for (int i = 0; i < childCount && !done(); i++) {
+                final ProgramElement child = nonTerminalNode.getChildAt(i);
+                if (child != null) {
+                    walk(child);
                 }
             }
             depth--;
         }
         // Otherwise, the node is left, so perform the action
         doAction(node);
+    }
+
+    /**
+     * Whether the walk has already collected everything it needs and may therefore stop early.
+     * Default <code>false</code>, i.e. a full traversal. Subclasses that only look for a bounded
+     * set
+     * of nodes can override this to short-circuit; it is consulted before each node and between
+     * siblings, so the work saved is the unvisited remainder of the AST. Returning a constant
+     * <code>false</code> leaves traversal behaviour unchanged.
+     *
+     * @return true iff the walk may stop
+     */
+    protected boolean done() {
+        return false;
     }
 
     /**

@@ -7,8 +7,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javax.swing.*;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Generic background thread worker.
  *

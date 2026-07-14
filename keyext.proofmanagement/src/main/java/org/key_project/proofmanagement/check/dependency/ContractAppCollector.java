@@ -10,16 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -28,8 +24,6 @@ import de.uka.ilkd.key.speclang.ContractAxiom;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_INSENSITIVE;
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
@@ -41,6 +35,7 @@ import static org.key_project.proofmanagement.check.dependency.DependencyGraph.E
  * Partial_invariant_axiom_... invariants
  * user defined taclets
  */
+
 /**
  * Walker for collecting contract applications. This includes:
  * <ul>
@@ -56,13 +51,17 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      * the proof we search for contract applications (needed to get the SpecificationRepository,
      * JavaInfo, ...)
      */
-    private Proof proof;
+    private final Proof proof;
 
-    /** the logger to print out messages */
-    private Logger logger;
+    /**
+     * the logger to print out messages
+     */
+    private final Logger logger;
 
-    /** the contracts (by name) as found by this collector as well as the termination type */
-    private @NonNull Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
+    /**
+     * the contracts (by name) as found by this collector as well as the termination type
+     */
+    private final Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
 
     /**
      * Creates a new collector for the given proof, starting at given root node.
@@ -107,7 +106,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      *
      * @param tacletApp the Taclet node to extract the contract from
      */
-    private void extractContractFromContractTaclet(@NonNull TacletAppIntermediate tacletApp) {
+    private void extractContractFromContractTaclet(TacletAppIntermediate tacletApp) {
         /*
          * With the current implementation in KeY, the name of the rule is always
          * Contract_axiom_for_m_in_C
@@ -128,7 +127,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
 
         if (classType == null) {
             // since className does not include package prefix, we have to search the complete list
-            Set<KeYJavaType> allTypes = services.getJavaInfo().getAllKeYJavaTypes();
+            var allTypes = services.getJavaInfo().getAllKeYJavaTypes();
             for (KeYJavaType t : allTypes) {
                 if (t.getJavaType().getName().equals(className)) {
                     // found match

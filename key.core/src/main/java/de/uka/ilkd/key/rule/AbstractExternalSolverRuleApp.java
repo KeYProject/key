@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.Goal;
-
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
@@ -15,7 +14,10 @@ import org.key_project.util.collection.ImmutableList;
  * <p>
  * {@link de.uka.ilkd.key.smt.SMTRuleApp}
  */
-public abstract class AbstractExternalSolverRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public abstract class AbstractExternalSolverRuleApp<T extends ExternalSolverRule>
+        extends AbstractBuiltInRuleApp<T> {
+
     protected final String title;
     protected final String successfulSolverName;
 
@@ -29,7 +31,7 @@ public abstract class AbstractExternalSolverRuleApp extends AbstractBuiltInRuleA
      * @param successfulSolverName the name of the solver used to find the proof
      * @param title the title of this rule app
      */
-    protected AbstractExternalSolverRuleApp(ExternalSolverRule rule, PosInOccurrence pio,
+    protected AbstractExternalSolverRuleApp(T rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> unsatCore,
             String successfulSolverName, String title) {
         super(rule, pio, unsatCore);
@@ -61,52 +63,16 @@ public abstract class AbstractExternalSolverRuleApp extends AbstractBuiltInRuleA
     }
 
     /**
-     * Interface for the rules of external solvers
-     */
-    public interface ExternalSolverRule extends BuiltInRule {
-        AbstractExternalSolverRuleApp createApp(String successfulSolverName);
-
-        /**
-         * Create a new rule application with the given solver name and unsat core.
-         *
-         * @param successfulSolverName solver that produced this result
-         * @param unsatCore formulas required to prove the result
-         * @return rule application instance
-         */
-        AbstractExternalSolverRuleApp createApp(String successfulSolverName,
-                ImmutableList<PosInOccurrence> unsatCore);
-
-        @Override
-        AbstractExternalSolverRuleApp createApp(PosInOccurrence pos, TermServices services);
-
-
-        @Override
-        default boolean isApplicable(Goal goal, PosInOccurrence pio) {
-            return false;
-        }
-
-        @Override
-        default boolean isApplicableOnSubTerms() {
-            return false;
-        }
-
-        @Override
-        String displayName();
-
-        @Override
-        String toString();
-    }
-
-    /**
      * Sets the title (needs to create a new instance for this)
      *
      * @param title new title for rule app
      * @return copy of this with the new title
      */
-    public abstract AbstractExternalSolverRuleApp setTitle(String title);
+    public abstract AbstractExternalSolverRuleApp<T> setTitle(String title);
 
     @Override
-    public AbstractExternalSolverRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public AbstractExternalSolverRuleApp<T> setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

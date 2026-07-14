@@ -12,8 +12,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
-
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
     protected final JTerm s;
@@ -188,8 +186,8 @@ public class ClashFreeSubst {
      * application of this substitution. This is the case, if <code>v</code> occurrs free in
      * <code>subTerm</code>, but does not occurr in <code>boundVars</code>.
      *
-     * @returns true if <code>subTerm</code> bound by <code>boundVars</code> would change under
-     *          application of this substitution
+     * @return true if <code>subTerm</code> bound by <code>boundVars</code> would change under
+     *         application of this substitution
      */
     protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
             JTerm subTerm) {
@@ -241,9 +239,7 @@ public class ClashFreeSubst {
      * A Visitor class to collect all (not just the free) variables occurring in a term.
      */
     public static class VariableCollectVisitor implements DefaultVisitor {
-        /**
-         * the collected variables
-         */
+        /** the collected variables */
         private ImmutableSet<QuantifiableVariable> vars;
 
         /**

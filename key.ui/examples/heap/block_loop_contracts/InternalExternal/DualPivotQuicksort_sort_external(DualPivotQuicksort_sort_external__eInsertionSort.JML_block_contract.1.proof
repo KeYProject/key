@@ -955,7 +955,7 @@
                                                          (rule "all_pull_out3" (formula "28") (term "0,0,1,0"))
                                                          (rule "all_pull_out3" (formula "28") (term "0,1,1,0"))
                                                          (rule "cut_direct" (formula "22") (term "0"))
-                                                         (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                                         (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                                             (builtin "One Step Simplification" (formula "23"))
                                                             (rule "true_left" (formula "23"))
                                                             (rule "ifthenelse_split" (formula "1") (term "0"))
@@ -6838,7 +6838,7 @@
                                                                )
                                                             )
                                                          )
-                                                         (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                                         (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                                             (builtin "One Step Simplification" (formula "22"))
                                                             (rule "ifthenelse_split" (formula "1") (term "0"))
                                                             (branch "anonIn_e3 = anonIn_e1 TRUE"
@@ -12717,7 +12717,7 @@
                                                          (rule "applyEqReverse" (formula "2") (term "1,1") (ifseqformula "3"))
                                                          (rule "hideAuxiliaryEq" (formula "3"))
                                                          (rule "cut_direct" (formula "21") (term "0"))
-                                                         (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                                         (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                                             (builtin "One Step Simplification" (formula "22"))
                                                             (rule "true_left" (formula "22"))
                                                             (rule "cut_direct" (formula "1") (term "1"))
@@ -12810,7 +12810,7 @@
                                                                (rule "closeFalse" (formula "7"))
                                                             )
                                                          )
-                                                         (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                                         (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                                             (builtin "One Step Simplification" (formula "21"))
                                                             (rule "cut_direct" (formula "1") (term "1"))
                                                             (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -13427,7 +13427,7 @@
                                                       (rule "applyEqReverse" (formula "7") (term "2,0") (ifseqformula "6"))
                                                       (rule "hideAuxiliaryEq" (formula "6"))
                                                       (rule "cut_direct" (formula "37") (term "0"))
-                                                      (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                                      (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                                          (builtin "One Step Simplification" (formula "38"))
                                                          (rule "true_left" (formula "38"))
                                                          (rule "ifthenelse_split" (formula "18") (term "0"))
@@ -15461,7 +15461,7 @@
                                                             )
                                                          )
                                                       )
-                                                      (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                                      (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                                          (builtin "One Step Simplification" (formula "37"))
                                                          (rule "ifthenelse_split" (formula "18") (term "0"))
                                                          (branch "anonIn_e3 = anonIn_e1 TRUE"
@@ -17502,7 +17502,7 @@
                                                       (rule "applyEqReverse" (formula "7") (term "2,0") (ifseqformula "6"))
                                                       (rule "hideAuxiliaryEq" (formula "6"))
                                                       (rule "cut_direct" (formula "36") (term "0"))
-                                                      (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                                      (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                                          (builtin "One Step Simplification" (formula "37"))
                                                          (rule "true_left" (formula "37"))
                                                          (rule "ifthenelse_split" (formula "16") (term "0"))
@@ -19096,7 +19096,7 @@
                                                             )
                                                          )
                                                       )
-                                                      (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                                      (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                                          (builtin "One Step Simplification" (formula "36"))
                                                          (rule "ifthenelse_split" (formula "16") (term "0"))
                                                          (branch "anonIn_e3 = anonIn_e1 TRUE"
@@ -20896,7 +20896,7 @@
                                        (rule "applyEqReverse" (formula "2") (term "1,1") (ifseqformula "3"))
                                        (rule "hideAuxiliaryEq" (formula "3"))
                                        (rule "cut_direct" (formula "20") (term "0"))
-                                       (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                       (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                           (builtin "One Step Simplification" (formula "21"))
                                           (rule "true_left" (formula "21"))
                                           (rule "cut_direct" (formula "1") (term "1"))
@@ -20989,7 +20989,7 @@
                                              (rule "closeFalse" (formula "6"))
                                           )
                                        )
-                                       (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                       (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                           (builtin "One Step Simplification" (formula "20"))
                                           (rule "cut_direct" (formula "1") (term "1"))
                                           (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -21142,7 +21142,7 @@
                                     (rule "applyEqReverse" (formula "2") (term "1,1") (ifseqformula "3"))
                                     (rule "hideAuxiliaryEq" (formula "3"))
                                     (rule "cut_direct" (formula "20") (term "0"))
-                                    (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                    (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "21"))
                                        (rule "true_left" (formula "21"))
                                        (rule "cut_direct" (formula "1") (term "1"))
@@ -21225,7 +21225,7 @@
                                           (rule "closeFalse" (formula "12"))
                                        )
                                     )
-                                    (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                    (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                        (builtin "One Step Simplification" (formula "20"))
                                        (rule "cut_direct" (formula "1") (term "1"))
                                        (branch "CUT: anonIn_a.length ≤ anonIn_e3 TRUE"
@@ -21377,7 +21377,7 @@
                                  (rule "applyEqReverse" (formula "2") (term "1,1") (ifseqformula "3"))
                                  (rule "hideAuxiliaryEq" (formula "3"))
                                  (rule "cut_direct" (formula "20") (term "0"))
-                                 (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                                 (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                     (builtin "One Step Simplification" (formula "21"))
                                     (rule "true_left" (formula "21"))
                                     (rule "cut_direct" (formula "1") (term "1"))
@@ -21470,7 +21470,7 @@
                                        (rule "closeFalse" (formula "6"))
                                     )
                                  )
-                                 (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                                 (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                     (builtin "One Step Simplification" (formula "20"))
                                     (rule "cut_direct" (formula "1") (term "1"))
                                     (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -21694,7 +21694,7 @@
                               (rule "all_pull_out3" (formula "26") (term "0,1,1,0"))
                               (rule "all_pull_out3" (formula "26") (term "0,0,1,0"))
                               (rule "cut_direct" (formula "21") (term "0"))
-                              (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                              (branch "CUT: anonIn_a.$created = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "22"))
                                  (rule "true_left" (formula "22"))
                                  (rule "ifthenelse_split" (formula "1") (term "0"))
@@ -24836,7 +24836,7 @@
                                     )
                                  )
                               )
-                              (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                              (branch "CUT: anonIn_a.$created = TRUE FALSE"
                                  (builtin "One Step Simplification" (formula "21"))
                                  (rule "ifthenelse_split" (formula "1") (term "0"))
                                  (branch "anonIn_e4 = anonIn_e1 TRUE"
@@ -28240,7 +28240,7 @@
                         (rule "mul_literals" (formula "1") (term "1,1"))
                         (rule "commute_or" (formula "1"))
                         (rule "cut_direct" (formula "19") (term "0"))
-                        (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                        (branch "CUT: anonIn_a.$created = TRUE TRUE"
                            (builtin "One Step Simplification" (formula "20"))
                            (rule "true_left" (formula "20"))
                            (rule "cut_direct" (formula "1") (term "1"))
@@ -28324,7 +28324,7 @@
                               (rule "closeFalse" (formula "5"))
                            )
                         )
-                        (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                        (branch "CUT: anonIn_a.$created = TRUE FALSE"
                            (builtin "One Step Simplification" (formula "19"))
                            (rule "cut_direct" (formula "1") (term "1"))
                            (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -28424,7 +28424,7 @@
                      (rule "mul_literals" (formula "1") (term "1,1"))
                      (rule "commute_or" (formula "1"))
                      (rule "cut_direct" (formula "19") (term "0"))
-                     (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                     (branch "CUT: anonIn_a.$created = TRUE TRUE"
                         (builtin "One Step Simplification" (formula "20"))
                         (rule "true_left" (formula "20"))
                         (rule "cut_direct" (formula "1") (term "1"))
@@ -28507,7 +28507,7 @@
                            (rule "closeFalse" (formula "5"))
                         )
                      )
-                     (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                     (branch "CUT: anonIn_a.$created = TRUE FALSE"
                         (builtin "One Step Simplification" (formula "19"))
                         (rule "cut_direct" (formula "1") (term "1"))
                         (branch "CUT: anonIn_a.length ≤ anonIn_e3 TRUE"
@@ -28606,7 +28606,7 @@
                   (rule "mul_literals" (formula "1") (term "1,1"))
                   (rule "commute_or" (formula "1"))
                   (rule "cut_direct" (formula "19") (term "0"))
-                  (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                  (branch "CUT: anonIn_a.$created = TRUE TRUE"
                      (builtin "One Step Simplification" (formula "20"))
                      (rule "true_left" (formula "20"))
                      (rule "cut_direct" (formula "1") (term "1"))
@@ -28688,7 +28688,7 @@
                         (rule "closeFalse" (formula "5"))
                      )
                   )
-                  (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                  (branch "CUT: anonIn_a.$created = TRUE FALSE"
                      (builtin "One Step Simplification" (formula "19"))
                      (rule "cut_direct" (formula "1") (term "1"))
                      (branch "CUT: anonIn_a.length ≤ anonIn_e4 TRUE"
@@ -28787,7 +28787,7 @@
                (rule "mul_literals" (formula "1") (term "1,1"))
                (rule "commute_or" (formula "1"))
                (rule "cut_direct" (formula "19") (term "0"))
-               (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+               (branch "CUT: anonIn_a.$created = TRUE TRUE"
                   (builtin "One Step Simplification" (formula "20"))
                   (rule "true_left" (formula "20"))
                   (rule "cut_direct" (formula "1") (term "1"))
@@ -28870,7 +28870,7 @@
                      (rule "closeFalse" (formula "5"))
                   )
                )
-               (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+               (branch "CUT: anonIn_a.$created = TRUE FALSE"
                   (builtin "One Step Simplification" (formula "19"))
                   (rule "cut_direct" (formula "1") (term "1"))
                   (branch "CUT: anonIn_a.length ≤ anonIn_e3 TRUE"
@@ -28970,7 +28970,7 @@
             (rule "mul_literals" (formula "1") (term "1,1"))
             (rule "commute_or" (formula "1"))
             (rule "cut_direct" (formula "19") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "20"))
                (rule "true_left" (formula "20"))
                (rule "cut_direct" (formula "1") (term "1"))
@@ -29052,7 +29052,7 @@
                   (rule "closeFalse" (formula "11"))
                )
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "19"))
                (rule "cut_direct" (formula "1") (term "1"))
                (branch "CUT: anonIn_a.length ≤ anonIn_e4 TRUE"
@@ -29267,7 +29267,7 @@
             (builtin "One Step Simplification" (formula "11"))
             (rule "true_left" (formula "11"))
             (rule "cut_direct" (formula "26") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "27"))
                (rule "true_left" (formula "27"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
@@ -29328,7 +29328,7 @@
                (rule "leq_literals" (formula "3"))
                (rule "closeFalse" (formula "3"))
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "26"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
                (rule "replaceKnownSelect_taclet0100_10" (formula "21") (term "1,1,0"))
@@ -29479,7 +29479,7 @@
             (rule "polySimp_mulLiterals" (formula "3") (term "1,1"))
             (rule "polySimp_elimOne" (formula "3") (term "1,1"))
             (rule "cut_direct" (formula "25") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "26"))
                (rule "true_left" (formula "26"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
@@ -29550,7 +29550,7 @@
                (rule "leq_literals" (formula "2"))
                (rule "closeFalse" (formula "2"))
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "25"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
                (rule "replaceKnownSelect_taclet1100_10" (formula "21") (term "1,1,0"))
@@ -29639,7 +29639,7 @@
       (rule "mul_literals" (formula "1") (term "1,1"))
       (rule "commute_or" (formula "1"))
       (rule "cut_direct" (formula "18") (term "0"))
-      (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+      (branch "CUT: anonIn_a.$created = TRUE TRUE"
          (builtin "One Step Simplification" (formula "19"))
          (rule "true_left" (formula "19"))
          (rule "cut_direct" (formula "1") (term "1"))
@@ -29722,7 +29722,7 @@
             (rule "closeFalse" (formula "10"))
          )
       )
-      (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+      (branch "CUT: anonIn_a.$created = TRUE FALSE"
          (builtin "One Step Simplification" (formula "18"))
          (rule "cut_direct" (formula "1") (term "1"))
          (branch "CUT: anonIn_a.length ≤ anonIn_e3 TRUE"
@@ -29821,7 +29821,7 @@
    (rule "mul_literals" (formula "1") (term "1,1"))
    (rule "commute_or" (formula "1"))
    (rule "cut_direct" (formula "18") (term "0"))
-   (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+   (branch "CUT: anonIn_a.$created = TRUE TRUE"
       (builtin "One Step Simplification" (formula "19"))
       (rule "true_left" (formula "19"))
       (rule "cut_direct" (formula "1") (term "1"))
@@ -29903,7 +29903,7 @@
          (rule "closeFalse" (formula "4"))
       )
    )
-   (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+   (branch "CUT: anonIn_a.$created = TRUE FALSE"
       (builtin "One Step Simplification" (formula "18"))
       (rule "cut_direct" (formula "1") (term "1"))
       (branch "CUT: anonIn_a.length ≤ anonIn_e4 TRUE"

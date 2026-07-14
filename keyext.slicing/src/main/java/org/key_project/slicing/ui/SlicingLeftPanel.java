@@ -46,7 +46,6 @@ import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +90,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * "Show rendering of graph" button.
      */
-    private @Nullable JButton showGraphRendering = null;
+    private JButton showGraphRendering = null;
     /**
      * "Slice proof" button.
      */
@@ -107,7 +106,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * "Show rule statistics" button.
      */
-    private @Nullable JButton showRuleStatistics = null;
+    private JButton showRuleStatistics = null;
     /**
      * Label indicating the number of dependency graph nodes.
      *
@@ -144,6 +143,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Checkbox to shorten chains in DOT output.
      */
     private @Nullable JCheckBox abbreviateChains = null;
+    /**
+     * Checkbox to shorten chains in DOT output.
+     */
+    private JCheckBox abbreviateChains = null;
     /**
      * Checkbox to enable the dependency analysis algorithm.
      */
@@ -464,7 +467,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }, this::showError).execute();
     }
 
-    private void showError(@NonNull Throwable e) {
+    private void showError(Throwable e) {
         LOGGER.error("failed to slice proof ", e);
         SwingUtilities.invokeLater(
             () -> IssueDialog.showExceptionDialog(MainWindow.getInstance(), e));
@@ -531,7 +534,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     @Override
-    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         currentProof = e.getSource().getSelectedProof();
         resetLabels();
         resetGraphLabels();

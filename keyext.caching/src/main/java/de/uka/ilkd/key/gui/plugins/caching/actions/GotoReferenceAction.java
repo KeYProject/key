@@ -10,8 +10,6 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Action to go the referenced proof.
  *
@@ -20,7 +18,7 @@ import org.jspecify.annotations.NonNull;
 public final class GotoReferenceAction extends KeyAction {
 
     private final KeYMediator mediator;
-    private final @NonNull Node node;
+    private final Node node;
 
     /**
      * Construct a new action.
@@ -28,7 +26,7 @@ public final class GotoReferenceAction extends KeyAction {
      * @param mediator KeY mediator
      * @param node the node to jump from
      */
-    public GotoReferenceAction(KeYMediator mediator, @NonNull Node node) {
+    public GotoReferenceAction(KeYMediator mediator, Node node) {
         this.mediator = mediator;
         this.node = node;
 

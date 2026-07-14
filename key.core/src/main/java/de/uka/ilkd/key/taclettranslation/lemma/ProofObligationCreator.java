@@ -148,7 +148,7 @@ public class ProofObligationCreator {
         // (MU 2013-08)
         // String header = userDefinedSymbols.createHeader(initConfig.getServices());
 
-        Proof proof = new Proof(name, formula, "" /* header */, initConfig);
+        Proof proof = new Proof(name, formula, null, initConfig);
 
 
         userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());

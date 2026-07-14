@@ -65,25 +65,25 @@
               (     leq(Z(0(#)), v_iv)
                   & lt(v_iv, v_jv)
                   & lt(v_jv, seqLen(s))
-               -> !  int::seqGet(s, v_iv)
-                   = int::seqGet(s, v_jv))
+               -> !  seqGet<[int]>(s, v_iv)
+                   = seqGet<[int]>(s, v_jv))
         & \\forall int v_iv;
             (     leq(Z(0(#)), v_iv)
                 & lt(v_iv, seqLen(s))
-             ->   leq(Z(0(#)), int::seqGet(s, v_iv))
-                & lt(int::seqGet(s, v_iv), seqLen(s)))
+             ->   leq(Z(0(#)), seqGet<[int]>(s, v_iv))
+                & lt(seqGet<[int]>(s, v_iv), seqLen(s)))
         & \\forall int v_iv;
             (     leq(Z(0(#)), v_iv)
                 & lt(v_iv, seqLen(s))
-             ->   int::instance(any::seqGet(s, v_iv))
+             ->   instance<[int]>(seqGet<[any]>(s, v_iv))
                 = TRUE)
      -> \\forall int iv;
           (   leq(Z(0(#)), iv) & lt(iv, seqLen(s))
            -> \\exists int jv;
                 (  leq(Z(0(#)), jv)
                  & lt(jv, seqLen(s))
-                 & int::seqGet(s, jv) = iv)))") (userinteraction))
-(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) TRUE"
+                 & seqGet<[int]>(s, jv) = iv)))") (userinteraction))
+(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> instance<[int]>(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) TRUE"
    (rule "allLeftHide" (formula "1") (inst "t=seqLen(f_s)") (userinteraction))
    (rule "allLeftHide" (formula "1") (inst "t=f_s") (userinteraction))
    (rule "impLeft" (formula "1") (userinteraction))
@@ -341,7 +341,7 @@
       )
    )
 )
-(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) FALSE"
+(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> instance<[int]>(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) FALSE"
    (rule "auto_int_induction_geqZero" (formula "4") (inst "sk=N_0") (userinteraction))
    (branch "Base Case"
       (rule "allRight" (formula "4") (inst "sk=s_0"))
@@ -375,18 +375,18 @@
       (rule "cut" (inst "cutFormula=\\exists int j;
   (  leq(Z(0(#)), j)
    & lt(j, seqLen(s_1))
-   & int::seqGet(s_1, j) = N_0)") (userinteraction))
+   & seqGet<[int]>(s_1, j) = N_0)") (userinteraction))
       (branch "CUT: exists int j; (0 <= j & j < s_1.length & (int)s_1[j] = N_0) TRUE"
          (rule "exLeft" (formula "1") (inst "sk=j_0") (userinteraction))
          (rule "cut" (inst "cutFormula=\\forall int j;
   (   leq(Z(0(#)), j) & lt(j, seqLen(s_1)) & !j = j_0
-   -> !int::seqGet(s_1, j) = N_0)") (userinteraction))
+   -> !seqGet<[int]>(s_1, j) = N_0)") (userinteraction))
          (branch "CUT: forall int j; ( 0 <= j & j < s_1.length & !j = j_0 -> !(int)s_1[j] = N_0) TRUE"
             (rule "allLeftHide" (formula "8") (inst "t=seqDef{int i;}(Z(0(#)),
                N_0,
                \\if (i = j_0)
-                   \\then (int::seqGet(s_1, N_0))
-                   \\else (int::seqGet(s_1, i)))") (userinteraction))
+                   \\then (seqGet<[int]>(s_1, N_0))
+                   \\else (seqGet<[int]>(s_1, i)))") (userinteraction))
             (rule "impLeft" (formula "8") (userinteraction))
             (branch
                (rule "lenOfSeqDef" (formula "11") (term "0"))
@@ -2004,7 +2004,7 @@
          )
       )
       (branch "CUT: exists int j; (0 <= j & j < s_1.length & (int)s_1[j] = N_0) FALSE"
-         (rule "allLeftHide" (formula "6") (inst "t=seqDef{int i;}(Z(0(#)), N_0, int::seqGet(s_1, i))") (userinteraction))
+         (rule "allLeftHide" (formula "6") (inst "t=seqDef{int i;}(Z(0(#)), N_0, seqGet<[int]>(s_1, i))") (userinteraction))
          (rule "impLeft" (formula "6") (userinteraction))
          (branch
             (rule "lenOfSeqDef" (formula "9") (term "0"))
@@ -2724,7 +2724,7 @@
                )
             )
             (branch
-               (rule "allLeftHide" (formula "6") (inst "t=int::seqGet(s_1, N_0)") (userinteraction))
+               (rule "allLeftHide" (formula "6") (inst "t=seqGet<[int]>(s_1, N_0)") (userinteraction))
                (rule "impLeft" (formula "6") (userinteraction))
                (branch
                   (rule "inEqSimp_ltToLeq" (formula "9") (term "1"))

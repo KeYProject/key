@@ -17,15 +17,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -45,12 +48,7 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
 
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.TokenSource;
 import org.jspecify.annotations.Nullable;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -626,6 +624,14 @@ public final class MiscTools {
                     assert !writtenPVs.contains(pv);
                     declaredPVs = declaredPVs.add(pv);
                 }
+            } else if (node instanceof SetStatement s) {
+                var spec = services.getSpecificationRepository().getStatementSpec(s);
+                if (spec != null) {
+                    var targetTerm = spec.getTerm(services, null, SetStatement.INDEX_TARGET);
+                    if (targetTerm.op() instanceof LocationVariable lv) {
+                        writtenPVs = writtenPVs.add(lv);
+                    }
+                }
             }
         }
 
@@ -639,7 +645,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (var pv : list) {
             if (pv != null) {
                 JTerm t = tb.var(pv);
@@ -668,7 +674,7 @@ public final class MiscTools {
 
     public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
             ImmutableList<JTerm> localOuts) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
@@ -701,47 +707,6 @@ public final class MiscTools {
         result.put("wdOperator", "wdOperator:L");
         result.put("permissions", "permissions:off");
         return result;
-    }
-
-    /**
-     * Tries to extract a valid URI from the given DataLocation.
-     *
-     * @param loc the given DataLocation
-     * @return an URI identifying the resource of the DataLocation
-     */
-    public static Optional<URI> extractURI(DataLocation loc) {
-        if (loc == null) {
-            throw new IllegalArgumentException("The given DataLocation is null!");
-        }
-
-        try {
-            return switch (loc.getType()) {
-            case "URL" -> // URLDataLocation
-                Optional.of(((URLDataLocation) loc).url().toURI());
-            case "ARCHIVE" -> { // ArchiveDataLocation
-                // format: "ARCHIVE:<filename>?<itemname>"
-                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
-
-                // extract item name and zip file
-                int qmindex = adl.toString().lastIndexOf('?');
-                String itemName = adl.toString().substring(qmindex + 1);
-                ZipFile zip = adl.getFile();
-
-                // use special method to ensure that path separators are correct
-                yield Optional.of(getZipEntryURI(zip, itemName));
-            }
-            case "FILE" -> // DataFileLocation
-                // format: "FILE:<path>"
-                Optional.of(((DataFileLocation) loc).getFile().toURI());
-            default -> // SpecDataLocation
-                // format "<type>://<location>"
-                // wrap into URN to ensure URI encoding is correct (no spaces!)
-                Optional.empty();
-            };
-        } catch (URISyntaxException | IOException e) {
-            throw new IllegalArgumentException(
-                "The given DataLocation can not be converted into a valid URI: " + loc, e);
-        }
     }
 
     /**
@@ -854,48 +819,49 @@ public final class MiscTools {
             schemeSpecPart = m.group(2);
         }
         switch (scheme) {
-        case "URL" -> {
-            // schemeSpecPart actually contains a URL again
-            return new URL(schemeSpecPart);
-        }
-        case "ARCHIVE" -> {
-            // format: "ARCHIVE:<filename>?<itemname>"
-            // extract item name and zip file
-            int qmindex = schemeSpecPart.lastIndexOf('?');
-            String zipName = schemeSpecPart.substring(0, qmindex);
-            String itemName = schemeSpecPart.substring(qmindex + 1);
-            try {
-                ZipFile zip = new ZipFile(zipName);
-                // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName).toURL();
-            } catch (IOException e) {
-                MalformedURLException me =
-                    new MalformedURLException(input + " does not contain a valid URL");
-                me.initCause(e);
-                throw me;
+            case "URL" -> {
+                // schemeSpecPart actually contains a URL again
+                return new URL(schemeSpecPart);
             }
-        }
-        case "FILE" -> {
-            // format: "FILE:<path>"
-            Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
-            return path.toUri().toURL();
-        }
-        case "" -> {
-            // only file/path without protocol
-            Path p = Paths.get(input).toAbsolutePath().normalize();
-            return p.toUri().toURL();
-        }
-        default -> {
-            // may still be Windows path starting with <drive_letter>:
-            if (scheme.length() == 1) {
-                // TODO: Theoretically, a protocol with only a single letter is allowed.
-                // This (very rare) case currently is not handled correctly.
-                Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
-                return windowsPath.toUri().toURL();
+            case "ARCHIVE" -> {
+                // format: "ARCHIVE:<filename>?<itemname>"
+                // extract item name and zip file
+                int qmindex = schemeSpecPart.lastIndexOf('?');
+                String zipName = schemeSpecPart.substring(0, qmindex);
+                String itemName = schemeSpecPart.substring(qmindex + 1);
+                try {
+                    ZipFile zip = new ZipFile(zipName);
+                    // use special method to ensure that path separators are correct
+                    return getZipEntryURI(zip, itemName).toURL();
+                } catch (IOException e) {
+                    MalformedURLException me =
+                        new MalformedURLException(input + " does not contain a valid URL");
+                    me.initCause(e);
+                    throw me;
+                }
             }
-            // otherwise call URL constructor
-            // if this also fails, there is an unknown protocol -> MalformedURLException
-            return new URL(input);
+            case "FILE" -> {
+                // format: "FILE:<path>"
+                Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
+                return path.toUri().toURL();
+            }
+            case "" -> {
+                // only file/path without protocol
+                Path p = Paths.get(input).toAbsolutePath().normalize();
+                return p.toUri().toURL();
+            }
+            default -> {
+                // may still be Windows path starting with <drive_letter>:
+                if (scheme.length() == 1) {
+                    // TODO: Theoretically, a protocol with only a single letter is allowed.
+                    // This (very rare) case currently is not handled correctly.
+                    Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
+                    return windowsPath.toUri().toURL();
+                }
+                // otherwise call URL constructor
+                // if this also fails, there is an unknown protocol -> MalformedURLException
+                return new URL(input);
+            }
         }
         }
     }

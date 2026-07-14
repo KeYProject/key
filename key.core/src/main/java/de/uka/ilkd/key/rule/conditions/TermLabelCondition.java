@@ -14,8 +14,6 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
  * label.
@@ -35,8 +33,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
-            @NonNull SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);

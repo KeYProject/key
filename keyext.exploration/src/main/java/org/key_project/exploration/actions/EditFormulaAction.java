@@ -4,7 +4,6 @@
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Objects;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;

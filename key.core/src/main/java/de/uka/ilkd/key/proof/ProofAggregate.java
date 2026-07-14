@@ -27,7 +27,7 @@ public abstract class ProofAggregate {
         }
     }
 
-    public static @Nullable ProofAggregate createProofAggregate(Proof[] proofs, String name) {
+    public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
         if (proofs.length == 0) {
             return null; // needed for tests
         }

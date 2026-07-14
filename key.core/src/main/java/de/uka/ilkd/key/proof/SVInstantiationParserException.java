@@ -5,16 +5,20 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.Position;
-
-import org.jspecify.annotations.Nullable;
+import org.key_project.util.parsing.Position;
 
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
     private final String instantiation;
     private final String detail;
 
-    public SVInstantiationParserException(String instantiation, Position position,
-            @Nullable String detail,
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4411508672178909020L;
+    private final String instantiation;
+    private final String detail;
+
+    public SVInstantiationParserException(String instantiation, Position position, String detail,
             boolean inIfSequent) {
         super("Parser Error", position, inIfSequent);
         this.instantiation = instantiation;

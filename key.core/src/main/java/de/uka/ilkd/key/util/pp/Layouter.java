@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
+
+import org.jspecify.annotations.NonNull;
 
 import org.jspecify.annotations.NonNull;
 
@@ -40,7 +39,7 @@ import org.jspecify.annotations.NonNull;
  * possible to include e.g. HTML markup in the output which does not take up any space. There is
  * a convenience implementation {@link StringBackend}, which writes to a {@link String}.
  *
- * <p>
+ * <P>
  * The layouter internally keeps track of a current <em>indentation level</em>. Think of nicely
  * indented Java source code. Then the indentation level at any point is the number of blank columns
  * to be inserted at the beginning of the next line if you inserted a line break. To increase the
@@ -164,14 +163,10 @@ import org.jspecify.annotations.NonNull;
 
 public class Layouter<M> {
 
-    /**
-     * The Printer used for output.
-     */
-    private final @NonNull Printer<M> out;
+    /** The Printer used for output. */
+    private final Printer<M> out;
 
-    /**
-     * The list of scanned tokens not yet output.
-     */
+    /** The list of scanned tokens not yet output. */
     private final Queue<StreamToken<M>> queue = new ArrayDeque<>();
 
     /**
@@ -211,9 +206,7 @@ public class Layouter<M> {
      */
     private final int largeSize;
 
-    /**
-     * A default indentation value used for blocks.
-     */
+    /** A default indentation value used for blocks. */
     private final int defaultIndent;
 
 
@@ -233,23 +226,17 @@ public class Layouter<M> {
         this.defaultIndent = indentation;
     }
 
-    /**
-     * Line width
-     */
+    /** Line width */
     public int lineWidth() {
         return out.lineWidth();
     }
 
-    /**
-     * Sets the line width
-     */
+    /** Sets the line width */
     public void setLineWidth(int lineWidth) {
         out.setLineWidth(lineWidth);
     }
 
-    /**
-     * Default indent
-     */
+    /** Default indent */
     public int defaultIndent() {
         return defaultIndent;
     }
@@ -258,7 +245,7 @@ public class Layouter<M> {
         return out.backend();
     }
 
-    public @NonNull String result() {
+    public String result() {
         return out.result();
     }
 
@@ -272,7 +259,7 @@ public class Layouter<M> {
      * @param s the String to print.
      * @return this
      */
-    public @NonNull Layouter<M> print(@NonNull String s) {
+    public Layouter<M> print(String s) {
         if (delimStack.isEmpty()) {
             out.print(s);
             totalSize += s.length();
@@ -298,7 +285,7 @@ public class Layouter<M> {
      * @param indent increment to indentation level
      * @return this
      */
-    public @NonNull Layouter<M> begin(boolean consistent, boolean relative, int indent) {
+    public Layouter<M> begin(boolean consistent, boolean relative, int indent) {
         StreamToken<M> t = new OpenBlockToken<>(totalSize, consistent, relative, indent);
         enqueue(t);
         push(t);
@@ -310,7 +297,7 @@ public class Layouter<M> {
      *
      * @return this
      **/
-    public @NonNull Layouter<M> end() {
+    public Layouter<M> end() {
         if (delimStack.isEmpty()) {
             /* then stream is also empty, so output */
             out.closeBlock();
@@ -342,7 +329,7 @@ public class Layouter<M> {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public @NonNull Layouter<M> brk(int width, int offset) {
+    public Layouter<M> brk(int width, int offset) {
         if (!delimStack.isEmpty()) {
             StreamToken<M> s = top();
             if (s instanceof BreakToken) {
@@ -369,7 +356,7 @@ public class Layouter<M> {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public @NonNull Layouter<M> ind(int width, int offset) {
+    public Layouter<M> ind(int width, int offset) {
         if (delimStack.isEmpty()) {
             out.indent(width, offset);
             totalSize += width;
@@ -390,8 +377,9 @@ public class Layouter<M> {
      *
      * @param o an object to be passed through to the backend.
      * @return this
+     *
      */
-    public @NonNull Layouter<M> mark(M o) {
+    public Layouter<M> mark(M o) {
         if (delimStack.isEmpty()) {
             out.mark(o);
         } else {
@@ -403,6 +391,7 @@ public class Layouter<M> {
     /**
      * Close the Layouter. No more methods should be called after this. All blocks begun must have
      * been ended by this point. Any pending material is written to the backend.
+     *
      */
     public void close() {
         if (!delimStack.isEmpty()) {
@@ -423,7 +412,7 @@ public class Layouter<M> {
      * @param indent increment to indentation level
      * @return this
      */
-    public @NonNull Layouter<M> begin(boolean consistent, int indent) {
+    public Layouter<M> begin(boolean consistent, int indent) {
         return begin(consistent, false, indent);
     }
 
@@ -436,7 +425,7 @@ public class Layouter<M> {
      * @param indent increment to indentation level
      * @return this
      */
-    public @NonNull Layouter<M> beginRelative(boolean consistent, int indent) {
+    public Layouter<M> beginRelative(boolean consistent, int indent) {
         return begin(consistent, true, indent);
     }
 
@@ -447,7 +436,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> beginRelativeI() {
+    public Layouter<M> beginRelativeI() {
         return beginRelative(false, defaultIndent);
     }
 
@@ -458,7 +447,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> beginRelativeC() {
+    public Layouter<M> beginRelativeC() {
         return beginRelative(true, defaultIndent);
     }
 
@@ -470,7 +459,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public @NonNull Layouter<M> beginRelativeC(int indent) {
+    public Layouter<M> beginRelativeC(int indent) {
         return beginRelative(true, indent);
     }
 
@@ -480,7 +469,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> beginI() {
+    public Layouter<M> beginI() {
         return begin(false, defaultIndent);
     }
 
@@ -489,7 +478,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> beginC() {
+    public Layouter<M> beginC() {
         return begin(true, defaultIndent);
     }
 
@@ -499,7 +488,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public @NonNull Layouter<M> beginI(int indent) {
+    public Layouter<M> beginI(int indent) {
         return begin(false, indent);
     }
 
@@ -509,7 +498,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public @NonNull Layouter<M> beginC(int indent) {
+    public Layouter<M> beginC(int indent) {
         return begin(true, indent);
     }
 
@@ -520,7 +509,7 @@ public class Layouter<M> {
      * @param consistent <code>true</code> for consistent block
      * @return this
      */
-    public @NonNull Layouter<M> begin(boolean consistent) {
+    public Layouter<M> begin(boolean consistent) {
         return begin(consistent, defaultIndent);
     }
 
@@ -531,7 +520,7 @@ public class Layouter<M> {
      * @param width space to insert if not broken
      * @return this
      */
-    public @NonNull Layouter<M> brk(int width) {
+    public Layouter<M> brk(int width) {
         return brk(width, 0);
     }
 
@@ -540,7 +529,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> brk() {
+    public Layouter<M> brk() {
         return brk(1);
     }
 
@@ -550,7 +539,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> nl() {
+    public Layouter<M> nl() {
         return brk(largeSize);
     }
 
@@ -560,7 +549,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public @NonNull Layouter<M> ind() {
+    public Layouter<M> ind() {
         return this.ind(0, 0);
     }
 
@@ -573,7 +562,7 @@ public class Layouter<M> {
      * @param s the pre-formatted string
      * @return this
      */
-    public @NonNull Layouter<M> pre(@NonNull String s) {
+    public Layouter<M> pre(String s) {
         StringTokenizer st = new StringTokenizer(s, "\n", true);
         beginC(0);
         while (st.hasMoreTokens()) {
@@ -595,17 +584,13 @@ public class Layouter<M> {
     /* Delimiter Stack handling */
 
 
-    /**
-     * Push an OpenBlockToken or BreakToken onto the delimStack
-     */
+    /** Push an OpenBlockToken or BreakToken onto the delimStack */
     private void push(StreamToken<M> t) {
         delimStack.offerLast(t);
     }
 
-    /**
-     * Pop the topmost Token from the delimStack
-     */
-    private @NonNull StreamToken<M> pop() {
+    /** Pop the topmost Token from the delimStack */
+    private StreamToken<M> pop() {
         StreamToken<M> token = delimStack.pollLast();
         if (token == null) {
             throw new UnbalancedBlocksException();
@@ -624,10 +609,8 @@ public class Layouter<M> {
         return token;
     }
 
-    /**
-     * Return the top of the delimStack, without popping it.
-     */
-    private @NonNull StreamToken<M> top() {
+    /** Return the top of the delimStack, without popping it. */
+    private StreamToken<M> top() {
         StreamToken<M> token = delimStack.peekLast();
         if (token == null) {
             throw new UnbalancedBlocksException();
@@ -638,9 +621,7 @@ public class Layouter<M> {
 
     /* stream handling */
 
-    /**
-     * Put a StreamToken into the stream (at the end).
-     */
+    /** Put a StreamToken into the stream (at the end). */
     private void enqueue(StreamToken<M> t) {
         queue.offer(t);
     }
@@ -651,11 +632,7 @@ public class Layouter<M> {
      */
     private void advanceLeft() {
         StreamToken<M> t;
-        while (!queue.isEmpty()) {
-            t = queue.peek();
-            if (t == null || !t.followingSizeKnown()) {
-                break;
-            }
+        while (!queue.isEmpty() && ((t = queue.peek()).followingSizeKnown())) {
             t.print(out);
             queue.poll();
             totalOutput += t.size();
@@ -668,14 +645,10 @@ public class Layouter<M> {
      * A stream token.
      */
     private static abstract class StreamToken<M> {
-        /**
-         * Send this token to the Printer {@link #out}.
-         */
+        /** Send this token to the Printer {@link #out}. */
         abstract void print(Printer<M> out);
 
-        /**
-         * Return the size of this token if the block is not broken.
-         */
+        /** Return the size of this token if the block is not broken. */
         abstract int size();
 
         /**
@@ -704,9 +677,7 @@ public class Layouter<M> {
         }
     }
 
-    /**
-     * A token corresponding to a <code>print</code> call.
-     */
+    /** A token corresponding to a <code>print</code> call. */
     private static class StringToken<M> extends StreamToken<M> {
         final String s;
 
@@ -714,7 +685,7 @@ public class Layouter<M> {
             this.s = s;
         }
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.print(s);
         }
 
@@ -723,9 +694,7 @@ public class Layouter<M> {
         }
     }
 
-    /**
-     * A token corresponding to an <code>ind</code> call.
-     */
+    /** A token corresponding to an <code>ind</code> call. */
     private static class IndentationToken<M> extends StreamToken<M> {
         protected final int width;
         protected final int offset;
@@ -735,7 +704,7 @@ public class Layouter<M> {
             this.offset = offset;
         }
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.indent(width, offset);
         }
 
@@ -744,14 +713,10 @@ public class Layouter<M> {
         }
     }
 
-    /**
-     * Superclass of tokens which calculate their followingSize.
-     */
+    /** Superclass of tokens which calculate their followingSize. */
     private static abstract class SizeCalculatingToken<M> extends StreamToken<M> {
         protected final int begin;
-        /**
-         * negative means that end has not been set yet.
-         */
+        /** negative means that end has not been set yet. */
         protected int end = -1;
 
         SizeCalculatingToken(int begin) {
@@ -778,9 +743,7 @@ public class Layouter<M> {
         }
     }
 
-    /**
-     * A token corresponding to a <code>brk</code> call.
-     */
+    /** A token corresponding to a <code>brk</code> call. */
     private static class BreakToken<M> extends SizeCalculatingToken<M> {
         protected final int width;
         protected final int offset;
@@ -795,14 +758,12 @@ public class Layouter<M> {
             return width;
         }
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.printBreak(width, offset, followingSize());
         }
     }
 
-    /**
-     * A token corresponding to a <code>begin</code> call.
-     */
+    /** A token corresponding to a <code>begin</code> call. */
     private static class OpenBlockToken<M> extends SizeCalculatingToken<M> {
         protected final boolean consistent;
         protected final boolean relative;
@@ -819,19 +780,16 @@ public class Layouter<M> {
             return 0;
         }
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.openBlock(consistent, relative, indent, followingSize());
         }
     }
 
-    /**
-     * A token corresponding to an <code>end</code> call.
-     */
+    /** A token corresponding to an <code>end</code> call. */
     private static class CloseBlockToken<M> extends StreamToken<M> {
-        CloseBlockToken() {
-        }
+        CloseBlockToken() {}
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.closeBlock();
         }
 
@@ -841,9 +799,7 @@ public class Layouter<M> {
 
     }
 
-    /**
-     * A token corresponding to a <code>mark</code> call.
-     */
+    /** A token corresponding to a <code>mark</code> call. */
     private static class MarkToken<M> extends StreamToken<M> {
         protected final M o;
 
@@ -855,7 +811,7 @@ public class Layouter<M> {
             return 0;
         }
 
-        void print(@NonNull Printer<M> out) {
+        void print(Printer<M> out) {
             out.mark(o);
         }
     }

@@ -16,14 +16,22 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.CMenu;
-import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
-public class ProofTreeSettingsMenuFactory {
+/**
+ * Factory for the settings menu of the {@link ProofTreeView}.
+ */
+public final class ProofTreeSettingsMenuFactory {
     private ProofTreeSettingsMenuFactory() {}
 
-    public static @NonNull CAction create(@NonNull ProofTreeView view) {
+    /**
+     * Create the settings menu for the provided view.
+     *
+     * @param view the view
+     * @return the constructed menu
+     */
+    public static CAction create(ProofTreeView view) {
         Supplier<CMenu> supplier = () -> {
             CMenu menu = new CMenu();
 
@@ -40,6 +48,7 @@ public class ProofTreeSettingsMenuFactory {
             }
             menu.addSeparator();
 
+            menu.add(createLinearizedModeToggle(view));
             menu.add(createExpandOSSToggle(view));
             menu.add(createTooltipToggle());
             menu.add(createTacletInfoToggle());
@@ -59,8 +68,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static @NonNull CCheckBox createFilter(@NonNull ProofTreeView view,
-            @NonNull ProofTreeViewFilter filter) {
+    private static CCheckBox createFilter(ProofTreeView view, ProofTreeViewFilter filter) {
         CCheckBox check = new ProofTreeSettingsCheckBox();
         check.setText(filter.name());
         check.setEnabled(view.getDelegateModel() != null);
@@ -112,7 +120,28 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static @NonNull CCheckBox createExpandOSSToggle(@NonNull ProofTreeView view) {
+    private static CCheckBox createLinearizedModeToggle(ProofTreeView view) {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                final boolean selected = isSelected();
+                view.setLinearizedMode(selected);
+            }
+        };
+        check.setText("Linearize Proof Tree");
+        check.setTooltip("""
+                <html>
+                Show the proof tree in a more linear fashion.<br>
+                When a goal is split, the "main" branch is continued
+                on the same indentation level.<br>
+                This includes e.g. the "Normal Execution" of symbolic execution rules
+                and the "TRUE" branch of cuts.
+                </html>""");
+        check.setSelected(view.isLinearizedMode());
+        return check;
+    }
+
+    private static CCheckBox createExpandOSSToggle(ProofTreeView view) {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {
@@ -125,7 +154,7 @@ public class ProofTreeSettingsMenuFactory {
         return check;
     }
 
-    private static @NonNull CCheckBox createTacletInfoToggle() {
+    private static CCheckBox createTacletInfoToggle() {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {
@@ -138,7 +167,7 @@ public class ProofTreeSettingsMenuFactory {
         return check;
     }
 
-    private static @NonNull CCheckBox createTooltipToggle() {
+    private static CCheckBox createTooltipToggle() {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {

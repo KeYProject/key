@@ -5,7 +5,9 @@ package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -26,12 +28,22 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
      */
     private final PosInOccurrence pio;
 
-    public ProofMacroUserAction(@NonNull KeYMediator mediator, ProofMacro macro,
-            PosInOccurrence pio,
-            @NonNull Proof proof) {
-        super(mediator, proof);
+    /// Root of the subtree to run the macro from. If null, it is run from the selected node.
+    private final Node node;
+
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio) {
+        super(mediator, mediator.getSelectedProof());
         this.macro = macro;
         this.pio = pio;
+        this.node = mediator.getSelectedNode();
+    }
+
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, Node node,
+            PosInOccurrence pio) {
+        super(mediator, mediator.getSelectedProof());
+        this.macro = macro;
+        this.pio = pio;
+        this.node = node;
     }
 
     @Override
@@ -44,6 +56,10 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
         if (mediator.isInAutoMode()) {
             return;
         }
-        mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, pio);
+        if (node == null) {
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, pio);
+        } else {
+            mediator.getUI().getProofControl().runMacro(node, macro, pio);
+        }
     }
 }

@@ -11,9 +11,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Encapsulates intermediate information for constructing a {@link MergeRule} application.
  *
@@ -23,10 +20,10 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
     private final String mergeProc;
-    private @Nullable String distinguishingFormula = null;
+    private String distinguishingFormula = null;
     private int nrPartners = 0;
-    private @Nullable String abstractionPredicates = null;
-    private @Nullable String userChoices = null;
+    private String abstractionPredicates = null;
+    private String userChoices = null;
     private final Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**

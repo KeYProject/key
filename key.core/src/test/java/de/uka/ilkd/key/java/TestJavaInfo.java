@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.java;
 
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.List;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -33,16 +35,14 @@ public class TestJavaInfo {
     @BeforeAll
     static void setUp() {
         if (services == null || javaInfo == null) {
-            HelperClassForTests helper = new HelperClassForTests();
-            final ProofAggregate agg = helper.parse(new File(testfile));
+            final ProofAggregate agg = HelperClassForTests.parse(Paths.get(testfile));
             services = agg.getFirstProof().getServices();
             javaInfo = services.getJavaInfo();
         }
     }
 
     @AfterEach
-    public void tearDown() {
-    }
+    public void tearDown() {}
 
     @Test
     public void testRetrieveArrayTypeByJLSName() {
@@ -76,7 +76,7 @@ public class TestJavaInfo {
     public void testGetAllSupertypes() {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         assertNotNull(rte, "Did not find class java.lang.RuntimeException");
-        final ImmutableList<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
+        final List<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
 
         assertNotNull(allSupertypes, "No supertypes of java.lang.RuntimeException?");
 
@@ -93,12 +93,12 @@ public class TestJavaInfo {
     }
 
     private static final String[] implictFieldsClassOnly = {
-        ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS,
-        ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
-        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED };
+        PipelineConstants.IMPLICIT_CLASS_ERRONEOUS,
+        PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS,
+        PipelineConstants.IMPLICIT_CLASS_INITIALIZED, PipelineConstants.IMPLICIT_CLASS_PREPARED };
 
     private static final String[] generalImplicitFields = {
-        ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_INITIALIZED };
+        PipelineConstants.IMPLICIT_CREATED, PipelineConstants.IMPLICIT_INITIALIZED };
 
 
     @Test
@@ -124,11 +124,11 @@ public class TestJavaInfo {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
 
 
-        assertNotNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj),
-            "Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED);
+        assertNotNull(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, obj),
+            "Did not find locally declared attribute " + PipelineConstants.IMPLICIT_CREATED);
 
-        assertNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte),
-            "Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED
+        assertNull(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, rte),
+            "Attribute " + PipelineConstants.IMPLICIT_CREATED
                 + " is locally declared in class java.lang.Object and should not be "
                 + "returned by this method for type java.lang.RuntimeException");
 

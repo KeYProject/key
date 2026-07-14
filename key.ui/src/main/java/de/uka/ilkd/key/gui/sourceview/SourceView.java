@@ -34,11 +34,11 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.statement.Else;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -56,8 +56,6 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +76,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class SourceView extends JComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
-
-    private static final long serialVersionUID = -94424677425561025L;
 
     /**
      * the only instance of this singleton
@@ -218,7 +214,7 @@ public final class SourceView extends JComponent {
             }
 
             @Override
-            public void selectedProofChanged(@NonNull KeYSelectionEvent<Proof> e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 clear();
                 ensureProofJavaSourceCollectionExists(e.getSource().getSelectedProof());
                 updateGUI();
@@ -230,7 +226,7 @@ public final class SourceView extends JComponent {
 
     }
 
-    private void ensureProofJavaSourceCollectionExists(@Nullable Proof proof) {
+    private void ensureProofJavaSourceCollectionExists(Proof proof) {
         if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
             final var sources = new ProofJavaSourceCollection();
             proof.register(sources, ProofJavaSourceCollection.class);
@@ -472,7 +468,7 @@ public final class SourceView extends JComponent {
      *
      * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(@NonNull Iterable<URI> fileURIs) throws IOException {
+    public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
         final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
@@ -612,7 +608,7 @@ public final class SourceView extends JComponent {
      * @return {@code true} if this source view did not already contain the file.
      * @throws IOException if the file cannot be opened.
      */
-    private boolean addFile(@Nullable URI fileURI) throws IOException {
+    private boolean addFile(URI fileURI) throws IOException {
         final Proof proof = mainWindow.getMediator().getSelectedProof();
         // quick fix: fileName could be null (see bug #1520)
         if (proof == null || fileURI == null || tabs.containsKey(fileURI)) {
@@ -806,11 +802,12 @@ public final class SourceView extends JComponent {
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      *
-     * @param se the given SourceElement
+     * @param se
+     *        the given SourceElement
      * @return a new PositionInfo starting at the minimum of all the contained positions and ending
      *         at the maximum position
      */
-    private static @NonNull PositionInfo joinPositionsRec(SourceElement se) {
+    private static PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement ntpe) {
             // TODO: additional elements, e.g. code inside if
             if (se instanceof If || se instanceof Then || se instanceof Else) {
@@ -1393,7 +1390,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-        public void mouseClicked(@NonNull MouseEvent e) {
+        public void mouseClicked(MouseEvent e) {
             final int pos = textPane.viewToModel2D(e.getPoint());
             if (isHighlighted(e.getPoint())) {
                 int line = 0;

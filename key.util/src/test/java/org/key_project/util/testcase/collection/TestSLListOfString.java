@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Objects;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,14 +36,14 @@ public class TestSLListOfString {
 
     @BeforeEach
     public void setUp() {
-        a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
-        a1 = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
-        b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
-        c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
-        d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+        a = ImmutableList.<String>nil().prepend("C").prepend("B").prepend("A");
+        a1 = ImmutableList.<String>nil().prepend("C").prepend("B").prepend("A");
+        b = ImmutableList.<String>nil().prepend("B").prepend("A");
+        c = ImmutableList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
+        d = ImmutableList.<String>nil().prepend("A").prepend("B").prepend("A");
+        e = ImmutableList.<@Nullable String>nil().prepend((String) null).prepend("B")
                 .prepend("A");
-        e1 = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+        e1 = ImmutableList.<@Nullable String>nil().prepend((String) null).prepend("B")
                 .prepend("A");
     }
 
@@ -53,7 +52,7 @@ public class TestSLListOfString {
     public void testPrepend() {
         @SuppressWarnings("unchecked")
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
-        newList[0] = ImmutableSLList.nil();
+        newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
             newList[i] = newList[i - 1].prepend(str[i - 1]);
@@ -91,7 +90,7 @@ public class TestSLListOfString {
     public void testAppend() {
         @SuppressWarnings("unchecked")
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
-        newList[0] = ImmutableSLList.nil();
+        newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
             newList[i] = newList[i - 1].append(str[i - 1]);
@@ -130,7 +129,7 @@ public class TestSLListOfString {
     public void testHeadTail() {
         @SuppressWarnings("unchecked")
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
-        newList[0] = ImmutableSLList.nil();
+        newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
             newList[i] = newList[i - 1].prepend(str[i - 1]);
@@ -145,7 +144,7 @@ public class TestSLListOfString {
     // tests contains
     @Test
     public void testContains() {
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
             newList = newList.append(str[i - 1]);
@@ -160,7 +159,7 @@ public class TestSLListOfString {
     // tests removeAll
     @Test
     public void testRemoveAll() {
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
 
         newList = newList.append(str[0]);
         for (int i = 1; i < str.length + 1; i++) {
@@ -174,7 +173,7 @@ public class TestSLListOfString {
 
     @Test
     public void testRemoveFirst() {
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
 
         newList = newList.prepend(str[0]);
         for (int i = 1; i < str.length + 1; i++) {
@@ -211,7 +210,7 @@ public class TestSLListOfString {
 
     @Test
     public void testToString() {
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
         for (String aStr : str) {
             newList = newList.append(aStr);
         }
@@ -221,7 +220,7 @@ public class TestSLListOfString {
 
     public static void performanceTest(int n) {
         LOGGER.info("Performance Test for " + n + " elements");
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
         LOGGER.info("Create list with prepend.");
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
@@ -245,7 +244,7 @@ public class TestSLListOfString {
 
 
     public static void main(String[] args) {
-        ImmutableList<String> newList = ImmutableSLList.nil();
+        ImmutableList<String> newList = ImmutableList.nil();
         newList.prepend("a");
 
         performanceTest(10);

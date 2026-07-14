@@ -15,9 +15,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import org.key_project.util.java.SwingUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop
  * system is not supported or internet connection missing.
@@ -42,7 +39,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         return SwingUtil.browseIsSupported();
     }
 
-    private static @Nullable URI getURI() {
+    private static URI getURI() {
         URI res = null;
         try {
             res = (new URL(url)).toURI();

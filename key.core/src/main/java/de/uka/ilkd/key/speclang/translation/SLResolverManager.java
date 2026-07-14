@@ -7,9 +7,9 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -18,10 +18,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -33,17 +29,17 @@ public abstract class SLResolverManager {
 
     public final SLExceptionFactory excManager;
 
-    private @NonNull ImmutableList<SLExpressionResolver> resolvers =
-        ImmutableSLList.nil();
+    private ImmutableList<SLExpressionResolver> resolvers =
+        ImmutableList.nil();
     private final KeYJavaType specInClass;
     private final LocationVariable selfVar;
     private final TermBuilder tb;
 
-    private @NonNull ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
-        ImmutableSLList.nil();
+    private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
+        ImmutableList.nil();
 
-    private @NonNull ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
-        ImmutableSLList.nil();
+    private ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
+        ImmutableList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
 
@@ -71,12 +67,12 @@ public abstract class SLResolverManager {
     }
 
 
-    private @NonNull String getShortName(@NonNull String name) {
+    private String getShortName(String name) {
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
 
-    private boolean isFullyQualified(@NonNull String name) {
+    private boolean isFullyQualified(String name) {
         return name.contains(".");
     }
 
@@ -213,7 +209,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(@NonNull LocationVariable pv, KeYJavaType kjt) {
+    public void putIntoTopLocalVariablesNamespace(LocationVariable pv, KeYJavaType kjt) {
         localVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
@@ -221,7 +217,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLogicVariablesNamespace(@NonNull LogicVariable pv, KeYJavaType kjt) {
+    public void putIntoTopLogicVariablesNamespace(LogicVariable pv, KeYJavaType kjt) {
         logicVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
@@ -230,7 +226,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(@NonNull LocationVariable pv) {
+    public void putIntoTopLocalVariablesNamespace(LocationVariable pv) {
         putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
     }
 
@@ -248,8 +244,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
      */
-    public void putIntoTopLocalVariablesNamespace(
-            @NonNull ImmutableList<? extends LocationVariable> pvs) {
+    public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends LocationVariable> pvs) {
         for (var pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }

@@ -13,8 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
  * contains all files needed to successfully reload the proof.
@@ -45,7 +43,7 @@ public final class SaveBundleAction extends MainWindowAction {
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 updateStatus();
             }
         });

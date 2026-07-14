@@ -5,6 +5,8 @@ package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,13 +31,24 @@ public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var file = new File(PathConfig.getProofIndependentSettings().replace(".props", ".json"));
-        if (file.exists()) {
-            DEFAULT_INSTANCE = new ProofIndependentSettings(file);
-        } else {
-            var old = new File(PathConfig.getProofIndependentSettings());
-            DEFAULT_INSTANCE = new ProofIndependentSettings(old);
+        var write = PathConfig.currentPaths.proofIndependentSettings;
+        var read = PathConfig.previousPaths.proofIndependentSettings;
+
+        if (Files.exists(write)) {
+            read = write;
         }
+
+        // change to props file, if json file does not exists
+        if (!Files.exists(read)) {
+            read = read.getParent()
+                    .resolve(read.getFileName().toString().replace(".json", ".props"));
+        }
+
+        // read from the old/new place
+        DEFAULT_INSTANCE = new ProofIndependentSettings(read.toFile());
+
+        // set the write place
+        DEFAULT_INSTANCE.filename = write.toFile();
     }
 
     private final ProofIndependentSMTSettings smtSettings =
@@ -53,8 +66,8 @@ public class ProofIndependentSettings {
     private final List<Settings> settings = new LinkedList<>();
 
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadedProperties;
-    private Configuration lastReadedConfiguration;
+    private Properties lastReadProperties;
+    private Configuration lastReadConfiguration;
 
     private ProofIndependentSettings() {
         addSettings(smtSettings);
@@ -74,8 +87,11 @@ public class ProofIndependentSettings {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
             settings.addPropertyChangeListener(settingsListener);
-            if (lastReadedProperties != null) {
-                settings.readSettings(lastReadedProperties);
+            if (lastReadProperties != null) {
+                settings.readSettings(lastReadProperties);
+            }
+            if (lastReadConfiguration != null) {
+                settings.readSettings(lastReadConfiguration);
             }
             if (lastReadedConfiguration != null) {
                 settings.readSettings(lastReadedConfiguration);
@@ -86,14 +102,14 @@ public class ProofIndependentSettings {
     private void loadSettings() {
         try {
             if (filename.exists()) {
-                if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                if (PathConfig.DISREGARD_SETTINGS) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
                         PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
                     load(filename);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Could not load settings from {}", filename, e);
         }
     }
@@ -106,19 +122,22 @@ public class ProofIndependentSettings {
                 for (Settings settings : settings) {
                     settings.readSettings(properties);
                 }
-                lastReadedProperties = properties;
+                lastReadProperties = properties;
             }
         } else {
-            this.lastReadedConfiguration = Configuration.load(file);
+            this.lastReadConfiguration = Configuration.load(file.toPath());
             for (Settings settings : settings) {
-                settings.readSettings(lastReadedConfiguration);
+                settings.readSettings(lastReadConfiguration);
             }
         }
     }
 
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
-            Properties result = new Properties();
+            Properties result = lastReadProperties == null
+                    ? new Properties()
+                    : new Properties(lastReadProperties);
+
             for (Settings settings : settings) {
                 settings.writeSettings(result);
             }
@@ -135,14 +154,18 @@ public class ProofIndependentSettings {
         }
 
         Configuration config = new Configuration();
+        if (lastReadConfiguration != null) {
+            config.overwriteWith(lastReadConfiguration);
+        }
+
         for (var settings : settings)
             settings.writeSettings(config);
         if (!filename.exists()) {
             filename.getParentFile().mkdirs();
         }
 
-        try (var out =
-            new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
+        try (var out = new BufferedWriter(new FileWriter(
+            filename.toString().replace(".props", ".json"), StandardCharsets.UTF_8))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
             LOGGER.error("Could not store settings to {}", filename, e);

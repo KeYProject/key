@@ -20,8 +20,6 @@ import de.uka.ilkd.key.smt.SMTFocusResults;
 
 import org.key_project.util.java.SwingUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +31,7 @@ public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
-    private final @NonNull ProgressTable table;
+    private final ProgressTable table;
     /**
      * Button to apply the results of running the SMT solver.
      * May close some open goals if the solver returned unsat.
@@ -57,7 +55,7 @@ public class ProgressDialog extends JDialog {
      * Overall progress of the SMT solvers (# goals started / total goals).
      */
     private JProgressBar progressBar;
-    private final @NonNull ProgressDialogListener listener;
+    private final ProgressDialogListener listener;
 
     /**
      * Current state of the dialog.
@@ -215,21 +213,21 @@ public class ProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case SOLVERS_DONE -> {
-            stopButton.setText("Discard");
-            if (applyButton != null) {
-                applyButton.setEnabled(true);
+            case SOLVERS_DONE -> {
+                stopButton.setText("Discard");
+                if (applyButton != null) {
+                    applyButton.setEnabled(true);
+                }
+                if (focusButton != null) {
+                    focusButton.setEnabled(true);
+                }
             }
-            if (focusButton != null) {
-                focusButton.setEnabled(true);
+            case SOLVERS_RUNNING -> {
+                stopButton.setText("Stop");
+                if (applyButton != null) {
+                    applyButton.setEnabled(false);
+                }
             }
-        }
-        case SOLVERS_RUNNING -> {
-            stopButton.setText("Stop");
-            if (applyButton != null) {
-                applyButton.setEnabled(false);
-            }
-        }
         }
     }
 

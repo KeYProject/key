@@ -24,10 +24,6 @@ import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -90,7 +86,7 @@ public class DelayedCutProcessor implements Runnable {
         listeners.remove(listener);
     }
 
-    public static @NonNull List<ApplicationCheck> getApplicationChecks() {
+    public static List<ApplicationCheck> getApplicationChecks() {
         List<ApplicationCheck> list = new LinkedList<>();
         list.add(new ApplicationCheck.NoNewSymbolsCheck());
         return list;
@@ -172,8 +168,8 @@ public class DelayedCutProcessor implements Runnable {
         return goal.apply(app);
     }
 
-    private @Nullable ImmutableList<Goal> apply(final String tacletName, @NonNull Goal goal,
-            @NonNull PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String tacletName, Goal goal,
+            PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(@NonNull Taclet taclet) {
@@ -242,8 +238,7 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * Rebuilds the subtree pruned by the process, that is the rules are replayed.
      */
-    private @NonNull List<NodeGoalPair> rebuildSubTrees(@NonNull DelayedCut cut,
-            @NonNull Goal goal) {
+    private List<NodeGoalPair> rebuildSubTrees(DelayedCut cut, Goal goal) {
         LinkedList<NodeGoalPair> pairs = new LinkedList<>();
         LinkedList<NodeGoalPair> openLeaves = new LinkedList<>();
 
@@ -283,8 +278,7 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private @NonNull LinkedList<Goal> apply(@NonNull Goal goal, RuleApp app,
-            @NonNull TermServices services) {
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             for (var entry : insts.getInstantiationMap()) {
@@ -346,8 +340,8 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(@NonNull Goal goal, final RuleApp app, @Nullable PosInOccurrence newPos,
-            @NonNull Services services) {
+    private void check(Goal goal, final RuleApp app,
+            PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -441,9 +435,8 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
      */
-    private void uncoverDecisionPredicate(@NonNull DelayedCut cut,
-            @NonNull List<NodeGoalPair> openLeaves) {
-        ImmutableList<NodeGoalPair> list = ImmutableSLList.nil();
+    private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
+        ImmutableList<NodeGoalPair> list = ImmutableList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =
                 list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));

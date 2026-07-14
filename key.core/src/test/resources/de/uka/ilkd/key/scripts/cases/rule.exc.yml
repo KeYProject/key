@@ -1,0 +1,12 @@
+name: "rule.exc"
+key: |
+  \predicates { a; b; }
+  \problem { a & b }
+
+script: |
+  rule andLeft;
+
+exception: |
+  Error while executing script: No matching applications.
+
+  Command: rule andLeft;

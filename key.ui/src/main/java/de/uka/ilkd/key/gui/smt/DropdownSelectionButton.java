@@ -178,7 +178,7 @@ public class DropdownSelectionButton {
     /**
      * @return the currently selected actions in the selection component
      */
-    public Action @NonNull [] getSelectedItems() {
+    public Action[] getSelectedItems() {
         return selectedItems.toArray(new Action[0]);
     }
 
@@ -400,6 +400,7 @@ public class DropdownSelectionButton {
             }
             menuItem.setEnabled(true);
             menuItem.setText(item.toString());
+            menuItem.setToolTipText(item.getValue(Action.SHORT_DESCRIPTION).toString());
             menuItem.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
             menuItems.add(menuItem);
         }

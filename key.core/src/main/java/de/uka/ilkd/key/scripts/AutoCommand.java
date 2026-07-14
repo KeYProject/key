@@ -3,65 +3,53 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.*;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProverCore;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.strategy.StrategyProperties.*;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
+ * <p>
+ * See documentation of {@link Parameters} for more information.
  *
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
-public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
+@NullMarked
+public class AutoCommand extends AbstractCommand {
 
     public AutoCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "auto";
     }
 
     @Override
-    public @NonNull String getDocumentation() {
-        return "The AutoCommand invokes the automatic strategy \"Auto\"";
-    }
-
-    @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
-            NoSpecifiedConverterException {
-        Parameters args = new Parameters();
-        state.getValueInjector().inject(this, args, arguments);
-        return args;
-    }
-
-    @Override
-    @SuppressWarnings("override.param.invalid")
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters arguments,
-            @NonNull EngineState state) throws ScriptException, InterruptedException {
-        final Services services = state.getProof().getServices();
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var arguments = state().getValueInjector().inject(new AutoCommand.Parameters(), args);
+        final Services services = state().getProof().getServices();
         final Profile profile = services.getProfile();
 
         // create the rule application engine
@@ -70,24 +58,48 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // find the targets
         final ImmutableList<Goal> goals;
-        if (arguments.isOnAllOpenGoals()) {
-            goals = state.getProof().openGoals();
+        if (arguments.onAllOpenGoals) {
+            goals = state().getProof().openGoals();
         } else {
-            final Goal goal = state.getFirstOpenAutomaticGoal();
-            goals = ImmutableSLList.<Goal>nil().prepend(goal);
+            final Goal goal = state().getFirstOpenAutomaticGoal();
+            goals = ImmutableList.<Goal>singleton(goal);
 
-            final Optional<String> matchesRegEx = Optional.ofNullable(arguments.matches);
-            final Optional<String> breakpoint = Optional.ofNullable(arguments.breakpoint);
-            if (matchesRegEx.isPresent() || breakpoint.isPresent()) {
+            if (arguments.matches != null || arguments.breakpoint != null) {
                 setupFocussedBreakpointStrategy( //
-                    matchesRegEx, breakpoint, goal, applyStrategy, services);
+                    arguments.matches, arguments.breakpoint, goal, applyStrategy, services);
             }
         }
 
         // set the max number of steps if given
-        int oldNumberOfSteps = state.getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0) {
-            state.setMaxAutomaticSteps(arguments.getSteps());
+        int oldNumberOfSteps = state().getMaxAutomaticSteps();
+        if (arguments.maxSteps > 0) {
+            state().setMaxAutomaticSteps(arguments.maxSteps);
+        }
+
+        // set model search if given
+        StrategyProperties activeStrategyProperties =
+            state().getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+
+        Map<String, OriginalValue> orgValues = prepareOriginalValues();
+        for (var entry : args.namedArgs().entrySet()) {
+            OriginalValue ov = orgValues.get(entry.getKey());
+            if (ov != null) {
+                ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
+                activeStrategyProperties.setProperty(ov.settingName,
+                    "true".equals(entry.getValue()) ? ov.trueValue : ov.falseValue);
+            }
+        }
+
+        SetCommand.updateStrategySettings(state(), activeStrategyProperties);
+
+        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        if (arguments.additionalRules != null) {
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
+        }
+        if (arguments.onlyRules != null) {
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
         }
 
         // Give some feedback
@@ -96,7 +108,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         // start actual autoprove
         try {
             for (Goal goal : goals) {
-                applyStrategy.start(state.getProof(), ImmutableSLList.<Goal>nil().prepend(goal));
+                applyStrategy.start(state().getProof(), ImmutableList.<Goal>singleton(goal));
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {
@@ -105,8 +117,29 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
             }
         } finally {
-            state.setMaxAutomaticSteps(oldNumberOfSteps);
+            state().setMaxAutomaticSteps(oldNumberOfSteps);
+            for (OriginalValue ov : orgValues.values()) {
+                if (ov.oldValue != null) {
+                    activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
+                }
+            }
+            state.getProof().setActiveStrategy(originalStrategy);
+            SetCommand.updateStrategySettings(state(), activeStrategyProperties);
         }
+    }
+
+    private Map<String, OriginalValue> prepareOriginalValues() {
+        var res = new HashMap<String, OriginalValue>();
+        res.put("modelSearch",
+            new OriginalValue(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_COMPLETION,
+                NON_LIN_ARITH_DEF_OPS));
+        res.put("expandQueries",
+            new OriginalValue(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF));
+        res.put("classAxioms",
+            new OriginalValue(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE, CLASS_AXIOM_OFF));
+        res.put("dependencies", new OriginalValue(DEP_OPTIONS_KEY, DEP_ON, DEP_OFF));
+        // ... add further (boolean for the moment) settings here.
+        return res;
     }
 
     /**
@@ -121,20 +154,17 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
-    private void setupFocussedBreakpointStrategy(final @NonNull Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final @NonNull Goal goal,
-            final @NonNull ProverCore proverCore,
-            final @NonNull Services services) throws ScriptException {
-        final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
-                ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
-                    maybeMatchesRegEx.get(), services))
-                : Optional.empty();
+    private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
+            final String breakpointArg, final Goal goal, final ProverCore proverCore,
+            final Services services) throws ScriptException {
+        final var focus =
+            MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);
 
-        final RuleApplicationManager realManager = //
+        final RuleApplicationManager<Goal> realManager = //
             goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
-        final RuleApplicationManager focusManager = //
+        final RuleApplicationManager<Goal> focusManager = //
             new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 
@@ -142,39 +172,110 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
-    @SuppressWarnings("initialization")
-    public static class Parameters {
-        @Option(value = "all", required = false)
+    @Documentation(category = "Fundamental", value = """
+            The AutoCommand invokes the automatic strategy "Auto" of KeY (which is also launched by
+            when clicking the "Auto" button in the GUI).
+            It can be used to try to automatically prove the current goal.
+            Use with care, as this command may leave the proof in a incomprehensible state
+            with many open goals.
+
+            Use the command with "close" to make sure the command succeeds for fails without
+            changes.""")
+    public static class Parameters implements ValueInjector.VerifyableParameters {
+        // @ TODO Deprecated with the higher order proof commands?
+        @Flag(value = "all")
+        @Documentation("*Deprecated*. Apply the strategy on all open goals. There is a better syntax for that now.")
         public boolean onAllOpenGoals = false;
 
-        @Option(value = "steps", required = false)
-        public int maxSteps = -1;
+        @Option(value = "steps")
+        @Documentation("The maximum number of proof steps to be performed.")
+        public @Nullable int maxSteps = -1;
 
         /**
          * Run on formula matching the given regex
          */
-        @Option(value = "matches", required = false)
-        @Nullable
-        public String matches = null;
+        @Option(value = "matches")
+        @Documentation("Run on the formula matching the given regex.")
+        public @Nullable String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
-        @Option(value = "breakpoint", required = false)
-        @Nullable
-        public String breakpoint = null;
+        @Option(value = "breakpoint")
+        @Documentation("When doing symbolic execution by auto, this option can be used to set a Java statement at which "
+            +
+            "symbolic execution has to stop.")
+        public @Nullable String breakpoint = null;
 
-        public boolean isOnAllOpenGoals() {
-            return onAllOpenGoals;
+        @Flag(value = "modelsearch")
+        @Documentation("Enable model search. Better for some (types of) arithmetic problems. Sometimes a lot worse.")
+        public boolean modelSearch;
+
+        @Flag(value = "expandQueries")
+        @Documentation("Automatically expand occurrences of query symbols using additional modalities on the sequent.")
+        public boolean expandQueries;
+
+        @Flag(value = "classAxioms")
+        @Documentation("""
+                Enable automatic and eager expansion of symbols. This expands class invariants, model methods and
+                fields and invariants quite eagerly. May be an enabler (if a few definitions need to expanded),
+                may be a showstopper (if expansion increases the complexity on the sequent too much).""")
+        public boolean classAxioms;
+
+        @Flag(value = "dependencies")
+        @Documentation("""
+                Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, \
+                without that its definition is known. May be an enabler, may be a showstopper.""")
+        public boolean dependencies;
+
+        @Option(value = "add")
+        @Documentation("""
+                Additional rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                Cannot be combined with the 'only' parameter.
+                """)
+        public @Nullable String additionalRules;
+
+        @Option(value = "only")
+        @Documentation("""
+                Limit the rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                All rules application which do not match the given names will be disabled.
+                Cannot be combined with the 'add' parameter.
+                """)
+        public @Nullable String onlyRules;
+
+        @Override
+        public void verifyParameters() throws IllegalArgumentException, InjectionException {
+            if (onlyRules != null && additionalRules != null) {
+                throw new InjectionException("Parameters 'add' and 'only' are mutually exclusive.");
+            }
+        }
+    }
+
+    private static final class OriginalValue {
+        private final String settingName;
+        private final String trueValue;
+        private final String falseValue;
+        private @Nullable String oldValue;
+
+        private OriginalValue(String settingName, String trueValue, String falseValue) {
+            this.settingName = settingName;
+            this.trueValue = trueValue;
+
+            this.falseValue = falseValue;
         }
 
-        public void setOnAllOpenGoals(boolean onAllOpenGoals) {
-            this.onAllOpenGoals = onAllOpenGoals;
+        @Override
+        public String toString() {
+            return "OriginalValue{" +
+                "settingName='" + settingName + '\'' +
+                ", trueValue='" + trueValue + '\'' +
+                ", falseValue='" + falseValue + '\'' +
+                ", oldValue='" + oldValue + '\'' +
+                '}';
         }
-
-        public int getSteps() {
-            return maxSteps;
-        }
-
     }
 }

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +34,12 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
     }
 
     @Override
-    public void closeButtonClicked(@NonNull ReferenceSearchDialog dialog) {
+    public void closeButtonClicked(ReferenceSearchDialog dialog) {
         dialog.dispose();
     }
 
     @Override
-    public void copyButtonClicked(@NonNull ReferenceSearchDialog dialog) {
+    public void copyButtonClicked(ReferenceSearchDialog dialog) {
         mediator.stopInterface(true);
         Proof p = mediator.getSelectedProof();
         new Thread(() -> {

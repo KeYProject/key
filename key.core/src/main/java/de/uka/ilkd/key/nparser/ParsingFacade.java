@@ -6,7 +6,8 @@ package de.uka.ilkd.key.nparser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
@@ -46,11 +47,11 @@ public final class ParsingFacade {
     }
 
     /**
-     * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
-     * <b>The use of this method is discourage and should be avoided in all high level
+     * Use this function to retrieve the {@link ParserRuleContext} inside an {@link KeyAst} object.
+     * <b>The use of this method is discouraged and should be avoided in all high level
      * scenarios.</b>
      *
-     * @param ast a key ast object
+     * @param ast a {@link KeyAst} object
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
@@ -61,19 +62,26 @@ public final class ParsingFacade {
 
     public static List<KeyAst.File> parseFiles(URI url) throws IOException {
         List<KeyAst.File> ctxs = new LinkedList<>();
-        ArrayDeque<URI> queue = new ArrayDeque<>();
+        ArrayDeque<URL> queue = new ArrayDeque<>();
         queue.push(url);
-        Set<URI> reached = new HashSet<>();
+        Set<URL> reached = new HashSet<>();
 
         while (!queue.isEmpty()) {
             url = queue.pop();
             reached.add(url);
             KeyAst.File ctx = parseFile(url);
             ctxs.add(ctx);
-            Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
+            Path path = null;
+            try {
+                path = Path.of(url.toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
+            path = path.getParent();
+            Collection<RuleSource> includes = ctx.getIncludes(path).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
-                    queue.push(u.uri());
+                    queue.push(u.url());
                 }
             }
         }
@@ -92,24 +100,53 @@ public final class ParsingFacade {
         return ci;
     }
 
-    private static KeYParser createParser(TokenSource lexer) {
-        KeYParser p = new KeYParser(new CommonTokenStream(lexer));
+    private static JavaKeYParser createParser(TokenSource lexer) {
+        JavaKeYParser p = new JavaKeYParser(new CommonTokenStream(lexer));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         return p;
     }
 
 
-    private static KeYParser createParser(CharStream stream) {
+    public static JavaKeYParser createParser(CharStream stream) {
         return createParser(createLexer(stream));
     }
 
-    public static KeYLexer createLexer(Path file) throws IOException {
+    /**
+     * Releases the ANTLR prediction (DFA) cache of the KeY parser.
+     * <p>
+     * This cache is built lazily while parsing and held on the generated parser's {@code static}
+     * fields, so it stays resident for the whole JVM -- including during proof search, where it is
+     * not needed (on a large proof it retains ~15-20 MB). It is a pure cache: ANTLR rebuilds it
+     * transparently on the next parse, so dropping it is correctness-safe (one-time re-warm on a
+     * subsequent parse). Intended to be called once a problem/proof has finished loading.
+     */
+    public static void clearParserCaches() {
+        try {
+            new JavaKeYParser(new CommonTokenStream(createLexer(CharStreams.fromString(""))))
+                    .getInterpreter().clearDFA();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not clear parser DFA caches", e);
+        }
+    }
+
+    public static JavaKeYLexer createLexer(Path file) throws IOException {
         return createLexer(CharStreams.fromPath(file));
     }
 
-    public static KeYLexer createLexer(CharStream stream) {
-        return new KeYLexer(stream);
+    public static JavaKeYLexer createLexer(CharStream stream) {
+        return new JavaKeYLexer(stream);
+    }
+
+    public static @NonNull JavaKeYLexer createLexer(@NonNull PositionedString ps) {
+        var position = ps.getLocation().getPosition();
+        var uri = ps.getLocation().fileUri().toString();
+
+        CharStream result = CharStreams.fromString(ps.text, uri);
+        var lexer = createLexer(result);
+        lexer.getInterpreter().setCharPositionInLine(position.column());
+        lexer.getInterpreter().setLine(position.line());
+        return lexer;
     }
 
     public static @NonNull KeYLexer createLexer(@NonNull PositionedString ps) {
@@ -145,21 +182,26 @@ public final class ParsingFacade {
     }
 
     public static KeyAst.File parseFile(CharStream stream) {
-        KeYParser p = createParser(stream);
+        JavaKeYParser p = createParser(stream);
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
-        KeYParser.FileContext ctx;
+        JavaKeYParser.FileContext ctx;
         try {
             ctx = p.file();
         } catch (ParseCancellationException ex) {
-            LOGGER.warn("SLL was not enough");
+            LOGGER.warn("SLL was not enough; retrying with LL and error recovery");
+            // Re-parse with LL prediction and ANTLR's default error recovery so that ALL syntax
+            // errors are collected (the bail strategy above stops at the first). To avoid
+            // regressing the polished single-error message and position, keep the bail-path
+            // exception when recovery finds exactly one error; report the whole list only when
+            // there are several. Zero errors means SLL was merely insufficient and the LL parse
+            // actually succeeded - fall through and return the tree.
             stream.seek(0);
             p = createParser(stream);
-            p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
-            if (p.getErrorReporter().hasErrors()) {
+            if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
             }
         }
@@ -169,14 +211,14 @@ public final class ParsingFacade {
     }
 
     public static KeyAst.Term parseExpression(CharStream stream) {
-        KeYParser p = createParser(stream);
-        KeYParser.TermContext term = p.termEOF().term();
+        JavaKeYParser p = createParser(stream);
+        JavaKeYParser.TermContext term = p.termEOF().term();
         p.getErrorReporter().throwException();
         return new KeyAst.Term(term);
     }
 
     public static KeyAst.Seq parseSequent(CharStream stream) {
-        KeYParser p = createParser(stream);
+        JavaKeYParser p = createParser(stream);
         KeyAst.Seq seq = new KeyAst.Seq(p.seqEOF().seq());
         p.getErrorReporter().throwException();
         return seq;
@@ -212,7 +254,7 @@ public final class ParsingFacade {
      * @return non-null string
      */
     public static @NonNull String getValueDocumentation(
-            KeYParser.@NonNull String_valueContext ctx) {
+            JavaKeYParser.@NonNull String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }
@@ -225,8 +267,8 @@ public final class ParsingFacade {
      * @deprecated
      */
     @Deprecated
-    public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
-        KeYParser p = createParser(stream);
+    public static JavaKeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
+        JavaKeYParser p = createParser(stream);
         return p.id_declaration();
     }
 
@@ -244,7 +286,7 @@ public final class ParsingFacade {
     }
 
     public static KeyAst.Taclet parseTaclet(CharStream source) {
-        KeYParser p = createParser(source);
+        JavaKeYParser p = createParser(source);
         var term = p.taclet();
         p.getErrorReporter().throwException();
         return new KeyAst.Taclet(term);
@@ -254,7 +296,8 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code file}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param file non-null {@link Path} object
      * @return monad that encapsluate the ParserRuleContext
@@ -276,14 +319,15 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param stream non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
-        KeYParser p = createParser(stream);
+        JavaKeYParser p = createParser(stream);
         var ctx = p.cfile();
         p.getErrorReporter().throwException();
         return new KeyAst.ConfigurationFile(ctx);
@@ -291,7 +335,8 @@ public final class ParsingFacade {
 
     /**
      * Parses the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the
+     * {@code JavaKeYParser.g4}.
      *
      * @param input non-null {@link CharStream} object
      * @return a configuration object with the data deserialize from the given file
@@ -317,7 +362,7 @@ public final class ParsingFacade {
         return readConfigurationFile(file.toPath());
     }
 
-    public static Configuration getConfiguration(KeYParser.TableContext ctx) {
+    public static Configuration getConfiguration(JavaKeYParser.TableContext ctx) {
         final var cfg = new ConfigurationBuilder();
         return cfg.visitTable(ctx);
     }

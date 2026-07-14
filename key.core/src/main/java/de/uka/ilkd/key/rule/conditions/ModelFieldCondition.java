@@ -17,7 +17,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
@@ -25,8 +25,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of
@@ -70,7 +68,7 @@ public class ModelFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return (negated ? "\\not" : "") + "\\isModelField(" + field + ")";
     }
 }

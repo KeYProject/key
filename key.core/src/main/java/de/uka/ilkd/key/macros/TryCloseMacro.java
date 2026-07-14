@@ -15,9 +15,6 @@ import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.
@@ -175,7 +172,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 int maxSteps = numberSteps > 0 ? numberSteps
                         : proof.getSettings().getStrategySettings().getMaxSteps();
                 final ProofSearchInformation<Proof, Goal> result = applyStrategy.start(proof,
-                    ImmutableSLList.<Goal>nil().prepend(goal), maxSteps, -1, false);
+                    ImmutableList.<Goal>nil().prepend(goal), maxSteps, -1, false);
                 // final Goal closedGoal;
 
                 // retreat if not closed

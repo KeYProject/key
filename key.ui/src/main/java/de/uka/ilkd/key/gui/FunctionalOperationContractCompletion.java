@@ -41,7 +41,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
             contracts.toArray(new FunctionalOperationContract[contracts.size()]);
 
         ContractConfigurator cc = new ContractConfigurator(MainWindow.getInstance(), services,
-            contractsArr, "Contracts for " + inst.pm.getName(), true);
+            contractsArr, "Contracts for " + inst.pm().getName(), true);
 
         if (cc.wasSuccessful()) {
             return ((UseOperationContractRule) app.rule()).createApp(app.posInOccurrence())

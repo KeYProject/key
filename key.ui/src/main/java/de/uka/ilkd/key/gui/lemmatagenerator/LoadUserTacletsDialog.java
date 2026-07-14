@@ -17,8 +17,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * @author Benjamin Niedermann
@@ -188,7 +188,7 @@ public class LoadUserTacletsDialog extends JPanel {
         this.add(Box.createVerticalStrut(5));
     }
 
-    public @NonNull List<Path> getFilesForAxioms() {
+    public List<Path> getFilesForAxioms() {
         return IntStream.range(0, listModel.size()).mapToObj(listModel::get).toList();
     }
 

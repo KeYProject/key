@@ -91,7 +91,7 @@ public class TestLocalSymbols {
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
-        Proof proof = new Proof("TestLocalSymbols", target, "n/a", TacletForTests.initConfig());
+        Proof proof = new Proof("TestLocalSymbols", target, null, TacletForTests.initConfig());
 
         apply(proof, andRight, 0, 1);
         apply(proof, orRight, 0, 1);
@@ -135,8 +135,8 @@ public class TestLocalSymbols {
         Proof proof = env.getLoadedProof();
         var script = env.getProofScript();
 
-        ProofScriptEngine pse = new ProofScriptEngine(script);
-        pse.execute(null, proof);
+        ProofScriptEngine pse = new ProofScriptEngine(proof);
+        pse.execute(null, script);
 
         ImmutableList<Goal> openGoals = proof.openGoals();
         assert openGoals.size() == 1;

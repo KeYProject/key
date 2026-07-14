@@ -15,8 +15,9 @@ entries in the array hold m.
 
 Suggested by J.C. Filliâtre as an example during VerifyThis 24.
 
-Currently the proofs do not go through automatically, the proof
-files are checked in with the example.
+Originally, the proofs did not go through automatically, with JML
+proof scripts they now succeed.
+
 
 @see https://en.wikipedia.org/wiki/Boyer-Moore_majority_vote_algorithm
 @author Mattias Ulbrich

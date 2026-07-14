@@ -43,6 +43,28 @@ public interface ImmutableSet<T extends @Nullable Object>
         return DefaultImmutableSet.nil();
     }
 
+    /// Creates an immutable set populated with the given values.
+    static <T> ImmutableSet<T> from(Collection<T> values) {
+        var set = ImmutableSet.<T>empty();
+        return set.add(values);
+    }
+
+    static <T extends @Nullable Object> ImmutableSet<T> of() {
+        return empty();
+    }
+
+    static <T extends @Nullable Object> ImmutableSet<T> of(T... elems) {
+        return DefaultImmutableSet.fromImmutableList(ImmutableList.of(elems));
+    }
+
+    static <T> ImmutableSet<T> from(Iterable<T> ts) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        for (T t : ts) {
+            result = result.add(t);
+        }
+        return result;
+    }
+
     /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
      */
@@ -95,7 +117,7 @@ public interface ImmutableSet<T extends @Nullable Object>
      * @return true iff this set is subset of o and vice versa.
      */
     @Override
-    public boolean equals(@Nullable Object o);
+    boolean equals(@Nullable Object o);
 
     @Override
     int hashCode();

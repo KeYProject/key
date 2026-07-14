@@ -19,8 +19,6 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * The default implementation of {@link ProofControl}.
  *
@@ -33,9 +31,11 @@ public class DefaultProofControl extends AbstractProofControl {
     private final UserInterfaceControl ui;
 
     /**
-     * The currently running {@link Thread}.
+     * The currently running {@link Thread}, or {@code null} if no auto mode / macro run is active.
+     * {@code volatile} so the null-out from the run thread's {@code finally} is visible to callers
+     * of {@link #isInAutoMode()} / {@link #startAutoMode} / {@link #runMacro} on other threads.
      */
-    private @Nullable Thread autoModeThread;
+    private volatile Thread autoModeThread;
 
     /**
      * Constructor.
@@ -132,7 +132,7 @@ public class DefaultProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void runMacro(Node node, ProofMacro macro,
+    public synchronized void runMacro(Node node, ProofMacro macro,
             PosInOccurrence posInOcc) {
         if (!isInAutoMode()) {
             autoModeThread = new MacroThread(node, macro, posInOcc);

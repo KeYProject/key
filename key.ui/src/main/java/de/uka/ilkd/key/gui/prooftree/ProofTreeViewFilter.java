@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Arrays;
+import java.util.WeakHashMap;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -50,11 +51,16 @@ public abstract class ProofTreeViewFilter {
         ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
 
     /**
+     * Hides subtrees that do not contain a node matching the current search query.
+     */
+    static final TreeSearchFilter SEARCH = new TreeSearchFilter();
+
+    /**
      * All ProofTreeViewFilters that operate on whole subtrees, as opposed to {@link NodeFilter}s,
      * which operate on single nodes.
      */
     public final static ProofTreeViewFilter[] ALL_GLOBAL_FILTERS =
-        { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
+        { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS, SEARCH };
 
     /**
      *
@@ -370,6 +376,111 @@ public abstract class ProofTreeViewFilter {
 
             // Also show closed subtrees.
             return proof.getSubtreeGoals(node).isEmpty();
+        }
+    }
+
+    /**
+     * Hides subtrees that do not contain a node matching the current search query, so that
+     * typing into the proof tree's search bar incrementally collapses non-matching parts of the
+     * tree. The query is set via {@link #setQuery(String)}; the filter is active iff the query is
+     * non-empty.
+     */
+    static final class TreeSearchFilter extends ProofTreeViewFilter {
+
+        private String query = "";
+
+        /**
+         * Caches, for a node, whether its subtree contains a match for {@link #query}.
+         */
+        private final WeakHashMap<Node, Boolean> containsMatchCache = new WeakHashMap<>();
+
+        /**
+         * Sets the search query and clears the match cache. The filter becomes active iff
+         * {@code query} is non-empty.
+         *
+         * @param query the search query, as entered into the proof tree's search bar.
+         */
+        void setQuery(String query) {
+            this.query = query == null ? "" : query.toLowerCase();
+            containsMatchCache.clear();
+        }
+
+        /**
+         * Invalidates the memoized "contains a match" information. Must be called whenever the
+         * proof changed (e.g. after a strategy run added nodes), since a node previously cached as
+         * containing no match may now contain one in a newly added descendant.
+         */
+        void invalidateCache() {
+            containsMatchCache.clear();
+        }
+
+        /**
+         * @param node a node.
+         * @return the text that {@link #query} is matched against for {@code node}, consistent
+         *         with {@link GUIProofTreeNode#toString()} and {@link GUIBranchNode#toString()}.
+         */
+        private static String searchString(Node node) {
+            String text = node.serialNr() + ":" + node.name();
+            String branchLabel = node.getNodeInfo().getBranchLabel();
+            if (branchLabel != null) {
+                text += ":" + branchLabel;
+            }
+            return text;
+        }
+
+        /**
+         * @param node a node.
+         * @return whether {@code node} itself matches the current query. Used to hide
+         *         non-matching intermediate proof steps within a branch (the step-level
+         *         counterpart to {@link #showSubtree(Node)}).
+         */
+        boolean matches(Node node) {
+            return searchString(node).toLowerCase().contains(query);
+        }
+
+        private boolean containsMatch(Node node) {
+            Boolean cached = containsMatchCache.get(node);
+            if (cached != null) {
+                return cached;
+            }
+            boolean result = matches(node);
+            for (int i = 0; !result && i < node.childrenCount(); i++) {
+                result = containsMatch(node.child(i));
+            }
+            containsMatchCache.put(node, result);
+            return result;
+        }
+
+        @Override
+        public String name() {
+            return "Search";
+        }
+
+        @Override
+        public boolean showSubtree(Node node) {
+            return containsMatch(node);
+        }
+
+        @Override
+        public boolean isActive() {
+            return !query.isEmpty();
+        }
+
+        @Override
+        public boolean addToProofTreeView() {
+            return false;
+        }
+
+        @Override
+        void setActive(boolean active) {
+            if (!active) {
+                setQuery("");
+            }
+        }
+
+        @Override
+        boolean global() {
+            return true;
         }
     }
 }

@@ -7,8 +7,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -22,7 +22,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -131,7 +130,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<LocationVariable> replaceVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> replaceVars = ImmutableList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);

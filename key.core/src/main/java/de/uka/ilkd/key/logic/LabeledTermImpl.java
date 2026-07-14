@@ -33,7 +33,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see JTerm
  * @see TermImpl
  */
-class LabeledTermImpl extends TermImpl {
+public class LabeledTermImpl extends TermImpl {
 
     /**
      * @see #getLabels()
@@ -52,7 +52,7 @@ class LabeledTermImpl extends TermImpl {
     public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
-        super(op, subs, boundVars, origin);
+        super(op, subs, boundVars);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
@@ -69,7 +69,7 @@ class LabeledTermImpl extends TermImpl {
     public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
-        super(op, subs, boundVars, "");
+        super(op, subs, boundVars);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;

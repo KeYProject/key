@@ -12,8 +12,9 @@ import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,17 +31,13 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.MissingTokenException;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,61 +66,32 @@ public abstract class AbstractProblemLoader {
      * @see EnvInput#isIgnoreOtherJavaFiles()
      */
     private boolean loadSingleJavaFile = false;
-
-    public static class ReplayResult {
-
-        private final Node node;
-        private final List<Throwable> errors;
-        private final String status;
-
-        public ReplayResult(String status, List<Throwable> errors, Node node) {
-            this.status = status;
-            this.errors = errors;
-            this.node = node;
-        }
-
-        public Node getNode() {
-            return node;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public List<Throwable> getErrorList() {
-            return errors;
-        }
-
-        public boolean hasErrors() {
-            return errors != null && !errors.isEmpty();
-        }
-
-    }
+    private @Nullable Configuration additionalProfileOptions;
 
     /**
      * The file or folder to load.
      */
-    private final Path file;
+    private Path file;
 
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
      */
-    private @Nullable Path proofFilename;
+    private Path proofFilename;
 
     /**
      * The optional class path entries to use.
      */
-    private final List<Path> classPath;
+    private List<Path> classPath;
 
     /**
      * An optional boot class path.
      */
-    private final Path bootClassPath;
+    private Path bootClassPath;
 
     /**
      * The global includes to use.
      */
-    private final List<Path> includes;
+    private List<Path> includes;
 
     /**
      * The {@link ProblemLoaderControl} to use.
@@ -133,7 +101,14 @@ public abstract class AbstractProblemLoader {
     /**
      * The {@link Profile} to use for new {@link Proof}s.
      */
-    private final Profile profileOfNewProofs;
+    private @Nullable Profile profileOfNewProofs;
+
+    /**
+     * {@code true} {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs,
+     * {@code false} the {@link Profile} specified by the problem file will be used for new proofs
+     * (with the default profile as fallback if the file specifies none).
+     */
+    private boolean forceNewProfileOfNewProofs;
 
     /**
      * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
@@ -146,12 +121,6 @@ public abstract class AbstractProblemLoader {
      * Some optional additional {@link Properties} for the PO.
      */
     private final Properties poPropertiesToForce;
-
-    /**
-     * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs,
-     * {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     */
-    private final boolean forceNewProfileOfNewProofs;
 
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
@@ -185,24 +154,22 @@ public abstract class AbstractProblemLoader {
      */
     private boolean ignoreWarnings = false;
 
+    // format: (expected, found)
     /**
      * Maps internal error codes of the parser to human readable strings. The integers refer to the
      * common MismatchedTokenExceptions, where one token is expected and another is found. Both are
      * usually only referred to by their internal code.
      */
-    private final static Map<Pair<Integer, Integer>, String> mismatchErrors;
-    private final static Map<Integer, String> missedErrors;
+    private static final Map<Pair<Integer, Integer>, String> mismatchErrors = new HashMap<>();
+    private static final Map<Integer, String> missedErrors = new HashMap<>();
 
     static {
-        // format: (expected, found)
-        mismatchErrors = new HashMap<>();
-        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors.put(new Pair<>(JavaKeYLexer.SEMI, JavaKeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors = new HashMap<>();
-        missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
-        missedErrors.put(KeYLexer.RBRACE, "closing brace");
-        missedErrors.put(KeYLexer.SEMI, "semicolon");
+        missedErrors.put(JavaKeYLexer.RPAREN, "closing parenthesis");
+        missedErrors.put(JavaKeYLexer.RBRACE, "closing brace");
+        missedErrors.put(JavaKeYLexer.SEMI, "semicolon");
     }
 
     /**
@@ -232,8 +199,7 @@ public abstract class AbstractProblemLoader {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
-        this.profileOfNewProofs =
-            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        setProfileOfNewProofs(profileOfNewProofs);
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -241,7 +207,75 @@ public abstract class AbstractProblemLoader {
         this.includes = includes;
     }
 
-    protected void setProof(Proof proof) {
+    public void setFile(Path file) {
+        this.file = file;
+    }
+
+    public void setClassPath(@Nullable List<Path> classPath) {
+        this.classPath = classPath;
+    }
+
+    public void setBootClassPath(@Nullable Path bootClassPath) {
+        this.bootClassPath = bootClassPath;
+    }
+
+    public void setIncludes(@Nullable List<Path> includes) {
+        this.includes = includes;
+    }
+
+    public void setProofFilename(Path proofFilename) {
+        this.proofFilename = proofFilename;
+    }
+
+    public void setEnvInput(EnvInput envInput) {
+        this.envInput = envInput;
+    }
+
+    public void setProblemInitializer(ProblemInitializer problemInitializer) {
+        this.problemInitializer = problemInitializer;
+    }
+
+    public void setInitConfig(InitConfig initConfig) {
+        this.initConfig = initConfig;
+    }
+
+    public void setResult(ReplayResult result) {
+        this.result = result;
+    }
+
+    public Path getProofFilename() {
+        return proofFilename;
+    }
+
+    public List<Path> getIncludes() {
+        return includes;
+    }
+
+    public ProblemLoaderControl getControl() {
+        return control;
+    }
+
+    public @Nullable Profile getProfileOfNewProofs() {
+        return profileOfNewProofs;
+    }
+
+    public void setProfileOfNewProofs(@Nullable Profile profileOfNewProofs) {
+        this.profileOfNewProofs = profileOfNewProofs;
+    }
+
+    public boolean isAskUiToSelectAProofObligationIfNotDefinedByLoadedFile() {
+        return askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+    }
+
+    public Properties getPoPropertiesToForce() {
+        return poPropertiesToForce;
+    }
+
+    public boolean isIgnoreWarnings() {
+        return ignoreWarnings;
+    }
+
+    protected void setProof(@Nullable Proof proof) {
         this.proof = proof;
     }
 
@@ -267,8 +301,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(@Nullable Consumer<Proof> callbackProofLoaded)
-            throws Exception {
+    public final void load(Consumer<Proof> callbackProofLoaded) throws Exception {
         control.loadingStarted(this);
 
         loadEnvironment();
@@ -286,6 +319,11 @@ public abstract class AbstractProblemLoader {
             }
         } finally {
             control.loadingFinished(this, poContainer, proofList, result);
+            // parsing is done; release the ANTLR DFA caches so they are not retained during the
+            // (long) proof search. They are a pure cache and rebuild transparently on the next
+            // parse.
+            ParsingFacade.clearParserCaches();
+            JmlFacade.clearCaches();
         }
     }
 
@@ -299,13 +337,13 @@ public abstract class AbstractProblemLoader {
     protected void loadEnvironment() throws ProofInputException, IOException {
         FileRepo fileRepo = createFileRepo();
 
-        var timeBeforeEnv = System.nanoTime();
+        long timeBeforeEnv = System.nanoTime();
         LOGGER.info("Loading environment from {}", file);
         envInput = createEnvInput(fileRepo);
         LOGGER.debug("Environment load took {}",
             PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
-        var beforeInitConfig = System.nanoTime();
+        long beforeInitConfig = System.nanoTime();
         LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
@@ -336,7 +374,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            @Nullable Consumer<Proof> callbackProofLoaded) {
+            Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -349,51 +387,6 @@ public abstract class AbstractProblemLoader {
             result = replayProof(proof);
             LOGGER.info("Replay result: {}", result.getStatus());
         }
-    }
-
-    /**
-     * Find first 'non-wrapper' exception type in cause chain.
-     */
-    private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException) {
-            e = e.getCause();
-        }
-        return e;
-    }
-
-    /**
-     * Tries to recover parser errors and make them human-readable, rewrap them into
-     * ProblemLoaderExceptions.
-     */
-    protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
-        // try to resolve error message
-        final Throwable c0 = unwrap(e);
-        if (c0 instanceof RecognitionException re) {
-            final Token occurrence = re.token; // may be null
-            if (c0 instanceof MismatchedTokenException) {
-                if (c0 instanceof MissingTokenException mte) {
-                    // TODO: other commonly missed tokens
-                    final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token
-                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                        + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                    // TODO other ANTLR exceptions
-                } else {
-                    final MismatchedTokenException mte =
-                        (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
-                    final String readable =
-                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                }
-            }
-        }
-        // default
-        return new ProblemLoaderException(this, "Loading proof input failed", e);
     }
 
     /**
@@ -502,11 +495,11 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(proofFilename);
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof,
-                fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, enforcedProfile(), false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
+            return new KeYUserProblemFile(filename, file, fileRepo, control, enforcedProfile(),
                 filename.endsWith(".proof.gz"));
         } else if (Files.isDirectory(file)) {
             // directory containing java sources, probably enriched
@@ -526,14 +519,27 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
+     * Returns the {@link Profile} that overrides any profile declaration of the loaded file, or
+     * {@code null} if the file's own {@code \profile} declaration should be respected (see #3713:
+     * unconditionally passing {@link #profileOfNewProofs} made the GUI ignore the
+     * {@code \profile "java-infflow"} declaration of information flow problem files).
+     *
+     * @return the enforced {@link Profile} or {@code null}
+     */
+    private @Nullable Profile enforcedProfile() {
+        return forceNewProfileOfNewProofs ? profileOfNewProofs : null;
+    }
+
+    /**
      * Instantiates the {@link ProblemInitializer} to use.
      *
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
-        Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
+        Profile profile = enforcedProfile() != null ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
         return pi;
     }
@@ -555,7 +561,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -830,6 +836,10 @@ public abstract class AbstractProblemLoader {
         this.proofFilename = proofFilename;
     }
 
+    public void forceNewProfileOfNewProofs(boolean forceNewProfileOfNewProofs) {
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
+    }
+
     public boolean isLoadSingleJavaFile() {
         return loadSingleJavaFile;
     }
@@ -840,5 +850,47 @@ public abstract class AbstractProblemLoader {
 
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
+    }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object representing additional options for the given profile.
+    /// @see ProblemInitializer
+    public Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
+
+
+    public static class ReplayResult {
+
+        private final Node node;
+        private final List<Throwable> errors;
+        private final String status;
+
+        public ReplayResult(String status, List<Throwable> errors, Node node) {
+            this.status = status;
+            this.errors = errors;
+            this.node = node;
+        }
+
+        public Node getNode() {
+            return node;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<Throwable> getErrorList() {
+            return errors;
+        }
+
+        public boolean hasErrors() {
+            return errors != null && !errors.isEmpty();
+        }
+
     }
 }

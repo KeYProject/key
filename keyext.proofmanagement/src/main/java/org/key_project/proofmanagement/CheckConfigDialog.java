@@ -13,8 +13,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +42,7 @@ class CheckConfigDialog extends JDialog {
 
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
-        protected @Nullable Void doInBackground() throws Exception {
+        protected Void doInBackground() throws Exception {
             Path reportPath = null;
             if (reportCheck.isSelected()) {
                 reportPath = Paths.get(reportFileField.getText());
@@ -54,12 +52,16 @@ class CheckConfigDialog extends JDialog {
                 }
             }
 
-            Main.check(missingProofsCheck.isSelected(),
-                settingsCheck.isSelected(),
-                replayCheck.isSelected(),
-                dependencyCheck.isSelected(),
-                Paths.get(bundleFileField.getText()),
-                reportPath);
+
+            var c = new Main.CheckCommand();
+            c.missing = missingProofsCheck.isSelected();
+            c.settings = settingsCheck.isSelected();
+            c.replay = replayCheck.isSelected();
+            c.dependency = dependencyCheck.isSelected();
+            c.bundlePath = Paths.get(bundleFileField.getText());
+            c.reportPath = reportPath;
+            c.call();
+
             if (reportPath != null) {
                 // automatically open the report in browser
                 Desktop.getDesktop().open(reportPath.toFile());
@@ -94,7 +96,7 @@ class CheckConfigDialog extends JDialog {
         BlockingGlassPane() {
             addMouseListener(new MouseInputAdapter() {
                 @Override
-                public void mouseClicked(@NonNull MouseEvent e) {
+                public void mouseClicked(MouseEvent e) {
                     // This is not optimal, e.g., it does not update the GUI (i.e. pressed state of
                     // the button). A proper forwarding of the events to the underlying stop button
                     // would be nice, but this is much more difficult to implement correctly.

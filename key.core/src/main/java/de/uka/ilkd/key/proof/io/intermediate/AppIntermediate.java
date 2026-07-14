@@ -6,8 +6,6 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Represents an intermediate rule / taclet application.
  *

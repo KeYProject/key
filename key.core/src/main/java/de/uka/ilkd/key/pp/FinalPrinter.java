@@ -6,10 +6,11 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -163,9 +164,9 @@ class FinalPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form:
-     * T::final( ... , ... , java.lang.Object::<...>)
+     * T::final( ... , ... , java.lang.Object::#$...)
      * For example:
-     * boolean::final(heap, object, java.lang.Object::<created>)
+     * boolean::final(heap, object, java.lang.Object::#$created)
      */
     private void printBuiltinObjectProperty(
             LogicPrinter lp, JTerm t,
@@ -176,7 +177,7 @@ class FinalPrinter extends FieldPrinter {
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
         if (selectKJT != null && objectKJT != null) {
-            assert fieldTerm.op().name().toString().contains("::<");
+            assert fieldTerm.op().name().toString().contains(JavaDLFieldNames.IMPLICIT_FIELD_INFIX);
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
             ProgramVariable pv =
                 javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);

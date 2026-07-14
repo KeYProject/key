@@ -1,0 +1,12 @@
+# Was a bug: b+0 would also match here ...
+key: |
+  \programVariables { int a; int b; }
+
+  \problem { a + 0 = a & b + 0 = b }
+
+script: |
+  rule add_zero_right on:(a+0);
+
+goals:
+  - "==> a = a & b + 0 = b"
+

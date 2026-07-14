@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+
+import org.key_project.logic.IntIterator;
 
 import org.key_project.logic.IntIterator;
 
@@ -137,8 +139,7 @@ public class PosInProgram {
      * compares this PosInProgram with another PosInProgram and returns true if both describe the
      * same position
      */
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

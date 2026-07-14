@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-import org.jspecify.annotations.NonNull;
-
 /*
  * Menu option for showing the proof tree search bar. Keyboard shortcut: STRG+SHIFT+F.
  */

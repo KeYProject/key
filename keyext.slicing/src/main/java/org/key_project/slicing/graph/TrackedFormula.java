@@ -13,8 +13,6 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
 import org.key_project.prover.sequent.SequentFormula;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A sequent formula tracked by the dependency graph.
  * The position in the sequent (antecedent / succedent)
@@ -76,7 +74,8 @@ public class TrackedFormula extends GraphNode {
             (JTerm) formula.formula(),
             services,
             true, // pretty print
-            true // using unicode symbols
+            true, // using unicode symbols
+            true // hide package prefix
         ).trim();
         if (!omitBranch) {
             term = term + branchLocation.toString();

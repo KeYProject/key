@@ -12,11 +12,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-
 class FormulaTermFeatures extends StaticFeatureCollection {
 
-    public FormulaTermFeatures(@NonNull ArithTermFeatures tf) {
+    public FormulaTermFeatures(ArithTermFeatures tf) {
         forF = extendsTrans(JavaDLTheory.FORMULA);
         orF = op(Junctor.OR);
         andF = op(Junctor.AND);

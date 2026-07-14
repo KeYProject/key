@@ -18,8 +18,6 @@ import org.key_project.logic.Name;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
-import org.jspecify.annotations.NonNull;
-
 // TODO: precise user feedback
 
 /**
@@ -84,8 +82,7 @@ public class SettingsChecker implements Checker {
      */
 
     // TODO: SMT settings ignored for now! (strategy settings should be irrelevant)
-    private static boolean consistent(@NonNull List<ProofSettings> proofSettings,
-            @NonNull CheckerData data) {
+    private static boolean consistent(List<ProofSettings> proofSettings, CheckerData data) {
 
         // TODO change to map Settings -> ProofEntry (for feedback)
         // extract ChoiceSettings from ProofSettings and check for compatibility
@@ -96,8 +93,8 @@ public class SettingsChecker implements Checker {
         return choicesConsistent(choiceSettings, data);
     }
 
-    private static boolean choicesConsistent(@NonNull List<ChoiceSettings> choiceSettings,
-            @NonNull CheckerData data) {
+    private static boolean choicesConsistent(List<ChoiceSettings> choiceSettings,
+            CheckerData data) {
         if (choiceSettings.isEmpty()) {
             return true;
         }

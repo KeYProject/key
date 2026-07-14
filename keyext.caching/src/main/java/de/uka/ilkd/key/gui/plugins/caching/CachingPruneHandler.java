@@ -16,7 +16,6 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class CachingPruneHandler implements ProofTreeListener {
     }
 
     @Override
-    public void proofIsBeingPruned(@NonNull ProofTreeEvent e) {
+    public void proofIsBeingPruned(ProofTreeEvent e) {
         Proof proofToBePruned = e.getSource();
         // check other proofs for any references to this proof
         for (Proof p : mediator.getCurrentlyOpenedProofs()) {

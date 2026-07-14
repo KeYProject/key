@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 
 import org.key_project.util.java.SwingUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * The table of reference search results.
      */
-    private final @NonNull ReferenceSearchTable table;
+    private final ReferenceSearchTable table;
     /**
      * Button to copy the relevant proof steps.
      */
@@ -46,7 +45,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Overall progress of the search / copy.
      */
-    private final @NonNull JProgressBar progressBar;
+    private final JProgressBar progressBar;
     /**
      * Listener used to react to user inputs.
      */
@@ -58,11 +57,10 @@ public class ReferenceSearchDialog extends JDialog {
      * @param proof the proof
      * @param listener control listener
      */
-    public ReferenceSearchDialog(@NonNull Proof proof, ReferenceSearchDialogListener listener) {
+    public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
         table.getTableHeader().setReorderingAllowed(false);
-        this.setLocationByPlatform(true);
         this.setTitle("Proof Caching");
         this.listener = listener;
 
@@ -101,6 +99,7 @@ public class ReferenceSearchDialog extends JDialog {
         }
 
         this.pack();
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     private JButton getApplyButton() {
@@ -128,7 +127,7 @@ public class ReferenceSearchDialog extends JDialog {
         getApplyButton().doClick();
     }
 
-    private @NonNull JScrollPane getScrollPane() {
+    private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = SwingUtil.createScrollPane(table);
         }

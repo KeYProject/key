@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
+import java.util.Objects;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
@@ -28,9 +29,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -42,23 +42,17 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author mulbrich
  */
-public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Parameters> {
+public class InstantiateCommand extends AbstractCommand {
 
     public InstantiateCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var params = state().getValueInjector().inject(new Parameters(), args);
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
-            @NonNull EngineState state) throws ScriptException, InterruptedException {
-
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = state().getFirstOpenAutomaticGoal();
 
         if ((params.var == null) == (params.formula == null)) {
             throw new ScriptException("One of 'var' or 'formula' must be specified");
@@ -86,7 +80,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         g.apply(theApp);
     }
 
-    private @NonNull TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state)
+    private @Nullable TacletApp findTacletApp(Parameters p, EngineState state)
             throws ScriptException {
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         TacletApp matchingApp = filterList(p, allApps);
@@ -101,7 +95,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p,
             @NonNull EngineState state)
             throws ScriptException {
-        boolean hide = p.hide.equals("hide");
+        boolean hide = p.hide;
 
 
         String rulename;
@@ -118,7 +112,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
                     && !(RENAMING_TERM_PROPERTY.equalsModThisProperty(sf.formula(), p.formula))) {
@@ -143,8 +137,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private @Nullable TacletApp filterList(@NonNull Parameters p,
-            @NonNull ImmutableList<TacletApp> list) {
+    private @Nullable TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 JTerm term = (JTerm) pta.posInOccurrence().subTerm();
@@ -166,7 +159,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             var stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.ALL) {
                 String varName = stripped.boundVars().get(0).name().toString();
-                if (params.var.equals(varName)) {
+                if (Objects.equals(params.var, varName)) {
                     occ--;
                     if (occ == 0) {
                         params.formula = (JTerm) term;
@@ -181,7 +174,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             var stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.EX) {
                 String varName = stripped.boundVars().get(0).name().toString();
-                if (params.var.equals(varName)) {
+                if (Objects.equals(params.var, varName)) {
                     occ--;
                     if (occ == 0) {
                         params.formula = (JTerm) term;
@@ -192,7 +185,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         }
 
         throw new ScriptException(
-            "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
+            "Variable '%s' has no occurrence no. '%d'.".formatted(params.var, params.occ));
     }
 
     private Term stripUpdates(Term term) {
@@ -230,31 +223,43 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         return "instantiate";
     }
 
-    @Override
-    public @NonNull String getDocumentation() {
-        return """
-                instantiate var=a occ=2 with="a_8" hide
-                  <p>
-                  instantiate formula="\\forall int a; phi(a)" with="a_8\"
-                """;
-    }
+    @Documentation(category = "Fundamental",
+        value = """
+                Instantiate a universally quantified formula (in the antecedent;
+                or an existentially quantified formula in succedent) by a term.
+                One of `var` or `formula` must be specified. If `var` is given, the formula is determined by looking for
+                a particular occurrence of a quantifier over that variable name.
+                If `formula` is given, that quantified formula is used directly.
+                `with` must be specified.
 
-    /**
-     *
-     */
+                #### Examples:
+
+                * `instantiate var:a occ:2 with:a_8 hide`
+                * `instantiate formula:"\\forall int a; phi(a)" with="a_8"`
+                """)
     public static class Parameters {
-        @Option(value = "formula", required = false)
+        @Documentation("The toplevel quantified formula to instantiate. Placeholder matching symbols can be used.")
+        @Option(value = "formula")
+        @Nullable
         public JTerm formula;
-        @Option(value = "var", required = false)
+
+        @Documentation("The name of the bound variable to instantiate.")
+        @Option(value = "var")
+        @Nullable
         public String var;
-        @Option(value = "occ", required = false)
-        public int occ = 1;
 
-        @Option(value = "#2", required = false)
-        public @NonNull String hide = "";
+        @Documentation("The occurrence number of the quantifier over 'var' in the sequent starting at 1. Default is 1.")
+        @Option(value = "occ")
+        public @Nullable int occ = 1;
 
-        @Option(value = "with", required = false)
-        public JTerm with;
+        @Documentation("If given, the rule used for instantiation is the one that hides the instantiated formula to "
+            + "prevent it from being used for further automatic proof steps.")
+        @Flag("hide")
+        public boolean hide;
+
+        @Documentation("The term to instantiate the bound variable with. Must be given.")
+        @Option(value = "with")
+        public @MonotonicNonNull JTerm with;
     }
 
     private static class TacletNameFilter extends TacletFilter {

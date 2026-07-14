@@ -12,8 +12,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * <p>
  * Instances of this class defines how a user interfaces has to look like which edits
@@ -48,7 +46,7 @@ public class StrategySettingsDefinition {
             IDefaultStrategyPropertiesFactory factory) {
     }
 
-    private static final @NonNull ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
+    private static final ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
 
     /**
      * Defines if a user interface control is shown to edit {@link StrategySettings#getMaxSteps()}.
@@ -206,7 +204,7 @@ public class StrategySettingsDefinition {
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
             String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
-            @NonNull IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
+            IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
             ArrayList<StrategySettingEntry> furtherDefaults,
             AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;

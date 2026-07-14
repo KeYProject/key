@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
@@ -39,17 +40,37 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.prover.engine.TaskStartedInfo;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
-public class ProofTreePopupFactory {
+/**
+ * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
+ */
+public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
         createFeature("DELAY_CUT", "Activates the delayed cut rule.");
 
     private ProofTreePopupFactory() {
+    }
+
+    /**
+     * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
+     */
+    public static boolean ossPathFilter(TreePath tp) {
+        // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
+        // (take care to not filter out any GUIBranchNodes accidentally!)
+        Object o = tp.getLastPathComponent();
+        if (o instanceof GUIProofTreeNode n) {
+            return !(n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
+        }
+        return true;
+    }
+
+    /**
+     * A predicate that filters oss nodes if filterOss is true
+     */
+    public static Predicate<TreePath> ossPathFilter(boolean filterOss) {
+        return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
     }
 
     /**
@@ -150,7 +171,7 @@ public class ProofTreePopupFactory {
         initMenu(menu, context);
 
         menu.addSeparator();
-        KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
+        KeYGuiExtensionFacade.addContextMenuItems(ContextMenuKind.PROOF_TREE, menu,
             context.invokedNode, context.mediator);
 
         if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
@@ -180,15 +201,12 @@ public class ProofTreePopupFactory {
         @Nullable
         Proof proof;
         KeYMediator mediator;
-        @Nullable
         Node invokedNode;
         TreePath path, branch;
         JTree delegateView;
     }
 
     static class SubtreeStatistics extends ProofTreeAction {
-        private static final long serialVersionUID = -8452239418108180349L;
-
         protected SubtreeStatistics(ProofTreeContext context) {
             super(context);
             setName("Show Subtree Statistics");
@@ -210,8 +228,6 @@ public class ProofTreePopupFactory {
     }
 
     static class CollapseOtherBranches extends ProofTreeAction {
-        private static final long serialVersionUID = -6461403850298323327L;
-
         protected CollapseOtherBranches(ProofTreeContext context) {
             super(context);
             setName("Collapse Other Branches");
@@ -224,8 +240,6 @@ public class ProofTreePopupFactory {
     }
 
     static class ExpandGoalsBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -500754845710844009L;
-
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
@@ -257,8 +271,6 @@ public class ProofTreePopupFactory {
     }
 
     static class ExpandAllBelow extends ProofTreeAction {
-        private static final long serialVersionUID = 850060084128297700L;
-
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
             setName("Expand All Below");
@@ -274,8 +286,6 @@ public class ProofTreePopupFactory {
     }
 
     static class CollapseBelow extends ProofTreeAction {
-        private static final long serialVersionUID = -7283113335781286556L;
-
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
@@ -289,8 +299,6 @@ public class ProofTreePopupFactory {
     }
 
     static class PrevSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 8705344500396898345L;
-
         public PrevSibling(ProofTreeContext context) {
             super(context);
             setName("Previous Sibling");
@@ -326,8 +334,6 @@ public class ProofTreePopupFactory {
     }
 
     static class NextSibling extends ProofTreeAction {
-        private static final long serialVersionUID = 2337297147243419973L;
-
         public NextSibling(ProofTreeContext context) {
             super(context);
             setName("Next Sibling");
@@ -363,8 +369,6 @@ public class ProofTreePopupFactory {
     }
 
     static class Notes extends ProofTreeAction {
-        private static final long serialVersionUID = -6871120844080468856L;
-
         public Notes(ProofTreeContext context) {
             super(context);
             setName("Edit Notes...");
@@ -390,9 +394,7 @@ public class ProofTreePopupFactory {
     }
 
     static class Prune extends ProofTreeAction {
-        private static final long serialVersionUID = -1744963704210861370L;
-
-        public Prune(@NonNull ProofTreeContext context) {
+        public Prune(ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
             setIcon(IconFactory.pruneLogo(ICON_SIZE));
@@ -405,6 +407,9 @@ public class ProofTreePopupFactory {
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed && context.proof
                                         .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
+                    setEnabled(true);
+                }
+                if (context.invokedNode.lookup(ClosedBy.class) != null) {
                     setEnabled(true);
                 }
             }
@@ -445,7 +450,7 @@ public class ProofTreePopupFactory {
             context.proofTreeView.makeNodeVisible(context.mediator.getSelectedNode());
         }
 
-        public boolean processDelayedCut(final @NonNull Node invokedNode) {
+        public boolean processDelayedCut(final Node invokedNode) {
             KeYMediator mediator = context.mediator;
             if (mediator.ensureProofLoaded()) {
                 final Proof proof = mediator.getSelectedProof();
@@ -610,7 +615,6 @@ public class ProofTreePopupFactory {
     }
 
     public static abstract class ProofTreeAction extends KeyAction {
-        private static final long serialVersionUID = 2686349019163064481L;
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -26,10 +27,9 @@ import org.jspecify.annotations.Nullable;
 /// {@link AbstractCommand}. You need to override [AbstractCommand#execute(Object)] to implement the
 /// command logic.
 ///
-/// @param <T> the expected parameter class
 /// @author Alexander Weigl
 @NullMarked
-public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
+public abstract class AbstractCommand implements ProofScriptCommand {
     protected @Nullable Proof proof;
     protected @Nullable Services service;
     protected @Nullable EngineState state;
@@ -41,34 +41,34 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     protected @Nullable String documentation = null;
 
     /**
-     * ...
+     * The state object of this engine.
      */
-    private final @Nullable Class<T> parameterClazz;
+    protected final @NonNull EngineState state() {
+        return Objects.requireNonNull(state);
+    }
 
-    protected AbstractCommand(@Nullable Class<T> clazz) {
+    /**
+     * The POJO class of the parameter object, or null if this command does not take any parameters
+     * via
+     * a POJO.
+     */
+    private final @Nullable Class<?> parameterClazz;
+
+    protected AbstractCommand(@Nullable Class<?> clazz) {
         this.parameterClazz = clazz;
     }
 
-    public List<ProofScriptArgument<T>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         if (parameterClazz == null) {
             return new ArrayList<>();
         }
-        return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
+        return ArgumentsLifter.inferScriptArguments(parameterClazz);
     }
 
 
     @Override
-    public @Nullable T evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        if (parameterClazz != null) {
-            T obj = parameterClazz.getDeclaredConstructor().newInstance();
-            return state.getValueInjector().inject(this, obj, arguments);
-        }
-        return null;
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
+    public final void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap)
             throws ScriptException, InterruptedException {
         proof = stateMap.getProof();
         service = proof.getServices();
@@ -87,14 +87,25 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
     /// Executes the command logic with the given parameters `args`.
     ///
+    /// This is usually overridden by subclasses.
+    ///
     /// @param args an instance of the parameters
     /// @throws ScriptException if something happened during execution
     /// @throws InterruptedException if thread was interrupted during execution
-    protected void execute(T args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
     }
 
     @Override
     public String getDocumentation() {
-        return "";
+        if (documentation == null && parameterClazz != null) {
+            documentation =
+                ArgumentsLifter.extractDocumentation(getName(), getClass(), parameterClazz);
+        }
+        return Objects.requireNonNullElse(documentation, "");
+    }
+
+    @Override
+    public String getCategory() {
+        return ArgumentsLifter.extractCategory(getClass(), parameterClazz);
     }
 }

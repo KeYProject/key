@@ -15,8 +15,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A builder providing a static factory method for building dependency graphs.
  *
@@ -30,8 +28,7 @@ public abstract class DependencyGraphBuilder {
      * @param logger the logger to print out error messages generated during graph creation
      * @return the newly created DependencyGraph
      */
-    public static @NonNull DependencyGraph buildGraph(
-            @NonNull List<CheckerData.ProofEntry> proofEntries,
+    public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,
             Logger logger) {
 
         DependencyGraph graph = new DependencyGraph();

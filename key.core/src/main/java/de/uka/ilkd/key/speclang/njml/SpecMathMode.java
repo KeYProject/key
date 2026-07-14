@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Spec math modes
  */
@@ -19,7 +17,7 @@ public enum SpecMathMode {
     /**
      * Default spec math mode
      */
-    public static @NonNull SpecMathMode defaultMode() {
+    public static SpecMathMode defaultMode() {
         return BIGINT;
     }
 }

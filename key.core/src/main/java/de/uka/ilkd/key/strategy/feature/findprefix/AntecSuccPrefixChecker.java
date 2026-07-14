@@ -10,8 +10,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
  *

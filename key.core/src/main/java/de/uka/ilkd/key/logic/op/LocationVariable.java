@@ -4,14 +4,12 @@
 package de.uka.ilkd.key.logic.op;
 
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents proper program variables, which are not program constants. See the

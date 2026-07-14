@@ -30,9 +30,9 @@ public class PosInOccurrence {
             seq.numberInAntecedent(formulaNumber));
     }
 
-    // saves 8 bytes (due to alignment issues) per instance if we use a
-    // short here instead of an int
-    private final short hashCode;
+    /// compute hash lazily: instances of [PosInOccurrence] are often created by descending a term
+    /// computing it eagerly in the constructor is wasted effort for unused instances
+    private short hashCode;
 
     /// the constrained formula the pos in occurrence describes
     private final SequentFormula sequentFormula;
@@ -56,7 +56,6 @@ public class PosInOccurrence {
         this.inAntec = inAntec;
         this.sequentFormula = sequentFormula;
         this.posInTerm = posInTerm;
-        this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
 
     /// Retrieves the formula associated with this position.
@@ -96,7 +95,16 @@ public class PosInOccurrence {
     /// @param i The index of the child to move to.
     /// @return A new [PosInOccurrence] pointing to the specified child.
     public PosInOccurrence down(int i) {
-        return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
+        final PosInOccurrence result =
+            new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
+        // propagate the subterm cache: without this, the first subTerm() call on the
+        // child walks the whole path from the formula root again (linear in the depth),
+        // which makes descending over a formula quadratic
+        final Term cached = subTermCache;
+        if (cached != null) {
+            result.subTermCache = cached.sub(i);
+        }
+        return result;
     }
 
     /// Retrieves the index of the deepest subterm this position points to.
@@ -124,7 +132,7 @@ public class PosInOccurrence {
 
     /// The usage of this method is strongly discouraged, use [#iterator]
     /// instead. describes the exact occurrence of the referred term inside
-    /// [#formula()]
+    /// [#sequentFormula()]
     ///
     /// @return the position in the formula of the SequentFormula of this [PosInOccurrence].
     public PosInTerm posInTerm() {
@@ -198,7 +206,21 @@ public class PosInOccurrence {
 
     @Override
     public int hashCode() {
-        return hashCode;
+        short h = hashCode;
+        if (h == 0) {
+            h = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
+            if (h == 0) {
+                h = 1;
+            }
+            hashCode = h;
+        }
+        return h;
+    }
+
+    @Override
+    public String toString() {
+        return "term at " + posInTerm() + " of formula \"" + sequentFormula() + "\" in the "
+            + (inAntec ? "antecedent" : "succedent");
     }
 
     /// Replaces the formula associated with this occurrence and returns a new object pointing

@@ -7,8 +7,6 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 
-import org.jspecify.annotations.NonNull;
-
 public class MetaShiftLeft extends MetaShift {
 
     public MetaShiftLeft() {

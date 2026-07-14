@@ -3,26 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
+import de.uka.ilkd.key.scripts.ScriptException;
+
 /**
- *
+ * Base exception for errors occurring during value injection into script command parameters.
+ * Thrown when argument injection or validation fails.
  *
  * @author Alexander Weigl
  * @version 1 (02.05.17)
  */
-public class InjectionException extends Exception {
-
-    private static final long serialVersionUID = 4922701573932568352L;
-    private final ProofScriptArgument<?> argument;
-
+public class InjectionException extends ScriptException {
     /**
      * An injection reflection exception with no cause (to display).
      *
      * @param message the respective String message to be passed.
-     * @param argument the proof script argument.
      */
-    public InjectionException(String message, ProofScriptArgument<?> argument) {
+    public InjectionException(String message) {
         super(message);
-        this.argument = argument;
     }
 
     /**
@@ -30,19 +27,17 @@ public class InjectionException extends Exception {
      *
      * @param message the respective String message to be passed.
      * @param cause the cause of the exception.
-     * @param argument the proof script argument.
      */
-    public InjectionException(String message, Throwable cause, ProofScriptArgument<?> argument) {
+    public InjectionException(String message, Throwable cause) {
         super(message, cause);
-        this.argument = argument;
     }
 
     /**
-     * Get the (proof script) argument of this injection exception.
+     * An injection exception with a cause to be displayed.
      *
-     * @return the proof script argument.
+     * @param cause the cause of the exception.
      */
-    public ProofScriptArgument<?> getArgument() {
-        return argument;
+    public InjectionException(Throwable cause) {
+        super(cause);
     }
 }

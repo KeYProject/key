@@ -7,7 +7,9 @@ import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -20,7 +22,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -221,7 +222,7 @@ public class TestCollisionResolving {
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_name_conflict").taclet();
         final ImmutableList<SequentFormula> semiseq =
-            ImmutableSLList
+            ImmutableList
                     .singleton(new SequentFormula(TacletForTests.parseTerm("\\forall s x; p(x)")))
                     .append(new SequentFormula(TacletForTests.parseTerm("\\exists s x; p(x)")));
         Sequent seq = JavaDLSequentKit.createSuccSequent(semiseq);

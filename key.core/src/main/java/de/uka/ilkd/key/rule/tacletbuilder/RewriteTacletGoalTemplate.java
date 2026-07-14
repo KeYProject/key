@@ -13,7 +13,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -47,7 +46,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     public RewriteTacletGoalTemplate(JTerm replacewith) {
-        this(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(), replacewith);
+        this(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableList.nil(), replacewith);
     }
 
 

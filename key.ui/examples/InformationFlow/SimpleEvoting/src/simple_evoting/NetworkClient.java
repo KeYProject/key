@@ -11,8 +11,7 @@ public class NetworkClient {
       @             ( (message != null) ? (\seq_def int i; 0; message.length; message[i]) : null )
       @        \by  \itself;
       @*/
-    //@ helper
-    public static void send(/*@ nullable */ byte[] message,
+    public static /*@ helper @*/ void send(/*@ nullable */ byte[] message,
                             Server server,
                             int port) {
         // input

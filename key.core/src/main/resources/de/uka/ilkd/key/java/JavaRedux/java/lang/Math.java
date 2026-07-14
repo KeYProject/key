@@ -1,7 +1,7 @@
 package java.lang;
 
 public final class Math {
-    
+
     private Math() {}
     
     /*@ public normal_behavior
@@ -92,4 +92,6 @@ public final class Math {
     public static double pow(double a , double b);
     public static double exp(double a);
     public static double atan(double a);
+
+    public static double random();
 }

@@ -21,8 +21,6 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Listener object to record various user actions (currently only rule applications)
  * in the undo buffer.

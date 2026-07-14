@@ -6,14 +6,13 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
 
 /**
  * A JML model method declaration in textual form.
@@ -22,16 +21,16 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final JmlParser.@NonNull Method_declarationContext methodDefinition;
 
 
-    public TextualJMLMethodDecl(@NonNull ImmutableList<JMLModifier> modifiers,
-            JmlParser.@NonNull Method_declarationContext methodDefinition) {
+    public TextualJMLMethodDecl(ImmutableList<JMLModifier> modifiers,
+            JmlParser.Method_declarationContext methodDefinition) {
         super(modifiers);
         this.methodDefinition = methodDefinition;
         setPosition(methodDefinition);
     }
 
-    public @NonNull String getParsableDeclaration() {
+    public String getParsableDeclaration() {
         String m = modifiers.stream().map(it -> {
-            if (JMLTransformer.javaModifiers.contains(it)) {
+            if (JMLTransformer.JAVA_MODS.contains(it)) {
                 return it.toString();
             } else {
                 JMLModifier jmlModifier = JMLModifier.valueOf(it.name());
@@ -71,7 +70,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

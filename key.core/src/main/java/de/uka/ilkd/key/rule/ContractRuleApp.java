@@ -20,21 +20,26 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Represents an application of a contract rule. Currently, this is only used for applications read
  * in from a proof file; fresh applications are represented as regular BuiltInRuleApps. (yes, I know
  * that this is ugly - BW)
  */
-public class ContractRuleApp extends AbstractContractRuleApp {
-
+@NullMarked
+public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContractRule> {
     private List<LocationVariable> heapContext;
 
-    ContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    ContractRuleApp(UseOperationContractRule rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
-    private ContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract instantiation) {
+    private ContractRuleApp(UseOperationContractRule rule,
+            @Nullable PosInOccurrence pio,
+            @Nullable Contract instantiation) {
         super(rule, pio, instantiation);
     }
 
@@ -42,12 +47,12 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         return new ContractRuleApp(rule(), newPos, instantiation);
     }
 
-    public ContractRuleApp setContract(Contract contract) {
+    public ContractRuleApp setContract(@Nullable Contract contract) {
         return new ContractRuleApp(rule(), posInOccurrence(), contract);
     }
 
     public UseOperationContractRule rule() {
-        return (UseOperationContractRule) super.rule();
+        return super.rule();
     }
 
     public boolean isSufficientlyComplete() {
@@ -61,8 +66,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         }
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
-            UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation((JTerm) posInOccurrence().subTerm(), services),
+            UseOperationContractRule.getApplicableContracts(
+                UseOperationContractRule.computeInstantiation((JTerm) posInOccurrence().subTerm(),
+                    services),
                 services);
         if (contracts.size() != 1) {
             return this; // incomplete app;
@@ -111,7 +117,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     @Override
     public IObserverFunction getObserverFunction(Services services) {
         return UseOperationContractRule.computeInstantiation((JTerm) posInOccurrence().subTerm(),
-            services).pm;
+            services).pm();
     }
 
 }

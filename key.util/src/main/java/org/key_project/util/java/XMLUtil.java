@@ -171,12 +171,12 @@ public final class XMLUtil {
         StringBuilder sb = new StringBuilder();
         for (char sign : signs) {
             switch (sign) {
-            case '"' -> sb.append("&quot;");
-            case '&' -> sb.append("&amp;");
-            case '\'' -> sb.append("&apos;");
-            case '<' -> sb.append("&lt;");
-            case '>' -> sb.append("&gt;");
-            default -> sb.append(sign);
+                case '"' -> sb.append("&quot;");
+                case '&' -> sb.append("&amp;");
+                case '\'' -> sb.append("&apos;");
+                case '<' -> sb.append("&lt;");
+                case '>' -> sb.append("&gt;");
+                default -> sb.append(sign);
             }
         }
         return sb.toString();

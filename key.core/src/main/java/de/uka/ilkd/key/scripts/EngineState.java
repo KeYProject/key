@@ -5,15 +5,13 @@ package de.uka.ilkd.key.scripts;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext;
+import de.uka.ilkd.key.nparser.JavaKeYParser.ProofScriptExpressionContext;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -31,19 +29,21 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.lookup.PLookup;
 
 import org.antlr.v4.runtime.CharStreams;
-import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Alexander Weigl
- * @version 1 (28.03.17)
- */
+/// Maintains the execution state for proof script evaluation.
+/// Holds references to the current proof, goal, abbreviations, and user data.
+/// Also provides type converters for parsing script arguments.
+///
+/// @author Alexander Weigl
+/// @version 1 (28.03.17)
 @NullMarked
 public class EngineState {
     public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);
@@ -60,6 +60,8 @@ public class EngineState {
 
     private @Nullable Goal goal;
     private @Nullable Node lastSetGoalNode;
+
+    private final PLookup userData = new PLookup();
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -78,11 +80,20 @@ public class EngineState {
         this.engine = engine;
     }
 
+    /// add converters for types used in proof scripts,
+    /// add support for parse trees
     private ValueInjector createDefaultValueInjector() {
         var v = ValueInjector.createDefault();
         v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
+        v.addConverter(TermWithHoles.class, ProofScriptExpressionContext.class,
+            it -> TermWithHoles.fromProofScriptExpression(this, it));
+        v.addConverter(TermWithHoles.class, String.class,
+            it -> new TermWithHoles(this.toTerm(it, null)));
+
+        v.addConverter(SequentWithHoles.class, ProofScriptExpressionContext.class,
+            it -> SequentWithHoles.fromParserContext(this, it));
 
         addContextTranslator(v, String.class);
         addContextTranslator(v, JTerm.class);
@@ -100,6 +111,7 @@ public class EngineState {
         addContextTranslator(v, JTerm.class);
         addContextTranslator(v, Sequent.class);
         addContextTranslator(v, Semisequent.class);
+        addContextTranslator(v, ScriptBlock.class);
         return v;
     }
 
@@ -133,7 +145,7 @@ public class EngineState {
         }
     }
 
-    protected static @Nullable Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if (goal.node() == node) {
                 return goal;
@@ -144,10 +156,9 @@ public class EngineState {
 
     public void setGoal(@Nullable Goal g) {
         goal = g;
-        lastSetGoalNode = g != null ? g.node() : null;
+        lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
     }
 
-    @Pure
     public Proof getProof() {
         return proof;
     }
@@ -163,7 +174,7 @@ public class EngineState {
      *         wrong.
      */
     @SuppressWarnings("unused")
-    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -202,9 +213,10 @@ public class EngineState {
         return getFirstOpenGoal(true);
     }
 
-    private static @Nullable Node goUpUntilOpen(@Nullable Node start) {
+    private static Node goUpUntilOpen(final Node start) {
         Node currNode = start;
-        while (currNode != null && currNode.isClosed()) {
+
+        while (currNode.isClosed()) {
             /*
              * There should always be a non-closed parent since we check whether the proof is closed
              * at the beginning.
@@ -215,7 +227,7 @@ public class EngineState {
         return currNode;
     }
 
-    private @Nullable Goal findGoalFromRoot(final @Nullable Node rootNode, boolean checkAutomatic) {
+    private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
@@ -229,30 +241,30 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0 -> {
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                    // We found our goal
-                    break loop;
+                case 0 -> {
+                    result = getGoal(proof.openGoals(), node);
+                    if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
+                        // We found our goal
+                        break loop;
+                    }
+                    node = choices.pollLast();
                 }
-                node = choices.pollLast();
-            }
-            case 1 -> node = node.child(0);
-            default -> {
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                case 1 -> node = node.child(0);
+                default -> {
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
+                    assert next != null;
+                    node = next;
                 }
-                assert next != null;
-                node = next;
-            }
             }
         }
 
@@ -280,7 +292,7 @@ public class EngineState {
 
     public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
-                : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
+                : getFirstOpenAutomaticGoal().getLocalNamespaces()).lookupSortOrAlias(sortName);
     }
 
     public Sequent toSequent(String sequent) throws ParserException, ScriptException {
@@ -306,7 +318,7 @@ public class EngineState {
         return observer;
     }
 
-    public void setObserver(@Nullable Consumer<ProofScriptEngine.Message> observer) {
+    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 
@@ -358,7 +370,11 @@ public class EngineState {
         }
     }
 
-    public ExprEvaluator getEvaluator() {
+    ExprEvaluator getEvaluator() {
         return exprEvaluator;
+    }
+
+    public PLookup getUserData() {
+        return userData;
     }
 }

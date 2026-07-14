@@ -19,12 +19,10 @@ import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -47,8 +45,8 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * The undo button contained in the main toolbar.
      */
-    private @Nullable UndoHistoryButton undoButton = null;
-    private @Nullable JButton undoUptoButton = null;
+    private UndoHistoryButton undoButton = null;
+    private JButton undoUptoButton = null;
     /**
      * Proofs this extension is monitoring for changes.
      */
@@ -58,7 +56,7 @@ public class ActionHistoryExtension implements UserActionListener,
      */
     private @Nullable Proof currentProof = null;
 
-    private @NonNull List<UserAction> getActions() {
+    private List<UserAction> getActions() {
         List<UserAction> actions = userActions.get(currentProof);
         if (actions == null) {
             return List.of();
@@ -96,7 +94,7 @@ public class ActionHistoryExtension implements UserActionListener,
         }
     }
 
-    public ActionHistoryExtension(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
+    public ActionHistoryExtension(MainWindow window, KeYMediator mediator) {
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
@@ -134,12 +132,12 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         // ignored
     }
 
     @Override
-    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         currentProof = p;
         if (p == null || registeredProofs.contains(p)) {
@@ -149,11 +147,11 @@ public class ActionHistoryExtension implements UserActionListener,
         p.addProofDisposedListener(this);
     }
 
-    public @Nullable JButton getUndoUptoButton() {
+    public JButton getUndoUptoButton() {
         return undoUptoButton;
     }
 
-    public @Nullable UndoHistoryButton getUndoButton() {
+    public UndoHistoryButton getUndoButton() {
         return undoButton;
     }
 }

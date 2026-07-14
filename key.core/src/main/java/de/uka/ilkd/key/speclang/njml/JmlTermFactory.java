@@ -7,17 +7,18 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -35,10 +36,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -88,6 +88,21 @@ public final class JmlTermFactory {
 
     public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
         return overloadedFunctionHandler.replaceSpecMathMode(specMathMode);
+    }
+
+    /**
+     * Ensure that <code>term</code> is a boolean term. If it is a formula, convert it to a boolean
+     * term.
+     */
+    public JTerm ensureTerm(JTerm term) {
+        if (term.sort() == JavaDLTheory.FORMULA) {
+            // bugfix (CS): t.getTerm() delivers a formula instead of a
+            // boolean term; obviously the original boolean terms are
+            // converted to formulas somewhere else; however, we need
+            // boolean terms instead of formulas here
+            return tb.convertToBoolean(term);
+        }
+        return term;
     }
 
     // region reach
@@ -365,7 +380,7 @@ public final class JmlTermFactory {
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
             ImmutableList<LogicVariable> _qvs =
-                ImmutableSLList.<LogicVariable>nil().prepend(lv);
+                ImmutableList.<LogicVariable>singleton(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -396,10 +411,11 @@ public final class JmlTermFactory {
         try {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
             if (result == null) {
-                throw exc.createException0(
-                    String.format("Cannot resolve JML operation %s %s %s (types %s %s %s).",
-                        left.getTerm(), jmlOperator.getImage(), right.getTerm(), left.getType(),
-                        jmlOperator.getImage(), right.getType()));
+                String message = String.format(
+                    "Operator '%s' is not defined for operands of type '%s' and '%s' (in '%s %s %s').",
+                    jmlOperator.getImage(), typeName(left), typeName(right),
+                    describe(left), jmlOperator.getImage(), describe(right));
+                throw exc.createException0(withModeHint(message, jmlOperator));
             }
             return result;
         } catch (SLTranslationException e) {
@@ -407,18 +423,47 @@ public final class JmlTermFactory {
         }
     }
 
+    /**
+     * Appends a spec-math-mode hint to {@code message} when the operator that failed to resolve is
+     * actually available in a different mode (e.g. {@code >>>} is unavailable for {@code \bigint}).
+     */
+    private String withModeHint(String message, JMLOperator op) {
+        String hint = overloadedFunctionHandler.modeHint(op);
+        return hint.isEmpty() ? message : message + "\n" + hint;
+    }
+
     public SLExpression unary(JMLOperator unaryOp, SLExpression arg) {
         try {
             SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
             if (result == null) {
-                throw exc.createException0(
-                    String.format("Cannot resolve JML operation %s %s (types %s).",
-                        unaryOp.getImage(), arg.getTerm(), arg.getType()));
+                String message = String.format(
+                    "Operator '%s' is not defined for an operand of type '%s' (in '%s %s').",
+                    unaryOp.getImage(), typeName(arg), unaryOp.getImage(), describe(arg));
+                throw exc.createException0(withModeHint(message, unaryOp));
             }
             return result;
         } catch (SLTranslationException e) {
             throw exc.createException0("Error while converting a unary expression", e);
         }
+    }
+
+    /**
+     * Renders an operand of a JML operation for a user-facing error message: the readable
+     * (pretty-printed) source expression rather than the internal term representation - e.g.
+     * {@code right + left} and {@code 1} instead of {@code add(right,left)} and {@code Z(1(#))}.
+     */
+    private String describe(SLExpression expr) {
+        if (expr.getTerm() != null) {
+            return LogicPrinter.quickPrintTerm(expr.getTerm(), services);
+        }
+        return typeName(expr);
+    }
+
+    /**
+     * @return the readable name of the operand's type, or {@code "?"} if it is unknown.
+     */
+    private static String typeName(SLExpression expr) {
+        return expr.getType() != null ? expr.getType().getName() : "?";
     }
 
 
@@ -860,14 +905,7 @@ public final class JmlTermFactory {
         }
         QuantifiableVariable qv = declVars.head();
         JTerm tt = t.getTerm();
-        if (tt.sort() == JavaDLTheory.FORMULA) {
-            // bugfix (CS): t.getTerm() delivers a formula instead of a
-            // boolean term; obviously the original boolean terms are
-            // converted to formulas somewhere else; however, we need
-            // boolean terms instead of formulas here
-            tt = tb.convertToBoolean(t.getTerm());
-        }
-        JTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
+        JTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), ensureTerm(tt));
         final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
         return new SLExpression(resultTerm, seqtype);
     }
@@ -900,7 +938,7 @@ public final class JmlTermFactory {
                     || t.op().equals(locSetLDT.getSingleton())) {
                 return t;
             } else {
-                ImmutableList<SLExpression> exprList = ImmutableSLList.nil();
+                ImmutableList<SLExpression> exprList = ImmutableList.nil();
                 exprList = exprList.append(expr);
                 return createLocSet(exprList);
             }
@@ -909,7 +947,7 @@ public final class JmlTermFactory {
     }
 
     public JTerm createLocSet(ImmutableList<SLExpression> exprList) {
-        ImmutableList<JTerm> singletons = ImmutableSLList.nil();
+        ImmutableList<JTerm> singletons = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
                 JTerm t = expr.getTerm();
@@ -948,7 +986,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression createPairwiseDisjoint(ImmutableList<JTerm> list) {
-        ImmutableList<JTerm> disTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> disTerms = ImmutableList.nil();
         while (!list.isEmpty()) {
             JTerm t1 = list.head();
             list = list.tail();
@@ -970,10 +1008,10 @@ public final class JmlTermFactory {
     }
 
     public SLExpression seqConst(ImmutableList<SLExpression> exprList) {
-        ImmutableList<JTerm> terms = ImmutableSLList.nil();
+        ImmutableList<JTerm> terms = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
-                JTerm t = expr.getTerm();
+                JTerm t = ensureTerm(expr.getTerm());
                 terms = terms.append(t);
             } else {
                 throw exc.createException0("Not a term: " + expr);
@@ -983,10 +1021,14 @@ public final class JmlTermFactory {
         return new SLExpression(tb.seq(terms), seqtype);
     }
 
+    public SLExpression seqUpd(JTerm seq, JTerm index, JTerm value) {
+        return new SLExpression(tb.seqUpd(seq, index, ensureTerm(value)));
+    }
+
     public SLExpression createIndexOf(JTerm seq, JTerm elem) {
         final KeYJavaType inttype =
             services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
-        return new SLExpression(tb.indexOf(seq, elem), inttype);
+        return new SLExpression(tb.indexOf(seq, ensureTerm(elem)), inttype);
     }
 
     public @NonNull JTerm createReturns(@Nullable JTerm term) {
@@ -1250,7 +1292,7 @@ public final class JmlTermFactory {
 
             JTerm[] args;
             if (list == null) {
-                list = ImmutableSLList.nil();
+                list = ImmutableList.nil();
             }
 
             JTerm heap = tb.getBaseHeap();

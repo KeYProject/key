@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -19,6 +19,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -54,20 +55,22 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (20.08.19)
  */
 
+@SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
-    private final Proof proof;
-    private final Services services;
+    private final @NonNull Proof proof;
+    private final @NonNull Services services;
 
-    public ProofExplorationService(Proof proof, Services services) {
+    public ProofExplorationService(@NonNull Proof proof, @NonNull Services services) {
         this.proof = proof;
         this.services = services;
     }
 
-    public static ProofExplorationService get(KeYMediator mediator) {
-        return get(Objects.requireNonNull(mediator.getSelectedProof()));
+    public static @NonNull ProofExplorationService get(KeYMediator mediator) {
+        return get(mediator.getSelectedProof());
     }
 
-    private static ProofExplorationService get(Proof selectedProof) {
+    private static @NonNull ProofExplorationService get(Proof selectedProof) {
+        @Nullable
         ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
             service = new ProofExplorationService(selectedProof, selectedProof.getServices());
@@ -88,7 +91,7 @@ public class ProofExplorationService {
     /**
      * Finds the `cut` taclet in the current proof environment.
      */
-    public Taclet getCutTaclet() {
+    public @NonNull Taclet getCutTaclet() {
         return Objects.requireNonNull(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
@@ -100,7 +103,7 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public Node soundAddition(Goal g, JTerm t, boolean antecedent) {
+    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -139,11 +142,13 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public @Nullable Node applyChangeFormula(Goal g, PosInOccurrence pio, JTerm term,
-            JTerm newTerm) {
+    public Node applyChangeFormula(@NonNull Goal g,
+            @NonNull PosInOccurrence pio,
+            @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
+        @NonNull
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
             String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
@@ -163,7 +168,7 @@ public class ProofExplorationService {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
             tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS,
-                null),
+                services),
             pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
@@ -181,8 +186,9 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(PosInOccurrence pio,
-            JTerm term, JTerm newTerm) {
+    private TacletApp soundChange(@NonNull PosInOccurrence pio,
+            @NonNull JTerm term,
+            @NonNull JTerm newTerm) {
         Taclet cut = getCutTaclet();
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();

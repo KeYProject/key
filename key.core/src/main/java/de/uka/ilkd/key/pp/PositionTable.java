@@ -7,7 +7,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A PositionTable describes the start and end positions of substrings of a String in order to get a
@@ -88,7 +87,7 @@ public class PositionTable {
     protected ImmutableList<Integer> pathForIndex(int index) {
         int sub = searchEntry(index);
         if (sub == -1) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         } else {
             return children[sub].pathForIndex(index - startPos[sub]).prepend(sub);
         }
@@ -203,6 +202,14 @@ public class PositionTable {
      */
     public PositionTable getChild(int i) {
         return children[i];
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public Range getRange(int i) {
+        return new Range(startPos[i], endPos[i]);
     }
 
     /**

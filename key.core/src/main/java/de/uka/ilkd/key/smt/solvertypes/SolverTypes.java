@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.jspecify.annotations.NonNull;
 
 import org.jspecify.annotations.Nullable;
 
@@ -39,7 +42,7 @@ public final class SolverTypes {
      *
      * @return the available solver types, including experimental solvers
      */
-    public static Collection<SolverType> getSolverTypes() {
+    public static @NonNull Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
             SOLVERS.addAll(solverLoader.getSolvers());
@@ -54,7 +57,7 @@ public final class SolverTypes {
      *
      * @return the available experimental solver types
      */
-    public static Collection<SolverType> getExperimentalSolvers() {
+    public static @NonNull Collection<SolverType> getExperimentalSolvers() {
         if (SOLVERS.isEmpty()) {
             getSolverTypes();
         }

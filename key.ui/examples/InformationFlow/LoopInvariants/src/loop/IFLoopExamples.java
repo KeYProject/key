@@ -37,8 +37,7 @@ public class IFLoopExamples {
         //@ normal_behavior
         //@ determines low, x \by \itself;
         //@ assignable low;
-        //@ helper
-        public void print(int x) {
+        public /*@ helper @*/ void print(int x) {
             low = x;
         }
 

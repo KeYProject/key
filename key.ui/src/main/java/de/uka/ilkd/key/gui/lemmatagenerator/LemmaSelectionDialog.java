@@ -17,8 +17,6 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a
  * table for presenting the taclets using special filters. The dialog owns two SelectionPanels, one

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.settings;
 
 
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+
 
 /**
  * The default implementation of {@link SMTSettings}.
@@ -65,13 +66,12 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public int getMaxNumberOfGenerics() {
-
         return pdSettings.getMaxGenericSorts();
     }
 
     @Override
-    public String getSMTTemporaryFolder() {
-        return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
+    public Path getSMTTemporaryFolder() {
+        return PathConfig.currentPaths.keyConfigDir.resolve("smt_formula");
     }
 
     @Override

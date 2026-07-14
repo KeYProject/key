@@ -18,9 +18,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -35,7 +32,7 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial(ImmutableSLList.nil(), BigInteger.ONE);
+    public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
 
     public static @NonNull Monomial create(Term monoTerm, @NonNull Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
@@ -82,7 +79,7 @@ public class Monomial {
     /**
      * @return true iff the monomial <code>this</code> divides the monomial <code>m</code>
      */
-    public boolean divides(@NonNull Monomial m) {
+    public boolean divides(Monomial m) {
         if (m.coefficient.signum() == 0) {
             return true;
         }
@@ -137,7 +134,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if (a.signum() == 0 || c.signum() == 0) {
-            return new Monomial(ImmutableSLList.nil(), BigInteger.ZERO);
+            return new Monomial(ImmutableList.nil(), BigInteger.ZERO);
         }
 
         return new Monomial(difference(m.parts, this.parts), LexPathOrdering.divide(a, c));
@@ -227,7 +224,7 @@ public class Monomial {
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         final StringBuilder res = new StringBuilder();
         res.append(coefficient);
 
@@ -239,10 +236,10 @@ public class Monomial {
     }
 
     private static class Analyser {
-        public @NonNull BigInteger coeff = BigInteger.ONE;
-        public @NonNull ImmutableList<Term> parts = ImmutableSLList.nil();
-        private final @NonNull Services services;
-        private final @NonNull Operator numbers, mul;
+        public BigInteger coeff = BigInteger.ONE;
+        public ImmutableList<Term> parts = ImmutableList.nil();
+        private final Services services;
+        private final Operator numbers, mul;
 
         public Analyser(final @NonNull Services services) {
             this.services = services;
@@ -267,7 +264,7 @@ public class Monomial {
 
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }

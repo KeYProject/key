@@ -20,8 +20,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     private final @NonNull LabeledParserRuleContext inv;
 
 
-    public TextualJMLInitially(@NonNull ImmutableList<JMLModifier> modifiers,
-            @NonNull LabeledParserRuleContext inv) {
+    public TextualJMLInitially(ImmutableList<JMLModifier> modifiers, LabeledParserRuleContext inv) {
         super(modifiers);
         assert inv != null;
         this.inv = inv;
@@ -39,7 +38,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -23,7 +23,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +53,15 @@ public class Main {
         }
     }
 
-    /// sets up the environment with the Java project described by its location
-    ///
-    /// @param location the Path with the path to the source directory of the Java project
-    /// to be verified
-    /// @return the [KeYEnvironment] that provides the context for all following verification tasks
-    /// @throws ProblemLoaderException if the setup fails
+    /**
+     * sets up the environment with the Java project described by its location
+     *
+     * @param location the Path with the path to the source directory of the Java project
+     *        to be verified
+     * @return the {@link KeYEnvironment} that provides the context for all following verification
+     *         tasks
+     * @throws ProblemLoaderException if the setup fails
+     */
     private static KeYEnvironment<?> setupEnvironment(Path location) throws ProblemLoaderException {
         List<Path> classPaths = null; // Optionally: Additional specifications for API classes
         Path bootClassPath = null; // Optionally: Different default specifications for Java API
@@ -91,9 +93,10 @@ public class Main {
             final List<Contract> proofContracts = getContracts(env);
 
             for (Contract contract : proofContracts) {
-                LOGGER.info("Found contract '{}'", contract.getDisplayName());
+                LOGGER.info("Found contract '" + contract.getDisplayName());
                 proveContract(env, contract);
             }
+        } catch (InterruptedException ignored) {
         } finally {
             env.dispose(); // Ensure always that all instances of KeYEnvironment are disposed
         }
@@ -109,7 +112,7 @@ public class Main {
         // List all specifications of all types in the source location (not classPaths and
         // bootClassPath)
         final List<Contract> proofContracts = new LinkedList<>();
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
@@ -132,7 +135,8 @@ public class Main {
      * @param env the {@link KeYEnvironment} in which to prove the contract
      * @param contract the {@link Contract} to be proven
      */
-    private static void proveContract(KeYEnvironment<?> env, Contract contract) {
+    private static void proveContract(KeYEnvironment<?> env, Contract contract)
+            throws InterruptedException {
         Proof proof = null;
         try {
             // Create proof

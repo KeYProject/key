@@ -11,8 +11,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * @author Alexander Weigl
  * @version 1 (04.12.23)
@@ -26,16 +24,16 @@ public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvi
     }
 
     @Override
-    public @NonNull String getDescription() {
+    public String getDescription() {
         return "Feature Flags";
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         pCenter.removeAll(); // start fresh
         checkboxes.clear();
         var fs = ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings();
-        for (FeatureSettings.Feature feature : FeatureSettings.FEATURES) {
+        for (FeatureSettings.Feature feature : FeatureSettings.Feature.FEATURES) {
             var cb =
                 addCheckBox(feature.id(), feature.documentation(), fs.isActivated(feature), null);
             checkboxes.put(feature, cb);

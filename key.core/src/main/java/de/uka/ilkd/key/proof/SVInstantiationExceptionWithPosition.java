@@ -5,9 +5,9 @@ package de.uka.ilkd.key.proof;
 
 import java.net.MalformedURLException;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 
@@ -60,7 +60,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     }
 
     @Override
-    public @Nullable Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() {
         return new Location(null, position);
     }
 }

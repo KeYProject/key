@@ -13,9 +13,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * This class wraps the information about the delayed cut. It only wraps data but not functional
  * information.

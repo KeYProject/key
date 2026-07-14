@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -18,6 +18,8 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 
 
@@ -235,7 +237,7 @@ public interface LoopSpecification extends SpecificationElement {
      * @return the instantiated loop specification.
      */
     LoopSpecification instantiate(Map<LocationVariable, JTerm> invariants,
-            Map<LocationVariable, JTerm> freeInvariants, JTerm variant);
+            Map<LocationVariable, JTerm> freeInvariants, @Nullable JTerm variant);
 
     /**
      * Configure the existing loop specification element with new elements, i.e., loop invariant
@@ -291,10 +293,12 @@ public interface LoopSpecification extends SpecificationElement {
      * @param heapContext all corresponding heaps.
      * @param usePrettyPrinting whether the text should be pretty-printed.
      * @param useUnicodeSymbols whether Unicode symbols should be used.
+     * @param hidePackagePrefix
      * @return a String containing the plain text representation of this invariant.
      */
     String getPlainText(Services services, Iterable<LocationVariable> heapContext,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols);
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix);
 
     String getUniqueName();
 

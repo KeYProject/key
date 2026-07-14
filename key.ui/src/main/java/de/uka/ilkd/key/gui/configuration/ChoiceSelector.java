@@ -28,8 +28,6 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -286,8 +284,7 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static @Nullable ChoiceEntry findChoice(ChoiceEntry @NonNull [] choices,
-            final String choice) {
+    public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
         return ArrayUtil.search(choices, element -> element.choice().equals(choice));
     }
 
@@ -400,7 +397,7 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(@Nullable Object obj) {
+        public boolean equals(Object obj) {
             if (obj instanceof ChoiceEntry(String choice1, boolean unsound1, boolean incomplete1, String information1)) {
                 return choice.equals(choice1) && incomplete == incomplete1
                         && unsound == unsound1

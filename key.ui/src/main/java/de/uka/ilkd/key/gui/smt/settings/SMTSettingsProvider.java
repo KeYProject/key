@@ -20,8 +20,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.jspecify.annotations.NonNull;
-
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 /**
@@ -106,16 +104,16 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private static final FeatureSettings.Feature FEATURE_SMT_TRANSLATION_OPTIONS =
         createFeature("SMT_TRANS_OPTIONS");
 
-    private final @NonNull JTextField saveToFilePanel;
-    private final @NonNull JComboBox<String> progressModeBox;
-    private final @NonNull JSpinner maxProcesses;
-    private final @NonNull JSpinner timeoutField;
-    private final @NonNull JSpinner intBoundField;
-    private final @NonNull JSpinner seqBoundField;
-    private final @NonNull JSpinner objectBoundField;
-    private final @NonNull JSpinner locsetBoundField;
-    private final @NonNull JCheckBox solverSupportCheck;
-    private final @NonNull JCheckBox enableOnLoad;
+    private final JTextField saveToFilePanel;
+    private final JComboBox<String> progressModeBox;
+    private final JSpinner maxProcesses;
+    private final JSpinner timeoutField;
+    private final JSpinner intBoundField;
+    private final JSpinner seqBoundField;
+    private final JSpinner objectBoundField;
+    private final JSpinner locsetBoundField;
+    private final JCheckBox solverSupportCheck;
+    private final JCheckBox enableOnLoad;
 
     private transient ProofIndependentSMTSettings settings;
     private final transient List<SettingsProvider> children = new ArrayList<>();
@@ -170,7 +168,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         setSmtSettings(pi.clone());
         return this;
@@ -183,7 +181,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         setSmtSettings(pi.clone());
     }
 
-    private @NonNull JSpinner createLocSetBoundField() {
+    private JSpinner createLocSetBoundField() {
         return addNumberField("LocSet bound:", 0L, (long) Integer.MAX_VALUE, 1,
             INFO_BOUND, e -> settings.setLocsetBound(e.longValue()));
     }
@@ -223,7 +221,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
             INFO_BOUND, e -> settings.setObjectBound(e.longValue()));
     }
 
-    private @NonNull JComboBox<String> getProgressModeBox() {
+    private JComboBox<String> getProgressModeBox() {
         return addComboBox("", INFO_PROGRESS_MODE_BOX, 0,
             e -> settings.setModeOfProgressDialog(
                 ProgressMode.values()[progressModeBox.getSelectedIndex()]),
@@ -236,23 +234,23 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
             e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
-    private @NonNull JCheckBox createEnableOnLoad() {
+    private JCheckBox createEnableOnLoad() {
         return addCheckBox("Enable SMT solvers when loading proofs",
             "", true,
             e -> settings.setEnableOnLoad(enableOnLoad.isSelected()));
     }
 
-    private @NonNull JTextField getSaveToFilePanel() {
+    private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:", "",
             INFO_SAVE_TO_FILE_PANEL, true,
             e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
-    private @NonNull String getProgressMode(@NonNull ProgressMode index) {
+    private String getProgressMode(ProgressMode index) {
         return switch (index) {
-        case USER -> PROGRESS_MODE_USER;
-        case CLOSE -> PROGRESS_MODE_CLOSE;
-        case CLOSE_FIRST -> PROGRESS_MODE_CLOSE_FIRST;
+            case USER -> PROGRESS_MODE_USER;
+            case CLOSE -> PROGRESS_MODE_CLOSE;
+            case CLOSE_FIRST -> PROGRESS_MODE_CLOSE_FIRST;
         };
     }
 

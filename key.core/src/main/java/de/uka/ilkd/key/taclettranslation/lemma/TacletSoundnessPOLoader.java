@@ -20,7 +20,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class TacletSoundnessPOLoader {
@@ -98,7 +97,7 @@ public class TacletSoundnessPOLoader {
         }
 
         @Override
-        public @NonNull String toString() {
+        public String toString() {
             return taclet.name() + (notSupported ? " (not supported)"
                     : isAlreadyInUse() ? "(already in use)" : "");
         }
@@ -229,9 +228,8 @@ public class TacletSoundnessPOLoader {
     }
 
 
-    private @NonNull ImmutableSet<Taclet> computeCommonTaclets(
-            @NonNull ImmutableList<Taclet> taclets,
-            @NonNull ImmutableSet<Taclet> reference) {
+    private ImmutableSet<Taclet> computeCommonTaclets(ImmutableList<Taclet> taclets,
+            ImmutableSet<Taclet> reference) {
         TreeSet<Taclet> treeSet =
             new TreeSet<>(Comparator.comparing(o -> o.name().toString()));
         for (Taclet taclet : reference) {
@@ -313,7 +311,7 @@ public class TacletSoundnessPOLoader {
     }
 
 
-    public void registerProofs(ProofAggregate aggregate, @NonNull ProofEnvironment proofEnv) {
+    public void registerProofs(ProofAggregate aggregate, ProofEnvironment proofEnv) {
         if (aggregate instanceof CompoundProof cp) {
             for (ProofAggregate child : cp.getChildren()) {
                 registerProofs(child, proofEnv);

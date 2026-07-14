@@ -1,0 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.informationflow.po.snippet;
+
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.jspecify.annotations.NonNull;
+
+
+/**
+ * Generate term "self != null".
+ * <p/>
+ *
+ * @author christoph
+ */
+class BlockCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateSnippet {
+
+    @Override
+    @NonNull
+    String generatePredicateName(@NonNull IProgramMethod pm, @NonNull StatementBlock block,
+            LoopSpecification loopInv) {
+        final String nameString = MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + "at_line_"
+            + block.getStartPosition().line() + "_in_" + pm.getUniqueName() + "_WITH_PRE")
+                .toString();
+        return nameString;
+    }
+}

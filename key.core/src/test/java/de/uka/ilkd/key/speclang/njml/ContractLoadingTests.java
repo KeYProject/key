@@ -42,7 +42,37 @@ public class ContractLoadingTests {
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1658/Test.java");
         Assumptions.assumeTrue(Files.exists(javaFile));
         KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
+    }
+
+    @Test
+    void issues1717() throws ProblemLoaderException, ProofInputException {
+        Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1717/UnderscoreZero.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
+        final var contract = file.getProofContracts().getFirst();
+        var proof = file.createProof(contract.createProofObl(file.getInitConfig()));
+        Assertions.assertNotNull(proof);
+    }
+
+    @Test
+    public void specMathJavaMathTest() throws ProblemLoaderException {
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("specMath/java/Test.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
+    }
+
+    @Test
+    public void specMathBigintMathTest() throws ProblemLoaderException {
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("specMath/bigint/Test.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test

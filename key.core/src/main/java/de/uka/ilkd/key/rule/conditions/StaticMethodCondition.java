@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -20,8 +20,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -60,7 +58,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, @NonNull SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);

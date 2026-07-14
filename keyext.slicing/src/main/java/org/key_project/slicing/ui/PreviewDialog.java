@@ -13,8 +13,6 @@ import javax.swing.border.EmptyBorder;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 import org.key_project.slicing.util.GraphvizResult;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Dialog that displays a rendering of the dependency graph.
  * Requires that graphviz (dot) is installed on the system.

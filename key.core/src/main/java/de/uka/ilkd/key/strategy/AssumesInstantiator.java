@@ -6,8 +6,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.FormulaTag;
-import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.strategy.IfInstantiationCachePool.AssumesInstantiationCac
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.indexing.FormulaTagManager;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
@@ -25,10 +24,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This class implements custom instantiation of if-formulas.
@@ -40,11 +35,11 @@ public class AssumesInstantiator {
     private ImmutableArray<AssumesFormulaInstantiation> allAntecFormulas;
     private ImmutableArray<AssumesFormulaInstantiation> allSuccFormulas;
 
-    private @NonNull ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
+    private ImmutableList<NoPosTacletApp> results = ImmutableList.nil();
 
     private final TacletAppContainer tacletAppContainer;
 
-    AssumesInstantiator(TacletAppContainer tacletAppContainer, final @NonNull Goal goal) {
+    AssumesInstantiator(TacletAppContainer tacletAppContainer, final Goal goal) {
         this.goal = goal;
         this.tacletAppContainer = tacletAppContainer;
         this.ifInstCache =
@@ -83,7 +78,7 @@ public class AssumesInstantiator {
                                                                                       //// with the
                                                                                       //// last
                                                                                       //// formula
-                ifSequent.antecedent().asList().reverse(), ImmutableSLList.nil(),
+                ifSequent.antecedent().asList().reverse(), ImmutableList.nil(),
                 tacletAppContainer.getTacletApp().matchConditions(), false);
         }
     }
@@ -93,7 +88,8 @@ public class AssumesInstantiator {
     }
 
     /**
-     * @param p_all if true then return all formulas of the particular semisequent, otherwise only
+     * @param p_all
+     *        if true then return all formulas of the particular semisequent, otherwise only
      *        the formulas returned by <code>selectNewFormulas</code>
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)
@@ -123,8 +119,7 @@ public class AssumesInstantiator {
      *         the current goal for which the method <code>isNewFormula</code> returns
      *         <code>true</code>
      */
-    private @NonNull ImmutableArray<AssumesFormulaInstantiation> selectNewFormulas(
-            boolean p_antec) {
+    private ImmutableArray<AssumesFormulaInstantiation> selectNewFormulas(boolean p_antec) {
         final ImmutableArray<AssumesFormulaInstantiation> allSequentFormulas =
             getAllSequentFormulas(p_antec);
         final AssumesFormulaInstantiation[] res =
@@ -173,8 +168,7 @@ public class AssumesInstantiator {
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();
 
-        final FormulaTag tag = tagManager.getTagForPos(pio);
-        final long formulaAge = tagManager.getAgeForTag(tag);
+        final long formulaAge = tagManager.getAgeForPos(pio);
 
         // The strict relation can be used, because when applying a rule the
         // age of a goal is increased before the actual modification of the
@@ -208,10 +202,10 @@ public class AssumesInstantiator {
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(
-            @NonNull ImmutableList<SequentFormula> p_ifSeqTail,
-            @Nullable ImmutableList<SequentFormula> p_ifSeqTail2nd,
-            @NonNull ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
-            @NonNull MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
+            ImmutableList<SequentFormula> p_ifSeqTail,
+            ImmutableList<SequentFormula> p_ifSeqTail2nd,
+            ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
+            MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {
@@ -252,8 +246,8 @@ public class AssumesInstantiator {
         return goal.proof().getServices();
     }
 
-    private @NonNull NoPosTacletApp setAllInstantiations(@NonNull MatchConditions p_matchCond,
-            @NonNull ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched) {
+    private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
+            ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
             p_alreadyMatched, getServices());
     }

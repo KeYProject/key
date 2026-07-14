@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 class ContractClauses {

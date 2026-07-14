@@ -5,15 +5,15 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
@@ -39,13 +39,13 @@ public class ExpressionTranslatorTest {
             return;
         }
         services = TacletForTests.services();
-        Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
+        JavaService r2k = services.getJavaService();
         r2k.parseSpecialClasses();
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "exprs.txt", delimiter = '^')
-    public void parseAndInterpret(@NonNull String expr) {
+    public void parseAndInterpret(String expr) {
         KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
         LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
@@ -56,7 +56,7 @@ public class ExpressionTranslatorTest {
         JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, SpecMathMode.defaultMode(),
-            ImmutableSLList.nil(), result, exc, new HashMap<>(), new HashMap<>());
+            ImmutableList.nil(), result, exc, new HashMap<>(), new HashMap<>());
         LOGGER.debug("{}", ctx.accept(et));
     }
 }

@@ -5,10 +5,22 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.indexing.FormulaTag;
+import org.key_project.prover.sequent.FormulaChangeInfo;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
@@ -38,26 +50,32 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final @NonNull PosInOccurrence applicationPosition;
 
     /**
+     * Cache for {@link #getPosInOccurrence(Goal)}: the position re-targeted to the current
+     * version of the formula. Rebuilding it on every query forces a fresh walk to the
+     * (possibly deep) find position each time the subterm is accessed. The cache is only
+     * an optimization, the container stays observably immutable.
+     */
+    private PosInOccurrence currentPositionCache;
+
+    /**
      * Creates a FindTacletAppContainer for applying a find taclet.
      *
      * @param app the taclet application
      * @param pio the position in occurrence
-     * @param cost the rule application cost
+     * @param ageFreeCost the rule application cost without the goal-age term
+     * @param cost the rule application cost (age-free cost plus the goal-age term)
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
-    FindTacletAppContainer(NoPosTacletApp app, @NonNull PosInOccurrence pio,
-            RuleAppCost cost,
-            @NonNull Goal goal,
+    FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
+            RuleAppCost ageFreeCost, boolean ageFreeCostIsRegular, RuleAppCost cost, Goal goal,
             long age) {
-        super(app, cost, age);
+        super(app, ageFreeCost, ageFreeCostIsRegular, cost, age);
         applicationPosition = pio;
-        positionTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
 
-        if (positionTag == null) {
-            // faster than <code>assertFalse</code>
-            Debug.fail("Formula " + pio + " does not exist");
-        }
+        final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
+        assert posTag != null : "No formula tag found for " + pio;
+        positionTag = posTag;
     }
 
 
@@ -66,10 +84,22 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         find-position does still exist (if-formulas are not considered)
      */
     @Override
-    protected boolean isStillApplicable(@NonNull Goal p_goal) {
+    protected boolean isStillApplicable(Goal p_goal) {
         PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
+    }
+
+    /**
+     * {@inheritDoc} The find formula is unchanged iff the formula now carried by this container's
+     * position tag is identity-equal to the one present when the container was created. (Terms are
+     * immutable, so any rewrite -- including an independent sibling rewrite that {@link
+     * #isStillApplicable} tolerates -- yields a fresh formula object.)
+     */
+    @Override
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        final PosInOccurrence cur = getPosInOccurrence(p_goal);
+        return cur != null && cur.sequentFormula() == applicationPosition.sequentFormula();
     }
 
 
@@ -77,8 +107,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return true iff a subformula that contains the find position stored by this object has been
      *         altered since the creation of this object or if a preceding update has changed
      */
-    private boolean subformulaOrPreceedingUpdateHasChanged(@NonNull Goal goal) {
-        ImmutableList<FormulaChangeInfo> infoList =
+    private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
+        ImmutableList<@NonNull FormulaChangeInfo> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
@@ -112,8 +142,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         formulas) and no indirect relationship exists which is established by a modification
      *         that occurred inside an update
      */
-    private boolean independentSubformulas(@NonNull PosInOccurrence changePos,
-            @NonNull SequentFormula newFormula) {
+    private boolean independentSubformulas(PosInOccurrence changePos,
+            SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator();
         final PIOPathIterator appPIO = applicationPosition.iterator();
 
@@ -176,11 +206,16 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return non-null for FindTaclets
      */
     @Override
-    protected @NonNull PosInOccurrence getPosInOccurrence(@NonNull Goal p_goal) {
+    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
         final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;
-        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+        PosInOccurrence cached = currentPositionCache;
+        if (cached == null || cached.sequentFormula() != topPos.sequentFormula()) {
+            cached = applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+            currentPositionCache = cached;
+        }
+        return cached;
     }
 
 }

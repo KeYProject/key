@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
@@ -22,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * @param <K> the type of the keys in the wrapped LinkedHashMap
  * @param <V> the type of the values in the wrapped LinkedHashMap
  */
-public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nullable Object> {
+public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /*
      * Internally, the elements are wrapped so that EqualsModProperty can be used for equality
      * checks and hash codes instead of the usual equals and hashCode methods.
@@ -31,7 +30,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
     /**
      * The wrapped {@link LinkedHashMap}.
      */
-    private final LinkedHashMap<ElementWrapper<K>, V> map;
+    private final LinkedHashMap<ElementWrapper<K>, @Nullable V> map;
 
     /**
      * The {@link Property} that is used for equality checks and hash codes.
@@ -147,7 +146,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
-    public @Nullable V put(K key, V value) {
+    public @Nullable V put(K key, @Nullable V value) {
         return map.put(wrapKey(key), value);
     }
 
@@ -161,7 +160,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      * @param keys the array of keys to be inserted
      * @param vals the array of values corresponding to the keys
      */
-    public void putAll(LinkedHashMapWrapper<K, @Nullable V> this, K[] keys, V[] vals) {
+    public void putAll(K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
             if (i < vals.length) {
                 put(keys[i], vals[i]);
@@ -181,8 +180,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      * @param keys the iterable of keys to be inserted
      * @param vals the iterable of values corresponding to the keys
      */
-    public void putAll(LinkedHashMapWrapper<K, @Nullable V> this, Iterable<K> keys,
-            Iterable<V> vals) {
+    public void putAll(Iterable<K> keys, Iterable<V> vals) {
         Iterator<V> itVals = vals.iterator();
         for (K key : keys) {
             if (itVals.hasNext()) {
@@ -222,8 +220,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      *
      * @return an iterator over the key-value pairs in this map
      */
-    public Iterator<Pair<K, V>> iterator(LinkedHashMapWrapper<K, V> this) {
-        return new PairIterator<K, V>(map);
+    public Iterator<Pair<K, V>> iterator() {
+        return new PairIterator<>(map);
     }
 
     /**
@@ -277,7 +275,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
         }
 
         @Override
-        public boolean equals(@Nullable Object obj) {
+        public boolean equals(Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
                 return property.equalsModThisProperty(key, (K) other.key);
             }
@@ -300,12 +298,22 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      * @param <K> the type of the keys in the {@link LinkedHashMapWrapper}
      * @param <V> the type of the values in the {@link LinkedHashMapWrapper}
      */
-    private static class PairIterator<K extends EqualsModProperty<K>, V extends @Nullable Object>
+    private static class PairIterator<K extends EqualsModProperty<K>, V>
             implements Iterator<Pair<K, V>> {
         /**
-         * The iterator over the internal map.
+         * The iterator over the keys of the internal map.
          */
-        private final Iterator<Map.Entry<ElementWrapper<K>, V>> it;
+        private final Iterator<ElementWrapper<K>> keyIt;
+
+        /**
+         * The internal map.
+         */
+        private final LinkedHashMap<ElementWrapper<K>, V> map;
+
+        /**
+         * The last key-value pair that was returned by {@link #next()}.
+         */
+        private @Nullable ElementWrapper<K> last = null;
 
         /**
          * Creates a new iterator over the key-value pairs in the {@link LinkedHashMapWrapper}.
@@ -313,23 +321,27 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
          * @param map the internal map of the {@link LinkedHashMapWrapper} to iterate over
          */
         public PairIterator(final LinkedHashMap<ElementWrapper<K>, V> map) {
-            it = map.entrySet().iterator();
+            this.map = map;
+            keyIt = map.keySet().iterator();
         }
 
         @Override
         public boolean hasNext() {
-            return it.hasNext();
+            return keyIt.hasNext();
         }
 
         @Override
         public Pair<K, V> next() {
-            Map.Entry<ElementWrapper<K>, V> last = it.next();
-            return new Pair<>(last.getKey().key, last.getValue());
+            last = keyIt.next();
+            return new Pair<>(last.key, map.get(last));
         }
 
         @Override
         public void remove() {
-            it.remove();
+            if (last != null) {
+                map.remove(last);
+                last = null;
+            }
         }
 
     }

@@ -28,7 +28,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,7 +231,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     }
 
     @Override
-    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         if (e.getSource().getSelectedProof() != null
                 && e.getSource().getSelectedProof().closed()) {
             if (e.getSource().getSelectedProof() == worker.getSlicedProof()) {

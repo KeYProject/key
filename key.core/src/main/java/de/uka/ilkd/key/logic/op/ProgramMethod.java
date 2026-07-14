@@ -4,14 +4,17 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.Constructor;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -21,8 +24,10 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.parsing.Position;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -172,18 +177,6 @@ public final class ProgramMethod extends ObserverFunction
         return pi.getEndPosition();
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return pi.getRelativePosition();
-    }
-
     @Override
     public PositionInfo getPositionInfo() {
         return pi;
@@ -252,7 +245,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
         return method.getModifiers();
     }
 
@@ -267,7 +260,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof IProgramMethod ipm)) {
             return false;
         }
@@ -362,7 +355,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean isImplicit() {
-        return getName().startsWith("<");
+        return getName().startsWith(JavaDLFieldNames.IMPLICIT_NAME_PREFIX + "");
     }
 
     /*
@@ -458,7 +451,7 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableList.nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);

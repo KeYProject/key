@@ -17,9 +17,6 @@ import java.util.List;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Provides methods to collect paths of files inside a proof bundle.
  *
@@ -121,6 +118,14 @@ public abstract class ProofBundleHandler implements Closeable {
     public abstract @Nullable Path getBootclasspath() throws IOException;
 
     /**
+     * Returns the path to the top-level `project.key` file in the bundle, if existing, otherwise
+     * null.
+     *
+     * @return the path to the top-level project file or null
+     */
+    public abstract Path getTopLevelProjectFile();
+
+    /**
      * Returns a tree of the complete file hierarchy inside the bundle.
      *
      * @return the file tree of the bundle
@@ -186,7 +191,7 @@ public abstract class ProofBundleHandler implements Closeable {
         }
 
         @Override
-        public @NonNull FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
             current = current.getParent(); // ascend in tree
             return FileVisitResult.CONTINUE;
         }

@@ -25,7 +25,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -37,7 +36,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     public String getName() {
-        return "Auto Pilot (Preparation Only)";
+        return "Structured Automation (Prep. Only)";
     }
 
     @Override
@@ -47,8 +46,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
-            + "<li>Expand invariant definitions</ol>";
+        return "<html>This configures the automation such that it preserves<br>" +
+            "the program structure and makes it easier to comprehend the<br>" +
+            "resulting proof. It produces proof goals without program<br>" +
+            "references, but does not try to close these goals.<br>" +
+            "The steps are:<ol><li>Finish symbolic execution" +
+            "<li>Separate proof obligations" +
+            "<li>Expand invariant definitions</ol>";
     }
 
     @Override
@@ -75,7 +79,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static class AutoPilotStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private final Strategy delegate;
+        private final Strategy<@NonNull Goal> delegate;
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
@@ -123,7 +127,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.getZeroCost();
             }
 
-            // apply OSS to <inv>() calls.
+            // apply OSS to $inv() calls.
             if (rule instanceof OneStepSimplifier) {
                 var target = pio.subTerm();
                 if (target.op() instanceof UpdateApplication) {
@@ -152,7 +156,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }
 }

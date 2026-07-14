@@ -10,8 +10,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
  *

@@ -4,7 +4,10 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.proof.Proof;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
@@ -16,7 +19,7 @@ import de.uka.ilkd.key.proof.Proof;
  *
  * @author Arne Keller
  */
-public abstract class UserAction implements ActionListener {
+public abstract class UserAction extends KeyAction {
     /**
      * KeY mediator. Used to register the execution of this user action.
      */

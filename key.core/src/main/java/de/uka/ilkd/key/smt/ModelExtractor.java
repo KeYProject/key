@@ -668,13 +668,13 @@ public class ModelExtractor {
     public void addFunction(SMTFunction f) {
         if (f.getDomainSorts().isEmpty()) {
             switch (f.getImageSort().getId()) {
-            case SMTObjTranslator.HEAP_SORT -> heaps.add(f);
-            case SMTObjTranslator.FIELD_SORT -> fields.add(f);
-            case SMTObjTranslator.LOCSET_SORT -> locsets.add(f);
-            case SMTObjTranslator.OBJECT_SORT -> objects.add(f);
-            case SMTObjTranslator.BINT_SORT -> ints.add(f);
-            case SMTObjTranslator.SEQ_SORT -> seqs.add(f);
-            default -> bools.add(f);
+                case SMTObjTranslator.HEAP_SORT -> heaps.add(f);
+                case SMTObjTranslator.FIELD_SORT -> fields.add(f);
+                case SMTObjTranslator.LOCSET_SORT -> locsets.add(f);
+                case SMTObjTranslator.OBJECT_SORT -> objects.add(f);
+                case SMTObjTranslator.BINT_SORT -> ints.add(f);
+                case SMTObjTranslator.SEQ_SORT -> seqs.add(f);
+                default -> bools.add(f);
             }
         } else if (f.getDomainSorts().size() == 2) {
 

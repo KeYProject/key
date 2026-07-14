@@ -19,6 +19,7 @@ import org.jspecify.annotations.NonNull;
 /// value of the whole expression is <code>f1</code> (if <code>c</code> returns zero, or more
 /// general
 /// if <code>c</code> returns a distinguished value <code>trueCost</code>) or <code>f2</code>
+@StableCost
 public class ShannonFeature implements Feature {
 
     /// The filter that decides which sub-feature is to be evaluated

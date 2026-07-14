@@ -11,8 +11,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Toggles the tooltips of the source view.
  *

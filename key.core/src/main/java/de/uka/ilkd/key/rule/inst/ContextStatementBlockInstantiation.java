@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
 
 import org.jspecify.annotations.NonNull;
@@ -16,24 +16,16 @@ import org.jspecify.annotations.Nullable;
  */
 public class ContextStatementBlockInstantiation {
 
-    /**
-     * the end position of the prefix omega
-     */
+    /** the end position of the prefix omega */
     private final PosInProgram prefixEnd;
 
-    /**
-     * the start position of the suffix omega
-     */
+    /** the start position of the suffix omega */
     private final PosInProgram suffixStart;
 
-    /**
-     * the execution context of the first active statement
-     */
+    /** the execution context of the first active statement */
     private final ExecutionContext activeStatementContext;
 
-    /**
-     * the whole program element this context term inst refers to
-     */
+    /** the whole program element this context term inst refers to */
     private final ProgramElement programElement;
 
     /**
@@ -86,8 +78,7 @@ public class ContextStatementBlockInstantiation {
         return programElement;
     }
 
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }

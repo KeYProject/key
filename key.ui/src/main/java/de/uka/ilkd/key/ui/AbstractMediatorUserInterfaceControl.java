@@ -37,8 +37,6 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,11 +114,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
-    public ProblemLoader getProblemLoader(@NonNull Path file,
-            @Nullable List<Path> classPath,
-            @Nullable Path bootClassPath,
-            @Nullable List<Path> includes,
-            KeYMediator mediator) {
+    public ProblemLoader getProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes, KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
@@ -177,15 +172,16 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             });
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
-            // it again at the right time
+            // it again at the right time.
             ThreadUtilities.invokeAndWait(() -> {
-                getMediator().initiateAutoMode(info.getProof(), true, false);
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
             });
         }
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
-            final @NonNull Proof initiatingProof, final @NonNull Proof sideProof) {
+            final Proof initiatingProof, final Proof sideProof) {
         ThreadUtilities.invokeAndWait(() -> {
             saveSideProof(sideProof);
             // make everyone listen to the proof remove

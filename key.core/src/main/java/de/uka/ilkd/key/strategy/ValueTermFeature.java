@@ -8,8 +8,6 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 
 class ValueTermFeature {

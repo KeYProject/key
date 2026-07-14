@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -50,7 +49,7 @@ public final class ProofInitServiceUtil {
      * @return The available {@link POExtension}s.
      */
     public static ImmutableList<POExtension> getOperationPOExtension(ProofOblInput po) {
-        ImmutableList<POExtension> result = ImmutableSLList.nil();
+        ImmutableList<POExtension> result = ImmutableList.nil();
         for (POExtension extension : poExtensions) {
             if (extension.isPOSupported(po)) {
                 result = result.prepend(extension);
@@ -65,7 +64,7 @@ public final class ProofInitServiceUtil {
      * @return The available {@link POExtension}s.
      */
     private static ImmutableList<POExtension> createOperationPOExtension() {
-        ImmutableList<POExtension> extensions = ImmutableSLList.nil();
+        ImmutableList<POExtension> extensions = ImmutableList.nil();
         Iterator<POExtension> iter = ClassLoaderUtil.loadServices(POExtension.class).iterator();
         while (iter.hasNext()) {
             try {

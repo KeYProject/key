@@ -1598,8 +1598,8 @@ ArrayInitializer ArrayInitializer() :
  * This production is needed to have a semantic lookahead to decide whether
  * <x> is a type parameter or an implicit identifier
  * consider:
- *    public <E> <ImplicitClass> <init>( ...
- *    public <ImplicitClass> <init>(
+ *    public <E> <ImplicitClass> $init( ...
+ *    public <ImplicitClass> $init(
  * The first < ist the decision point!
  * If 2 identifiers follow the <...>, it is a type parameter
  * otherwise a lookahead of >= 7 would have to be specified.

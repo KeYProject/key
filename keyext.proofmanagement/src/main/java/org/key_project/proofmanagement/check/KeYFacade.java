@@ -8,9 +8,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -38,9 +38,6 @@ import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This class provides static methods to access the prover (KeY).
@@ -124,8 +121,7 @@ public final class KeYFacade {
         return null;
     }
 
-    private static boolean loadProofTree(@NonNull Path path, CheckerData.@NonNull ProofEntry line,
-            @NonNull Logger logger)
+    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger)
             throws Exception {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
@@ -157,8 +153,7 @@ public final class KeYFacade {
         return true;
     }
 
-    private static Proof @Nullable [] loadProofFile(@NonNull Path path,
-            CheckerData.@NonNull ProofEntry line)
+    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
             throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -232,11 +227,11 @@ public final class KeYFacade {
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
      *
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
-    private static IPersistablePO.@NonNull LoadedPOContainer createProofObligationContainer(
-            @NonNull KeYFile keyFile,
-            @NonNull InitConfig initConfig, @NonNull Configuration properties) throws Exception {
+    private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
+            InitConfig initConfig, Configuration properties) throws Exception {
         final String chooseContract = keyFile.chooseContract();
         final Configuration proofObligation = keyFile.getProofObligation();
 
@@ -327,9 +322,8 @@ public final class KeYFacade {
         }
     }
 
-    private static @NonNull ReplayResult replayProof(CheckerData.@NonNull ProofEntry line,
-            EnvInput envInput,
-            @NonNull Logger logger) throws ProofInputException {
+    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
+            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
@@ -445,7 +439,18 @@ public final class KeYFacade {
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
+            /*
+             * We need to respect included .key files from project.key (for dl_ escapes). The
+             * easiest way to do this is to add the top-level project.key as include and let
+             * SLEnvInput take care about the includes from there.
+             */
+            List<Path> includePaths = List.of();
+            Path projectFile = pbh.getTopLevelProjectFile();
+            if (projectFile != null) {
+                includePaths = List.of(projectFile);
+            }
+
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, includePaths);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");

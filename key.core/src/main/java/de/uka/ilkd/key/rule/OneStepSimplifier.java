@@ -3,12 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -45,7 +40,6 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
@@ -80,11 +74,12 @@ public final class OneStepSimplifier implements BuiltInRule {
      * would not improve prover performance. I tested it for "simplify_literals", "cast_del", and
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
-    private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
-            .append("concrete").append("update_elim").append("update_apply_on_update")
+    private static final ImmutableList<String> ruleSets = ImmutableList.<String>nil()
+            .append("concrete").append("concrete_java").append("update_elim")
+            .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
-    private static final boolean[] bottomUp = { false, false, true, true, true, false };
+    private static final boolean[] bottomUp = { false, false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
 
@@ -120,7 +115,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableList<Taclet> tacletsForRuleSet(Proof proof, String ruleSetName,
             ImmutableList<String> excludedRuleSetNames) {
         assert !proof.openGoals().isEmpty();
-        ImmutableList<Taclet> result = ImmutableSLList.nil();
+        ImmutableList<Taclet> result = ImmutableList.nil();
 
         // collect apps present in all open goals
         Set<NoPosTacletApp> allApps =
@@ -189,11 +184,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.nil();
+            appsTakenOver = ImmutableList.nil();
             indices = new TacletIndex[ruleSets.size()];
             notSimplifiableCaches = (Map<JTerm, JTerm>[]) new LRUCache[indices.length];
             int i = 0;
-            ImmutableList<String> done = ImmutableSLList.nil();
+            ImmutableList<String> done = ImmutableList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
                 indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
@@ -429,7 +424,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 inAntecedent); // It is required to create a new PosInOccurrence because formula and
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
-        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableList.nil();
         ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
@@ -496,7 +491,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             new ArrayList<>(seq.size());
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> list = ImmutableList.nil();
         SequentFormula simplifiedCf = cf;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(simplifiedCf, ossPIO.isInAntec(),
@@ -512,7 +507,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence[] ifInstsArr =
             ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
-            ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
+            ImmutableList.<PosInOccurrence>nil().append(ifInstsArr);
         return new Instantiation(list.head(), list.size(), immutableIfInsts);
     }
 
@@ -618,9 +613,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             ImmutableList<PosInOccurrence> ifInsts =
                 ((OneStepSimplifierRuleApp) ruleApp).assumesInsts();
             ImmutableList<SequentFormula> anteFormulas =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             ImmutableList<SequentFormula> succFormulas =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             if (ifInsts != null) {
                 for (PosInOccurrence it : ifInsts) {
                     if (it.isInAntec()) {
@@ -687,7 +682,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         return result;
     }
-
 
     // -------------------------------------------------------------------------
     // inner classes
@@ -794,5 +788,29 @@ public final class OneStepSimplifier implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
+    }
+
+
+    @Override
+    public String getDocumentation() {
+        return """
+                The One Step Simplifier (OSS) aggregates the application of simplification rules into a single rule. This is done to make the calculus more efficient.
+
+                You can activate/deactivate the simplifier by toggling the menu entry Options->One Step Simplifier. An active OSS makes the proof faster, a deactivated more transparent.
+
+                In particular, the OSS performs normalisation and simplification on updated terms:
+                  * Updates on terms without modality are resolved.
+                  * Updates without effects are dropped.
+                  * Sequential updates are merged into one parallel update.
+
+                Technical Information:
+                The OSS aggregates the rules from the following heuristics (-> Taclet Base):
+                  concrete,
+                  update_elim,
+                  update_apply_on_update,
+                  update_apply,
+                  update_join,
+                  elimQuantifier
+                  """;
     }
 }

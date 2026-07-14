@@ -6,8 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Instances of this class provides functionality only if a supported rule is active.
  *
@@ -24,6 +22,5 @@ public interface RuleSpecificTask {
      * @return The list of supported rule {@link Name}s or {@code null}/empty list if all rules are
      *         supported.
      */
-    @Nullable
     ImmutableList<Name> getSupportedRuleNames();
 }

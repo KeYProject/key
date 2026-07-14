@@ -1,0 +1,94 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.speclang.njml;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import de.uka.ilkd.key.java.JavaService;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.rule.TacletForTests;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ModifiersTest {
+    private static JavaService java = null;
+
+    @BeforeEach
+    public void setUp() throws URISyntaxException, IOException {
+        if (java == null) {
+            java = TacletForTests.services().getJavaService();
+        }
+    }
+
+    private static final String CLASSES =
+        """
+                package test;
+
+                public /*@ nullable_by_default @*/ class A {}
+
+                /*@ nullable_by_default @*/ class B {}
+
+                public /*@ pure @*/ class C {}
+                """;
+
+    private static final String METHODS =
+        """
+                package test;
+
+                public class D {
+                    public /*@ helper @*/ void a() {}
+
+                    /*@ model_behaviour
+                      @ requires true;
+                      @ static helper model void modelA();
+                      @*/
+
+                    public int spacer;
+
+                    public /*@ helper @*/ void b() {}
+
+                    /*@ model_behaviour
+                      @ requires true;
+                      @ static helper model void modelB();
+                      @*/
+                }
+                """;
+
+    @Test
+    public void testClassModifiers() {
+        var cu = java.readCompilationUnit(CLASSES);
+        var decls = cu.getDeclarations();
+        var a = decls.get(0);
+        var b = decls.get(1);
+        var c = decls.get(2);
+        var expected = new TypeDeclaration.JMLModifiers(false, false, true, null);
+        assertEquals(expected, a.getJmlModifiers());
+        // assertEquals(expected, b.getJmlModifiers());
+        assertTrue(c.getJmlModifiers().pure());
+    }
+
+    @Test
+    public void testMethodModifiers() {
+        var cu = java.readCompilationUnit(METHODS);
+        var members = cu.getDeclarations().get(0).getMembers();
+        var a = ((ProgramMethod) members.get(0)).getMethodDeclaration();
+        var modelA = ((ProgramMethod) members.get(3)).getMethodDeclaration();
+        var b = ((ProgramMethod) members.get(2)).getMethodDeclaration();
+        var modelB = ((ProgramMethod) members.get(4)).getMethodDeclaration();
+        var expected = new MethodDeclaration.JMLModifiers(false, false, true, null);
+        assertEquals(expected, a.getJmlModifiers(), "Jml modifiers of method D::a");
+        assertEquals(expected, b.getJmlModifiers(), "Jml modifiers of method D::b");
+        assertEquals(expected, modelA.getJmlModifiers(),
+            "Jml modifiers of method D::modelA");
+        assertEquals(expected, modelB.getJmlModifiers(),
+            "Jml modifiers of method D::modelB");
+    }
+}

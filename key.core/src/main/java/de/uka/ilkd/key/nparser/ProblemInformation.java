@@ -3,8 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import org.key_project.util.parsing.Location;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -27,6 +34,13 @@ public class ProblemInformation {
      * A list of class paths entries.
      */
     private final @NonNull List<String> classpath;
+
+    /**
+     * The source location (file + position) at which each {@code \classpath}/{@code \bootclasspath}
+     * value was declared, keyed by the raw path string. Used to point error messages (e.g. "the
+     * directory does not exist") at the declaration in the {@code .key} file.
+     */
+    private final @NonNull Map<String, Location> pathLocations = new HashMap<>();
 
     /**
      * Value of a "\chooseContract". If "\chooseContract" are mentioned in the file, but without a
@@ -100,6 +114,24 @@ public class ProblemInformation {
 
     public void setPreferences(@Nullable String preferences) {
         this.preferences = preferences;
+    }
+
+    /**
+     * Records the source location at which the given classpath/bootclasspath value was declared.
+     *
+     * @param path the raw path string
+     * @param location its location in the {@code .key} file
+     */
+    public void putPathLocation(@NonNull String path, @NonNull Location location) {
+        pathLocations.put(path, location);
+    }
+
+    /**
+     * @param path a raw classpath/bootclasspath string
+     * @return the location at which it was declared, or {@code null} if unknown
+     */
+    public @Nullable Location getPathLocation(@Nullable String path) {
+        return path == null ? null : pathLocations.get(path);
     }
 
     public @Nullable String getBootClassPath() {

@@ -12,24 +12,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.EnhancedFor;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -593,13 +593,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
             LoopContractImpl r, Services services) {
         switch (ReplaceTypes.fromClass(init.getClass())) {
-        case PROGRAM_VARIABLE -> replaceVariable(var, (ProgramVariable) init, preReplacementMap,
-            postReplacementMap, r, services);
-        case ABSTRACT_INTEGER_LITERAL -> replaceVariable(var, (AbstractIntegerLiteral) init,
-            preReplacementMap, postReplacementMap, r, services);
-        case EMPTY_SEQ_LITERAL -> replaceVariable(var, (EmptySeqLiteral) init, preReplacementMap,
-            postReplacementMap, r, services);
-        default -> throw new AssertionError();
+            case PROGRAM_VARIABLE -> replaceVariable(var, (ProgramVariable) init, preReplacementMap,
+                postReplacementMap, r, services);
+            case ABSTRACT_INTEGER_LITERAL -> replaceVariable(var, (AbstractIntegerLiteral) init,
+                preReplacementMap, postReplacementMap, r, services);
+            case EMPTY_SEQ_LITERAL ->
+                replaceVariable(var, (EmptySeqLiteral) init, preReplacementMap,
+                    postReplacementMap, r, services);
+            default -> throw new AssertionError();
         }
     }
 

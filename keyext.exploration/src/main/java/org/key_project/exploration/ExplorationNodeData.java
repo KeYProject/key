@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,7 +18,10 @@ import org.jspecify.annotations.Nullable;
 public class ExplorationNodeData {
     private @Nullable String explorationAction;
 
-    public static ExplorationNodeData get(Node node) {
+    private String explorationAction;
+
+    public static @NonNull ExplorationNodeData get(@NonNull Node node) {
+        @Nullable
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if (data == null) {
             data = new ExplorationNodeData();
@@ -42,7 +46,7 @@ public class ExplorationNodeData {
 
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

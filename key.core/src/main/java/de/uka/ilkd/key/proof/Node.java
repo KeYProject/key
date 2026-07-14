@@ -3,7 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -16,10 +25,12 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
-import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -44,9 +55,7 @@ public class Node implements Iterable<Node> {
      */
     private final Proof proof;
 
-    /**
-     * The parent node.
-     **/
+    /** The parent node. **/
     private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
@@ -65,13 +74,13 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated program variables. It extends the list of the parent
      * node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableList.nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<Function> localFunctions = ImmutableList.nil();
 
     private boolean closed = false;
 
@@ -104,7 +113,7 @@ public class Node implements Iterable<Node> {
 
     private @Nullable ImmutableList<RenamingTable> renamings;
 
-    private @Nullable String cachedName = null;
+    private String cachedName = null;
 
     private @Nullable Lookup userData = null;
 
@@ -282,7 +291,6 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    @Pure
     public @Nullable Node parent() {
         return parent;
     }
@@ -513,8 +521,8 @@ public class Node implements Iterable<Node> {
         return -1;
     }
 
-    public StringBuffer getUniqueTacletId() {
-        StringBuffer id = new StringBuffer();
+    public StringBuilder getUniqueTacletId() {
+        StringBuilder id = new StringBuilder(32);
         int c = 0;
         Node n = this;
 
@@ -788,7 +796,7 @@ public class Node implements Iterable<Node> {
      * @param service the key under it should be registered
      * @param <T> the type of the object to be registered
      */
-    public <T extends @NonNull Object> void register(T obj, Class<T> service) {
+    public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
     }
 
@@ -799,9 +807,7 @@ public class Node implements Iterable<Node> {
      * @param service the key under which the data was registered
      * @param <T> arbitray object
      */
-    public <T> void deregister(@Nullable T obj, Class<T> service) {
-        if (obj == null)
-            return;
+    public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
             userData.deregister(obj, service);
         }
@@ -855,5 +861,9 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    public Stream<Node> childrenStream() {
+        return children.stream();
     }
 }

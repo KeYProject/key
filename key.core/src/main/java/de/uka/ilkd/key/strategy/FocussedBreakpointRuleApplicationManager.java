@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import java.util.Optional;
-
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,9 +16,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,20 +28,22 @@ public class FocussedBreakpointRuleApplicationManager
         implements DelegationBasedRuleApplicationManager<Goal> {
 
     private final RuleApplicationManager<Goal> delegate;
-    private final Optional<String> breakpoint;
+    private final @Nullable String breakpoint;
 
     private FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
-            Optional<String> breakpoint) {
+            @Nullable String breakpoint) {
         this.delegate = delegate;
         this.breakpoint = breakpoint;
     }
 
     public FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
-            Goal goal, Optional<PosInOccurrence> focussedSubterm,
-            Optional<String> breakpoint) {
+            Goal goal,
+            @Nullable PosInOccurrence focussedSubterm,
+            @Nullable String breakpoint) {
         // noinspection unchecked
-        this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
-                .map(RuleApplicationManager.class::cast).orElse(delegate),
+        this(focussedSubterm != null
+                ? new FocussedRuleApplicationManager(delegate, goal, focussedSubterm)
+                : delegate,
             breakpoint);
 
         clearCache();
@@ -89,10 +87,10 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(@NonNull ImmutableList<? extends RuleApp> rules,
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -102,8 +100,8 @@ public class FocussedBreakpointRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean mayAddRule(RuleApp rule, @NonNull PosInOccurrence pos) {
-        if (!breakpoint.isPresent()) {
+    private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
+        if (breakpoint == null) {
             return true;
         }
 
@@ -117,7 +115,7 @@ public class FocussedBreakpointRuleApplicationManager
             return currStmtString == null || //
                     !(currStmtString.contains("{")
                             ? currStmtString.substring(0, currStmtString.indexOf('{'))
-                            : currStmtString).trim().equals(breakpoint.get());
+                            : currStmtString).trim().equals(breakpoint);
         }
 
         return true;

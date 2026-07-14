@@ -15,6 +15,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.jspecify.annotations.NonNull;
 
@@ -23,8 +24,9 @@ import org.jspecify.annotations.NonNull;
  * choose the left branch (subterm) and how the right branches. This is used to identify the
  * upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
  */
+@StableCost
 public class FindRightishFeature implements Feature {
-    private final @NonNull Operator add;
+    private final Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
 
     public static @NonNull Feature create(@NonNull IntegerLDT numbers) {
@@ -37,7 +39,7 @@ public class FindRightishFeature implements Feature {
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            @NonNull PosInOccurrence pos, Goal goal,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

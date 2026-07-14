@@ -13,6 +13,8 @@ import org.key_project.prover.rules.VariableCondition;
 
 import org.jspecify.annotations.NonNull;
 
+import org.key_project.prover.rules.VariableCondition;
+
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
     private final boolean negationSupported;

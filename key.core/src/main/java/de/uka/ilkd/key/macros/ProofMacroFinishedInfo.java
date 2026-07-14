@@ -15,9 +15,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * An information object with additional information about the finished proof macro. The source is
@@ -31,8 +30,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     private final Map<String, Object> proofMacroSpecificData = new HashMap<>();
 
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, @Nullable Proof proof,
-            long time,
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof, long time,
             int appliedRules, int closedGoals) {
         super(macro, goals, proof, time, appliedRules, closedGoals);
     }
@@ -40,7 +38,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, @Nullable Proof proof, long time,
             int appliedRules,
             int closedGoals) {
-        this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof, time, appliedRules,
+        this(macro, ImmutableList.<Goal>nil().prepend(goal), proof, time, appliedRules,
             closedGoals);
     }
 
@@ -51,14 +49,13 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, @Nullable Proof proof,
-            @Nullable Statistics statistics) {
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, Statistics statistics) {
         this(macro, goal, proof, statistics == null ? 0 : statistics.timeInMillis,
             statistics == null ? 0 : statistics.nodes - statistics.branches,
             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, @Nullable Proof proof) {
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof) {
         this(macro, goals, proof, proof == null ? null : proof.getStatistics());
     }
 
@@ -76,7 +73,9 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     public ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
             List<Node> statisticNodes) {
-        this(macro, goals, goals.isEmpty() ? null : goals.head().proof(),
+        this(macro, goals,
+            !goals.isEmpty() ? goals.head().proof()
+                    : (statisticNodes.isEmpty() ? null : statisticNodes.get(0).proof()),
             statisticNodes.isEmpty() ? null : new Statistics(statisticNodes));
     }
 
@@ -94,7 +93,8 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
             info.getClosedGoals());
     }
 
-    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ProofSearchInformation stratInfo) {
+    ProofMacroFinishedInfo(ProofMacroFinishedInfo info,
+            ProofSearchInformation<@NonNull Proof, Goal> stratInfo) {
         this(info.getMacro(), info.getGoals(), info.getProof(),
             info.getTime() + stratInfo.getTime(),
             info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
@@ -117,13 +117,13 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     public ImmutableList<Goal> getGoals() {
         final Object result = getResult();
         if (result == null) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         } else {
             return (ImmutableList<Goal>) result;
         }
     }
 
     public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
-        return new ProofMacroFinishedInfo(macro, ImmutableSLList.nil(), proof);
+        return new ProofMacroFinishedInfo(macro, ImmutableList.nil(), proof);
     }
 }

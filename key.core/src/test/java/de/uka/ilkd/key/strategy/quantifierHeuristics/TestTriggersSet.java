@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -13,15 +16,18 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 // most Code are copyed from Logic.TestUpdateFactory
@@ -194,14 +200,18 @@ public class TestTriggersSet {
         proof.setRoot(g.node());
         proof.add(g);
 
-        proof.setNamespaces(new NamespaceSet(variables, functions, sorts, new Namespace<>(),
-            new Namespace<>(), new Namespace<>()));
+        proof.setNamespaces(
+            new NamespaceSet(variables, functions, sorts, new Namespace<>(), new Namespace<>(),
+                new Namespace<>(), new Namespace<>(),
+                new Namespace<>(), new Namespace<>()));
 
     }
 
     private JTerm parseTerm(String termstr) {
-        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
-            new Namespace<>(), new Namespace<>(), new Namespace<>()));
+        return TacletForTests.parseTerm(termstr,
+            new NamespaceSet(variables, functions, sorts, new Namespace<>(), new Namespace<>(),
+                new Namespace<>(),
+                new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
 
     @Test
@@ -214,6 +224,150 @@ public class TestTriggersSet {
         assertEquals(1, triggerNum);
         var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
+    }
+
+    // --- Characterization tests ---------------------------------------------------------------
+    // These pin the CURRENT trigger-set output to guard the cleanup/restructure refactor; they are
+    // a behavior-preservation net, NOT a statement that the current output is ideal. Cases marked
+    // "SCRUTINIZE" are deliberate-tuning candidates for the later inequality/specificity step and
+    // must not be treated as desirable behavior to keep forever.
+
+    private ImmutableSet<Trigger> triggersOf(String formula) {
+        return TriggersSet.create(parseTerm(formula), proof.getServices()).getAllTriggers();
+    }
+
+    @Test
+    public void existentialInnerVariableYieldsUniTrigger() {
+        // forall x. exists y. prs(x,y): the existential variable is carried in the trigger; still a
+        // single uni-trigger (matched two-sidedly because it contains a non-universal variable).
+        final JTerm all = parseTerm("\\forall r x;(\\exists s y;(prs(x,y)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        assertEquals(all.sub(0).sub(0), triggers.iterator().next().getTriggerTerm()); // prs(x,y)
+    }
+
+    @Test
+    public void conjunctionYieldsOneTriggerPerClause() {
+        // forall x. (pr(x) & pr(frr(x))): the matrix is AND-split into two clauses, each
+        // contributing its own trigger.
+        final JTerm all = parseTerm("\\forall r x;(pr(x) & pr(frr(x)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(2, triggers.size());
+        final Set<Term> expected = new HashSet<>();
+        expected.add(all.sub(0).sub(0)); // pr(x)
+        expected.add(all.sub(0).sub(1).sub(0)); // frr(x) inside pr(frr(x))
+        final Set<Term> actual = new HashSet<>();
+        for (Trigger tr : triggers) {
+            actual.add(tr.getTriggerTerm());
+        }
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void bodyWithoutOuterVariableHasNoTriggers() {
+        // forall x. forall y. ps(y): no literal mentions the OUTER variable x, so the
+        // first-variable
+        // requirement rejects every candidate -> no triggers at all. (Refactor-fragile invariant.)
+        final ImmutableSet<Trigger> triggers = triggersOf("\\forall r x;(\\forall s y;(ps(y)))");
+        assertEquals(0, triggers.size());
+    }
+
+    @Test
+    public void negatedGuardLiteralTriggersFromGuard() {
+        // The canonical quantifier shape forall x. (!guard | post) == (guard -> post): the NOT
+        // is stripped, so triggers come from BOTH the guard and the post (here frr(x) and pr(x)).
+        final JTerm all = parseTerm("\\forall r x;(!pr(frr(x)) | pr(x))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(2, triggers.size());
+        final Set<Term> expected = new HashSet<>();
+        expected.add(all.sub(0).sub(0).sub(0).sub(0)); // frr(x), inside !pr(frr(x))
+        expected.add(all.sub(0).sub(1)); // pr(x)
+        final Set<Term> actual = new HashSet<>();
+        for (Trigger tr : triggers) {
+            assertTrue(tr instanceof UniTrigger);
+            actual.add(tr.getTriggerTerm());
+        }
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void negatedLiteralParticipatesInMultiTrigger() {
+        // forall x,y. (!pr(x) | ps(y)): the negated guard (covering only x) joins ps(y) in one
+        // multi-trigger; the clause term keeps the negation, the matched element strips it.
+        final ImmutableSet<Trigger> triggers =
+            triggersOf("\\forall r x;(\\forall s y;(!pr(x) | ps(y)))");
+        assertEquals(1, triggers.size());
+        assertTrue(triggers.iterator().next() instanceof MultiTrigger);
+    }
+
+    @Test
+    public void uniTriggerDescendsPastPredicate() {
+        // pr(frr(x)) -> the term argument frr(x), not the predicate literal.
+        final JTerm all = parseTerm("\\forall r x;(pr(frr(x)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        assertEquals(all.sub(0).sub(0), triggers.iterator().next().getTriggerTerm()); // frr(x)
+    }
+
+    @Test
+    public void uniTriggerPicksInnermostSubterm() {
+        // pr(frr(f2rr(x))) -> f2rr(x): descends to the INNERMOST subterm still containing the bound
+        // variable, i.e. a very general trigger. SCRUTINIZE (over-general -> excess instantiation).
+        final JTerm all = parseTerm("\\forall r x;(pr(frr(f2rr(x))))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        assertEquals(all.sub(0).sub(0).sub(0), triggers.iterator().next().getTriggerTerm()); // f2rr(x)
+    }
+
+    @Test
+    public void fullCoverUniTriggerPreferredOverElements() {
+        // prs(x,y) covers both clause variables -> single uni-trigger; partial pr(x) is dropped.
+        final JTerm all = parseTerm("\\forall r x;(\\forall s y;(prs(x,y) | pr(x)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        final Trigger only = triggers.iterator().next();
+        assertTrue(only instanceof UniTrigger);
+        assertEquals(all.sub(0).sub(0).sub(0), only.getTriggerTerm()); // prs(x,y)
+    }
+
+    @Test
+    public void multiTriggerAcrossLiterals() {
+        // pr(x) | ps(y): neither literal covers {x,y} -> one multi-trigger over the clause.
+        final ImmutableSet<Trigger> triggers =
+            triggersOf("\\forall r x;(\\forall s y;(pr(x) | ps(y)))");
+        assertEquals(1, triggers.size());
+        assertTrue(triggers.iterator().next() instanceof MultiTrigger);
+    }
+
+    @Test
+    public void multiTriggerPowersetEnumeratesCoveringCombinations() {
+        // pr(x) | pr(frr(x)) | ps(y): the two x-elements {pr(x), frr(x)} each combine with ps(y)
+        // into TWO minimal covering multi-triggers (supersets pruned). Pins the powerset
+        // cardinality
+        // so the restructure step must preserve it.
+        final ImmutableSet<Trigger> triggers =
+            triggersOf("\\forall r x;(\\forall s y;(pr(x) | pr(frr(x)) | ps(y)))");
+        assertEquals(2, triggers.size());
+        for (Trigger tr : triggers) {
+            assertTrue(tr instanceof MultiTrigger);
+        }
+    }
+
+    @Test
+    public void equalityExcludedButSubtermStillTriggers() {
+        // frr(x) = r_a: the equality op is excluded (isAcceptableTrigger), but subterm frr(x) still
+        // triggers. Pins the equality handling, relevant to the later inequality knob. SCRUTINIZE.
+        final JTerm all = parseTerm("\\forall r x;(frr(x) = r_a)");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        assertEquals(all.sub(0).sub(0), triggers.iterator().next().getTriggerTerm()); // frr(x)
     }
 
     @Test

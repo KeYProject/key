@@ -5,14 +5,9 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Stack;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
@@ -31,11 +26,11 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
@@ -64,7 +59,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * indicate that a term using these subterms should build a new term instead of using the old
      * one, because one of its subterms has been built, too.
      */
-    private final Stack<Object> subStack; // of Term (and Boolean)
+    private final Deque<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
     private final Deque<JTerm> tacletTermStack = new ArrayDeque<>();
 
@@ -95,7 +90,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
-        subStack = new Stack<>(); // of Term
+        subStack = new ArrayDeque<>(); // of Term
         if (labelHint != null) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -128,7 +123,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = null;
-        subStack = new Stack<>(); // of Term
+        subStack = new ArrayDeque<>(); // of Term
         if (labelHint != null) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -173,7 +168,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.goal = null;
         this.ruleApp = null;
         this.labelHint = null;
-        subStack = new Stack<>();
+        subStack = new ArrayDeque<>();
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
@@ -223,7 +218,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             }
             result[i] = (JTerm) top;
         }
-        if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) {
+        if (newTerm && (subStack.isEmpty() || subStack.peek() != newMarker)) {
             subStack.push(newMarker);
         }
         return result;
@@ -231,7 +226,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
 
     protected void pushNew(Object t) {
-        if (subStack.empty() || subStack.peek() != newMarker) {
+        if (subStack.isEmpty() || subStack.peek() != newMarker) {
             subStack.push(newMarker);
         }
         subStack.push(t);
@@ -274,7 +269,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
+            kind = svInst.getInstantiation(op.kind());
         }
         if (jb != op.programBlock() || kind != op.kind()) {
             return JModality.getModality(kind, jb);
@@ -284,15 +279,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
-        if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
-            instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
+        if (p_operatorToBeInstantiated instanceof ParametricFunctionInstance pfi) {
+            instantiatedOp = handleParametricFunction(pfi);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
             instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
         } else if (p_operatorToBeInstantiated instanceof JModality mod) {
             instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
-                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
+                instantiatedOp = svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -310,7 +305,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final JTerm instantiationForBoundSchemaVariable =
-                        (JTerm) svInst.getInstantiation(boundSchemaVariable);
+                        svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
@@ -364,7 +359,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             // instantiate sub terms
             final JTerm[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
-                    || (!subStack.empty() && subStack.peek() == newMarker)) {
+                    || (!subStack.isEmpty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
                 final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
@@ -398,17 +393,14 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
     }
 
-    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
-        final Sort depSort = depOp.getSortDependingOn();
+    private Operator handleParametricFunction(ParametricFunctionInstance pfi) {
+        ImmutableList<GenericArgument> args = ImmutableList.nil();
 
-        final Sort realDepSort =
-            svInst.getGenericSortInstantiations().getRealSort(depSort, services);
+        for (int i = pfi.getArgs().size() - 1; i >= 0; i--) {
+            args = args.prepend(pfi.getArgs().get(i).instantiate(svInst, services));
+        }
 
-
-        final Operator res = depOp.getInstanceFor(realDepSort, services);
-        assert res != null
-                : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
-        return res;
+        return ParametricFunctionInstance.get(pfi.getBase(), args, services);
     }
 
     private JTerm resolveSubst(JTerm t) {

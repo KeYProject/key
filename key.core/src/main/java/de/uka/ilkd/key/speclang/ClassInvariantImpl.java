@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 import org.key_project.logic.op.Operator;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -211,6 +211,6 @@ public final class ClassInvariantImpl implements ClassInvariant {
         self = this.originalSelfVar;
         return new OriginalVariables(self, null, null,
             new LinkedHashMap<>(),
-            ImmutableSLList.nil());
+            ImmutableList.nil());
     }
 }

@@ -12,9 +12,6 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
@@ -70,14 +67,14 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
                 Note: If this option is not selected, an exception is thrown in the case that a not supported number occurs.
                 """;
-    private final @NonNull JCheckBox useExplicitTypeHierachy;
-    private final @NonNull JCheckBox useNullInstantiation;
-    private final @NonNull JCheckBox useBuiltInUniqueness;
-    private final @NonNull JCheckBox useUIMultiplication;
-    private final @NonNull JCheckBox useConstantsForIntegers;
-    private final @NonNull JSpinner minField;
-    private final @NonNull JSpinner maxField;
-    private @Nullable ProofDependentSMTSettings settings;
+    private final JCheckBox useExplicitTypeHierachy;
+    private final JCheckBox useNullInstantiation;
+    private final JCheckBox useBuiltInUniqueness;
+    private final JCheckBox useUIMultiplication;
+    private final JCheckBox useConstantsForIntegers;
+    private final JSpinner minField;
+    private final JSpinner maxField;
+    private ProofDependentSMTSettings settings;
 
 
     public TranslationOptions() {
@@ -172,7 +169,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPdSettings(window).clone());
         return this;
     }

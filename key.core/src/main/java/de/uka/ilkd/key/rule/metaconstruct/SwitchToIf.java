@@ -6,19 +6,19 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.Equals;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -33,12 +33,12 @@ import org.key_project.logic.op.sv.SchemaVariable;
  */
 public class SwitchToIf extends ProgramTransformer {
 
-    private boolean noNewBreak = true;
 
     /**
      * creates a switch-to-if ProgramTransformer
      *
-     * @param _switch the Statement contained by the meta construct
+     * @param _switch
+     *        the Statement contained by the meta construct
      */
     public SwitchToIf(SchemaVariable _switch) {
         super("switch-to-if", (ProgramSV) _switch);
@@ -48,6 +48,7 @@ public class SwitchToIf extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         Switch sw = (Switch) pe;
+
 
         VariableNamer varNamer = services.getVariableNamer();
 
@@ -62,7 +63,8 @@ public class SwitchToIf extends ProgramTransformer {
         Statement s =
             KeYJavaASTFactory.declare(name, sw.getExpression().getKeYJavaType(services, ec));
 
-        sw = changeBreaks(sw, newBreak);
+        final var changeBreakResult = changeBreaks(sw, newBreak, true);
+        sw = (Switch) changeBreakResult.result;
         Statement currentBlock = null;
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Default) {
@@ -96,7 +98,7 @@ public class SwitchToIf extends ProgramTransformer {
             // empty switch of primitive type, the expression can still have side-effects
             result = KeYJavaASTFactory.block(s, KeYJavaASTFactory.assign(exV, sw.getExpression()));
         }
-        if (noNewBreak) {
+        if (changeBreakResult.noNewBreak) {
             return new ProgramElement[] { result };
         } else {
             return new ProgramElement[] {
@@ -130,69 +132,103 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * Replaces all breaks in <code>sw</code>, whose target is sw, with <code>b</code>
      */
-    private Switch changeBreaks(Switch sw, Break b) {
+    private ChangeBreakResult changeBreaks(Switch sw, Break b, boolean noNewBreak) {
         int n = sw.getBranchCount();
         Branch[] branches = new Branch[n];
         for (int i = 0; i < n; i++) {
-            branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b);
+            final var branch = recChangeBreaks(sw.getBranchAt(i), b, noNewBreak);
+            noNewBreak = branch.noNewBreak;
+            branches[i] = (Branch) branch.result;
         }
-        return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
+        return new ChangeBreakResult(KeYJavaASTFactory.switchBlock(sw.getExpression(), branches),
+            noNewBreak);
     }
 
-    private ProgramElement recChangeBreaks(ProgramElement p, Break b) {
+    private ChangeBreakResult recChangeBreaks(ProgramElement p, Break b, boolean noNewBreak) {
         if (p == null) {
             return null;
         }
         if (p instanceof Break && ((Break) p).getLabel() == null) {
-            noNewBreak = false;
-            return b;
+            return new ChangeBreakResult(b, false);
         }
         if (p instanceof Branch) {
             Statement[] s = new Statement[((Branch) p).getStatementCount()];
             for (int i = 0; i < ((Branch) p).getStatementCount(); i++) {
-                s[i] = (Statement) recChangeBreaks(((Branch) p).getStatementAt(i), b);
+                final ChangeBreakResult r =
+                    recChangeBreaks(((Branch) p).getStatementAt(i), b, noNewBreak);
+                noNewBreak = r.noNewBreak;
+                s[i] = (Statement) r.result;
             }
             if (p instanceof Case) {
-                return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s);
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s),
+                    noNewBreak);
             }
             if (p instanceof Default) {
-                return KeYJavaASTFactory.defaultBlock(s);
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.defaultBlock(s),
+                    noNewBreak);
             }
             if (p instanceof Catch) {
-                return KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s);
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s),
+                    noNewBreak);
             }
             if (p instanceof Finally) {
-                return KeYJavaASTFactory.finallyBlock(s);
+                return new ChangeBreakResult(KeYJavaASTFactory.finallyBlock(s),
+                    noNewBreak);
             }
             if (p instanceof Then) {
-                return KeYJavaASTFactory.thenBlock(s);
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.thenBlock(s),
+                    noNewBreak);
             }
             if (p instanceof Else) {
-                return KeYJavaASTFactory.elseBlock(s);
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.elseBlock(s),
+                    noNewBreak);
             }
         }
         if (p instanceof If) {
-            return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
-                (Then) recChangeBreaks(((If) p).getThen(), b),
-                (Else) recChangeBreaks(((If) p).getElse(), b));
+            final ChangeBreakResult then = recChangeBreaks(((If) p).getThen(), b, noNewBreak);
+            noNewBreak = then.noNewBreak;
+            final ChangeBreakResult _else = recChangeBreaks(((If) p).getElse(), b, noNewBreak);
+            noNewBreak = _else.noNewBreak;
+            return new ChangeBreakResult(
+                KeYJavaASTFactory.ifElse(((If) p).getExpression(),
+                    (Then) then.result, (Else) _else.result),
+                noNewBreak);
+
         }
         if (p instanceof StatementBlock) {
             Statement[] s = new Statement[((StatementBlock) p).getStatementCount()];
             for (int i = 0; i < ((StatementBlock) p).getStatementCount(); i++) {
-                s[i] = (Statement) recChangeBreaks(((StatementBlock) p).getStatementAt(i), b);
+                final ChangeBreakResult blockStmnt =
+                    recChangeBreaks(((StatementBlock) p).getStatementAt(i), b, noNewBreak);
+                noNewBreak = blockStmnt.noNewBreak;
+                s[i] = (Statement) blockStmnt.result;
             }
-            return KeYJavaASTFactory.block(s);
+            return new ChangeBreakResult(
+                KeYJavaASTFactory.block(s),
+                noNewBreak);
         }
         if (p instanceof Try) {
             int n = ((Try) p).getBranchCount();
             Branch[] branches = new Branch[n];
             for (int i = 0; i < n; i++) {
-                branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b);
+                final ChangeBreakResult branch =
+                    recChangeBreaks(((Try) p).getBranchAt(i), b, noNewBreak);
+                noNewBreak = branch.noNewBreak;
+                branches[i] = (Branch) branch.result;
             }
-            return KeYJavaASTFactory
-                    .tryBlock((StatementBlock) recChangeBreaks(((Try) p).getBody(), b), branches);
+            final var block = recChangeBreaks(((Try) p).getBody(), b, noNewBreak);
+            noNewBreak = block.noNewBreak;
+            return new ChangeBreakResult(
+                KeYJavaASTFactory
+                        .tryBlock((StatementBlock) block.result, branches),
+                noNewBreak);
         }
-        return p;
+        return new ChangeBreakResult(p, noNewBreak);
     }
 
     /**
@@ -214,6 +250,9 @@ public class SwitchToIf extends ProgramTransformer {
             }
         }
         return KeYJavaASTFactory.block(stats);
+    }
+
+    record ChangeBreakResult(ProgramElement result, boolean noNewBreak) {
     }
 
 }

@@ -7,8 +7,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -29,7 +30,6 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
     private static final float SIZE_ICON_DOCK = 12f;
-    private static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
+    private static final Path LAYOUT_FILE =
+        PathConfig.currentPaths.keyConfigDir.resolve("layout.xml");
+
     private static final String[] LAYOUT_NAMES = { "Default", "Slot 1", "Slot 2" };
     private static final int[] LAYOUT_KEYS =
         { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };
@@ -86,8 +88,8 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 
     private static void loadLayouts(@NonNull CControl globalPort) {
         try {
-            if (LAYOUT_FILE.exists()) {
-                globalPort.readXML(LAYOUT_FILE);
+            if (Files.exists(LAYOUT_FILE)) {
+                globalPort.readXML(LAYOUT_FILE.toFile());
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to load layouts", e);
@@ -114,7 +116,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
             @Override
             public void shutDown(EventObject e) {
                 try {
-                    window.getDockControl().writeXML(LAYOUT_FILE);
+                    window.getDockControl().writeXML(LAYOUT_FILE.toFile());
                 } catch (IOException ex) {
                     LOGGER.warn("Failed to save layouts", ex);
                 }
@@ -156,7 +158,7 @@ final class SaveLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = -2646217961498111734L;
     private final String layoutName;
 
-    SaveLayoutAction(@NonNull MainWindow mainWindow, String name, @Nullable Integer key) {
+    SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Save " + name);
@@ -181,7 +183,7 @@ final class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
     private final String layoutName;
 
-    LoadLayoutAction(@NonNull MainWindow mainWindow, String name, @Nullable Integer key) {
+    LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Load " + name);
@@ -210,7 +212,7 @@ final class LoadLayoutAction extends MainWindowAction {
 final class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;
 
-    ResetLayoutAction(@NonNull MainWindow mainWindow) {
+    ResetLayoutAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Reset Layout");
         KeyStrokeManager.lookupAndOverride(this);

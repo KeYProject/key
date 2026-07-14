@@ -8,8 +8,9 @@ on:
     branches:
       - "main"
       - "KeY-*"
+      - "releases/*"
   merge_group:
-  
+
 permissions:
   contents: write
   issues: write
@@ -22,19 +23,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        java: [21]
+        os: [ ubuntu-latest, windows-latest ]
+        java: [ 21 ]
+        modules: [
+          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
+          key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
+          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
+          keyext.proofmanagement]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0
-        # with:
-        #  z3Version: 4.13.0
+        with:
+          # Pin Z3 so CI is reproducible: an unpinned solver makes the SMT-dependent tests
+          # (e.g. key.core.testgen) a moving target that fails intermittently when the action's
+          # default version changes.
+          z3Version: 4.13.0
 
       - name: z3 version
         run: z3 --version
@@ -43,30 +52,27 @@ jobs:
         run: cvc5 --version
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
+        run: ./gradlew --continue :${{ matrix.modules }}:test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.os }}
+          name: test-results-${{ matrix.os }}-${{ matrix.modules }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
             !**/jacocoTestReport.xml
-          
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
 
   integration-tests:
     env:
@@ -75,14 +81,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
-        os: [ubuntu-latest]
-        java: [21]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs ]
+        os: [ ubuntu-latest ]
+        java: [ 21 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
@@ -90,18 +96,21 @@ jobs:
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0
+        with:
+          z3Version: 4.13.0
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results-${{ matrix.test }}
           path: |
+            key.core/proofs/**        
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/

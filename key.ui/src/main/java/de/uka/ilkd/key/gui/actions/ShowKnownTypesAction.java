@@ -31,7 +31,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
 
     private final Proof proof;
 
-    public ShowKnownTypesAction(@NonNull MainWindow mainWindow, Proof proof) {
+    public ShowKnownTypesAction(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Known Types");
 

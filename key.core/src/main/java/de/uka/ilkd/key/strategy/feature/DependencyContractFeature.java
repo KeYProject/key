@@ -19,7 +19,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -32,7 +32,8 @@ public final class DependencyContractFeature extends BinaryFeature {
         for (RuleApp app : goal.appliedRuleApps()) {
             JTerm term = (JTerm) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
-                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(app.posInOccurrence().subTerm(),
+                        focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
                 for (PosInOccurrence ifInst : bapp.assumesInsts()) {
                     steps.remove(ifInst);
@@ -73,7 +74,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         }
 
         // instantiate with arbitrary remaining step
-        bapp = bapp.setAssumesInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
+        bapp = bapp.setAssumesInsts(ImmutableList.<PosInOccurrence>singleton(steps.get(0)));
         return true;
     }
 }

@@ -14,7 +14,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
@@ -73,7 +73,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 
@@ -90,7 +91,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
          */
         private final ModalityCache modalityCache = new ModalityCache();
 
-        public FilterSymbexStrategy(Strategy delegate) {
+        public FilterSymbexStrategy(Strategy<@NonNull Goal> delegate) {
             super(delegate);
         }
 

@@ -78,7 +78,7 @@ public class TermTacletAppIndex {
     private static ImmutableList<NoPosTacletApp> getFindTaclet(
             PosInOccurrence pos,
             RuleFilter filter, Services services, TacletIndex tacletIndex) {
-        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableList.nil();
         if (pos.isTopLevel()) {
             if (pos.isInAntec()) {
                 tacletInsts = tacletInsts.prepend(antecTaclet(pos, filter, services, tacletIndex));
@@ -503,10 +503,10 @@ public class TermTacletAppIndex {
             PosInOccurrence pos, RuleFilter p_filter,
             Services services) {
 
-        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        ImmutableList<TacletApp> result = ImmutableList.nil();
 
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
-            collectAllTacletAppsHereAndBelow(pos, ImmutableSLList.nil());
+            collectAllTacletAppsHereAndBelow(pos, ImmutableList.nil());
 
         for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             result = convert(pair.second, pair.first, p_filter, result, services);
@@ -526,7 +526,7 @@ public class TermTacletAppIndex {
             NewRuleListener listener) {
 
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> result =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
             collectAllTacletAppsHereAndBelow(pos, result);
 
@@ -568,7 +568,7 @@ public class TermTacletAppIndex {
      */
     private void reportTacletApps(PIOPathIterator pathToModification, NewRuleListener listener) {
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
-            collectAllTacletAppsAffectedByModification(pathToModification, ImmutableSLList.nil());
+            collectAllTacletAppsAffectedByModification(pathToModification, ImmutableList.nil());
 
         for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             fireRulesAdded(listener, pair.second, pair.first);
@@ -633,7 +633,7 @@ public class TermTacletAppIndex {
      */
     public static ImmutableList<NoPosTacletApp> filter(RuleFilter p_filter,
             ImmutableList<NoPosTacletApp> taclets) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableList.nil();
 
         for (final NoPosTacletApp app : taclets) {
             if (p_filter.filter(app.taclet())) {

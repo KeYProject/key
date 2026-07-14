@@ -14,12 +14,11 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -65,14 +64,15 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 setEnabled(haveZ3CE && proof != null);
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                final Proof proof = getMediator().getSelectedProof();
+                setEnabled(haveZ3CE && proof != null);
             }
         };
         getMediator().addKeYSelectionListener(selListener);
@@ -91,7 +91,27 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
                 getMediator().addKeYSelectionListener(selListener);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+    }
+
+    /**
+     * @return whether Z3 is installed
+     */
+    private boolean checkZ3CE() {
+        haveZ3CE = SolverTypes.Z3_CE_SOLVER.isInstalled(false);
+        if (!haveZ3CE) {
+            setEnabled(false);
+            setTooltip(TOOLTIP + TOOLTIP_EXTRA);
+        } else if (!isEnabled()) {
+            setEnabled(getMediator().getSelectedProof() != null);
+            setTooltip(TOOLTIP);
+        }
+        return haveZ3CE;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        checkZ3CE();
     }
 
     /**

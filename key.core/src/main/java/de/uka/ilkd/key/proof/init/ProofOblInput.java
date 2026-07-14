@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.jspecify.annotations.Nullable;
 
@@ -41,4 +43,11 @@ public interface ProofOblInput {
      */
     @Nullable
     KeYJavaType getContainerType();
+
+
+    /// A way to do some stuff before this obligation get stored by
+    /// [de.uka.ilkd.key.proof.io.ProofSaver].
+    default void prepareSave(StrategyProperties strategyProperties, Proof proof) {
+
+    }
 }

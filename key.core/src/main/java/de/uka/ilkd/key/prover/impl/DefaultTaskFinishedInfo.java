@@ -7,7 +7,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.TaskFinishedInfo;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  * specific information about the proof search (strategy execution, proof macros or similar).
  * </p>
  */
+@NullMarked
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
     /**
@@ -42,7 +43,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     private final Object source;
 
     // The result of the task, which can be either a Throwable or ApplyStrategyInfo.
-    private final Object result;
+    private final @Nullable Object result;
 
     // The proof the task worked on.
     private final @Nullable Proof proof;
@@ -67,8 +68,8 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * @param appliedRules The number of rules applied during the task.
      * @param closedGoals The number of goals closed during the task.
      */
-    public DefaultTaskFinishedInfo(Object source, Object result, @Nullable Proof proof, long time,
-            int appliedRules, int closedGoals) {
+    public DefaultTaskFinishedInfo(Object source, @Nullable Object result, @Nullable Proof proof,
+            long time, int appliedRules, int closedGoals) {
         this.source = source;
         this.result = result;
         this.proof = proof;
@@ -89,7 +90,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * {@inheritDoc}
      */
     @Override
-    public Object getResult() {
+    public @Nullable Object getResult() {
         return result;
     }
 
@@ -137,7 +138,13 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * @return A status message summarizing the task's execution details.
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
+        if (proof == null) {
+            // Some tasks finish without an associated proof (e.g. a load that failed before a
+            // proof was created, or a pruning/macro task with none selected). proof is nullable,
+            // so guard against it instead of throwing an NPE from the status-bar update.
+            return "No proof";
+        }
         if (proof.isDisposed()) {
             return "Proof disposed";
         }

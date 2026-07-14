@@ -13,8 +13,6 @@ import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * The information window is used to present detailed information about the execution of a solver.
@@ -123,7 +121,7 @@ public class InformationWindow extends JDialog {
 
     }
 
-    private @NonNull Component newTab(@NonNull Information information) {
+    private Component newTab(Information information) {
         final JTextPane content = new JTextPane();
         Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         content.setFont(font);

@@ -10,9 +10,9 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
@@ -30,7 +30,6 @@ import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -502,7 +501,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
         }
 
-        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
+        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableList.nil();
         for (LocationVariable heap : heapContext) {
             // weigl: prevent NPE
             JTerm modifiableTerm = modifiables.get(heap);

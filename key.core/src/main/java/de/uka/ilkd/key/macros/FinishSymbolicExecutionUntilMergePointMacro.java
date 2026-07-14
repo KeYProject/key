@@ -8,7 +8,11 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -29,7 +33,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
@@ -45,9 +49,18 @@ import org.jspecify.annotations.Nullable;
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
-    private final HashSet<ProgramElement> blockElems = new HashSet<>();
+
+    private HashSet<ProgramElement> blockElems = new HashSet<>();
     private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
-    private @Nullable UserInterfaceControl uic = null;
+
+    private UserInterfaceControl uic = null;
+
+    public FinishSymbolicExecutionUntilMergePointMacro() {
+    }
+
+    public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
+        this.blockElems = blockElems;
+    }
 
     @Override
     public String getName() {
@@ -66,16 +79,17 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-            @Nullable ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener)
             throws InterruptedException {
         this.uic = uic; // weigl: It is not appropriate to store uic in a macro.
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -169,7 +183,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
-        public FilterSymbexStrategy(Strategy delegate) {
+        public FilterSymbexStrategy(Strategy<@NonNull Goal> delegate) {
             super(delegate);
         }
 

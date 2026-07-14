@@ -8,7 +8,6 @@ import java.util.Iterator;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -42,7 +41,7 @@ class Sequent extends org.key_project.prover.sequent.Sequent {
 
             @Override
             public @NonNull Iterator<SequentFormula> iterator() {
-                return ImmutableSLList.<SequentFormula>nil().iterator();
+                return ImmutableList.<SequentFormula>nil().iterator();
             }
         };
 

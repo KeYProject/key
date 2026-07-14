@@ -12,8 +12,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-
-import org.jspecify.annotations.NonNull;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
@@ -28,6 +28,8 @@ public abstract class MainWindowAction extends KeyAction {
     private static final MainWindowActionSelectionListener LISTENER =
         new MainWindowActionSelectionListener();
 
+    protected final MainWindow mainWindow;
+
     protected final @NonNull MainWindow mainWindow;
 
     protected MainWindowAction(@NonNull MainWindow mainWindow) {
@@ -37,8 +39,7 @@ public abstract class MainWindowAction extends KeyAction {
         KeyStrokeManager.registerAction(this);
     }
 
-    protected MainWindowAction(@NonNull MainWindow mainWindow,
-            boolean onlyActiveWhenProofAvailable) {
+    protected MainWindowAction(MainWindow mainWindow, boolean onlyActiveWhenProofAvailable) {
         this(mainWindow);
         if (onlyActiveWhenProofAvailable) {
             LISTENER.addAction(this);
@@ -67,7 +68,7 @@ public abstract class MainWindowAction extends KeyAction {
     private static final class MainWindowActionSelectionListener implements KeYSelectionListener {
         private final Collection<MainWindowAction> actions = new ArrayList<>();
 
-        private void addAction(@NonNull MainWindowAction action) {
+        private void addAction(MainWindowAction action) {
             if (actions.isEmpty()) {
                 action.getMediator().addKeYSelectionListener(this);
             }
@@ -75,14 +76,15 @@ public abstract class MainWindowAction extends KeyAction {
         }
 
         @Override
-        public void selectedNodeChanged(@NonNull KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             var enable = e.getSource().getSelectedProof() != null;
             actions.forEach(a -> a.setEnabled(enable));
         }
 
         @Override
-        public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
-            selectedNodeChanged(e);
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            var enable = e.getSource().getSelectedProof() != null;
+            actions.forEach(a -> a.setEnabled(enable));
         }
     }
 }

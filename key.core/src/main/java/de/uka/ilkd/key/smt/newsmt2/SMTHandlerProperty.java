@@ -7,8 +7,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * SMT handler properties are properties for the new modular smt handler.
  *

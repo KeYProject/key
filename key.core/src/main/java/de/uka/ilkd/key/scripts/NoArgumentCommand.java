@@ -5,24 +5,17 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
-import org.jspecify.annotations.NonNull;
-
-/**
- * @author Alexander Weigl
- * @version 1 (28.03.17)
- */
-public abstract class NoArgumentCommand implements ProofScriptCommand<@NonNull Void> {
+/// Base class for proof script commands that do not accept any arguments.
+/// Simplifies implementation by providing an empty argument list.
+///
+/// @author Alexander Weigl
+/// @version 1 (28.03.17)
+public abstract class NoArgumentCommand implements ProofScriptCommand {
     @Override
-    public @NonNull List<ProofScriptArgument<@NonNull Void>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public Void evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return null;
     }
 }

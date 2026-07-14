@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -127,45 +126,37 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         });
     }
 
-    protected PropertyEntry<Double> createDoubleProperty(
-            @UnknownInitialization AbstractPropertiesSettings this,
-            String key, double defValue) {
-        PropertyEntry<Double> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseDouble, (it) -> (double) it);
+    protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
+        PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble,
+            (it) -> ((Number) it).doubleValue());
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Integer> createIntegerProperty(
-            @UnknownInitialization AbstractPropertiesSettings this,
-            String key, int defValue) {
+    protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
+        // A stored numeric value may deserialize as Integer or Long depending on its magnitude and
+        // the settings format, so accept any Number rather than assuming a particular boxed type.
         PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
-            (it) -> Math.toIntExact((Long) it));
+            (it) -> Math.toIntExact(((Number) it).longValue()));
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Float> createFloatProperty(
-            @UnknownInitialization AbstractPropertiesSettings this,
-            String key, float defValue) {
-        PropertyEntry<Float> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseFloat, (it) -> (float) (double) it);
+    protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
+        PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat,
+            (it) -> ((Number) it).floatValue());
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<String> createStringProperty(
-            @UnknownInitialization AbstractPropertiesSettings this,
-            String key, String defValue) {
+    protected PropertyEntry<String> createStringProperty(String key, String defValue) {
         PropertyEntry<String> pe =
             new DefaultPropertyEntry<>(key, defValue, id -> id, Object::toString);
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Boolean> createBooleanProperty(
-            @UnknownInitialization AbstractPropertiesSettings this,
-            String key, boolean defValue) {
+    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
         PropertyEntry<Boolean> pe =
             new DefaultPropertyEntry<>(key, defValue, parseBoolean, (it) -> (Boolean) it);
         propertyEntries.add(pe);

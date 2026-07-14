@@ -3,31 +3,31 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -42,10 +42,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +56,10 @@ public class MethodCall extends ProgramTransformer {
 
     protected MethodReference methRef;
     private IProgramMethod pm;
-    protected @Nullable ReferencePrefix newContext;
-    protected @Nullable ProgramVariable pvar;
+    protected ReferencePrefix newContext;
+    protected ProgramVariable pvar;
     private final IExecutionContext execContextSV;
-    private @Nullable ExecutionContext execContext;
+    private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
     protected @Nullable KeYJavaType staticPrefixType;
 
@@ -110,9 +107,9 @@ public class MethodCall extends ProgramTransformer {
     }
 
     /** gets an array of expression and returns a list of types */
-    private @NonNull ImmutableList<KeYJavaType> getTypes(@NonNull ImmutableArray<Expression> args,
-            @NonNull Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
+    private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
+            Services services) {
+        ImmutableList<KeYJavaType> result = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result =
@@ -197,8 +194,8 @@ public class MethodCall extends ProgramTransformer {
      * @return the transformed program
      */
     @Override
-    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-            @NonNull SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
         LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
@@ -282,7 +279,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleInstanceInvocation(@NonNull Services services, Statement result) {
         if (pm.isPrivate() || (methRef.implicit() && methRef.getName()
-                .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+                .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
             LOGGER.trace("method-call: invocation of private method detected."

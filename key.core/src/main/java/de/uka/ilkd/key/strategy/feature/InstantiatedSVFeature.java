@@ -11,17 +11,21 @@ import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
  * not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+ *
+ * <p>
+ * {@link StableCost}: the instantiation is read from the rule application's own instantiations, not
+ * from the goal, so the result is fixed for a given application.
  */
+@StableCost
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
-    private final @NonNull ProjectionToTerm<Goal> instProj;
+    private final ProjectionToTerm<Goal> instProj;
 
     public static @NonNull Feature create(Name svName) {
         return new InstantiatedSVFeature(svName);

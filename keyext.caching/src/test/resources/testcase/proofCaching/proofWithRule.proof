@@ -3,7 +3,6 @@
     \lemma
     two_plus_two_is_four {
         \find(2 + 2 = 4)
-        \sameUpdateLevel
         \replacewith(true)
     };
     }

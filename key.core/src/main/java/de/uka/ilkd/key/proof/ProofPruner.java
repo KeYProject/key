@@ -7,13 +7,13 @@ import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is responsible for pruning a proof tree at a certain cutting point. It has been
@@ -36,6 +36,20 @@ class ProofPruner {
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {
+        // special case: prune cached goal = only need to re-open the final node
+        ClosedBy cby = cuttingPoint.lookup(ClosedBy.class);
+        if (cby != null) {
+            Goal goal = proof.getClosedGoal(cuttingPoint);
+            if (goal == null) {
+                throw new IllegalStateException("Something went wrong: Node " + cuttingPoint.name()
+                    + " has ClosedBy registered, but no corresponding goal!");
+            }
+
+            cuttingPoint.deregister(cby, ClosedBy.class);
+            proof.reOpenGoal(goal);
+            refreshGoal(goal, cuttingPoint);
+            return ImmutableList.of(cuttingPoint);
+        }
 
         // there is only one leaf containing an open goal that is interesting for pruning the
         // subtree of <code>node</code>, namely the first leave that is found by a breadth
@@ -68,8 +82,16 @@ class ProofPruner {
 
             if (initConfig != null && visitedNode.parent() != null) {
                 proof.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                for (final NoPosTacletApp app : visitedNode.parent()
-                        .getLocalIntroducedRules()) {
+            }
+            // Deregister taclets that were locally introduced (e.g. via \addrules) in the pruned
+            // subtree. These are stored on the node at which they were introduced, so we must
+            // iterate the node itself rather than its parent: otherwise taclets introduced at a
+            // leaf of a branch other than firstLeaf are never deregistered (the parent-based loop
+            // only ever reaches the introduced rules of nodes that have a child in the subtree).
+            // The cutting point itself survives the pruning, so its locally introduced rules are
+            // kept.
+            if (initConfig != null && visitedNode != cuttingPoint) {
+                for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
                     initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                 }
             }
@@ -161,7 +183,7 @@ class ProofPruner {
     }
 
     private ImmutableList<Node> cut(Node node) {
-        ImmutableList<Node> children = ImmutableSLList.nil();
+        ImmutableList<Node> children = ImmutableList.nil();
         Iterator<Node> it = node.childrenIterator();
 
         while (it.hasNext()) {

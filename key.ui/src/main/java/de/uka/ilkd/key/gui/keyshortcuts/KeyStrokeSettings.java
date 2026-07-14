@@ -5,11 +5,10 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -22,8 +21,6 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,31 +29,19 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
 
 /**
  * Class for storing and retrieving {@link KeyStroke}s.
- *
+ * <p>
  * If possible, define the keyboard shortcuts in the static block here. By that, it is easier to
  * detect and prevent possible duplicates. In addition, be careful to avoid combinations that are
  * used by the docking framework, such as Ctrl+E or Ctrl+M.
  *
  * @author Alexander Weigl, Wolfram Pfeifer (overhaul, v2)
- * @version 1 (09.05.19)
  * @version 2 (04.08.23)
  */
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
-    /**
-     * filename of the properties file
-     */
-    public static final String SETTINGS_FILENAME = "keystrokes.properties";
-
-    /**
-     * path of the properties file
-     */
-    public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
-    private static final File SETTINGS_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
-
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
+    /// path of the properties file
+    public static final Path SETTINGS_FILE = PathConfig.getSettingsFile("keystrokes.json");
 
     /**
      * singleton instance
@@ -66,7 +51,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * default {@link KeyStroke}s
      */
-    private static @NonNull Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
+    private static Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
 
     // define the default mappings
     static {
@@ -131,7 +116,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyEvent.VK_F1, 0);
     }
 
-    private KeyStrokeSettings(@NonNull Properties init) {
+    private KeyStrokeSettings(Properties init) {
         super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
@@ -143,7 +128,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    public KeyStrokeSettings(@NonNull Configuration config) {
+    public KeyStrokeSettings(Configuration config) {
         super("");
         this.properties.putAll(DEFAULT_KEYSTROKES);
         readSettings(config);
@@ -151,41 +136,43 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    public static <T> void defineDefault(@NonNull T any, @NonNull KeyStroke ks) {
+    public static <T> void defineDefault(T any, KeyStroke ks) {
         defineDefault(any.getClass(), ks);
     }
 
-    public static <T> void defineDefault(@NonNull Class<T> clazz, @NonNull KeyStroke ks) {
+    public static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
         DEFAULT_KEYSTROKES.put(clazz.getName(), ks.toString());
     }
 
     // convenience method to make the definitions above better readable
-    private static <T> void defineDefault(@NonNull Class<T> clazz, int keyCode, int modifiers) {
+    private static <T> void defineDefault(Class<T> clazz, int keyCode, int modifiers) {
         defineDefault(clazz, KeyStroke.getKeyStroke(keyCode, modifiers));
     }
 
-    private static @NonNull KeyStrokeSettings loadFromConfig() {
-        return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+    private static KeyStrokeSettings loadFromConfig() {
+        return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE.toFile()));
     }
 
-    public static @NonNull KeyStrokeSettings getInstance() {
-
+    public static KeyStrokeSettings getInstance() {
         if (INSTANCE == null) {
-            if (SETTINGS_FILE.exists()) {
+            if (Files.exists(SETTINGS_FILE)) {
                 try {
-                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
-                    return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE_NEW));
+                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE);
+                    return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE));
                 } catch (IOException e) {
-                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                    LOGGER.error("Could not read {}", SETTINGS_FILE, e);
+                    return INSTANCE = new KeyStrokeSettings(new Properties());
                 }
+            } else {
+                // if no settings file exists, initialise with default settings
+                return INSTANCE = new KeyStrokeSettings(new Properties());
             }
-            return INSTANCE = loadFromConfig();
         }
         return INSTANCE;
     }
 
     @Override
-    public void readSettings(@NonNull Properties props) {
+    public void readSettings(Properties props) {
         props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 
@@ -209,17 +196,17 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
-        SETTINGS_FILE.getParentFile().mkdirs();
-        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-            Properties props = new Properties();
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                props.setProperty(entry.getKey(), entry.getValue().toString());
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
+        try {
+            Files.createDirectories(SETTINGS_FILE.getParent());
+            LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
+            try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE)) {
+                var config = new Configuration(properties);
+                config.save(writer, "KeY's KeyStrokes");
+                writer.flush();
             }
-            props.store(writer, "KeY's KeyStrokes");
-            writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Failed to save", ex);
         }
 
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.getAbsolutePath());

@@ -38,7 +38,10 @@ public class PrintFeature implements Feature {
             PosInOccurrence pos, Goal goal,
             MutableState mState) {
         RuleAppCost cost = f.computeCost(app, pos, goal, mState);
-        LOGGER.debug("{}:{}:{}{}", prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "",
+        System.out.println(
+            prefix + ":" + cost.toString() + ":" + (pos != null ? pos.subTerm() + ":" : "") + ":" +
+                app.rule().name());
+        LOGGER.debug("{}:{}:{}{}", prefix, cost, pos != null ? pos.subTerm() + ":" : "",
             app.rule().name());
         return cost;
     }

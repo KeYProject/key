@@ -11,7 +11,8 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
+import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Test;
 
@@ -110,7 +111,7 @@ public class TestSearchNodeReversePreorderIterator {
      */
     protected void assertRoot(Node root) {
         NodePreorderIterator iter = new NodePreorderIterator(root);
-        ImmutableList<Node> reverseList = ImmutableSLList.nil();
+        ImmutableList<Node> reverseList = ImmutableList.nil();
         while (iter.hasNext()) {
             Node next = iter.next();
             reverseList = reverseList.prepend(next);
@@ -131,7 +132,7 @@ public class TestSearchNodeReversePreorderIterator {
         while (reverseIter.hasPrevious()) {
             Node previous = reverseIter.previous();
             assertEquals(previous, expectedReverseList.head());
-            expectedReverseList = expectedReverseList.take(1); // Remove head
+            expectedReverseList = expectedReverseList.tail(); // Remove head
         }
         assertTrue(expectedReverseList.isEmpty(),
             "Reverse still contains " + expectedReverseList.size() + " elements.");

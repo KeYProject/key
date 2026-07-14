@@ -12,8 +12,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
  * condition in form of a JavaDL formula.

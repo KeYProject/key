@@ -9,6 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jspecify.annotations.Nullable;
 
 
+
+/// WEIGL: These classes are redundant with {@link PropertyEntry}
+/// {@link PropertyEntry} is also prepared for {@link Configuration} which provides
+/// a type safe access.
 public interface Properties {
 
     final class Property<T> {
@@ -41,12 +45,12 @@ public interface Properties {
     }
 
     interface PropertyListener {
-        <T> void propertyChanged(Property<T> property, @Nullable T oldValue, T newValue);
+        <T> void propertyChanged(Property<T> property, T oldValue, T newValue);
     }
 
     <T> void put(Property<T> property, T value);
 
-    <T> @Nullable T get(Property<T> property);
+    <T> T get(Property<T> property);
 
     <T> void remove(Property<T> property);
 

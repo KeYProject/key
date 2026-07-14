@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 
 import org.key_project.proofmanagement.io.Logger;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on
  * which contracts to be proven.

@@ -105,7 +105,7 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public @Nullable Path readBootClassPath() {
+    public Path readBootClassPath() {
         return null;
     }
 
@@ -149,7 +149,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof LDTInput li)) {
             return false;
         }
@@ -194,7 +194,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public @Nullable Path getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

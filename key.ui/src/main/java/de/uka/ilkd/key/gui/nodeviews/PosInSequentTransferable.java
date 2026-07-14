@@ -13,8 +13,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +39,7 @@ public class PosInSequentTransferable implements Transferable {
     }
 
     /** the highlighted position in the sequentview to be transferred */
-    private final @NonNull PosInSequent pis;
+    private final PosInSequent pis;
 
     /** the highlighted term as parseable string */
     private String stringSelection;

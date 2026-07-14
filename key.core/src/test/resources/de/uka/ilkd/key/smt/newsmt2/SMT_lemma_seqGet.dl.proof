@@ -47,7 +47,7 @@
   \forall Seq s;
     (   lt(i, Z(0(#)))
       | geq(i, seqLen(s))
-     -> any::seqGet(s, i)<<Trigger>> = seqGetOutside)
+     -> seqGet<[any]>(s, i)<<Trigger>> = seqGetOutside)
 
 }
 

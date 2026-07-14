@@ -11,8 +11,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Toggles the tooltips of the proof tree.
  *
@@ -31,7 +29,7 @@ public class ToggleProofTreeTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleProofTreeTooltipAction(@NonNull MainWindow mainWindow) {
+    public ToggleProofTreeTooltipAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -52,7 +50,7 @@ public class ToggleProofTreeTooltipAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(@NonNull ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setShowProofTreeTooltips(selected);

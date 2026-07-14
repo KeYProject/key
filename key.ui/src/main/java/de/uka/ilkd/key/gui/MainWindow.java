@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -21,6 +22,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -52,19 +54,19 @@ import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.settings.FeatureSettings;
-import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.macros.DefaultAutoMacro;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
@@ -75,7 +77,10 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +101,7 @@ public final class MainWindow extends JFrame {
      * Tooltip for auto mode button.
      */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-    private static final long serialVersionUID = 5853419918923902636L;
+
     private static final String PARA =
         "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
@@ -236,6 +241,7 @@ public final class MainWindow extends JFrame {
     private ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
+    private DropdownSelectionButton automationComponent;
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
@@ -279,6 +285,12 @@ public final class MainWindow extends JFrame {
     private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
         new LruCached<>(HTMLSyntaxHighlighter.Args::run);
 
+    /**
+     * List of automation actions for the dropdown button.
+     * To add new automation modes, add them to {@link #createAutomationActions()}.
+     */
+    private final List<Action> automationActions;
+
     /*
      * This class should only be instantiated once!
      */
@@ -294,7 +306,6 @@ public final class MainWindow extends JFrame {
         if (!applyTaskbarIcon()) {
             applyMacOsWorkaround();
         }
-        setLaF();
         setIconImages(IconFactory.applicationLogos());
 
 
@@ -312,18 +323,34 @@ public final class MainWindow extends JFrame {
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
-        proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
         mainFrame = new MainFrame(this, emptySequent);
         sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
+        proofListView = new JScrollPane(proofList);
+
         notificationManager = new NotificationManager(mediator, this);
-        recentFileMenu = new RecentFileMenu(mediator);
+        recentFileMenu = new RecentFileMenu(this);
+        // Postpone load for faster UI creation.
+        SwingUtilities.invokeLater(recentFileMenu::loadEntries);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView(this, mediator);
+        infoView = new InfoView(mediator);
         strategySelectionView = new StrategySelectionView(this, mediator);
         openGoalsView = new GoalList(mediator);
+
+        // Initialize automation actions
+        automationActions = createAutomationActions();
+
+        // Register keyboard shortcut for default automation action (Ctrl+Space)
+        if (!automationActions.isEmpty()) {
+            Action defaultAction = automationActions.get(0);
+            KeyStroke accelerator = (KeyStroke) defaultAction.getValue(Action.ACCELERATOR_KEY);
+            if (accelerator != null) {
+                inputMap.put(accelerator, "defaultAutomation");
+                getRootPane().getActionMap().put("defaultAutomation", defaultAction);
+            }
+        }
 
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -389,8 +416,11 @@ public final class MainWindow extends JFrame {
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
             LOGGER.error(
-                "Error: KeY started in graphical mode, " + "but no graphical environment present.");
-            LOGGER.error("Please use the --auto option to start KeY in batch mode.");
+                "Error: KeY started in graphical mode, but no graphical environment present or supported.");
+            LOGGER.error(
+                "If this is unexpected, ensure that you are not using a headless version of Java " +
+                    "(or force windowed mode with java parameter -Djava.awt.headless=false).");
+            LOGGER.error("Otherwise, please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
         }
@@ -403,13 +433,43 @@ public final class MainWindow extends JFrame {
             }
             return instance;
         }
+
         if (instance == null) {
+            updateLookAndFeel();
             instance = new MainWindow();
+            final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+            final PropertyChangeListener propertyChangeListener = (evt) -> updateLookAndFeel();
+            viewSettings.addPropertyChangeListener(
+                ViewSettings.PROP_DEFAULT_LOOK_AND_FEEL_DECORATED, propertyChangeListener);
+            viewSettings.addPropertyChangeListener(
+                ViewSettings.PROP_LOOK_AND_FEEL, propertyChangeListener);
+
             if (ensureIsVisible) {
                 instance.setVisible(true);
             }
         }
         return instance;
+    }
+
+    private static void updateLookAndFeel() {
+        final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        String laf = viewSettings.getLookAndFeel();
+        try {
+            UIManager.setLookAndFeel(laf);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+            FlatLightLaf.setup();
+        }
+
+        if (SystemInfo.isLinux) {
+            // enable custom window decorations
+            JFrame.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
+            JDialog.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
+        }
+
+        for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+        }
     }
 
     /**
@@ -442,36 +502,12 @@ public final class MainWindow extends JFrame {
      */
     private void applyGnomeWorkaround() {
         Toolkit xToolkit = Toolkit.getDefaultToolkit();
-        java.lang.reflect.Field awtAppClassNameField;
+        Field awtAppClassNameField;
         try {
             awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
             awtAppClassNameField.setAccessible(true);
             awtAppClassNameField.set(xToolkit, "KeY");
-        } catch (Exception e) {
-        }
-    }
-
-    /**
-     * Tries to set the configured look and feel if the option is activated.
-     */
-    private void setLaF() {
-        try {
-            String className =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
-            // only set look and feel if configured
-            // (previous KeY versions stored [no value set] as "null")
-            if (className != null && !className.equals("null")) {
-                UIManager.setLookAndFeel(className);
-
-                // Workarounds for GTK+
-                // TODO: check whether they apply to other LaFs
-                UIManager.put("Slider.paintValue", Boolean.FALSE);
-                UIManager.put("Menu.background", Color.GRAY); // menu background is still white....
-
-                SwingUtilities.updateComponentTreeUI(this);
-            }
-        } catch (Exception e) {
-            LOGGER.error("failed to set look and feel ", e);
+        } catch (Exception ignored) {
         }
     }
 
@@ -573,29 +609,10 @@ public final class MainWindow extends JFrame {
 
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
-        proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
-        GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
+        proofListView.setPreferredSize(new Dimension(350, 100));
+        proofListView.setBorder(new TitledBorder("Proofs"));
 
-        // JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView,
-        // mainWindowTabbedPane);
-        // leftPane.setName("leftPane");
-        // leftPane.setOneTouchExpandable(true);
-
-        // JPanel rightPane = new JPanel();
-        // rightPane.setLayout(new BorderLayout());
-        // rightPane.add(mainFrame, BorderLayout.CENTER);
         mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
-
-        // JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
-        // pane.setResizeWeight(0.5);
-        // pane.setOneTouchExpandable(true);
-        // pane.setName("split2");
-
-        // JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
-        // splitPane.setResizeWeight(0); // the right pane is more important
-        // splitPane.setOneTouchExpandable(true);
-        // splitPane.setName("splitPane");
-        // getContentPane().add(splitPane, BorderLayout.CENTER);
 
         dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
 
@@ -658,7 +675,9 @@ public final class MainWindow extends JFrame {
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
-        toolBar.add(createWiderAutoModeButton());
+        DropdownSelectionButton autoComp = createAutomationComponent();
+        toolBar.add(autoComp.getActionComponent());
+        toolBar.add(autoComp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
@@ -754,9 +773,93 @@ public final class MainWindow extends JFrame {
         return smtComponent;
     }
 
-    private JComponent createWiderAutoModeButton() {
-        JButton b = new JButton(autoModeAction);
-        b.putClientProperty("hideActionText", Boolean.TRUE);
+    // @formatter:off
+    /**
+     * Creates the list of automation actions for the dropdown button.
+     * <p>
+     * The first action in the list is the default and will be triggered by the {@code Ctrl+Space}
+     * keyboard shortcut. Actions are displayed in the dropdown menu in the order they are added.
+     * </p>
+     * <p>
+     * To add new automation modes, simply add them to this list. No configuration file or service
+     * loader is needed. For macro-based automations, use {@link MacroAutomationAction}. For custom
+     * behaviors, extend {@link MainWindowAction}.
+     * </p>
+     * <p>
+     * Example:
+     *
+     * <pre>
+     * {@code
+     * actions.add(new MacroAutomationAction(this,
+     *     new YourCustomMacro(),
+     *     "Your Automation Name",
+     *     IconFactory.yourIcon(TOOLBAR_ICON_SIZE)));
+     * }
+     * </pre>
+     * </p>
+     *
+     * @return list of automation actions
+     * @see MacroAutomationAction
+     * @see AutoModeAction
+     */
+    // @formatter:on
+    private List<Action> createAutomationActions() {
+        return List.of(
+            new MacroAutomationAction(this,
+                new DefaultAutoMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "A")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.FullAutoPilotProofMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "S")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P"))
+        // when it is finished ... new MacroAutomationAction(this ... ScriptMacro ... "J" (*J*ML
+        // scripts)
+        );
+    }
+
+    /**
+     * Create the automation component dropdown button.
+     * This replaces the old auto mode button with a configurable dropdown selector.
+     *
+     * @return the automation {@link DropdownSelectionButton}
+     */
+    private DropdownSelectionButton createAutomationComponent() {
+        automationComponent = new DropdownSelectionButton(TOOLBAR_ICON_SIZE);
+
+        // Convert list to array
+        Action[] actionArray = automationActions.toArray(new Action[0]);
+
+        // Identity reducer - just return the single selected action
+        Function<Action[], Action> identityReducer = a -> {
+            if (a.length == 0) {
+                return null;
+            }
+            return a[0];
+        };
+
+        // Set items with single selection (maxChoiceAmount = 1)
+        automationComponent.setItems(actionArray, identityReducer, 1);
+
+        // Add change listener to update enabled state based on proof status
+        automationComponent.addListener(e -> {
+            Proof proof = mediator.getSelectedProof();
+            boolean hasProof = proof != null && !proof.closed();
+            automationComponent.setEnabled(hasProof);
+        });
+
+        // Initialize enabled state
+        Proof initialProof = mediator.getSelectedProof();
+        automationComponent.setEnabled(initialProof != null && !initialProof.closed());
+
+        automationComponent.getActionComponent().putClientProperty("hideActionText", Boolean.TRUE);
+        automationComponent.getActionComponent().putClientProperty("isAutoButton", Boolean.TRUE);
+
+        return automationComponent;
+    }
+
+    private JComponent createWiderAutoModeButton(JComponent b) {
         // the following rigmarole is to make the button slightly wider
         JPanel p = new JPanel();
         p.setLayout(new GridBagLayout());
@@ -846,7 +949,7 @@ public final class MainWindow extends JFrame {
         SwingUtilities.invokeLater(this::updateSequentView);
     }
 
-    private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    private void addToProofList(ProofAggregate plist) {
         proofList.addProof(plist);
         // TODO/Check: the code below emulates phantom actions. Check if this can be solved
         // differently
@@ -857,9 +960,6 @@ public final class MainWindow extends JFrame {
         for (Proof proof : plist.getProofs()) {
             new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
         }
-        // GUI
-        proofList.setSize(proofList.getPreferredSize());
-        proofListView.setViewportView(proofList);
     }
 
     /**
@@ -975,7 +1075,12 @@ public final class MainWindow extends JFrame {
         proof.setMnemonic(KeyEvent.VK_P);
 
         if (selected == null) {
-            proof.add(autoModeAction);
+            JMenu automationMenu = new JMenu("Automation");
+            for (Action action : automationActions) {
+                JMenuItem item = new JMenuItem(action);
+                automationMenu.add(item);
+            }
+            proof.add(automationMenu);
             GoalBackAction goalBack = new GoalBackAction(this, true);
             proof.addMenuListener(new MenuListener() {
                 @Override
@@ -1054,6 +1159,7 @@ public final class MainWindow extends JFrame {
         help.add(new KeYProjectHomepageAction(this));
         // help.add(new SystemInfoAction(this));
         help.add(new MenuSendFeedackAction(this));
+        help.add(new CreateGithubIssueAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -1183,7 +1289,7 @@ public final class MainWindow extends JFrame {
         return currentGoalView;
     }
 
-    public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public void addProblem(final ProofAggregate plist) {
         Runnable guiUpdater = () -> {
             disableCurrentGoalView = true;
             addToProofList(plist);
@@ -1395,14 +1501,22 @@ public final class MainWindow extends JFrame {
     /**
      * A file to the menu of recent opened files.
      *
-     * @see RecentFileMenu#addRecentFile(String)
+     * @see RecentFileMenu#addRecentFile(String, Profile, boolean, Configuration)
      */
-    public void addRecentFile(@NonNull String absolutePath) {
-        recentFileMenu.addRecentFile(absolutePath);
+    public void addRecentFile(@NonNull String absolutePath,
+            @Nullable Profile profile,
+            boolean singleJava,
+            @Nullable Configuration additionalOption) {
+        recentFileMenu.addRecentFile(absolutePath, profile, singleJava, additionalOption);
     }
 
     public void openExamples() {
         openExampleAction.actionPerformed(null);
+    }
+
+    /// @see WindowUserInterfaceControl#loadProblem(Path, Consumer)
+    public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
+        getUserInterface().loadProblem(file, configure);
     }
 
     public void loadProblem(Path file) {
@@ -1599,10 +1713,17 @@ public final class MainWindow extends JFrame {
                 Component component = SwingUtilities.getDeepestComponentAt(contentPane,
                     containerPoint.x, containerPoint.y);
 
-                if (eventID == MouseEvent.MOUSE_PRESSED && isLiveComponent(component)) {
-                    currentComponent = component;
-                    dispatchForCurrentComponent(e);
+                if (isLiveComponent(component)) {
+                    if (eventID == MouseEvent.MOUSE_PRESSED) {
+                        currentComponent = component;
+                        dispatchForCurrentComponent(e);
+                    }
+                    glassPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    glassPane.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 }
+
+
             }
         }
 
@@ -1611,8 +1732,8 @@ public final class MainWindow extends JFrame {
             // this is not the most elegant way to identify the right
             // components, but it scales well ;-)
             while (c != null) {
-                if ((c instanceof JComponent)
-                        && AUTO_MODE_TEXT.equals(((JComponent) c).getToolTipText())) {
+                if (c instanceof JComponent jc
+                        && jc.getClientProperty("isAutoButton") == Boolean.TRUE) {
                     return true;
                 }
                 c = c.getParent();
@@ -1739,7 +1860,7 @@ public final class MainWindow extends JFrame {
          * focused node has changed
          */
         @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             if (disableCurrentGoalView) {
                 return;
             }
@@ -1750,7 +1871,7 @@ public final class MainWindow extends JFrame {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             if (disableCurrentGoalView) {
                 return;
             }
@@ -1805,19 +1926,21 @@ public final class MainWindow extends JFrame {
         }
 
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            handleProof(e.getSource().getSelectedProof());
+        }
 
-            if (e.getSource().getSelectedProof() != null) {
-                enable(!e.getSource().getSelectedProof().closed());
+        private void handleProof(Proof p) {
+            if (p != null) {
+                enable(!p.closed());
             } else {
                 enable(false);
             }
-
         }
 
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-            selectedProofChanged(e);
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
+            handleProof(e.getSource().getSelectedProof());
         }
 
     }

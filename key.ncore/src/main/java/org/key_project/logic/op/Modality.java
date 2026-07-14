@@ -41,10 +41,10 @@ public abstract class Modality extends AbstractSortedOperator {
     @Override
     public SyntaxElement getChild(int n) {
         return switch (n) {
-        case 0 -> kind;
-        case 1 -> programBlock();
-        default -> throw new IndexOutOfBoundsException(
-            "Modality " + name() + " has only two children");
+            case 0 -> kind;
+            case 1 -> programBlock();
+            default -> throw new IndexOutOfBoundsException(
+                "Modality " + name() + " has only two children");
         };
     }
 

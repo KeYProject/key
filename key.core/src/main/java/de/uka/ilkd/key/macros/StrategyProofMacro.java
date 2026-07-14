@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -22,7 +21,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros which use their own
@@ -40,8 +39,7 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy<Goal> createStrategy(Proof proof,
-            @Nullable PosInOccurrence posInOcc);
+    protected abstract Strategy<Goal> createStrategy(Proof proof, PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -53,7 +51,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            @Nullable PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -108,7 +106,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         // set a new strategy.
-        Strategy oldStrategy = proof.getActiveStrategy();
+        Strategy<@NonNull Goal> oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
         ProofMacroFinishedInfo info;

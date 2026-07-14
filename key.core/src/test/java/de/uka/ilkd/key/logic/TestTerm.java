@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
@@ -14,10 +14,12 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,7 +108,7 @@ public class TestTerm {
         JTerm t_allxt1 = tb.all(x, t2());
         JTerm t_allxt1_andt2 = tf.createTerm(Junctor.AND, t_allxt1, t1());
         JTerm t_exw_allxt1_andt2 =
-            tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x), t_allxt1_andt2);
+            tb.ex(ImmutableList.of(w, x), t_allxt1_andt2);
         assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
                 && !t_exw_allxt1_andt2.freeVars().contains(x));
     }

@@ -7,6 +7,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -16,13 +18,17 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+/**
+ * Command to invoke an SMT solver on the current goal(s).
+ *
+ * See Parameters for documentation.
+ */
+public class SMTCommand extends AbstractCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTCommand.class);
 
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
@@ -31,7 +37,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         super(SMTCommandArguments.class);
     }
 
-    private static @NonNull Map<String, SolverType> computeSolverMap() {
+    private static Map<String, SolverType> computeSolverMap() {
         Map<String, SolverType> result = new HashMap<>();
 
         for (SolverType type : SolverTypes.getSolverTypes()) {
@@ -41,12 +47,6 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         return Collections.unmodifiableMap(result);
     }
 
-    @Override
-    public SMTCommandArguments evaluateArguments(@NonNull EngineState state,
-            Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
-    }
 
     @Override
     public @NonNull String getName() {
@@ -54,15 +54,16 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public void execute(@NonNull SMTCommandArguments args)
-            throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(new SMTCommandArguments(), params);
+
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
         if (args.all) {
             goals = state.getProof().openGoals();
         } else {
-            goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
 
         for (Goal goal : goals) {
@@ -91,7 +92,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = SMTRuleApp.RULE.createApp(args.solver);
+                IBuiltInRuleApp app = SMTRule.INSTANCE.createApp(args.solver);
                 app = app.tryToInstantiate(problem.getGoal());
                 problem.getGoal().apply(app);
             }
@@ -114,15 +115,25 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         return new SolverTypeCollection(value, 1, types);
     }
 
+    @Documentation(category = "Fundamental", value = """
+            The smt command invokes an SMT solver on the current goal(s).
+            By default, it uses the Z3 solver on the first open automatic goal.
+            If the option 'all' is given, it runs on all open goals.
+            If the option 'solver' is given, it uses the specified solver(s) instead of Z3.
+            Multiple solvers can be specified by separating their names with commas.
+            The available solvers depend on your system: KeY supports at least z3, cvc5.
+            """)
     public static class SMTCommandArguments {
         @Option("solver")
         public @NonNull String solver = "Z3";
 
-        @Option(value = "all", required = false)
+        @Deprecated
+        @Flag(value = "all")
+        @Documentation("*Deprecated!* Apply the command on all open goals instead of only the first open automatic goal.")
         public boolean all = false;
 
-        @Option(value = "timeout", required = false)
-        public int timeout = -1;
+        @Option(value = "timeout")
+        public @Nullable int timeout = -1;
     }
 
     private static class TimerListener implements SolverLauncherListener {

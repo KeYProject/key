@@ -30,11 +30,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -78,13 +74,13 @@ public class MergePartnerSelectionDialog extends JDialog {
     private @Nullable Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private @Nullable SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
+    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private @Nullable MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
 
     /** The chosen distinguishing formula */
-    private @Nullable JTerm chosenDistForm = null;
+    private JTerm chosenDistForm = null;
 
     private @Nullable JEditorPane txtPartner1 = null;
     private @Nullable JEditorPane txtPartner2 = null;
@@ -304,8 +300,9 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param candidates Potential merge candidates.
      * @param services The services object.
      */
-    public MergePartnerSelectionDialog(@NonNull Goal mergeGoal, @NonNull PosInOccurrence pio,
-            @NonNull ImmutableList<MergePartner> candidates, Services services) {
+    public MergePartnerSelectionDialog(Goal mergeGoal,
+            PosInOccurrence pio,
+            ImmutableList<MergePartner> candidates, Services services) {
 
         this();
         this.services = services;
@@ -328,8 +325,8 @@ public class MergePartnerSelectionDialog extends JDialog {
     /**
      * @return All chosen merge partners.
      */
-    public @NonNull ImmutableList<MergePartner> getChosenCandidates() {
-        ImmutableSLList<MergePartner> result = ImmutableSLList.nil();
+    public ImmutableList<MergePartner> getChosenCandidates() {
+        ImmutableList<MergePartner> result = ImmutableList.nil();
 
         if (chosenGoals != null) {
             return result.append(chosenGoals);
@@ -355,7 +352,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return The chosen distinguishing formula. If null, an automatic generation of the
      *         distinguishing formula should be performed.
      */
-    public @Nullable JTerm getChosenDistinguishingFormula() {
+    public JTerm getChosenDistinguishingFormula() {
         return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
@@ -435,7 +432,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         final TermBuilder tb = services.getTermBuilder();
 
         Sequent toProve = JavaDLSequentKit.createSequent(seq.antecedent().asList(),
-            ImmutableSLList.singleton(new SequentFormula(formulaToProve)));
+            ImmutableList.singleton(new SequentFormula(formulaToProve)));
 
         for (SequentFormula succedentFormula : seq.succedent()) {
             final JTerm formula = (JTerm) succedentFormula.formula();
@@ -452,8 +449,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param it Iterable to convert into an ImmutableList.
      * @return An ImmutableList consisting of the elements in it.
      */
-    private <T> @NonNull ImmutableList<T> immutableListFromIterabe(@NonNull Iterable<T> it) {
-        ImmutableList<T> result = ImmutableSLList.nil();
+    private <T> ImmutableList<T> immutableListFromIterabe(Iterable<T> it) {
+        ImmutableList<T> result = ImmutableList.nil();
         for (T t : it) {
             result = result.prepend(t);
         }
@@ -512,8 +509,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param pio Position indicating subterm to highlight.
      * @param area The editor pane to add the highlighted goal to.
      */
-    private void setHighlightedSequentForArea(@NonNull Goal goal, @NonNull PosInOccurrence pio,
-            @NonNull JEditorPane area) {
+    private void setHighlightedSequentForArea(Goal goal,
+            PosInOccurrence pio, JEditorPane area) {
 
         String subterm = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
 

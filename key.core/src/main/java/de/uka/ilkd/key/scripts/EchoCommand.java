@@ -3,49 +3,44 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
  */
-public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
+public class EchoCommand extends AbstractCommand {
     public EchoCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "echo";
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
-            @NonNull EngineState state)
+    public void execute(ScriptCommandAst args)
             throws ScriptException, InterruptedException {
-        var obs = state.getObserver();
+        var params = state().getValueInjector().inject(new Parameters(), args);
+
+        var obs = state().getObserver();
         if (obs != null) {
-            obs.accept(new ProofScriptEngine.EchoMessage(args.message));
+            obs.accept(new ProofScriptEngine.EchoMessage(params.message));
         }
     }
 
-    @SuppressWarnings("initialization")
+    @Documentation(category = "Control", value = """
+            A simple "print" command for giving progress feedback to the
+            human verfier during lengthy executions.
+            """)
     public static class Parameters {
-        /**
-         * The message to show.
-         */
-        @Option("#2")
-        public String message;
+        @Argument
+        @Documentation("The message to be printed.")
+        public @MonotonicNonNull String message;
     }
 
 }

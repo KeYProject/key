@@ -6,7 +6,6 @@ package org.key_project.prover.sequent;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -29,12 +28,12 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
 
     /// used by inner class Empty
     protected Semisequent() {
-        seqList = ImmutableSLList.nil();
+        seqList = ImmutableList.nil();
     }
 
     /// creates a new [Semisequent] with the [Semisequent] elements in seqList
     private Semisequent(SequentFormula seqFormula) {
-        this(ImmutableSLList.singleton(seqFormula));
+        this(ImmutableList.singleton(seqFormula));
     }
 
     /// inserts an element at a specified index performing redundancy checks, this may result in
@@ -117,7 +116,7 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
         final var orig = semiCI.getFormulaList();
         pos = Math.min(idx, orig.size());
 
-        searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);
+        searchList = semiCI.getFormulaList().skip(pos).prepend(sequentFormula);
 
         while (pos > 0) {
             --pos;
@@ -182,12 +181,18 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
         if (idx < 0 || idx >= seqList.size()) {
             throw new IndexOutOfBoundsException();
         }
-        return seqList.take(idx).head();
+        return seqList.get(idx);
     }
 
     /// @return the first [SequentFormula] of this [Semisequent]
     public SequentFormula getFirst() {
         return seqList.head();
+    }
+
+    /// @return the last [SequentFormula] of this [Semisequent]
+    public SequentFormula getLast() {
+        return seqList.last();
+        // or return seqList.take(seqList.size() - 1).head();
     }
 
     /// Returns iterator about the formulas contained in this [Semisequent]

@@ -3,46 +3,42 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
- * A simple "echo" command for giving feedback to human observers during lengthy executions.
+ * An internal command to switch on/off echoing of executed commands.
  */
-public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
+@Deprecated
+@Documentation(category = "Internal", value = """
+        An internal command to switch on/off echoing of executed commands.
+        """)
+public class SetEchoCommand extends AbstractCommand {
     public SetEchoCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "@echo";
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
-            @NonNull EngineState state)
+    public void execute(ScriptCommandAst args)
             throws ScriptException, InterruptedException {
-        state.setEchoOn("on".equalsIgnoreCase(args.command));
+        Parameters parameters = state().getValueInjector().inject(new Parameters(), args);
+        state().setEchoOn("on".equalsIgnoreCase(parameters.command));
     }
 
-    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "off".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        public @MonotonicNonNull String command;
     }
 
 }

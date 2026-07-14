@@ -13,8 +13,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.
  *
@@ -41,7 +39,8 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
 
         if (result == JFileChooser.APPROVE_OPTION) {
             Path file = fc.getSelectedFile().toPath();
-            mainWindow.addRecentFile(file.toAbsolutePath().toString());
+            mainWindow.addRecentFile(file.toAbsolutePath().toString(),
+                null, true, null);
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
             ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,

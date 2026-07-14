@@ -16,8 +16,6 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This class completes the instantiation for a merge rule application. The user is queried for
  * partner goals and concrete merge rule to choose. If in forced mode, all potential partners and
@@ -67,7 +65,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             return null;
         }
 
-        final MergeRuleBuiltInRuleApp result = new MergeRuleBuiltInRuleApp(app.rule(), pio);
+        final MergeRuleBuiltInRuleApp result =
+            new MergeRuleBuiltInRuleApp((MergeRule) app.rule(), pio);
         result.setMergePartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);

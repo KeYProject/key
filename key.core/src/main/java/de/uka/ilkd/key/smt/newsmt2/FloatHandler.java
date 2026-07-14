@@ -4,14 +4,20 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;

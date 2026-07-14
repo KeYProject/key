@@ -22,7 +22,7 @@ public final class GoalSelectAboveAction extends MainWindowAction {
      *
      * @param mainWindow the main window this action belongs to
      */
-    public GoalSelectAboveAction(@NonNull MainWindow mainWindow) {
+    public GoalSelectAboveAction(MainWindow mainWindow) {
         super(mainWindow, true);
         setName("Select Goal Above");
         setIcon(IconFactory.selectGoalAbove(MainWindow.TOOLBAR_ICON_SIZE));

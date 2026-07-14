@@ -76,7 +76,7 @@
    (rule "exLeft" (formula "4") (inst "sk=s_1") (userinteraction))
    (rule "exRightHide" (formula "5") (inst "t=seqDef{int i;}(Z(0(#)),
                seqLen(s_1),
-               int::seqGet(s_0, int::seqGet(s_1, i)))") (userinteraction))
+               seqGet<[int]>(s_0, seqGet<[int]>(s_1, i)))") (userinteraction))
    (rule "andRight" (formula "5") (userinteraction))
    (branch
       (rule "andRight" (formula "5") (userinteraction))
@@ -310,7 +310,7 @@
                      (rule "andLeft" (formula "4"))
                      (rule "add_zero_right" (formula "15") (term "1,1,0,0") (userinteraction))
                      (rule "castDel" (formula "15") (term "0") (userinteraction))
-                     (rule "eqTermCut" (formula "15") (term "1,0") (inst "s=any::seqGet(s_1, jv_1)") (userinteraction))
+                     (rule "eqTermCut" (formula "15") (term "1,0") (inst "s=seqGet<[any]>(s_1, jv_1)") (userinteraction))
                      (branch "Assume (int)s_1[jv_1] = s_1[jv_1]"
                         (rule "applyEqRigid" (formula "16") (term "1,0") (ifseqformula "1") (userinteraction))
                         (rule "applyEqRigid" (formula "16") (term "0,1,0") (ifseqformula "4") (userinteraction))

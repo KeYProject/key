@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -151,10 +152,13 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     }
 
     private static void collectGenerics(JTerm term, HashSet<GenericSort> genericSorts) {
-
-        if (term.op() instanceof SortDependingFunction func) {
-            if (func.getSortDependingOn() instanceof GenericSort) {
-                genericSorts.add((GenericSort) func.getSortDependingOn());
+        if (term.op() instanceof ParametricFunctionInstance func) {
+            for (GenericArgument a : func.getArgs()) {
+                if (a.sort() instanceof GenericSort s) {
+                    genericSorts.add(s);
+                } else if (a.sort() instanceof ParametricSortInstance psi) {
+                    collectGenerics(psi, genericSorts);
+                }
             }
         }
 
@@ -165,6 +169,16 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             collectGenerics(term.sub(i), genericSorts);
         }
 
+    }
+
+    private static void collectGenerics(ParametricSortInstance psi, Set<GenericSort> genericSorts) {
+        for (GenericArgument a : psi.getArgs()) {
+            if (a.sort() instanceof GenericSort gs) {
+                genericSorts.add(gs);
+            } else if (a.sort() instanceof ParametricSortInstance p) {
+                collectGenerics(p, genericSorts);
+            }
+        }
     }
 
     /**

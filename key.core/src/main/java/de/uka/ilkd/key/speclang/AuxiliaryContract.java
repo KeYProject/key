@@ -11,19 +11,19 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.LabelJumpStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.LoopInitializer;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.Continue;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -42,7 +42,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -911,7 +910,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
             return new OriginalVariables(self, result, exception, atPreVars,
-                ImmutableSLList.nil());
+                ImmutableList.nil());
         }
 
     }

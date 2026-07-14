@@ -73,7 +73,7 @@
  } 
 
 \datatypes {
-	List = Nil | Cons(any head, List tail) | Cons2(any head2, List tail);
+	List = Nil | Cons(any head, List tail) | Cons2(any head2, List tail2);
 }
 
 \functions {
@@ -81,8 +81,8 @@
 }
 \problem {
   Nil = tail(Cons(Z(0(#)), Nil))
-& Nil = tail(Cons2(Z(0(#)), Nil))
-& (   x = Cons(Z(0(#)), Cons(Z(1(#)), Nil))
+& Nil = tail2(Cons2(Z(0(#)), Nil))
+& (   Cons(Z(0(#)), Cons(Z(1(#)), Nil)) = x
    -> head(x) = Z(0(#)))
 }
 
@@ -96,19 +96,19 @@
 (branch "Case 1"
    (rule "andRight" (formula "1") (userinteraction))
    (branch "Case 1"
-      (rule "tail_Dec_Cons" (formula "1") (term "1") (userinteraction))
+      (rule "DT_List#Dec_tail#Cons" (formula "1") (term "1") (userinteraction))
       (rule "equalUnique" (formula "1") (userinteraction))
       (rule "closeTrue" (formula "1") (userinteraction))
    )
    (branch "Case 2"
-      (rule "tail_Dec_Cons2" (formula "1") (term "1") (userinteraction))
+      (rule "DT_List#Dec_tail2#Cons2" (formula "1") (term "1") (userinteraction))
       (rule "equalUnique" (formula "1") (userinteraction))
       (rule "closeTrue" (formula "1") (userinteraction))
    )
 )
 (branch "Case 2"
    (rule "impRight" (formula "1") (userinteraction))
-   (rule "head_DecEQ_Cons" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
+   (rule "DT_List#Dec_head#Cons#EQ" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
    (rule "equal_literals" (formula "2") (userinteraction))
    (rule "closeTrue" (formula "2") (userinteraction))
 )

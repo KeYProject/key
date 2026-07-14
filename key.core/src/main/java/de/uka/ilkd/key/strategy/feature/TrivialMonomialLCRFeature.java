@@ -11,9 +11,8 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -22,6 +21,7 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
+@StableCost
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm<Goal> a, b;
 
@@ -30,13 +30,12 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         this.b = b;
     }
 
-    public static @NonNull Feature create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
+    public static Feature create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
-            MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
         final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);

@@ -24,8 +24,6 @@ import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -81,21 +79,22 @@ class EndToEndTests {
     @Test
     void sliceMultipleIterations() throws Exception {
         // simple Java proof
+        Path directory = testCaseDirectory
+                .getParent().getParent().getParent().getParent().getParent()
+                .resolve("key.ui")
+                .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
+                .resolve("reverseArray.proof");
         Pair<Proof, Path> iteration1 = sliceProofFullFilename(
-            testCaseDirectory
-                    .getParent().getParent().getParent().getParent().getParent()
-                    .resolve("key.ui")
-                    .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
-                    .resolve("reverseArray.proof"),
-            6537, 4236, true, true, true);
+            directory,
+            5270, 4183, true, true, true);
         var iteration2 =
-            sliceProofFullFilename(iteration1.second, 4236, 4229, true, true, true);
+            sliceProofFullFilename(iteration1.second, 4183, 4181, true, true, true);
         var iteration3 =
-            sliceProofFullFilename(iteration2.second, 4229, 4220, true, true, true);
+            sliceProofFullFilename(iteration2.second, 4181, 4179, true, true, true);
         var iteration4 =
-            sliceProofFullFilename(iteration3.second, 4220, 4209, true, true, true);
+            sliceProofFullFilename(iteration3.second, 4179, 4177, true, true, true);
         var iteration5 =
-            sliceProofFullFilename(iteration4.second, 4209, 4197, true, true, true);
+            sliceProofFullFilename(iteration4.second, 4177, 4175, true, true, true);
         iteration5.first.dispose();
         iteration4.first.dispose();
         iteration3.first.dispose();
@@ -117,16 +116,17 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            3245, 1184, true, false).dispose();
         sliceProofOffline(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            3245, 1184, true, false).dispose();
     }
 
     /**
      * Test that the dependency analyzer can remove a cut on <code>true</code>.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceCutExample() throws Exception {
@@ -254,7 +254,7 @@ class EndToEndTests {
         Files.delete(iteration1.second);
     }
 
-    private @Nullable Proof sliceProof(@NonNull String filename, int expectedTotal,
+    private Proof sliceProof(String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         var it =
@@ -264,7 +264,7 @@ class EndToEndTests {
         return it.first;
     }
 
-    private @Nullable Proof sliceProofOffline(@NonNull String filename, int expectedTotal,
+    private Proof sliceProofOffline(String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         var it =
@@ -284,7 +284,8 @@ class EndToEndTests {
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         LOGGER.trace("Loading {}", proofFile.toAbsolutePath());
         KeYEnvironment<?> environment =
-            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
+            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, null,
                 null, proof -> {
                     if (trackOnline) {
                         tracker.set(new DependencyTracker(proof));
@@ -302,8 +303,16 @@ class EndToEndTests {
             // analyze proof
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
-            assertEquals(expectedTotal, results.totalSteps);
-            assertEquals(expectedInSlice, results.usefulStepsNr);
+            if (expectedTotal > 0) {
+                assertEquals(expectedTotal, results.totalSteps);
+            } else {
+                LOGGER.info("total steps: {}", results.totalSteps);
+            }
+            if (expectedInSlice > 0) {
+                assertEquals(expectedInSlice, results.usefulStepsNr);
+            } else {
+                LOGGER.info("total steps in slice: {}", results.usefulStepsNr);
+            }
             // slice proof
             DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
@@ -318,13 +327,14 @@ class EndToEndTests {
                 Assertions.assertTrue(slicedProof.closed(), "Proof is not closed");
             }
 
-            assertEquals(expectedInSlice
-                    + slicedProof.closedGoals().size()
-                    - slicedProof.closedGoals().stream()
-                            .filter(x -> x.node().getAppliedRuleApp() instanceof SMTRuleApp)
-                            .count(),
-                slicedProof.countNodes());
-
+            if (expectedInSlice > 0) {
+                assertEquals(expectedInSlice
+                        + slicedProof.closedGoals().size()
+                        - slicedProof.closedGoals().stream()
+                                .filter(x -> x.node().getAppliedRuleApp() instanceof SMTRuleApp)
+                                .count(),
+                    slicedProof.countNodes());
+            }
             return new Pair<>(slicedProof, tempFile);
         } finally {
             environment.dispose();

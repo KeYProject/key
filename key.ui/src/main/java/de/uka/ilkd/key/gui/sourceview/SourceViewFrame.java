@@ -22,9 +22,6 @@ import org.jspecify.annotations.NonNull;
  * @author lanzinger
  */
 public class SourceViewFrame extends JSplitPane {
-
-    private static final long serialVersionUID = 382427737154314400L;
-
     /** The source view contained in this frame. */
     private final @NonNull SourceView sourceView;
 
@@ -42,7 +39,7 @@ public class SourceViewFrame extends JSplitPane {
      *
      * @param mainWindow the main window.
      */
-    public SourceViewFrame(@NonNull MainWindow mainWindow) {
+    public SourceViewFrame(MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
 
         sourceView = SourceView.getSourceView(mainWindow);

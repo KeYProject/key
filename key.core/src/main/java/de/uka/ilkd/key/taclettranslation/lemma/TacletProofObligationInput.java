@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -23,7 +23,6 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
-    private @Nullable ProofAggregate proofObligation;
+    private ProofAggregate proofObligation;
     private Throwable ex;
 
     // The following may all possibly be null
@@ -117,7 +116,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      * Fill in only the necessary info.
      */
     @Override
-    public @NonNull Configuration createLoaderConfig() throws IOException {
+    public Configuration createLoaderConfig() throws IOException {
         var c = new Configuration();
         c.set(PROPERTY_CLASS, getClass().getCanonicalName());
         c.set(PROPERTY_NAME, name());
@@ -182,7 +181,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     }
 
 
-    private @NonNull Collection<Path> fileCollection(String @NonNull [] strings) {
+    private Collection<Path> fileCollection(String[] strings) {
         ArrayList<Path> result = new ArrayList<>();
         for (String string : strings) {
             result.add(Paths.get(baseDir, string));
@@ -204,7 +203,7 @@ public class TacletProofObligationInput implements IPersistablePO {
         return this == po;
     }
 
-    void setLoadInfo(@NonNull Configuration properties) {
+    void setLoadInfo(Configuration properties) {
         final var pathname =
             Objects.requireNonNull(properties.getString(PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();

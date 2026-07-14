@@ -14,15 +14,15 @@ import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical
  * coefficients. The constant term of the polynomial is ignored. The result is guaranteed to be
  * non-negative.
  */
+@StableCost
 public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
 
     private final ProjectionToTerm<Goal> monomialLeft;
@@ -34,14 +34,13 @@ public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
         this.polynomialRight = polynomialRight;
     }
 
-    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> monomialLeft,
+    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> monomialLeft,
             ProjectionToTerm<Goal> polynomialRight) {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
     @Override
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-            MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 
         final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);

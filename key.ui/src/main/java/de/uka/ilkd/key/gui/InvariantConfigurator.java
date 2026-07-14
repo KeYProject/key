@@ -14,7 +14,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -31,7 +31,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import static java.lang.String.format;
 
@@ -1007,10 +1006,10 @@ public class InvariantConfigurator {
                 // TODO: allow more than one term
                 JTerm newObjects = parser.parseExpression(newObjectsAsString);
 
-                return ImmutableSLList.<InfFlowSpec>nil()
-                        .append(new InfFlowSpec(ImmutableSLList.<JTerm>nil().append(preExps),
-                            ImmutableSLList.<JTerm>nil().append(postExps),
-                            ImmutableSLList.<JTerm>nil().append(newObjects)));
+                return ImmutableList.<InfFlowSpec>nil()
+                        .append(new InfFlowSpec(ImmutableList.<JTerm>nil().append(preExps),
+                            ImmutableList.<JTerm>nil().append(postExps),
+                            ImmutableList.<JTerm>nil().append(newObjects)));
             }
 
             protected JTerm parseVariant() {

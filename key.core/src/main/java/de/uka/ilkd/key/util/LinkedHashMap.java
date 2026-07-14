@@ -9,10 +9,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.Pair;
 
-import org.checkerframework.checker.nullness.qual.KeyFor;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public class LinkedHashMap<K, V extends @Nullable Object> extends java.util.LinkedHashMap<K, V>
+public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
         implements Iterable<Pair<K, V>> {
 
 
@@ -68,7 +65,7 @@ public class LinkedHashMap<K, V extends @Nullable Object> extends java.util.Link
     }
 
     public Iterator<Pair<K, V>> iterator() {
-        return new PairIterator<K, V>(this);
+        return new PairIterator<>(this);
     }
 
     private static class PairIterator<K, V extends @Nullable Object>

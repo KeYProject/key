@@ -35,7 +35,7 @@ class Thread1 {
           ensures \permission(t.a) == \dl_transferPermission(\dl_TRUE(),
             \dl_currentThread(), this, 0, \old(\permission(t.a)));
           assignable \strictly_nothing; assignable<permissions> t.a; @*/
-    /*@ helper @*/ public native void start();
+    public native /*@ helper @*/ void start();
 
     /*@ public normal_behavior
           requires this != \dl_currentThread();
@@ -43,7 +43,7 @@ class Thread1 {
             \dl_currentThread(), \old(\permission(t.a)));
           assignable \strictly_nothing; assignable<permissions> t.a;
       @*/
-    /*@ helper @*/ public native void join();
+    public native /*@ helper @*/ void join();
 
 }
 
@@ -60,12 +60,12 @@ class Thread2 {
           ensures \permission(t.a) == \dl_transferPermission(\dl_TRUE(),
             \dl_currentThread(), this, 1, \old(\permission(t.a)));
           assignable \strictly_nothing; assignable<permissions> t.a; @*/
-    /*@ helper @*/ public native void start();
+    public native /*@ helper @*/ void start();
 
     /*@ public normal_behavior
           requires this != \dl_currentThread();
           ensures \permission(t.a) == \dl_returnPermission(this, \dl_currentThread(),
             \dl_returnPermission(this.t1, this, \old(\permission(t.a))));
           assignable \strictly_nothing; assignable<permissions> t.a; @*/
-    /*@ helper @*/ public native void join();
+    public native /*@ helper @*/ void join();
 }

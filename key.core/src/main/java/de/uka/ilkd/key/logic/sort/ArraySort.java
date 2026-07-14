@@ -6,8 +6,8 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
@@ -149,12 +149,15 @@ public final class ArraySort extends SortImpl {
         return sk.elemSort;
     }
 
+    @Override
+    public boolean containsGenericSort() {
+        return elementSort().containsGenericSort();
+    }
 
     private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
             Sort javaLangCloneable,
             Sort javaLangSerializable) {
-        @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(Object o) {
             if (!(o instanceof SortKey(Sort sort, Type type, Sort langObjectSort, Sort langCloneable, Sort langSerializable))) {
                 return false;
             }

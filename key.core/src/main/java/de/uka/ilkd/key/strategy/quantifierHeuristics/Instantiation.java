@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -24,7 +24,6 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 class Instantiation {
@@ -75,7 +74,7 @@ class Instantiation {
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-        ImmutableList<Term> res = ImmutableSLList.nil();
+        ImmutableList<Term> res = ImmutableList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
@@ -150,7 +149,7 @@ class Instantiation {
      */
     private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,
             TermServices services) {
-        ImmutableList<JTerm> assertLits = ImmutableSLList.nil();
+        ImmutableList<JTerm> assertLits = ImmutableList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final var op = atom.op();
@@ -178,8 +177,8 @@ class Instantiation {
 
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
-        if (cost == null && (inst.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) inst.op()).getKind().equals(JavaDLTheory.CAST_NAME))) {
+        if (cost == null && (inst.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
             cost = instancesWithCosts.get(inst.sub(0));
         }
 

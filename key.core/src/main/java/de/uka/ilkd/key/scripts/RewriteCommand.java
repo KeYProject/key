@@ -5,11 +5,9 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -17,6 +15,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.IntIterator;
@@ -25,7 +24,9 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -47,7 +48,19 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author lulong, grebing, weigl
  */
-public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
+@Documentation(category = "Fundamental",
+    value = """
+            The `rewrite` command replaces occurrences of one term with another using rewrite taclets.
+            It searches for applicable rewrite rules that transform the `find` term into the `replace` term.
+
+            If some occurrences cannot be rewritten directly, the command applies a cut to establish
+            the replacement formula, ensuring the proof can continue.
+
+            #### Examples
+            - `rewrite find="x+y" replace="y+x";` //(mulbrich script syntax)
+            - `rewrite find=`y+x` replace=`y+x`;` //(psdbg)
+            """)
+public class RewriteCommand extends AbstractCommand {
 
     /**
      * List of PosInOcc that haven't been successfully replaced
@@ -73,33 +86,26 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         return "rewrite";
     }
 
-
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        Proof proof = state.getProof();
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+
+        Proof proof = state().getProof();
         assert proof != null;
 
-        ImmutableList<TacletApp> allApps = findAllTacletApps(args, state);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(args, state());
 
         // filter all taclets for being applicable on the find term
         List<PosInOccurrence> failposInOccs =
-            findAndExecReplacement(args, allApps, state);
+            findAndExecReplacement(args, allApps, state());
 
         // if not all find terms successfully replaced, apply cut
         if (!failposInOccs.isEmpty()) {
 
-            CutCommand cut = new CutCommand();
             CutCommand.Parameters param = new CutCommand.Parameters();
             param.formula = args.replace;
-
-            cut.execute(uiControl, param, state);
+            CutCommand.execute(state(), param);
         }
 
     }
@@ -115,7 +121,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent
@@ -156,7 +162,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                if (pta.taclet() instanceof RewriteTaclet) {
+                if (pta.taclet() instanceof RewriteTaclet rw) {
                     if (pta.taclet().displayName().equals("cut_direct")) {
                         continue;
                     }
@@ -168,8 +174,6 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
                         try { // Term not already successfully replaced
                             Goal goalold = state.getFirstOpenAutomaticGoal();
-
-                            RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
                                 SequentFormula rewriteResult =
                                     ((RewriteTacletExecutor) rw.getExecutor()).getRewriteResult(
@@ -247,26 +251,17 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         }
     }
 
-    /**
-     * Parameters for the {@link RewriteCommand}
-     *
-     * @author luong, grebing, weigl
-     */
     public static class Parameters {
-        /**
-         * Term, which should be replaced
-         */
         @Option(value = "find")
-        public JTerm find;
-        /**
-         * Substitutent
-         */
+        @Documentation("The term pattern to search for and replace")
+        public @MonotonicNonNull JTerm find;
+
         @Option(value = "replace")
-        public JTerm replace;
-        /**
-         * Formula, where to find {@see find}.
-         */
-        @Option(value = "formula", required = false)
-        public JTerm formula;
+        @Documentation("The replacement term to substitute for the found term")
+        public @MonotonicNonNull JTerm replace;
+
+        @Option(value = "formula")
+        @Documentation("Optional top-level formula to restrict the search scope")
+        public @Nullable JTerm formula;
     }
 }

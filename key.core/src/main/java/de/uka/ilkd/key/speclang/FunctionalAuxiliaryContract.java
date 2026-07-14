@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -25,8 +25,6 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
@@ -67,7 +65,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @param contract a block contract.
      */
-    FunctionalAuxiliaryContract(@NonNull T contract) {
+    FunctionalAuxiliaryContract(T contract) {
         this(contract, INVALID_ID);
     }
 

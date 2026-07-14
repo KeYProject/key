@@ -28,8 +28,6 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +42,19 @@ import org.slf4j.LoggerFactory;
 public class MediatorProofControl extends AbstractProofControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(MediatorProofControl.class);
 
-    private final @NonNull AbstractMediatorUserInterfaceControl ui;
-    private @Nullable AutoModeWorker worker;
+    private final AbstractMediatorUserInterfaceControl ui;
+    private AutoModeWorker worker;
 
-    public MediatorProofControl(@NonNull AbstractMediatorUserInterfaceControl ui) {
+    /**
+     * True while an automode/macro run is active or still winding down; released only when the
+     * worker's background task has truly ended. Prevents a second run from starting on the same
+     * proof before the first has fully stopped -- fast-clicking the auto button otherwise overlaps
+     * two provers on one proof and corrupts it.
+     */
+    private final java.util.concurrent.atomic.AtomicBoolean autoModeActive =
+        new java.util.concurrent.atomic.AtomicBoolean(false);
+
+    public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
         this.ui = ui;
     }
@@ -84,6 +91,9 @@ public class MediatorProofControl extends AbstractProofControl {
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
+        }
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
         }
         worker = new AutoModeWorker(proof, goals, ptl);
         ui.getMediator().initiateAutoMode(proof, true, false);
@@ -140,8 +150,12 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
+        }
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+        worker.setOnTerminated(() -> autoModeActive.set(false));
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
@@ -157,11 +171,12 @@ public class MediatorProofControl extends AbstractProofControl {
      * unfreezes the UI when it is finished. </p>
      */
     private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
-        private final @NonNull Proof proof;
-        private final @NonNull List<Node> initialGoals;
-        private final @NonNull ImmutableList<Goal> goals;
-        private final @NonNull ApplyStrategy applyStrategy;
+        private final Proof proof;
+        private final List<Node> initialGoals;
+        private final ImmutableList<Goal> goals;
+        private final ApplyStrategy applyStrategy;
         private ProofSearchInformation<Proof, Goal> info;
+        private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final @NonNull Proof proof, final @NonNull ImmutableList<Goal> goals,
                 @Nullable ProverTaskListener ptl) {
@@ -192,6 +207,11 @@ public class MediatorProofControl extends AbstractProofControl {
             } finally {
                 // make it possible to free memory and falsify the isAutoMode() property
                 worker = null;
+                if (!backgroundStarted) {
+                    // doInBackground never ran (cancelled before it started); release the guard
+                    // here.
+                    autoModeActive.set(false);
+                }
                 // Clear strategy
                 synchronized (applyStrategy) {// wait for apply Strategy to terminate
                     applyStrategy.removeProverTaskObserver(ui);
@@ -211,21 +231,26 @@ public class MediatorProofControl extends AbstractProofControl {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
-        private void notifyException(final @NonNull Throwable exception) {
+        private void notifyException(final Throwable exception) {
             LOGGER.error("exception during strategy ", exception);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
         }
 
         @Override
         protected ProofSearchInformation<Proof, Goal> doInBackground() {
-            boolean stopMode =
-                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
-                        .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            backgroundStarted = true;
+            try {
+                boolean stopMode =
+                    proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                            .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
-            info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
-                ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
-            return info;
+                info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
+                    ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+                return info;
+            } finally {
+                autoModeActive.set(false);
+            }
         }
     }
 }

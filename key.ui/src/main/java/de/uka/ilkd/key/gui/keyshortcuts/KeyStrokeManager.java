@@ -11,9 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
  * <p>
@@ -53,8 +50,7 @@ public final class KeyStrokeManager {
      */
     static final Map<String, WeakReference<Action>> actions = new HashMap<>(100);
 
-    private KeyStrokeManager() {
-    }
+    private KeyStrokeManager() {}
 
     /**
      * Get a {@link KeyStroke} for the given <code>key</code>. If no {@link KeyStroke} is defined,
@@ -62,8 +58,10 @@ public final class KeyStrokeManager {
      * <p>
      * Also thsi method sets the determined key stroke in the settings.
      *
-     * @param key key
-     * @param defaultValue default value
+     * @param key
+     *        key
+     * @param defaultValue
+     *        default value
      * @return nullable
      * @see KeyStrokeSettings
      */
@@ -144,7 +142,7 @@ public final class KeyStrokeManager {
         return KeyStrokeSettings.getInstance();
     }
 
-    static @Nullable Action findAction(String clazz) {
+    static Action findAction(String clazz) {
         return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
     }
 
@@ -164,7 +162,7 @@ public final class KeyStrokeManager {
      *
      * @return all actions
      */
-    public static @NonNull Collection<WeakReference<Action>> getAllActions() {
+    public static Collection<WeakReference<Action>> getAllActions() {
         return actions.values();
     }
 }

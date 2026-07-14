@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import javax.swing.*;
 
@@ -24,7 +25,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
         + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
-        + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials"
+        + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials,"
         + "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2,"
         + "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq,"
         + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
@@ -69,10 +70,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String HIDE_CLOSED_SUBTREES = "HideClosedSubtrees";
 
-    /**
-     * Which look and feel to use.
-     */
-    private static final String LOOK_AND_FEEL = "LookAndFeel";
+    /// Property name for property [#lookAndFeel]
+    public static final String PROP_LOOK_AND_FEEL = "LookAndFeel";
+
+    /// Property name for property [#defaultLookAndFeelDecorated]
+    public static final String PROP_DEFAULT_LOOK_AND_FEEL_DECORATED = "defaultLookAndFeelDecorated";
 
     private static final String SHOW_JAVA_WARNING = "ShowJavaWarning";
 
@@ -102,6 +104,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String CONFIRM_EXIT = "ConfirmExit";
 
     /**
+     * use the classic (pre-2026) taclet instantiation dialog instead of the redesigned one
+     */
+    private static final String USE_CLASSIC_TACLET_DIALOG = "UseClassicTacletDialog";
+
+    /**
      * Heatmap options property
      */
     private static final String HEATMAP_OPTIONS = "HeatmapOptions";
@@ -110,10 +117,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String SEQUENT_VIEW_TOOLTIP = "SequentViewTooltips";
 
-    /** this setting enables/disables tool tips in the source view */
+    /**
+     * this setting enables/disables tool tips in the source view
+     */
     private static final String SOURCE_VIEW_TOOLTIP = "SourceViewTooltips";
 
-    /** this setting enables/disables tool tips in the proof tree */
+    /**
+     * this setting enables/disables tool tips in the proof tree
+     */
     private static final String PROOF_TREE_TOOLTIP = "ProofTreeTooltips";
 
     private static final String HIGHLIGHT_ORIGIN = "HighlightOrigin";
@@ -195,13 +206,19 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> hidePackagePrefix =
         createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private final PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private final PropertyEntry<Boolean> useClassicTacletDialog =
+        createBooleanProperty(USE_CLASSIC_TACLET_DIALOG, false);
     private final PropertyEntry<Boolean> showLoadExamplesDialog =
         createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
     private final PropertyEntry<Boolean> showWholeTaclet =
         createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private final PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private final PropertyEntry<String> lookAndFeel =
-        createStringProperty(LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
+        createStringProperty(PROP_LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
+    /// Boolean flag, if activate the LAF draws the decoration by itself. e.g., FlatLAF. We disable
+    /// it by default, because it prevents the main window to be dragged properly with some LAFs.
+    private final PropertyEntry<Boolean> defaultLookAndFeelDecorated =
+        createBooleanProperty(PROP_DEFAULT_LOOK_AND_FEEL_DECORATED, false);
     private final PropertyEntry<Boolean> showSequentViewTooltips =
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showSourceViewTooltips =
@@ -231,8 +248,30 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<List<String>> folderBookmarks =
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
+    //
+    private boolean isDarkMode;
+
     public ViewSettings() {
         super("View");
+        updateIsDarkMode();
+    }
+
+    private void updateIsDarkMode() {
+        isDarkMode = getLookAndFeel().contains("FlatDark")
+                || getLookAndFeel().contains("FlatDarcula")
+                || getLookAndFeel().contains("FlatMacDarkLaf");
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        super.readSettings(props);
+        updateIsDarkMode();
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        super.readSettings(props);
+        updateIsDarkMode();
     }
 
     /**
@@ -344,7 +383,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setLookAndFeel(String className) {
         lookAndFeel.set(className);
+        updateIsDarkMode();
     }
+
+    public boolean isDefaultLookAndFeelDecorated() {
+        return defaultLookAndFeelDecorated.get();
+    }
+
+    public void setDefaultLookAndFeelDecorated(boolean value) {
+        defaultLookAndFeelDecorated.set(value);
+    }
+
 
     /**
      * When loading a Java file, all other java files in the parent directory are loaded as well.
@@ -466,6 +515,21 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setConfirmExit(boolean confirmExit) {
         this.confirmExit.set(confirmExit);
+    }
+
+    /**
+     * Whether to use the classic (pre-2026) taclet instantiation dialog instead of the redesigned
+     * one. Provided as a fallback for a migration period; the redesigned dialog is the default.
+     */
+    public boolean isUseClassicTacletDialog() {
+        return useClassicTacletDialog.get();
+    }
+
+    /**
+     * Set whether to use the classic taclet instantiation dialog instead of the redesigned one.
+     */
+    public void setUseClassicTacletDialog(boolean b) {
+        this.useClassicTacletDialog.set(b);
     }
 
     public boolean getShowUninstantiatedTaclet() {
@@ -596,5 +660,10 @@ public class ViewSettings extends AbstractPropertiesSettings {
         } else {
             throw new IllegalStateException("tried to set wrong value for notification setting");
         }
+    }
+
+    /// Completely based on heuristics.
+    public boolean isDarkMode() {
+        return isDarkMode;
     }
 }

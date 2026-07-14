@@ -51,7 +51,6 @@ import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -598,8 +597,8 @@ public final class DependencyAnalyzer {
      * @param mergeBase common prefix of <code>locA</code> and <code>locB</code>
      * @return whether a merge is valid
      */
-    private boolean canMergeStepsInto(@NonNull List<Node> apps, int idxA, Node stepA, Node stepB,
-            @NonNull BranchLocation locA, BranchLocation locB, @NonNull BranchLocation mergeBase) {
+    private boolean canMergeStepsInto(List<Node> apps, int idxA, Node stepA, Node stepB,
+            BranchLocation locA, BranchLocation locB, BranchLocation mergeBase) {
         // calculate the step index of the merged rule application
         BranchLocation differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
         int newStepIdx = differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
@@ -721,8 +720,8 @@ public final class DependencyAnalyzer {
      * @param mergeBase merge base of stepA and stepB
      * @return whether the merge is obstructed
      */
-    private boolean otherStepsRequireConsumedInputs(@NonNull List<Node> apps, int idxA, Node stepA,
-            Node stepB, @NonNull BranchLocation mergeBase) {
+    private boolean otherStepsRequireConsumedInputs(List<Node> apps, int idxA, Node stepA,
+            Node stepB, BranchLocation mergeBase) {
         boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
                 .anyMatch(AnnotatedEdge::replacesInputNode);
         if (consumesInput) {

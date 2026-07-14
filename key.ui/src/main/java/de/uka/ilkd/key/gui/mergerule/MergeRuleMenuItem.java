@@ -18,9 +18,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * The menu item for the state merging rule.
  *
@@ -103,7 +100,7 @@ public class MergeRuleMenuItem extends JMenuItem {
         });
     }
 
-    private void signalError(final @NonNull Throwable e, final @NonNull KeYMediator mediator) {
+    private void signalError(final Throwable e, final KeYMediator mediator) {
         SwingUtilities
                 .invokeLater(() -> mediator.notify(new ExceptionFailureEvent(e.getMessage(), e)));
     }

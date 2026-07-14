@@ -31,8 +31,7 @@ public class AmtoftBanerjee2 {
     //@ assignable \strictly_nothing;
     //@ accessible \nothing;
     //@ determines z, \result \by \itself;
-    //@ helper
-    final int expensive(int z) {
+    final /*@ helper @*/ int expensive(int z) {
         return z;
     }
 }

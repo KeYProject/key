@@ -3,19 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.Named;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+
+
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
@@ -32,7 +35,7 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return computeCost(app, pos, goal, new MutableState());
     }
 
@@ -68,8 +71,8 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      * @param proof The {@link Proof} the strategy of which should be updated.
      * @param p The new {@link StrategyProperties}
      */
-    static void updateStrategySettings(@NonNull Proof proof, @NonNull StrategyProperties p) {
-        final Strategy strategy = proof.getActiveStrategy();
+    static void updateStrategySettings(Proof proof, StrategyProperties p) {
+        final Strategy<de.uka.ilkd.key.proof.Goal> strategy = proof.getActiveStrategy();
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
 
@@ -77,5 +80,13 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(p);
 
         proof.setActiveStrategy(strategy);
+    }
+
+    default boolean isResponsibleFor(RuleSet rs) { return false; }
+
+    default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            de.uka.ilkd.key.proof.Goal goal,
+            MutableState mState) {
+        return null;
     }
 }

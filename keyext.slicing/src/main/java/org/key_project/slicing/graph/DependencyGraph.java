@@ -16,8 +16,6 @@ import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +39,21 @@ public class DependencyGraph {
     /**
      * Main storage container of graph nodes and edges.
      */
-    private final @NonNull EquivalenceDirectedGraph graph;
+    private final EquivalenceDirectedGraph graph;
     /**
      * Mapping of rule applications to graph edges.
      * Stores the edges introduced by a proof step.
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
+    /**
+     * Create a new empty dependency graph.
+     */
     public DependencyGraph() {
         graph = new EquivalenceDirectedGraph();
     }
 
-    private DependencyGraph(@NonNull DependencyGraph copyFrom) {
+    private DependencyGraph(DependencyGraph copyFrom) {
         graph = copyFrom.graph.copy();
         graph.edgeSet().forEach(x -> edgeDataReversed
                 .computeIfAbsent(x.getProofStep(), _node -> new ArrayList<>()).add(x));
@@ -63,7 +64,7 @@ public class DependencyGraph {
      *
      * @param p the proof
      */
-    public void ensureProofIsTracked(@NonNull Proof p) {
+    public void ensureProofIsTracked(Proof p) {
         if (!edgeDataReversed.keySet().stream().findFirst().map(x -> x.proof() == p).orElse(true)) {
             throw new IllegalStateException("tried to use DependencyGraph with wrong proof");
         }
@@ -86,8 +87,8 @@ public class DependencyGraph {
      *        (pairs of graph node + whether the rule app consumes the node)
      * @param output outputs produced by this proof step
      */
-    public void addRuleApplication(Node node, @NonNull Collection<Pair<GraphNode, Boolean>> input,
-            @NonNull Collection<GraphNode> output) {
+    public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input,
+            Collection<GraphNode> output) {
         for (Pair<GraphNode, Boolean> in : input) {
             for (GraphNode out : output) {
                 AnnotatedEdge edge = new AnnotatedEdge(node, in.second);
@@ -136,7 +137,7 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public @NonNull Stream<Edge> incomingGraphEdgesOf(@NonNull GraphNode node) {
+    public Stream<Edge> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
@@ -162,7 +163,7 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public @NonNull Stream<Edge> outgoingGraphEdgesOf(@NonNull GraphNode node) {
+    public Stream<Edge> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
@@ -295,7 +296,7 @@ public class DependencyGraph {
      * @param node graph node
      * @return the outgoing edges of that node
      */
-    public Stream<AnnotatedEdge> edgesUsing(@NonNull GraphNode node) {
+    public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
         return outgoingGraphEdgesOf(node).map(it -> it.annotation);
     }
 
@@ -388,7 +389,7 @@ public class DependencyGraph {
      *
      * @return modified copy
      */
-    public @NonNull DependencyGraph removeChains() {
+    public DependencyGraph removeChains() {
         // first, create a copy of the graph
         var nGraph = new DependencyGraph(this);
         // get all nodes in the proof
@@ -459,7 +460,7 @@ public class DependencyGraph {
      *
      * @return the proof
      */
-    public @Nullable Proof proof() {
+    public Proof proof() {
         return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
 }

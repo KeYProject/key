@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.recoderext.MergePointStatement;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
@@ -37,7 +37,7 @@ public class DeleteMergePointRuleFeature implements Feature {
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         return ((de.uka.ilkd.key.proof.Goal) goal).node().parent()
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         ? NumberRuleAppCost.create(-50000)

@@ -22,8 +22,6 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +31,9 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     public static final String TAB = "   ";
 
-    private final @NonNull KeYMediator mediator;
+    private final KeYMediator mediator;
     protected final InitConfig initConfig;
-    protected final @NonNull ConsoleUserInterfaceControl ui;
+    protected final ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
 

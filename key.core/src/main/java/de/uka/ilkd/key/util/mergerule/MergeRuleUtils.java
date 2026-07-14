@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -1067,7 +1071,7 @@ public class MergeRuleUtils {
             PosInOccurrence pio, Services services) {
 
         ImmutableList<SequentFormula> pathConditionSet =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         var selected = pio.subTerm();
@@ -1106,7 +1110,7 @@ public class MergeRuleUtils {
      */
     public static ImmutableList<SymbolicExecutionState> sequentsToSEPairs(
             Iterable<MergePartner> sequentInfos) {
-        ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
+        ImmutableList<SymbolicExecutionState> result = ImmutableList.nil();
         for (MergePartner sequentInfo : sequentInfos) {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
@@ -1178,31 +1182,10 @@ public class MergeRuleUtils {
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof Function partnerFun) {
-                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (Function) mergeStateOp);
-                    thisGoalNamespaces.functions().add((Function) newOp1);
-                    thisGoalNamespaces.flushToParent();
 
-                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), partnerFun);
-                    thisGoalNamespaces.functions().add((Function) newOp2);
-                    thisGoalNamespaces.flushToParent();
-                } else if (partnerStateOp instanceof LocationVariable partnerLV) {
-                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
-                    thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
-                    thisGoalNamespaces.flushToParent();
+                newOp1 = renameMergeParticipantOp(partnerStateOp, mergeStateOp, thisGoal);
 
-                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), partnerLV);
-                    thisGoalNamespaces.programVariables().add((LocationVariable) newOp2);
-                    thisGoalNamespaces.flushToParent();
-                } else {
-                    throw new RuntimeException(
-                        "MergeRule: Unexpected type of Operator involved in name clash: "
-                            + partnerStateOp.getClass().getSimpleName());
-                }
+                newOp2 = renameMergeParticipantOp(partnerStateOp, partnerStateOp, thisGoal);
 
                 mergeState = new SymbolicExecutionState(
                     OpReplacer.replace(mergeStateOp, newOp1, mergeState.getSymbolicState(), tb.tf(),
@@ -1221,6 +1204,36 @@ public class MergeRuleUtils {
         }
 
         return new Pair<>(mergeState, mergePartnerState);
+    }
+
+    /**
+     * returns an operator of the same kind like <code>mergeStateOp</code> but with a unique name
+     *
+     * @param partnerStateOp the {@link Operator} on whose name the name is based
+     * @param mergeStateOp the {@link Operator} to rename
+     * @param thisGoal the {@link Goal} where the <code>mergeStateOp</code> occurs
+     * @return the renamed {@link Operator}
+     */
+    private static @NonNull Operator renameMergeParticipantOp(Operator partnerStateOp,
+            Operator mergeStateOp, Goal thisGoal) {
+        final TermBuilder tb = thisGoal.getOverlayServices().getTermBuilder();
+        final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
+        Operator newOp1;
+        if (mergeStateOp instanceof Function mergeFct) {
+            newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                thisGoal.getLocalNamespaces())), mergeFct);
+            thisGoalNamespaces.functions().add((Function) newOp1);
+        } else if (mergeStateOp instanceof LocationVariable mergeLV) {
+            newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                thisGoal.getLocalNamespaces())), mergeLV);
+            thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
+        } else {
+            throw new RuntimeException(
+                "MergeRule: Unexpected type of Operator involved in name clash: " +
+                    mergeStateOp + " : " + mergeStateOp.getClass().getSimpleName());
+        }
+        thisGoalNamespaces.flushToParent();
+        return newOp1;
     }
 
     /**
@@ -1338,7 +1351,7 @@ public class MergeRuleUtils {
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-        ImmutableList<JTerm> elementaries = ImmutableSLList.nil();
+        ImmutableList<JTerm> elementaries = ImmutableList.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {
             final String newName = tb.newName(stripIndex(loc.name().toString()));
@@ -1487,12 +1500,13 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ProofSearchInformation tryToProve(JTerm toProve, Services services,
+    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(JTerm toProve,
+            Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
-            JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
-                ImmutableSLList.singleton(new SequentFormula(toProve))),
+            JavaDLSequentKit.createSequent(ImmutableList.nil(),
+                ImmutableList.singleton(new SequentFormula(toProve))),
             services, doSplit, sideProofName, timeout);
     }
 
@@ -1506,7 +1520,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds. Set to -1 for no timeout.
      * @return The proof result.
      */
-    private static ProofSearchInformation tryToProve(Sequent toProve, Services services,
+    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(Sequent toProve,
+            Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
@@ -1558,7 +1573,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(JTerm toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation proofResult =
+            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1580,7 +1595,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation<Proof, Goal> proofResult =
+            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1617,7 +1632,7 @@ public class MergeRuleUtils {
         if (openGoals.isEmpty()) {
             return tb.tt();
         } else {
-            ImmutableList<JTerm> goalImplications = ImmutableSLList.nil();
+            ImmutableList<JTerm> goalImplications = ImmutableList.nil();
             for (Goal goal : openGoals) {
                 JTerm goalImplication = sequentToFormula(goal.sequent(), services);
                 goalImplications = goalImplications.append(goalImplication);
@@ -1639,8 +1654,8 @@ public class MergeRuleUtils {
     private static JTerm sequentToFormula(Sequent sequent, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        ImmutableList<JTerm> negAntecedentForms = ImmutableSLList.nil();
-        ImmutableList<JTerm> succedentForms = ImmutableSLList.nil();
+        ImmutableList<JTerm> negAntecedentForms = ImmutableList.nil();
+        ImmutableList<JTerm> succedentForms = ImmutableList.nil();
 
         // Shift antecedent formulae to the succedent by negation
         for (SequentFormula sf : sequent.antecedent().asList()) {

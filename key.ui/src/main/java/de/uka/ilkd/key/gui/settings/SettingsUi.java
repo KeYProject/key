@@ -20,9 +20,6 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
@@ -31,9 +28,9 @@ public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
     private static int calculatedWidth = 0;
 
-    private final @NonNull JSplitPane root;
-    private final @NonNull JComponent westPanel;
-    private @NonNull DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
+    private final JSplitPane root;
+    private final JComponent westPanel;
+    private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private final JTree treeSettingsPanels = new JTree(treeModel);
     private final JTextField txtSearch = new JTextField();
     private final MainWindow mainWindow;
@@ -109,7 +106,7 @@ public class SettingsUi extends JPanel {
         root.setDividerLocation(0.3d);
     }
 
-    private void setSettingsPanel(@NonNull JComponent comp) {
+    private void setSettingsPanel(JComponent comp) {
         SwingUtilities.updateComponentTreeUI(comp);
         root.setRightComponent(comp);
 
@@ -133,10 +130,11 @@ public class SettingsUi extends JPanel {
     /**
      * Configure the settings providers to display. Calculates the maximum width of the settings UI.
      *
-     * @param providers settings providers
+     * @param providers
+     *        settings providers
      * @return maximum width of the dialog
      */
-    public int setSettingsProvider(@NonNull List<SettingsProvider> providers) {
+    public int setSettingsProvider(List<SettingsProvider> providers) {
         SettingsTreeNode root = new SettingsTreeNode(providers);
         treeModel = new DefaultTreeModel(root);
         treeSettingsPanels.setModel(treeModel);

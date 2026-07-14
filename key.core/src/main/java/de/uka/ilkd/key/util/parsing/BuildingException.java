@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -21,13 +21,64 @@ import org.jspecify.annotations.Nullable;
 public class BuildingException extends RuntimeException implements HasLocation {
     private final @Nullable Token offendingSymbol;
 
-    public BuildingException(@Nullable ParserRuleContext ctx, String format) {
+    /**
+     * An optional position that overrides the position derived from {@link #offendingSymbol}. This
+     * is used when the real error location is not the offending token itself but a more precise
+     * spot, e.g. a position <em>inside</em> a Java block that is represented by a single token
+     * (the modality), but whose URI is still the one of that token.
+     */
+    private final @Nullable Position overridePosition;
+
+    /**
+     * The message as passed in, <em>without</em> the " at &lt;file&gt;:&lt;line&gt;:&lt;col&gt;"
+     * suffix that {@link #getMessage()} appends. Consumers that render the {@link #getLocation()}
+     * separately (the GUI dialog, the console formatter) should use this to avoid printing the
+     * position twice.
+     */
+    private final @Nullable String rawMessage;
+
+    /**
+     * A location supplied explicitly (rather than derived from an offending token), e.g. the
+     * {@code \classpath} declaration in a {@code .key} file whose directory does not exist.
+     */
+    private final @Nullable Location explicitLocation;
+
+    public BuildingException(ParserRuleContext ctx, String format) {
         this(ctx, format, null);
     }
 
     public BuildingException(@Nullable Throwable e) {
         super(e);
         offendingSymbol = null;
+        overridePosition = null;
+        explicitLocation = null;
+        rawMessage = e == null ? null : e.getMessage();
+    }
+
+    /**
+     * Creates an exception carrying an explicit {@link Location} (file + position), for errors
+     * whose
+     * origin is a declaration in a {@code .key} file rather than an offending parser token - e.g. a
+     * missing {@code \classpath}/{@code \bootclasspath} directory.
+     *
+     * @param location the location (file and position) of the offending declaration
+     * @param message the error message
+     */
+    public BuildingException(Location location, String message) {
+        super(message + locationSuffix(location));
+        offendingSymbol = null;
+        overridePosition = null;
+        explicitLocation = location;
+        rawMessage = message;
+    }
+
+    private static String locationSuffix(@Nullable Location location) {
+        if (location == null || location.getFileURI().isEmpty()
+                || location.getPosition().isNegative()) {
+            return "";
+        }
+        return " at " + location.getFileUri() + ":" + location.getPosition().line() + ":"
+            + location.getPosition().column();
     }
 
     public BuildingException(@Nullable ParserRuleContext ctx, String message,
@@ -35,14 +86,44 @@ public class BuildingException extends RuntimeException implements HasLocation {
         this(ctx == null ? null : ctx.start, message, e);
     }
 
-    public BuildingException(@Nullable Token t, @Nullable String message, @Nullable Throwable e) {
-        super(message + " at " + getPosition(t), e);
+    public BuildingException(@Nullable Token t, String message, Throwable e) {
+        this(t, null, message, e);
+    }
+
+    /**
+     * Creates an exception whose location uses the URI of the given token but the explicitly
+     * provided position instead of the token's own position.
+     *
+     * @param t the token providing the source (file) of the error, may be null
+     * @param overridePosition the precise position of the error, or null to use the token's
+     *        position
+     * @param message the error message
+     * @param e the causing throwable, may be null
+     */
+    public BuildingException(@Nullable Token t, @Nullable Position overridePosition, String message,
+            Throwable e) {
+        super(message + " at " + getPosition(t, overridePosition), e);
         offendingSymbol = t;
+        this.overridePosition = overridePosition;
+        this.explicitLocation = null;
+        this.rawMessage = message;
+    }
+
+    /**
+     * The error message without the trailing " at &lt;position&gt;" suffix. Use this together with
+     * {@link #getLocation()} to avoid reporting the position twice.
+     */
+    public String getRawMessage() {
+        return rawMessage != null ? rawMessage : getMessage();
     }
 
     private static String getPosition(@Nullable Token t) {
+        return getPosition(t, null);
+    }
+
+    private static String getPosition(@Nullable Token t, @Nullable Position override) {
         if (t != null) {
-            var p = Position.fromToken(t);
+            var p = override != null ? override : Position.fromToken(t);
             return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
         } else {
             return "";
@@ -55,15 +136,20 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     @Override
     public String toString() {
-        return getMessage() + " (" + getPosition(offendingSymbol) + ")";
+        return getMessage() + " (" + getPosition(offendingSymbol, overridePosition) + ")";
     }
 
     @Override
-    public @Nullable Location getLocation() throws MalformedURLException {
-        if (offendingSymbol != null) {
-            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
-            return new Location(uri, Position.fromToken(offendingSymbol));
+    public Location getLocation() {
+        if (explicitLocation != null) {
+            return explicitLocation;
         }
-        return null;
+        if (offendingSymbol != null) {
+            URI uri = SourceNames.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            Position p = overridePosition != null ? overridePosition
+                    : Position.fromToken(offendingSymbol);
+            return new Location(uri, p);
+        }
+        return Location.UNDEFINED;
     }
 }

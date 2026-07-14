@@ -16,8 +16,6 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Adapter for {@link KeYGuiExtension.KeyboardShortcuts} interface.
  * <p>

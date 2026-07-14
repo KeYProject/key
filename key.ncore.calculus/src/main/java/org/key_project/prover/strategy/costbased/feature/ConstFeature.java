@@ -12,6 +12,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.jspecify.annotations.NonNull;
 
 /// A feature that returns a constant value
+@StableCost
 public class ConstFeature implements Feature {
 
     @Override
@@ -24,7 +25,7 @@ public class ConstFeature implements Feature {
         val = p_val;
     }
 
-    public static @NonNull Feature createConst(RuleAppCost p_val) {
+    public static Feature createConst(RuleAppCost p_val) {
         return new ConstFeature(p_val);
     }
 

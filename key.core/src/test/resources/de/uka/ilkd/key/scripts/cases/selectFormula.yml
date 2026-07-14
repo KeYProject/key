@@ -1,0 +1,15 @@
+name: "selectFormula"
+key: |
+  \predicates { a; b; c; }
+  \problem { a & b & c}
+
+script: |
+  macro "split-prop";
+  select formula="b";
+
+goals:
+  - "==> b"
+  - "==> a"
+  - "==> c"
+
+selectedGoal: 0

@@ -10,9 +10,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 /**
  * This class offers a simple solution for receiving checked user input. It describes a panel
@@ -36,7 +33,6 @@ public class CheckedUserInput extends JPanel {
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */
-        @Nullable
         String check(String toBeChecked);
 
 

@@ -45,7 +45,7 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
     /**
      * @return The node corresponding to this SE state.
      */
-    public @Nullable Node getCorrespondingNode() { return correspondingNode; }
+    public Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).

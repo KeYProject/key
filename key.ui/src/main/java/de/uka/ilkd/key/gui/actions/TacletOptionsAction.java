@@ -11,8 +11,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.jspecify.annotations.NonNull;
-
 // This class is not used anymore as taclet options should be set through the general settings
 // dialog
 @Deprecated

@@ -179,7 +179,7 @@ public class UndoHistoryButton {
      *
      * @return the action
      */
-    public @NonNull MainWindowAction getAction() {
+    public MainWindowAction getAction() {
         return action;
     }
 

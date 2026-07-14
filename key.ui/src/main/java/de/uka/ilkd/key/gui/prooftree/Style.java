@@ -23,7 +23,7 @@ public class Style {
     public String text;
 
     /** the tooltip */
-    public Tooltip tooltip;
+    public @Nullable Tooltip tooltip;
 
     /** foreground color of the node */
     public Color foreground;
@@ -102,7 +102,7 @@ public class Style {
         /**
          * @return list of all additional infos, immutable
          */
-        public @NonNull List<Fragment> getAdditionalInfos() {
+        public List<Fragment> getAdditionalInfos() {
             return Collections.unmodifiableList(additionalInfo);
         }
 

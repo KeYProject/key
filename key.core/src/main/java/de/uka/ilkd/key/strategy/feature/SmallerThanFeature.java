@@ -10,8 +10,6 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 
 
 /**
@@ -52,7 +50,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
 
-        private ImmutableList<Term> terms = ImmutableSLList.nil();
+        private ImmutableList<Term> terms = ImmutableList.nil();
 
         protected void addTerm(Term mon) {
             terms = terms.prepend(mon);

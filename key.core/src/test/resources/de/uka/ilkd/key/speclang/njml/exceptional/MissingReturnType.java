@@ -1,4 +1,4 @@
-// exceptionClass: PosConvertException
+// exceptionClass: ParserException
 // msgContains: no viable alternative at input 'modelFct('
 // position: 11/23
 // verbose: true

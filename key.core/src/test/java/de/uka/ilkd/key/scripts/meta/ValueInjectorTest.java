@@ -4,15 +4,16 @@
 package de.uka.ilkd.key.scripts.meta;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.AbstractCommand;
-import de.uka.ilkd.key.scripts.EngineState;
-import de.uka.ilkd.key.scripts.ScriptException;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
 
-import org.jspecify.annotations.NonNull;
+import org.assertj.core.api.Assertions;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
@@ -27,15 +28,21 @@ public class ValueInjectorTest {
     public void testInjectionSimple() throws Exception {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+            null);
         args.put("b", true);
         args.put("i", 42);
-        args.put("s", "blubb");
 
-        ValueInjector.injection(new PPCommand(), pp, args);
+        assertThrows(ArgumentRequiredException.class, () -> {
+            ValueInjector.injection(new PPCommand(), pp, ast);
+        });
+
+        args.put("q", "blubb");
+        ValueInjector.injection(new PPCommand(), pp, ast);
 
         assertTrue(pp.b);
         assertEquals(42, pp.i);
-        assertEquals("blubb", pp.s);
+        assertEquals("blubb", pp.required);
 
     }
 
@@ -43,19 +50,54 @@ public class ValueInjectorTest {
     public void testRequired() {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+            null);
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,
-            () -> ValueInjector.injection(new PPCommand(), pp, args));
+            () -> ValueInjector.injection(new PPCommand(), pp, ast));
+    }
+
+    // copied from old jmlScript branch ... possibly needs adaptation
+    @Test
+    public void testUnknownArguments() {
+        PP pp = new PP();
+        Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+            null);
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("q", "requiredValue");
+        args.put("unknownParameter", "unknownValue");
+        assertThrows(UnknownArgumentException.class,
+            () -> ValueInjector.injection(new PPCommand(), pp, ast));
+    }
+
+    // copied from old jmlScript branch ... possibly needs adaptation
+    @Test
+    public void testVarargsOld() throws Exception {
+        PP pp = new PP();
+        Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+            null);
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("var_21", "21");
+        args.put("q", "requiredValue");
+        args.put("var_other", "otherString");
+        ValueInjector.injection(new PPCommand(), pp, ast);
+        assertEquals("21", pp.varargs.get("var_21"));
+        assertEquals("otherString", pp.varargs.get("var_other"));
+        assertEquals(2, pp.varargs.size());
     }
 
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
-        List<ProofScriptArgument<PP>> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
-        assertEquals(3, meta.size());
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
+        assertEquals(5, meta.size());
 
         {
-            ProofScriptArgument<PP> b = meta.get(0);
+            ProofScriptArgument b = meta.getFirst();
             assertEquals("b", b.getName());
             assertEquals(PP.class.getDeclaredField("b"), b.getField());
             assertEquals(Boolean.TYPE, b.getType());
@@ -63,7 +105,7 @@ public class ValueInjectorTest {
         }
 
         {
-            ProofScriptArgument<PP> i = meta.get(1);
+            ProofScriptArgument i = meta.get(1);
             assertEquals("i", i.getName());
             assertEquals(PP.class.getDeclaredField("i"), i.getField());
             assertEquals(Integer.TYPE, i.getType());
@@ -71,41 +113,109 @@ public class ValueInjectorTest {
         }
 
         {
-            ProofScriptArgument<PP> i = meta.get(2);
-            assertEquals("s", i.getName());
-            assertEquals(PP.class.getDeclaredField("s"), i.getField());
-            assertEquals(String.class, i.getType());
-            assertFalse(i.isRequired());
+            ProofScriptArgument s = meta.get(2);
+            assertEquals("s", s.getName());
+            assertEquals(PP.class.getDeclaredField("s"), s.getField());
+            assertEquals(String.class, s.getType());
+            assertFalse(s.isRequired());
+        }
+
+        {
+            ProofScriptArgument q = meta.get(3);
+            assertEquals("q", q.getName());
+            assertEquals(PP.class.getDeclaredField("required"), q.getField());
+            assertEquals(String.class, q.getType());
+            assertTrue(q.isRequired());
+        }
+
+        {
+            ProofScriptArgument vars = meta.get(4);
+            assertEquals("varargs", vars.getName());
+            assertEquals(PP.class.getDeclaredField("varargs"), vars.getField());
+            assertEquals(Map.class, vars.getType());
+            assertEquals("var_", vars.getOptionalVarArgs().prefix());
+            assertSame(String.class, vars.getOptionalVarArgs().as());
+            assertTrue(vars.isOptionalVarArgs());
         }
 
     }
 
-    public static class PP {
-        @Option("b")
-        boolean b;
-        @Option(value = "i")
-        int i;
-        @Option(value = "s", required = false)
-        String s;
+    @Test
+    public void testFlag() throws Exception {
+        class Options {
+            @Flag
+            boolean a;
+            @Flag
+            boolean b;
+            @Flag
+            boolean c = true;
+        }
+        var arg = new ScriptCommandAst("empty", Map.of("a", "true", "c", false), List.of("b"));
+        var injector = ValueInjector.createDefault().inject(new Options(), arg);
+
+        assertTrue(injector.a, "Field a should be true given as key-value argument");
+        assertTrue(injector.b, "Field b should be true given as positional argument");
+        assertFalse(injector.c, "Field c should be false, given explicitly as key-value argument");
     }
 
-    private static class PPCommand extends AbstractCommand<PP> {
+
+    @Test
+    public void testVarargs() throws InjectionException {
+        class Varargs {
+            @OptionalVarargs(prefix = "a", as = Boolean.class)
+            Map<String, Boolean> a;
+
+            @OptionalVarargs(prefix = "b", as = Integer.class)
+            Map<String, Integer> b;
+        }
+        var arg = new ScriptCommandAst("empty",
+            Map.of("a1", "true", "b1", "1", "b2", "2", "a2", "false"),
+            List.of());
+        var values = ValueInjector.createDefault().inject(new Varargs(), arg);
+
+        Assertions.assertThat(values.a)
+                .containsEntry("a1", true)
+                .containsEntry("a2", false);
+
+        Assertions.assertThat(values.b)
+                .containsEntry("b1", 1)
+                .containsEntry("b2", 2);
+    }
+
+
+
+    public static class PP {
+        @Option
+        boolean b;
+
+        @Option
+        int i;
+
+        @Option
+        @Nullable
+        String s;
+
+        @Option("q")
+        @MonotonicNonNull
+        String required;
+
+        @OptionalVarargs(prefix = "var_")
+        Map<String, String> varargs;
+    }
+
+    @NullMarked
+    private static class PPCommand extends AbstractCommand {
         public PPCommand() {
             super(null);
         }
 
         @Override
-        public @Nullable PP evaluateArguments(EngineState state, Map<String, Object> arguments) {
-            return null;
+        public void execute(ScriptCommandAst args) {
+
         }
 
         @Override
-        public void execute(AbstractUserInterfaceControl uiControl, PP args, EngineState stateMap)
-                throws ScriptException, InterruptedException {
-        }
-
-        @Override
-        public @NonNull String getName() {
+        public String getName() {
             return "pp";
         }
     }

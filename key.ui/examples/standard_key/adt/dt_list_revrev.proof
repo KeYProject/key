@@ -110,7 +110,7 @@
 (autoModeTime "22638")
 
 (branch "dummy ID"
-(rule "List_Ind" (inst "phi=(rev(rev(l)) = l)<<origin(\"User_Interaction @ node 0 (InductionforList)\",\"[]\")>>") (inst "x=l") (userinteraction))
+(rule "DT_List_Induction" (inst "phi=(rev(rev(l)) = l)<<origin(\"User_Interaction @ node 0 (InductionforList)\",\"[]\")>>") (inst "x=l") (userinteraction))
 (branch "Nil"
    (rule "allRight" (formula "2") (inst "sk=l_0"))
    (rule "revert_base" (formula "1") (term "0,0") (userinteraction))

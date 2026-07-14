@@ -11,16 +11,15 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
 
 import org.antlr.v4.runtime.CharStreams;
-import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.nparser.KeYLexer.*;
+import static de.uka.ilkd.key.nparser.JavaKeYLexer.*;
 
 /**
  * This is a lexer class used by a {@link SourceHighlightDocument} to highlight KeY code.
- * It uses the ANTLR lexer {@link KeYLexer} to tokenize the text.
+ * It uses the ANTLR lexer {@link JavaKeYLexer} to tokenize the text.
  *
  * Secondary keywords are highlighted in a different color. These are schema variables kinds,
  * variable conditions etc.
@@ -97,7 +96,7 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
             GET_INVARIANT, GET_FREE_INVARIANT, GET_VARIANT, IS_LABELED, SAME_OBSERVER, VARCOND,
             FORALL, EXISTS, SUBST, IF, IFEX, THEN, ELSE, INCLUDE, INCLUDELDTS, CLASSPATH,
             BOOTCLASSPATH, NODEFAULTCLASSES, JAVASOURCE, WITHOPTIONS, OPTIONSDECL, KEYSETTINGS,
-            PROFILE, SAMEUPDATELEVEL, INSEQUENTSTATE, ANTECEDENTPOLARITY, SUCCEDENTPOLARITY,
+            PROFILE, IGNOREUPDATELEVEL, INSEQUENTSTATE, ANTECEDENTPOLARITY, SUCCEDENTPOLARITY,
             CLOSEGOAL, HEURISTICSDECL, NONINTERACTIVE, DISPLAYNAME, HELPTEXT, REPLACEWITH, ADDRULES,
             ADDPROGVARS, HEURISTICS, FIND, ADD, ASSUMES, TRIGGER, AVOID, PREDICATES, FUNCTIONS,
             DATATYPES, TRANSFORMERS, UNIQUE, FREE, RULES, AXIOMS, PROBLEM, CHOOSECONTRACT,
@@ -120,13 +119,13 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
         addAll(MODALITIES, MODALITY);
     }
 
-    private static void addAll(@NonNull BitSet bitSet, int @NonNull... values) {
+    private static void addAll(BitSet bitSet, int... values) {
         for (int value : values) {
             bitSet.set(value);
         }
     }
 
-    private @NonNull SimpleAttributeSet getAttributes(int type) {
+    private SimpleAttributeSet getAttributes(int type) {
         if (KEYWORDS.get(type)) {
             return keywordStyle;
         } else if (KEYWORDS2.get(type)) {
@@ -143,8 +142,8 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
     }
 
     @Override
-    public @NonNull List<SourceHighlightDocument.Token> applyTo(@NonNull String text) {
-        KeYLexer keYLexer = new KeYLexer(CharStreams.fromString(text));
+    public List<SourceHighlightDocument.Token> applyTo(String text) {
+        JavaKeYLexer keYLexer = new JavaKeYLexer(CharStreams.fromString(text));
         List<SourceHighlightDocument.Token> result = new ArrayList<>();
         var t = keYLexer.nextToken();
         while (t.getType() != -1) {

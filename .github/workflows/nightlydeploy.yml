@@ -1,39 +1,52 @@
-name: Nightly Deployer of Weekly Builds
+name: Weekly Builds of KeY
 
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '0 5 * * 1' # every monday morning
+    - cron: '0 5 * * 1' # every monday morning
 
 permissions:
   contents: write
   id-token: write
 
+env:
+  JAVA_VERSION: 21
+
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      # weigl: Should produce fancier release notes, but needs some configuration
-      # # https://github.com/marketplace/actions/release-changelog-builder
-      # - name: "Build Changelog"
-      #   id: build_changelog
-      #   uses: mikepenz/release-changelog-builder-action@v3.7.0
-      #   with:
-      #     ignorePreReleases: true
-      #     fetchReviewers: true
-
-      - uses: actions/checkout@v4
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
         with:
-          java-version: 21
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
+
       - name: Build with Gradle
-        run: ./gradlew --parallel assemble
+        run: ./gradlew --parallel assemble javadoc alldoc
+
+      - name: Upload ShadowJar
+        uses: actions/upload-artifact@v7
+        with:
+          name: shadowjars
+          path: "*/build/libs/*-exe.jar"
+          retention-days: 1
+
+      - name: Package
+        run: tar cvf key-javadoc.tar.xz build/docs/javadoc
+
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v7
+        with:
+          name: javadoc
+          path: "key-javadoc.tar.xz"
+          retention-days: 1
 
       - name: Delete previous nightly release
         continue-on-error: true
@@ -42,11 +55,24 @@ jobs:
         run: |
           gh release delete nightly --yes --cleanup-tag 
 
+
       - name: Create nightly release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |          
+        run: |
           gh release create --generate-notes --title "Nightly Release" \
              --prerelease --notes-start-tag KEY-2.12.3 \
-             nightly key.ui/build/libs/key-*-exe.jar
+             nightly key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
+
+
+      - name: Upload to MAVEN CENTRAL SNAPSHOT repository
+        run: |
+          ./gradlew publishAndReleaseToMavenCentral publishMavenPublicationToKEYLABRepository
+        env:
+          BUILD_NUMBER: "SNAPSHOT"
+          GITLAB_DEPLOY_TOKEN: ${{ secrets.GITLAB_DEPLOY_TOKEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.GPG_PRIVATE_KEY}}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.GPG_PASSPHRASE}}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}

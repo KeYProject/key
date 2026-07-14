@@ -20,9 +20,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
         static final NamedComparator INSTANCE = new NamedComparator();
@@ -33,7 +30,7 @@ public class UserDefinedSymbols {
         }
     }
 
-    final @Nullable UserDefinedSymbols parent;
+    final UserDefinedSymbols parent;
     final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
@@ -58,8 +55,8 @@ public class UserDefinedSymbols {
         this.referenceNamespaces = parent.referenceNamespaces;
     }
 
-    private <T extends Named> void addUserDefinedSymbol(T symbol, @NonNull Set<T> set,
-            @NonNull Namespace<T> excludeNamespace) {
+    private <T extends Named> void addUserDefinedSymbol(T symbol, Set<T> set,
+            Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
                     || excludeNamespace.lookup(symbol.name()) == null) {
@@ -125,8 +122,7 @@ public class UserDefinedSymbols {
         Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
             if (sort instanceof GenericSort genSort) {
-                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts(),
-                    "", "");
+                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
                 result.add(proxySort);
             } else {
                 result.add(sort);
@@ -137,7 +133,7 @@ public class UserDefinedSymbols {
         usedExtraSorts.addAll(result);
     }
 
-    public @NonNull String toString() {
+    public String toString() {
         StringBuilder symbols = new StringBuilder("functions:\n");
         for (Named named : usedExtraFunctions) {
             symbols.append(named.name()).append(", ");

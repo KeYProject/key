@@ -14,8 +14,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Caches whether a Term contains a modality operation.
  *

@@ -68,7 +68,7 @@
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "a"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "2") (term "1") (inst "#v0=a_1"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "a_1"))
-(rule "methodBodyExpand" (formula "2") (term "1") (newnames "heapBefore_<createObject>"))
+(rule "methodBodyExpand" (formula "2") (term "1") (newnames "heapBefore_$createObject"))
 (rule "simplifyUpdate2" (formula "2") (term "1"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "__NEW__"))
 (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "2") (term "1") (inst "#v0=a_2"))
@@ -103,10 +103,10 @@
 (rule "applyOnPV" (formula "5") (term "0,0,1,0"))
 (rule "applyOnPV" (formula "5") (term "1,0,1,0"))
 (rule "methodCallWithinClass" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<prepareEnter>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$prepareEnter"))
 (rule "simplifyUpdate2" (formula "5") (term "1"))
 (rule "methodCallSuper" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<prepare>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$prepare"))
 (rule "simplifyUpdate2" (formula "5") (term "1"))
 (rule "methodCallEmpty" (formula "5") (term "1"))
 (rule "blockEmpty" (formula "5") (term "1"))
@@ -166,10 +166,10 @@
 (rule "simplifyUpdate2" (formula "5"))
 (rule "applyOnElementary" (formula "5") (term "1,0"))
 (rule "applyOnPV" (formula "5") (term "0,1,0"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<init>"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$init"))
 (rule "simplifyUpdate2" (formula "5") (term "1"))
 (rule "methodCallSuper" (formula "5") (term "1"))
-(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_<init>_0"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_$init_0"))
 (rule "simplifyUpdate2" (formula "5") (term "1"))
 (rule "methodCallEmpty" (formula "5") (term "1"))
 (rule "blockEmpty" (formula "5") (term "1"))
@@ -608,7 +608,7 @@
       (rule "commute_and" (formula "6") (term "0,2,2,2,0"))
       (rule "commute_and" (formula "6") (term "0,0"))
       (rule "ifthenelse_split" (formula "6") (term "2,2,2,2,0"))
-      (branch " f_0 = <created> & o_0 = a_2 TRUE"
+      (branch " f_0 = $created & o_0 = a_2 TRUE"
          (rule "andLeft" (formula "1"))
          (rule "replace_known_left" (formula "8") (term "1,0,0") (ifseqformula "2"))
          (rule "concrete_and_3" (formula "8") (term "0,0"))
@@ -632,9 +632,9 @@
          (rule "eqSymm" (formula "3"))
          (rule "close" (formula "7") (ifseqformula "3"))
       )
-      (branch " f_0 = <created> & o_0 = a_2 FALSE"
+      (branch " f_0 = $created & o_0 = a_2 FALSE"
          (rule "ifthenelse_split" (formula "7") (term "0"))
-         (branch " f_0 = <initialized> & o_0 = a_2 TRUE"
+         (branch " f_0 = $initialized & o_0 = a_2 TRUE"
             (rule "andLeft" (formula "1"))
             (rule "eqSymm" (formula "9"))
             (rule "replace_known_left" (formula "8") (term "1") (ifseqformula "2"))
@@ -652,7 +652,7 @@
             (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
             (rule "close" (formula "6") (ifseqformula "1"))
          )
-         (branch " f_0 = <initialized> & o_0 = a_2 FALSE"
+         (branch " f_0 = $initialized & o_0 = a_2 FALSE"
             (rule "ifthenelse_split" (formula "8") (term "2,2,0"))
             (branch " f_0 = balance & o_0 = a_2 TRUE"
                (rule "andLeft" (formula "1"))

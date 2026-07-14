@@ -149,7 +149,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
         /**
          * Refactor the child below the updates computed via
-         * {@link TermBuilder#goBelowUpdates(org.key_project.logic.Term)}.
+         * {@link TermBuilder#goBelowUpdates(JTerm)}
          */
         APPLICATION_BELOW_UPDATES,
 

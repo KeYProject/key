@@ -1,0 +1,27 @@
+---
+contains:
+  - (declare-const sort_Field T)
+  - (declare-fun fieldIdentifier (U) Int)
+expected: VALID
+keySrc: |-
+  \functions { int[][] n; long[] i_arr_2; int j_0; int a_0; int i_0; int start; }
+
+  \problem {
+   (j_0 = a_0 &
+   a_0 >= 0 &
+   a_0 < n.length &
+   n[i_0][j_0] >= 0 &
+   i_arr_2[i_0] >= 1 &
+   i_0 < n.length &
+   i_0 >= 0 &
+   (\forall int i;
+     (   i < n.length & i >= 0
+      -> \forall int j; (j < n.length & j >= 0 -> (n[i][j] = 0 <-> j = i)))))
+  ->
+   !(n[i_0][j_0] = -1 &
+   j_0 = i_0 &
+     (!n[i_0][a_0] = -1
+   & (   !a_0 = start
+      -> i_arr_2[i_0] < i_arr_2[i_0] + n[i_0][j_0])
+   & !i_arr_2[i_0] + n[i_0][j_0] = -1))
+  }

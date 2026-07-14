@@ -11,8 +11,6 @@ import javax.swing.event.HyperlinkEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Dialog that displays an HTML document.
  *

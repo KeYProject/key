@@ -134,8 +134,7 @@ public class ProofEnvironment {
      * returns true iff the java model equals those of the argument proof environment. TODO: extend
      * to available rules and specs.
      */
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object cmp) {
+    public boolean equals(Object cmp) {
         if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }

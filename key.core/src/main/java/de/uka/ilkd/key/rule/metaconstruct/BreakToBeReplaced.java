@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.Break;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.jspecify.annotations.Nullable;
@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 class BreakToBeReplaced {
 
     private final Break brk;
-    private @Nullable ProgramVariable pvar;
+    private ProgramVariable pvar;
 
     public BreakToBeReplaced(Break brk, ProgramVariable pvar) {
         this.brk = brk;

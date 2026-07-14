@@ -22,7 +22,6 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Settings panel where extensions are disabled / enabled.
@@ -103,7 +102,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                 });
     }
 
-    private @NonNull String getSupportLabel(@NonNull Extension<?> it) {
+    private String getSupportLabel(Extension<?> it) {
         return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
             + (it.supportsLeftPanel() ? "LeftPanel " : "")
             + (it.supportsMainMenu() ? "MainMenu " : "")
@@ -118,7 +117,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public @NonNull JPanel getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         refresh();
         return this;
     }

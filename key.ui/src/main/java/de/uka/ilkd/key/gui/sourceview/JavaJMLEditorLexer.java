@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +16,7 @@ import javax.swing.text.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
-import org.jspecify.annotations.NonNull;
+import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
 
 /**
  * This lexer splits a text into tokens with coloured attributes.
@@ -28,34 +27,6 @@ import org.jspecify.annotations.NonNull;
  * @author Wolfram Pfeifer, Mattias Ulbrich
  */
 public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
-
-    @Serial
-    private static final long serialVersionUID = -1856296532743892931L;
-
-    // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
-
-    /** highight color for Java keywords (dark red/violet) */
-    private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-        ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
-
-    // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
-
-    /** highight color for comments (dull green) */
-    private static final ColorSettings.ColorProperty COMMENT_COLOR =
-        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
-
-    /** highight color for JavaDoc (dull green) */
-    private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
-
-    /** highight color for JML (dark blue) */
-    private static final ColorSettings.ColorProperty JML_COLOR =
-        ColorSettings.define("[java]jml", "", new Color(0x0000c0));
-
-    /** highight color for JML keywords (blue) */
-    private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
-
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),
      * COMMENT (&#47;&#42; ... &#42;&#47;), JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
@@ -258,17 +229,17 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     /**
      * The current token of the parser.
      */
-    private @NonNull String token = "";
+    private String token = "";
 
     /**
      * Stores the mode in which the parser currently is.
      */
-    private JavaJMLEditorLexer.@NonNull Mode mode = Mode.NORMAL;
+    private JavaJMLEditorLexer.Mode mode = Mode.NORMAL;
 
     /**
      * Stores the current comment state of the parser to recognize comments/comment ends.
      */
-    private JavaJMLEditorLexer.@NonNull CommentState state = CommentState.NO;
+    private JavaJMLEditorLexer.CommentState state = CommentState.NO;
 
     /**
      * The settings listener of this document (registered in the static listener list).
@@ -297,7 +268,7 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
      * @return list of tokens with their respective styles
      */
     @Override
-    public @NonNull List<SourceHighlightDocument.Token> applyTo(@NonNull String text) {
+    public List<SourceHighlightDocument.Token> applyTo(String text) {
         result.clear();
         currentPos = 0;
         tokenStart = 0;
@@ -486,43 +457,44 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
 
     private void processChar(char strChar) throws BadLocationException {
         switch (strChar) {
-        case ('@') -> checkAt();
-        case '\n' -> checkLinefeed();
-        // all tabs should have been replaced earlier!
-        case '\t', ' ' -> checkSpaceTab(strChar);
-        case '*' -> checkStar();
-        case '/' -> checkSlash();
-        case '"' -> checkQuote();
+            case ('@') -> checkAt();
+            case '\n' -> checkLinefeed();
+            // all tabs should have been replaced earlier!
+            case '\t', ' ' -> checkSpaceTab(strChar);
+            case '*' -> checkStar();
+            case '/' -> checkSlash();
+            case '"' -> checkQuote();
 
-        // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
-        case '+', '-' -> checkPlusMinus(strChar);
+            // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
+            case '+', '-' -> checkPlusMinus(strChar);
 
-        // case '*':
-        // case '/':
-        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<',
-                '>', '=', '\'' ->
-            // case ' ':
-            // case '"':
-            // case '\'':
-            // case '\n':
-            checkDelimiter(strChar);
-        default -> checkOther(strChar);
+            // case '*':
+            // case '/':
+            case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?',
+                    '<',
+                    '>', '=', '\'' ->
+                // case ' ':
+                // case '"':
+                // case '\'':
+                // case '\n':
+                checkDelimiter(strChar);
+            default -> checkOther(strChar);
         }
     }
 
-    private void insertCommentString(@NonNull String str, int pos) throws BadLocationException {
+    private void insertCommentString(String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), comment));
     }
 
-    private void insertAnnotation(@NonNull String str, int pos) throws BadLocationException {
+    private void insertAnnotation(String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), annotation));
     }
 
-    private void insertJavadocString(@NonNull String str, int pos) throws BadLocationException {
+    private void insertJavadocString(String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), javadoc));
     }
 
-    private void insertJMLString(@NonNull String str, int pos) throws BadLocationException {
+    private void insertJMLString(String str, int pos) throws BadLocationException {
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (jmlkeywords.contains(t)) {
@@ -533,7 +505,7 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
         }
     }
 
-    private void insertNormalString(@NonNull String str, int pos) throws BadLocationException {
+    private void insertNormalString(String str, int pos) throws BadLocationException {
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (keywords.contains(t)) {

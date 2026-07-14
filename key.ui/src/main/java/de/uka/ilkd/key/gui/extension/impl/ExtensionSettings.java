@@ -9,8 +9,6 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
-import org.jspecify.annotations.NonNull;
-
 public class ExtensionSettings extends AbstractPropertiesSettings {
     private static final String NAME = "Extensions";
     public static final String KEY_DISABLED = "disabled";
@@ -24,7 +22,7 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
         super(NAME);
     }
 
-    public @NonNull Collection<String> getForbiddenClasses() {
+    public Collection<String> getForbiddenClasses() {
         return forbiddenClasses.get();
     }
 
@@ -37,7 +35,7 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
     }
 
 
-    public void setForbiddenClass(@NonNull Class<?> type, boolean activated) {
+    public void setForbiddenClass(Class<?> type, boolean activated) {
         String text = type.getName();
         Collection<String> classes = getForbiddenClasses();
         if (activated) {

@@ -4,9 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -14,13 +12,13 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
@@ -32,32 +30,25 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Parameters> {
+public class SaveNewNameCommand extends AbstractCommand {
     public SaveNewNameCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
-            EngineState stateMap) throws ScriptException, InterruptedException {
-
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var params = state().getValueInjector().inject(new Parameters(), arguments);
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(
                 "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);
         }
 
-        final AbbrevMap abbrMap = stateMap.getAbbreviations();
+        final AbbrevMap abbrMap = state().getAbbreviations();
         final String key = params.abbreviation.substring(1);
         final String stringToMatch = params.matches;
 
         try {
-            final Goal goal = stateMap.getFirstOpenAutomaticGoal();
+            final Goal goal = state().getFirstOpenAutomaticGoal();
             final Node node = goal.node().parent();
             final List<String> matches =
                 node.getNameRecorder().getProposals().stream().map(Name::toString)
@@ -69,13 +60,14 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
                         matches.size(), stringToMatch));
             }
 
-            final Named lookupResult = goal.getLocalNamespaces().lookup(new Name(matches.get(0)));
+            final Named lookupResult =
+                goal.getLocalNamespaces().lookup(new Name(matches.getFirst()));
 
             assert lookupResult != null;
 
             // Should be a function or program variable
             final TermBuilder tb = //
-                stateMap.getProof().getServices().getTermBuilder();
+                state().getProof().getServices().getTermBuilder();
             final JTerm t;
             if (lookupResult instanceof Function) {
                 t = tb.func((Function) lookupResult);
@@ -97,11 +89,22 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
         }
     }
 
-    @SuppressWarnings("initialization")
+    @Documentation(category = "Internal",
+        value = """
+                Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
+                introduced by the last rule which matches certain criteria into an abbreviation for
+                later use. A nice use case is a manual loop invariant rule application, where the newly
+                introduced anonymizing Skolem constants can be saved for later interactive instantiations. As for
+                the let command, it is not allowed to call this command multiple times with the same name
+                argument (all names used for remembering instantiations are "final").
+                """)
     public static class Parameters {
-        @Option(value = "#2", required = true)
+        @Documentation("The abbreviation to store the new name under, must start with @")
+        @Argument
         public String abbreviation;
-        @Option(value = "matches", required = true)
+
+        @Documentation("A regular expression to match the new name against, must match exactly one name")
+        @Option(value = "matches")
         public String matches;
     }
 

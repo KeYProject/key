@@ -23,17 +23,14 @@ import org.jspecify.annotations.NonNull;
  * search bars.
  */
 public abstract class SearchBar extends JPanel {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4821960226273983607L;
-    public final JTextField searchField = new JTextField(20);
+    protected final JTextField searchField = new JTextField(20);
     private final JButton prev;
     private final JButton next;
     private final JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
-        ColorSettings.define("[searchBar]alert", "", new Color(255, 178, 178));
+        ColorSettings.define("[searchBar]alert", "",
+            new Color(255, 178, 178),
+            new Color(85, 40, 40));
 
     protected SearchBar() {
         prev = new JButton(IconFactory.previous(16));
@@ -118,9 +115,9 @@ public abstract class SearchBar extends JPanel {
     public void search() {
         boolean match = search(searchField.getText());
         if (match) {
-            searchField.setBackground(Color.WHITE);
+            searchField.setBackground(UIManager.getColor("TextField.background"));
         } else {
-            searchField.setBackground(ALERT_COLOR.get());
+            searchField.setBackground(ALERT_COLOR.getCurrentColor());
         }
     }
 

@@ -14,7 +14,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class SettingsDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);
 
     private final MainWindow mainWindow;
-    private final @NonNull SettingsUi ui;
+    private final SettingsUi ui;
     private final Action actionCancel = new CancelAction();
     private final Action actionAccept = new AcceptAction();
     private final Action actionApply = new ApplyAction();

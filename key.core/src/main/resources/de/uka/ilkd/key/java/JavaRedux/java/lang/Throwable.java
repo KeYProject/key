@@ -13,6 +13,10 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
    //@ protected nullable ghost String message = null;
    //@ protected nullable ghost Throwable cause = null;
 
+   // protected model \seq suppressedExceptions;
+   // protected model \locset suppressedListFootprint;
+
+
    /*@ public normal_behavior
      @    requires true;
      @    ensures message == null && cause == null;
@@ -65,9 +69,8 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @    requires cause == null;
      @    ensures \result == this && cause == arg0;
      @    assignable cause;
-     @ helper // needs to be helper because called in constructor
      @*/
-   public java.lang.Throwable initCause(java.lang.Throwable arg0) {
+   public /*@ helper @*/ java.lang.Throwable initCause(java.lang.Throwable arg0) { // needs to be helper because called in constructor
        //@ set cause = arg0;
        return this;
    }
@@ -79,4 +82,20 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
    public java.lang.Throwable fillInStackTrace();
 // public java.lang.StackTraceElement[] getStackTrace();
 // public void setStackTrace(java.lang.StackTraceElement[] arg0);
+
+   /// Try-With-Resource
+   /// the helper modifier should not be needed, but otherwise proofs of callers stop because they cannot show the
+   /// throwable invariant;
+   /// The whole spec below is commented out as permissions throw an error when declaring model fields (at least
+   /// without a represents, needs to be addressed after KeY 3.0)
+   /* public normal_behavior
+      assignable suppressedListFootprint;
+      ensures suppressedExceptions == \seq_concat(\old(suppressedExceptions), \seq_singleton(exception));
+    */
+   /*@ public normal_behavior
+     @ requires true;
+     @ ensures true;
+     @*/
+   public /*@ helper @*/ final synchronized void addSuppressed(Throwable exception);
+
 }

@@ -18,8 +18,6 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
 import org.key_project.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +166,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *
      * @param predicates The predicates to set.
      */
-    public void addPredicates(@NonNull Iterable<AbstractionPredicate> predicates) {
+    public void addPredicates(Iterable<AbstractionPredicate> predicates) {
         for (AbstractionPredicate predicate : predicates) {
             addPredicate(predicate);
         }

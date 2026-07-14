@@ -26,6 +26,21 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
+    private final Behavior behavior;
+    private ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    public TextualJMLSpecCase(TextualJMLSpecCase specCase) {
+        this(specCase.modifiers, specCase.behavior);
+        clauses.addAll(specCase.clauses);
+    }
+
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+        super(modifiers);
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
+        this.behavior = behavior;
+    }
 
     public @NonNull ImmutableList<LabeledParserRuleContext> getRequiresFree(
             @NonNull Name toString) {
@@ -40,12 +55,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignableFree(
-            @NonNull Name toString) {
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
         return getList(ASSIGNABLE_FREE, toString);
     }
 
-    private @NonNull ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
+    private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
             @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
@@ -74,12 +88,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignable(@NonNull Name heap) {
+    public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
         return getList(ASSIGNABLE, heap);
     }
 
     public @NonNull ImmutableList<LabeledParserRuleContext> getDecreases() {
         return getList(DECREASES);
+    }
+
+    public Iterable<ParserRuleContext> getClauses() {
+        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toList());
     }
 
     /**
@@ -100,8 +118,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         AXIOMS,
     }
 
-    private final @NonNull Behavior behavior;
-    private @NonNull ArrayList<Entry> clauses = new ArrayList<>(16);
 
     static class Entry {
         final Object clauseType;
@@ -119,17 +135,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(@NonNull ImmutableList<JMLModifier> modifiers,
-            @NonNull Behavior behavior) {
-        super(modifiers);
-        if (behavior == null) {
-            throw new IllegalArgumentException();
-        }
-        this.behavior = behavior;
-    }
-
-    public @NonNull TextualJMLSpecCase addClause(Clause clause,
-            @NonNull LabeledParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
         if (clauses.isEmpty()) {
             setPosition(ctx);
         }
@@ -164,19 +170,28 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
+    public boolean contains(ClauseHd clause, @Nullable Name heapName) {
+        return clauses.stream()
+                .anyMatch(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
+    public boolean removeClauses(ClauseHd clause, @Nullable Name heapName) {
+        return clauses
+                .removeIf(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+    }
+
     /**
      * Merge clauses of two spec cases. Keep behavior of this one.
      *
      * @param other
      */
     public @NonNull TextualJMLSpecCase merge(@NonNull TextualJMLSpecCase other) {
-        TextualJMLSpecCase res = clone();
+        TextualJMLSpecCase res = copy();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
-    @Override
-    public @NonNull TextualJMLSpecCase clone() {
+    public @NonNull TextualJMLSpecCase copy() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getModifiers(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);
@@ -197,7 +212,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
             + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
@@ -219,6 +234,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public record Abbreviation(LabeledParserRuleContext typeName,
             LabeledParserRuleContext abbrevName,
             LabeledParserRuleContext abbreviatedTerm) {
+    }
+
+    public Abbreviation[] getAbbreviations() {
+        /* weigl: prepare for future use of generated abbreviations from JML specifications */
+        return new Abbreviation[0];
     }
 
     public Abbreviation @NonNull [] getAbbreviations() {
@@ -269,7 +289,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignable() {
+    public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
 
@@ -283,7 +303,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     // endregion
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

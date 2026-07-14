@@ -12,7 +12,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A special kind of gui proof tree node to show intermediate steps of the
@@ -24,9 +23,9 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
     private final int formulaNr;
-    private final @NonNull GUIAbstractTreeNode parent;
+    private final GUIAbstractTreeNode parent;
 
-    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, @NonNull GUIAbstractTreeNode parent,
+    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
             RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;

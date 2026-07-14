@@ -23,8 +23,15 @@ class BoyerMoore {
       @  measured_by k;
       @  accessible a[*];
       @ model int count(int[] a, \bigint k, \bigint v) {
-      @   return k == 0 ? 0 :
-      @     ((a[k-1] == v ? 1 : 0) + count(a, k-1, v));
+      @   if (k == 0)
+      @     return 0;
+      @   else {
+      @     var last = a[k-1];
+      @     if (a[k-1] == v)
+      @       return 1 + count(a, k-1, v);
+      @     else
+      @       return count(a, k-1, v);
+      @   }
       @ }
       @*/
 
@@ -52,11 +59,25 @@ class BoyerMoore {
             if(mc == 0) {
                 mc = 1;
                 mx = a[k];
+                /*@ assert count(a, k+1, a[k]) <= count(a, k, a[k]) + 1 \by {
+                  @  oss;
+                  @  expand on: "self.count(a, k_0 + 1, a[k_0])";
+                  @  macro "nosplit-prop";
+                  @  auto classAxioms:false;
+                  @ }*/
             } else if(mx == a[k]) {
                 mc++;
             } else {
                 mc--;
             }
+            /*@ assert (\forall int x; x != mx; 2 * count(a, k+1, x) <= k+1 - mc) \by {
+              @  oss;
+              @  obtain int x \from_goal;
+              @  expand on: "self.count(a, k_0 + 1, x)";
+              @  macro "nosplit-prop";
+              @  instantiate var:"x" with: x;
+              @  auto classAxioms:false;
+              @ }*/
         }
 
         if(mc == 0) return IntOpt.NONE;

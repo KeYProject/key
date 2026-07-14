@@ -18,8 +18,6 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
  * apply macros one after the other. This works only for macros which use
@@ -59,7 +57,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            @Nullable PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if (macros.isEmpty()) {
             return false;
@@ -78,9 +76,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-            @Nullable ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {

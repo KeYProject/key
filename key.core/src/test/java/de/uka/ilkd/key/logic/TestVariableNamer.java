@@ -6,11 +6,13 @@ package de.uka.ilkd.key.logic;
 import java.util.Collections;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
@@ -27,7 +29,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.*;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
 
@@ -82,8 +84,8 @@ public class TestVariableNamer {
 
 
     private Goal constructGoal(SequentFormula containedFormula) {
-        final var empty = ImmutableSLList.<SequentFormula>nil();
-        final var ante = ImmutableSLList.singleton(containedFormula);
+        final var empty = ImmutableList.<SequentFormula>nil();
+        final var ante = ImmutableList.singleton(containedFormula);
 
         Sequent seq = JavaDLSequentKit.createSequent(ante, empty);
         Node node = new Node(proof, seq);
@@ -141,7 +143,6 @@ public class TestVariableNamer {
     }
 
 
-    @Test
     private void testTemporaryNames(VariableNamer vn) {
         ProgramElementName name = vn.getTemporaryNameProposal("x");
         assertNotEquals("x", name.getProgramName());

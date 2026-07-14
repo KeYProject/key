@@ -13,8 +13,12 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+
+public abstract class TacletVisitor implements DefaultVisitor {
+    private String failureDescription = null;
 
 public abstract class TacletVisitor implements DefaultVisitor {
     private @Nullable String failureDescription = null;
@@ -31,7 +35,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
         visit(seq.succedent());
     }
 
-    public @Nullable String visit(@NonNull Taclet taclet, boolean visitAddrules) {
+    public String visit(Taclet taclet, boolean visitAddrules) {
         visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
@@ -52,7 +56,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
         }
     }
 
-    protected void visitGoalTemplates(@NonNull Taclet taclet, boolean visitAddrules) {
+    protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
         for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {

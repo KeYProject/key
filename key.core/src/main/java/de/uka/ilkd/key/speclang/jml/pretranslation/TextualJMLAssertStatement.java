@@ -5,7 +5,10 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.RuleContext;
+import org.jspecify.annotations.Nullable;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.NonNull;
@@ -15,12 +18,21 @@ import org.jspecify.annotations.NonNull;
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
-    private final @NonNull Kind kind;
+    private final String optLabel;
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
+    private final Kind kind;
 
-    public TextualJMLAssertStatement(@NonNull Kind kind, KeyAst.Expression clause) {
-        super(ImmutableSLList.nil(), kind.toString() + " " + clause);
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
+        this(kind, clause, null, null);
+    }
+
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause,
+            KeyAst.@Nullable JMLProofScript assertionProof, String optLabel) {
+        super(ImmutableList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
+        this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     public KeyAst.Expression getContext() {
@@ -52,7 +64,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         }
     }
 
-    public @NonNull String getClauseText() {
+    public String getClauseText() {
         return context.getText();
         /*
          * var builder = new StringBuilder();
@@ -63,6 +75,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
     public @NonNull Kind getKind() {
         return kind;
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 
     public enum Kind {
@@ -78,5 +94,9 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         public String toString() {
             return name;
         }
+    }
+
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
     }
 }

@@ -3,14 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -19,9 +22,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.parsing.Position;
 
-import org.checkerframework.dataflow.qual.Pure;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,9 +71,8 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         assert sort() != JavaDLTheory.UPDATE;
     }
 
-    protected ProgramVariable(ProgramElementName name, Sort s, @Nullable KeYJavaType t,
-            @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
-            boolean isGhost) {
+    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+            KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
 
@@ -171,12 +172,6 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
-
-    @Override
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
     }
@@ -236,7 +231,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     public boolean isImplicit() {
-        return getProgramElementName().getProgramName().startsWith("<");
+        return JavaDLFieldNames.isImplicit(getProgramElementName());
     }
 
 

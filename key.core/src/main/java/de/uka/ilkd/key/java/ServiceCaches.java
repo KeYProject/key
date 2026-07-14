@@ -4,9 +4,12 @@
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,6 +27,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.SessionCaches;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -93,8 +97,22 @@ public class ServiceCaches implements SessionCaches {
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
+    /**
+     * the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for Skolem
+     * constants
+     */
     private final LRUCache<Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
+
+    /**
+     * Per-proof cache for {@code CostReuse}'s feature-locality classification (taclet -> its
+     * reuse-eligibility verdict). Held here, like the other proof-scoped caches, so it is freed
+     * with
+     * the proof and never shared between proofs with different taclet options. Values are opaque to
+     * this class (a {@code CostReuse.Eligibility}, or its ineligible sentinel) to keep this package
+     * independent of the strategy package.
+     */
+    private final Map<Taclet, Object> costReuseClassificationCache = new ConcurrentHashMap<>();
 
     private final LRUCache<org.key_project.logic.Term, Monomial> monomialCache =
         new LRUCache<>(2000);
@@ -157,6 +175,13 @@ public class ServiceCaches implements SessionCaches {
     private final LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> mvCache =
         new LRUCache<>(2000);
 
+    /**
+     * Cache used by {@link de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring}: the
+     * origins of a term and all its subterms. Terms are immutable, so the set never
+     * changes for a given term.
+     */
+    private final Map<JTerm, Set<Origin>> subtermOriginsCache = new LRUCache<>(20000);
+
 
     /**
      * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -167,6 +192,16 @@ public class ServiceCaches implements SessionCaches {
         return termTacletAppIndexCache;
     }
 
+    /**
+     * Returns the cache used by
+     * {@link de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring}.
+     *
+     * @return map from a term to the origins of the term and all its subterms
+     */
+    public final Map<JTerm, Set<Origin>> getSubtermOriginsCache() {
+        return subtermOriginsCache;
+    }
+
     public final LRUCache<JTerm, TermInfo> getBetaCandidates() {
         return betaCandidates;
     }
@@ -175,8 +210,16 @@ public class ServiceCaches implements SessionCaches {
         return ifThenElseMalusCache;
     }
 
+    /**
+     * returns the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for
+     * Skolem constants
+     */
     public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
         return introductionTimeCache;
+    }
+
+    public final Map<Taclet, Object> getCostReuseClassificationCache() {
+        return costReuseClassificationCache;
     }
 
     public final LRUCache<org.key_project.logic.Term, Monomial> getMonomialCache() {

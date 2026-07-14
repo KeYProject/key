@@ -25,10 +25,8 @@ public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extend
     }
 
     @Override
-    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app,
-            @NonNull PosInOccurrence pos,
-            G goal,
-            MutableState mState) {
+    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
+            G goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();

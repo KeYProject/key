@@ -14,8 +14,6 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 
 import org.key_project.prover.rules.RuleApp;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Tracks which rule application introduced each {@link LocationVariable} in a proof.
  * Currently only checks for {@code ifElseUnfold} rules.
@@ -35,7 +33,7 @@ public class LocationVariableTracker implements RuleAppListener {
      *
      * @param proof proof to track
      */
-    public static void handleProofLoad(@NonNull Proof proof) {
+    public static void handleProofLoad(Proof proof) {
         if (proof.lookup(LocationVariableTracker.class) != null) {
             return;
         }
@@ -53,7 +51,7 @@ public class LocationVariableTracker implements RuleAppListener {
     }
 
     @Override
-    public void ruleApplied(@NonNull ProofEvent e) {
+    public void ruleApplied(ProofEvent e) {
         var rai = e.getRuleAppInfo();
         if (rai.getRuleApp().rule().displayName().equals("ifElseUnfold")) {
             rai.getReplacementNodes().forEach(x -> {

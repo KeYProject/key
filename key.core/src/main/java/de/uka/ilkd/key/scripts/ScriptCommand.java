@@ -7,13 +7,18 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
+/**
+ * Includes and runs another script file.
+ * See Parameters for more documentation.
+ */
+public class ScriptCommand extends AbstractCommand {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ProofScriptCommand.class);
 
@@ -21,15 +26,17 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         super(Parameters.class);
     }
 
-    @SuppressWarnings("initialization")
+    @Documentation(category = "Control", value = "Includes and runs another script file.")
     public static class Parameters {
-        @Option("#2")
-        public String filename;
+        @Documentation("The filename of the script to include. May be relative to the current script.")
+        @Argument
+        public @MonotonicNonNull String filename;
     }
 
     @Override
-    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
-        Path root = state.getBaseFileName();
+    public void execute(ScriptCommandAst ast) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), ast);
+        Path root = state().getBaseFileName();
         if (!Files.isDirectory(root)) {
             root = root.getParent();
         }
@@ -38,9 +45,9 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         LOGGER.info("Included script {}", file);
 
         try {
-            ProofScriptEngine pse = new ProofScriptEngine(file);
-            pse.setCommandMonitor(state.getObserver());
-            pse.execute(uiControl, proof);
+            ProofScriptEngine pse = new ProofScriptEngine(proof);
+            pse.setCommandMonitor(state().getObserver());
+            pse.execute(uiControl, file);
         } catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
             throw new ScriptException("Script file '" + file + "' not found", e);
@@ -51,7 +58,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "script";
     }
 }

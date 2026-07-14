@@ -7,11 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -32,7 +32,6 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -116,35 +115,35 @@ public final class DLSpecFactory {
 
     private IProgramMethod extractProgramMethod(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.pm;
+        return inst.pm();
     }
 
 
     private JModality.JavaModalityKind extractModalityKind(
             UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.modality.kind();
+        return inst.modality().kind();
     }
 
 
     private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        if (inst.actualSelf == null) {
-            assert inst.pm.isStatic();
+        if (inst.actualSelf() == null) {
+            assert inst.pm().isStatic();
             return null;
-        } else if (inst.actualSelf.op() instanceof LocationVariable lv) {
+        } else if (inst.actualSelf().op() instanceof LocationVariable lv) {
             return lv;
         } else {
             throw new ProofInputException(
-                "Program variable expected, " + "but found: " + inst.actualSelf);
+                "Program variable expected, " + "but found: " + inst.actualSelf());
         }
     }
 
 
     private ImmutableList<LocationVariable> extractParamVars(
             UseOperationContractRule.Instantiation inst) throws ProofInputException {
-        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
-        for (JTerm param : inst.actualParams) {
+        ImmutableList<LocationVariable> result = ImmutableList.nil();
+        for (JTerm param : inst.actualParams()) {
             if (param.op() instanceof LocationVariable lv) {
                 result = result.append(lv);
             } else {
@@ -158,13 +157,13 @@ public final class DLSpecFactory {
 
     private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        if (inst.actualResult == null) {
+        if (inst.actualResult() == null) {
             return null;
-        } else if (inst.actualResult instanceof LocationVariable lv) {
+        } else if (inst.actualResult() instanceof LocationVariable lv) {
             return lv;
         } else {
             throw new ProofInputException(
-                "Program variable expected, " + "but found: " + inst.actualResult);
+                "Program variable expected, " + "but found: " + inst.actualResult());
         }
     }
 

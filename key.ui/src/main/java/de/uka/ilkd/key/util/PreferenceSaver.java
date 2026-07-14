@@ -8,8 +8,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A simple utility which stores and loads user manipulatable properties of swing components in the
  * system's preferences.

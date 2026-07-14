@@ -13,8 +13,6 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.io.Logger;
 
-import org.jspecify.annotations.NonNull;
-
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
@@ -119,7 +117,7 @@ public class DependencyNode {
 
     // TODO: equals and hashCode needed for HashMaps?
     // @Override
-    // boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    // public boolean equals(Object o) {
     // if (o instanceof DependencyNode) {
     // DependencyNode node = (DependencyNode) o;
     // if (node.contract.equals(contract)) {

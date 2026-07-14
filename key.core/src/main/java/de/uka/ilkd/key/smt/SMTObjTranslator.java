@@ -7,10 +7,13 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericArgument;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
@@ -47,7 +50,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private static final String EMPTY_CONSTANT = "empty";
     public static final String ELEMENTOF = "elementOf";
     private static final String SELECT = "select";
-    private static final String CREATED_FIELD_NAME = "java.lang.Object::<created>";
+    private static final String CREATED_FIELD_NAME = "java.lang.Object::#$created";
     private static final String ARR_FUNCTION_NAME = "arr";
     private static final String SEQ_EMPTY = "seqEmpty";
     private static final String SEQ_OUTSIDE = "seqGetOutside";
@@ -674,19 +677,19 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
-            case "int", "char", "byte" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
-            case "java.lang.Object" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
-            default -> {
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
-                addTypePredicate(singleSort);
-                SMTFunction tps = getTypePredicate(singleSort.name().toString());
-                SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
-                typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
-            }
+                case "int", "char", "byte" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+                case "java.lang.Object" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+                default -> {
+                    typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                    Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+                    addTypePredicate(singleSort);
+                    SMTFunction tps = getTypePredicate(singleSort.name().toString());
+                    SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
+                    typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
+                }
             }
             assertion4 = assertion4.and(premise.implies(typeReq));
         }
@@ -902,8 +905,10 @@ public class SMTObjTranslator implements SMTTranslator {
      */
     private void findSorts(Set<Sort> sorts, Term term) {
         addSingleSort(sorts, term.sort());
-        if (term.op() instanceof SortDependingFunction sdf) {
-            addSingleSort(sorts, sdf.getSortDependingOn());
+        if (term.op() instanceof ParametricFunctionInstance pfi) {
+            for (GenericArgument a : pfi.getArgs()) {
+                addSingleSort(sorts, a.sort());
+            }
         }
         for (Term sub : term.subs()) {
             findSorts(sorts, sub);
@@ -1411,7 +1416,7 @@ public class SMTObjTranslator implements SMTTranslator {
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
-            name = name.replace("$", "");
+            name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
             Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
             fieldSorts.put(name, sort);
@@ -1451,20 +1456,22 @@ public class SMTObjTranslator implements SMTTranslator {
             function = wellformedFunction;
         } else if (name.equals(ELEMENTOF)) {
             function = elementOfFunction;
-        } else if (name.endsWith("::exactInstance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getExactInstanceofSymbol(services)) {
+            Sort depSort = pfi.getArgs().head().sort();
             function = getExactInstanceFunction(depSort);
-        } else if (name.endsWith("::instance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getInstanceofSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            Sort depSort = sort;
             addTypePredicate(depSort);
-            function = getTypePredicate(sdf.getSortDependingOn().name().toString());
-        } else if (name.endsWith("::cast")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            SMTSort target = translateSort(sdf.getSortDependingOn());
+            function = getTypePredicate(sort.name().toString());
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getCastSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            SMTSort target = translateSort(sort);
             if (target.getId().equals(OBJECT_SORT)) {
-                function = getCastFunction(sdf.getSortDependingOn());
+                function = getCastFunction(sort);
             } else {
                 Sort s = subs.get(0).sort();
                 SMTSort source = translateSort(s);
@@ -1474,7 +1481,11 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
                 function = getCastFunction(source, target);
             }
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) { // is the
+                                                                                        // static
+            // invariant
+            // supposed to
+            // be here?
             if (functions.containsKey(CLASS_INVARIANT)) {
                 function = functions.get(CLASS_INVARIANT);
             } else {

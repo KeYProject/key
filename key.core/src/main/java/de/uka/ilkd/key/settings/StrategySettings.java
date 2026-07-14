@@ -17,7 +17,6 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.engine.impl.AppliedRuleStopCondition;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,11 +179,10 @@ public class StrategySettings extends AbstractSettings {
 
     @Override
     public void readSettings(Configuration props) {
-        var section = props.getSection(CATEGORY);
-        if (section == null) {
+        props = props.getSection(CATEGORY);
+        if (props == null) {
             return;
         }
-        props = section;
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));

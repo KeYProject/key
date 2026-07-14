@@ -4,8 +4,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,10 +50,9 @@ public class KeyIO {
 
     private final Services services;
     private final NamespaceSet nss;
-    private List<BuildingIssue> warnings = new LinkedList<>();
-
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
-    private @Nullable AbbrevMap abbrevMap;
+    private List<BuildingIssue> warnings = new LinkedList<>();
+    private AbbrevMap abbrevMap;
 
 
     public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
@@ -221,7 +219,7 @@ public class KeyIO {
         return warnings;
     }
 
-    public List<BuildingIssue> resetWarnings() {
+    public @Nullable List<BuildingIssue> resetWarnings() {
         var w = warnings;
         warnings = new LinkedList<>();
         return w;
@@ -286,7 +284,8 @@ public class KeyIO {
             if (resource != null) {
                 ctx = parseFiles(resource);
             } else {
-                ctx.add(ParsingFacade.parseFile(content));
+                KeyAst.File c = ParsingFacade.parseFile(content);
+                ctx.add(c);
             }
             long stop = System.currentTimeMillis();
             LOGGER.info("Parsing took {} ms", stop - start);

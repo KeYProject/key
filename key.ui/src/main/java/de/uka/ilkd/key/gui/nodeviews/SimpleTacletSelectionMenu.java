@@ -12,8 +12,6 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This simple taclet menu displays the user a list of applicable taclets and lets select her/him
  * one of those. It is similar to {@link de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu} but with

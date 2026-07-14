@@ -13,7 +13,6 @@ import java.util.Map;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 
-import org.jspecify.annotations.NonNull;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
@@ -38,7 +37,7 @@ public final class HTMLReport {
      * @throws IOException if an error occurs when accessing to the target path or the string
      *         template resources
      */
-    public static void print(@NonNull CheckerData data, @NonNull Path target) throws IOException {
+    public static void print(CheckerData data, Path target) throws IOException {
 
         ST st = prepareStringTemplate();
 
@@ -84,7 +83,7 @@ public final class HTMLReport {
         // (needed to access some KeY properties, e.g. Proof.name()
         group.registerModelAdaptor(Object.class, new ObjectModelAdaptor<>() {
             @Override
-            public synchronized Object getProperty(Interpreter interp, ST self, @NonNull Object o,
+            public synchronized Object getProperty(Interpreter interp, ST self, Object o,
                     Object property, String propertyName)
                     throws STNoSuchPropertyException {
                 Method m = tryGetMethod(o.getClass(), propertyName);
@@ -103,8 +102,7 @@ public final class HTMLReport {
         Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>) (Class) Map.class;
         group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
-            public Object getProperty(Interpreter interp, ST self, @NonNull Map<?, ?> map,
-                    @NonNull Object property,
+            public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("entrySet")) {
@@ -124,7 +122,7 @@ public final class HTMLReport {
         group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self,
-                    Map.@NonNull Entry<?, ?> entry, @NonNull Object property,
+                    Map.Entry<?, ?> entry, Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("value")) {
@@ -136,7 +134,7 @@ public final class HTMLReport {
             }
         });
 
-        // StringRenderer to escape special HTML chars, for example in java.lang.Object::<inv>
+        // StringRenderer to escape special HTML chars, for example in java.lang.Object::$inv
         group.registerRenderer(String.class, new StringRenderer());
         // NumberRenderer to allow for format strings such as %02d
         group.registerRenderer(Number.class, new NumberRenderer());

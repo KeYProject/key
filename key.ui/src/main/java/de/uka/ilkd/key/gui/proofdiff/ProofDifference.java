@@ -11,12 +11,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.Levensthein;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -32,14 +30,13 @@ public class ProofDifference {
     private final Set<String> exclusiveSucc = new HashSet<>();
     private final Set<String> commonAntec = new HashSet<>();
 
-    public static @NonNull ProofDifference create(@NonNull Services services, @NonNull Node left,
-            @NonNull Node right) {
+    public static ProofDifference create(Services services, Node left, Node right) {
         return create(left, right,
             (Term t) -> LogicPrinter.quickPrintTerm((JTerm) t, services));
     }
 
-    public static @NonNull ProofDifference create(@NonNull Node left, @NonNull Node right,
-            @NonNull Function<Term, String> printer) {
+    public static ProofDifference create(Node left, Node right,
+            Function<Term, String> printer) {
         ProofDifference pd = new ProofDifference();
         assert left != null && right != null;
         pd.leftAntec = initialise(printer, left.sequent().antecedent());
@@ -105,8 +102,7 @@ public class ProofDifference {
     private record QueueEntry(int idxLeft, int idxRight, int distance) {
     }
 
-    static @NonNull List<Matching> findPairs(@NonNull List<String> left,
-            @NonNull List<String> right) {
+    static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
             Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
@@ -191,38 +187,6 @@ public class ProofDifference {
 
     public @NonNull List<Matching> getAntecPairs() {
         return findPairs(getLeftAntec(), getRightAntec());
-    }
-
-    /**
-     * https://www.baeldung.com/java-levenshtein-distance
-     */
-    static class Levensthein {
-        static int calculate(@NonNull String x, @NonNull String y) {
-            int[][] dp = new int[x.length() + 1][y.length() + 1];
-            for (int i = 0; i <= x.length(); i++) {
-                for (int j = 0; j <= y.length(); j++) {
-                    if (i == 0) {
-                        dp[i][j] = j;
-                    } else if (j == 0) {
-                        dp[i][j] = i;
-                    } else {
-                        dp[i][j] = min(
-                            dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
-                            dp[i - 1][j] + 1, dp[i][j - 1] + 1);
-                    }
-                }
-            }
-            return dp[x.length()][y.length()];
-        }
-
-        public static int costOfSubstitution(char a, char b) {
-            return a == b ? 0 : 1;
-        }
-
-
-        public static int min(int @NonNull... numbers) {
-            return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
-        }
     }
 
     record Matching(String left, String right, int distance) {

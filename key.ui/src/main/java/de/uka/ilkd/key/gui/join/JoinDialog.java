@@ -29,9 +29,6 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.prover.sequent.Sequent;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);
 

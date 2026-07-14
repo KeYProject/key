@@ -10,8 +10,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * A collection of all program variables needed to translate a textual JML specification case.
  *
@@ -36,7 +34,7 @@ public class ProgramVariableCollection {
     /**
      * {@code exception}
      */
-    public @Nullable LocationVariable excVar;
+    public LocationVariable excVar;
 
     /**
      * A map from every variable {@code var} to {@code \old(var)}.
@@ -81,7 +79,7 @@ public class ProgramVariableCollection {
      *
      * @param selfVar {@code self}
      * @param paramVars the list of method parameters if the textual specification case is a method
-     *        contract.
+     *        contract. May also contain the local variables visible at a statement.
      * @param resultVar {@code result}
      * @param excVar {@code exception}
      * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.

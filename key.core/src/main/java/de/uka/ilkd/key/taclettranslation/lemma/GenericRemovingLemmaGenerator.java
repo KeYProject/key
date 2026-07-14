@@ -6,17 +6,18 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Generic removing lemma generator adds the default implementation only that all
@@ -43,13 +44,13 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * is a generic sort.
      */
     @Override
-    protected Operator replaceOp(Operator op, @NonNull TermServices services) {
-
-        if (op instanceof SortDependingFunction sdf) {
-            Sort sort = sdf.getSortDependingOn();
+    protected Operator replaceOp(Operator op, TermServices services) {
+        if (op instanceof ParametricFunctionInstance pfi && pfi.getArgs().size() == 1) {
+            Sort sort = pfi.getArgs().head().sort();
             Sort repSort = replaceSort(sort, services);
             if (sort != repSort) {
-                op = sdf.getInstanceFor(repSort, services);
+                op = ParametricFunctionInstance.get(pfi.getBase(),
+                    ImmutableList.of(new GenericArgument(repSort)), (Services) services);
             }
         }
 

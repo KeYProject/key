@@ -7,8 +7,6 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Graph node that represents a rule added by some rule application.
  *
