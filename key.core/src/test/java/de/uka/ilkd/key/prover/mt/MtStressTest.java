@@ -98,6 +98,7 @@ public class MtStressTest {
         final String prevThreads = System.getProperty(ParallelProver.THREADS_PROPERTY);
         System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
         System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
+        MtSwitch.assertMultiWorkerActive();
         try {
             for (int i = 0; i < reps; i++) {
                 final int rep = i;

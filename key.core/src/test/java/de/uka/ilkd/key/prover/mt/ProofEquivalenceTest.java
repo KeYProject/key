@@ -122,6 +122,7 @@ public class ProofEquivalenceTest {
         String prevThreads = System.getProperty(ParallelProver.THREADS_PROPERTY);
         System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
         System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(threads));
+        MtSwitch.assertParallelActive(threads);
         try {
             parallel = proveAndFingerprint(file);
         } finally {

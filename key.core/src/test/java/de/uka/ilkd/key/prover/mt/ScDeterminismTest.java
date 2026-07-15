@@ -86,6 +86,14 @@ public class ScDeterminismTest {
         "standard_key/java_dl/polishFlagSort.key",
     })
     void singleCoreProofIsReproducible(String relPath) throws Exception {
+        // This gate claims that the SINGLE-THREADED prover is reproducible, so it has to know that
+        // it really proved single-threaded. The suite is pinned to it (see the root build file),
+        // but the pin is a system property that the multi-core tests overwrite for their own runs;
+        // one of them failing to put it back would leave this gate proving multi-core and claiming
+        // the result for single-threaded. Checking here makes that a failure instead, whatever
+        // order the tests run in.
+        MtSwitch.assertSingleThreaded();
+
         final Path examples = FindResources.getExampleDirectory();
         Assumptions.assumeTrue(examples != null, "examples directory not found");
         final Path keyFile = examples.resolve(relPath);

@@ -81,6 +81,7 @@ public class MtStopTest {
         String prevThreads = System.getProperty(ParallelProver.THREADS_PROPERTY);
         System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
         System.setProperty(ParallelProver.THREADS_PROPERTY, "4");
+        MtSwitch.assertMultiWorkerActive();
 
         KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
         try {

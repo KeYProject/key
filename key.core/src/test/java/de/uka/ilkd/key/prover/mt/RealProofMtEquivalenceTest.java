@@ -114,6 +114,9 @@ public class RealProofMtEquivalenceTest {
         if (parallel) {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
             System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(WORKERS));
+            MtSwitch.assertParallelActive(WORKERS);
+        } else {
+            MtSwitch.assertSingleThreaded();
         }
         try {
             Proof proof = env.getLoadedProof();

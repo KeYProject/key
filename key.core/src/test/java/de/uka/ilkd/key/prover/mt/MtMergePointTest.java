@@ -64,6 +64,7 @@ public class MtMergePointTest {
         final String prevThreads = System.getProperty(ParallelProver.THREADS_PROPERTY);
         System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
         System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(WORKERS));
+        MtSwitch.assertMultiWorkerActive();
         try {
             ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
             final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);

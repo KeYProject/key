@@ -146,9 +146,11 @@ public class ParallelProverDeterminismTest {
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsBaseline);
         if (workers == 0) {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "false");
+            MtSwitch.assertSingleThreaded();
         } else {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
             System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
+            MtSwitch.assertParallelActive(workers);
         }
         final KeYEnvironment<?> env = KeYEnvironment.load(file);
         final ProofStarter starter = new ProofStarter(false);

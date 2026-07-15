@@ -68,6 +68,9 @@ public class NamespaceDeferralTest {
             if (parallel) {
                 System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
                 System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(threads));
+                MtSwitch.assertParallelActive(threads);
+            } else {
+                MtSwitch.assertSingleThreaded();
             }
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
