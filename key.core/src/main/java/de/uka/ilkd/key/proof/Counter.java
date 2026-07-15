@@ -4,34 +4,46 @@
 package de.uka.ilkd.key.proof;
 
 
-/** Proof-specific counter object: taclet names, var names, node numbers, etc */
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Proof-specific counter object: taclet names, var names, node numbers, etc.
+ *
+ * <p>
+ * A single {@link de.uka.ilkd.key.java.Services} (and thus its counters) is shared by all goals of
+ * a proof. To make counter-based fresh-name minting safe once goals are processed on worker
+ * threads,
+ * the increment is atomic. This is behaviour-preserving for single-threaded use:
+ * {@link #getCountPlusPlus()} still returns the pre-increment value and {@link #copy()} still
+ * snapshots the current value.
+ */
 public class Counter {
 
     private final String name;
-    private int count;
+    private final AtomicInteger count;
 
     public Counter(String name) {
-        this.name = name;
+        this(name, 0);
     }
 
     private Counter(String name, int count) {
-        this(name);
-        this.count = count;
+        this.name = name;
+        this.count = new AtomicInteger(count);
     }
 
     public int getCount() {
-        return count;
+        return count.get();
     }
 
     public int getCountPlusPlus() {
-        return count++;
+        return count.getAndIncrement();
     }
 
     public String toString() {
-        return "Counter " + name + ": " + count;
+        return "Counter " + name + ": " + count.get();
     }
 
     public Counter copy() {
-        return new Counter(name, count);
+        return new Counter(name, count.get());
     }
 }

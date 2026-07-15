@@ -148,6 +148,14 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
+    protected boolean allowParallel() {
+        // AutoMacroFilterStrategy's breakpointReached flag is cross-goal state: one goal reaching
+        // the breakpoint must veto Java-block rules on all others, which is schedule-dependent
+        // with several workers. Pin to the single-threaded prover.
+        return false;
+    }
+
+    @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);

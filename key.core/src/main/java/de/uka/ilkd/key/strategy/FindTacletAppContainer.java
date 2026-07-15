@@ -41,8 +41,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * version of the formula. Rebuilding it on every query forces a fresh walk to the
      * (possibly deep) find position each time the subterm is accessed. The cache is only
      * an optimization, the container stays observably immutable.
+     *
+     * <p>
+     * {@code volatile}: a container instance is shared across the sibling goals of a split
+     * (the rule-app queue is copied by reference), so concurrently-owned goals may query it on
+     * different worker threads. The recompute guard in {@link #getPosInOccurrence(Goal)} keeps the
+     * returned value correct under any interleaving (a cached value that does not match the queried
+     * formula is rebuilt), but {@code volatile} is still needed for safe publication of the cached
+     * {@link PosInOccurrence} -- without it a reader could observe the reference before the
+     * object's
+     * fields are visible.
      */
-    private PosInOccurrence currentPositionCache;
+    private volatile PosInOccurrence currentPositionCache;
 
     /**
      * Creates a FindTacletAppContainer for applying a find taclet.
@@ -63,6 +73,14 @@ public class FindTacletAppContainer extends TacletAppContainer {
         final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
         assert posTag != null : "No formula tag found for " + pio;
         positionTag = posTag;
+    }
+
+    /**
+     * @return the original position for which this container was created (a stable key for the
+     *         deterministic queue tie-break, see {@link RuleAppContainer#compareTo})
+     */
+    PosInOccurrence getApplicationPosition() {
+        return applicationPosition;
     }
 
 

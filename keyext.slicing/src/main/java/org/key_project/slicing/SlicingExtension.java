@@ -26,6 +26,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.GraphNode;
@@ -126,9 +128,35 @@ public class SlicingExtension implements KeYGuiExtension,
     public void init(MainWindow window, KeYMediator mediator) {
         mediator.addKeYSelectionListener(this);
         mediator.registerProofLoadListener(this::createTrackerForProof);
+        // Slicing is single-core only. Enabling the multi-core prover suspends every
+        // DependencyTracker (a non-essential listener) for the duration of each run, so it silently
+        // misses the rules that run applies. Mark all existing trackers incomplete the instant the
+        // multi-core prover is switched on, so a later switch back to single-core can never slice a
+        // proof from a graph with a gap in it. (New trackers are not created while the multi-core
+        // prover is enabled; see createTrackerForProof.)
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addPropertyChangeListener(
+            GeneralSettings.PARALLEL_PROVER_ENABLED, evt -> {
+                if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                        .isParallelProverEnabled()) {
+                    trackers.values().forEach(t -> {
+                        if (t != null) {
+                            t.markIncompleteAfterParallelRun();
+                        }
+                    });
+                }
+            });
     }
 
     private void createTrackerForProof(Proof newProof) {
+        // Proof slicing is a single-core-only feature. Its DependencyTracker is a per-rule listener
+        // that the parallel prover suspends for the duration of each run; it would therefore miss
+        // every rule the multi-core prover applies and end up inconsistent (walking the tree later
+        // throws "found formula that was not produced by any rule"). Do not attach it while the
+        // multi-core prover is enabled.
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .isParallelProverEnabled()) {
+            return;
+        }
         trackers.computeIfAbsent(newProof, proof -> {
             if (proof == null) {
                 return null;

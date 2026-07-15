@@ -77,11 +77,14 @@ jobs:
   integration-tests:
     env:
       GH_TOKEN: ${{ github.token }}
-    continue-on-error: true
+    # The multi-core prover gates (testMt*) must be able to fail CI; the long-running proof
+    # regression legs keep their historical advisory (continue-on-error) status. fail-fast is
+    # off, so a red MT leg never cancels the sibling legs either way.
+    continue-on-error: ${{ !startsWith(matrix.test, 'testMt') }}
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs ]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
         os: [ ubuntu-latest ]
         java: [ 21 ]
     runs-on: ${{ matrix.os }}

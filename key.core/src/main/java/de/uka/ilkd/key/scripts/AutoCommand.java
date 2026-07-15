@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -52,9 +52,11 @@ public class AutoCommand extends AbstractCommand {
         final Services services = state().getProof().getServices();
         final Profile profile = services.getProfile();
 
-        // create the rule application engine
+        // Create the rule application engine via AutoProvers: the script `auto` command is plain
+        // automode, so it honours the selected prover mode (single- or multi-core).
         final ProverCore<Proof, Goal> applyStrategy =
-            new ApplyStrategy(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create());
+            AutoProvers.create(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create(),
+                profile);
 
         // find the targets
         final ImmutableList<Goal> goals;

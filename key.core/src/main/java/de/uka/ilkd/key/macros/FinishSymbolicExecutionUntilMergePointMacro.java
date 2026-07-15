@@ -88,6 +88,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
+    protected boolean allowParallel() {
+        // blockElems/alreadySeen accumulate merge points discovered ACROSS goals during the run
+        // (plain HashSets, mutated from isApprovedApp): under several workers both the data
+        // structures and the discovery order become schedule-dependent. Pin to the
+        // single-threaded prover.
+        return false;
+    }
+
+    @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this

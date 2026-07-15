@@ -1,0 +1,75 @@
+/* The multi-core determinism probe: a Java agent that measures where a proof diverges between the
+ * single-core and multi-core prover, plus a small driver that runs the two and prints the diff.
+ * Kept out of KeY's own build on purpose -- it is a developer tool, not part of the prover. */
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    toolchain {
+        // match the prover / CI (JDK 21); the multi-core timing that triggers races is JDK-sensitive
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+def byteBuddyVersion = '1.15.11'
+
+dependencies {
+    // the prover, via the composite build declared in settings.gradle
+    implementation 'org.key-project:key.core'
+    // bytecode weaving for the agent
+    implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    implementation "net.bytebuddy:byte-buddy-agent:${byteBuddyVersion}"
+}
+
+application {
+    mainClass = 'de.uka.ilkd.key.mtprobe.driver.DivergenceDriver'
+}
+
+/* A single self-contained jar that works BOTH as the -javaagent (it declares Premain-Class and
+ * bundles ByteBuddy) and as a normal library on the classpath (it also holds the driver + sink). */
+jar {
+    manifest {
+        attributes(
+            'Premain-Class': 'de.uka.ilkd.key.mtprobe.agent.DivProbeAgent',
+            'Can-Retransform-Classes': 'true',
+            'Can-Redefine-Classes': 'true'
+        )
+    }
+    // fold ByteBuddy into the jar so the agent has it available before main() runs
+    from {
+        configurations.runtimeClasspath.findAll { it.name.startsWith('byte-buddy') }
+                .collect { zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+/* Convenience: `./gradlew probe -Pproof=<file.key> [-Psites=choice-point,rule-cost] [-Pworkers=4,8] [-Preps=200]`
+ * builds the agent jar, then runs the driver under it. */
+tasks.register('probe', JavaExec) {
+    group = 'verification'
+    description = 'Run the divergence probe on a .key file under the agent'
+    dependsOn tasks.jar
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'de.uka.ilkd.key.mtprobe.driver.DivergenceDriver'
+    doFirst {
+        def sites = project.findProperty('sites') ?: 'choice-point'
+        jvmArgs = ["-javaagent:${tasks.jar.archiveFile.get().asFile}=sites=${sites}", '-ea']
+        def a = []
+        if (project.hasProperty('proof')) {
+            a << project.property('proof')
+        }
+        if (project.hasProperty('workers')) {
+            a << "workers=${project.property('workers')}"
+        }
+        if (project.hasProperty('reps')) {
+            a << "reps=${project.property('reps')}"
+        }
+        args = a
+    }
+}

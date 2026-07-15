@@ -84,16 +84,6 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
      */
     private static final Name NAME = new Name("InfFlow Block Contract (Internal)");
 
-    /**
-     * @see #getLastFocusTerm()
-     */
-    private JTerm lastFocusTerm;
-
-    /**
-     * @see #getLastInstantiation()
-     */
-    private Instantiation lastInstantiation;
-
     private InfFlowBlockContractInternalRule() {
         super();
     }
@@ -130,28 +120,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
-        return lastFocusTerm;
-    }
-
-    @Override
-    protected void setLastFocusTerm(JTerm lastFocusTerm) {
-        this.lastFocusTerm = lastFocusTerm;
-    }
-
-    @Override
-    public Instantiation getLastInstantiation() {
-        return lastInstantiation;
-    }
-
-    @Override
     public Name name() {
         return NAME;
-    }
-
-    @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
-        this.lastInstantiation = lastInstantiation;
     }
 
     /**

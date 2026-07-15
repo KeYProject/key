@@ -17,7 +17,7 @@ public class TermPredicateTermFeature extends BinaryTermFeature {
         return new TermPredicateTermFeature(predicate);
     }
 
-    private Predicate<Term> property;
+    private final Predicate<Term> property;
 
     protected TermPredicateTermFeature(Predicate<Term> property) {
         this.property = property;

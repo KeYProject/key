@@ -16,20 +16,13 @@ class LabelCollectionTest {
     private LabelCollection collection;
     private ParameterlessTermLabel paramA;
     private ParameterlessTermLabel paramB;
-    private FormulaTermLabel formulaLabel;
 
     @BeforeEach
     void setup() {
         paramA = new ParameterlessTermLabel(new Name("A"));
         paramB = new ParameterlessTermLabel(new Name("B"));
-        try {
-            formulaLabel = new FormulaTermLabel("10.5");
-        } catch (TermLabelException e) {
-            throw new RuntimeException(e);
-        }
         final TermLabel[] labels = {
             paramA,
-            formulaLabel,
             paramB,
         };
         this.collection = new LabelCollection(new ImmutableArray<>(labels));

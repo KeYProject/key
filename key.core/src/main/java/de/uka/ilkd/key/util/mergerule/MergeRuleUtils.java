@@ -1232,7 +1232,12 @@ public class MergeRuleUtils {
                 "MergeRule: Unexpected type of Operator involved in name clash: " +
                     mergeStateOp + " : " + mergeStateOp.getClass().getSimpleName());
         }
-        thisGoalNamespaces.flushToParent();
+        // The renamed operator stays in the goal's top namespace layer: every lookup during the
+        // remaining merge application searches the whole layer chain, and only symbols in the top
+        // layer are harvested into the node-local symbol storage when the rule application
+        // commits. That storage is what the goal's namespaces are rebuilt from after the commit
+        // and after every prune -- the renamed operator occurs in the merged sequent, so it must
+        // be part of it.
         return newOp1;
     }
 

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -189,7 +190,16 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
     private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
-        private final Map<Sequent, Boolean> modalityCache = new WeakHashMap<>();
+        /**
+         * Memo for {@link #hasModality(Sequent)}, a pure function of the sequent. The one strategy
+         * instance is installed proof-wide, so under the multi-core prover every worker calls
+         * {@link #isApprovedApp} on it concurrently, outside the commit lock. A bare
+         * {@link WeakHashMap} structurally mutates even on {@code get} (stale-entry expunge), so it
+         * must be synchronized; {@code computeIfAbsent} is atomic on a synchronized map, and the
+         * cached value being key-pure keeps this deterministic.
+         */
+        private final Map<Sequent, Boolean> modalityCache =
+            Collections.synchronizedMap(new WeakHashMap<>());
 
         public FilterSymbexStrategy(Strategy<@NonNull Goal> delegate) {
             super(delegate);

@@ -15,7 +15,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -54,19 +53,47 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         return super.complete() && step != null;
     }
 
-    private UseDependencyContractApp computeStep(Sequent seq, Services services) {
+    private UseDependencyContractApp computeStep(Goal goal, Services services) {
         assert this.step == null;
         final List<PosInOccurrence> steps = UseDependencyContractRule
-                .getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);
-        PosInOccurrence l_step =
+                .getSteps(this.getHeapContext(), this.posInOccurrence(), goal.sequent(), services);
+        final PosInOccurrence recorded =
             UseDependencyContractRule.findStepInIfInsts(steps, this);
-        assert l_step != null;/*
-                               * : "The strategy failed to properly " +
-                               * "instantiate the base heap!\n" + "at: " +
-                               * app.posInOccurrence().subTerm() + "\n" + "ifInsts: " +
-                               * app.ifInsts() + "\n" + "steps: " + steps;
-                               */
-        return setStep(l_step);
+        if (recorded != null) {
+            return setStep(recorded);
+        }
+        // The step recorded on this application is not a step of this goal. The step is recorded
+        // by the strategy's cost computation (DependencyContractFeature), on the application the
+        // rule-application queue holds, and that same application is handed on to the goals the
+        // queue is projected onto, so the recorded step is the one whichever goal was costed last
+        // chose. A step is a position in a goal's sequent, so a step chosen for another goal names
+        // a formula of that goal and is not found here, even when the same formula is present in
+        // this one. Which goal was costed last depends on the order the goals are worked on, so
+        // under the multi-core prover this is reached for some worker schedules and not others.
+        //
+        // The step is therefore chosen here, for the goal the application is completed on, with
+        // the same policy the cost computation uses (chooseStep): of the candidate steps of this
+        // goal, the first that no earlier application on this focus used. That is the choice the
+        // cost computation would make on this goal, so the application is completed with the step
+        // it would have been costed with, whichever goal was costed last.
+        //
+        // This is a pre-existing problem on main before adding MT support and just not observed
+        // as often. Decision on the multi-threading branch was to fix the issue in the least
+        // intrusive way, but postponing a proper fix for a follow-up issue/PR, which should
+        // center on making the UseDependencyContractApp immutable and use the instantiateApp
+        // path instead of assumes to provide step instantiations and cost evaluation for
+        // different steps.
+        final PosInOccurrence chosen = UseDependencyContractRule.chooseStep(posInOccurrence(),
+            goal, getHeapContext(), services);
+        if (chosen == null) {
+            // the policy offers no step on this goal: the step stays unset, which keeps
+            // complete() false, and the caller discards the application
+            return this;
+        }
+        // the chosen step is recorded as the assumes instantiation too: the policy reads the steps
+        // already used on a focus off the assumes instantiations of the applied rules
+        return new UseDependencyContractApp<>(rule(), posInOccurrence(),
+            ImmutableList.singleton(chosen), instantiation, chosen);
     }
 
 
@@ -101,7 +128,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         app = tryToInstantiateContract(services);
 
         if (!app.complete() && app.isSufficientlyComplete()) {
-            app = app.computeStep(goal.sequent(), services);
+            app = app.computeStep(goal, services);
         }
         return app;
     }

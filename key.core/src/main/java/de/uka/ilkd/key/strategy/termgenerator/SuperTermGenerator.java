@@ -53,7 +53,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     public static TermGenerator<Goal> upwardsWithIndex(TermFeature cond, final Services services) {
-        return new SuperTermWithIndexGenerator(cond) {
+        return new SuperTermWithIndexGenerator(cond, services) {
             @Override
             protected Iterator<Term> createIterator(
                     PosInOccurrence focus, MutableState mState) {
@@ -81,28 +81,27 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
-        private Services services;
-        private Operator binFunc;
+        // Both are fixed at construction from the proof's services (one generator is built per
+        // proof and shared by all goals). They used to be lazily filled by generate(), which runs
+        // during proof search: under the multi-core prover several workers raced that lazy write,
+        // and binFunc is a freshly created operator, so a worker could read a half-initialised or
+        // foreign operator. Computing them once in the constructor removes the race; the value is
+        // unchanged, since goal.proof().getServices() is the same services the strategy was built
+        // with.
+        private final Services services;
+        private final Operator binFunc;
 
-        protected SuperTermWithIndexGenerator(TermFeature cond) {
+        protected SuperTermWithIndexGenerator(TermFeature cond, Services services) {
             super(cond);
+            this.services = services;
+            final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
+            this.binFunc = new SuperTermGeneratedOp(numbers);
         }
 
         @Override
         public Iterator<Term> generate(RuleApp app,
                 PosInOccurrence pos, Goal goal,
                 MutableState mState) {
-            if (services == null) {
-                services = goal.proof().getServices();
-                final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
-
-                binFunc = new SuperTermGeneratedOp(numbers);
-
-                // binFunc = new Function
-                // ( new Name ( "SuperTermGenerated" ), Sort.ANY,
-                // new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
-            }
-
             return createIterator(pos, mState);
         }
 

@@ -19,11 +19,12 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -87,6 +88,14 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+        if (proof.isErroneous()) {
+            // The proof was marked erroneous by a failing essential proof listener; it may be
+            // inconsistent, so refuse a new run. Saving the proof for a later reload is still fine.
+            ui.notify(new GeneralInformationEvent(
+                "This proof is marked erroneous (an essential proof listener failed) and cannot be "
+                    + "continued. You can still save it and try to reload it later."));
+            return;
+        }
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
@@ -173,7 +182,7 @@ public class MediatorProofControl extends AbstractProofControl {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
-        private final ApplyStrategy applyStrategy;
+        private final ProverCore<Proof, Goal> applyStrategy;
         private ProofSearchInformation<Proof, Goal> info;
         private volatile boolean backgroundStarted = false;
 
@@ -182,9 +191,15 @@ public class MediatorProofControl extends AbstractProofControl {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
-            this.applyStrategy = new ApplyStrategy(
+            // Route through AutoProvers so the GUI auto button (and the proof-tree / context-menu
+            // "start auto" actions that funnel through here) run on whichever prover the user has
+            // selected -- single-core or multi-core. Historically this was hardcoded to
+            // ApplyStrategy
+            // only because no alternative engine existed.
+            this.applyStrategy = AutoProvers.create(
                 proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
-                        .create());
+                        .create(),
+                proof.getInitConfig().getProfile());
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
@@ -217,10 +232,17 @@ public class MediatorProofControl extends AbstractProofControl {
                     applyStrategy.clear();
                 }
                 ui.getMediator().finishAutoMode(proof, true, true, null);
-                emitInteractiveAutoMode(initialGoals, proof, info);
-
-                if (info.getException() != null) {
-                    notifyException(info.getException());
+                // 'info' is assigned in doInBackground only after applyStrategy.start() returns; on
+                // a Stop (cancel), done() can run before that assignment completes, so it may still
+                // be null here. The synchronized(applyStrategy) above already guarantees the run
+                // has
+                // finished (the prover holds its own monitor for the whole run); this guard just
+                // avoids an EDT NullPointerException in the narrow assignment race.
+                if (info != null) {
+                    emitInteractiveAutoMode(initialGoals, proof, info);
+                    if (info.getException() != null) {
+                        notifyException(info.getException());
+                    }
                 }
             }
         }

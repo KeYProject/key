@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -14,7 +16,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
@@ -57,13 +58,11 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             return -1;
         }
 
-        final LRUCache<Operator, Integer> introductionTimeCache =
+        final Map<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
-        Integer res;
 
-        synchronized (introductionTimeCache) {
-            res = introductionTimeCache.get(op);
-        }
+        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
+        Integer res = introductionTimeCache.get(op);
 
         if (res == null) {
             res = introductionTimeHelp(op, goal);
@@ -75,9 +74,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             // subtly non-deterministic. A real introduction time, once found, is stable (the
             // introducing rule stays in the applied-rule prefix), so it is safe to cache.
             if (res != -1) {
-                synchronized (introductionTimeCache) {
-                    introductionTimeCache.put(op, res);
-                }
+                introductionTimeCache.put(op, res);
             }
         }
 
