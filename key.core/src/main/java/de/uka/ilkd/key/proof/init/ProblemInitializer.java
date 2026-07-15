@@ -381,11 +381,13 @@ public final class ProblemInitializer {
         }
     }
 
-    // what is the purpose of this method?
+    /**
+     * Updates the global settings the taclet options that declared in {@code optionDeclaration.key}.
+     * A proof created afterwards inherits these settings unless it overwrites it.
+     */
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
-        // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-            false);
+            initConfig.getCategory2DefaultChoices(), false);
         return initConfig;
     }
 
