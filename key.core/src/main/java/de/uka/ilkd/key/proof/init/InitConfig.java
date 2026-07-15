@@ -204,6 +204,14 @@ public class InitConfig {
 
 
     /**
+     * @return an immutable mapping from a category to its default choice
+     */
+    public @NonNull Map<String, Choice> getCategory2DefaultChoices() {
+        return Collections.unmodifiableMap(category2DefaultChoice);
+    }
+
+
+    /**
      * sets the set of activated choices of this initial configuration. For categories without a
      * specified choice the default choice contained in category2DefaultChoice is added.
      */
