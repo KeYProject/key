@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
  * A positional cursor over the children of one syntax element, used when matching a program whose
  * pattern may consume a <em>variable</em> number of source children (a list schema variable). It
  * keeps the parent {@code element} and the index {@code childPos} of the child to be matched next.
- * For convenience, the index {@code -1} means the element itself is the one to be matched — used
+ * For convenience, the index {@code -1} means the element itself is the one to be matched, used
  * when a match starts at an element rather than inside one (e.g. an empty block).
  *
  * <p>

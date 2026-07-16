@@ -56,8 +56,8 @@ public interface ProgramMatchPlan {
     /**
      * @return whether this plan can be realised on the <em>interpreter</em> (VM-instruction)
      *         back-end. The DFS cursor of the interpreter has no clean end-of-children boundary,
-     *         so a variable-arity list SV — matched only on the compiled back-end, by the
-     *         enclosing plan's greedy list match — is not interpretable; an element containing one
+     *         so a variable-arity list SV (matched only on the compiled back-end, by the
+     *         enclosing plan's greedy list match) is not interpretable; an element containing one
      *         propagates that. When {@code false} the interpreter side keeps its own matcher for
      *         the whole program, while the compiled side still uses this plan. This is the one
      *         deliberate point where the two back-ends may diverge.

@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * variables (see {@link ProgramMatchPlan#listSV()}). It walks the source children with a
  * {@link ProgramChildCursor}, advancing it as it goes: a fixed child matches the one current
  * source child with its pre-compiled matcher, then the cursor steps forward one; a list-SV child
- * consumes a maximal greedy run of source children — the run extends while the current child is
+ * consumes a maximal greedy run of source children: the run extends while the current child is
  * {@linkplain ListSVMatcher#isAdmissible admissible}, the first inadmissible child is not
  * consumed, and there is no backtracking; agreement with an earlier binding is checked only after
  * the whole run has been collected ({@link ListSVMatcher#bindRun}). A cursor that is already past

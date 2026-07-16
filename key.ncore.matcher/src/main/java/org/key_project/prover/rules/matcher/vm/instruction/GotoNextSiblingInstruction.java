@@ -11,7 +11,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
  * A {@link VMInstruction} that moves the {@link PoolSyntaxElementCursor}
  * to the next sibling of the current syntax element.
  * <p>
- * This instruction is used to traverse horizontally within the syntax tree structure—
+ * This instruction is used to traverse horizontally within the syntax tree structure,
  * typically from one argument or subcomponent of a compound term to the next.
  * It does not perform any pattern matching itself and always returns the current
  * {@link MatchResultInfo} unchanged.

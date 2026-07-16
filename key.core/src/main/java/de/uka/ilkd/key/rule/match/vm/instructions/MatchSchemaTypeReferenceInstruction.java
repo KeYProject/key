@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * Matches a {@link SchemaTypeReference} against the source element, replicating
  * {@code SchemaTypeReference.match}: the source matches iff it is a {@link TypeReference} with the
  * same simple name ({@code getName()}) and the same number of dimensions. It matches any concrete
- * type reference by name — it descends into no prefix and binds no schema variable. As for the
+ * type reference by name; it descends into no prefix and binds no schema variable. As for the
  * other single-position program instructions the cursor advance is the emitted {@code
  * gotoNextSibling}.
  */

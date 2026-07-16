@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Opens a binding scope for a term with bound variables (a quantifier, a substitution, ...): it
  * extends the renaming table and matches the pattern's bound variables pairwise against the source
- * term's own bound variables — a concrete {@code LogicVariable} in the pattern by consistent
+ * term's own bound variables: a concrete {@code LogicVariable} in the pattern by consistent
  * renaming (same sort, same abstract name), a {@code VariableSV} by instantiating it with the
  * source variable. The scope is closed again after the term has been matched
  * ({@code MatchConditions.shrinkRenameTable()}, called through the {@code BinderMatcher}).
@@ -51,8 +51,8 @@ public class BindVariablesInstruction implements MatchInstruction {
             implements VariableBinderSubinstruction {
 
         /**
-         * a match between two logic variables is possible if they have been assigned they are same
-         * or have been assigned to the same abstract name and the sorts are equal.
+         * Two logic variables match if they are the same variable, or if the consistent renaming
+         * maps both to the same abstract name and their sorts are equal.
          */
         public MatchConditions match(LogicVariable instantiationCandidate,
                 MatchConditions matchCond, LogicServices services) {

@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Matches a (single, non-list) program schema variable: the candidate — a program element, or a
- * term when the schema variable stands inside an expression — must be admissible for the schema
+ * Matches a (single, non-list) program schema variable: the candidate (a program element, or a
+ * term when the schema variable stands inside an expression) must be admissible for the schema
  * variable's {@link ProgramSVSort} ({@code canStandFor}), and must agree with any instantiation
  * the schema variable already has (a program element is converted to its logic term for that
  * comparison where needed).

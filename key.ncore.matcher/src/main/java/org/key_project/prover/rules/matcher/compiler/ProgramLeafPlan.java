@@ -14,7 +14,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 /**
  * A leaf of the program plan tree: an element matched by a single {@code instruction}, with no
  * child plans (the instruction itself may bind a whole source subtree, as for a program schema
- * variable). The language front-end supplies the instruction — a schema-variable match, a
+ * variable). The language front-end supplies the instruction: a schema-variable match, a
  * value-comparison, whatever the construct needs. Both back-ends use the same instruction object,
  * so the match semantics exist in exactly one place: {@link #emit} appends it (plus the cursor
  * advance), {@link #compile} applies it directly.

@@ -17,8 +17,8 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * Java-DL implementation of the {@link BinderMatcher} SPI (service provider interface): bound
  * variables are bound via the
  * {@code matchAndBindVariables} instruction, and the binding scope is closed via
- * {@link MatchConditions#shrinkRenameTable()}. The renaming table is scope-structured — closing
- * pops one scope — so the bound variables themselves are not needed for unbinding.
+ * {@link MatchConditions#shrinkRenameTable()}. The renaming table is scope-structured (closing
+ * pops one scope), so the bound variables themselves are not needed for unbinding.
  */
 public final class JavaBinderMatcher implements BinderMatcher {
 

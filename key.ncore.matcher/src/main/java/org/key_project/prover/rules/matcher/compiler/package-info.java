@@ -5,8 +5,11 @@
  */
 
 /**
- * A language-agnostic framework for taclet find-matching that produces, from a single description
- * of a pattern, both an interpreted matcher (a sequence of
+ * A language-agnostic framework for taclet find-matching. A taclet is a proof rule; its find
+ * pattern is the term shape the rule applies to, and matching locates that shape in a proof and
+ * binds the pattern's placeholders (schema variables) to the concrete parts they stand for. From
+ * a single description of a pattern the framework produces both an interpreted matcher (a sequence
+ * of
  * {@link org.key_project.prover.rules.matcher.vm.instruction.VMInstruction}s run by
  * {@link org.key_project.prover.rules.matcher.vm.VMProgramInterpreter}) and a cursor-free compiled
  * matcher. It works purely over {@link org.key_project.logic.SyntaxElement} /
@@ -28,20 +31,20 @@
  * <p>
  * A language front-end supplies only what is genuinely its own, each piece small:
  * <ul>
- * <li>a <b>dispatch</b> that walks its pattern syntax and composes the plan nodes — one
+ * <li>a <b>dispatch</b> that walks its pattern syntax and composes the plan nodes, one
  * {@code instanceof} case per construct;</li>
  * <li>the <b>match instructions</b> for its schema-variable kinds and special leaves (fed into
  * {@code SchemaVarPlan} / {@code ProgramLeafPlan});</li>
- * <li>{@link org.key_project.prover.rules.matcher.compiler.BinderMatcher} — how its bound
+ * <li>{@link org.key_project.prover.rules.matcher.compiler.BinderMatcher}: how its bound
  * variables are bound and unbound;</li>
- * <li>{@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook} — how the program of
+ * <li>{@link org.key_project.prover.rules.matcher.compiler.ProgramMatchHook}: how the program of
  * a modality is entered from the term skeleton;</li>
- * <li>{@link org.key_project.prover.rules.matcher.compiler.ListSVMatcher} — which program elements
+ * <li>{@link org.key_project.prover.rules.matcher.compiler.ListSVMatcher}: which program elements
  * a list schema variable may absorb, and how the matched run is recorded;</li>
  * <li>per-operator {@code MatchHead}s and per-construct guards where its calculus has special
  * matching (modalities, updates, parametric functions, ...).</li>
  * </ul>
- * Everything else — the plan skeleton, the child walks, the greedy list-SV run, the emission of
- * interpreter instructions and the compilation to cursor-free matchers — is shared.
+ * Everything else is shared: the plan skeleton, the child walks, the greedy list-SV run, the
+ * emission of interpreter instructions and the compilation to cursor-free matchers.
  */
 package org.key_project.prover.rules.matcher.compiler;

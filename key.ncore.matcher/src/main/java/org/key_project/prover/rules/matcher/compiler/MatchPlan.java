@@ -13,13 +13,14 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * (sub)pattern, from which <em>both</em> back-ends are derived.
  *
  * <p>
- * A match plan is built once per find pattern (when the taclet base is loaded) by a per-language
+ * A match plan is built once per find pattern (the term shape a proof rule, called a taclet,
+ * applies to) when the rule base is loaded, by a per-language
  * dispatch that composes plan nodes for each syntax construct. The point is that each construct is
  * described in exactly one place: a node carries both
  * <ul>
- * <li>{@link #emit(List)} — the interpreted back-end: it appends the cursor-based
+ * <li>{@link #emit(List)}: the interpreted back-end; it appends the cursor-based
  * {@link VMInstruction}s executed by {@code VMProgramInterpreter}; and</li>
- * <li>{@link #compile()} — the compiled back-end: it builds a cursor-free {@link MatchProgram} that
+ * <li>{@link #compile()}: the compiled back-end; it builds a cursor-free {@link MatchProgram} that
  * navigates the syntax element directly.</li>
  * </ul>
  * Adding a construct (or fixing its matching) is therefore done once, in the node, and both the

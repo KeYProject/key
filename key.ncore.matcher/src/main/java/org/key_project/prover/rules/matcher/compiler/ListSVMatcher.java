@@ -13,7 +13,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Language SPI (service provider interface) for matching <em>list program schema variables</em> —
+ * Language SPI (service provider interface) for matching <em>list program schema variables</em>:
  * schema variables such as
  * {@code #slist} that stand for a run of consecutive statements or expressions rather than exactly
  * one. What a run may contain is language-specific: each front-end decides for itself which
@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * The framework owns the matching itself ({@link ProgramChildSequence}): it walks the source
- * children and greedily extends the run while {@link #isAdmissible} holds — the first inadmissible
+ * children and greedily extends the run while {@link #isAdmissible} holds; the first inadmissible
  * child is not consumed, and there is no backtracking. The language plugs in only the two
  * judgements below.
  */
@@ -40,8 +40,9 @@ public interface ListSVMatcher {
             LogicServices services);
 
     /**
-     * Records the maximal run collected for {@code listSV}, or — if the schema variable is already
-     * bound — succeeds without change exactly when the existing binding equals the run.
+     * Records the maximal run collected for {@code listSV}. If the schema variable is already
+     * bound, the match instead succeeds without change exactly when the existing binding equals
+     * the run.
      *
      * @param listSV the list schema variable being matched
      * @param run the consecutive source children the greedy run consumed (possibly empty)

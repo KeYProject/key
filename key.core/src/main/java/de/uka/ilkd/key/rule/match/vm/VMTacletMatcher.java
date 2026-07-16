@@ -43,14 +43,16 @@ import org.jspecify.annotations.Nullable;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
- * <p>
- * Matching algorithm using a virtual machine based approach inspired by Voronkonv et al. It matches
- * exactly one taclet and does not produce code trees.
- * </p>
+ * The matcher of one taclet (proof rule): it decides whether the taclet applies to a given term
+ * and, if so, with which instantiations of the taclet's schema variables (its placeholders). At
+ * construction it builds a matcher for the taclet's find pattern and one per {@code \assumes}
+ * formula (the side formulas the rule additionally requires) through the match-plan framework;
+ * {@link #INTERPRETER_MATCHER_PROPERTY} selects which of the two back-ends they run on. Matching
+ * itself is read-only: results are threaded through immutable {@link MatchConditions}, so one
+ * matcher instance serves concurrent proof-search threads.
  * <p>
  * Instances of this class should <strong>not</strong> be created directly, use
  * {@link TacletMatcherKit#createTacletMatcher(Taclet)} instead.
- * </p>
  *
  * @see TacletMatcherKit
  */

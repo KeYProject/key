@@ -116,7 +116,7 @@ public final class OperatorPlan implements MatchPlan {
      * The interpreter form of {@link BinderMatcher#unbind}: it closes the binding scope and
      * leaves the cursor untouched. It is a plain cursor-level instruction (not a
      * {@link MatchInstruction}) because it runs after the binder term's subterms have been
-     * matched, when the cursor has already advanced past the whole term — there is no current
+     * matched, when the cursor has already advanced past the whole term; there is no current
      * element it could read.
      */
     private record UnbindInstruction(BinderMatcher binder,

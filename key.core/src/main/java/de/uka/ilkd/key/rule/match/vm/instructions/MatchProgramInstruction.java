@@ -22,7 +22,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
  *
  * <p>
  * It is the safety net of the interpreter back-end: it matches a program the converted
- * instructions do not cover (conversion off — the default — or a construct outside the
+ * instructions do not cover (conversion off, the default, or a construct outside the
  * single-source dispatch, e.g. a variable-arity list schema variable), and it is the main consumer
  * of the AST {@code match} methods.
  */

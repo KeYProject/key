@@ -63,12 +63,12 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * Builds the {@link ProgramMatchPlan} for one Java program (sub)element of a modality. A taclet's
  * find pattern may contain a piece of Java code inside a modality ({@code \<{ ... }\>}); matching
  * decides whether that pattern fits the program of a concrete formula, and binds the pattern's
- * <em>schema variables</em> — placeholders such as {@code #se} or {@code #slist} — to the concrete
+ * <em>schema variables</em> (placeholders such as {@code #se} or {@code #slist}) to the concrete
  * program parts they stand for (their <em>instantiations</em>).
  *
  * <p>
  * A plan is a single description of how one pattern element is matched, from which both matcher
- * back-ends are derived —
+ * back-ends are derived:
  * {@link ProgramMatchPlan#emit} produces the interpreter's VM instructions and
  * {@link ProgramMatchPlan#compile} the compiled, cursor-free matcher. It is the program-AST
  * counterpart of {@link JavaMatchPlanBuilder} (which does the same for the first-order term
@@ -82,19 +82,19 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * The plans form a small immutable tree that mirrors the pattern, with one node kind per way of
  * matching:
  * <ul>
- * <li>{@link LeafPlan} — a plan-tree leaf matched by a single instruction (schema variables,
+ * <li>{@link LeafPlan}: a plan-tree leaf matched by a single instruction (schema variables,
  * schema type references, and value-carrying leaves such as literals);</li>
- * <li>{@link ListSVPlan} — a list program schema variable, which matches a run of source children
+ * <li>{@link ListSVPlan}: a list program schema variable, which matches a run of source children
  * and is driven by its enclosing {@link StructuralPlan};</li>
- * <li>{@link StructuralPlan} — the default <b>generic match</b>: same concrete class as the
+ * <li>{@link StructuralPlan}: the default <b>generic match</b>, i.e. same concrete class as the
  * pattern, an optional extra field check (the {@code guard}, e.g. array dimensions), and the
  * children matched recursively;</li>
- * <li>{@link FieldReferencePlan} — a schematic field reference, which accepts any source
+ * <li>{@link FieldReferencePlan}: a schematic field reference, which accepts any source
  * {@link FieldReference} instead of one exact class;</li>
- * <li>{@link ContextBlockPlan} — the {@code .. ...} context pattern of symbolic-execution
+ * <li>{@link ContextBlockPlan}: the {@code .. ...} context pattern of symbolic-execution
  * taclets.</li>
  * </ul>
- * "Generic" is used throughout in the sense of {@link #isGenericMatch} — the
+ * "Generic" is used throughout in the sense of {@link #isGenericMatch}: the
  * class-identity-plus-children match that {@code JavaProgramElement} /
  * {@code JavaNonTerminalProgramElement} provide by default, for elements that do not override
  * {@code match}. It has nothing to do with Java generics or generic sorts. Each node's
@@ -103,7 +103,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * <p>
  * {@link #buildProgramPlan} returns {@code null} for an element this dispatch does not describe.
  * On the compiled back-end the modality then has no head and the taclet fails to load with the
- * framework's clear "no head for this find pattern" error — the same contract the term side has;
+ * framework's clear "no head for this find pattern" error (the same contract the term side has);
  * on the interpreter back-end the conversion falls back to the monolithic matcher. Every construct
  * expressible in the taclet language is described.
  */
@@ -247,8 +247,8 @@ public final class JavaProgramMatchPlanBuilder {
     /**
      * A {@code SchematicFieldReference} ({@code #ref.#field}). Unlike a generic match it accepts
      * <em>any</em> source that is a {@link FieldReference} (an {@code instanceof} check, not exact
-     * class), then matches its children — the reference prefix and the field program schema
-     * variable — one-to-one against the source's children, requiring the same child count. As in
+     * class), then matches its children (the reference prefix and the field program schema
+     * variable) one-to-one against the source's children, requiring the same child count. As in
      * {@link LeafPlan}, the head check is one instruction object shared by both back-ends.
      */
     private static final class FieldReferencePlan implements ProgramMatchPlan {
@@ -322,7 +322,7 @@ public final class JavaProgramMatchPlanBuilder {
     }
 
     /**
-     * A {@link ContextStatementBlock} — the {@code .. ...} pattern with which taclets match a
+     * A {@link ContextStatementBlock}, the {@code .. ...} pattern with which taclets match a
      * program at its current execution point. Such a pattern matches statements (the <em>active
      * statements</em>, written between {@code ..} and {@code ...}) that sit inside an arbitrary
      * nesting of blocks, try-catch statements, labels and method frames. The leading {@code ..}
@@ -339,7 +339,7 @@ public final class JavaProgramMatchPlanBuilder {
      * {@code -1} means the located element itself is the match target, e.g. an empty
      * block);</li>
      * <li><b>match the execution context</b>: the execution context says in which class, method
-     * and on which object the active statements run — needed, for example, to resolve field
+     * and on which object the active statements run, needed, for example, to resolve field
      * accesses and method calls during matching. It is taken from the source's innermost method
      * frame (the statement KeY wraps around an inlined method body), or is the default context if
      * there is none. If the pattern names an execution context of its own ({@code .#ex..} or
@@ -349,13 +349,13 @@ public final class JavaProgramMatchPlanBuilder {
      * source child (a list schema variable consumes a run of children);</li>
      * <li><b>record the context</b>: store the position where the prefix ends and the position
      * where the suffix starts (as paths into the source program) in the <em>context
-     * instantiation</em> — when the taclet is applied, the new program is assembled around these
+     * instantiation</em>: when the taclet is applied, the new program is assembled around these
      * two positions.</li>
      * </ol>
      *
      * <p>
-     * The order of the instantiation updates — execution-context match, recording the context,
-     * active statements, final completion — must not be changed: it is observable through the
+     * The order of the instantiation updates (execution-context match, recording the context,
+     * active statements, final completion) must not be changed: it is observable through the
      * iteration order of the instantiation map. The interpreter back-end ({@link #emit}) does not
      * use these steps; it delegates to {@code ContextStatementBlock.match}, which must produce
      * identical results.
@@ -540,19 +540,19 @@ public final class JavaProgramMatchPlanBuilder {
         }
 
         /**
-         * Step 3: matches the active statements. In the common case — no list schema variable
-         * among them, and the match starts at a regular child index — each sub-matcher is applied
+         * Step 3: matches the active statements. In the common case (no list schema variable
+         * among them, and the match starts at a regular child index) each sub-matcher is applied
          * directly to its source child, and the cursor is then advanced past the matched children.
          * Otherwise a cursor walks the source children one by one: an active statement that is a
          * list schema variable consumes a greedy run of children, and a start index of {@code -1}
          * means the first sub-matcher consumes the located element itself (an empty block or empty
-         * try). The pattern need not consume all source children — whatever remains belongs to the
+         * try). The pattern need not consume all source children; whatever remains belongs to the
          * context's suffix.
          *
          * <p>
          * When the source runs out of children before the pattern's active statements are
          * exhausted, the match simply fails. (The interpreter back-end instead crashes with a
-         * {@code NullPointerException} if the leftover pattern statement is a childless terminal —
+         * {@code NullPointerException} if the leftover pattern statement is a childless terminal;
          * its AST matcher does not null-check; failing cleanly here is deliberate. No shipped
          * taclet has such a shape.)
          */

@@ -17,8 +17,8 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
 /**
- * Matches a generic sort of the pattern against the concrete sort found in the source — the sort
- * of a parametric function's {@link GenericArgument} or of a {@link QualifierWrapper} — by
+ * Matches a generic sort of the pattern against the concrete sort found in the source (the sort
+ * of a parametric function's {@link GenericArgument} or of a {@link QualifierWrapper}) by
  * recording an identity {@link GenericSortCondition} in the instantiations: the generic sort must
  * be (or already have been) instantiated with exactly that concrete sort.
  */

@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  * variable's run if it is admissible for the schema variable's sort
  * ({@code ProgramSVSort.canStandFor}, judged in the execution context recorded with the
  * instantiations), and the collected run is stored as an {@code ImmutableArray} of program
- * elements — or, if the schema variable is already bound, the match succeeds without change
+ * elements; if the schema variable is already bound, the match instead succeeds without change
  * exactly when the existing list equals the run. (The interpreter back-end matches list schema
  * variables with {@code ProgramSV.matchListSV}; both must yield identical results.)
  */

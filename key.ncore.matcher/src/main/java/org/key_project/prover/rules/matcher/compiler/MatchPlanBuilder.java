@@ -16,24 +16,25 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The language-agnostic skeleton of a term-side match-plan dispatch: it walks a find pattern
- * ({@link Term}: operator, subterms, bound variables) and composes the {@link MatchPlan} nodes
+ * The language-agnostic skeleton of a term-side match-plan dispatch: it walks a find pattern (the
+ * {@link Term} shape a proof rule applies to) along its operator, subterms and bound variables,
+ * and composes the {@link MatchPlan} nodes
  * from which both matcher back-ends are derived. A language front-end subclasses it and supplies
  * only the per-language decisions:
  * <ul>
- * <li>{@link #instructionForSV(SchemaVariable)} — the match instruction for each of its
+ * <li>{@link #instructionForSV(SchemaVariable)}: the match instruction for each of its
  * schema-variable kinds;</li>
- * <li>{@link #headFor(Term)} — the {@link MatchHead} for each operator: an operator-specific head
+ * <li>{@link #headFor(Term)}: the {@link MatchHead} for each operator, an operator-specific head
  * where its calculus has special matching (modalities, updates, ...), the
  * {@link GenericOperatorHead} for every ordinary operator, or {@code null} for a construct it
  * cannot model;</li>
- * <li>{@link #binder()} — its {@link BinderMatcher}, i.e. how bound variables are bound and
+ * <li>{@link #binder()}: its {@link BinderMatcher}, i.e. how bound variables are bound and
  * unbound;</li>
- * <li>optionally {@link #finishPlan(Term, MatchPlan)} — a hook to wrap the built plan with
+ * <li>optionally {@link #finishPlan(Term, MatchPlan)}: a hook to wrap the built plan with
  * language-specific in-place checks (for example term labels).</li>
  * </ul>
- * Everything else — the recursion over the pattern, the derivation of the interpreter program and
- * the compiled matcher, and the fail-at-load contract of {@link #planOrThrow(Term)} — is shared.
+ * Everything else is shared: the recursion over the pattern, the derivation of the interpreter
+ * program and the compiled matcher, and the fail-at-load contract of {@link #planOrThrow(Term)}.
  *
  * <p>
  * A builder instance is stateless apart from what the subclass adds, so one instance is typically

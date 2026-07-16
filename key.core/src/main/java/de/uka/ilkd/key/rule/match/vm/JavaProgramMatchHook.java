@@ -20,7 +20,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * Java-DL implementation of the {@link ProgramMatchHook} SPI (service provider interface): it
  * matches the
  * {@code JavaBlock} program of a modality. The compiled side is the single-source dispatch's plan
- * ({@link JavaProgramMatchPlanBuilder#buildProgramPlan}) and nothing else — it calls no AST
+ * ({@link JavaProgramMatchPlanBuilder#buildProgramPlan}) and nothing else; it calls no AST
  * {@code match} method; a program the dispatch does not describe yields no hook, and the taclet
  * fails to load with the framework's clear error. The interpreter side reuses the generator's
  * converted program instruction

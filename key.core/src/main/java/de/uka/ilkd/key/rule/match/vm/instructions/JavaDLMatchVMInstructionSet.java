@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  * The factory for the Java-DL match instructions: static creation methods for every instruction
  * kind used when a find pattern's matcher is built (schema variables by kind, term labels,
  * programs, bound-variable binding, cursor moves, and the generic identity / node-kind checks from
- * the framework). Both back-ends obtain their instructions here — the interpreter emits them into
+ * the framework). Both back-ends obtain their instructions here: the interpreter emits them into
  * its instruction stream, the compiled matcher applies element-based ones directly.
  */
 public final class JavaDLMatchVMInstructionSet {

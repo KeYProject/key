@@ -13,18 +13,11 @@ import org.jspecify.annotations.Nullable;
 
 
 /**
- * Interpreter for executing a sequence of instructions in a virtual machine
- * designed for matching logical syntax elements.
- * <p>
- * This class interprets a program consisting of {@link VMInstruction}
- * instances, which operate over a {@link SyntaxElement}. The interpreter processes
- * the instructions sequentially and attempts to match the input term against
- * a pattern term under specified match conditions.
- * <p>
- * To execute the program, use the {@link #match(SyntaxElement, MatchResultInfo, LogicServices)}
- * method. It returns the result of the match, which may include additional
- * constraints such as variable instantiations if successful, or {@code null}
- * if the match fails.
+ * Runs a matcher program, a sequence of {@link VMInstruction}s, against a {@link SyntaxElement}:
+ * a cursor starts at the element and each instruction checks or navigates one step.
+ * {@link #match(SyntaxElement, MatchResultInfo, LogicServices)} returns the extended match result
+ * (for example with new schema-variable instantiations), or {@code null} as soon as an
+ * instruction fails.
  */
 public class VMProgramInterpreter implements MatchProgram, ProgramChildrenMatcher {
 

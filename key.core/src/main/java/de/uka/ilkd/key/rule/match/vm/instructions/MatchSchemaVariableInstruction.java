@@ -23,7 +23,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 /**
  * Base of the schema-variable match instructions ({@code MatchVariableSVInstruction},
  * {@code MatchProgramSVInstruction}, {@code MatchNonVariableSVInstruction}, ...): holds the schema
- * variable and provides {@link #addInstantiation}, the common "instantiate or agree" step — a term
+ * variable and provides {@link #addInstantiation}, the common "instantiate or agree" step: a term
  * candidate is checked for rigidness and either recorded as the schema variable's instantiation or
  * compared (modulo renaming) against the instantiation it already has.
  */

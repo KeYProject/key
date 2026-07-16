@@ -14,7 +14,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  * consecutive source children rather than exactly one (variable arity). It is never matched on
  * its own: the enclosing plan drives it (see {@link ProgramChildSequence}), so this plan's own
  * {@link #emit} and {@link #compile} are never called and throw. It announces itself through
- * {@link #listSV()}, and it is <em>not interpretable</em> — a run of children cannot be expressed
+ * {@link #listSV()}, and it is <em>not interpretable</em>: a run of children cannot be expressed
  * on the interpreter's single-step cursor, so a program containing one keeps the interpreter
  * back-end's own matcher while the compiled back-end handles it. This is the one deliberate point
  * where the two back-ends diverge.

@@ -23,8 +23,8 @@ import org.jspecify.annotations.Nullable;
  * the child plans. The child plans are built by the language front-end's dispatch and passed in.
  * Two child shapes exist:
  * <ul>
- * <li><b>fixed arity</b> (no list-SV child): the source must also have the same child count —
- * both back-ends share the one {@link MatchProgramElementInstruction} checking class + count —
+ * <li><b>fixed arity</b> (no list-SV child): the source must also have the same child count
+ * (both back-ends share the one {@link MatchProgramElementInstruction} checking class + count)
  * and child {@code i} matches source child {@code i} directly, no cursor;</li>
  * <li><b>variable arity</b> (some child is a {@link ProgramListSVPlan}): a cursor walks the
  * source children ({@link ProgramChildSequence}) because a list SV consumes a run of them, and

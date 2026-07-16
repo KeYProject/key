@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Language SPI (service provider interface) for matching <em>bound variables</em> (the variables
  * introduced by a binder such as
  * a quantifier, a substitution or a {@code let}). Binding is language-specific: each front-end
- * binds its own kinds of logic and schema variables and keeps its own binding state — for example
+ * binds its own kinds of logic and schema variables and keeps its own binding state, for example
  * a renaming table with nested scopes, or a counted stack of the variables bound along the current
  * path.
  *
@@ -21,8 +21,8 @@ import org.key_project.util.collection.ImmutableArray;
  * before matching the operator and subterms and unbinds them afterwards, on both back-ends. A
  * language plugs in the two operations here. The {@linkplain #binder(ImmutableArray) binder} is an
  * element-based instruction (it reads the source element's own bound variables), so both back-ends
- * apply it as it is; {@link #unbind} reads no element at all — it only transforms the match state
- * — so the framework calls it directly on the compiled back-end and wraps it into a
+ * apply it as it is; {@link #unbind} reads no element at all (it only transforms the match
+ * state), so the framework calls it directly on the compiled back-end and wraps it into a
  * cursor-neutral instruction for the interpreter.
  */
 public interface BinderMatcher {
