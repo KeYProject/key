@@ -41,10 +41,8 @@ public class MatchGenericSortInstruction implements MatchInstruction {
      */
     private MatchResultInfo matchSorts(Sort dependingSortToMatch, MatchResultInfo matchConditions,
             LogicServices services) {
-        // This restriction has been dropped for free generic sorts to prove taclets correct
-        // assert !(s2 instanceof GenericSort)
-        // : "Sort s2 is not allowed to be of type generic.";
-        MatchResultInfo result;
+        // the source sort may itself be generic: proving a taclet correct matches schematic
+        // patterns against schematic terms
         final GenericSortCondition c =
             GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);
         try {
