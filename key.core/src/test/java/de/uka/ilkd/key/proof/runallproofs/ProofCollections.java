@@ -624,6 +624,30 @@ public class ProofCollections {
         g.provable("heap/vstte10_05_Queue/LinkedList_reverse.key");
         g.provable("heap/vstte10_05_Queue/LinkedList_tail.key");
 
+        g = c.group("FM2024Tutorial");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearchR.key");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_normal.key");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_exc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_ArrayList.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_find.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_add.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_get_normal.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_get_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_inv_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_swap.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_sort.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_binSearch.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_add.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_find.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_get.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_get_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_inv_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_LinkedList.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_newNode.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_size.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_size_acc.key");
 
         g = c.group("WeideEtAl");
         g.provable("heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key");
