@@ -35,8 +35,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete,"
         + "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx,"
-        + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,polySimp_normalise,"
-        + "polySimp_directEquations";
+        + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,inEqSimp_nonLin_multiply,"
+        + "polySimp_normalise,polySimp_directEquations";
 
     /**
      * default max number of displayed tooltip lines is 40
