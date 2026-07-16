@@ -68,17 +68,15 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified
-     * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
-     * {@link MatchResultInfo}
+     * Matches the schema variable against a program element. Most schema-variable kinds stand for
+     * terms and cannot match a program element, so this default fails; the program schema variable
+     * overrides it.
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchResultInfo} with additional constraints (e.g. previous matches of
-     *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
+     * @param mc the {@link MatchResultInfo} with the constraints accumulated so far
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchResultInfo} with
-     *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
-     *         added
+     * @return the extended {@link MatchResultInfo}, or {@code null} if the schema variable does
+     *         not match the program element
      */
     public @Nullable MatchResultInfo match(ProgramElement instantiationCandidate,
             MatchResultInfo mc,

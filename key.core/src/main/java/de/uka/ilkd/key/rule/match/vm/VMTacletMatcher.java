@@ -137,18 +137,14 @@ public class VMTacletMatcher implements TacletMatcher {
     }
 
     /**
-     * Builds the matcher for a find / assumes {@code pattern}: the cursor-free compiled matcher
-     * unless the interpreter is requested or the compiler has no head for the pattern (then the
-     * interpreter is used as a fallback).
+     * Builds the matcher for a find / assumes {@code pattern} on the selected back-end. Both
+     * back-ends are derived from the same match plan, so a pattern outside the plan framework
+     * fails at taclet-load time on either one.
      */
     private static MatchProgram matchProgramFor(JTerm pattern, boolean interpreter) {
-        if (!interpreter) {
-            final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgramOrNull(pattern);
-            if (compiled != null) {
-                return compiled;
-            }
-        }
-        return new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(pattern));
+        return interpreter
+                ? new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(pattern))
+                : JavaMatchPlanBuilder.compiledProgram(pattern);
     }
 
     /**
@@ -163,7 +159,11 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull Term p_template,
             @NonNull MatchResultInfo p_matchCond,
             @NonNull LogicServices p_services) {
-        MatchProgram program = assumesMatchPrograms.get(p_template);
+        final MatchProgram program = assumesMatchPrograms.get(p_template);
+        if (program == null) {
+            throw new IllegalArgumentException(
+                "template is not an assumes formula of this taclet: " + p_template);
+        }
         final var mc = (MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableList.nil();
@@ -417,11 +417,16 @@ public class VMTacletMatcher implements TacletMatcher {
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
-        matchCond = instr.match(syntaxElement, matchCond, services);
-        if (syntaxElement instanceof JTerm) {
-            matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
-        } else if (syntaxElement instanceof ProgramElement) {
+        if (syntaxElement instanceof ProgramElement pe) {
+            // dispatch to the program-element overload: a schema-variable kind that cannot match
+            // a program element fails there instead of casting the candidate to a term
+            matchCond = instr.match(pe, matchCond, services);
             matchCond = checkConditions(matchCond, services);
+        } else {
+            matchCond = instr.match(syntaxElement, matchCond, services);
+            if (syntaxElement instanceof JTerm) {
+                matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
+            }
         }
         return matchCond;
     }

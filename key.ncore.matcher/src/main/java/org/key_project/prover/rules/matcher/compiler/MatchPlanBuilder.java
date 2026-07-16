@@ -107,20 +107,6 @@ public abstract class MatchPlanBuilder {
     }
 
     /**
-     * Like {@link #compiledProgram(Term)}, but returns {@code null} instead of throwing when the
-     * dispatch has no head for {@code pattern} (so the caller can fall back to the interpreter).
-     * Used for {@code \assumes} formulas, which are not guaranteed to be among the patterns the
-     * find-matcher coverage is validated against.
-     *
-     * @param pattern the find / assumes pattern
-     * @return the compiled matcher, or {@code null} if the pattern is not compilable
-     */
-    public final @Nullable MatchProgram compiledProgramOrNull(Term pattern) {
-        final MatchPlan plan = buildPlan(pattern);
-        return plan == null ? null : plan.compile();
-    }
-
-    /**
      * Builds the match plan for {@code pattern}, or fails with a clear error naming the
      * unsupported operator. The failure happens at taclet-load time, so an unsupported construct
      * is reported when the rule is loaded, not silently mis-matched during proof search.

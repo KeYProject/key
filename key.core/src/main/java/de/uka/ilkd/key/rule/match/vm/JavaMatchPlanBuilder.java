@@ -110,19 +110,6 @@ public final class JavaMatchPlanBuilder extends MatchPlanBuilder {
         return DELEGATING.compiledProgram((Term) pattern);
     }
 
-    /**
-     * Like {@link #compiledProgram(JTerm)}, but returns {@code null} instead of throwing when the
-     * dispatch has no head for {@code pattern} (so the caller can fall back to the interpreter).
-     * Used for {@code \assumes} formulas, which are not guaranteed to be among the patterns the
-     * find-matcher coverage is validated against.
-     *
-     * @param pattern the find / assumes pattern
-     * @return the compiled matcher, or {@code null} if the pattern is not compilable
-     */
-    public static @Nullable MatchProgram compiledProgramOrNull(JTerm pattern) {
-        return DELEGATING.compiledProgramOrNull((Term) pattern);
-    }
-
     @Override
     protected MatchInstruction instructionForSV(SchemaVariable sv) {
         return getMatchInstructionForSV(sv);
