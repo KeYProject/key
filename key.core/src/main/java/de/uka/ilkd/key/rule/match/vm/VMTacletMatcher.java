@@ -417,16 +417,12 @@ public class VMTacletMatcher implements TacletMatcher {
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
-        if (syntaxElement instanceof ProgramElement pe) {
-            // dispatch to the program-element overload: a schema-variable kind that cannot match
-            // a program element fails there instead of casting the candidate to a term
-            matchCond = instr.match(pe, matchCond, services);
+        // the instruction routes the candidate by kind (term or program element) itself
+        matchCond = instr.match(syntaxElement, matchCond, services);
+        if (syntaxElement instanceof JTerm) {
+            matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
+        } else if (syntaxElement instanceof ProgramElement) {
             matchCond = checkConditions(matchCond, services);
-        } else {
-            matchCond = instr.match(syntaxElement, matchCond, services);
-            if (syntaxElement instanceof JTerm) {
-                matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
-            }
         }
         return matchCond;
     }

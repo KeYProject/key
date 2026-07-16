@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
@@ -97,21 +96,16 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
 
 
     /**
-     * {@inheritDoc}
+     * A term candidate matches when the schema variable's sort can stand for the term (a program
+     * schema variable may occur at an expression position and then binds a term).
      */
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement,
-            MatchResultInfo mc,
+    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
-        MatchResultInfo result = null;
-        if (actualElement instanceof ProgramElement programElement) {
-            result = match(programElement, mc, services);
-        } else if (actualElement instanceof JTerm term) {
-            final ProgramSVSort svSort = (ProgramSVSort) op.sort();
-            if (svSort.canStandFor(term)) {
-                return addInstantiation(term, mc, services);
-            }
+        final ProgramSVSort svSort = (ProgramSVSort) op.sort();
+        if (svSort.canStandFor(instantiationCandidate)) {
+            return addInstantiation(instantiationCandidate, mc, services);
         }
-        return result;
+        return null;
     }
 }

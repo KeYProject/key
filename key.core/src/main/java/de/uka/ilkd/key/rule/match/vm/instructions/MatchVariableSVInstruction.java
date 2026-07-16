@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
@@ -24,13 +23,12 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
 
 
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
+    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
-        final JTerm actualTerm = (JTerm) actualElement;
-        if (actualTerm.op() instanceof QuantifiableVariable qv) {
+        if (instantiationCandidate.op() instanceof QuantifiableVariable qv) {
             final JTerm foundMapping = mc.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
-                return addInstantiation(actualTerm, mc, services);
+                return addInstantiation(instantiationCandidate, mc, services);
             } else if (foundMapping.op() == qv) {
                 return mc;
             }

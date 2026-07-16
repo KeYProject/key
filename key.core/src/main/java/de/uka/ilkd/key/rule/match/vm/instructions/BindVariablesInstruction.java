@@ -94,7 +94,7 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         @Override
-        public MatchResultInfo match(SyntaxElement actualElement,
+        protected MatchResultInfo match(JTerm instantiationCandidate,
                 MatchResultInfo matchConditions,
                 LogicServices services) {
             throw new UnsupportedOperationException();
