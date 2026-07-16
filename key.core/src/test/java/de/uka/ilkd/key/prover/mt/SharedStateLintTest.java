@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -35,7 +38,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * proof code is therefore a data race waiting to happen: two workers writing at the same moment
  * can lose entries, compute wrong costs, or crash.
  * <p>
- * This test scans the compiled classes of the proving-path packages and fails when it finds
+ * This test scans the compiled classes of the proving-path packages, in {@code key.core} and in
+ * the {@code key.ncore.matcher} match framework alike, and fails when it finds
  * <ul>
  * <li>a non-{@code final} static field, or</li>
  * <li>a {@code final} static field whose value is a plain mutable collection
@@ -51,13 +55,22 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public final class SharedStateLintTest {
 
-    /** Packages that run during proof search (the "proving path"). */
-    private static final String[] SCANNED_PACKAGES = {
+    /** Packages of {@code key.core} that run during proof search (the "proving path"). */
+    private static final String[] SCANNED_CORE_PACKAGES = {
         "de.uka.ilkd.key.rule",
         "de.uka.ilkd.key.strategy",
         "de.uka.ilkd.key.proof",
         "de.uka.ilkd.key.logic",
         "de.uka.ilkd.key.prover",
+    };
+
+    /**
+     * Packages of {@code key.ncore.matcher} that run during proof search: every taclet match goes
+     * through the match framework, so it is as much on the proving path as the {@code key.core}
+     * packages above. It lives in its own module, hence its own classes directory to walk.
+     */
+    private static final String[] SCANNED_MATCHER_PACKAGES = {
+        "org.key_project.prover.rules.matcher",
     };
 
     /**
@@ -200,31 +213,66 @@ public final class SharedStateLintTest {
         }
     }
 
-    /** Enumerates the class names of the scanned packages from the key.core classes directory. */
+    /** Enumerates the class names of the scanned packages, per module. */
     private static Set<String> scannedClassNames() throws Exception {
-        // the compiled classes of key.core are on the test classpath as a directory; walk it
-        final URL codeSource =
-            de.uka.ilkd.key.proof.Goal.class.getProtectionDomain().getCodeSource().getLocation();
-        final Path classesRoot = Path.of(codeSource.toURI());
-        if (!Files.isDirectory(classesRoot)) {
-            throw new IllegalStateException(
-                "expected a classes directory on the test classpath, got: " + classesRoot);
-        }
         final Set<String> result = new TreeSet<>();
-        for (String pkg : SCANNED_PACKAGES) {
-            final Path pkgDir = classesRoot.resolve(pkg.replace('.', '/'));
-            if (!Files.isDirectory(pkgDir)) {
-                continue;
-            }
-            try (Stream<Path> files = Files.walk(pkgDir)) {
-                files.filter(p -> p.toString().endsWith(".class"))
-                        .map(p -> classesRoot.relativize(p).toString()
-                                .replace(java.io.File.separatorChar, '.')
-                                .replaceAll("\\.class$", ""))
-                        .forEach(result::add);
-            }
-        }
+        // each module contributes its own classes directory; an anchor class locates it
+        collectClassNames(de.uka.ilkd.key.proof.Goal.class, SCANNED_CORE_PACKAGES, result);
+        collectClassNames(org.key_project.prover.rules.matcher.vm.VMProgramInterpreter.class,
+            SCANNED_MATCHER_PACKAGES, result);
         return result;
+    }
+
+    /**
+     * Adds the class names of {@code packages} to {@code out}, read from the classes directory of
+     * the module that {@code moduleAnchor} belongs to.
+     *
+     * @param moduleAnchor any class of the module to scan
+     * @param packages the packages to walk, as declared above
+     * @param out collects the fully qualified class names
+     */
+    private static void collectClassNames(Class<?> moduleAnchor, String[] packages,
+            Set<String> out) throws Exception {
+        // a module is on the test classpath either as its classes directory (the module the test
+        // itself lives in) or as its jar (a module dependency)
+        final URL codeSource = moduleAnchor.getProtectionDomain().getCodeSource().getLocation();
+        final Path root = Path.of(codeSource.toURI());
+        for (String pkg : packages) {
+            final Set<String> found = Files.isDirectory(root) ? classNamesFromDirectory(root, pkg)
+                    : classNamesFromJar(root, pkg);
+            // a scanned package without classes means the code moved and this guard silently
+            // stopped covering it -- the same rot the stale-allowlist check above prevents
+            if (found.isEmpty()) {
+                throw new IllegalStateException("scanned package " + pkg + " has no classes in "
+                    + root + ": update the scanned packages of this test to follow the code");
+            }
+            out.addAll(found);
+        }
+    }
+
+    private static Set<String> classNamesFromDirectory(Path classesRoot, String pkg)
+            throws IOException {
+        final Path pkgDir = classesRoot.resolve(pkg.replace('.', '/'));
+        if (!Files.isDirectory(pkgDir)) {
+            return Set.of();
+        }
+        try (Stream<Path> files = Files.walk(pkgDir)) {
+            return files.filter(p -> p.toString().endsWith(".class"))
+                    .map(p -> classesRoot.relativize(p).toString()
+                            .replace(java.io.File.separatorChar, '.')
+                            .replaceAll("\\.class$", ""))
+                    .collect(Collectors.toCollection(TreeSet::new));
+        }
+    }
+
+    private static Set<String> classNamesFromJar(Path jarPath, String pkg) throws IOException {
+        final String prefix = pkg.replace('.', '/') + "/";
+        try (JarFile jar = new JarFile(jarPath.toFile())) {
+            return jar.stream().map(JarEntry::getName)
+                    .filter(n -> n.startsWith(prefix) && n.endsWith(".class"))
+                    .map(n -> n.replace('/', '.').replaceAll("\\.class$", ""))
+                    .collect(Collectors.toCollection(TreeSet::new));
+        }
     }
 
     private static Set<String> readAllowlist() throws IOException {

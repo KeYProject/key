@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
-import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -44,50 +43,33 @@ import org.jspecify.annotations.Nullable;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
- * <p>
- * Matching algorithm using a virtual machine based approach inspired by Voronkonv et al. It matches
- * exactly one taclet and does not produce code trees.
- * </p>
+ * The matcher of one taclet (proof rule): it decides whether the taclet applies to a given term
+ * and, if so, with which instantiations of the taclet's schema variables (its placeholders). At
+ * construction it builds a matcher for the taclet's find pattern and one per {@code \assumes}
+ * formula (the side formulas the rule additionally requires) through the match-plan framework;
+ * {@link #INTERPRETER_MATCHER_PROPERTY} selects which of the two back-ends they run on. Matching
+ * itself is read-only: results are threaded through immutable {@link MatchConditions}, so one
+ * matcher instance serves concurrent proof-search threads.
  * <p>
  * Instances of this class should <strong>not</strong> be created directly, use
  * {@link TacletMatcherKit#createTacletMatcher(Taclet)} instead.
- * </p>
  *
  * @see TacletMatcherKit
  */
 public class VMTacletMatcher implements TacletMatcher {
 
     /**
-     * System property ({@code -Dkey.matcher.interpreter=true}) forcing the legacy cursor-based
-     * interpreter find-matcher. The cursor-free compiled matcher is the default; this is mainly for
-     * headless / CI A/B comparison. In the GUI use the {@link #INTERPRETER_MATCHER_FEATURE} feature
-     * flag instead.
+     * System property ({@code -Dkey.matcher.interpreter=true}): the single switch between the two
+     * back-ends. It forces the legacy cursor-based interpreter for all of a taclet's matching (its
+     * find pattern and its {@code \assumes} formulas alike); the cursor-free compiled matcher is
+     * the default. Which back-end matches taclets is a core setting, so it is a plain system
+     * property (not a {@code FeatureSettings} feature, which are for optional extensions and would
+     * be switched on en masse by {@code --experimental}).
      * <p>
      * Read in the constructor (i.e. per taclet, when the taclet base is loaded) rather than once at
      * class load, so toggling it and reloading the proof switches matchers.
      */
     public static final String INTERPRETER_MATCHER_PROPERTY = "key.matcher.interpreter";
-
-    /**
-     * Feature flag (Settings &rarr; Feature Flags, persistent) forcing the legacy interpreter
-     * find-matcher, the GUI-friendly equivalent of {@link #INTERPRETER_MATCHER_PROPERTY}. The
-     * compiled matcher is the default; activate this to fall back to the interpreter. Like the
-     * property it is read per taclet at construction time, so it takes effect for newly loaded
-     * proofs (or after reloading the current one) -- hence {@code restartRequired = true}.
-     */
-    public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
-        FeatureSettings.createFeature("MATCHER_INTERPRETER",
-            "Use the legacy interpreter taclet find-matcher instead of the compiled one "
-                + "(reload the proof to apply).",
-            true);
-
-    /**
-     * System property ({@code -Dkey.matcher.interpreterAssumes=true}) forcing the interpreter for
-     * {@code \assumes} formula matching even when the compiled find-matcher is selected. The
-     * compiled matcher (incl. the Java program of a modality) is used for assumes by default; this
-     * is mainly for headless A/B comparison of the compiled-assumes extension.
-     */
-    public static final String INTERPRETER_ASSUMES_PROPERTY = "key.matcher.interpreterAssumes";
 
     /** the matcher for the find expression of the taclet */
     private final MatchProgram findMatchProgram;
@@ -130,10 +112,9 @@ public class VMTacletMatcher implements TacletMatcher {
 
         // both back-ends are derived from the unified match-plan framework (one dispatch per
         // construct, see JavaMatchPlanBuilder); the compiled matcher is the default, the
-        // interpreter is used only when explicitly selected (property/feature flag) or as the
-        // automatic fallback for a pattern the compiler does not handle
-        final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY)
-                || FeatureSettings.isFeatureActivated(INTERPRETER_MATCHER_FEATURE);
+        // interpreter is used only when explicitly selected (property) or as the automatic
+        // fallback for a pattern the compiler does not handle
+        final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY);
 
         if (taclet instanceof final FindTaclet findTaclet) {
             findExp = findTaclet.find();
@@ -146,30 +127,24 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = null;
         }
 
-        // The taclet's \assumes formulas use the same back-end as the find: when the compiled
-        // matcher is selected they are compiled too (cursor-free, including the Java program of a
-        // modality), unless -Dkey.matcher.interpreterAssumes forces the interpreter for them.
-        final boolean assumesInterpreter =
-            useInterpreter || Boolean.getBoolean(INTERPRETER_ASSUMES_PROPERTY);
+        // The taclet's \assumes formulas use the same back-end as the find, chosen by the one
+        // switch above: with the compiled matcher they are compiled too (cursor-free, including
+        // the Java program of a modality), with the interpreter they are interpreted.
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
-                matchProgramFor((JTerm) sf.formula(), assumesInterpreter));
+                matchProgramFor((JTerm) sf.formula(), useInterpreter));
         }
     }
 
     /**
-     * Builds the matcher for a find / assumes {@code pattern}: the cursor-free compiled matcher
-     * unless the interpreter is requested or the compiler has no head for the pattern (then the
-     * interpreter is used as a fallback).
+     * Builds the matcher for a find / assumes {@code pattern} on the selected back-end. Both
+     * back-ends are derived from the same match plan, so a pattern outside the plan framework
+     * fails at taclet-load time on either one.
      */
     private static MatchProgram matchProgramFor(JTerm pattern, boolean interpreter) {
-        if (!interpreter) {
-            final MatchProgram compiled = JavaMatchPlanBuilder.compiledProgramOrNull(pattern);
-            if (compiled != null) {
-                return compiled;
-            }
-        }
-        return new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(pattern));
+        return interpreter
+                ? new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(pattern))
+                : JavaMatchPlanBuilder.compiledProgram(pattern);
     }
 
     /**
@@ -184,7 +159,11 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull Term p_template,
             @NonNull MatchResultInfo p_matchCond,
             @NonNull LogicServices p_services) {
-        MatchProgram program = assumesMatchPrograms.get(p_template);
+        final MatchProgram program = assumesMatchPrograms.get(p_template);
+        if (program == null) {
+            throw new IllegalArgumentException(
+                "template is not an assumes formula of this taclet: " + p_template);
+        }
         final var mc = (MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableList.nil();
@@ -438,6 +417,7 @@ public class VMTacletMatcher implements TacletMatcher {
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
+        // the instruction routes the candidate by kind (term or program element) itself
         matchCond = instr.match(syntaxElement, matchCond, services);
         if (syntaxElement instanceof JTerm) {
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);

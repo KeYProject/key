@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
@@ -25,9 +24,9 @@ public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstructio
     }
 
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
+    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
-        return addInstantiation((JTerm) actualElement, mc, services);
+        return addInstantiation(instantiationCandidate, mc, services);
     }
 
 }
