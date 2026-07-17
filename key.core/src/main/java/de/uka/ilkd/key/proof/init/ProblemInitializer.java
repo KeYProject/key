@@ -393,7 +393,8 @@ public final class ProblemInitializer {
     }
 
     /**
-     * Updates the global settings the taclet options that declared in {@code optionDeclaration.key}.
+     * Updates the global settings the taclet options that declared in
+     * {@code optionDeclaration.key}.
      * A proof created afterwards inherits these settings unless it overwrites it.
      */
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
