@@ -80,6 +80,7 @@ public class InitConfig {
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
+    private boolean defaultsComputed;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
@@ -104,6 +105,9 @@ public class InitConfig {
     /// combines the found choices in KeY files, together with the current settings.
     /// The namespace of choices has to be filled.
     public void computeDefaults(ChoiceInformation ci) {
+        if (defaultsComputed) {
+            return;
+        }
         var currentDefaultChoices =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
@@ -145,6 +149,8 @@ public class InitConfig {
             }
             settings.getChoiceSettings().setDefaultChoices(defaults);
         }
+        activatedTacletCache = null;
+        defaultsComputed = true;
     }
 
     /**
@@ -456,6 +462,7 @@ public class InitConfig {
         ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
+        ic.defaultsComputed = defaultsComputed;
         return ic;
     }
 
