@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -508,7 +509,7 @@ public final class ProblemInitializer {
         var warnings = ic.getProfile()
                 .prepareInitConfig(ic, additionalProfileOptions);
         addWarnings(warnings);
-
+        ic.computeDefaults(new ChoiceInformation());
         return ic;
     }
 
