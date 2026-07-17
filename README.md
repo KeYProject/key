@@ -83,7 +83,7 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Developing KeY
 
-* Quality is automatically assessed using [SonarQube](https://sonarqube.org) on each pull request.
+* Quality is automatically assessed on each pull request.
   The results of the assessments (pass/fail) can be inspected in the checks section of the PR.
 
   The rules and quality gate are maintained by Alexander Weigl
@@ -113,7 +113,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2024 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2026 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 
