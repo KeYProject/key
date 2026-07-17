@@ -645,7 +645,7 @@ public class ProofCollections {
         g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_get_acc.proof");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_inv_acc.key");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_LinkedList.key");
-        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_newNode.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_newNode.proof");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_size.key");
         g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_size_acc.proof");
 
