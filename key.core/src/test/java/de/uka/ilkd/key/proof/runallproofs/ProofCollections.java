@@ -643,7 +643,7 @@ public class ProofCollections {
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_find.key");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_get.key");
         g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_get_acc.proof");
-        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_inv_acc.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_inv_acc.proof");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_LinkedList.key");
         g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_newNode.proof");
         g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_size.key");
