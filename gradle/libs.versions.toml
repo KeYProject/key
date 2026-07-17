@@ -98,3 +98,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 checkerframework = { id = "org.checkerframework", version.ref = "checkerframework-gradle" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+license-report = { id = "com.github.jk1.dependency-license-report", version = "3.1.4" }

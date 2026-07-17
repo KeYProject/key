@@ -1,71 +1,232 @@
-===============================================================================
-Font Awesome 5.9
-Icons — CC BY 4.0 License
-https://fontawesome.com/license/free
+Dependency and their licenses of KeY
+This report was generated at Fri Jul 17 16:07:09 CEST 2026 .
 
-===============================================================================
-Docking Frames 1.1.3p1
-Project URL: http://www.docking-frames.org/
-License: LGPL 2.1 - https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+---
 
-===============================================================================
-Group: antlr  Name: antlr  Version: 2.7.7
-POM Project URL: http://www.antlr.org/
-POM License: BSD License - http://www.antlr.org/license.html
+1. Group: ch.qos.logback Name: logback-classic Version: 1.5.37
 
-===============================================================================
-Group: com.atlassian.commonmark  Name: commonmark  Version: 0.15.2
-POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
-POM License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
-POM License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
+Manifest Project URL: http://www.qos.ch
+POM License: EPL-2.0 - https://www.eclipse.org/legal/epl-v20.html
+POM License: LGPL-2.1-only - https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 
-===============================================================================
-4. Group: com.atlassian.commonmark  Name: commonmark-ext-gfm-tables  Version: 0.15.2
-POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
-POM License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
-POM License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
+2. Group: ch.qos.logback Name: logback-core Version: 1.5.37
 
-===============================================================================
-Group: com.miglayout  Name: miglayout-core  Version: 5.2
+Manifest Project URL: http://www.qos.ch
+POM License: EPL-2.0 - https://www.eclipse.org/legal/epl-v20.html
+POM License: LGPL-2.1-only - https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+3. Group: com.formdev Name: flatlaf Version: 3.7.1
+
+POM Project URL: https://github.com/JFormDesigner/FlatLaf
+POM License: The Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+Embedded license files: flatlaf-3.7.1.jar/META-INF/LICENSE
+
+4. Group: com.google.errorprone Name: error_prone_annotations Version: 2.41.0
+
+Manifest Project URL: https://errorprone.info/error_prone_annotations
+Manifest License: Apache 2.0
+POM License: Apache 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+5. Group: com.google.guava Name: failureaccess Version: 1.0.3
+
+Manifest Project URL: https://github.com/google/guava/
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+Embedded license files: failureaccess-1.0.3.jar/META-INF/LICENSE
+
+6. Group: com.google.guava Name: guava Version: 33.5.0-jre
+
+Manifest Project URL: https://github.com/google/guava/
+POM Project URL: https://github.com/google/guava
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+Embedded license files: guava-33.5.0-jre.jar/META-INF/LICENSE
+
+7. Group: com.google.guava Name: listenablefuture Version: 9999.0-empty-to-avoid-conflict-with-guava
+
+POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+8. Group: com.google.j2objc Name: j2objc-annotations Version: 3.1
+
+POM Project URL: https://github.com/google/j2objc/
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+9. Group: com.ibm.icu Name: icu4j Version: 75.1
+
+POM License: Unicode-3.0 - https://raw.githubusercontent.com/unicode-org/icu/main/LICENSE
+Embedded license files: icu4j-75.1.jar/LICENSE
+
+10. Group: com.miglayout Name: miglayout-core Version: 11.4.3
+
+POM Project URL: http://www.miglayout.com/
 POM License: BSD - http://www.debian.org/misc/bsd.license
 
-===============================================================================
-Group: com.miglayout  Name: miglayout-swing  Version: 5.2
+11. Group: com.miglayout Name: miglayout-swing Version: 11.4.3
+
+POM Project URL: http://www.miglayout.com/
 POM License: BSD - http://www.debian.org/misc/bsd.license
 
-===============================================================================
-Group: javax.activation  Name: javax.activation-api  Version: 1.2.0
-Manifest Project URL: http://www.oracle.com
-POM License: CDDL/GPLv2+CE - https://github.com/javaee/activation/blob/master/LICENSE.txt
+12. Group: com.squareup Name: javapoet Version: 1.13.0
 
-===============================================================================
-Group: javax.xml.bind  Name: jaxb-api  Version: 2.4.0-b180830.0359
-Manifest Project URL: http://www.oracle.com/
-POM License: CDDL 1.1 - https://oss.oracle.com/licenses/CDDL+GPL-1.1
-POM License: GPL2 w/ CPE - https://oss.oracle.com/licenses/CDDL+GPL-1.1
+POM Project URL: http://github.com/square/javapoet/
+POM License: Apache 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-===============================================================================
-Group: net.java.dev.javacc  Name: javacc  Version: 4.0
-POM Project URL: http://javacc.dev.java.net/
-POM License: The BSD License - http://www.opensource.org/licenses/bsd-license.html
+13. Group: commons-io Name: commons-io Version: 2.16.1
 
-===============================================================================
-Group: org.antlr  Name: ST4  Version: 4.0.8
-POM Project URL: http://www.stringtemplate.org
-POM License: BSD licence - http://antlr.org/license.html
+Project URL: https://commons.apache.org/proper/commons-io/
+POM License: Apache-2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
 
-===============================================================================
-Group: org.antlr  Name: antlr  Version: 3.5.2
-POM License: BSD licence - http://antlr.org/license.html
+Embedded license files: commons-io-2.16.1.jar/META-INF/LICENSE.txt
+commons-io-2.16.1.jar/META-INF/NOTICE.txt
 
-===============================================================================
-Group: org.antlr  Name: antlr-runtime  Version: 3.5.2
+14. Group: de.unruh Name: java-patterns Version: 0.1.0
+
+POM Project URL: https://github.com/dominique-unruh/java-patterns
+POM License: MIT - https://raw.githubusercontent.com/dominique-unruh/java-patterns/655c7cc5c71eb9ea0fcfee0ae797269e61845d8a/LICENSE
+
+15. Group: de.unruh Name: scala-isabelle_2.13 Version: 0.4.5
+
+POM Project URL: https://dominique-unruh.github.io/scala-isabelle
+POM License: Isabelle - https://raw.githubusercontent.com/dominique-unruh/scala-isabelle/5f28d8e6248f39dd7a31649d92c9850498e3985c/COPYRIGHT.Isabelle
+POM License: MIT - https://raw.githubusercontent.com/dominique-unruh/scala-isabelle/5f28d8e6248f39dd7a31649d92c9850498e3985c/LICENSE
+
+16. Group: info.picocli Name: picocli Version: 4.7.7
+
+POM Project URL: https://picocli.info
+POM License: The Apache Software License, version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+17. Group: jakarta.json Name: jakarta.json-api Version: 2.1.3
+
+Manifest Project URL: https://www.eclipse.org
+POM Project URL: https://github.com/eclipse-ee4j/jsonp
+POM License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+POM License: GNU General Public License, version 2 with the GNU Classpath Exception - https://projects.eclipse.org/license/secondary-gpl-2.0-cp
+
+Embedded license files: jakarta.json-api-2.1.3.jar/META-INF/LICENSE.md
+
+18. Group: org.antlr Name: ST4 Version: 4.3.4
+
+POM License: The BSD License - http://www.antlr.org/license.html
+
+19. Group: org.antlr Name: antlr-runtime Version: 3.5.3
+
 POM Project URL: http://www.antlr.org
 POM License: BSD licence - http://antlr.org/license.html
 
-===============================================================================
-Group: org.jetbrains  Name: annotations  Version: 20.1.0
+20. Group: org.antlr Name: antlr4-runtime Version: 4.13.2
+
+Manifest Project URL: https://www.antlr.org/
+POM License: BSD-3-Clause - https://www.antlr.org/license.html
+
+21. Group: org.apache.commons Name: commons-lang3 Version: 3.14.0
+
+Project URL: https://commons.apache.org/proper/commons-lang/
+POM License: Apache-2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+Embedded license files: commons-lang3-3.14.0.jar/META-INF/LICENSE.txt
+
+22. Group: org.apache.commons Name: commons-text Version: 1.12.0
+
+Project URL: https://commons.apache.org/proper/commons-text
+POM License: Apache-2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+23. Group: org.checkerframework Name: checker-qual Version: 3.53.0
+
+Manifest License: MIT
+POM Project URL: https://checkerframework.org/
+POM License: The MIT License - http://opensource.org/licenses/MIT
+
+24. Group: org.javassist Name: javassist Version: 3.30.2-GA
+
+POM Project URL: https://www.javassist.org/
+POM License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+POM License: LGPL 2.1 - https://www.gnu.org/licenses/lgpl-2.1.html
+POM License: MPL 1.1 - https://www.mozilla.org/en-US/MPL/1.1/
+
+25. Group: org.jetbrains Name: annotations Version: 24.1.0
+
 POM Project URL: https://github.com/JetBrains/java-annotations
 POM License: The Apache Software License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
 
+26. Group: org.jspecify Name: jspecify Version: 1.0.0
 
+Manifest Project URL: https://jspecify.dev/docs/start-here
+POM Project URL: http://jspecify.org/
+POM License: The Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+27. Group: org.junit Name: junit-bom Version: 5.14.2
+
+POM Project URL: https://junit.org/
+POM License: Eclipse Public License v2.0 - https://www.eclipse.org/legal/epl-v20.html
+
+28. Group: org.junit.jupiter Name: junit-jupiter-api Version: 5.14.2
+
+POM Project URL: https://junit.org/
+POM License: Eclipse Public License v2.0 - https://www.eclipse.org/legal/epl-v20.html
+
+
+29. Group: org.junit.jupiter Name: junit-jupiter-engine Version: 5.14.2
+
+POM Project URL: https://junit.org/
+POM License: Eclipse Public License v2.0 - https://www.eclipse.org/legal/epl-v20.html
+
+30. Group: org.junit.platform Name: junit-platform-commons Version: 1.14.2
+
+POM Project URL: https://junit.org/
+POM License: Eclipse Public License v2.0 - https://www.eclipse.org/legal/epl-v20.html
+
+
+31. Group: org.junit.platform Name: junit-platform-engine Version: 1.14.2
+
+POM Project URL: https://junit.org/
+POM License: Eclipse Public License v2.0 - https://www.eclipse.org/legal/epl-v20.html
+
+
+32. Group: org.key-project.proofjava Name: javaparser-core Version: 3.28.0-K13.5
+
+Manifest Project URL: https://javaparser.org
+Manifest License: Apache License, Version 2.0
+Manifest License: GNU Lesser General Public License
+
+POM Project URL: https://github.com/javaparser
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+POM License: GNU Lesser General Public License - http://www.gnu.org/licenses/lgpl-3.0.html
+
+33. Group: org.key-project.proofjava Name: javaparser-core-serialization Version: 3.28.0-K13.5
+
+POM Project URL: https://github.com/javaparser
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+POM License: GNU Lesser General Public License - http://www.gnu.org/licenses/lgpl-3.0.html
+
+34. Group: org.key-project.proofjava Name: javaparser-symbol-solver-core Version: 3.28.0-K13.5
+
+POM Project URL: https://github.com/javaparser
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+POM License: GNU Lesser General Public License - http://www.gnu.org/licenses/lgpl-3.0.html
+
+35. Group: org.log4s Name: log4s_2.13 Version: 1.10.0
+
+POM Project URL: http://log4s.org/
+POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+36. Group: org.opentest4j Name: opentest4j Version: 1.3.0
+
+Manifest License: The Apache License, Version 2.0
+POM Project URL: https://github.com/ota4j-team/opentest4j
+POM License: The Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+Embedded license files: opentest4j-1.3.0.jar/META-INF/LICENSE
+
+37. Group: org.scala-lang Name: scala-library Version: 2.13.14
+
+POM Project URL: https://www.scala-lang.org/
+POM License: Apache-2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+38. Group: org.scalaz Name: scalaz-core_2.13 Version: 7.3.8
+
+POM Project URL: http://scalaz.org
+POM License: BSD-style - https://opensource.org/licenses/BSD-3-Clause
+
+39. Group: org.slf4j Name: slf4j-api Version: 2.0.18
+
+Project URL: http://www.slf4j.org
+POM License: MIT - https://opensource.org/license/mit
