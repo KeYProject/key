@@ -75,9 +75,10 @@ public class ProofCollections {
          * If the fork mode is not set to noFork, the launched subprocesses
          * get the specified amount of heap memory.
          *
-         * Heap memory for subprocesses (like 500m or 2G)
+         * Heap memory for subprocesses (like 500m or 3G)
          */
-        // forkMemory = 1000m
+        settings.setForkMemory("3g");
+
 
         /*
          * To run the forked JVM in debug mode, set the TCP port to listen to here.
