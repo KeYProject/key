@@ -335,7 +335,10 @@ public final class MainWindow extends JFrame {
         SwingUtilities.invokeLater(() -> {
             recentFileMenu.loadEntries();
             // otherwise open most recent cannot be used with a fresh started KeY
-            openMostRecentFileAction.updateEnabledStatus();
+            if (openMostRecentFileAction != null) {
+                // should always be the case, but better safe than sorry
+                openMostRecentFileAction.updateEnabledStatus();
+            }
         });
 
         proofTreeView = new ProofTreeView(mediator);
