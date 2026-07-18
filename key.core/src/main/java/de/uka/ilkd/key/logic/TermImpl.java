@@ -89,6 +89,11 @@ class TermImpl implements JTerm {
      */
     private int hashcodeModRenaming = 0;
 
+    /**
+     * Cached {@link #nameHash()} value. {@code 0} = not yet computed.
+     */
+    private int nameHash = 0;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -214,6 +219,23 @@ class TermImpl implements JTerm {
         return sort;
     }
 
+
+    @Override
+    public int nameHash() {
+        if (nameHash == 0) {
+            int h = 5;
+            h = h * 31 + op.name().toString().hashCode();
+            h = h * 31 + arity();
+            for (int i = 0, n = arity(); i < n; i++) {
+                h = h * 31 + sub(i).nameHash();
+            }
+            if (h == 0) {
+                h = 1;
+            }
+            nameHash = h;
+        }
+        return nameHash;
+    }
 
     @Override
     public int depth() {
