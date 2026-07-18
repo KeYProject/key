@@ -27,8 +27,6 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
-import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
-import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
@@ -115,14 +113,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature countOccurrences(ProjectionToTerm<Goal> cutFormula) {
-        final TermBuffer sf = new TermBuffer();
-        final TermBuffer sub = new TermBuffer();
-
-        return sum(sf, SequentFormulasGenerator.sequent(),
-            sum(sub, SubtermGenerator.leftTraverse(sf, any()),
-                // instead of any a condition which stops traversal when
-                // depth(cutF) > depth(sub) would be better
-                ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
+        return CountOccurrencesFeature.create(cutFormula);
     }
 
     protected static Feature termSmallerThan(String smaller, String bigger) {

@@ -782,8 +782,12 @@ public final class OneStepSimplifier implements BuiltInRule {
          */
         @Override
         public int hashCode() {
-            return term.op().hashCode(); // Allow more conflicts to ensure that naming and term
-                                         // labels are ignored.
+            // The hash of the equivalence used by equals (equality modulo renaming), cached on
+            // the term. A well-spread, equals-consistent hash matters here: the replace-known
+            // context holds one entry per context formula and is probed for every subterm of
+            // the formula being simplified, so hash collisions turn each probe into a scan of
+            // all colliding context formulas.
+            return ((JTerm) term).hashCodeModRenaming();
         }
 
         /**

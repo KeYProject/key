@@ -38,9 +38,13 @@ public class PredictCostProver {
 
     private final Services services;
 
+    /** the integer theory, fetched once because a prediction judges many literals in a row */
+    private final de.uka.ilkd.key.ldt.IntegerLDT integerLDT;
+
     private PredictCostProver(JTerm instance, ImmutableSet<JTerm> assertList, Services services) {
         this.assertLiterals = assertList;
         this.services = services;
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
         this.tb = services.getTermBuilder();
         this.trueT = tb.tt();
         this.falseT = tb.ff();
@@ -108,7 +112,7 @@ public class PredictCostProver {
                 return negated ? falseT : trueT;
             }
         }
-        JTerm arithRes = HandleArith.provedByArith(pro, services);
+        JTerm arithRes = HandleArith.provedByArith(pro, integerLDT, services);
         if (TriggerUtils.isTrueOrFalse(arithRes)) {
             return negated ? tb.not(arithRes) : arithRes;
         } else {
@@ -151,7 +155,7 @@ public class PredictCostProver {
         if (TriggerUtils.isTrueOrFalse(res)) {
             return res;
         }
-        return HandleArith.provedByArith(problem, axiom, services);
+        return HandleArith.provedByArith(problem, axiom, integerLDT, services);
     }
 
     // (5) combine rules

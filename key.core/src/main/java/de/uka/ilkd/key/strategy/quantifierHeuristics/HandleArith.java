@@ -53,7 +53,14 @@ public class HandleArith {
      *         <code>problem</code> if it cann't be proved.
      */
     public static JTerm provedByArith(JTerm problem, Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        return provedByArith(problem, services.getTypeConverter().getIntegerLDT(), services);
+    }
+
+    /**
+     * The variant of {@link #provedByArith(JTerm, Services)} taking the integer theory, which
+     * one decision consults several times.
+     */
+    static JTerm provedByArith(JTerm problem, IntegerLDT integerLDT, Services services) {
         if (!isArithComparison(problem, integerLDT) && strippedOp(problem) != Equality.EQUALS) {
             // neither an (in)equality nor an equality: formatArithTerm yields false and
             // provedArithEqual returns the problem unchanged -- bail before locking the cache.
@@ -147,7 +154,16 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static JTerm provedByArith(JTerm problem, JTerm axiom, Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        return provedByArith(problem, axiom, services.getTypeConverter().getIntegerLDT(),
+            services);
+    }
+
+    /**
+     * The variant of {@link #provedByArith(JTerm, JTerm, Services)} taking the integer theory,
+     * which one decision consults several times.
+     */
+    static JTerm provedByArith(JTerm problem, JTerm axiom, IntegerLDT integerLDT,
+            Services services) {
         if (!isArithComparison(problem, integerLDT) || !isArithComparison(axiom, integerLDT)) {
             // not an arithmetic implication: formatArithTerm would yield false for one side and
             // this method returns the unproved problem -- bail before allocating the key and
