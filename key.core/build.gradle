@@ -336,6 +336,7 @@ def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/k
 tasks.register('runAntlr4Key', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.files "src/main/antlr4/JavaKeYLexer.g4", "src/main/antlr4/JavaKeYParser.g4"
+    inputs.files fileTree("../key.ncore/src/main/antlr") { include "*.g4" }
     outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
     mainClass.set("org.antlr.v4.Tool")
