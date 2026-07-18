@@ -73,10 +73,11 @@ class TermImpl implements JTerm {
     private Sort sort;
 
     /**
-     * This flag indicates that the {@link JTerm} itself or one of its children contains a non-empty
-     * {@link JavaBlock}. {@link JTerm}s which provides a {@link JavaBlock} directly or indirectly
-     * can't be cached because it is possible that the contained meta information inside the
-     * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
+     * This flag indicates that the {@link JTerm} itself or one of its children has a modality as
+     * operator, that is, carries a program. A program with no statements counts as well: the
+     * modality is still there, and its {@link JavaBlock} still carries meta information such as
+     * {@link PositionInfo}s. Terms with this flag can't be cached because two of them may differ
+     * only in that meta information.
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
@@ -243,7 +244,7 @@ class TermImpl implements JTerm {
             int localDepth = -1;
             for (int i = 0, n = arity(); i < n; i++) {
                 final int subTermDepth = sub(i).depth();
-                if (subTermDepth > depth) {
+                if (subTermDepth > localDepth) {
                     localDepth = subTermDepth;
                 }
             }
@@ -433,7 +434,9 @@ class TermImpl implements JTerm {
     public boolean containsJavaBlockRecursive() {
         if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (!javaBlock().isEmpty()) {
+            if (op instanceof JModality) {
+                // a modality with an empty program still counts: the program is part of the
+                // term, and its JavaBlock still carries position information
                 result = ThreeValuedTruth.TRUE;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
