@@ -55,15 +55,35 @@ class TermImpl implements JTerm {
     private final ImmutableArray<QuantifiableVariable> boundVars;
 
     // caches
-    private enum ThreeValuedTruth {
-        TRUE, FALSE, UNKNOWN
-    }
+
+    /**
+     * The three-valued cached markers of this term, packed two bits each into one int:
+     * {@code 00} = not yet computed, {@code 01} = false, {@code 10} = true. The markers are
+     * <ul>
+     * <li>rigidness ({@link #isRigid()});
+     * <li>whether the term or one of its children has a modality as operator, that is, carries a
+     * program ({@link #containsJavaBlockRecursive()}). A program with no statements counts as
+     * well: the modality is still there, and its {@link JavaBlock} still carries meta information
+     * such as {@link PositionInfo}s. Terms with this marker can't be cached because two of them
+     * may differ only in that meta information;
+     * <li>whether the term or one of its children has a {@link Transformer} operator
+     * ({@link #containsTransformerRecursive()}).
+     * </ul>
+     * One int instead of three fields keeps the term object small. Writes of an int are atomic;
+     * two threads caching different markers at once can lose one of the two updates, which only
+     * means that marker is recomputed on its next query (every marker is a pure function of the
+     * term, so any computed value is the correct one).
+     */
+    private int flags;
+
+    private static final int FLAGS_RIGID_SHIFT = 0;
+    private static final int FLAGS_JAVABLOCK_SHIFT = 2;
+    private static final int FLAGS_TRANSFORMER_SHIFT = 4;
+    private static final int FLAG_MASK = 3;
+    private static final int FLAG_FALSE = 1;
+    private static final int FLAG_TRUE = 2;
 
     private int depth = -1;
-    /**
-     * A cached value for computing the term's rigidness.
-     */
-    private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
@@ -73,27 +93,16 @@ class TermImpl implements JTerm {
     private Sort sort;
 
     /**
-     * This flag indicates that the {@link JTerm} itself or one of its children has a modality as
-     * operator, that is, carries a program. A program with no statements counts as well: the
-     * modality is still there, and its {@link JavaBlock} still carries meta information such as
-     * {@link PositionInfo}s. Terms with this flag can't be cached because two of them may differ
-     * only in that meta information.
-     */
-    private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
-
-    /** caches whether this term or a (direct/indirect) child has a {@link Transformer} operator. */
-    private ThreeValuedTruth containsTransformerRecursive = ThreeValuedTruth.UNKNOWN;
-
-    /**
      * Cached renaming-invariant hashCode ({@link RenamingTermProperty#hashCodeModThisProperty}),
-     * used to fast-reject unequal pairs in equality modulo renaming. {@code 0} = not yet computed.
+     * used to fast-reject unequal pairs in equality modulo renaming. {@code -1} = not yet
+     * computed.
      */
-    private int hashcodeModRenaming = 0;
+    private int hashcodeModRenaming = -1;
 
     /**
-     * Cached {@link #nameHash()} value. {@code 0} = not yet computed.
+     * Cached {@link #nameHash()} value. {@code -1} = not yet computed.
      */
-    private int nameHash = 0;
+    private int nameHash = -1;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -223,19 +232,44 @@ class TermImpl implements JTerm {
 
     @Override
     public int nameHash() {
-        if (nameHash == 0) {
+        if (nameHash == -1) {
+            computeHashes();
+        }
+        return nameHash;
+    }
+
+    /**
+     * Fills the caches of {@link #hashCode()} and {@link #nameHash()} together. Both hashes are
+     * recursions over the whole subterm tree, so a term that needs both would walk the tree
+     * twice; this walk visits every subterm once and fills both caches while the term is in the
+     * processor cache. The values are exactly those of the two separate computations: the
+     * hashCode part is still produced by the (subclass-overridable) {@link #computeHashCode()},
+     * which finds all subterm hashes already cached.
+     */
+    private void computeHashes() {
+        // Iterate the subterm array, not arity(): the term factory probes hashCode() before it
+        // validates that the operator's arity matches the subterm count, so the two can differ.
+        final int n = subs.size();
+        for (int i = 0; i < n; i++) {
+            if (subs.get(i) instanceof TermImpl t && (t.hashcode == -1 || t.nameHash == -1)) {
+                t.computeHashes();
+            }
+        }
+        if (hashcode == -1) {
+            this.hashcode = computeHashCode();
+        }
+        if (nameHash == -1) {
             int h = 5;
             h = h * 31 + op.name().toString().hashCode();
             h = h * 31 + arity();
-            for (int i = 0, n = arity(); i < n; i++) {
-                h = h * 31 + sub(i).nameHash();
+            for (int i = 0; i < n; i++) {
+                h = h * 31 + subs.get(i).nameHash();
             }
-            if (h == 0) {
-                h = 1;
+            if (h == -1) {
+                h = 0;
             }
             nameHash = h;
         }
-        return nameHash;
     }
 
     @Override
@@ -255,24 +289,37 @@ class TermImpl implements JTerm {
     }
 
 
+    /** Reads the two-bit marker at {@code shift}: 0 = not yet computed, else FLAG_FALSE/TRUE. */
+    private int flag(int shift) {
+        return (flags >> shift) & FLAG_MASK;
+    }
+
+    /** Caches the two-bit marker at {@code shift}. */
+    private void setFlag(int shift, boolean value) {
+        flags |= (value ? FLAG_TRUE : FLAG_FALSE) << shift;
+    }
+
     @Override
     public boolean isRigid() {
-        if (rigid == ThreeValuedTruth.UNKNOWN) {
+        int rigid = flag(FLAGS_RIGID_SHIFT);
+        if (rigid == 0) {
+            boolean localIsRigid;
             if (!op.isRigid()) {
-                rigid = ThreeValuedTruth.FALSE;
+                localIsRigid = false;
             } else {
-                ThreeValuedTruth localIsRigid = ThreeValuedTruth.TRUE;
+                localIsRigid = true;
                 for (int i = 0, n = arity(); i < n; i++) {
                     if (!sub(i).isRigid()) {
-                        localIsRigid = ThreeValuedTruth.FALSE;
+                        localIsRigid = false;
                         break;
                     }
                 }
-                rigid = localIsRigid;
             }
+            setFlag(FLAGS_RIGID_SHIFT, localIsRigid);
+            return localIsRigid;
         }
 
-        return rigid == ThreeValuedTruth.TRUE;
+        return rigid == FLAG_TRUE;
     }
 
 
@@ -333,8 +380,7 @@ class TermImpl implements JTerm {
     @Override
     public final int hashCode() {
         if (hashcode == -1) {
-            // compute into local variable first to be thread-safe.
-            this.hashcode = computeHashCode();
+            computeHashes();
         }
         return hashcode;
     }
@@ -432,23 +478,25 @@ class TermImpl implements JTerm {
      */
     @Override
     public boolean containsJavaBlockRecursive() {
-        if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+        int marker = flag(FLAGS_JAVABLOCK_SHIFT);
+        if (marker == 0) {
+            boolean result = false;
             if (op instanceof JModality) {
                 // a modality with an empty program still counts: the program is part of the
                 // term, and its JavaBlock still carries position information
-                result = ThreeValuedTruth.TRUE;
+                result = true;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsJavaBlockRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsJavaBlockRecursive = result;
+            setFlag(FLAGS_JAVABLOCK_SHIFT, result);
+            return result;
         }
-        return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
+        return marker == FLAG_TRUE;
     }
 
     /**
@@ -456,31 +504,33 @@ class TermImpl implements JTerm {
      * {@link RenamingTermProperty} to fast-reject pairs that cannot be equal modulo renaming.
      */
     public int hashCodeModRenaming() {
-        if (hashcodeModRenaming == 0) {
+        if (hashcodeModRenaming == -1) {
             final int h = de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY
                     .hashCodeModThisProperty(this);
-            hashcodeModRenaming = h == 0 ? 1 : h;
+            hashcodeModRenaming = h == -1 ? 0 : h;
         }
         return hashcodeModRenaming;
     }
 
     @Override
     public boolean containsTransformerRecursive() {
-        if (containsTransformerRecursive == ThreeValuedTruth.UNKNOWN) {
-            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+        int marker = flag(FLAGS_TRANSFORMER_SHIFT);
+        if (marker == 0) {
+            boolean result = false;
             if (op instanceof Transformer) {
-                result = ThreeValuedTruth.TRUE;
+                result = true;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
                     if (subs.get(i).containsTransformerRecursive()) {
-                        result = ThreeValuedTruth.TRUE;
+                        result = true;
                         break;
                     }
                 }
             }
-            this.containsTransformerRecursive = result;
+            setFlag(FLAGS_TRANSFORMER_SHIFT, result);
+            return result;
         }
-        return containsTransformerRecursive == ThreeValuedTruth.TRUE;
+        return marker == FLAG_TRUE;
     }
 
 
