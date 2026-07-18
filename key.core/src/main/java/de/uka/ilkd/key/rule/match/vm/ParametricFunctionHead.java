@@ -34,7 +34,10 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  */
 public final class ParametricFunctionHead implements MatchHead {
 
-    /** the pattern's parametric function; kept for {@link #toString} only. */
+    /**
+     * the pattern's parametric function; used by {@link #topOperatorDescriptor} and
+     * {@link #toString}.
+     */
     private final ParametricFunctionInstance pfi;
     private final MatchInstruction similar;
     private final MatchInstruction[] argMatchers;
@@ -95,6 +98,13 @@ public final class ParametricFunctionHead implements MatchHead {
             }
             return r;
         };
+    }
+
+    @Override
+    public Object topOperatorDescriptor() {
+        // every instance with the same base function is accepted (the generic arguments are
+        // matched separately), so the base is the family
+        return pfi.getBase();
     }
 
     @Override

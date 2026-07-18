@@ -137,6 +137,41 @@ public abstract class MatchPlanBuilder {
         return core == null ? core : finishPlan(pattern, core);
     }
 
+    /**
+     * Classifies {@code pattern} into its {@link PatternKeySource} (see there for what the result
+     * means and why the queue needs it). The classification comes from the same per-operator
+     * matcher construction ({@link #headFor}) used to match the pattern, so it always agrees with
+     * which terms the pattern accepts.
+     *
+     * @param pattern the pattern to classify
+     * @return the key source of {@code pattern}
+     */
+    public final PatternKeySource keySourceFor(Term pattern) {
+        if (pattern.op() instanceof SchemaVariable sv) {
+            return new PatternKeySource.ByWholeSchemaVariable(sv);
+        }
+        final MatchHead head = headFor(pattern);
+        final Object headDescriptor = head == null ? null : head.topOperatorDescriptor();
+        if (headDescriptor == null) {
+            return PatternKeySource.Unkeyable.INSTANCE;
+        }
+        PatternKeySource.FirstArg firstArg = PatternKeySource.FirstArg.None.INSTANCE;
+        if (pattern.arity() > 0) {
+            final Term arg = pattern.sub(0);
+            if (arg.op() instanceof SchemaVariable argSv) {
+                firstArg = new PatternKeySource.FirstArg.ByArgSchemaVariable(argSv);
+            } else {
+                final MatchHead argHead = headFor(arg);
+                final Object argDescriptor =
+                    argHead == null ? null : argHead.topOperatorDescriptor();
+                if (argDescriptor != null) {
+                    firstArg = new PatternKeySource.FirstArg.ByArgHead(argDescriptor);
+                }
+            }
+        }
+        return new PatternKeySource.ByHead(headDescriptor, firstArg);
+    }
+
     private @Nullable MatchPlan buildCore(Term pattern) {
         final Operator op = pattern.op();
 

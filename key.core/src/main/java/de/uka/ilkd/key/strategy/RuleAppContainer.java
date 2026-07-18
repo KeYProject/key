@@ -75,7 +75,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // comes from cost (above), which the tie-break never sees. Cost (aging) and this tie-break
         // together keep the multi-worker search deterministic -- the tie-break alone is not the
         // whole story, so a change that leaves this method intact can still reorder the proof by
-        // shifting costs/ages (e.g. by changing candidate birth timing).
+        // shifting costs/ages (e.g. by changing the round in which a candidate is created).
         return compareByContent(this, o);
     }
 

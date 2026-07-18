@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.CheckNodeKindInstruction;
@@ -14,6 +15,8 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Match head for a {@link Modality} {@code \<{ prog }\> post} (the dynamic-logic operator that
@@ -27,7 +30,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
  */
 public final class ModalityHead implements MatchHead {
 
-    /** the pattern's modal kind; kept for {@link #toString} only. */
+    /** the pattern's modal kind; used by {@link #topOperatorDescriptor} and {@link #toString}. */
     private final Modality.Kind patternKind;
     private final MatchInstruction kindInstr;
     private final ProgramMatchHook programHook;
@@ -68,6 +71,13 @@ public final class ModalityHead implements MatchHead {
             }
             return programMatch.match(m.programBlock(), r, services);
         };
+    }
+
+    @Override
+    public @Nullable Object topOperatorDescriptor() {
+        // a modality is accepted when its kind agrees (the program is matched separately), so
+        // the kind is the family; a schematic kind stands for several kinds and yields none
+        return patternKind instanceof SchemaVariable ? null : patternKind;
     }
 
     @Override

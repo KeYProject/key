@@ -21,6 +21,7 @@ import org.key_project.prover.rules.matcher.compiler.MatchHead;
 import org.key_project.prover.rules.matcher.compiler.MatchPlan;
 import org.key_project.prover.rules.matcher.compiler.MatchPlanBuilder;
 import org.key_project.prover.rules.matcher.compiler.ModalityHead;
+import org.key_project.prover.rules.matcher.compiler.PatternKeySource;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
@@ -113,6 +114,60 @@ public final class JavaMatchPlanBuilder extends MatchPlanBuilder {
     @Override
     protected MatchInstruction instructionForSV(SchemaVariable sv) {
         return getMatchInstructionForSV(sv);
+    }
+
+    /**
+     * Summarizes the {@code \assumes} pattern {@code pattern} for indexing (see
+     * {@link PatternKeySource}), through the same
+     * dispatch ({@link #headFor}) the matcher is built from.
+     *
+     * @param pattern the assumes pattern
+     * @return the key source of {@code pattern}
+     */
+    public static PatternKeySource keySource(
+            JTerm pattern) {
+        return DELEGATING.keySourceFor(pattern);
+    }
+
+    /**
+     * The operator family of a concrete operator, as a key for indexing: the counterpart of
+     * {@link org.key_project.prover.rules.matcher.compiler.MatchHead#topOperatorDescriptor()}
+     * for the operators of concrete terms (which have no match head). A key built at some
+     * position of a term names what the matcher observes at that position, so the family of an
+     * operator is the operator itself, up to the identifications the heads make (pinned by
+     * {@code QueueRuleApplicationManagerWakeKeyTest}):
+     * <ul>
+     * <li>a parametric function instance belongs to its base's family (the head accepts every
+     * instance of the base),</li>
+     * <li>a modality belongs to its kind's family (the head accepts every modality of the
+     * kind),</li>
+     * <li>every other operator, update applications and elementary updates included, is its own
+     * family (the generic head accepts by identity).</li>
+     * </ul>
+     * Only schematic operators have no family ({@code null}): a schema variable and a
+     * schematic modality kind fix no operator a key could name.
+     *
+     * <p>
+     * The family is position-relative in one respect. The top of an {@code \assumes} candidate
+     * is matched after its leading updates have been removed (they are the find's update
+     * context, see {@code VMTacletMatcher.matchUpdateContext}), so a caller keying a top
+     * position strips leading updates before asking for the family. Every other position is
+     * matched as written, so updates keep their own family there.
+     *
+     * @param op the operator of a concrete term
+     * @return the operator's family, or {@code null} if the operator is schematic
+     */
+    public static @Nullable Object matchFamilyOf(Operator op) {
+        if (op instanceof SchemaVariable) {
+            return null;
+        }
+        if (op instanceof ParametricFunctionInstance pfi) {
+            return pfi.getBase();
+        }
+        if (op instanceof Modality mod) {
+            return mod.kind() instanceof ModalOperatorSV ? null : mod.kind();
+        }
+        return op;
     }
 
     /**
