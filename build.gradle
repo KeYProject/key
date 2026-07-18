@@ -313,7 +313,11 @@ subprojects {
 
         pom {
             name = project.name
-            description = project.description
+            afterEvaluate {
+                description = project.description
+                assert (project.description != null && project.description != "") : "Description of modules are required at maven-central"
+                print(project.description)
+            }
             url = 'https://key-project.org/'
 
             licenses {
