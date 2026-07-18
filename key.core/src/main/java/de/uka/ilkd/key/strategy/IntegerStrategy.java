@@ -26,6 +26,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.CostLocality;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -671,6 +672,13 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     Goal goal, MutableState mState) {
                 return tOne;
             }
+
+            @Override
+            public CostLocality locality() {
+                // a constant term fixed at strategy construction: annotations are looked up on
+                // the concrete (here: anonymous) class, so the classification is given explicitly
+                return CostLocality.STABLE;
+            }
         };
 
         final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
@@ -687,6 +695,13 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
+            }
+
+            @Override
+            public CostLocality locality() {
+                // a constant term fixed at strategy construction: annotations are looked up on
+                // the concrete (here: anonymous) class, so the classification is given explicitly
+                return CostLocality.STABLE;
             }
         };
 
