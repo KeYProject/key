@@ -235,6 +235,17 @@ public class StrategySettings extends AbstractSettings {
     }
 
     /**
+     * Reads a single active strategy property without copying the whole map. Cheap enough to call
+     * from the cost path, unlike {@link #getActiveStrategyProperties()}.
+     *
+     * @param key a strategy property key
+     * @return the active value for {@code key}, or {@code null} if unset
+     */
+    public String getActiveStrategyProperty(String key) {
+        return strategyProperties.getProperty(key);
+    }
+
+    /**
      * sets the strategy properties if different from current ones
      */
     public void setActiveStrategyProperties(StrategyProperties p) {

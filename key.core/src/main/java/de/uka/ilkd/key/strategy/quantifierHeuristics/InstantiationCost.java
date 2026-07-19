@@ -24,12 +24,16 @@ public class InstantiationCost implements Feature {
 
     final private ProjectionToTerm<Goal> varInst;
 
-    private InstantiationCost(ProjectionToTerm<Goal> var) {
+    /** whether the prediction runs with the classic trigger selection */
+    private final boolean classicTriggers;
+
+    private InstantiationCost(ProjectionToTerm<Goal> var, boolean classicTriggers) {
         varInst = var;
+        this.classicTriggers = classicTriggers;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> varInst) {
-        return new InstantiationCost(varInst);
+    public static Feature create(ProjectionToTerm<Goal> varInst, boolean classicTriggers) {
+        return new InstantiationCost(varInst, classicTriggers);
     }
 
     /**
@@ -41,9 +45,10 @@ public class InstantiationCost implements Feature {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();
-        final var instance = varInst.toTerm(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState);
+        final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;
+        final var instance = varInst.toTerm(app, pos, jgoal, mState);
 
         return Instantiation.computeCost(instance, formula, goal.sequent(),
-            (Services) goal.proof().getServices());
+            (Services) goal.proof().getServices(), classicTriggers);
     }
 }
