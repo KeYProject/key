@@ -37,6 +37,11 @@ class MultiTrigger implements Trigger {
         this.clause = clause;
     }
 
+    /** The uni-trigger elements that jointly cover the clause variables. */
+    ImmutableSet<Trigger> elements() {
+        return elements;
+    }
+
     @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
             Services services) {

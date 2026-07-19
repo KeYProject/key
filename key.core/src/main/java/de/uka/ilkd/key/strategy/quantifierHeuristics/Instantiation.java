@@ -52,6 +52,53 @@ class Instantiation {
         triggersSet = TriggersSet.create((JTerm) allterm, services);
         assumedLiterals = initAssertLiterals(seq, services);
         addInstances(sequentToTerms(seq), services);
+        addStoreCoordinateInstances((JTerm) matrix, services);
+    }
+
+    /**
+     * Heap-aware instance candidates from write coordinates: where the matrix reads an array
+     * through a built-up heap, {@code select(... store(h, o, arr(c), v) ..., o, arr(j))} with
+     * quantified index {@code j}, the written index {@code c} is a candidate for {@code j}.
+     * Instantiating with it lets the select collapse by the select-over-store rules, which is
+     * how such a quantified formula speaks about the stored value. Trigger matching cannot
+     * produce these candidates: the store coordinate contains no quantified variable, so no
+     * trigger binds {@code j} to it. The candidates go through the same cost computation as
+     * matched ones, so useless coordinates are excluded or ranked down as usual.
+     */
+    private void addStoreCoordinateInstances(JTerm term, Services services) {
+        final var heapLDT = services.getTypeConverter().getHeapLDT();
+        // isSelectOp tests the operator directly. Do not build getSelect(term.sort()): that
+        // constructs a select of the subterm's sort, which fails for e.g. the Null sort.
+        if (heapLDT.isSelectOp(term.op())) {
+            final JTerm field = term.sub(2);
+            if (field.op() == heapLDT.getArr() && field.freeVars().contains(firstVar)) {
+                collectWrittenIndices(term.sub(0), term.sub(1), services);
+            }
+        }
+        for (int i = 0; i < term.arity(); i++) {
+            addStoreCoordinateInstances(term.sub(i), services);
+        }
+    }
+
+    /** Adds every ground index written on {@code obj}'s array fields in {@code heap}. */
+    private void collectWrittenIndices(JTerm heap, JTerm obj, Services services) {
+        final var heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heap.sort() != heapLDT.targetSort()) {
+            return;
+        }
+        if (heap.op() == heapLDT.getStore()) {
+            final JTerm field = heap.sub(2);
+            if (heap.sub(1).equals(obj) && field.op() == heapLDT.getArr()
+                    && field.freeVars().isEmpty()) {
+                final ImmutableMap<QuantifiableVariable, Term> varMap =
+                    DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()
+                            .put(firstVar, field.sub(0));
+                addInstance(new Substitution(varMap), services);
+            }
+        }
+        for (int i = 0; i < heap.arity(); i++) {
+            collectWrittenIndices(heap.sub(i), obj, services);
+        }
     }
 
     private record Cached(Term qf, Sequent seq, Instantiation result) {

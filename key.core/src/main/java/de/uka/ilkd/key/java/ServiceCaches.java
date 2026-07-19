@@ -141,6 +141,17 @@ public class ServiceCaches implements SessionCaches {
         new ConcurrentLruCache<>(1000);
 
     /**
+     * Per-formula operator-occurrence summary for the quantifier instantiation tie-break (which
+     * operators occur in a sequent formula, and which at proving polarity). A sequent step
+     * replaces few formulas, and the {@link org.key_project.prover.sequent.SequentFormula} objects
+     * are immutable and shared across the sequents of a branch, so the summary is memoised per
+     * formula rather than recomputed per sequent. The value is opaque here (an
+     * {@code Instantiation.OccInfo}) to keep this package independent of the strategy package.
+     */
+    private final Map<org.key_project.prover.sequent.SequentFormula, Object> formulaOccurrenceCache =
+        new ConcurrentLruCache<>(10000);
+
+    /**
      * Map from <code>Term</code>(allTerm) to <code>ClausesGraph</code>
      */
     private final Map<org.key_project.logic.Term, ClausesGraph> graphCache =
@@ -237,6 +248,10 @@ public class ServiceCaches implements SessionCaches {
 
     public final Map<org.key_project.logic.Term, Monomial> getMonomialCache() {
         return monomialCache;
+    }
+
+    public final Map<org.key_project.prover.sequent.SequentFormula, Object> getFormulaOccurrenceCache() {
+        return formulaOccurrenceCache;
     }
 
     public final Map<org.key_project.logic.Term, Polynomial> getPolynomialCache() {

@@ -557,9 +557,13 @@ public class EqualityConstraint implements Constraint {
         // MV cycles are impossible if the orders of MV pairs are
         // correct
 
-        if (!t.isRigid()) {
-            return TOP;
-        }
+        // A metavariable may be bound to a ground non-rigid term. This is only trigger
+        // matching: the metavariable stands for a quantifier instance, and instantiating a
+        // quantifier with a non-rigid term (a program value like a pivot index, or a heap) is
+        // sound, the wary substitution at taclet application takes care of modalities. Array
+        // indices such as a split result are non-rigid, and rejecting them here would strand
+        // the instantiation the proof needs. The binding is dropped anyway if it is a
+        // metavariable or contains free variables (below).
 
         // metavariable instantiations must not contain free variables
         if (!t.freeVars().isEmpty() ||

@@ -79,11 +79,13 @@ public final class OneStepSimplifier implements BuiltInRule {
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets = ImmutableList.<String>nil()
-            .append("concrete").append("simplify_select_elim_store").append("concrete_java").append("update_elim")
+            .append("concrete").append("simplify_select_elim_store").append("concrete_java")
+            .append("update_elim")
             .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
-    private static final boolean[] bottomUp = { false, false, false, false, true, true, true, false };
+    private static final boolean[] bottomUp =
+        { false, false, false, false, true, true, true, false };
     // OSS is shared per proof and runs concurrently on every parallel-prover worker. Its two caches
     // are PURE (the value is a function of the key: "does this formula simplify?" / "this term is
     // irreducible"), so eviction order is irrelevant to the result and a striped (lower-contention)
