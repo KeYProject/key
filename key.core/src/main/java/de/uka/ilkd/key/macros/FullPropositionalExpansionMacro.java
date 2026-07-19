@@ -28,7 +28,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     @Override
     public String getScriptCommandName() {
-        return "split_prop";
+        return "split-prop";
     }
 
     private static final String[] ADMITTED_RULES =
