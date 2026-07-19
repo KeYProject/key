@@ -630,7 +630,7 @@ public class ProofCollections {
         g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_exc.key");
         g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_ArrayList.key");
         g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_find.key");
-        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_add.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/ArrayList_add.proof");
         g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size.key");
         g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size_acc.key");
         g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_get_normal.key");

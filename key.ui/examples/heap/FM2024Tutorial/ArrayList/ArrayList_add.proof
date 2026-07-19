@@ -86,3 +86,8 @@
     "name" : "ArrayList[List::add(int)].JML normal_behavior operation contract.0"
 }
 
+\proofScript "
+  macro autopilot;
+  rule Class_invariant_axiom_for_ArrayList occ=1;
+  macro split_prop;
+  auto all=true steps=10000;"
