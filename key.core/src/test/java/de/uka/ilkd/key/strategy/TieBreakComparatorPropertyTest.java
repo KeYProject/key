@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -16,6 +17,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,19 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TieBreakComparatorPropertyTest {
 
-    private static Method compareByName;
-
     private static int cmp(Term a, Term b) {
-        try {
-            if (compareByName == null) {
-                compareByName = RuleAppContainer.class.getDeclaredMethod("compareByName",
-                    Term.class, Term.class);
-                compareByName.setAccessible(true);
-            }
-            return (int) compareByName.invoke(null, a, b);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        return RuleAppContainer.compareByName(a, b);
     }
 
     private static JTerm t(TermFactory tf, Function f, JTerm... subs) {
@@ -121,5 +112,117 @@ public class TieBreakComparatorPropertyTest {
             }
         }
         assertTrue(triples > 0, "test set too flat");
+    }
+
+    /**
+     * The invariant the production comparator rests on: {@code compareFormulasByName} tries the
+     * cached name hash first and walks only on a hash tie, which is a total order exactly when a
+     * walk tie implies a hash tie. Checked over structurally equal terms built as distinct
+     * objects, so the identity shortcut cannot hide a violation.
+     */
+    @Test
+    void walkTieImpliesNameHashTie() {
+        final var services = de.uka.ilkd.key.rule.TacletForTests.services();
+        final TermFactory tf = services.getTermFactory();
+        final List<JTerm> terms = generatedTerms(tf);
+        final List<JTerm> copies = generatedTerms(tf);
+        int ties = 0;
+        for (int i = 0; i < terms.size(); i++) {
+            for (int j = 0; j < terms.size(); j++) {
+                final Term a = terms.get(i);
+                final Term b = copies.get(j);
+                if (cmp(a, b) == 0) {
+                    ties++;
+                    assertEquals(a.nameHash(), b.nameHash(),
+                        "walk tie without hash tie for [" + a + "] vs [" + b + "]");
+                }
+            }
+        }
+        assertTrue(ties >= terms.size(), "expected at least the diagonal ties");
+    }
+
+    /**
+     * The production path {@code compareFormulasByName} must order exactly like the plain walk:
+     * the hash is a discriminator for speed, never for a different order. A tie means a walk
+     * tie, and where the hashes disagree the walk of that pair is what loses, so only the sign
+     * consistency on hash ties can be asserted; totality and antisymmetry hold over the set.
+     */
+    @Test
+    void formulaComparatorAgreesWithTheWalk() {
+        final var services = de.uka.ilkd.key.rule.TacletForTests.services();
+        final TermFactory tf = services.getTermFactory();
+        final List<JTerm> terms = generatedTerms(tf);
+        final List<JTerm> copies = generatedTerms(tf);
+        for (int i = 0; i < terms.size(); i++) {
+            for (int j = 0; j < terms.size(); j++) {
+                final Term a = terms.get(i);
+                final Term b = copies.get(j);
+                final int full = RuleAppContainer.compareFormulasByName(a, b);
+                final int back = RuleAppContainer.compareFormulasByName(b, a);
+                assertEquals(Integer.signum(full), -Integer.signum(back),
+                    "antisymmetry violated for [" + a + "] vs [" + b + "]");
+                if (full == 0) {
+                    assertEquals(0, cmp(a, b),
+                        "formula comparator tie without walk tie for [" + a + "] vs [" + b + "]");
+                }
+                if (a.nameHash() == b.nameHash()) {
+                    assertEquals(Integer.signum(cmp(a, b)), Integer.signum(full),
+                        "hash-tied pair ordered differently than the walk: [" + a + "] vs ["
+                            + b + "]");
+                }
+            }
+        }
+    }
+
+    /**
+     * Term labels are invisible to the ordering: a labeled variant shares the name hash and the
+     * label-agnostic hash of the plain term and compares as a tie, although the two terms are
+     * not equal.
+     */
+    @Test
+    void orderingHashesIgnoreLabels() {
+        final var services = de.uka.ilkd.key.rule.TacletForTests.services();
+        final TermFactory tf = services.getTermFactory();
+        final Sort s = new SortImpl(new Name("S"));
+        final Function a = new JFunction(new Name("a"), s);
+        final Function f = new JFunction(new Name("f"), s, s);
+        final JTerm plain = t(tf, f, t(tf, a));
+        final JTerm labeled = tf.createTerm(f, new JTerm[] { t(tf, a) },
+            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL));
+
+        assertTrue(!plain.equals(labeled), "the label must matter for equality");
+        assertEquals(plain.nameHash(), labeled.nameHash(), "nameHash must ignore labels");
+        assertEquals(plain.labelAgnosticHash(), labeled.labelAgnosticHash(),
+            "labelAgnosticHash must ignore labels");
+        assertEquals(0, cmp(plain, labeled), "the walk must ignore labels");
+        assertEquals(0, RuleAppContainer.compareFormulasByName(plain, labeled),
+            "the production comparator must ignore labels");
+    }
+
+    /** The generated term set of the total-order test, built fresh so instances are distinct. */
+    private static List<JTerm> generatedTerms(TermFactory tf) {
+        final Sort s = new SortImpl(new Name("S"));
+        final Function a = new JFunction(new Name("a"), s);
+        final Function b = new JFunction(new Name("b"), s);
+        final Function c = new JFunction(new Name("c"), s);
+        final Function f = new JFunction(new Name("f"), s, s);
+        final Function g = new JFunction(new Name("g"), s, s, s);
+        final Function h = new JFunction(new Name("h"), s, s, s);
+        final List<JTerm> base = new ArrayList<>();
+        base.add(t(tf, a));
+        base.add(t(tf, b));
+        base.add(t(tf, c));
+        final List<JTerm> terms = new ArrayList<>(base);
+        for (JTerm x : base) {
+            terms.add(t(tf, f, x));
+            for (JTerm y : base) {
+                terms.add(t(tf, g, x, y));
+                terms.add(t(tf, h, x, y));
+                terms.add(t(tf, f, t(tf, f, x)));
+                terms.add(t(tf, g, t(tf, f, x), y));
+                terms.add(t(tf, h, x, t(tf, g, x, y)));
+            }
+        }
+        return terms;
     }
 }

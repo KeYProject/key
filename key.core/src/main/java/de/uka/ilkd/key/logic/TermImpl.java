@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -103,6 +104,11 @@ class TermImpl implements JTerm {
      * Cached {@link #nameHash()} value. {@code -1} = not yet computed.
      */
     private int nameHash = -1;
+
+    /**
+     * Cached {@link #labelAgnosticHash()} value. {@code -1} = not yet computed.
+     */
+    private int labelAgnosticHash = -1;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -238,20 +244,25 @@ class TermImpl implements JTerm {
         return nameHash;
     }
 
+    @Override
+    public int labelAgnosticHash() {
+        if (labelAgnosticHash == -1) {
+            computeHashes();
+        }
+        return labelAgnosticHash;
+    }
+
     /**
-     * Fills the caches of {@link #hashCode()} and {@link #nameHash()} together. Both hashes are
-     * recursions over the whole subterm tree, so a term that needs both would walk the tree
-     * twice; this walk visits every subterm once and fills both caches while the term is in the
-     * processor cache. The values are exactly those of the two separate computations: the
-     * hashCode part is still produced by the (subclass-overridable) {@link #computeHashCode()},
-     * which finds all subterm hashes already cached.
+     * Computes the three hashcode caches of {@link #hashCode()}, {@link #nameHash()} and
+     * {@link #labelAgnosticHash()}.
      */
     private void computeHashes() {
         // Iterate the subterm array, not arity(): the term factory probes hashCode() before it
         // validates that the operator's arity matches the subterm count, so the two can differ.
         final int n = subs.size();
         for (int i = 0; i < n; i++) {
-            if (subs.get(i) instanceof TermImpl t && (t.hashcode == -1 || t.nameHash == -1)) {
+            if (subs.get(i) instanceof TermImpl t
+                    && (t.hashcode == -1 || t.nameHash == -1 || t.labelAgnosticHash == -1)) {
                 t.computeHashes();
             }
         }
@@ -269,6 +280,26 @@ class TermImpl implements JTerm {
                 h = 0;
             }
             nameHash = h;
+        }
+        if (labelAgnosticHash == -1) {
+            // like the base computeHashCode() (op, bound vars, program, subterms) but recursing
+            // through labelAgnosticHash and never adding this term's labels, so it is a full,
+            // program-aware structural hash that ignores only term labels. It is computed here
+            // instead of through computeHashCode() because the LabeledTermImpl override of that
+            // method folds the labels in, which would make this hash label-sensitive.
+            // This hash can disappear and be replaced with the normal hashcode once PR 3884 is
+            // merged and the normal hashcode becomes label agnostic
+            int h = 5;
+            h = h * 17 + op.hashCode();
+            h = h * 17 + boundVars().hashCode();
+            h = h * 17 + javaBlock().hashCode();
+            for (int i = 0; i < n; i++) {
+                h = h * 17 + subs.get(i).labelAgnosticHash();
+            }
+            if (h == -1) {
+                h = 0;
+            }
+            labelAgnosticHash = h;
         }
     }
 
@@ -505,7 +536,7 @@ class TermImpl implements JTerm {
      */
     public int hashCodeModRenaming() {
         if (hashcodeModRenaming == -1) {
-            final int h = de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY
+            final int h = RenamingTermProperty.RENAMING_TERM_PROPERTY
                     .hashCodeModThisProperty(this);
             hashcodeModRenaming = h == -1 ? 0 : h;
         }

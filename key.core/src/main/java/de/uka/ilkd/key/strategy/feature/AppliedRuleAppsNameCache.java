@@ -23,15 +23,15 @@ import org.jspecify.annotations.NonNull;
  * See the get method for additional required constraints for correctness.
  * <p>
  * Within a rule name the applied apps are additionally bucketed by an application
- * <em>fingerprint</em> ({@link #focusFingerprint}: the operators of the focus term and its direct
- * subterms), or {@code 0} for find-less apps. This turns the duplicate search in
+ * <em>fingerprint</em> ({@link #focusFingerprint}: the label-agnostic structural hash of the
+ * focus term), or {@code 0} for find-less apps. This turns the duplicate search in
  * {@link AbstractNonDuplicateAppFeature} from a linear scan over all same-named applications on the
  * branch into a bucket lookup. It is sound for every duplicate check because each one's
  * {@code comparePio} implies the two focus terms are equal up to term labels:
  * {@link NonDuplicateAppFeature} (equal positions), {@link EqNonDuplicateAppFeature} (equal
  * positions modulo formula renaming) and {@link NonDuplicateAppModPositionFeature} (equal focus
- * terms modulo irrelevant labels). The fingerprint is built only from operators (never from term
- * labels), so focus terms that are equal up to labels always share a fingerprint, and a duplicate
+ * terms modulo irrelevant labels). The fingerprint ignores term labels, so focus terms that are
+ * equal up to labels always share a fingerprint, and a duplicate
  * can only ever live in the candidate's own bucket -- including for the modulo-position variant,
  * which deliberately matches the same focus term at different sequent positions.
  *
@@ -53,22 +53,19 @@ public class AppliedRuleAppsNameCache {
     public AppliedRuleAppsNameCache() {}
 
     /**
-     * A cheap, label-insensitive fingerprint of a focus term for bucketing applied rule apps: the
-     * top operator plus the operators of its direct subterms. It is built only from operators (an
-     * operator is not a term label), so it is invariant under the mod-term-labels equality the
-     * buckets are probed with -- a duplicate therefore always shares the candidate's bucket. It is
-     * O(arity) and touches no subterm below depth one, unlike a full term hash. Coarser than a full
-     * hash (more terms may share a bucket), but the {@code sameApplication} scan resolves any
-     * collision, so this only trades a little bucket length for a much cheaper fingerprint.
+     * A cheap, label-insensitive fingerprint of a focus term for bucketing applied rule apps:
+     * its {@link Term#labelAgnosticHash()}. That hash folds the term's operators, bound
+     * variables, programs and subterms and never its term labels, so it is invariant under the
+     * mod-term-labels equality the buckets are probed with, and a duplicate always shares the
+     * candidate's bucket. The hash is cached on the term, so bucketing is exact at O(1) per
+     * lookup, one term per bucket up to genuine collisions, which the {@code sameApplication}
+     * scan resolves. It deliberately does not use {@link Term#nameHash()}: that ignores the
+     * program of a modality, so on update-simplification proofs, whose focus terms are
+     * modalities differing only in their program, it collapses everything into one bucket and
+     * degrades the {@code sameApplication} scan to quadratic.
      */
     public static int focusFingerprint(Term focus) {
-        int h = focus.op().hashCode();
-        final int arity = focus.arity();
-        h = 31 * h + arity;
-        for (int i = 0; i < arity; i++) {
-            h = 31 * h + focus.sub(i).op().hashCode();
-        }
-        return h;
+        return focus.labelAgnosticHash();
     }
 
     /**

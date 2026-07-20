@@ -52,6 +52,12 @@ public interface Term extends LogicElement, Sorted {
     /// differ.
     int nameHash();
 
+    /// A hash folded from the operators, arities, bound variables, programs (Java blocks) and
+    /// subterm structure of this term, ignoring only term labels. Unlike [#nameHash()] it
+    /// distinguishes modalities by their program; unlike [#hashCode()] it ignores term labels, so
+    /// it is the same in every run. Terms equal up to labels share it. Cached.
+    int labelAgnosticHash();
+
     /// Returns a serial number for a term. The serial number is not persistent.
     int serialNumber();
 
