@@ -6,20 +6,22 @@
 ![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20central)
 
 
-This repository is the home of the interactive theorem prover KeY for formal verification and analysis of Java programs. KeY comes as a standalone GUI application, which allows you to verify the functional correctness of Java programs with respect to formal specifications formulated in the Java Modeling Language JML. Moreover, KeY can also be used as a library e.g. for symbolic program execution, first order reasoning, or test case generation.
+This repository is the home of the interactive theorem prover KeY for formal verification and analysis of Java programs.
+KeY comes as a standalone GUI application, which allows you to verify the functional correctness of Java programs with
+respect to formal specifications formulated in the Java Modeling Language JML. Moreover, KeY can also be used as a
+library e.g. for symbolic program execution, first order reasoning, or test case generation.
 
 For more information, refer to
 
 * [The KeY homepage](https://key-project.org) 
 * [The KeY book](https://www.key-project.org/thebook2/)
-* [The KeY developer documentation](https://keyproject.github.io/key-docs/)
+* [The KeY documentation pages](https://keyproject.github.io/key-docs/)
 * KeY's success stories:
   * [Severe bug discovered in JDK sorting routine (TimSort)](http://www.envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/),  
   * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
   * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
-The current version of KeY is 2.12.2, licensed under GPL v2.
-
+The current version of KeY is 3.0, licensed under GPL v2.
 
 Feel free to use the project templates to get started using KeY:
 * [For Verification Projects](https://github.com/KeYProject/verification-project-template)
@@ -30,7 +32,7 @@ Feel free to use the project templates to get started using KeY:
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java 17 or newer
+* Java 21 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
     * [Z3](https://github.com/Z3Prover/z3#z3)
@@ -87,15 +89,8 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Developing KeY
 
-* Quality is automatically assessed using [SonarQube](https://sonarqube.org) on each pull request.
-  The results of the assessments (pass/fail) can be inspected in the checks section of the PR.
-
-  The rules and quality gate are maintained by Alexander Weigl
-  <weigl@kit.edu> currently.
-
-* More guideline and documentation for the KeY development can be found under
+Guidelines and documentation for the KeY development can be found under
 [key-docs](https://keyproject.github.io/key-docs/devel/).
-
 
 
 # Issues and Bug Reports
@@ -106,7 +101,9 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Contributing to KeY
 
-Feel free to submit [pull requests](https://github.com/KeYProject/key/pulls) via GitHub. Pull requests are assessed using automatic tests, formatting and static source checkers, as well as a manual review by one of the developers. More guidelines and documentation for the KeY development can be found under [key-docs](https://keyproject.github.io/key-docs/devel/).
+Feel free to submit [pull requests](https://github.com/KeYProject/key/pulls) via GitHub. Pull requests are assessed
+using automatic tests, formatting and static source checkers, as well as a manual review by one of the developers. More
+guidelines and documentation for the KeY development can be found under [key-docs](https://keyproject.github.io/key-docs/devel/).
 
 
 
