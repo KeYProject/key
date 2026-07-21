@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -402,12 +403,14 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public java.io.@Nullable File getJavaSourceLocation() {
+        public Path getJavaSourceLocation() {
             try {
                 JavaKeYParser.String_valueContext value =
                     ctx.programSource(0).oneProgramSource().string_value(0);
                 String v = ParsingFacade.getValueDocumentation(value);
-                return new java.io.File(v);
+                var location = Location.fromToken(ctx.start);
+                var keyFile = Paths.get(location.fileUri());
+                return keyFile.getParent().resolve(v);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 {
                     return null;

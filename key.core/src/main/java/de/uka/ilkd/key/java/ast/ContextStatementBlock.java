@@ -136,20 +136,19 @@ public class ContextStatementBlock extends StatementBlock {
     }
 
     /**
-     * Matches this context block against the given source. Phases (1) prefix descent to the active
-     * statement, (2) inner execution context matching and (4) completion of the context
-     * instantiation (prefix/suffix positions) are always performed here. Phase (3), the matching of
-     * the active statements (this block's children from the active offset), is delegated to the
-     * supplied {@code activeStatements} matcher when one is given (and the located source position
-     * is a regular child offset); otherwise the built-in {@link #matchChildren} is used. All three
-     * yield identical results; the {@code activeStatements} matcher (a VM sub-program or a compiled
-     * matcher) simply matches the active-statement subtree by direct navigation instead of the
-     * monolithic AST matcher.
+     * Matches this context block against the given source. The context bookkeeping is always
+     * performed here: locating the active statements under the source's nesting of prefix
+     * elements, determining and matching the inner execution context, and recording the positions
+     * where the prefix ends and the suffix starts. The active statements themselves are matched by
+     * the supplied {@code activeStatements} matcher when one is given (and the located source
+     * position is a regular child offset); otherwise by the built-in {@link #matchChildren}. Both
+     * yield identical results; a supplied matcher simply matches the active-statement subtrees by
+     * direct navigation instead of through their AST {@code match} methods.
      *
      * @param source the source to match against
      * @param matchCond the match conditions found so far
      * @param activeStatements a matcher for the active statements, or {@code null} to use the
-     *        built-in {@link #matchChildren} for phase (3)
+     *        built-in {@link #matchChildren}
      * @return the resulting match conditions, or {@code null} if matching fails
      */
     public MatchConditions match(SourceData source, MatchConditions matchCond,
@@ -216,7 +215,7 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
 
-        // matching children (the active statements) -- phase (3)
+        // match the active statements
         final int offset = executionContext == null ? 0 : 1;
         if (activeStatements != null && newSource.getChildPos() >= 0) {
             matchCond = matchActiveStatements(newSource, matchCond, activeStatements, offset);
@@ -235,13 +234,12 @@ public class ContextStatementBlock extends StatementBlock {
     }
 
     /**
-     * Phase (3) via a supplied matcher (VM sub-program or compiled): matches the active statements
-     * of this context block (its children from index {@code offset}) against the children of
-     * {@code newSource.getElement()} starting at {@code newSource.getChildPos()}. This mirrors
+     * Matches the active statements via the supplied matcher: this block's children from index
+     * {@code offset} against the children of {@code newSource.getElement()} starting at
+     * {@code newSource.getChildPos()}. This mirrors
      * {@link #matchChildren(SourceData, MatchConditions, int)} for the case where every active
-     * statement consumes exactly one source child (the only case the generator converts -- list
-     * schema variables and other variable-arity constructs keep the interpreter). On success the
-     * source position is advanced exactly as {@code matchChildren} would, so the subsequent
+     * statement consumes exactly one source child. On success the source position is advanced
+     * exactly as {@code matchChildren} would, so the subsequent
      * {@link #makeContextInfoComplete} computes the same suffix start.
      */
     private @Nullable MatchConditions matchActiveStatements(SourceData newSource,

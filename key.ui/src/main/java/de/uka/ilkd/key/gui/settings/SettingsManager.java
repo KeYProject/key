@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 import de.uka.ilkd.key.settings.*;
 
 import org.slf4j.Logger;
@@ -40,15 +39,8 @@ public class SettingsManager {
     public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
     public static final FeatureSettingsPanel FEATURE_SETTINGS_PANEL = new FeatureSettingsPanel();
-
-    /**
-     * Registration anchor: referencing a feature flag declared in a lazily-loaded core class (here
-     * the interpreter-matcher fallback flag in {@link VMTacletMatcher}) forces its registration so
-     * it shows in the {@link FeatureSettingsPanel} on a fresh start, before any proof is loaded.
-     */
-    @SuppressWarnings("unused")
-    public static final FeatureSettings.Feature INTERPRETER_MATCHER_FEATURE =
-        VMTacletMatcher.INTERPRETER_MATCHER_FEATURE;
+    public static final ParallelProverSettingsProvider PARALLEL_PROVER_SETTINGS =
+        new ParallelProverSettingsProvider();
 
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -70,6 +62,7 @@ public class SettingsManager {
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             // INSTANCE.add(COLOR_SETTINGS);
             INSTANCE.add(FEATURE_SETTINGS_PANEL);
+            INSTANCE.add(PARALLEL_PROVER_SETTINGS);
         }
         return INSTANCE;
     }

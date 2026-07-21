@@ -78,10 +78,17 @@ class MainStatusLine extends JPanel {
 
     /**
      * Set the range of values the progress bar can display (see <code>setMaximum</code> of
-     * <code>ProgressBar</code>)
+     * <code>ProgressBar</code>). A non-positive maximum means "unknown workload" -- the parallel
+     * prover reports no per-step progress -- and switches the bar to indeterminate ("busy") mode so
+     * it animates instead of sitting frozen at zero.
      */
     public void setProgressBarMaximum(int value) {
-        progressBar.setMaximum(value);
+        if (value <= 0) {
+            progressBar.setIndeterminate(true);
+        } else {
+            progressBar.setIndeterminate(false);
+            progressBar.setMaximum(value);
+        }
     }
 
     /**
@@ -96,6 +103,11 @@ class MainStatusLine extends JPanel {
      */
     public void setProgressPanelVisible(boolean visible) {
         progressBar.setVisible(visible);
+        if (!visible) {
+            // Leave the bar in a clean determinate state so a later run with a known workload
+            // is not stuck animating.
+            progressBar.setIndeterminate(false);
+        }
         if (visible) {
             setProgress(0);
 

@@ -67,10 +67,15 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     private static final Name NAME = new Name("Observer to update");
 
     /**
-     * caching matching results
+     * caching matching results; thread-local because {@code instantiate} is called from the
+     * applicability check (no rule app available) and this rule INSTANCE is shared via the taclet
+     * base -- a plain static cache raced across concurrent workers. Confining it to the worker
+     * thread
+     * keeps the optimization (applicability + apply run on the same worker).
      */
-    private static JTerm lastFocusTerm;
-    private static Union<Instantiation, ModelFieldInstantiation> lastInstantiation;
+    private static final ThreadLocal<JTerm> lastFocusTerm = new ThreadLocal<>();
+    private static final ThreadLocal<Union<Instantiation, ModelFieldInstantiation>> lastInstantiation =
+        new ThreadLocal<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -181,7 +186,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" + inst.receiver + " = null)");
+            final var recv = inst.receiver;
+            nullGoal.setBranchLabel(() -> "Null reference (" + recv + " = null)");
         } else {
             result = goal.split(1);
             contGoal = result.head();
@@ -244,7 +250,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" + inst.actualSelf() + " = null)");
+            final var self = inst.actualSelf();
+            nullGoal.setBranchLabel(() -> "Null reference (" + self + " = null)");
         } else {
             result = goal.split(1);
             contGoal = result.head();
@@ -402,27 +409,25 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     private static Union<Instantiation, ModelFieldInstantiation> instantiate(JTerm focusTerm,
             Services services) {
-        // result cached?
-        if (focusTerm == lastFocusTerm) {
-            return lastInstantiation;
+        // result cached (per worker thread)?
+        if (focusTerm == lastFocusTerm.get()) {
+            return lastInstantiation.get();
         }
 
         // compute
+        final Union<Instantiation, ModelFieldInstantiation> result;
         Instantiation inst = UseOperationContractRule.computeInstantiation(focusTerm, services);
         if (inst != null) {
-            lastInstantiation = Union.fromFirst(inst);
+            result = Union.fromFirst(inst);
         } else {
             ModelFieldInstantiation mfInst = matchModelField(focusTerm, services);
-            if (mfInst != null) {
-                lastInstantiation = Union.fromSecond(mfInst);
-            } else {
-                lastInstantiation = null;
-            }
+            result = mfInst != null ? Union.fromSecond(mfInst) : null;
         }
 
         // cache and return
-        lastFocusTerm = focusTerm;
-        return lastInstantiation;
+        lastFocusTerm.set(focusTerm);
+        lastInstantiation.set(result);
+        return result;
     }
     // endregion
 

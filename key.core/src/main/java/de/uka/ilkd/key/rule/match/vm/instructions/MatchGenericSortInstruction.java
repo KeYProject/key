@@ -16,6 +16,12 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+/**
+ * Matches a generic sort of the pattern against the concrete sort found in the source (the sort
+ * of a parametric function's {@link GenericArgument} or of a {@link QualifierWrapper}) by
+ * recording an identity {@link GenericSortCondition} in the instantiations: the generic sort must
+ * be (or already have been) instantiated with exactly that concrete sort.
+ */
 public class MatchGenericSortInstruction implements MatchInstruction {
 
     private final GenericSort genericSortOfOp;
@@ -25,21 +31,18 @@ public class MatchGenericSortInstruction implements MatchInstruction {
     }
 
     /**
-     * matches the depending sort of this instructions sort depending function against the given
-     * sort. If a match is possible the resulting match conditions are returned otherwise
-     * {@code null} is returned.
+     * Matches this instruction's generic sort against the given concrete sort by adding the
+     * corresponding identity condition. If that is consistent with the instantiations so far the
+     * resulting match conditions are returned, otherwise {@code null}.
      *
-     * @param dependingSortToMatch the depending {@link Sort} of the concrete function to be matched
+     * @param dependingSortToMatch the concrete {@link Sort} found in the source
      * @param matchConditions the {@link MatchResultInfo} accumulated so far
-     * @return <code>null</code> if failed the resulting match conditions otherwise the resulting
-     *         {@link MatchResultInfo}
+     * @return the resulting {@link MatchResultInfo}, or {@code null} on failure
      */
     private MatchResultInfo matchSorts(Sort dependingSortToMatch, MatchResultInfo matchConditions,
             LogicServices services) {
-        // This restriction has been dropped for free generic sorts to prove taclets correct
-        // assert !(s2 instanceof GenericSort)
-        // : "Sort s2 is not allowed to be of type generic.";
-        MatchResultInfo result;
+        // the source sort may itself be generic: proving a taclet correct matches schematic
+        // patterns against schematic terms
         final GenericSortCondition c =
             GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);
         try {

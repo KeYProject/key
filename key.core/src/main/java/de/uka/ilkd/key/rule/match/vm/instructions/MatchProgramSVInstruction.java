@@ -11,13 +11,19 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Matches a (single, non-list) program schema variable: the candidate (a program element, or a
+ * term when the schema variable stands inside an expression) must be admissible for the schema
+ * variable's {@link ProgramSVSort} ({@code canStandFor}), and must agree with any instantiation
+ * the schema variable already has (a program element is converted to its logic term for that
+ * comparison where needed).
+ */
 public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
@@ -71,32 +77,36 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         final SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
-        if (svSort.canStandFor(instantiationCandidate,
+        if (!svSort.canStandFor(instantiationCandidate,
             instantiations.getExecutionContext(), (Services) services)) {
+            return null;
+        }
+        // A schema variable that is already bound matches a program element again only if the
+        // element IS its binding: the bound program element itself, or -- for a term binding --
+        // the term's operator (so a bound term re-matches only the program variable it consists
+        // of). This is the same rule as in ProgramSV.match, keeping this instruction and the AST
+        // matcher in agreement.
+        final Object instant = instantiations.getInstantiation(op);
+        if (instant == null || instant.equals(instantiationCandidate)
+                || (instant instanceof JTerm t && t.op().equals(instantiationCandidate))) {
             return addInstantiation(instantiationCandidate, matchCond, services);
         }
-
         return null;
     }
 
 
     /**
-     * {@inheritDoc}
+     * A term candidate matches when the schema variable's sort can stand for the term (a program
+     * schema variable may occur at an expression position and then binds a term).
      */
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement,
-            MatchResultInfo mc,
+    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
-        MatchResultInfo result = null;
-        if (actualElement instanceof ProgramElement programElement) {
-            result = match(programElement, mc, services);
-        } else if (actualElement instanceof JTerm term) {
-            final ProgramSVSort svSort = (ProgramSVSort) op.sort();
-            if (svSort.canStandFor(term)) {
-                return addInstantiation(term, mc, services);
-            }
+        final ProgramSVSort svSort = (ProgramSVSort) op.sort();
+        if (svSort.canStandFor(instantiationCandidate)) {
+            return addInstantiation(instantiationCandidate, mc, services);
         }
-        return result;
+        return null;
     }
 
     @Override

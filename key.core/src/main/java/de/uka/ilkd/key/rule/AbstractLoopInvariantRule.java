@@ -46,17 +46,6 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  */
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
-    /**
-     * The last formula the loop invariant rule was applied to. Used for checking whether
-     * {@link #lastInstantiation} can be used instead of doing a new instantiation.
-     */
-    private static JTerm lastFocusTerm;
-
-    /**
-     * A simple cache which ensures that we don't instantiate the rule multiple times for the same
-     * loop.
-     */
-    private static Instantiation lastInstantiation;
 
     /**
      * @return The number of generated goals by this invariant rule.
@@ -373,12 +362,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final JTerm focusTerm = (JTerm) app.posInOccurrence().subTerm();
-
-        if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
-                .getSpecificationRepository().getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
+        // Use the instantiation cached on this (thread-confined) rule app if it is still valid,
+        // i.e.
+        // the loop spec has not changed since it was computed.
+        final Instantiation cached = app.getInstantiation();
+        if (cached != null && cached.inv() == services.getSpecificationRepository()
+                .getLoopSpec(cached.loop())) {
+            return cached;
         }
+
+        final JTerm focusTerm = (JTerm) app.posInOccurrence().subTerm();
 
         // leading update?
         final Pair<JTerm, JTerm> update = splitUpdates(focusTerm, services);
@@ -419,8 +412,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Instantiation result = new Instantiation( //
             u, progPost, loop, spec, selfTerm, innermostExecutionContext);
 
-        lastFocusTerm = focusTerm;
-        lastInstantiation = result;
+        app.setInstantiation(result);
 
         return result;
     }

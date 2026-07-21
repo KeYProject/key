@@ -10,4 +10,5 @@ public class Exception extends java.lang.Throwable
    public Exception(java.lang.String arg0) { super(arg0); }
    public Exception(java.lang.String arg0, java.lang.Throwable arg1) { super(arg0, arg1); }
    public Exception(java.lang.Throwable arg0) { super(arg0); }
+
 }

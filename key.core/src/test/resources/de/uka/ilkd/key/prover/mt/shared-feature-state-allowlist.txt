@@ -1,0 +1,7 @@
+# Feature/TermGenerator/ProjectionToTerm/ChoicePoint fields the FeatureStatelessnessLintTest flags
+# but that are safe by design. Format: fully.qualified.Class#field   # one-line justification.
+# A strategy's feature tree is shared across all goals of a proof, so a mutable instance field on
+# such an object is shared mutable state under the multi-core prover -- fix it (move per-call state
+# to the MutableState, as ForEachCP does) rather than allowlist, unless it is genuinely safe.
+
+de.uka.ilkd.key.strategy.AbstractFeatureStrategy#instantiateActive   # toggled only while the feature tree is built at strategy construction (enableInstantiate/disableInstantiate in the strategy setup); never read or written during proof search

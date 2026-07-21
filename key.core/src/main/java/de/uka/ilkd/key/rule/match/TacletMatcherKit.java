@@ -10,15 +10,10 @@ import org.key_project.prover.rules.TacletMatcher;
 
 
 /**
- * Abstract factory for the creation of taclet matcher.
- *
- * Use method {@link #getKit()} to get the concrete factory and call
- * {@link #createTacletMatcher(Taclet)} to create a matcher for a {@link Taclet}
- *
- * The active factory is chosen at runtime by passing a value for the system property
- * <code>taclet.match</code> Currently supported values are: {@code vm}. The
- * legacy matching algorithm is the one used since the beginning of KeY. It will soon become
- * deprecated and replaced y {@code vm} as default.
+ * Abstract factory for taclet matchers: {@link #getKit()} returns the active factory, and
+ * {@link #createTacletMatcher(Taclet)} creates the matcher deciding where a taclet (a proof rule)
+ * applies. The factory is selected by the system property {@code taclet.match}; the only
+ * supported value is {@code vm}, the match-plan based {@link VMTacletMatcher}.
  */
 public abstract class TacletMatcherKit {
 

@@ -10,53 +10,76 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 
 import org.jspecify.annotations.NonNull;
+
 
 /**
  * Establishes a cache for the applied rule apps to query them by name.
  * See the get method for additional required constraints for correctness.
  * <p>
  * Within a rule name the applied apps are additionally bucketed by an application
- * <em>fingerprint</em>: the hash code of the application's focus term ({@code pos.subTerm()}), or
- * {@code 0} for find-less apps. This turns the duplicate search in
+ * <em>fingerprint</em> ({@link #focusFingerprint}: the operators of the focus term and its direct
+ * subterms), or {@code 0} for find-less apps. This turns the duplicate search in
  * {@link AbstractNonDuplicateAppFeature} from a linear scan over all same-named applications on the
- * branch into an O(1) bucket lookup. It is sound for every duplicate check because each one's
+ * branch into a bucket lookup. It is sound for every duplicate check because each one's
  * {@code comparePio} implies the two focus terms are equal up to term labels:
  * {@link NonDuplicateAppFeature} (equal positions), {@link EqNonDuplicateAppFeature} (equal
  * positions modulo formula renaming) and {@link NonDuplicateAppModPositionFeature} (equal focus
- * terms modulo irrelevant labels). As {@code TermImpl.hashCode} ignores term labels, focus terms
- * that are equal up to labels always share a fingerprint, so a duplicate can only ever live in the
- * candidate's own bucket -- including for the modulo-position variant, which deliberately matches
- * the same focus term at different sequent positions.
+ * terms modulo irrelevant labels). The fingerprint is built only from operators (never from term
+ * labels), so focus terms that are equal up to labels always share a fingerprint, and a duplicate
+ * can only ever live in the candidate's own bucket -- including for the modulo-position variant,
+ * which deliberately matches the same focus term at different sequent positions.
  *
  * @author Julian Wiesler
  */
 public class AppliedRuleAppsNameCache {
     /** cache of all applied rules of a node, by rule name and then by application fingerprint */
-    private final LRUCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
-        new LRUCache<>(32);
+    private final ConcurrentLruCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
+        new ConcurrentLruCache<>(32);
 
+    // Only the structural cache-fill in fillCacheForNode needs mutual exclusion (it does a compound
+    // read-modify-write across parent and child entries). Plain reads go straight to the
+    // already-thread-safe ConcurrentLruCache and re-check under the write lock on a miss, so no
+    // read
+    // lock is needed.
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
     public AppliedRuleAppsNameCache() {}
 
     /**
-     * @return the fingerprint of a rule application: the hash code of its focus term, or {@code 0}
-     *         for a find-less application. The hash ignores term labels (as does
-     *         {@code TermImpl.hashCode}); see the class comment for why this is sound for all
-     *         duplicate checks. A find-less app uses {@code 0}; should a focus term also hash to
-     *         {@code 0} the only effect is a shared bucket, which the {@code sameApplication} scan
-     *         resolves.
+     * A cheap, label-insensitive fingerprint of a focus term for bucketing applied rule apps: the
+     * top operator plus the operators of its direct subterms. It is built only from operators (an
+     * operator is not a term label), so it is invariant under the mod-term-labels equality the
+     * buckets are probed with -- a duplicate therefore always shares the candidate's bucket. It is
+     * O(arity) and touches no subterm below depth one, unlike a full term hash. Coarser than a full
+     * hash (more terms may share a bucket), but the {@code sameApplication} scan resolves any
+     * collision, so this only trades a little bucket length for a much cheaper fingerprint.
+     */
+    public static int focusFingerprint(Term focus) {
+        int h = focus.op().hashCode();
+        final int arity = focus.arity();
+        h = 31 * h + arity;
+        for (int i = 0; i < arity; i++) {
+            h = 31 * h + focus.sub(i).op().hashCode();
+        }
+        return h;
+    }
+
+    /**
+     * @return the fingerprint of a rule application ({@link #focusFingerprint} of its focus term),
+     *         or {@code 0} for a find-less application. A find-less app uses {@code 0}; should a
+     *         focus term also fingerprint to {@code 0} the only effect is a shared bucket, which
+     *         the {@code sameApplication} scan resolves.
      */
     private static int fingerprint(RuleApp app) {
         final PosInOccurrence pio = app.posInOccurrence();
-        return pio == null ? 0 : pio.subTerm().hashCode();
+        return pio == null ? 0 : focusFingerprint(pio.subTerm());
     }
 
     private static void add(HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache, RuleApp app) {
@@ -151,14 +174,7 @@ public class AppliedRuleAppsNameCache {
             throw new AssertionFailure("Expected an empty leaf node");
         }
 
-        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache;
-        try {
-            readLock.lock();
-            nodeCache = cache.get(node);
-        } finally {
-            readLock.unlock();
-        }
-
+        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache = cache.get(node);
         if (nodeCache == null) {
             nodeCache = fillCacheForNode(node);
         }

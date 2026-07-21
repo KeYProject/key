@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -35,6 +36,21 @@ class ProofPruner {
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {
+        // special case: prune cached goal = only need to re-open the final node
+        ClosedBy cby = cuttingPoint.lookup(ClosedBy.class);
+        if (cby != null) {
+            Goal goal = proof.getClosedGoal(cuttingPoint);
+            if (goal == null) {
+                throw new IllegalStateException("Something went wrong: Node " + cuttingPoint.name()
+                    + " has ClosedBy registered, but no corresponding goal!");
+            }
+
+            cuttingPoint.deregister(cby, ClosedBy.class);
+            proof.reOpenGoal(goal);
+            refreshGoal(goal, cuttingPoint);
+            return ImmutableList.of(cuttingPoint);
+        }
+
         // there is only one leaf containing an open goal that is interesting for pruning the
         // subtree of <code>node</code>, namely the first leave that is found by a breadth
         // first search.
@@ -124,10 +140,15 @@ class ProofPruner {
 
             firstGoal.pruneToParent();
 
+            // Replay a node's strategy-info undos in REVERSE (LIFO) order. They are absolute
+            // restore-previous operations, so several registered at the same node (e.g. QueryExpand
+            // recording more than one first-seen query while scanning the subterms of one sequent)
+            // must unwind last-in-first-out to reach the pre-node state; forward replay would leave
+            // the map at the second-registered value instead of the original.
             final List<StrategyInfoUndoMethod> undoMethods =
                 visitedNode.getStrategyInfoUndoMethods();
-            for (StrategyInfoUndoMethod undoMethod : undoMethods) {
-                firstGoal.undoStrategyInfoAdd(undoMethod);
+            for (int i = undoMethods.size() - 1; i >= 0; i--) {
+                firstGoal.undoStrategyInfoAdd(undoMethods.get(i));
             }
         });
 

@@ -32,6 +32,13 @@ public class KeYJavaType implements Type {
     private @Nullable Type javaType = null;
     /** the logic sort */
     private @Nullable Sort sort = null;
+    /**
+     * Whether this is a synthetic, internal type (e.g. the {@code __Default__} default-execution-
+     * context class) that should be hidden from user-facing type enumerations. Set once, at load,
+     * before any concurrent read; see
+     * {@link de.uka.ilkd.key.java.JavaInfo#getAllKeYJavaTypes(boolean)}.
+     */
+    private boolean internal = false;
 
     /** creates a new KeYJavaType */
     public KeYJavaType() {}
@@ -66,6 +73,22 @@ public class KeYJavaType implements Type {
 
     public @Nullable Sort getSort() {
         return sort;
+    }
+
+    /**
+     * @return whether this is a synthetic, internal type that is hidden from user-facing type
+     *         enumerations (see {@link #markInternal()})
+     */
+    public boolean isInternal() {
+        return internal;
+    }
+
+    /**
+     * Marks this type as synthetic/internal so it stays out of user-facing enumerations
+     * ({@link de.uka.ilkd.key.java.JavaInfo#getAllKeYJavaTypes(boolean)}).
+     */
+    public void markInternal() {
+        this.internal = true;
     }
 
     /**

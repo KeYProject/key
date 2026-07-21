@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -52,17 +53,44 @@ public final class JavaInfo {
      */
     private KeYJavaType nullType = null;
 
-    // some caches for the getKeYJavaType methods.
-    private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
-    private HashMap<Type, KeYJavaType> type2KJTCache = null;
-    private HashMap<String, KeYJavaType> name2KJTCache = null;
+    // Caches for the getKeYJavaType methods. A single JavaInfo is shared across all parallel-prover
+    // workers of a proof, so every access below is made thread-safe:
+    // * sort2KJTCache / name2KJTCache are built-then-read. Each (re)build constructs a fresh map
+    // locally and publishes it via the volatile field in one assignment, so a concurrent reader
+    // never observes a half-populated map. Builds are serialized by cacheBuildLock.
+    // * type2KJTCache also receives entries on the fly (getPrimitiveKeYJavaType), so it is a
+    // ConcurrentHashMap; its lazy creation is serialized by cacheBuildLock.
+    // * commonSubtypeCache is an access-ordered LRU (get() mutates), so all access synchronizes on
+    // the cache instance.
+    private volatile HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
+    private volatile ConcurrentHashMap<Type, KeYJavaType> type2KJTCache = null;
+    private volatile HashMap<String, KeYJavaType> name2KJTCache = null;
 
+    /** serializes (re)builds of the lazily populated caches above */
+    private final Object cacheBuildLock = new Object();
 
-    private final LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
-        new LRUCache<>(200);
+    private final ConcurrentLruCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
+        new ConcurrentLruCache<>(200);
 
-    private int nameCachedSize = 0;
-    private int sortCachedSize = 0;
+    private volatile int nameCachedSize = 0;
+    private volatile int sortCachedSize = 0;
+    /**
+     * Cached user-facing type view: all types minus {@link KeYJavaType#isInternal() internal} ones.
+     * Rebuilt only when the type set grows (see {@link #getAllKeYJavaTypes(boolean)}).
+     */
+    private volatile Collection<KeYJavaType> userTypesCache = null;
+    private volatile int userTypesCachedSize = 0;
+
+    /**
+     * When {@code true}, registering a new Java type is rejected (enforced in
+     * {@link de.uka.ilkd.key.java.JavaService#readCompilationUnit}). The parallel prover seals the
+     * type model for the duration of a multi-worker run, so a stray lazy type registration on the
+     * proving path fails fast (a loud {@link IllegalStateException}) instead of racing the shared
+     * model. All types are expected to be registered before proving starts -- see the
+     * {@code ProblemInitializer} warm-up that pre-creates the default execution context.
+     * Single-threaded proving never seals, so its behaviour is unchanged.
+     */
+    private volatile boolean typeRegistrationSealed = false;
 
     /**
      * The default execution context is for the case of program statements on the top level. It is
@@ -157,11 +185,15 @@ public final class JavaInfo {
     }
 
     public void resetCaches() {
-        sort2KJTCache = null;
-        type2KJTCache = null;
-        name2KJTCache = null;
-        nameCachedSize = 0;
-        sortCachedSize = 0;
+        synchronized (cacheBuildLock) {
+            sort2KJTCache = null;
+            type2KJTCache = null;
+            name2KJTCache = null;
+            nameCachedSize = 0;
+            sortCachedSize = 0;
+            userTypesCache = null;
+            userTypesCachedSize = 0;
+        }
     }
 
     /**
@@ -173,31 +205,42 @@ public final class JavaInfo {
      */
     public KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
-        if (name2KJTCache == null || kpmi.rec2key().keYTypes().size() > nameCachedSize) {
-            buildNameCache();
+        HashMap<String, KeYJavaType> cache = name2KJTCache;
+        if (cache == null || kpmi.rec2key().keYTypes().size() > nameCachedSize) {
+            cache = buildNameCache();
         }
-        return name2KJTCache.get(fullName);
+        return cache.get(fullName);
     }
 
     /**
      * caches all known types using their qualified name as retrieval key
+     *
+     * @return the (re)built cache, published to {@link #name2KJTCache}
      */
-    private void buildNameCache() {
-        var types = kpmi.rec2key().keYTypes();
-        nameCachedSize = types.size();
-        name2KJTCache = new LinkedHashMap<>();
-        for (final KeYJavaType type : types) {
-            if (type.getJavaType() instanceof ArrayType) {
-                final ArrayType at = (ArrayType) type.getJavaType();
-                var old = name2KJTCache.put(at.getFullName(), type);
-                assert old == null;
-                old = name2KJTCache.put(at.getAlternativeNameRepresentation(), type);
-                assert old == null;
-            } else {
-                var name = getFullName(type);
-                var old = name2KJTCache.put(name, type);
-                assert old == null : "Already had KeYJavaType for name '" + name + "'";
+    private HashMap<String, KeYJavaType> buildNameCache() {
+        synchronized (cacheBuildLock) {
+            // another worker may have (re)built the cache while we waited for the lock
+            if (name2KJTCache != null && kpmi.rec2key().keYTypes().size() <= nameCachedSize) {
+                return name2KJTCache;
             }
+            var types = kpmi.rec2key().keYTypes();
+            var cache = new LinkedHashMap<String, KeYJavaType>();
+            for (final KeYJavaType type : types) {
+                if (type.getJavaType() instanceof ArrayType) {
+                    final ArrayType at = (ArrayType) type.getJavaType();
+                    var old = cache.put(at.getFullName(), type);
+                    assert old == null;
+                    old = cache.put(at.getAlternativeNameRepresentation(), type);
+                    assert old == null;
+                } else {
+                    var name = getFullName(type);
+                    var old = cache.put(name, type);
+                    assert old == null : "Already had KeYJavaType for name '" + name + "'";
+                }
+            }
+            nameCachedSize = types.size();
+            name2KJTCache = cache; // publish fully built map in a single volatile write
+            return cache;
         }
     }
 
@@ -260,12 +303,64 @@ public final class JavaInfo {
 
 
     /**
-     * returns all known KeYJavaTypes of the current program type model
+     * Returns the user-facing KeYJavaTypes of the current program type model. Equivalent to
+     * {@link #getAllKeYJavaTypes(boolean) getAllKeYJavaTypes(false)}, i.e. synthetic
+     * {@link KeYJavaType#isInternal() internal} types (such as the {@code __Default__}
+     * execution-context class) are excluded.
      *
-     * @return all known KeYJavaTypes of the current program type model
+     * @return all non-internal KeYJavaTypes of the current program type model
      */
     public Collection<KeYJavaType> getAllKeYJavaTypes() {
-        return kpmi.allTypes();
+        return getAllKeYJavaTypes(false);
+    }
+
+    /**
+     * Returns the KeYJavaTypes of the current program type model.
+     *
+     * @param includeInternal whether to include synthetic, {@link KeYJavaType#isInternal()
+     *        internal}
+     *        types such as the {@code __Default__} default-execution-context class. Pass
+     *        {@code false} (the default of {@link #getAllKeYJavaTypes()}) for user-facing
+     *        enumerations -- proof-obligation/specification browsing, "existing classes" queries --
+     *        so those synthetic types stay hidden without every call site filtering them out.
+     * @return the requested types. The {@code false} result is a cached view rebuilt only when the
+     *         type set grows (mirroring {@link #getTypeByName}); both variants stay O(1) amortized.
+     */
+    public Collection<KeYJavaType> getAllKeYJavaTypes(boolean includeInternal) {
+        if (includeInternal) {
+            return kpmi.allTypes();
+        }
+        Collection<KeYJavaType> cache = userTypesCache;
+        if (cache == null || kpmi.allTypes().size() > userTypesCachedSize) {
+            cache = buildUserTypesCache();
+        }
+        return cache;
+    }
+
+    /**
+     * (Re)builds the cache of user-facing (non-{@link KeYJavaType#isInternal() internal}) types.
+     * Mirrors {@link #buildNameCache()}.
+     *
+     * @return the (re)built cache, published to {@link #userTypesCache}
+     */
+    private Collection<KeYJavaType> buildUserTypesCache() {
+        synchronized (cacheBuildLock) {
+            final Collection<KeYJavaType> all = kpmi.allTypes();
+            // another worker may have (re)built the cache while we waited for the lock
+            if (userTypesCache != null && all.size() <= userTypesCachedSize) {
+                return userTypesCache;
+            }
+            final List<KeYJavaType> user = new ArrayList<>(all.size());
+            for (final KeYJavaType type : all) {
+                if (!type.isInternal()) {
+                    user.add(type);
+                }
+            }
+            final Collection<KeYJavaType> cache = Collections.unmodifiableCollection(user);
+            userTypesCachedSize = all.size();
+            userTypesCache = cache; // publish fully built collection in a single volatile write
+            return cache;
+        }
     }
 
 
@@ -275,12 +370,17 @@ public final class JavaInfo {
         }
 
 
-        if (type2KJTCache != null && type2KJTCache.containsKey(type)) {
-            return type2KJTCache.get(type);
+        final ConcurrentHashMap<Type, KeYJavaType> typeCache = type2KJTCache;
+        if (typeCache != null) {
+            final KeYJavaType cached = typeCache.get(type);
+            if (cached != null) {
+                return cached;
+            }
         }
 
-        if (name2KJTCache != null && name2KJTCache.containsKey(type.getName())) {
-            return name2KJTCache.get(type.getName());
+        final HashMap<String, KeYJavaType> nameCache = name2KJTCache;
+        if (nameCache != null && nameCache.containsKey(type.getName())) {
+            return nameCache.get(type.getName());
         }
 
         Name ldtName;
@@ -298,8 +398,13 @@ public final class JavaInfo {
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
-        if (type2KJTCache != null) {
-            type2KJTCache.put(type, result);
+        final ConcurrentHashMap<Type, KeYJavaType> cacheForPut = type2KJTCache;
+        if (cacheForPut != null) {
+            // adopt the winner so concurrent misses converge on a single KeYJavaType instance
+            final KeYJavaType existing = cacheForPut.putIfAbsent(type, result);
+            if (existing != null) {
+                return existing;
+            }
         }
 
         return result;
@@ -411,39 +516,70 @@ public final class JavaInfo {
         return null;
     }
 
-    private void updateSort2KJTCache() {
-        if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
-            sortCachedSize = kpmi.rec2key().size();
-            sort2KJTCache = new HashMap<>();
+    private HashMap<Sort, List<KeYJavaType>> updateSort2KJTCache() {
+        HashMap<Sort, List<KeYJavaType>> cache = sort2KJTCache;
+        if (cache != null && kpmi.rec2key().size() <= sortCachedSize) {
+            return cache;
+        }
+        synchronized (cacheBuildLock) {
+            // another worker may have (re)built the cache while we waited for the lock
+            if (sort2KJTCache != null && kpmi.rec2key().size() <= sortCachedSize) {
+                return sort2KJTCache;
+            }
+            var newCache = new HashMap<Sort, List<KeYJavaType>>();
             for (final KeYJavaType oKJT : kpmi.allTypes()) {
                 Sort s = oKJT.getSort();
-                List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
+                List<KeYJavaType> l = newCache.computeIfAbsent(s, k -> new LinkedList<>());
                 if (!l.contains(oKJT)) {
                     l.add(oKJT);
                 }
             }
+            sortCachedSize = kpmi.rec2key().size();
+            sort2KJTCache = newCache; // publish fully built map in a single volatile write
+            return newCache;
         }
     }
 
     public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
-        updateSort2KJTCache();
-        return sort2KJTCache.get(sort);
+        return updateSort2KJTCache().get(sort);
     }
 
     /**
      * returns the KeYJavaType belonging to the given Type t
      */
     public KeYJavaType getKeYJavaType(Type t) {
-        if (type2KJTCache == null) {
-            type2KJTCache = new LinkedHashMap<>();
-            for (final KeYJavaType type : kpmi.allTypes()) {
-                type2KJTCache.put(type.getJavaType(), type);
-            }
+        ConcurrentHashMap<Type, KeYJavaType> cache = type2KJTCache;
+        if (cache == null) {
+            cache = buildType2KJTCache();
         }
         if (t instanceof PrimitiveType) {
             return getPrimitiveKeYJavaType((PrimitiveType) t);
         } else {
-            return type2KJTCache.get(t);
+            return cache.get(t);
+        }
+    }
+
+    /**
+     * lazily builds the {@link Type} to {@link KeYJavaType} cache
+     *
+     * @return the built cache, published to {@link #type2KJTCache}
+     */
+    private ConcurrentHashMap<Type, KeYJavaType> buildType2KJTCache() {
+        synchronized (cacheBuildLock) {
+            if (type2KJTCache != null) {
+                return type2KJTCache;
+            }
+            var cache = new ConcurrentHashMap<Type, KeYJavaType>();
+            for (final KeYJavaType type : kpmi.allTypes()) {
+                final Type javaType = type.getJavaType();
+                // a ConcurrentHashMap rejects null keys; such entries were never retrievable by a
+                // (non-null) Type lookup anyway, so skipping them preserves behaviour
+                if (javaType != null) {
+                    cache.put(javaType, type);
+                }
+            }
+            type2KJTCache = cache; // publish fully built map in a single volatile write
+            return cache;
         }
     }
 
@@ -1069,17 +1205,52 @@ public final class JavaInfo {
      *
      * @return the default execution context
      */
-    public ExecutionContext getDefaultExecutionContext() {
+    public synchronized ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
-            var cu = services.getJavaService()
-                    .readCompilationUnit("public class %s { void %s() {} }"
-                            .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
-                                DEFAULT_EXECUTION_CONTEXT_METHOD));
-            final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            // Register the synthetic __Default__ class only if it is not already in the (shared)
+            // Java model. A copied Services shares its JavaService -- which owns the parsed model
+            // --
+            // so once any JavaInfo has registered __Default__ every copy can look it up rather than
+            // re-parse it. Re-parsing per proof registers a type lazily on the proving path, which
+            // races under the parallel prover (and repeats work needlessly). The single, load-time
+            // registration is done by the ProblemInitializer warm-up.
+            KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            if (kjt == null) {
+                services.getJavaService()
+                        .readCompilationUnit("public class %s { void %s() {} }"
+                                .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
+                                    DEFAULT_EXECUTION_CONTEXT_METHOD));
+                kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            }
+            // The synthetic __Default__ class is registered in the (shared) model -- now at load
+            // time via the ProblemInitializer warm-up -- but it is not a user class. Mark it so it
+            // is hidden from user-facing type enumerations (getAllKeYJavaTypes(false)); drop the
+            // user-types cache in case it was built between registering and marking the type.
+            kjt.markInternal();
+            userTypesCache = null;
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableList.nil()), null);
         }
         return defaultExecutionContext;
+    }
+
+    /**
+     * Seals the Java type model: any subsequent attempt to register a new type (via
+     * {@link de.uka.ilkd.key.java.JavaService#readCompilationUnit}) throws. Used by the parallel
+     * prover to fail fast if a lazy type registration reaches the proving path. Idempotent.
+     */
+    public void sealTypeRegistration() {
+        typeRegistrationSealed = true;
+    }
+
+    /** Lifts a {@link #sealTypeRegistration() seal}; the model accepts new types again. */
+    public void unsealTypeRegistration() {
+        typeRegistrationSealed = false;
+    }
+
+    /** @return whether the type model is currently {@link #sealTypeRegistration() sealed} */
+    public boolean isTypeRegistrationSealed() {
+        return typeRegistrationSealed;
     }
 
 
@@ -1147,6 +1318,9 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
         final Pair<KeYJavaType, KeYJavaType> ck = new Pair<>(k1, k2);
+        // commonSubtypeCache is a ConcurrentLruCache: get/put are internally synchronized (the
+        // underlying access-ordered LRU reorders even on get). The value is a pure function of the
+        // key, so a recomputed-after-eviction entry is always identical -- no proof dependence.
         ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
         if (result != null) {

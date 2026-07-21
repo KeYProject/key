@@ -37,9 +37,7 @@ public class VariableNameProposer implements InstantiationProposer {
     private static final String SKOLEMTERM_VARIABLE_NAME_POSTFIX = "_";
     private static final String LABEL_NAME_PREFIX = "_label";
 
-    private static final String GENERALNAMECOUNTER_PREFIX = "GenCnt";
     // private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
-    private static final String LABELCOUNTER_NAME = "LabelCnt";
 
 
     /**
@@ -71,12 +69,17 @@ public class VariableNameProposer implements InstantiationProposer {
 
         Name name = services.getNameRecorder().getProposal();
         if (name == null || namespaces.lookup(name) != null) {
+            // Search from 0 against the passed namespaces. Callers on the proving path hand in
+            // the goal-local overlay, so the result is a pure function of the branch state:
+            // deterministic under any worker scheduling and free of cross-branch leakage
+            // (sibling branches deliberately reuse the same names, see #3851/#3848). This holds
+            // for the multi-core prover too: goals are owned by one worker at a time, the shared
+            // namespace base is immutable during an MT run and fresh symbols are registered
+            // branch-locally, so no cross-worker race on this search exists.
             int i = 0;
-
             do {
                 name = new Name(baseName + "_" + i++);
             } while (namespaces.lookup(name) != null);
-
         }
 
         return name;
@@ -133,6 +136,11 @@ public class VariableNameProposer implements InstantiationProposer {
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
+        // Branch-state-derived: automode instantiates against the goal-local namespace overlay,
+        // so the smallest free index is a pure function of the branch -- identical no matter
+        // which worker (or how many) runs the goal, and never influenced by sibling branches.
+        // (Previously the multi-core prover minted here via a per-worker allocator, which made
+        // names scheduling-dependent -- the last source of MT proof-shape wobble, #3851.)
         int cnt = 0;
         do {
             name = basename + cnt;
@@ -140,25 +148,22 @@ public class VariableNameProposer implements InstantiationProposer {
             cnt++;
         } while (nss.lookup(l_name) != null || previousProposals.contains(name));
 
-
         return name;
     }
 
 
     public String getNameProposal(String basename, Services services, Node undoAnchor) {
         final NamespaceSet nss = services.getNamespaces();
-        Name l_name;
-        String name = "";
-        do {
-            if (name.length() > 0) {
-                name = basename
-                        + services.getCounter(GENERALNAMECOUNTER_PREFIX + name).getCountPlusPlus();
-            } else {
-                name = basename.length() > 0 ? basename : "gen";
-            }
-            l_name = new Name(name);
-        } while (nss.lookup(l_name) != null);
-
+        final String base = basename.length() > 0 ? basename : "gen";
+        // Pick the smallest free index against the current namespace rather than drawing from a
+        // proof-global counter: the proposed name is then a function of the goal's namespace
+        // occupancy alone, so it is reproducible across prune-and-redo and reload (#3851). The bare
+        // base name is tried first, then base0, base1, ... (This feeds ObtainCommand, whose Skolem
+        // constant enters the proof, so the name has to be reproducible.)
+        String name = base;
+        for (int i = 0; nss.lookup(new Name(name)) != null; i++) {
+            name = base + i;
+        }
         return name;
     }
 
@@ -209,10 +214,14 @@ public class VariableNameProposer implements InstantiationProposer {
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 
         lc.start();
+        // Smallest free index among the labels of the context program (and this application's
+        // previous proposals): a pure function of the matched program, replacing the
+        // proof-global counter whose value depended on unrelated earlier label mints (#3851).
         String proposal;
+        int cnt = 0;
         do {
-            proposal =
-                LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME).getCountPlusPlus();
+            proposal = LABEL_NAME_PREFIX + cnt;
+            cnt++;
         } while (lc.contains(new ProgramElementName(proposal))
                 || previousProposals.contains(proposal));
 

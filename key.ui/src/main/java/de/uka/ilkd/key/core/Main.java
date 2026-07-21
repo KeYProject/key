@@ -26,6 +26,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -87,6 +88,19 @@ public final class Main implements Callable<Integer> {
         description = "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)",
         defaultValue = "0")
     private int autoSaveSteps = 0;
+
+    /**
+     * Number of worker threads for the multi-core prover. A value &gt;= 1 enables the multi-core
+     * prover (capped at the available processors); 0 leaves the persisted prover-mode setting
+     * untouched (single-core by default).
+     */
+    @Option(names = "--threads", paramLabel = "INT",
+        description = "run automatic proof search on the multi-core prover with INT worker threads "
+            + "(>= 1, capped at the available processors). Omit for the single-core prover. "
+            + "The single-core-only features (proof caching, slicing, merge rule) are off under "
+            + "multi-worker runs (more than one worker); note that proof caching and slicing do "
+            + "not record parallel runs even with a single worker.")
+    private int proverThreads = 0;
 
     /**
      * Lists all features currently marked as experimental. Unless invoked with
@@ -251,6 +265,19 @@ public final class Main implements Callable<Integer> {
 
         GeneralSettings.noPruningClosed = isNoPruningClosed;
         GeneralSettings.keepFileRepos = isKeepFileRepos;
+
+        if (proverThreads >= 1) {
+            // Apply --threads as a TRANSIENT process-scoped override via system properties.
+            // Mutating GeneralSettings here would fire a PropertyChange that
+            // ProofIndependentSettings turns into saveSettings(), permanently rewriting the user's
+            // persisted prover mode from a one-off CLI run. The run-selection seam
+            // (ParallelProver.isEnabled()/effectiveWorkerCount(), reached via AutoProvers.create)
+            // reads these properties first, so the override still takes effect for headless --auto
+            // and GUI automode without touching the settings file.
+            int workers = Math.min(proverThreads, Runtime.getRuntime().availableProcessors());
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
+            System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
+        }
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {

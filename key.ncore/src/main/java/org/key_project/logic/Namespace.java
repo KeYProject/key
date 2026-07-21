@@ -4,6 +4,7 @@
 package org.key_project.logic;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -21,7 +22,19 @@ public class Namespace<E extends Named> {
     private @Nullable Namespace<E> parent;
 
     /// The map that maps a name to a symbols of that name if it is defined in this Namespace.
-    private @Nullable Map<Name, E> symbols;
+    ///
+    /// `volatile`, and a [ConcurrentHashMap] once it grows past the single-element optimization, so
+    /// that a shared proof namespace can be read lock-free while the parallel prover concurrently
+    /// interns a new parametric sort into it (see [ParametricSortInstance] -- the only writer on
+    /// the
+    /// proving path). Reads therefore never observe a half-mutated map. The concurrent write is an
+    /// in-place `put` on the already-grown map; the singleton -> map transition only ever runs
+    /// single-threaded at load time (a shared namespace already holds many symbols before proving
+    /// begins), so no lock is needed. Iteration order is not consumed anywhere -- the
+    /// sort-hierarchy
+    /// scans and symbol collections are order-independent and no proof saver iterates namespaces --
+    /// so dropping the former [LinkedHashMap] insertion order is proof-preserving.
+    private volatile @Nullable Map<Name, E> symbols;
 
     /// A namespace can be made immutable, this is called "sealing". This flag indicates whether
     /// this
@@ -51,7 +64,11 @@ public class Namespace<E extends Named> {
     /// only contain a single element; no need to allocate a hash map. The hash map is only created
     /// when the 2nd element is added.
     ///
-    /// This is not threadsafe.
+    /// A `put` into an already-grown map is thread-safe (concurrent map) and safe against
+    /// concurrent
+    /// readers; only the singleton/empty -> map transition must not run concurrently (it does not
+    /// --
+    /// see the [#symbols] field doc), so it needs no lock.
     public void add(E sym) {
 
         if (sealed) {
@@ -68,10 +85,18 @@ public class Namespace<E extends Named> {
 
         if (symbols == null) {
             symbols = Collections.singletonMap(sym.name(), sym);
+        } else if (symbols.size() == 1) {
+            // Grow out of the immutable single-element map into a concurrent map, publishing it via
+            // the volatile field so a concurrent reader sees either the old map or the full new
+            // one.
+            // This transition runs only single-threaded at load time (see the symbols field doc).
+            Map<Name, E> grown = new ConcurrentHashMap<>();
+            grown.putAll(symbols);
+            grown.put(sym.name(), sym);
+            symbols = grown;
         } else {
-            if (symbols.size() == 1) {
-                symbols = new LinkedHashMap<>(symbols);
-            }
+            // Already a ConcurrentHashMap: put in place -- thread-safe and allocation-free, so the
+            // hot load path and the rare concurrent parametric-sort write both avoid a copy.
             symbols.put(sym.name(), sym);
         }
 

@@ -50,6 +50,37 @@ import org.slf4j.LoggerFactory;
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
  * {@link Feature#computeCost(RuleApp, PosInOccurrence, ProofGoal, MutableState)}).
+ *
+ * <h2>Determinism invariant — assumes-base parking is goal-local (do not break under MT)</h2>
+ *
+ * The assumes-base parking/wake state ({@link #parkedByOp} / {@link #pendingWakeOps}) is
+ * <strong>strictly goal-local</strong>: exactly one manager instance per {@link Goal}, deep-copied
+ * on split ({@link #clone()}), built only from insertion-ordered structures ({@link LinkedHashMap}
+ * /
+ * {@link ArrayList} / {@link LinkedHashSet}) with interned-operator keys. This is not merely a
+ * thread-safety measure -- it is load-bearing for <em>proof reproducibility</em>. A
+ * rule-application
+ * candidate's <em>birth-age</em> (the age baked into its {@link RuleAppContainer} when it enters
+ * the
+ * queue) is fixed by <em>which round</em> its assumes-base is woken (see {@link #parkedByOp}), and
+ * that age drives the cost/tie-break ordering of the entire search. A goal's wake volume and timing
+ * are a pure function of that goal's own deterministic rule- and sequent-change history,
+ * independent
+ * of thread scheduling; that is exactly what keeps the multi-worker prover byte-identical to the
+ * single-threaded one on this path (the residual MT variance was root-caused elsewhere -- shared
+ * caches, the veto fingerprint, naming, the tie-break -- and never to parking).
+ *
+ * <p>
+ * <strong>Therefore, for anyone evolving the multi-core prover:</strong> the wake path must stay
+ * <em>goal-confined</em> and {@link #sequentChanged} events must be delivered in the goal's own
+ * order. Any optimization that perturbs a goal's wake/birth timing -- a wake cache shared across
+ * goals, speculative cross-goal base reuse, or coalesced/reordered {@code sequentChanged}
+ * notifications -- would <strong>silently change proofs</strong> (they would diverge, not crash,
+ * and
+ * no test that only checks closure would notice). The goal-locality of the copy is pinned by
+ * {@code QueueRuleApplicationManagerParkingLocalityTest}; end-to-end determinism (single-threaded
+ * ==
+ * parallel) is pinned by {@code ProofEquivalenceTest} / {@code MtDeterminismCiTest}.
  */
 @NullMarked
 public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
@@ -617,8 +648,14 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * this sequent change. The assumes matcher strips the update context before matching, so the
      * whole update-prefix spine of each changed formula is recorded -- a sound superset of the
      * operators a parked base could match (see {@link #parkedByOp}). Called by {@code Goal} on
-     * every
-     * sequent change.
+     * every sequent change.
+     * <p>
+     * <strong>Determinism invariant (see the class Javadoc):</strong> these events must be
+     * delivered
+     * in the goal's <em>own</em> order. The wake operators recorded here decide which parked bases
+     * are re-inserted next round, and thus the birth-age of the resulting candidates; reordering or
+     * coalescing {@code sequentChanged} deliveries across a goal's history would change wake timing
+     * and silently diverge the proof.
      */
     public void sequentChanged(SequentChangeInfo sci) {
         recordWakeOps(sci.addedFormulas(true));
@@ -662,13 +699,24 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         return (RuleApplicationManager<Goal>) clone();
     }
 
+    /**
+     * Copies this manager for a split goal. The parking/wake structures MUST be
+     * <em>deep</em>-copied
+     * (fresh outer map/set + fresh per-operator buckets), so each split sibling parks and wakes
+     * independently: sharing them would let one sibling's wake shift another sibling's candidate
+     * birth-ages and silently change that branch's proof. This deep copy is the enforcement of the
+     * goal-local determinism invariant documented on the class; see also
+     * {@code QueueRuleApplicationManagerParkingLocalityTest}. The contained
+     * {@link RuleAppContainer}s
+     * and {@link Operator}s are immutable and may be shared.
+     */
     @Override
     public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
         res.queue = queue;
         res.previousMinimum = previousMinimum;
-        // the parking structures are mutable and goal-local: deep-copy so split goals park/wake
-        // independently (the contained containers and operators are immutable and shared)
+        // deep-copy the goal-local parking structures (see the method Javadoc and the class-level
+        // determinism invariant); the contained containers and operators are immutable and shared
         if (parkedByOp != null) {
             final LinkedHashMap<Operator, Collection<RuleAppContainer>> copy =
                 new LinkedHashMap<>(parkedByOp.size());

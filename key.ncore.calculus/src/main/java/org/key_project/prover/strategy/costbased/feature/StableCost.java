@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 /**
  * The stable end of the three-way locality scale ({@code StableCost} / {@link WeakStableCost} /
  * {@link VolatileCost}): marks a {@link Feature} whose cost for a given rule application does not
- * change as the proof goes on -- asked to score the same application now or much later, it always
+ * change as the proof goes on, asked to score the same application now or much later, it always
  * returns the same cost. Such a feature derives its cost only from the rule application it is
  * scoring, the taclet, how its schema variables and {@code \assumes} matched, and the term the
  * application is applied to, and from nothing else about the goal.
@@ -48,19 +48,19 @@ import java.lang.annotation.Target;
  * sequent, or ranks terms by when the proof first introduced their symbols: its answer, and hence
  * the cost, can differ from one moment to the next. Such a feature must be marked
  * {@link VolatileCost}, not this one. A feature that reads the whole find formula but nothing
- * further is in between -- mark it {@link WeakStableCost}. When you are not sure, leave the feature
+ * further is in between, mark it {@link WeakStableCost}. When you are not sure, leave the feature
  * unmarked.
  *
  * <p>
  * <b>What if I get it wrong?</b> Leaving a feature unmarked is always safe: its cost is simply
  * recomputed every time and never reused, which only costs a little performance. Marking a feature
  * that is <em>not</em> in fact fixed, on the other hand, lets the strategy work with a stale cost
- * and
- * can change, or even stall, the automatic search (it never makes a found proof invalid, but it can
+ * and can change, or even stall, the automatic search (it never makes a found proof invalid, but it
+ * can
  * stop one from being found). To check your annotations, run the prover with
  * {@code -Dkey.strategy.costReuse.verify=true}: it recomputes every reused cost and prints a
- * warning
- * whenever the reused value disagrees with a freshly computed one, pointing at the offending
+ * warning whenever the reused value disagrees with a freshly computed one, pointing at the
+ * offending
  * taclet.
  *
  * <p>

@@ -104,6 +104,13 @@ public abstract class AbstractProblemLoader {
     private @Nullable Profile profileOfNewProofs;
 
     /**
+     * {@code true} {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs,
+     * {@code false} the {@link Profile} specified by the problem file will be used for new proofs
+     * (with the default profile as fallback if the file specifies none).
+     */
+    private boolean forceNewProfileOfNewProofs;
+
+    /**
      * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
      * {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to
      * work with the loaded {@link InitConfig}.
@@ -193,6 +200,7 @@ public abstract class AbstractProblemLoader {
         this.bootClassPath = bootClassPath;
         this.control = control;
         setProfileOfNewProofs(profileOfNewProofs);
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
@@ -487,11 +495,11 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(proofFilename);
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof,
-                fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, enforcedProfile(), false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
+            return new KeYUserProblemFile(filename, file, fileRepo, control, enforcedProfile(),
                 filename.endsWith(".proof.gz"));
         } else if (Files.isDirectory(file)) {
             // directory containing java sources, probably enriched
@@ -511,13 +519,25 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
+     * Returns the {@link Profile} that overrides any profile declaration of the loaded file, or
+     * {@code null} if the file's own {@code \profile} declaration should be respected (see #3713:
+     * unconditionally passing {@link #profileOfNewProofs} made the GUI ignore the
+     * {@code \profile "java-infflow"} declaration of information flow problem files).
+     *
+     * @return the enforced {@link Profile} or {@code null}
+     */
+    private @Nullable Profile enforcedProfile() {
+        return forceNewProfileOfNewProofs ? profileOfNewProofs : null;
+    }
+
+    /**
      * Instantiates the {@link ProblemInitializer} to use.
      *
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
-        Profile profile = profileOfNewProofs != null ? profileOfNewProofs : envInput.getProfile();
+        Profile profile = enforcedProfile() != null ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
         pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
@@ -816,6 +836,10 @@ public abstract class AbstractProblemLoader {
         this.proofFilename = proofFilename;
     }
 
+    public void forceNewProfileOfNewProofs(boolean forceNewProfileOfNewProofs) {
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
+    }
+
     public boolean isLoadSingleJavaFile() {
         return loadSingleJavaFile;
     }
@@ -837,6 +861,7 @@ public abstract class AbstractProblemLoader {
     public Configuration getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
+
 
 
     public static class ReplayResult {

@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -105,6 +107,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     public StrategySelectionView() {
         layoutPane();
+        // Keep the merge-point option in sync with the prover mode (merge is single-core only).
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addPropertyChangeListener(
+            GeneralSettings.PARALLEL_PROVER_ENABLED,
+            evt -> refresh(mediator == null ? null : mediator.getSelectedProof()));
         refresh(mediator == null ? null : mediator.getSelectedProof());
         setVisible(true);
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -148,6 +154,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         // //////////////////////////////////////////////////////////////////////
 
         this.btnGo = new JButton();
+        this.btnGo.putClientProperty("isAutoButton", Boolean.TRUE);
 
         JPanel timeout = createDefaultPanel(components);
 
@@ -482,8 +489,37 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 }
             }
             enableAll(true);
+            reflectParallelProverMergeLock();
 
             refreshDefaultButton();
+        }
+    }
+
+    /**
+     * Reflects in the strategy view that the merge rule is unavailable while the multi-core prover
+     * is active: the merge-point option group is forced to <em>skip</em> and greyed with an
+     * explanatory tooltip. This is view-only -- the stored strategy property is left untouched, so
+     * the user's real choice reappears when they switch back to the single-core prover. (The merge
+     * rule is additionally disabled at the engine level during parallel runs.)
+     */
+    private void reflectParallelProverMergeLock() {
+        boolean mt = SingleCoreFeatureGate.isActive();
+        List<JRadioButton> mergeButtons =
+            components.getPropertyButtons().get(StrategyProperties.MPS_OPTIONS_KEY);
+        if (mergeButtons == null) {
+            return;
+        }
+        for (JRadioButton button : mergeButtons) {
+            if (mt) {
+                button.setSelected(
+                    StrategyProperties.MPS_SKIP.equals(button.getActionCommand()));
+                button.setEnabled(false);
+                button.setToolTipText("The merge rule is disabled while the multi-core prover is "
+                    + "active (forced to 'skip'). Switch to the single-core prover to use it.");
+            } else {
+                button.setEnabled(true);
+                button.setToolTipText(null);
+            }
         }
     }
 
@@ -545,6 +581,16 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 p.setProperty(entry.getKey(), DEFINITION.getDefaultPropertiesFactory()
                         .createDefaultStrategyProperties().getProperty(entry.getKey()));
             }
+        }
+
+        // While the multi-core prover is active the merge-point option is forced to 'skip'
+        // view-only (see reflectParallelProverMergeLock). Do not let that forced selection leak
+        // into the persisted settings: keep the user's stored MPS choice instead.
+        Proof proof = mediator == null ? null : mediator.getSelectedProof();
+        if (SingleCoreFeatureGate.isActive() && proof != null) {
+            p.setProperty(StrategyProperties.MPS_OPTIONS_KEY,
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY));
         }
 
         return p;

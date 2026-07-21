@@ -24,18 +24,22 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.gotoNextSiblingInstruction;
 
 /**
- * Match head for an {@link ElementaryUpdate} {@code lhs := value}: it matches the operator and the
- * left-hand side; the value subterm is matched by the enclosing
- * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}. Mirrors the elementary-update
- * fragments of the hand-written interpreter generator and compiled matcher.
+ * Match head for an {@link ElementaryUpdate} {@code lhs := value} (the update operator assigning
+ * a value to a program variable): it matches the operator and the left-hand side; the value
+ * subterm is matched by the enclosing
+ * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}.
  */
 public final class ElementaryUpdateHead implements MatchHead {
 
+    /** the pattern's update operator; kept for {@link #toString} only. */
+    private final ElementaryUpdate op;
     private final MatchInstruction lhsMatcher;
     /** whether the left-hand side is a schema variable (it advances by sibling, not by descent). */
     private final boolean lhsIsSchemaVariable;
 
-    private ElementaryUpdateHead(MatchInstruction lhsMatcher, boolean lhsIsSchemaVariable) {
+    private ElementaryUpdateHead(ElementaryUpdate op, MatchInstruction lhsMatcher,
+            boolean lhsIsSchemaVariable) {
+        this.op = op;
         this.lhsMatcher = lhsMatcher;
         this.lhsIsSchemaVariable = lhsIsSchemaVariable;
     }
@@ -47,9 +51,9 @@ public final class ElementaryUpdateHead implements MatchHead {
      */
     public static @Nullable ElementaryUpdateHead of(ElementaryUpdate elUp) {
         if (elUp.lhs() instanceof SchemaVariable sv) {
-            return new ElementaryUpdateHead(getMatchInstructionForSV(sv), true);
+            return new ElementaryUpdateHead(elUp, getMatchInstructionForSV(sv), true);
         } else if (elUp.lhs() instanceof LocationVariable locVar) {
-            return new ElementaryUpdateHead(getMatchIdentityInstruction(locVar), false);
+            return new ElementaryUpdateHead(elUp, getMatchIdentityInstruction(locVar), false);
         }
         return null;
     }
@@ -69,5 +73,10 @@ public final class ElementaryUpdateHead implements MatchHead {
                 services) -> ((Term) element).op() instanceof ElementaryUpdate actualElUp
                         ? lhs.match(actualElUp.lhs(), mc, services)
                         : null;
+    }
+
+    @Override
+    public String toString() {
+        return "elemUpdate(" + op.name() + ")";
     }
 }

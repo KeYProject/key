@@ -34,7 +34,6 @@
      },
     "SMTSettings" : { 
         "SelectedTaclets" : [ 
-            
          ],
         "UseBuiltUniqueness" : false,
         "explicitTypeHierarchy" : false,
@@ -50,7 +49,7 @@
         "ActiveStrategy" : "JavaCardDLStrategy",
         "MaximumNumberOfAutomaticApplications" : 20000,
         "Timeout" : -1,
-        "options" : { 
+        "options" : {
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
             "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",

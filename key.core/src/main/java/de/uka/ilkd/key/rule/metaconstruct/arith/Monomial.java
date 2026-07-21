@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -35,20 +35,15 @@ public class Monomial {
     public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
 
     public static Monomial create(Term monoTerm, Services services) {
-        final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
+        final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
         monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);
-        Monomial res;
-
-        synchronized (monomialCache) {
-            res = monomialCache.get(monoTerm);
-        }
+        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
+        Monomial res = monomialCache.get(monoTerm);
 
         if (res == null) {
             res = createHelp(monoTerm, services);
-            synchronized (monomialCache) {
-                monomialCache.put(monoTerm, res);
-            }
+            monomialCache.put(monoTerm, res);
         }
         return res;
     }

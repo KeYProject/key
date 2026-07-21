@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Apr 25 17:11:57 CEST 2026
+# Date: Thu Jul 09 09:36:44 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -41,14 +41,14 @@ Choices: reach:on}
 == acosIsNaN (acosIsNaN) =========================================
 acosIsNaN {
 \find(acosDouble(arg))
-\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(acosDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(acosDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == acosRange (acosRange) =========================================
 acosRange {
 \find(acosDouble(arg))
-\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(acosDouble(arg),DFP(0(#))),leqDouble(acosDouble(arg),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(acosDouble(arg),DFP(0(#))),leqDouble(acosDouble(arg),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -1006,7 +1006,7 @@ Choices: true}
 apply_eq_boolean_rigid {
 \assumes ([]==>[equals(br,TRUE)]) 
 \find(br)
-\replacewith(FALSE) 
+\sameUpdateLevel\replacewith(FALSE) 
 \heuristics(apply_equations)
 Choices: true}
 -----------------------------------------------------
@@ -1014,7 +1014,7 @@ Choices: true}
 apply_eq_boolean_rigid_2 {
 \assumes ([]==>[equals(br,FALSE)]) 
 \find(br)
-\replacewith(TRUE) 
+\sameUpdateLevel\replacewith(TRUE) 
 \heuristics(apply_equations)
 Choices: true}
 -----------------------------------------------------
@@ -1171,21 +1171,21 @@ Choices: programRules:Java}
 == asinIsNaN (asinIsNaN) =========================================
 asinIsNaN {
 \find(asinDouble(arg))
-\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(asinDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(asinDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == asineIsZero (asineIsZero) =========================================
 asineIsZero {
 \find(asinDouble(arg))
-\add [imp(equals(arg,DFP(0(#))),equals(asinDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg,DFP(0(#))),equals(asinDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == asineRange (asineRange) =========================================
 asineRange {
 \find(asinDouble(arg))
-\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(asinDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(asinDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(asinDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(asinDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -1900,7 +1900,7 @@ assignment_read_length_this {
 \find(#allmodal ((modal operator))|{{ ..
   #v0 = #v.#length;
 ... }}| (post))
-\sameUpdateLevel\varcond(\isThisReference (#v (program Variable)))
+\varcond(\isThisReference (#v (program Variable)))
 \replacewith(update-application(elem-update(#v0 (program Variable))(length(#v)),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -1930,7 +1930,7 @@ assignment_read_static_attribute_with_variable_prefix {
 \find(#allmodal ((modal operator))|{{ ..
   #loc = @(#v.#sv);
 ... }}| (post))
-\varcond(\hasSort(#sv (program StaticVariable), G))
+\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G))
 \replacewith(update-application(elem-update(#loc (program Variable))(select<[G]>(heap,#v,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2020,7 +2020,7 @@ assignment_write_static_attribute {
 \find(#allmodal ((modal operator))|{{ ..
   @(#sv) = #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(heap)(store(heap,null,#memberPVToField(#sv),#se)),#allmodal(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(heap)(store(heap,null,#memberPVToField(#sv),#se)),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2029,7 +2029,7 @@ assignment_write_static_attribute_with_variable_prefix {
 \find(#allmodal ((modal operator))|{{ ..
   @(#v.#sv) = #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(heap)(store(heap,#v,#memberPVToField(#sv),#se)),#allmodal(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(heap)(store(heap,#v,#memberPVToField(#sv),#se)),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2050,35 +2050,35 @@ Choices: programRules:Java}
 == atan2IsNaN (atan2IsNaN) =========================================
 atan2IsNaN {
 \find(atan2Double(arg1,arg2))
-\add [imp(or(doubleIsNaN(arg1),doubleIsNaN(arg2)),doubleIsNaN(atan2Double(arg1,arg2)))]==>[] 
+\sameUpdateLevel\add [imp(or(doubleIsNaN(arg1),doubleIsNaN(arg2)),doubleIsNaN(atan2Double(arg1,arg2)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == atan2Range (atan2Range) =========================================
 atan2Range {
 \find(atan2Double(arg1,arg2))
-\add [imp(and(not(doubleIsNaN(arg1)),not(doubleIsNaN(arg2))),and(geqDouble(atan2Double(arg1,arg2),negDouble(DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))),leqDouble(atan2Double(arg1,arg2),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg1)),not(doubleIsNaN(arg2))),and(geqDouble(atan2Double(arg1,arg2),negDouble(DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))),leqDouble(atan2Double(arg1,arg2),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == atanIsNaN (atanIsNaN) =========================================
 atanIsNaN {
 \find(atanDouble(arg))
-\add [imp(doubleIsNaN(arg),doubleIsNaN(atanDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(doubleIsNaN(arg),doubleIsNaN(atanDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == atanIsZero (atanIsZero) =========================================
 atanIsZero {
 \find(atanDouble(arg))
-\add [imp(equals(arg,DFP(0(#))),equals(atanDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg,DFP(0(#))),equals(atanDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == atanRange (atanRange) =========================================
 atanRange {
 \find(atanDouble(arg))
-\add [imp(not(doubleIsNaN(arg)),and(geqDouble(atanDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(atanDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(not(doubleIsNaN(arg)),and(geqDouble(atanDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(atanDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -2786,7 +2786,7 @@ Choices: programRules:Java}
 == bprod_all_positive (bprod_all_positive) =========================================
 bprod_all_positive {
 \find(bprod{uSub (variable)}(i0,i1,t1))
-\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [imp(all{uSub (variable)}(imp(and(leq(i0,uSub),lt(uSub,i1)),geq(t1,Z(0(#))))),geq(bprod{uSub (variable)}(i0,i1,t1),Z(0(#))))]==>[] 
 
 Choices: (integerSimplificationRules:full & sequences:on)}
@@ -2884,7 +2884,7 @@ Choices: integerSimplificationRules:full}
 == bprod_lower_equals_upper (bprod_lower_equals_upper) =========================================
 bprod_lower_equals_upper {
 \find(bprod{uSub (variable)}(i0,i0,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(Z(1(#))) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -2900,7 +2900,7 @@ Choices: integerSimplificationRules:full}
 == bprod_one_factor (bprod_one_factor) =========================================
 bprod_one_factor {
 \find(bprod{uSub (variable)}(i0,i1,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(if-then-else(equals(add(i0,Z(1(#))),i1),subst{uSub (variable)}(i0,t),bprod{uSub (variable)}(i0,i1,t))) 
 
 Choices: integerSimplificationRules:full}
@@ -2908,7 +2908,7 @@ Choices: integerSimplificationRules:full}
 == bprod_one_factor_concrete1 (bprod_one_factor_concrete1) =========================================
 bprod_one_factor_concrete1 {
 \find(bprod{uSub (variable)}(i0,add(Z(1(#)),i0),t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(subst{uSub (variable)}(i0,t)) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -2916,7 +2916,7 @@ Choices: integerSimplificationRules:full}
 == bprod_one_factor_concrete2 (bprod_one_factor_concrete2) =========================================
 bprod_one_factor_concrete2 {
 \find(bprod{uSub (variable)}(add(Z(neglit(1(#))),i0),i0,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(subst{uSub (variable)}(add(Z(neglit(1(#))),i0),t)) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -2969,7 +2969,7 @@ Choices: integerSimplificationRules:full}
 == bsum_add_concrete (bsum_add_concrete) =========================================
 bsum_add_concrete {
 \find(add(bsum{uSub1 (variable)}(i0,i1,t1),bsum{uSub2 (variable)}(i1,i3,t2)))
-\varcond(\notFreeIn(uSub2 (variable), t1 (int term)), \notFreeIn(uSub2 (variable), i3 (int term)), \notFreeIn(uSub2 (variable), i1 (int term)), \notFreeIn(uSub2 (variable), i0 (int term)), \notFreeIn(uSub1 (variable), t2 (int term)), \notFreeIn(uSub1 (variable), i3 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub2 (variable), t1 (int term)), \notFreeIn(uSub2 (variable), i3 (int term)), \notFreeIn(uSub2 (variable), i1 (int term)), \notFreeIn(uSub2 (variable), i0 (int term)), \notFreeIn(uSub1 (variable), t2 (int term)), \notFreeIn(uSub1 (variable), i3 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)))
 \replacewith(bsum{uSub1 (variable)}(i0,i3,subst{uSub2 (variable)}(uSub1,if-then-else(lt(uSub1,i1),t1,t2)))) ;
 \add []==>[and(leq(i0,i1),leq(i1,i3))] 
 
@@ -2986,7 +2986,7 @@ Choices: integerSimplificationRules:full}
 == bsum_def (bsum_def) =========================================
 bsum_def {
 \find(bsum{uSub (variable)}(i0,i1,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(if-then-else(lt(i0,i1),add(bsum{uSub (variable)}(i0,sub(i1,Z(1(#))),t),subst{uSub (variable)}(sub(i1,Z(1(#))),t)),Z(0(#)))) 
 
 Choices: integerSimplificationRules:full}
@@ -3158,7 +3158,7 @@ Choices: integerSimplificationRules:full}
 == bsum_lower_equals_upper (bsum_lower_equals_upper) =========================================
 bsum_lower_equals_upper {
 \find(bsum{uSub (variable)}(i0,i0,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(Z(0(#))) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -3166,7 +3166,7 @@ Choices: integerSimplificationRules:full}
 == bsum_num_of_bounds (bsum_num_of_bounds) =========================================
 bsum_num_of_bounds {
 \find(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(1(#)),Z(0(#)))))
-\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [leq(Z(0(#)),bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(1(#)),Z(0(#))))),imp(leq(i0,i2),leq(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(1(#)),Z(0(#)))),sub(i2,i0)))]==>[] 
 
 Choices: integerSimplificationRules:full}
@@ -3174,7 +3174,7 @@ Choices: integerSimplificationRules:full}
 == bsum_num_of_bounds2 (bsum_num_of_bounds2) =========================================
 bsum_num_of_bounds2 {
 \find(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(0(#)),Z(1(#)))))
-\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [leq(Z(0(#)),bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(0(#)),Z(1(#))))),imp(leq(i0,i2),leq(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(0(#)),Z(1(#)))),sub(i2,i0)))]==>[] 
 
 Choices: integerSimplificationRules:full}
@@ -3182,7 +3182,7 @@ Choices: integerSimplificationRules:full}
 == bsum_num_of_gt0 (bsum_num_of_gt0) =========================================
 bsum_num_of_gt0 {
 \find(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(1(#)),Z(0(#)))))
-\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [imp(gt(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(1(#)),Z(0(#)))),Z(0(#))),exists{uSub (variable)}(and(and(leq(i0,uSub),lt(uSub,i2)),phi)))]==>[] 
 
 Choices: integerSimplificationRules:full}
@@ -3190,7 +3190,7 @@ Choices: integerSimplificationRules:full}
 == bsum_num_of_gt0_alt (bsum_num_of_gt0_alt) =========================================
 bsum_num_of_gt0_alt {
 \find(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(0(#)),Z(1(#)))))
-\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [imp(gt(bsum{uSub (variable)}(i0,i2,if-then-else(phi,Z(0(#)),Z(1(#)))),Z(0(#))),exists{uSub (variable)}(and(and(leq(i0,uSub),lt(uSub,i2)),not(phi))))]==>[] 
 
 Choices: integerSimplificationRules:full}
@@ -3268,7 +3268,7 @@ Choices: integerSimplificationRules:full}
 == bsum_one_summand (bsum_one_summand) =========================================
 bsum_one_summand {
 \find(bsum{uSub (variable)}(i0,i1,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(if-then-else(equals(add(i0,Z(1(#))),i1),subst{uSub (variable)}(i0,t),bsum{uSub (variable)}(i0,i1,t))) 
 
 Choices: integerSimplificationRules:full}
@@ -3276,7 +3276,7 @@ Choices: integerSimplificationRules:full}
 == bsum_one_summand_concrete1 (bsum_one_summand_concrete1) =========================================
 bsum_one_summand_concrete1 {
 \find(bsum{uSub (variable)}(i0,add(Z(1(#)),i0),t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(subst{uSub (variable)}(i0,t)) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -3284,7 +3284,7 @@ Choices: integerSimplificationRules:full}
 == bsum_one_summand_concrete2 (bsum_one_summand_concrete2) =========================================
 bsum_one_summand_concrete2 {
 \find(bsum{uSub (variable)}(add(Z(neglit(1(#))),i0),i0,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i0 (int term)))
+\varcond(\notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(subst{uSub (variable)}(add(Z(neglit(1(#))),i0),t)) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
@@ -3391,7 +3391,7 @@ Choices: integerSimplificationRules:full}
 == cancel_equation (cancel_equation) =========================================
 cancel_equation {
 \find(equals(mul(eqLeft,Fac),mul(eqRight,Fac)))
-\add []==>[not(equals(Fac,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(Fac,Z(0(#))))] ;
 \replacewith(equals(eqLeft,eqRight)) 
 \heuristics(simplify_enlarging)
 Choices: integerSimplificationRules:full}
@@ -5120,7 +5120,7 @@ Choices: Strings:on}
 == cosIsNaN (cosIsNaN) =========================================
 cosIsNaN {
 \find(cosDouble(arg))
-\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(cosDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(cosDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -5134,21 +5134,21 @@ Choices: true}
 == cosIsNotNaN (cosIsNotNaN) =========================================
 cosIsNotNaN {
 \find(cosDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(cosDouble(arg))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(cosDouble(arg))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == cosRange (cosRange) =========================================
 cosRange {
 \find(cosDouble(arg))
-\add [or(and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(cosDouble(arg)))]==>[] 
+\sameUpdateLevel\add [or(and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(cosDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == cosRange2 (cosRange2) =========================================
 cosRange2 {
 \find(cosDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -5895,7 +5895,7 @@ Choices: programRules:Java}
 == divAddMultDenom (divAddMultDenom) =========================================
 divAddMultDenom {
 \find(div(add(divNum,mul(coef,divDenom)),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(add(div(divNum,divDenom),coef)) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -5943,7 +5943,7 @@ Choices: true}
 == divMinus (divMinus) =========================================
 divMinus {
 \find(div(neg(divNum),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(if-then-else(equals(mul(div(divNum,divDenom),divDenom),divNum),neg(div(divNum,divDenom)),if-then-else(gt(divDenom,Z(0(#))),sub(neg(div(divNum,divDenom)),Z(1(#))),add(neg(div(divNum,divDenom)),Z(1(#)))))) 
 
 Choices: true}
@@ -5951,7 +5951,7 @@ Choices: true}
 == divMinusDenom (divMinusDenom) =========================================
 divMinusDenom {
 \find(div(divNum,neg(divDenom)))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(neg(div(divNum,divDenom))) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -5959,28 +5959,28 @@ Choices: true}
 == divResOne1 (divResOne1) =========================================
 divResOne1 {
 \find(div(divNum,divDenom))
-\add [imp(and(and(gt(divDenom,Z(0(#))),lt(divNum,Z(0(#)))),lt(neg(divDenom),divNum)),equals(div(divNum,divDenom),Z(neglit(1(#)))))]==>[] 
+\sameUpdateLevel\add [imp(and(and(gt(divDenom,Z(0(#))),lt(divNum,Z(0(#)))),lt(neg(divDenom),divNum)),equals(div(divNum,divDenom),Z(neglit(1(#)))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == divResOne2 (divResOne2) =========================================
 divResOne2 {
 \find(div(divNum,divDenom))
-\add [imp(and(and(lt(divDenom,Z(0(#))),lt(divNum,Z(0(#)))),lt(divDenom,divNum)),equals(div(divNum,divDenom),Z(1(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(and(lt(divDenom,Z(0(#))),lt(divNum,Z(0(#)))),lt(divDenom,divNum)),equals(div(divNum,divDenom),Z(1(#))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == divResZero1 (divResZero1) =========================================
 divResZero1 {
 \find(div(divNum,divDenom))
-\add [imp(and(and(gt(divDenom,Z(0(#))),leq(Z(0(#)),divNum)),lt(divNum,divDenom)),equals(div(divNum,divDenom),Z(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(and(gt(divDenom,Z(0(#))),leq(Z(0(#)),divNum)),lt(divNum,divDenom)),equals(div(divNum,divDenom),Z(0(#))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == divResZero2 (divResZero2) =========================================
 divResZero2 {
 \find(div(divNum,divDenom))
-\add [imp(and(and(lt(divDenom,Z(0(#))),leq(Z(0(#)),divNum)),lt(divNum,neg(divDenom))),equals(div(divNum,divDenom),Z(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(and(lt(divDenom,Z(0(#))),leq(Z(0(#)),divNum)),lt(divNum,neg(divDenom))),equals(div(divNum,divDenom),Z(0(#))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -5994,7 +5994,7 @@ Choices: true}
 == div_cancel1 (div_cancel1) =========================================
 div_cancel1 {
 \find(div(mul(divNum,divDenom),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(divNum) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -6002,7 +6002,7 @@ Choices: true}
 == div_cancel2 (div_cancel2) =========================================
 div_cancel2 {
 \find(div(mul(divDenom,divNum),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(divNum) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -6010,7 +6010,7 @@ Choices: true}
 == div_exists (div_exists) =========================================
 div_exists {
 \find(div(divNum,divDenom))
-\add [all{cnom (variable)}(imp(not(equals(cnom,Z(0(#)))),all{a (variable)}(exists{qu (variable)}(exists{rm (variable)}(and(and(equals(a,add(mul(qu,cnom),rm)),leq(Z(0(#)),rm)),if-then-else(geq(cnom,Z(0(#))),and(geq(mul(qu,cnom),add(add(Z(1(#)),a),mul(Z(neglit(1(#))),cnom))),lt(rm,cnom)),and(geq(mul(qu,cnom),add(add(Z(1(#)),a),cnom)),lt(rm,neg(cnom))))))))))]==>[] 
+\sameUpdateLevel\add [all{cnom (variable)}(imp(not(equals(cnom,Z(0(#)))),all{a (variable)}(exists{qu (variable)}(exists{rm (variable)}(and(and(equals(a,add(mul(qu,cnom),rm)),leq(Z(0(#)),rm)),if-then-else(geq(cnom,Z(0(#))),and(geq(mul(qu,cnom),add(add(Z(1(#)),a),mul(Z(neglit(1(#))),cnom))),lt(rm,cnom)),and(geq(mul(qu,cnom),add(add(Z(1(#)),a),cnom)),lt(rm,neg(cnom))))))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -6031,21 +6031,21 @@ Choices: true}
 == div_unique1 (div_unique1) =========================================
 div_unique1 {
 \find(div(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(gt(cnom,Z(0(#))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),geq(mul(x,cnom),sub(add(Z(1(#)),a),cnom))),geq(mul(y,cnom),sub(add(Z(1(#)),a),cnom))),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(gt(cnom,Z(0(#))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),geq(mul(x,cnom),sub(add(Z(1(#)),a),cnom))),geq(mul(y,cnom),sub(add(Z(1(#)),a),cnom))),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == div_unique2 (div_unique2) =========================================
 div_unique2 {
 \find(div(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(lt(cnom,Z(0(#))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),geq(mul(x,cnom),add(add(Z(1(#)),a),cnom))),geq(mul(y,cnom),add(add(Z(1(#)),a),cnom))),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(lt(cnom,Z(0(#))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),geq(mul(x,cnom),add(add(Z(1(#)),a),cnom))),geq(mul(y,cnom),add(add(Z(1(#)),a),cnom))),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == div_zero (div_zero) =========================================
 div_zero {
 \find(div(Z(0(#)),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(Z(0(#))) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -7315,6 +7315,14 @@ equalityToElementOfRight {
 \replacewith([]==>[all{ov (variable)}(all{fv (variable)}(equiv(elementOf(ov,fv,s),elementOf(ov,fv,s2))))]) 
 \heuristics(setEqualityBlastingRight)
 Choices: programRules:Java}
+-----------------------------------------------------
+== equalityToSElementOf (equalityToSElementOf) =========================================
+equalityToSElementOf {
+\find(equals(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<[T]> term)), \notFreeIn(av (variable), s (Set<[T]> term)))
+\replacewith(all{av (variable)}(equiv(sElementOf<[T]>(av,s),sElementOf<[T]>(av,t)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
 -----------------------------------------------------
 == equalityToSelect (equalityToSelect) =========================================
 equalityToSelect {
@@ -9271,21 +9279,21 @@ Choices: programRules:Java}
 == expIsInfinite (expIsInfinite) =========================================
 expIsInfinite {
 \find(expDouble(arg))
-\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(expDouble(arg)),gtDouble(expDouble(arg),DFP(0(#)))))]==>[] 
+\sameUpdateLevel\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(expDouble(arg)),gtDouble(expDouble(arg),DFP(0(#)))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == expIsNaN (expIsNaN) =========================================
 expIsNaN {
 \find(expDouble(arg))
-\add [imp(doubleIsNaN(arg),doubleIsNaN(expDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(doubleIsNaN(arg),doubleIsNaN(expDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == expIsZero (expIsZero) =========================================
 expIsZero {
 \find(expDouble(arg))
-\add [imp(and(doubleIsInfinite(arg),ltDouble(arg,DFP(0(#)))),equals(expDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(doubleIsInfinite(arg),ltDouble(arg,DFP(0(#)))),equals(expDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -9617,49 +9625,49 @@ Choices: sequences:on}
 == getOfMapEmpty (getOfMapEmpty) =========================================
 getOfMapEmpty {
 \find(mapGet(mapEmpty,x))
-\sameUpdateLevel\replacewith(mapUndef) 
+\replacewith(mapUndef) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == getOfMapForeach (getOfMapForeach) =========================================
 getOfMapForeach {
 \find(mapGet(mapForeach{v (variable)}(b,y),x))
-\sameUpdateLevel\replacewith(if-then-else(inDomain(mapForeach{v (variable)}(b,y),x),subst{v (variable)}(cast<[alpha]>(x),y),mapUndef)) 
+\replacewith(if-then-else(inDomain(mapForeach{v (variable)}(b,y),x),subst{v (variable)}(cast<[alpha]>(x),y),mapUndef)) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapOverride (getOfMapOverride) =========================================
 getOfMapOverride {
 \find(mapGet(mapOverride(m0,m1),x))
-\sameUpdateLevel\replacewith(if-then-else(inDomain(m1,x),mapGet(m1,x),mapGet(m0,x))) 
+\replacewith(if-then-else(inDomain(m1,x),mapGet(m1,x),mapGet(m0,x))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapRemove (getOfMapRemove) =========================================
 getOfMapRemove {
 \find(mapGet(mapRemove(m,key),x))
-\sameUpdateLevel\replacewith(if-then-else(equals(x,key),mapUndef,mapGet(m,x))) 
+\replacewith(if-then-else(equals(x,key),mapUndef,mapGet(m,x))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapSingleton (getOfMapSingleton) =========================================
 getOfMapSingleton {
 \find(mapGet(mapSingleton(x,y),z))
-\sameUpdateLevel\replacewith(if-then-else(equals(x,z),y,mapUndef)) 
+\replacewith(if-then-else(equals(x,z),y,mapUndef)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == getOfMapUpdate (getOfMapUpdate) =========================================
 getOfMapUpdate {
 \find(mapGet(mapUpdate(m,key,value),x))
-\sameUpdateLevel\replacewith(if-then-else(equals(x,key),value,mapGet(m,x))) 
+\replacewith(if-then-else(equals(x,key),value,mapGet(m,x))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfSeq2Map (getOfSeq2Map) =========================================
 getOfSeq2Map {
 \find(mapGet(seq2map(s),x))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s))),seqGet<[any]>(s,cast<[int]>(x)),mapUndef)) 
+\replacewith(if-then-else(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s))),seqGet<[any]>(s,cast<[int]>(x)),mapUndef)) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -9889,7 +9897,7 @@ hideAuxiliaryEq {
 \find(equals(result,auxiliarySK)==>)
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(result) 
+\sameUpdateLevel\inSequentState\replacewith(result) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq)
@@ -9900,7 +9908,7 @@ hideAuxiliaryEqConcrete {
 \find(equals(auxiliarySK,TRUE)==>)
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(TRUE) 
+\sameUpdateLevel\inSequentState\replacewith(TRUE) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq_const)
@@ -9911,7 +9919,7 @@ hideAuxiliaryEqConcrete2 {
 \find(==>equals(auxiliarySK,TRUE))
 \addrules [replaceKnownAuxiliaryConstant {
 \find(auxiliarySK)
-\inSequentState\replacewith(FALSE) 
+\sameUpdateLevel\inSequentState\replacewith(FALSE) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([]==>[]) 
 \heuristics(hide_auxiliary_eq_const)
@@ -10261,7 +10269,7 @@ Choices: true}
 == ifExthenelse1_min (ifExthenelse1_min) =========================================
 ifExthenelse1_min {
 \find(ifExThenElse{intVar (variable)}(phi,then,else))
-\sameUpdateLevel\varcond(\notFreeIn(intVar (variable), phi (formula)))
+\varcond(\notFreeIn(intVar (variable), phi (formula)))
 \replacewith(if-then-else(phi,subst{intVar (variable)}(Z(0(#)),then),else)) 
 \heuristics(concrete)
 Choices: true}
@@ -10269,7 +10277,7 @@ Choices: true}
 == ifExthenelse1_min_for (ifExthenelse1_min) =========================================
 ifExthenelse1_min_for {
 \find(ifExThenElse{intVar (variable)}(phi,b,c))
-\sameUpdateLevel\varcond(\notFreeIn(intVar (variable), phi (formula)))
+\varcond(\notFreeIn(intVar (variable), phi (formula)))
 \replacewith(if-then-else(phi,subst{intVar (variable)}(Z(0(#)),b),c)) 
 \heuristics(concrete)
 Choices: true}
@@ -11210,7 +11218,7 @@ Choices: sequences:on}
 == indexOfSeqSingleton (indexOfSeqSingleton) =========================================
 indexOfSeqSingleton {
 \find(seqIndexOf(seqSingleton(x),x))
-\sameUpdateLevel\replacewith(Z(0(#))) 
+\replacewith(Z(0(#))) 
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -11377,7 +11385,7 @@ Choices: true}
 instAll {
 \assumes ([all{u (variable)}(b)]==>[]) 
 \find(t)
-\add [subst{u (variable)}(t,b)]==>[] 
+\sameUpdateLevel\add [subst{u (variable)}(t,b)]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -11385,7 +11393,7 @@ Choices: true}
 instEx {
 \assumes ([]==>[exists{u (variable)}(b)]) 
 \find(t)
-\add []==>[subst{u (variable)}(t,b)] 
+\sameUpdateLevel\add []==>[subst{u (variable)}(t,b)] 
 
 Choices: true}
 -----------------------------------------------------
@@ -11516,7 +11524,7 @@ Choices: true}
 instanceof_not_compatible_5 {
 \assumes ([equals(instance<[H]>(a),TRUE)]==>[]) 
 \find(equals(instance<[G]>(a),TRUE))
-\varcond(\sub(Null, G), \disjointModuloNull(G, H))
+\sameUpdateLevel\varcond(\sub(Null, G), \disjointModuloNull(G, H))
 \replacewith(equals(a,null)) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11541,7 +11549,7 @@ Choices: true}
 == intDivRem (intDivRem) =========================================
 intDivRem {
 \find(jmod(divNum,divDenom))
-\add [imp(not(equals(divDenom,Z(0(#)))),equals(divNum,add(mul(jdiv(divNum,divDenom),divDenom),jmod(divNum,divDenom))))]==>[] 
+\sameUpdateLevel\add [imp(not(equals(divDenom,Z(0(#)))),equals(divNum,add(mul(jdiv(divNum,divDenom),divDenom),jmod(divNum,divDenom))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -11664,35 +11672,35 @@ Choices: true}
 == isFiniteOfMapEmpty (isFiniteOfMapEmpty) =========================================
 isFiniteOfMapEmpty {
 \find(isFinite(mapEmpty))
-\sameUpdateLevel\replacewith(true) 
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapRemove (isFiniteOfMapRemove) =========================================
 isFiniteOfMapRemove {
 \find(isFinite(mapRemove(m,key)))
-\sameUpdateLevel\replacewith(isFinite(m)) 
+\replacewith(isFinite(m)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapSingleton (isFiniteOfMapSingleton) =========================================
 isFiniteOfMapSingleton {
 \find(isFinite(mapSingleton(key,value)))
-\sameUpdateLevel\replacewith(true) 
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapUpdate (isFiniteOfMapUpdate) =========================================
 isFiniteOfMapUpdate {
 \find(isFinite(mapUpdate(m,key,value)))
-\sameUpdateLevel\replacewith(isFinite(m)) 
+\replacewith(isFinite(m)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfSeq2Map (isFiniteOfSeq2Map) =========================================
 isFiniteOfSeq2Map {
 \find(isFinite(seq2map(s)))
-\sameUpdateLevel\replacewith(true) 
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -11877,7 +11885,7 @@ Choices: true}
 == jdivMultDenom1 (jdivMultDenom1) =========================================
 jdivMultDenom1 {
 \find(jdiv(mul(divDenom,cfac),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(cfac) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -11885,7 +11893,7 @@ Choices: true}
 == jdivMultDenom2 (jdivMultDenom2) =========================================
 jdivMultDenom2 {
 \find(jdiv(mul(cfac,divDenom),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(cfac) 
 
 Choices: true}
@@ -11893,7 +11901,7 @@ Choices: true}
 == jdivPulloutMinusDenom (jdivPulloutMinusDenom) =========================================
 jdivPulloutMinusDenom {
 \find(jdiv(divNum,neg(divDenom)))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(neg(jdiv(divNum,divDenom))) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -11901,7 +11909,7 @@ Choices: true}
 == jdivPulloutMinusNum (jdivPulloutMinusNum) =========================================
 jdivPulloutMinusNum {
 \find(jdiv(neg(divNum),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(neg(jdiv(divNum,divDenom))) 
 
 Choices: true}
@@ -11930,35 +11938,35 @@ Choices: true}
 == jdiv_uniqueNegNeg (jdiv_uniqueNegNeg) =========================================
 jdiv_uniqueNegNeg {
 \find(jdiv(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(lt(a,Z(0(#))),lt(cnom,Z(0(#)))),geq(mul(x,cnom),a)),geq(mul(y,cnom),a)),lt(mul(add(x,Z(1(#))),cnom),a)),lt(mul(add(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(lt(a,Z(0(#))),lt(cnom,Z(0(#)))),geq(mul(x,cnom),a)),geq(mul(y,cnom),a)),lt(mul(add(x,Z(1(#))),cnom),a)),lt(mul(add(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jdiv_uniqueNegPos (jdiv_uniqueNegPos) =========================================
 jdiv_uniqueNegPos {
 \find(jdiv(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(lt(a,Z(0(#))),gt(cnom,Z(0(#)))),geq(mul(x,cnom),a)),geq(mul(y,cnom),a)),lt(mul(sub(x,Z(1(#))),cnom),a)),lt(mul(sub(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(lt(a,Z(0(#))),gt(cnom,Z(0(#)))),geq(mul(x,cnom),a)),geq(mul(y,cnom),a)),lt(mul(sub(x,Z(1(#))),cnom),a)),lt(mul(sub(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jdiv_uniquePosNeg (jdiv_uniquePosNeg) =========================================
 jdiv_uniquePosNeg {
 \find(jdiv(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(geq(a,Z(0(#))),lt(cnom,Z(0(#)))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),gt(mul(sub(x,Z(1(#))),cnom),a)),gt(mul(sub(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(geq(a,Z(0(#))),lt(cnom,Z(0(#)))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),gt(mul(sub(x,Z(1(#))),cnom),a)),gt(mul(sub(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jdiv_uniquePosPos (jdiv_uniquePosPos) =========================================
 jdiv_uniquePosPos {
 \find(jdiv(divNum,divDenom))
-\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(geq(a,Z(0(#))),gt(cnom,Z(0(#)))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),gt(mul(add(x,Z(1(#))),cnom),a)),gt(mul(add(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
+\sameUpdateLevel\add [all{a (variable)}(all{cnom (variable)}(all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(geq(a,Z(0(#))),gt(cnom,Z(0(#)))),leq(mul(x,cnom),a)),leq(mul(y,cnom),a)),gt(mul(add(x,Z(1(#))),cnom),a)),gt(mul(add(y,Z(1(#))),cnom),a)),equals(x,y))))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jdiv_zero (jdiv_zero) =========================================
 jdiv_zero {
 \find(jdiv(Z(0(#)),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(Z(0(#))) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -11986,7 +11994,7 @@ Choices: true}
 == jmodDivisibleRep (jmodDivisibleRep) =========================================
 jmodDivisibleRep {
 \find(jmod(mul(D,A),D))
-\add []==>[not(equals(D,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(D,Z(0(#))))] ;
 \replacewith(Z(0(#))) 
 \heuristics(simplify_enlarging)
 Choices: true}
@@ -12013,14 +12021,14 @@ Choices: true}
 == jmod_NumNeg (jmod_NumNeg) =========================================
 jmod_NumNeg {
 \find(jmod(divNum,divDenom))
-\add [imp(and(not(equals(divDenom,Z(0(#)))),leq(divNum,Z(0(#)))),gt(jmod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),neg(divDenom),divDenom)))]==>[] 
+\sameUpdateLevel\add [imp(and(not(equals(divDenom,Z(0(#)))),leq(divNum,Z(0(#)))),gt(jmod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),neg(divDenom),divDenom)))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jmod_NumPos (jmod_NumPos) =========================================
 jmod_NumPos {
 \find(jmod(divNum,divDenom))
-\add [imp(and(not(equals(divDenom,Z(0(#)))),geq(divNum,Z(0(#)))),lt(jmod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),divDenom,neg(divDenom))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(equals(divDenom,Z(0(#)))),geq(divNum,Z(0(#)))),lt(jmod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),divDenom,neg(divDenom))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12034,14 +12042,14 @@ Choices: true}
 == jmod_geZero (jmod_geZero) =========================================
 jmod_geZero {
 \find(jmod(divNum,divDenom))
-\add [imp(not(equals(divDenom,Z(0(#)))),leq(Z(0(#)),if-then-else(geq(divNum,Z(0(#))),jmod(divNum,divDenom),neg(jmod(divNum,divDenom)))))]==>[] 
+\sameUpdateLevel\add [imp(not(equals(divDenom,Z(0(#)))),leq(Z(0(#)),if-then-else(geq(divNum,Z(0(#))),jmod(divNum,divDenom),neg(jmod(divNum,divDenom)))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == jmod_pulloutminusDenom (jmod_pulloutminusDenom) =========================================
 jmod_pulloutminusDenom {
 \find(jmod(divNum,neg(divDenom)))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(jmod(divNum,divDenom)) 
 
 Choices: true}
@@ -12049,7 +12057,7 @@ Choices: true}
 == jmod_pulloutminusNum (jmod_pulloutminusNum) =========================================
 jmod_pulloutminusNum {
 \find(jmod(neg(divNum),divDenom))
-\add []==>[not(equals(divDenom,Z(0(#))))] ;
+\sameUpdateLevel\add []==>[not(equals(divDenom,Z(0(#))))] ;
 \replacewith(neg(jmod(divNum,divDenom))) 
 
 Choices: true}
@@ -12191,6 +12199,7 @@ lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
+
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
@@ -12529,7 +12538,7 @@ Choices: true}
 == logLessThanPow (logLessThanPow) =========================================
 logLessThanPow {
 \find(lt(log(base,x),exp))
-\add [imp(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),lt(x,pow(base,exp))),geq(exp,Z(1(#)))),lt(log(base,x),exp))]==>[] 
+\sameUpdateLevel\add [imp(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),lt(x,pow(base,exp))),geq(exp,Z(1(#)))),lt(log(base,x),exp))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12543,7 +12552,7 @@ Choices: true}
 == logMono (logMono) =========================================
 logMono {
 \find(leq(log(base,x),log(base,x_2)))
-\add [imp(and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#)))),leq(log(base,x),log(base,x_2)))]==>[] 
+\sameUpdateLevel\add [imp(and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#)))),leq(log(base,x),log(base,x_2)))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12557,7 +12566,7 @@ Choices: true}
 == logPositive (logPositive) =========================================
 logPositive {
 \find(log(base,x))
-\add [imp(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(log(base,x),Z(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(log(base,x),Z(0(#))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12571,7 +12580,7 @@ Choices: true}
 == logPowIdentity (logPowIdentity) =========================================
 logPowIdentity {
 \find(log(base,x))
-\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), x (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), x (int term)))
 \add [imp(gt(base,Z(1(#))),all{i (variable)}(imp(geq(i,Z(0(#))),equals(log(base,pow(base,i)),i))))]==>[] 
 
 Choices: true}
@@ -12586,7 +12595,7 @@ Choices: true}
 == logProdIdentity (logProdIdentity) =========================================
 logProdIdentity {
 \find(log(base,bprod{i (variable)}(Z(0(#)),exp,base)))
-\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
+\sameUpdateLevel\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
 \add [imp(and(geq(exp,Z(0(#))),gt(base,Z(1(#)))),equals(log(base,bprod{i (variable)}(Z(0(#)),exp,base)),exp))]==>[] 
 
 Choices: true}
@@ -12602,7 +12611,7 @@ Choices: true}
 == logProduct (logProduct) =========================================
 logProduct {
 \find(log(base,mul(x,base)))
-\add [imp(and(geq(x,Z(1(#))),gt(base,Z(1(#)))),equals(log(base,mul(x,base)),add(log(base,x),Z(1(#)))))]==>[] 
+\sameUpdateLevel\add [imp(and(geq(x,Z(1(#))),gt(base,Z(1(#)))),equals(log(base,mul(x,base)),add(log(base,x),Z(1(#)))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12616,7 +12625,7 @@ Choices: true}
 == logSqueeze (logSqueeze) =========================================
 logSqueeze {
 \find(equals(log(base,x),exp))
-\add [imp(and(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(x,pow(base,exp))),lt(x,pow(base,add(exp,Z(1(#)))))),geq(exp,Z(0(#)))),equals(log(base,x),exp))]==>[] 
+\sameUpdateLevel\add [imp(and(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(x,pow(base,exp))),lt(x,pow(base,add(exp,Z(1(#)))))),geq(exp,Z(0(#)))),equals(log(base,x),exp))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12632,7 +12641,7 @@ loopScopeInvBox {
 \find(#box ((modal operator))|{{ ..
   while (#nse) #body
 ... }}| (post))
-\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #box ((modal operator))|{{
+\sameUpdateLevel\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #box ((modal operator))|{{
   while (#nse) #body
 }}| (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #box ((modal operator))|{{
   while (#nse) #body
@@ -12662,7 +12671,7 @@ loopScopeInvDia {
 \find(#dia ((modal operator))|{{ ..
   while (#nse) #body
 ... }}| (post))
-\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#variant (program Variable), KeYJavaType:null,any), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #dia ((modal operator))|{{
+\sameUpdateLevel\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#variant (program Variable), KeYJavaType:null,any), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #dia ((modal operator))|{{
   while (#nse) #body
 }}| (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #dia ((modal operator))|{{
   while (#nse) #body
@@ -12915,7 +12924,7 @@ Choices: true}
 == mapSizeNotNegativeForFiniteMaps (mapSizeNotNegativeForFiniteMaps) =========================================
 mapSizeNotNegativeForFiniteMaps {
 \find(mapSize(m))
-\add [imp(isFinite(m),geq(mapSize(m),Z(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(isFinite(m),geq(mapSize(m),Z(0(#))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
@@ -13226,7 +13235,7 @@ Choices: true}
 == mod_geZero (mod_geZero) =========================================
 mod_geZero {
 \find(mod(divNum,divDenom))
-\add [imp(not(equals(divDenom,Z(0(#)))),leq(Z(0(#)),mod(divNum,divDenom)))]==>[] 
+\sameUpdateLevel\add [imp(not(equals(divDenom,Z(0(#)))),leq(Z(0(#)),mod(divNum,divDenom)))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -13240,7 +13249,7 @@ Choices: true}
 == mod_lessDenom (mod_lessDenom) =========================================
 mod_lessDenom {
 \find(mod(divNum,divDenom))
-\add [imp(not(equals(divDenom,Z(0(#)))),lt(mod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),divDenom,neg(divDenom))))]==>[] 
+\sameUpdateLevel\add [imp(not(equals(divDenom,Z(0(#)))),lt(mod(divNum,divDenom),if-then-else(geq(divDenom,Z(0(#))),divDenom,neg(divDenom))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -13478,7 +13487,7 @@ multiply_2_inEq0 {
 \assumes ([leq(multFacLeft,multFacRight)]==>[]) 
 \find(leq(multLeft,multRight)==>)
 \add [geq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq1 (multiply_2_inEq1) =========================================
@@ -13486,7 +13495,7 @@ multiply_2_inEq1 {
 \assumes ([geq(multFacLeft,multFacRight)]==>[]) 
 \find(leq(multLeft,multRight)==>)
 \add [leq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq2 (multiply_2_inEq2) =========================================
@@ -13494,7 +13503,7 @@ multiply_2_inEq2 {
 \assumes ([leq(multFacLeft,multFacRight)]==>[]) 
 \find(geq(multLeft,multRight)==>)
 \add [leq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_2_inEq3 (multiply_2_inEq3) =========================================
@@ -13502,7 +13511,7 @@ multiply_2_inEq3 {
 \assumes ([geq(multFacLeft,multFacRight)]==>[]) 
 \find(geq(multLeft,multRight)==>)
 \add [geq(mul(multLeft,multFacLeft),add(add(mul(neg(multRight),multFacRight),mul(multRight,multFacLeft)),mul(multLeft,multFacRight)))]==>[] 
-\heuristics(inEqSimp_nonLin_multiply, inEqSimp_nonLin)
+\heuristics(inEqSimp_nonLin_multiply)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == multiply_distribute_1 (multiply_distribute) =========================================
@@ -13569,7 +13578,7 @@ Choices: programRules:Java}
 narrowSelectType {
 \assumes ([wellFormed(h)]==>[]) 
 \find(select<[beta]>(h,o,f))
-\varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
+\sameUpdateLevel\varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
 \replacewith(select<[alpha]>(h,o,f)) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -13944,7 +13953,7 @@ Choices: programRules:Java}
 == observerDependency (observerDependency) =========================================
 observerDependency {
 \find(termWithLargeHeap)
-\inSequentState\varcond(\sameObserver (termWithLargeHeap (any term), termWithSmallHeap (any term)))
+\sameUpdateLevel\inSequentState\varcond(\sameObserver (termWithLargeHeap (any term), termWithSmallHeap (any term)))
 \add []==>[#ObserverEquality(termWithLargeHeap,termWithSmallHeap)] ;
 \replacewith(termWithSmallHeap) 
 
@@ -13953,7 +13962,7 @@ Choices: programRules:Java}
 == observerDependencyEQ (observerDependencyEQ) =========================================
 observerDependencyEQ {
 \find(equals(t1,t2))
-\inSequentState\varcond(\sameObserver (t1 (any term), t2 (any term)))
+\sameUpdateLevel\inSequentState\varcond(\sameObserver (t1 (any term), t2 (any term)))
 \add []==>[#ObserverEquality(t1,t2)] ;
 \replacewith(true) 
 
@@ -13962,7 +13971,7 @@ Choices: programRules:Java}
 == observerDependencyEquiv (observerDependencyEQ) =========================================
 observerDependencyEquiv {
 \find(equiv(t1,t2))
-\inSequentState\varcond(\sameObserver (t1 (formula), t2 (formula)))
+\sameUpdateLevel\inSequentState\varcond(\sameObserver (t1 (formula), t2 (formula)))
 \add []==>[#ObserverEquality(t1,t2)] ;
 \replacewith(true) 
 
@@ -13971,7 +13980,7 @@ Choices: programRules:Java}
 == observerDependencyFormula (observerDependency) =========================================
 observerDependencyFormula {
 \find(termWithLargeHeap)
-\inSequentState\varcond(\sameObserver (termWithLargeHeap (formula), termWithSmallHeap (formula)))
+\sameUpdateLevel\inSequentState\varcond(\sameObserver (termWithLargeHeap (formula), termWithSmallHeap (formula)))
 \add []==>[#ObserverEquality(termWithLargeHeap,termWithSmallHeap)] ;
 \replacewith(termWithSmallHeap) 
 
@@ -14154,7 +14163,7 @@ Choices: true}
 == polyMod_ltdivDenom (polyMod_ltdivDenom) =========================================
 polyMod_ltdivDenom {
 \find(mod(divNum,divDenom))
-\add [and(imp(gt(divDenom,Z(0(#))),lt(mod(divNum,divDenom),divDenom)),imp(lt(divDenom,Z(0(#))),lt(mod(divNum,divDenom),neg(divDenom))))]==>[] 
+\sameUpdateLevel\add [and(imp(gt(divDenom,Z(0(#))),lt(mod(divNum,divDenom),divDenom)),imp(lt(divDenom,Z(0(#))),lt(mod(divNum,divDenom),neg(divDenom))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -14606,84 +14615,84 @@ Choices: true}
 == powIsInfinite1 (powIsInfinite1) =========================================
 powIsInfinite1 {
 \find(powDouble(arg1,arg2))
-\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
+\sameUpdateLevel\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsInfinite2 (powIsInfinite2) =========================================
 powIsInfinite2 {
 \find(powDouble(arg1,arg2))
-\add [imp(or(and(eqDouble(arg1,DFP(0(#))),ltDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),gtDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
+\sameUpdateLevel\add [imp(or(and(eqDouble(arg1,DFP(0(#))),ltDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),gtDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsNaN1 (powIsNaN1) =========================================
 powIsNaN1 {
 \find(powDouble(arg1,arg2))
-\add [imp(doubleIsNaN(arg2),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\sameUpdateLevel\add [imp(doubleIsNaN(arg2),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsNaN2 (powIsNaN2) =========================================
 powIsNaN2 {
 \find(powDouble(arg1,arg2))
-\add [imp(and(doubleIsNaN(arg1),not(equals(arg2,DFP(0(#))))),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\sameUpdateLevel\add [imp(and(doubleIsNaN(arg1),not(equals(arg2,DFP(0(#))))),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsNaN3 (powIsNaN3) =========================================
 powIsNaN3 {
 \find(powDouble(arg1,arg2))
-\add [imp(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\sameUpdateLevel\add [imp(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsNotNaN (powIsNotNaN) =========================================
 powIsNotNaN {
 \find(powDouble(arg1,arg2))
-\add [imp(and(not(doubleIsNaN(arg1)),equals(arg2,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),equals(powDouble(arg1,arg2),arg1))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg1)),equals(arg2,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),equals(powDouble(arg1,arg2),arg1))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsOne (powIsOne) =========================================
 powIsOne {
 \find(powDouble(arg1,arg2))
-\add [imp(equals(arg2,DFP(0(#))),equals(powDouble(arg1,arg2),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg2,DFP(0(#))),equals(powDouble(arg1,arg2),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsZero1 (powIsZero1) =========================================
 powIsZero1 {
 \find(powDouble(arg1,arg2))
-\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powIsZero2 (powIsZero2) =========================================
 powIsZero2 {
 \find(powDouble(arg1,arg2))
-\add [imp(or(and(eqDouble(arg1,DFP(0(#))),gtDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),ltDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(or(and(eqDouble(arg1,DFP(0(#))),gtDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),ltDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == powLogLess (powLogLess) =========================================
 powLogLess {
 \find(pow(base,log(base,exp)))
-\add [imp(and(geq(exp,Z(1(#))),gt(base,Z(1(#)))),leq(pow(base,log(base,exp)),exp))]==>[] 
+\sameUpdateLevel\add [imp(and(geq(exp,Z(1(#))),gt(base,Z(1(#)))),leq(pow(base,log(base,exp)),exp))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == powLogMore2 (powLogMore2) =========================================
 powLogMore2 {
 \find(pow(base,log(base,x)))
-\add [imp(and(equals(base,Z(2(#))),geq(x,Z(1(#)))),lt(sub(x,pow(base,log(base,x))),pow(base,log(base,x))))]==>[] 
+\sameUpdateLevel\add [imp(and(equals(base,Z(2(#))),geq(x,Z(1(#)))),lt(sub(x,pow(base,log(base,x))),pow(base,log(base,x))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
 == powMono (powMono) =========================================
 powMono {
 \find(leq(pow(base,exp),pow(base,exp_2)))
-\add [imp(and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#)))),leq(pow(base,exp),pow(base,exp_2)))]==>[] 
+\sameUpdateLevel\add [imp(and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#)))),leq(pow(base,exp),pow(base,exp_2)))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -14704,7 +14713,7 @@ Choices: true}
 == powPositive (powPositive) =========================================
 powPositive {
 \find(pow(base,exp))
-\add [imp(and(geq(exp,Z(0(#))),geq(base,Z(1(#)))),geq(pow(base,exp),Z(1(#))))]==>[] 
+\sameUpdateLevel\add [imp(and(geq(exp,Z(0(#))),geq(base,Z(1(#)))),geq(pow(base,exp),Z(1(#))))]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -15077,7 +15086,7 @@ Choices: reach:on}
 reachDependenciesStoreSimpleEQ {
 \assumes ([equals(store(h,o3,f2,x),h2)]==>[]) 
 \find(reach(h2,allObjects(f),o,o2,n))
-\varcond(\metaDisjoint f (Field term), f2 (Field term))
+\sameUpdateLevel\varcond(\metaDisjoint f (Field term), f2 (Field term))
 \replacewith(reach(h,allObjects(f),o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15148,7 +15157,7 @@ Choices: reach:on}
 reach_does_not_depend_on_fresh_locs {
 \assumes ([]==>[equals(o,null)]) 
 \find(reach(anon(h,empty,h2),s,o,o2,n))
-\add []==>[and(wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE))] ;
+\sameUpdateLevel\add []==>[and(wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15157,7 +15166,7 @@ Choices: reach:on}
 reach_does_not_depend_on_fresh_locs_EQ {
 \assumes ([equals(anon(h,empty,h2),EQ)]==>[equals(o,null)]) 
 \find(reach(EQ,s,o,o2,n))
-\add []==>[and(wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE))] ;
+\sameUpdateLevel\add []==>[and(wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15604,11 +15613,152 @@ rotate_params {
 
 Choices: true}
 -----------------------------------------------------
+== sCardNonNegative (sCardNonNegative) =========================================
+sCardNonNegative {
+\find(sCard<[T]>(s))
+\sameUpdateLevel\add [geq(sCard<[T]>(s),Z(0(#)))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: true}
+-----------------------------------------------------
+== sCardSEmpty (sCardSEmpty) =========================================
+sCardSEmpty {
+\find(sCard<[T]>(sEmpty<[T]>))
+\replacewith(Z(0(#))) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== sCardSSingleton (sCardSSingleton) =========================================
+sCardSSingleton {
+\find(sCard<[T]>(sSingleton<[T]>(b)))
+\replacewith(Z(1(#))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sDisjointToSElementOf (sDisjointToSElementOf) =========================================
+sDisjointToSElementOf {
+\find(sDisjoint<[T]>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<[T]> term)), \notFreeIn(av (variable), s (Set<[T]> term)))
+\replacewith(all{av (variable)}(or(not(sElementOf<[T]>(av,s)),not(sElementOf<[T]>(av,t))))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSEmpty (sElementOfSEmpty) =========================================
+sElementOfSEmpty {
+\find(sElementOf<[T]>(a,sEmpty<[T]>))
+\replacewith(false) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSInfiniteUnion (sElementOfSInfiniteUnion) =========================================
+sElementOfSInfiniteUnion {
+\find(sElementOf<[T]>(a,sInfiniteUnion<[T]>{av (variable)}(s)))
+\varcond(\notFreeIn(av (variable), a (T term)))
+\replacewith(exists{av (variable)}(sElementOf<[T]>(a,s))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSInfiniteUnionEQ (sElementOfSInfiniteUnionEQ) =========================================
+sElementOfSInfiniteUnionEQ {
+\assumes ([equals(sInfiniteUnion<[T]>{av (variable)}(s),EQ)]==>[]) 
+\find(sElementOf<[T]>(a,EQ))
+\sameUpdateLevel\varcond(\notFreeIn(av (variable), a (T term)))
+\replacewith(exists{av (variable)}(sElementOf<[T]>(a,s))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSIntersect (sElementOfSIntersect) =========================================
+sElementOfSIntersect {
+\find(sElementOf<[T]>(a,sIntersect<[T]>(s,t)))
+\replacewith(and(sElementOf<[T]>(a,s),sElementOf<[T]>(a,t))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSIntersectEQ (sElementOfSIntersectEQ) =========================================
+sElementOfSIntersectEQ {
+\assumes ([equals(sIntersect<[T]>(s,t),EQ)]==>[]) 
+\find(sElementOf<[T]>(a,EQ))
+\sameUpdateLevel\replacewith(and(sElementOf<[T]>(a,s),sElementOf<[T]>(a,t))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSSetMinus (sElementOfSSetMinus) =========================================
+sElementOfSSetMinus {
+\find(sElementOf<[T]>(a,sSetMinus<[T]>(s,t)))
+\replacewith(and(sElementOf<[T]>(a,s),not(sElementOf<[T]>(a,t)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSSingleton (sElementOfSSingleton) =========================================
+sElementOfSSingleton {
+\find(sElementOf<[T]>(a,sSingleton<[T]>(b)))
+\replacewith(equals(a,b)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSUnion (sElementOfSUnion) =========================================
+sElementOfSUnion {
+\find(sElementOf<[T]>(a,sUnion<[T]>(s,t)))
+\replacewith(or(sElementOf<[T]>(a,s),sElementOf<[T]>(a,t))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSUnionEQ (sElementOfSUnionEQ) =========================================
+sElementOfSUnionEQ {
+\assumes ([equals(sUnion<[T]>(s,t),EQ)]==>[]) 
+\find(sElementOf<[T]>(a,EQ))
+\sameUpdateLevel\replacewith(or(sElementOf<[T]>(a,s),sElementOf<[T]>(a,t))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sElementOfSetMinusEQ (sElementOfSetMinusEQ) =========================================
+sElementOfSetMinusEQ {
+\assumes ([equals(sSetMinus<[T]>(s,t),EQ)]==>[]) 
+\find(sElementOf<[T]>(a,EQ))
+\sameUpdateLevel\replacewith(and(sElementOf<[T]>(a,s),not(sElementOf<[T]>(a,t)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sEmptyEqualsSSingleton (sEmptyEqualsSSingleton) =========================================
+sEmptyEqualsSSingleton {
+\find(equals(sEmpty<[T]>,sSingleton<[T]>(a)))
+\replacewith(false) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== sSingletonEqualsSEmpty (sSingletonEqualsSEmpty) =========================================
+sSingletonEqualsSEmpty {
+\find(equals(sSingleton<[T]>(a),sEmpty<[T]>))
+\replacewith(false) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== sSubsetToSElementOf (sSubsetToSElementOf) =========================================
+sSubsetToSElementOf {
+\find(sSubset<[T]>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<[T]> term)), \notFreeIn(av (variable), s (Set<[T]> term)))
+\replacewith(all{av (variable)}(imp(sElementOf<[T]>(av,s),sElementOf<[T]>(av,t)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== sUnionWithSSingletonEqualsSUnionWithSSingleton (sUnionWithSSingletonEqualsSUnionWithSSingleton) =========================================
+sUnionWithSSingletonEqualsSUnionWithSSingleton {
+\find(equals(sUnion<[T]>(s,sSingleton<[T]>(a)),sUnion<[T]>(t,sSingleton<[T]>(a))))
+\replacewith(equals(sSetMinus<[T]>(s,sSingleton<[T]>(a)),sSetMinus<[T]>(t,sSingleton<[T]>(a)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sUnionWithSSingletonEqualsSUnionWithSSingleton_2 (sUnionWithSSingletonEqualsSUnionWithSSingleton_2) =========================================
+sUnionWithSSingletonEqualsSUnionWithSSingleton_2 {
+\find(equals(sUnion<[T]>(sSingleton<[T]>(a),s),sUnion<[T]>(sSingleton<[T]>(a),t)))
+\replacewith(equals(sSetMinus<[T]>(s,sSingleton<[T]>(a)),sSetMinus<[T]>(t,sSingleton<[T]>(a)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == sameTypeFalse (sameTypeFalse) =========================================
 sameTypeFalse {
 \assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[H]>(x2),TRUE)]==>[]) 
 \find(sameType(x1,x2))
-\varcond(\not\same(G, H))
+\sameUpdateLevel\varcond(\not\same(G, H))
 \replacewith(false) 
 \heuristics(concrete)
 Choices: true}
@@ -15617,7 +15767,7 @@ Choices: true}
 sameTypeTrue {
 \assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[G]>(x2),TRUE)]==>[]) 
 \find(sameType(x1,x2))
-\replacewith(true) 
+\sameUpdateLevel\replacewith(true) 
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
@@ -15882,7 +16032,7 @@ Choices: sequences:on}
 == seqDef_lower_equals_upper (seqDef_lower_equals_upper) =========================================
 seqDef_lower_equals_upper {
 \find(seqDef{uSub (variable)}(idx,idx,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), idx (int term)))
+\varcond(\notFreeIn(uSub (variable), idx (int term)))
 \replacewith(seqEmpty) 
 \heuristics(simplify)
 Choices: sequences:on}
@@ -15915,7 +16065,7 @@ Choices: sequences:on}
 == seqGetAlphaCast (seqGetAlphaCast) =========================================
 seqGetAlphaCast {
 \find(seqGet<[alpha]>(seq,at))
-\add [equals(cast<[alpha]>(seqGet<[any]>(seq,at)),seqGet<[alpha]>(seq,at))]==>[] 
+\sameUpdateLevel\add [equals(cast<[alpha]>(seqGet<[any]>(seq,at)),seqGet<[alpha]>(seq,at))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -15948,7 +16098,7 @@ Choices: programRules:Java}
 == seqIndexOf (seqIndexOf) =========================================
 seqIndexOf {
 \find(seqIndexOf(s,t))
-\varcond(\notFreeIn(m (variable), t (any term)), \notFreeIn(m (variable), s (Seq term)), \notFreeIn(n (variable), t (any term)), \notFreeIn(n (variable), s (Seq term)))
+\sameUpdateLevel\varcond(\notFreeIn(m (variable), t (any term)), \notFreeIn(m (variable), s (Seq term)), \notFreeIn(n (variable), t (any term)), \notFreeIn(n (variable), s (Seq term)))
 \add [imp(exists{n (variable)}(and(and(leq(Z(0(#)),n),lt(n,seqLen(s))),equals(seqGet<[any]>(s,n),t))),and(and(and(leq(Z(0(#)),seqIndexOf(s,t)),lt(seqIndexOf(s,t),seqLen(s))),equals(seqGet<[any]>(s,seqIndexOf(s,t)),t)),all{m (variable)}(imp(and(leq(Z(0(#)),m),lt(m,seqIndexOf(s,t))),not(equals(seqGet<[any]>(s,m),t))))))]==>[] 
 
 Choices: sequences:on}
@@ -15995,7 +16145,7 @@ Choices: programRules:Java}
 == seqOutsideValue (seqOutsideValue) =========================================
 seqOutsideValue {
 \find(seqGetOutside)
-\add [all{s (variable)}(all{iv (variable)}(imp(or(lt(iv,Z(0(#))),leq(seqLen(s),iv)),equals(seqGet<[any]>(s,iv),seqGetOutside))))]==>[] 
+\sameUpdateLevel\add [all{s (variable)}(all{iv (variable)}(imp(or(lt(iv,Z(0(#))),leq(seqLen(s),iv)),equals(seqGet<[any]>(s,iv),seqGetOutside))))]==>[] 
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16022,7 +16172,7 @@ Choices: programRules:Java}
 == seqSelfDefinition (seqSelfDefinition) =========================================
 seqSelfDefinition {
 \find(seq)
-\add [all{s (variable)}(equals(s,seqDef{u (variable)}(Z(0(#)),seqLen(s),seqGet<[any]>(s,u))))]==>[] 
+\sameUpdateLevel\add [all{s (variable)}(equals(s,seqDef{u (variable)}(Z(0(#)),seqLen(s),seqGet<[any]>(s,u))))]==>[] 
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16170,7 +16320,7 @@ Choices: programRules:Java}
 setMinusSingleton {
 \assumes ([]==>[elementOf(o,f,s)]) 
 \find(setMinus(s,singleton(o,f)))
-\replacewith(s) 
+\sameUpdateLevel\replacewith(s) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16348,7 +16498,7 @@ simplifySelectOfAnon {
 \find(equals(select<[beta]>(anon(h,s,h2),o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(anon(h,s,h2),o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16360,7 +16510,7 @@ simplifySelectOfAnonEQ {
 \find(equals(select<[beta]>(EQ,o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16371,7 +16521,7 @@ simplifySelectOfCreate {
 \find(equals(select<[beta]>(create(h,o),o2,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(create(h,o),o2,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16383,7 +16533,7 @@ simplifySelectOfCreateEQ {
 \find(equals(select<[beta]>(EQ,o2,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o2,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::#$created)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16394,7 +16544,7 @@ simplifySelectOfMemset {
 \find(equals(select<[beta]>(memset(h,s,x),o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(memset(h,s,x),o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16406,7 +16556,7 @@ simplifySelectOfMemsetEQ {
 \find(equals(select<[beta]>(EQ,o,f),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o,f))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16417,7 +16567,7 @@ simplifySelectOfStore {
 \find(equals(select<[beta]>(store(h,o,f,x),o2,f2),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(store(h,o,f,x),o2,f2))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16429,7 +16579,7 @@ simplifySelectOfStoreEQ {
 \find(equals(select<[beta]>(EQ,o2,f2),sk)==>)
 \addrules [replaceKnownSelect {
 \find(select<[beta]>(EQ,o2,f2))
-\inSequentState\replacewith(sk) 
+\sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
 \heuristics(simplify_select)
@@ -16462,28 +16612,28 @@ Choices: true}
 == sinIsNaN (sinIsNaN) =========================================
 sinIsNaN {
 \find(sinDouble(arg))
-\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(sinDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(sinDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sinIsNotNaN (sinIsNotNaN) =========================================
 sinIsNotNaN {
 \find(sinDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(sinDouble(arg))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(sinDouble(arg))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sinRange2 (sinRange2) =========================================
 sinRange2 {
 \find(sinDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sinRange3 (sinRange3) =========================================
 sinRange3 {
 \find(sinDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(0(#))),leqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(0(#))),leqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -16497,14 +16647,14 @@ Choices: true}
 == sineIsZero (sineIsZero) =========================================
 sineIsZero {
 \find(sinDouble(arg))
-\add [imp(equals(arg,DFP(0(#))),equals(sinDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg,DFP(0(#))),equals(sinDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sineRange (sineRange) =========================================
 sineRange {
 \find(sinDouble(arg))
-\add [or(and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(sinDouble(arg)))]==>[] 
+\sameUpdateLevel\add [or(and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(sinDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -16547,35 +16697,35 @@ Choices: programRules:Java}
 == sizeOfMapEmpty (sizeOfMapEmpty) =========================================
 sizeOfMapEmpty {
 \find(mapSize(mapEmpty))
-\sameUpdateLevel\replacewith(Z(0(#))) 
+\replacewith(Z(0(#))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapRemove (sizeOfMapRemove) =========================================
 sizeOfMapRemove {
 \find(mapSize(mapRemove(m,key)))
-\add [imp(isFinite(m),equals(mapSize(mapRemove(m,key)),if-then-else(inDomain(m,key),sub(mapSize(m),Z(1(#))),mapSize(m))))]==>[] 
+\sameUpdateLevel\add [imp(isFinite(m),equals(mapSize(mapRemove(m,key)),if-then-else(inDomain(m,key),sub(mapSize(m),Z(1(#))),mapSize(m))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapSingleton (sizeOfMapSingleton) =========================================
 sizeOfMapSingleton {
 \find(mapSize(mapSingleton(key,value)))
-\sameUpdateLevel\replacewith(Z(1(#))) 
+\replacewith(Z(1(#))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapUpdate (sizeOfMapUpdate) =========================================
 sizeOfMapUpdate {
 \find(mapSize(mapUpdate(m,key,value)))
-\add [imp(isFinite(m),equals(mapSize(mapUpdate(m,key,value)),if-then-else(inDomain(m,key),mapSize(m),add(mapSize(m),Z(1(#))))))]==>[] 
+\sameUpdateLevel\add [imp(isFinite(m),equals(mapSize(mapUpdate(m,key,value)),if-then-else(inDomain(m,key),mapSize(m),add(mapSize(m),Z(1(#))))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == sizeOfSeq2Map (sizeOfSeq2Map) =========================================
 sizeOfSeq2Map {
 \find(mapSize(seq2map(s)))
-\sameUpdateLevel\replacewith(seqLen(s)) 
+\replacewith(seqLen(s)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -16640,35 +16790,35 @@ Choices: true}
 == sqrtIsInfinite (sqrtIsInfinite) =========================================
 sqrtIsInfinite {
 \find(sqrtDouble(arg))
-\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(sqrtDouble(arg)),gtDouble(sqrtDouble(arg),DFP(0(#)))))]==>[] 
+\sameUpdateLevel\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(sqrtDouble(arg)),gtDouble(sqrtDouble(arg),DFP(0(#)))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sqrtIsNaN (sqrtIsNaN) =========================================
 sqrtIsNaN {
 \find(sqrtDouble(arg))
-\add [imp(or(doubleIsNaN(arg),ltDouble(arg,DFP(0(#)))),doubleIsNaN(sqrtDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(doubleIsNaN(arg),ltDouble(arg,DFP(0(#)))),doubleIsNaN(sqrtDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sqrtIsNotNaN (sqrtIsNotNaN) =========================================
 sqrtIsNotNaN {
 \find(sqrtDouble(arg))
-\add [imp(and(not(doubleIsNaN(arg)),geqDouble(arg,DFP(0(#)))),not(doubleIsNaN(sqrtDouble(arg))))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsNaN(arg)),geqDouble(arg,DFP(0(#)))),not(doubleIsNaN(sqrtDouble(arg))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sqrtIsSmaller (sqrtIsSmaller) =========================================
 sqrtIsSmaller {
 \find(sqrtDouble(arg))
-\add [imp(and(not(doubleIsInfinite(arg)),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),ltDouble(sqrtDouble(arg),arg))]==>[] 
+\sameUpdateLevel\add [imp(and(not(doubleIsInfinite(arg)),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),ltDouble(sqrtDouble(arg),arg))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == sqrtIsZero (sqrtIsZero) =========================================
 sqrtIsZero {
 \find(sqrtDouble(arg))
-\add [imp(equals(arg,DFP(0(#))),equals(sqrtDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg,DFP(0(#))),equals(sqrtDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -16880,7 +17030,7 @@ Choices: sequences:on}
 subSeqCompleteSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),u))
-\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
+\sameUpdateLevel\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
 \heuristics(concrete, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -17325,14 +17475,14 @@ Choices: programRules:Java}
 == tanIsNaN (tanIsNaN) =========================================
 tanIsNaN {
 \find(tanDouble(arg))
-\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(tanDouble(arg)))]==>[] 
+\sameUpdateLevel\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(tanDouble(arg)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
 == tanIsZero (tanIsZero) =========================================
 tanIsZero {
 \find(tanDouble(arg))
-\add [imp(equals(arg,DFP(0(#))),equals(tanDouble(arg),DFP(0(#))))]==>[] 
+\sameUpdateLevel\add [imp(equals(arg,DFP(0(#))),equals(tanDouble(arg),DFP(0(#))))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------

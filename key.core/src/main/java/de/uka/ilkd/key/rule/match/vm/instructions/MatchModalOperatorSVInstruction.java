@@ -14,6 +14,11 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+/**
+ * Matches a modal-operator schema variable against a concrete Java modality kind: the source kind
+ * must be one of the kinds the schema variable ranges over, and the schema variable is
+ * instantiated with it.
+ */
 public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
     private final Set<JModality.JavaModalityKind> modalityKinds;
@@ -30,7 +35,13 @@ public final class MatchModalOperatorSVInstruction implements MatchInstruction {
         if (actualElement instanceof JModality.JavaModalityKind kind
                 && modalityKinds.contains(kind)) {
             final SVInstantiations instantiations = (SVInstantiations) mc.getInstantiations();
-            return mc.setInstantiations(instantiations.add(modalitySV, kind, services));
+            // instantiate or agree: a schema variable that is already instantiated matches only
+            // the same modality kind again (SVInstantiations.add would silently overwrite)
+            final Object inst = instantiations.getInstantiation(modalitySV);
+            if (inst == null) {
+                return mc.setInstantiations(instantiations.add(modalitySV, kind, services));
+            }
+            return inst.equals(kind) ? mc : null;
         } else {
             return null;
         }

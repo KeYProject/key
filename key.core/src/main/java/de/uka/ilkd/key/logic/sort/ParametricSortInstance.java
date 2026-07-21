@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -17,13 +16,21 @@ import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NonNull;
 
 /// Concrete sort of a parametric sort.
 public final class ParametricSortInstance extends AbstractSort {
-    private static final Map<ParametricSortInstance, ParametricSortInstance> CACHE =
-        new WeakHashMap<>();
+    /**
+     * Thread-safe Interning of parametric sort instances so that equal instances are the same
+     * object.
+     * The miss action, registering a genuinely new sort in the namespace, runs inside
+     * {@link WeakValueInterner#intern}, so it happens exactly once per new sort and is
+     * serialized with the interning.
+     */
+    private static final WeakValueInterner<ParametricSortInstance, ParametricSortInstance> CACHE =
+        new WeakValueInterner<>();
 
     private final ImmutableList<GenericArgument> args;
     private final ParametricSortDecl base;
@@ -34,17 +41,13 @@ public final class ParametricSortInstance extends AbstractSort {
     public static ParametricSortInstance get(ParametricSortDecl base,
             ImmutableList<GenericArgument> args, Services services) {
         assert args.size() == base.getParameters().size();
-        ParametricSortInstance sort =
-            new ParametricSortInstance(base, args);
-        ParametricSortInstance cached = CACHE.get(sort);
-        if (cached != null) {
-            return cached;
-        } else {
-            CACHE.put(sort, sort);
-            if (!sort.containsGenericSort())
-                services.getNamespaces().sorts().addSafely(sort);
-            return sort;
-        }
+        ParametricSortInstance sort = new ParametricSortInstance(base, args);
+        return CACHE.intern(sort, candidate -> {
+            if (!candidate.containsGenericSort()) {
+                services.getNamespaces().sorts().addSafely(candidate);
+            }
+            return candidate;
+        });
     }
 
     /// This must only be called in [ParametricSortInstance#get], which ensures that the cache is

@@ -331,6 +331,8 @@ public final class MainWindow extends JFrame {
 
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
+        // Postpone load for faster UI creation.
+        SwingUtilities.invokeLater(recentFileMenu::loadEntries);
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
@@ -857,9 +859,7 @@ public final class MainWindow extends JFrame {
         return automationComponent;
     }
 
-    private JComponent createWiderAutoModeButton() {
-        JButton b = new JButton(autoModeAction);
-        b.putClientProperty("hideActionText", Boolean.TRUE);
+    private JComponent createWiderAutoModeButton(JComponent b) {
         // the following rigmarole is to make the button slightly wider
         JPanel p = new JPanel();
         p.setLayout(new GridBagLayout());
@@ -898,14 +898,15 @@ public final class MainWindow extends JFrame {
     }
 
     private void setStatusLineImmediately(String str, int max) {
-        // statusLine.reset();
         statusLine.setStatusText(str);
-        if (max > 0) {
-            getStatusLine().setProgressBarMaximum(max);
-            statusLine.setProgressPanelVisible(true);
-        } else {
-            statusLine.setProgressPanelVisible(false);
-        }
+        // A non-positive maximum means "unknown workload" -- the parallel prover (whose workers
+        // commit concurrently) and symbolic-execution stop conditions report no per-step progress.
+        // Show the progress panel and let setProgressBarMaximum switch the bar to indeterminate
+        // ("busy") mode so it animates, instead of hiding it and sitting frozen. A positive maximum
+        // drives the normal determinate bar. (The panel is hidden again at task end via reset() /
+        // hideStatusProgress().)
+        getStatusLine().setProgressBarMaximum(max);
+        statusLine.setProgressPanelVisible(true);
         statusLine.validate();
         statusLine.paintImmediately(0, 0, statusLine.getWidth(), statusLine.getHeight());
     }
@@ -1909,6 +1910,11 @@ public final class MainWindow extends JFrame {
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             getMediator().addKeYSelectionListenerChecked(proofListener);
+            // Refresh the sequent view from the final state explicitly. The selection listener was
+            // detached for the duration of the run, so the view would otherwise only update if a
+            // selectedNodeChanged event happens to fire afterwards -- which is not guaranteed (the
+            // run may end with the selection unchanged), leaving the displayed sequent stale.
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         @Override

@@ -13,19 +13,15 @@ dependencyResolutionManagement {
 include "key.util"
 include "key.ncore"
 include 'key.ncore.calculus'
-include 'key.ncore.compiler'
+include 'key.ncore.matcher'
 
 include "key.core"
 //include "key.core.rifl"
 include "key.core.infflow"
 include "key.core.wd"
-include "key.core.symbolic_execution"
 include "key.core.testgen"
-include "key.core.proof_references"
-//include "key.removegenerics"
 
 include "key.core.example"
-include "key.core.symbolic_execution.example"
 
 include "key.ui"
 

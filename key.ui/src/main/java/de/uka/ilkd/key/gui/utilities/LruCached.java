@@ -5,7 +5,7 @@ package de.uka.ilkd.key.gui.utilities;
 
 import java.util.function.Function;
 
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 
 /**
  * Caches a computation using a lru cache
@@ -14,7 +14,7 @@ import org.key_project.util.LRUCache;
  * @param <T> return type
  */
 public class LruCached<A, T> {
-    private final LRUCache<A, T> lru = new LRUCache<>(32);
+    private final ConcurrentLruCache<A, T> lru = new ConcurrentLruCache<>(32);
     private final Function<A, T> update;
 
     /**
