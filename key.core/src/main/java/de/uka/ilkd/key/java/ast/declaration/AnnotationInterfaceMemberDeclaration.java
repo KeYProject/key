@@ -10,7 +10,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration {
+public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration
+        implements MemberDeclaration {
     private final TypeReference typeRef;
 
     private final ProgramElementName name;
@@ -72,4 +73,14 @@ public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration {
     public ProgramElementName getProgramElementName() {
         return name;
     }
+
+    public boolean isPrivate() { return false; }
+
+    public boolean isProtected() { return false; }
+
+    public boolean isPublic() { return true; }
+
+    public boolean isStatic() { return false; }
+
+    public boolean isStrictFp() { return false; }
 }
