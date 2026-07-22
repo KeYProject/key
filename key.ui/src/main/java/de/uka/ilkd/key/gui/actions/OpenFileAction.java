@@ -30,6 +30,8 @@ public class OpenFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser fc = new KeYFileChooser(lastSelectedPath);
         fc.setDialogTitle("Select file to load proof or problem");
+        fc.setSelectedFile(KeYFileChooser.getFileChooser("Select file to load proof or problem")
+                .getSelectedFile());
         KeYFileChooserLoadingOptions options = fc.addLoadingOptions();
         fc.addBookmarkPanel();
         fc.prepare();
@@ -40,7 +42,8 @@ public class OpenFileAction extends MainWindowAction {
         if (result == JFileChooser.APPROVE_OPTION) {
             Path file = fc.getSelectedFile().toPath();
             lastSelectedPath = fc.getSelectedFile();
-
+            KeYFileChooser.getFileChooser("Select file to load proof or problem")
+                    .setSelectedFile(lastSelectedPath);
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
