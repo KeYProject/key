@@ -23,7 +23,7 @@ stringtemplate = "4.3.4"
 
 # Java parsing and analysis
 javapoet = "1.13.0"
-javaparser = "3.28.0-K13.5"
+javaparser = "3.28.0-K13.6"
 truth = "1.4.5"
 
 # UI and CLI
