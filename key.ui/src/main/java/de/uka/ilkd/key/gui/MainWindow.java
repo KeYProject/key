@@ -899,14 +899,14 @@ public final class MainWindow extends JFrame {
 
     private void setStatusLineImmediately(String str, int max) {
         statusLine.setStatusText(str);
-        // A non-positive maximum means "unknown workload" -- the parallel prover (whose workers
-        // commit concurrently) and symbolic-execution stop conditions report no per-step progress.
+        // A negative maximum means "unknown workload", e.g. the parallel prover (whose workers
+        // commit concurrently).
         // Show the progress panel and let setProgressBarMaximum switch the bar to indeterminate
         // ("busy") mode so it animates, instead of hiding it and sitting frozen. A positive maximum
         // drives the normal determinate bar. (The panel is hidden again at task end via reset() /
-        // hideStatusProgress().)
+        // hideStatusProgress().) A maximum of 0 hides the bar
         getStatusLine().setProgressBarMaximum(max);
-        statusLine.setProgressPanelVisible(true);
+        statusLine.setProgressPanelVisible(max != 0);
         statusLine.validate();
         statusLine.paintImmediately(0, 0, statusLine.getWidth(), statusLine.getHeight());
     }
