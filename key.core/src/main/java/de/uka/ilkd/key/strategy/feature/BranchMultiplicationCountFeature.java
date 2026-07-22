@@ -17,14 +17,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * further application only while that count stays within a limit.
  *
  * <p>
- * A single application says nothing about whether a proof is saturating: the first one on a branch
- * and the twentieth look alike, so a criterion that describes only the application cannot tell them
- * apart. The branch it sits on does. On the Stipula bike obligation, which needs
- * cross-multiplication to close, no branch reaches six applications; on the deposit obligation,
- * where the rule saturates, the median application is the nineteenth on its branch.
- * </p>
- *
- * <p>
  * The count is carried in the goal's strategy information rather than recomputed or held in a map.
  * A goal inherits the count of the node it grew from, so advancing costs one comparison, and
  * pruning restores the previous value through the undo method. A map keyed by node would instead

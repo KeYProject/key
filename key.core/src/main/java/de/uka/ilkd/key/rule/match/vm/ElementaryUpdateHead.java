@@ -79,10 +79,9 @@ public final class ElementaryUpdateHead implements MatchHead {
     }
 
     @Override
-    public @Nullable Object topOperatorDescriptor() {
-        // with a concrete left-hand side exactly one update operator is accepted (elementary
-        // updates are interned per left-hand side); with a schema-variable left-hand side many
-        // are, and no single family describes them
+    public @Nullable ElementaryUpdate topOperatorDescriptor() {
+        // interned per left-hand side: a concrete lhs fixes one operator, a schema-variable
+        // lhs accepts many, which no single family describes
         return lhsIsSchemaVariable ? null : op;
     }
 

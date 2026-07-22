@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Jul 21 09:39:34 CEST 2026
+# Date: Wed Jul 22 17:10:12 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -15916,6 +15916,14 @@ selectOfCreateReduce {
 \find(select<[beta]>(create(h,o),o,f))
 \sameUpdateLevel\replacewith(if-then-else(equals(f,java.lang.Object::#$created),cast<[beta]>(TRUE),select<[beta]>(h,o,f))) 
 \heuristics(simplify_select_concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== selectOfCreateReduceConcrete (selectOfCreateReduceConcrete) =========================================
+selectOfCreateReduceConcrete {
+\assumes ([]==>[equals(o,null)]) 
+\find(select<[beta]>(create(h,o),o,java.lang.Object::#$created))
+\sameUpdateLevel\replacewith(cast<[beta]>(TRUE)) 
+\heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfMemset (selectOfMemset) =========================================
