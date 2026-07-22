@@ -3,7 +3,7 @@ example.path = Getting Started
 example.additionalFile.1 = RemoveDup.unspecified
 example.additionalFile.2 = RemoveDup.java
 
-This is a simple excercise for JML and KeY.
+This is a simple exercise for JML and KeY.
 
 @author Mattias Ulbrich
 
