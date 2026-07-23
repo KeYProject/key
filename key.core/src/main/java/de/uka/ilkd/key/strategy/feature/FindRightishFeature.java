@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -29,11 +29,11 @@ public class FindRightishFeature implements Feature {
     private final Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
 
-    public static Feature create(IntegerLDT numbers) {
+    public static Feature create(IIntLdt numbers) {
         return new FindRightishFeature(numbers);
     }
 
-    private FindRightishFeature(IntegerLDT numbers) {
+    private FindRightishFeature(IIntLdt numbers) {
         add = numbers.getAdd();
     }
 

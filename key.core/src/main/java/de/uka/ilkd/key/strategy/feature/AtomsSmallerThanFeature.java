@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -37,7 +37,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     private final Function Z;
 
     private AtomsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+            IIntLdt numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -46,7 +46,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
 
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+            IIntLdt numbers) {
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 

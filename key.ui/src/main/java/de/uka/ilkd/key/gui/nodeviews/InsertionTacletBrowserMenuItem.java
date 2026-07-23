@@ -83,7 +83,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      * Adds a new taclet to be displayed by this component it is assumed that the app has been
      * tested before by {@link #isResponsible}.
      *
-     * @param app the TacletApp to be added
+     * @param app the ITacletApp to be added
      */
     public void add(TacletApp app) {
         insertionTaclets.add(createListItem(app));

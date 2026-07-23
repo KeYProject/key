@@ -49,7 +49,8 @@ public class JFOLStrategyFactory implements StrategyFactory {
             + "The previous behaviour; use only if a proof was tuned to it.</html>";
 
     @Override
-    public Strategy<Goal> create(Proof proof, StrategyProperties strategyProperties) {
+    public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
+            StrategyProperties strategyProperties) {
         return new JFOLStrategy(proof, strategyProperties);
     }
 

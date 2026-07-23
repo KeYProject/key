@@ -62,7 +62,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+    protected org.key_project.prover.strategy.Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
@@ -110,7 +110,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      * This strategy accepts all rule apps for which the rule name is in the admitted set or has
      * INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.
      */
-    private class SelfCompExpansionStrategy implements Strategy<Goal> {
+    private class SelfCompExpansionStrategy implements JavaStrategy {
 
         private final Name NAME = new Name(
             SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy.class.getSimpleName());
@@ -134,7 +134,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 ModularJavaDLStrategyFactory strategyFactory = new ModularJavaDLStrategyFactory();
-                Strategy<@NonNull Goal> dlStrategy =
+                org.key_project.prover.strategy.Strategy<@NonNull Goal> dlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
                 RuleAppCost costs = dlStrategy.computeCost(ruleApp, pio, goal, mState);
                 if ("orLeft".equals(name)) {
@@ -154,7 +154,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
+                org.key_project.prover.strategy.RuleAppCostCollector collector) {
         }
 
         @Override

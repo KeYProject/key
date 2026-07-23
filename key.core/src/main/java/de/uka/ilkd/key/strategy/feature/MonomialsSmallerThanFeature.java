@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -47,7 +47,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
 
     private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+            IIntLdt numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -58,7 +58,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         hasCoeff = createHasCoeffTermFeature(numbers);
     }
 
-    static TermFeature createHasCoeffTermFeature(final IntegerLDT numbers) {
+    static TermFeature createHasCoeffTermFeature(final IIntLdt numbers) {
         return BinarySumTermFeature.createSum(OperatorTF.create(numbers.getMul()),
             SubTermFeature.create(
                 new TermFeature[] { ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()),
@@ -66,7 +66,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+            IIntLdt numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 

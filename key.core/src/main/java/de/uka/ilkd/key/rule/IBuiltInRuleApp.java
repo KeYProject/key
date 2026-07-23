@@ -8,19 +8,13 @@ import java.util.List;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public interface IBuiltInRuleApp extends RuleApp {
-
-    /**
-     * returns the built-in rule of this rule application
-     */
-    BuiltInRule rule();
+public interface IBuiltInRuleApp extends org.key_project.prover.rules.IBuiltInRuleApp<Goal> {
 
     /**
      * Tries to complete the rule application from the available information. Attention: Do neither
@@ -34,18 +28,14 @@ public interface IBuiltInRuleApp extends RuleApp {
 
     IBuiltInRuleApp forceInstantiate(Goal goal);
 
-    List<LocationVariable> getHeapContext();
-
-    /**
-     * returns true if tryToInstantiate is able to complete the app
-     *
-     * @return true if tryToInstantiate is able to complete the app
-     */
-    boolean isSufficientlyComplete();
-
-    ImmutableList<PosInOccurrence> assumesInsts();
-
     IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
+
+    /**
+     * returns the built-in rule of this rule application
+     */
+    BuiltInRule rule();
+
+    List<LocationVariable> getHeapContext();
 }

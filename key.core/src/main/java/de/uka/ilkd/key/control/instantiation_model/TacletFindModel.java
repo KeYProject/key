@@ -70,7 +70,7 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * Create new data model for tree.
      *
-     * @param app the TacletApp where to get the necessary entries
+     * @param app the ITacletApp where to get the necessary entries
      * @param services services.
      * @param nss universal namespace of variables, minimum for input in a row.
      * @param scm the abbreviation map.

@@ -25,8 +25,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -40,6 +39,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.RuleAppCostCollector;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -203,7 +204,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
     }
 
-    private class SemanticsBlastingStrategy implements Strategy<Goal> {
+    private class SemanticsBlastingStrategy implements JavaStrategy {
 
         @Override
         public @NonNull Name name() {

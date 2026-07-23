@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
@@ -349,7 +350,8 @@ public abstract class StaticFeatureCollection {
         return add(op(op), sub(sub0, sub1));
     }
 
-    protected static TermFeature eq(TermBuffer t) {
+    protected static TermFeature eq(
+            org.key_project.prover.strategy.costbased.termProjection.TermBuffer<Goal> t) {
         return EqTermFeature.create(t);
     }
 

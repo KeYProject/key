@@ -6,14 +6,17 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.anonHeapTermFeature;
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.literalsSmallerThan;
 
 /// This strategy extends the classical [FOLStrategy] with heuristics
 /// for quantifier instantiation based on E-matching, which involves

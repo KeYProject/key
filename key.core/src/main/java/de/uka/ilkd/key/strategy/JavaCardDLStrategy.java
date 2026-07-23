@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -22,9 +21,11 @@ import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -33,12 +34,15 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoin
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+
 /// This strategy is the catch-all for Java related features that are either
 /// cross-cutting or one of the features that do not fit well into any other
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
+        implements ComponentStrategy<Goal> {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -56,7 +60,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     private final HeapLDT heapLDT;
 
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
 
@@ -64,9 +68,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
 
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        this.strategyProperties = strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();
@@ -85,9 +89,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     @Override
     public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        set.addAll(getDispatcher(aspect).ruleSets());
-        return set;
+        return new HashSet<>(getDispatcher(aspect).ruleSets());
     }
 
     @Override
@@ -263,7 +265,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(d, "induction_var", ifZero(
-                applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+                applyTF(StaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
+                longConst(0), inftyConst()));
         }
 
         return d;
@@ -438,7 +441,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                  * the outer 'not' then ensures that the costs are infinite in the first and 0 in
                  * the latter case
                  */
-                not(sum(tb, HeapGenerator.INSTANCE, not(eq(instOf("sv_heap"), tb)))));
+                not(sum(tb, HeapGenerator.INSTANCE, not(
+                    StaticFeatureCollection.eq(StaticFeatureCollection.instOf("sv_heap"), tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(d, "classAxiom", add(sequentContainsNoPrograms(),
@@ -573,7 +577,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }

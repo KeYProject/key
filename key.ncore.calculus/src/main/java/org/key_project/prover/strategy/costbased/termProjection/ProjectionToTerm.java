@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 
 /// Interface for mappings from rule applications to terms. This is used, for instance, for
 /// determining the instantiation of a schema variable. We also allow projections to be partial,
-/// which is signalled by <code>toTerm</code> returning <code>null</code>
+/// which is signaled by `toTerm` returning `null`
 public interface ProjectionToTerm<Goal extends ProofGoal<Goal>> extends CostClassifiable {
     @Nullable
     Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
