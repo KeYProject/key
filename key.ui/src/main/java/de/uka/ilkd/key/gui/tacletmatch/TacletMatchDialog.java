@@ -162,7 +162,7 @@ public class TacletMatchDialog extends ApplyTacletDialog {
 
         alternatives = new JTabbedPane();
         for (int i = 0; i < model.length; i++) {
-            alternatives.addTab("Match " + (i + 1) + " of " + model.length, buildAlternative(i));
+            alternatives.addTab("Match " + (i + 1), buildAlternative(i));
         }
         alternatives.addChangeListener(e -> refreshStatus(current()));
         return alternatives;
