@@ -51,10 +51,7 @@ import org.key_project.logic.op.Modality;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.NonNull;
@@ -1359,7 +1356,7 @@ public final class AuxiliaryContractBuilders {
             JavaBlock newJavaBlock = getJavaBlock(exceptionParameter);
             JTerm newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
-                newPost, ImmutableSLList.<LocationVariable>nil()
+                newPost, ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
                 terms.exception);
             if (goal != null) {
@@ -1681,7 +1678,7 @@ public final class AuxiliaryContractBuilders {
                 final TermBuilder tb) {
             JTerm post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
-                ImmutableSLList.<LocationVariable>nil()
+                ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
                 terms.exception);
             post = TermLabelManager.refactorTerm(termLabelState, services, null, post, rule, goal,
@@ -1689,7 +1686,7 @@ public final class AuxiliaryContractBuilders {
 
             JTerm postNext = tb.and(postconditionsNext);
             postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
-                postNext, ImmutableSLList.<LocationVariable>nil()
+                postNext, ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
                 terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,

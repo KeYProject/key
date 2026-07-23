@@ -43,7 +43,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -146,7 +145,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @SuppressWarnings("unchecked")
     private <T> ImmutableList<T> listOf(List<? extends ParserRuleContext> contexts) {
-        ImmutableList<T> seq = ImmutableSLList.nil();
+        ImmutableList<T> seq = ImmutableList.nil();
         for (ParserRuleContext context : contexts) {
             seq = seq.append((T) accept(context));
         }
@@ -327,7 +326,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<JTerm> visitStoreRefList(JmlParser.StoreRefListContext ctx) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JmlParser.StorerefContext context : ctx.storeref()) {
             result = result.append((JTerm) accept(context));
         }
@@ -361,7 +360,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitCreateLocset(JmlParser.CreateLocsetContext ctx) {
         JmlParser.ExprListContext exprList = ctx.exprList();
         if (exprList == null) {
-            return termFactory.createLocSet(ImmutableSLList.nil());
+            return termFactory.createLocSet(ImmutableList.nil());
         } else {
             return termFactory.createLocSet(requireNonNull(accept(exprList)));
         }
@@ -370,7 +369,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<SLExpression> visitExprList(JmlParser.ExprListContext ctx) {
-        ImmutableList<SLExpression> result = ImmutableSLList.nil();
+        ImmutableList<SLExpression> result = ImmutableList.nil();
         for (JmlParser.ExpressionContext context : ctx.expression()) {
             result = result.append((SLExpression) accept(context));
         }
@@ -899,7 +898,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         if (expr == null) {
             raiseError(
-                format("The fully qualified name '%s' could not be resolved.", fullyQualifiedName),
+                format("Cannot resolve '%s'. No variable, field, model field, or type with this "
+                    + "name is in scope here (check for typos).", fullyQualifiedName),
                 ctx);
         }
         fullyQualifiedName = oldFqName;
@@ -1121,7 +1121,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
         ImmutableList<SLExpression> params =
             ctx.param_decl().stream().map(it -> lookupIdentifier(it.p.getText(), null, null, it))
-                    .collect(ImmutableSLList.toImmutableList());
+                    .collect(ImmutableList.collector());
         return getSlParametersWithHeap(params);
     }
 
@@ -1131,7 +1131,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
-        ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
+        ImmutableList<SLExpression> preHeapParams = ImmutableList.nil();
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             JTerm p;
             if (atPres == null || atPres.get(heap) == null) {
@@ -1539,7 +1539,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
         if (ctx.storeRefUnion() == null) {
-            return new SLExpression(termFactory.createLocSet(ImmutableSLList.nil()));
+            return new SLExpression(termFactory.createLocSet(ImmutableList.nil()));
         }
         JTerm t = accept(ctx.storeRefUnion());
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
@@ -1864,7 +1864,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Pair<KeYJavaType, ImmutableList<LogicVariable>> visitQuantifiedvardecls(
             JmlParser.QuantifiedvardeclsContext ctx) {
-        ImmutableList<LogicVariable> vars = ImmutableSLList.nil();
+        ImmutableList<LogicVariable> vars = ImmutableList.nil();
         KeYJavaType t = accept(ctx.typespec());
         for (JmlParser.QuantifiedvariabledeclaratorContext context : ctx
                 .quantifiedvariabledeclarator()) {
@@ -2025,7 +2025,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
-        ImmutableList<KeYJavaType> typeList = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> typeList = ImmutableList.nil();
         for (JmlParser.ReferencetypeContext context : ctx.referencetype()) {
             typeList = typeList.append((KeYJavaType) accept(context));
         }
@@ -2068,7 +2068,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<String> visitModifiers(JmlParser.ModifiersContext ctx) {
-        mods = ImmutableSLList.nil();
+        mods = ImmutableList.nil();
         return mods;
     }
 
@@ -2256,9 +2256,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public InfFlowSpec visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
-        ImmutableList<JTerm> decl = ImmutableSLList.nil();
-        ImmutableList<JTerm> erases = ImmutableSLList.nil();
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
+        ImmutableList<JTerm> decl = ImmutableList.nil();
+        ImmutableList<JTerm> erases = ImmutableList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
 
         ImmutableList<JTerm> sep = accept(ctx.sep);
 
@@ -2274,17 +2274,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
         ImmutableList<JTerm> sep = accept(ctx.sep);
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
         newObs = append(newObs, ctx.newobj);
         return new InfFlowSpec(sep, sep, newObs);
     }
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        ImmutableList<JTerm> decl = ImmutableSLList.nil();
-        ImmutableList<JTerm> erases = ImmutableSLList.nil();
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
-        ImmutableList<JTerm> by = ImmutableSLList.nil();
+        ImmutableList<JTerm> decl = ImmutableList.nil();
+        ImmutableList<JTerm> erases = ImmutableList.nil();
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
+        ImmutableList<JTerm> by = ImmutableList.nil();
 
         ImmutableList<JTerm> determined = accept(ctx.determined);
 
@@ -2310,8 +2310,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
-        ImmutableList<JTerm> newObs = ImmutableSLList.nil();
-        ImmutableList<JTerm> det = append(ImmutableSLList.nil(), ctx.det);
+        ImmutableList<JTerm> newObs = ImmutableList.nil();
+        ImmutableList<JTerm> det = append(ImmutableList.nil(), ctx.det);
         newObs = append(newObs, ctx.newObs);
         return new InfFlowSpec(det, det, newObs);
     }
@@ -2319,7 +2319,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public ImmutableList<JTerm> visitInfflowspeclist(JmlParser.InfflowspeclistContext ctx) {
         if (ctx.NOTHING() != null) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         ImmutableList<SLExpression> seq = accept(ctx.expressionlist());
         assert seq != null;

@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -42,6 +39,8 @@ public class SettingsManager {
     public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
     public static final FeatureSettingsPanel FEATURE_SETTINGS_PANEL = new FeatureSettingsPanel();
+    public static final ParallelProverSettingsProvider PARALLEL_PROVER_SETTINGS =
+        new ParallelProverSettingsProvider();
 
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -63,6 +62,7 @@ public class SettingsManager {
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             // INSTANCE.add(COLOR_SETTINGS);
             INSTANCE.add(FEATURE_SETTINGS_PANEL);
+            INSTANCE.add(PARALLEL_PROVER_SETTINGS);
         }
         return INSTANCE;
     }
@@ -92,12 +92,20 @@ public class SettingsManager {
     }
 
     public static ChoiceSettings getChoiceSettings(MainWindow window) {
-        return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        /*
-         * if (null != window.getMediator().getSelectedProof()) { return
-         * window.getMediator().getSelectedProof().getSettings().getChoiceSettings(); } else {
-         * return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings(); }
-         */
+        var selectedProof = window.getMediator().getSelectedProof();
+        if (null != selectedProof) {
+            ChoiceSettings settings = new ChoiceSettings();
+            settings.setDefaultChoices(
+                selectedProof.getSettings().getChoiceSettings().getDefaultChoices());
+            var cat = selectedProof.getSettings().getChoiceSettings().getCategory2Choices();
+            if (cat.isEmpty()) {
+                cat = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getCategory2Choices();
+            }
+            settings.setChoiceCategories(new TreeMap<>(cat));
+            return settings;
+        } else {
+            return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+        }
     }
 
     public static Properties loadProperties(File settingsFile) {

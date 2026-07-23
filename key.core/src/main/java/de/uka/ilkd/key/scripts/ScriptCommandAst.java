@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ANTLRUtil;
+
+import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
@@ -73,12 +75,11 @@ public record ScriptCommandAst(
         if (value instanceof ScriptBlock b) {
             return b.asCommandLine();
         }
-
-        if (value instanceof KeYParser.ProofScriptCodeBlockContext ctx) {
+        if (value instanceof JavaKeYParser.ProofScriptCodeBlockContext ctx) {
             asReadableString(KeyAst.ProofScript.asAst(null, ctx));
         }
         if (value instanceof ParserRuleContext ctx) {
-            return ctx.getText();
+            return ANTLRUtil.reconstructOriginal(ctx);
         }
         return Objects.toString(value);
     }

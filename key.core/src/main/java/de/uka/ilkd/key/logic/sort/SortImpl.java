@@ -11,50 +11,27 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Abstract base class for implementations of the Sort interface.
  */
 public class SortImpl extends AbstractSort {
-    /**
-     * Documentation for this sort given by the associated documentation comment.
-     *
-     * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
-     */
-    private final String documentation;
-
-    /** Information of the origin of this sort */
-    private final String origin;
     private ImmutableSet<Sort> ext;
 
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
-            String origin) {
+    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, isAbstract);
         this.ext = ext;
-        this.documentation = documentation;
-        this.origin = origin;
-    }
-
-    public SortImpl(Name name, ImmutableSet<Sort> ext, String documentation, String origin) {
-        this(name, ext, false, documentation, origin);
-    }
-
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
-        this(name, ext, isAbstract, "", "");
     }
 
     public SortImpl(Name name, ImmutableSet<Sort> ext) {
-        this(name, ext, false, "", "");
+        this(name, ext, false);
     }
 
     public SortImpl(Name name, Sort ext) {
-        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false, "", "");
+        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false);
     }
 
-
     public SortImpl(Name name) {
-        this(name, DefaultImmutableSet.nil(), "", "");
+        this(name, DefaultImmutableSet.nil());
     }
 
     @Override
@@ -86,16 +63,6 @@ public class SortImpl extends AbstractSort {
 
     public String declarationString() {
         return name().toString();
-    }
-
-    @Override
-    public @Nullable String getDocumentation() {
-        return documentation;
-    }
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
     }
 
     @Override

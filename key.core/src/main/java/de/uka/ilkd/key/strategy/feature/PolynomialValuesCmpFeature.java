@@ -15,6 +15,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -22,16 +23,24 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * than the value of a second (right) polynomial. Both polynomials can optionally be multiplied with
  * some constant before comparison.
  */
-public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
+@StableCost
+public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
+
+    /** Which polynomial-value relation an instance checks. */
+    private enum Cmp {
+        LT, LEQ, EQ, DIVIDES
+    }
 
     private final ProjectionToTerm<Goal> left, right, leftCoeff, rightCoeff;
+    private final Cmp cmp;
 
-    protected PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    private PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff, Cmp cmp) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
         this.rightCoeff = rightCoeff;
+        this.cmp = cmp;
     }
 
     public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
@@ -40,12 +49,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
-        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
-            @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueLess(rightPoly);
-            }
-        };
+        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LT);
     }
 
     public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
@@ -54,12 +58,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
-        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
-            @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueLeq(rightPoly);
-            }
-        };
+        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LEQ);
     }
 
     public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
@@ -68,12 +67,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
-        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
-            @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueEq(rightPoly);
-            }
-        };
+        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.EQ);
     }
 
     public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
@@ -82,22 +76,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
-        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
-            @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                // we currently only support constant polynomials
-                assert leftPoly.getParts().isEmpty();
-                assert rightPoly.getParts().isEmpty();
-                if (leftPoly.getConstantTerm().signum() == 0) {
-                    return true;
-                }
-                if (rightPoly.getConstantTerm().signum() == 0) {
-                    return false;
-                }
-                return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs())
-                        .signum() == 0;
-            }
-        };
+        return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.DIVIDES);
     }
 
     @Override
@@ -108,7 +87,27 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
             getPolynomial(right, rightCoeff, tacletApp, pos, goal, mState));
     }
 
-    protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
+    private boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
+        return switch (cmp) {
+            case LT -> leftPoly.valueLess(rightPoly);
+            case LEQ -> leftPoly.valueLeq(rightPoly);
+            case EQ -> leftPoly.valueEq(rightPoly);
+            case DIVIDES -> dividesCmp(leftPoly, rightPoly);
+        };
+    }
+
+    private static boolean dividesCmp(Polynomial leftPoly, Polynomial rightPoly) {
+        // we currently only support constant polynomials
+        assert leftPoly.getParts().isEmpty();
+        assert rightPoly.getParts().isEmpty();
+        if (leftPoly.getConstantTerm().signum() == 0) {
+            return true;
+        }
+        if (rightPoly.getConstantTerm().signum() == 0) {
+            return false;
+        }
+        return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs()).signum() == 0;
+    }
 
     private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
             ProjectionToTerm<Goal> coeffProj,

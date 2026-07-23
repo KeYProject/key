@@ -48,8 +48,6 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
 
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.TokenSource;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -647,7 +645,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (var pv : list) {
             if (pv != null) {
                 JTerm t = tb.var(pv);
@@ -676,7 +674,7 @@ public final class MiscTools {
 
     public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
             ImmutableList<JTerm> localOuts) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
@@ -755,28 +753,6 @@ public final class MiscTools {
         // Path p = fs.getPath(entryName);
         // return p.toUri();
         // }
-    }
-
-    public static @Nullable URI getURIFromTokenSource(TokenSource source) {
-        return getURIFromTokenSource(source.getSourceName());
-    }
-
-    public static @Nullable URI getURIFromTokenSource(String source) {
-        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-            return null;
-        }
-
-        try {
-            URI uri = new URI(source);
-            if (uri.getScheme() != null) {
-                // use this URI only if there is an explicit scheme;
-                // otherwise parse it as a filename
-                return uri;
-            }
-        } catch (URISyntaxException ignored) {
-        }
-
-        return Path.of(source).toUri();
     }
 
     /**

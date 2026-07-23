@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.JPContext;
@@ -36,7 +38,6 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import com.github.javaparser.*;
@@ -190,9 +191,89 @@ public class JavaService {
                 .flatMap(TokenRange::toRange)
                 .map(b -> b.begin)
                 .orElse(new Position(-1, -1));
-        return new BuildingIssue(problem.getVerboseMessage(),
+        return new BuildingIssue(simplifyJavaParserMessage(problem.getVerboseMessage()),
             problem.getCause().orElse(null), false,
-            de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
+            JavaSourceLocations.positionFromJP(loc), source);
+    }
+
+    /**
+     * JavaParser reports pure syntax errors as
+     * {@code "Parse error. Found \"X\", expected one of <very long token list>"}. The generic
+     * "Parse error" lead-in and the exhaustive token list are hard to read. This method rewrites
+     * such messages into a clearer "Java syntax error: unexpected X" form and shortens an
+     * over-long list of expected alternatives. Messages that do not follow this pattern (e.g.
+     * semantic problems) are returned unchanged.
+     *
+     * @param message the original (verbose) JavaParser problem message
+     * @return a more readable message
+     */
+    static String simplifyJavaParserMessage(@Nullable String message) {
+        if (message == null) {
+            return "";
+        }
+        String result = message.replace("Parse error. Found", "Java syntax error: unexpected");
+        int idx = result.indexOf("expected one of");
+        if (idx >= 0) {
+            String head = result.substring(0, idx);
+            String[] items =
+                result.substring(idx + "expected one of".length()).trim().split("\\s+");
+            // Drop JavaCard / schema-internal alternatives (e.g. "#abortJavaCardTransaction");
+            // they are noise for ordinary Java source and otherwise crowd out the relevant ones.
+            List<String> relevant = Arrays.stream(items)
+                    .filter(t -> !t.startsWith("\"#"))
+                    .collect(Collectors.toList());
+            if (relevant.isEmpty()) {
+                relevant = Arrays.asList(items);
+            }
+            final int limit = 6;
+            String list = relevant.size() > limit
+                    ? String.join(" ", relevant.subList(0, limit)) + " ..."
+                    : String.join(" ", relevant);
+            result = head + "expected one of " + list;
+        }
+        return humanizeJavaParserJargon(cleanFoundToken(result));
+    }
+
+    /**
+     * Rewrites JavaParser symbol-solver jargon into the user-facing wording KeY uses elsewhere:
+     * {@code "Unsolved symbol : Foobar"} becomes {@code "Cannot resolve 'Foobar'. No variable,
+     * field, or type with this name is in scope here (check for typos)."}. Text without that jargon
+     * is returned unchanged.
+     *
+     * @param message a message that may contain JavaParser symbol-solver jargon
+     * @return the message with that jargon humanized
+     */
+    public static String humanizeJavaParserJargon(@Nullable String message) {
+        if (message == null) {
+            return "";
+        }
+        return message.replaceAll("Unsolved symbol\\s*:\\s*([A-Za-z_$][\\w$.]*)",
+            "Cannot resolve '$1'. No variable, field, or type with this name is in scope here "
+                + "(check for typos)");
+    }
+
+    /**
+     * The offending token quoted in a JavaParser message can be a multi-line construct (e.g. a
+     * block comment); its raw text - with (escaped) line breaks - makes the message span many
+     * lines. Collapse the internal whitespace of that quoted {@code unexpected "..."} token to
+     * single spaces and shorten it if very long, so the message stays on one readable line.
+     *
+     * @param message a JavaParser message whose lead-in has already been rewritten
+     * @return the message with its offending token collapsed to a single line
+     */
+    private static String cleanFoundToken(String message) {
+        // JavaParser writes the offending token as {@code unexpected "..."} (note: it can use more
+        // than one space); match one-or-more spaces so the token is found and collapsed.
+        Matcher m = Pattern.compile("unexpected\\s+\"(.*?)\"", Pattern.DOTALL).matcher(message);
+        if (!m.find()) {
+            return message;
+        }
+        String token = m.group(1).replaceAll("\\\\[nrt]|\\s+", " ").trim();
+        final int max = 60;
+        if (token.length() > max) {
+            token = token.substring(0, max) + "…";
+        }
+        return message.substring(0, m.start(1)) + token + message.substring(m.end(1));
     }
 
     // region parsing of compilation units
@@ -269,6 +350,15 @@ public class JavaService {
      * @return a KeY structured compilation unit.
      */
     public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(String text) {
+        if (services.getJavaInfo().isTypeRegistrationSealed()) {
+            // The type model is sealed for the duration of a (parallel) proof run; registering a
+            // new type here would be a lazy registration on the proving path, racing the shared
+            // model. Fail fast rather than corrupt it. All types must be registered before proving
+            // starts -- see the ProblemInitializer warm-up of the default execution context.
+            throw new IllegalStateException(
+                "Java type registration attempted while the type model is sealed (during a proof "
+                    + "run): " + trim(text));
+        }
         parseSpecialClasses();
         LOGGER.debug("Reading {}", trim(text));
         var reader = new StringReader(text);
@@ -323,6 +413,11 @@ public class JavaService {
      * @return the compilation units
      */
     private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
+        if (!Files.isDirectory(bootClassPath)) {
+            throw new FileNotFoundException(String.format(
+                "The \\bootclasspath \"%s\" does not exist or is not a directory.",
+                bootClassPath));
+        }
         List<Path> paths;
         try (var stream = Files.walk(bootClassPath)) {
             paths = stream.filter(it -> {
@@ -351,8 +446,11 @@ public class JavaService {
                     .collect(Collectors.toList());
         }
 
+        // Collect the problems from the compilation units that failed to parse.
+        // (Previously this filtered for successful units, so the actual boot-class
+        // parse errors were silently dropped and an empty exception was thrown.)
         var errors = compilationUnits.stream()
-                .filter(c -> c.second.isSuccessful()) // FIXME weigl: should be negated
+                .filter(c -> !c.second.isSuccessful())
                 .flatMap(c -> c.second.getProblems().stream()
                         .map(problem -> buildingIssueFromProblem(c.first.toString(), problem)))
                 .collect(Collectors.toList());
@@ -382,6 +480,13 @@ public class JavaService {
     private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
         List<FileCollection> sources = new ArrayList<>();
         for (var cp : libraryPath) {
+            if (cp == null) {
+                continue;
+            }
+            if (!Files.exists(cp)) {
+                throw new FileNotFoundException(String.format(
+                    "The \\classpath entry \"%s\" does not exist.", cp));
+            }
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp));
             } else {
@@ -477,7 +582,21 @@ public class JavaService {
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
+            // The special classes were not fully parsed: do not leave the model marked as
+            // "parsed" (see the RuntimeException branch below for why).
+            mapping.setParsedSpecial(false);
             throw new RuntimeException(e);
+        } catch (RuntimeException | Error e) {
+            // Parsing the special (boot/library) classes failed - e.g. because one of the
+            // stub files under JavaRedux (or a \bootclasspath/\classpath entry) does not
+            // parse. We must NOT keep parsedSpecial == true here: otherwise the half-built
+            // Java model is silently reused, subsequent calls return early (line above),
+            // and every later type lookup - java.lang.Math in the float rules, user types,
+            // ... - fails with a misleading "cannot be found" that hides the real parse
+            // error. Reset the flag and let the actual failure (which points at the
+            // offending stub file) propagate.
+            mapping.setParsedSpecial(false);
+            throw e;
         } finally {
             mapping.setParsingLibraries(false);
         }
@@ -840,7 +959,7 @@ public class JavaService {
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,
             Namespace<SchemaVariable> allowSchemaJava) {
-        ImmutableList<IProgramVariable> pvs = ImmutableSLList.nil();
+        ImmutableList<IProgramVariable> pvs = ImmutableList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
                 pvs = pvs.append(n); // preserve the order (nested namespaces!)

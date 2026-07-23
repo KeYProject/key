@@ -2,7 +2,7 @@
 // verbose: true
 // broken: false
 // exceptionClass: ParserException
-// msgContains: mismatched input '('
+// msgContains: expected, but found '('
 
 class MethodInMethod {
 

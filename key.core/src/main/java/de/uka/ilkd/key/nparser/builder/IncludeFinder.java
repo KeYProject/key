@@ -7,7 +7,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -31,14 +31,14 @@ public class IncludeFinder extends AbstractBuilder<Void> {
     }
 
     @Override
-    public Void visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
+    public Void visitOne_include_statement(JavaKeYParser.One_include_statementContext ctx) {
         ldt = ctx.INCLUDELDTS() != null;
         mapOf(ctx.one_include());
         return null;
     }
 
     @Override
-    public Void visitOne_include(KeYParser.One_includeContext ctx) {
+    public Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
         String value = StringUtil.trim(ctx.getText(), "\"'");
         try {
             addInclude(value);
@@ -57,9 +57,10 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
         // whatsoever
         filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
-        var path = base.resolve(filename).normalize();
+        var path = base.resolve(filename).normalize().toAbsolutePath();
 
         var url = path.toUri().toURL();
+        // url = URI.create(path.toString()).toURL();
         source = RuleSourceFactory.initRuleFile(url);
         if (ldt) {
             includes.putLDT(filename, source);

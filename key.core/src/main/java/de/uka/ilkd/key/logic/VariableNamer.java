@@ -66,13 +66,6 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * name of the counter object used for temporary name proposals
-     */
-    private static final String TEMPCOUNTER_NAME = "VarNamerCnt";
-
-
-
-    /**
      * status of suggestive name proposing
      */
     private static boolean suggestive_off = true;
@@ -419,11 +412,21 @@ public abstract class VariableNamer implements InstantiationProposer {
         if (basename == null || basename.isEmpty()) {
             basename = DEFAULT_BASENAME;
         }
-        int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
-        // using null as undo anchor should be okay, since the name which the
-        // the counter is used for is only temporary and will be changed
-        // before the variable enters the logic
-
+        // Smallest index whose name is free in the current namespaces. Call sites on the proving
+        // path hold goal-local overlay services (Goal#getOverlayServices), so the chosen index is
+        // a pure function of the branch state: identical across worker schedulings, proof
+        // reloads and prune/redo cycles. The previous proof-global counter advanced as a side
+        // effect of unrelated mints, so these names -- which, despite the historical "temporary"
+        // label, do reach sequents (e.g. block-contract remembrance variables) -- differed
+        // between otherwise identical proofs (#3851, and the reload drift of #3834). Callers
+        // minting several names with the SAME base within one rule application must register
+        // the symbols (or reserve the names) in between, as the search cannot see unregistered
+        // earlier proposals.
+        int cnt = 0;
+        while (services.getNamespaces()
+                .lookup(new Name(basename + TEMP_INDEX_SEPARATOR + cnt)) != null) {
+            cnt++;
+        }
         return new TempIndProgramElementName(basename, cnt, null);
     }
 
@@ -568,11 +571,6 @@ public abstract class VariableNamer implements InstantiationProposer {
     // interface: suggestive name proposals
     // (taken from VarNameDeliverer.java, pretty much unchanged)
     // -------------------------------------------------------------------------
-
-    public static void setSuggestiveEnabled(boolean enabled) {
-        suggestive_off = !enabled;
-    }
-
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,

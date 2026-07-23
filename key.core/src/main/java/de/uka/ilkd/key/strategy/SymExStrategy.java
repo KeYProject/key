@@ -8,6 +8,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -23,6 +24,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.FindDepthFeature;
@@ -211,10 +213,25 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
             case StrategyProperties.MPS_MERGE ->
                 /*
                  * For this case, we use a special feature, since deleting merge points should only
-                 * be
-                 * done after a merge rule application.
+                 * be done after a merge rule application. EXCEPT during a multi-worker parallel
+                 * run on this proof: there the merge rule disables itself (linking several goals
+                 * would require
+                 * synchronizing a subset of goals across workers), so waiting for a merge would
+                 * stall every goal at its merge point forever. The run falls back to the safe
+                 * 'skip' treatment and deletes the statement cheaply instead. Decided per cost
+                 * evaluation, not at strategy construction, because the same strategy instance
+                 * serves runs on either prover.
                  */
-                bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+                bindRuleSet(d, "merge_point", new Feature() {
+                    @Override
+                    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
+                            PosInOccurrence pos, G goal, MutableState mState) {
+                        return ParallelProver.isMultiThreadedRunActive(goal.proof())
+                                ? NumberRuleAppCost.create(-5000)
+                                : DeleteMergePointRuleFeature.INSTANCE.computeCost(app, pos, goal,
+                                    mState);
+                    }
+                });
             case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
             case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
             default -> throw new RuntimeException("Unexpected strategy property " + mpsProp);

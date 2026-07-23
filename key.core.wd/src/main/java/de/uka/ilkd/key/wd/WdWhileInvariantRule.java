@@ -17,7 +17,6 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 
 @NullMarked
@@ -36,11 +35,6 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
     @Override
     public Name name() {
         return NAME;
-    }
-
-    @Override
-    public @Nullable String getOrigin() {
-        return super.getOrigin();
     }
 
     protected static class WdWhileInvariantRuleApplier extends WhileInvariantRuleApplier {

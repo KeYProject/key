@@ -2,9 +2,8 @@ parser grammar KeYTacletParser;
 
 import KeYSequentParser;
 
-options { tokenVocab = KeYLexer; }
 taclet
-   : doc = DOC_COMMENT? (LEMMA)? name = IDENT (choices_ = option_list)? LBRACE (form = term | (SCHEMAVAR one_schema_var_decl SEMI)* (ASSUMES LPAREN ifSeq = seq RPAREN)? (FIND LPAREN find = termorseq RPAREN (SAMEUPDATELEVEL | INSEQUENTSTATE | ANTECEDENTPOLARITY | SUCCEDENTPOLARITY)*)? (VARCOND LPAREN varexplist RPAREN)* goalspecs modifiers) RBRACE
+   : doc = DOC_COMMENT? (LEMMA)? name = IDENT (choices_ = option_list)? LBRACE (form = term | (SCHEMAVAR one_schema_var_decl SEMI)* (ASSUMES LPAREN assumesSeq = seq RPAREN)? (FIND LPAREN find = termorseq RPAREN (IGNOREUPDATELEVEL | SAMEUPDATELEVEL | INSEQUENTSTATE | ANTECEDENTPOLARITY | SUCCEDENTPOLARITY)*)? (VARCOND LPAREN varexplist RPAREN)* goalspecs modifiers) RBRACE
    ;
 
 option_list
@@ -24,7 +23,7 @@ option_expr
    ;
 
 goalspec
-   : (name = string_value COLON)? (rwObj = replacewith addSeq = add? addRList = addrules? addpv = addprogvar? | addSeq = add (addRList = addrules)? | addRList = addrules)
+   : (name = string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)? (rwObj = replacewith addSeq = add? addRList = addrules? addpv = addprogvar? | addSeq = add (addRList = addrules)? | addRList = addrules)
    ;
 
 replacewith
@@ -63,10 +62,6 @@ metaId
    : id = simple_ident
    ;
 
-metaTerm
-   : vf = metaId (LPAREN t += term (COMMA t += term)* RPAREN)?
-   ;
-
 varexplist
    : varexp (COMMA varexp)*
    ;
@@ -78,55 +73,17 @@ varexp
 varexpId
    : // weigl, 2021-03-12: This will be later just an arbitrary identifier. Only for backwards compatibility.
    APPLY_UPDATE_ON_RIGID
-   | SAME_OBSERVER
    | DROP_EFFECTLESS_ELEMENTARIES
-   | DROP_EFFECTLESS_STORES
-   | DIFFERENTFIELDS
    | SIMPLIFY_IF_THEN_ELSE_UPDATE
-   | CONTAINS_ASSIGNMENT
-   | ISENUMTYPE
-   | ISTHISREFERENCE
-   | STATICMETHODREFERENCE
-   | ISREFERENCEARRAY
-   | ISARRAY
-   | ISARRAYLENGTH
-   | IS_ABSTRACT_OR_INTERFACE
-   | ENUM_CONST
-   | FINAL
-   | STATIC
-   | ISLOCALVARIABLE
-   | ISOBSERVER
    | DIFFERENT
-   | METADISJOINT
    | EQUAL_UNIQUE
-   | FREELABELIN
-   | ISCONSTANT
-   | HASLABEL
-   | ISSTATICFIELD
-   | ISMODELFIELD
-   | HASSUBFORMULAS
-   | FIELDTYPE
    | NEW
    | NEW_TYPE_OF
-   | NEW_DEPENDING_ON
    | HAS_ELEMENTARY_SORT
    | SAME
    | ISSUBTYPE
    | STRICT ISSUBTYPE
-   | DISJOINTMODULONULL
-   | NOTFREEIN
    | HASSORT
-   | NEWLABEL
-   | ISREFERENCE
-   | MAXEXPANDMETHOD
-   | STORE_TERM_IN
-   | STORE_STMT_IN
-   | HAS_INVARIANT
-   | GET_INVARIANT
-   | GET_FREE_INVARIANT
-   | GET_VARIANT
-   | IS_LABELED
-   | ISINSTRICTFP
    ;
 
 varexp_argument
@@ -135,8 +92,6 @@ varexp_argument
    
    //       suggestion add an explicit keyword to request the sort by name or manually resolve later in builder
    TYPEOF LPAREN y = varId RPAREN
-   | CONTAINERTYPE LPAREN y = varId RPAREN
-   | DEPENDINGON LPAREN y = varId RPAREN
    | term
    ;
 
@@ -163,7 +118,6 @@ one_schema_var_decl
    : MODALOPERATOR one_schema_modal_op_decl
    | PROGRAM (schema_modifiers)? id = simple_ident (LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET)? ids = simple_ident_comma_list
    | FORMULA (schema_modifiers)? ids = simple_ident_comma_list
-   | TERMLABEL (schema_modifiers)? ids = simple_ident_comma_list
    | UPDATE (schema_modifiers)? ids = simple_ident_comma_list
    | SKOLEMFORMULA (schema_modifiers)? ids = simple_ident_comma_list
    | (TERM | (VARIABLES | VARIABLE) | SKOLEMTERM) (schema_modifiers)? s = sortId ids = simple_ident_comma_list

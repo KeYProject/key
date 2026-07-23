@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -29,7 +29,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +69,7 @@ public class ProofStarter {
         public UserProvidedInput(JTerm formula, ProofEnvironment env) {
             this(
                 JavaDLSequentKit.createSuccSequent(
-                    ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
+                    ImmutableList.<SequentFormula>singleton(new SequentFormula(formula))),
                 env);
         }
 
@@ -125,6 +124,15 @@ public class ProofStarter {
     private @Nullable AutoSaver autoSaver;
 
     private @Nullable Strategy<@NonNull Goal> strategy;
+
+    /**
+     * whether the parallel prover may be used for this run; {@code false} pins the run to the
+     * single-threaded {@link de.uka.ilkd.key.prover.impl.ApplyStrategy}. Side proofs run under a
+     * tight step/timeout budget, so they must stay single-threaded to keep their pass/fail outcome
+     * (and, for term simplification, the resulting open goals) deterministic; see
+     * {@link de.uka.ilkd.key.util.SideProofUtil#createSideProof}.
+     */
+    private boolean allowParallel = true;
 
     /**
      * creates an instance of the ProofStarter
@@ -203,6 +211,16 @@ public class ProofStarter {
     }
 
     /**
+     * Controls whether the parallel prover may be used for this proof attempt. Pass {@code false}
+     * for tight-budget side proofs so their outcome is deterministic regardless of thread schedule.
+     *
+     * @param allowParallel whether the parallel prover may be used at all for this run
+     */
+    public void setAllowParallel(boolean allowParallel) {
+        this.allowParallel = allowParallel;
+    }
+
+    /**
      * Initializes the strategy with the provided settings. The proof object must be created at that
      * point.
      *
@@ -251,7 +269,8 @@ public class ProofStarter {
             OneStepSimplifier.refreshOSS(proof);
 
             var goalChooser = profile.<Proof, Goal>getSelectedGoalChooserBuilder().create();
-            ProverCore<Proof, Goal> prover = new ApplyStrategy(goalChooser);
+            ProverCore<Proof, Goal> prover =
+                AutoProvers.create(goalChooser, profile, allowParallel);
             if (ptl != null) {
                 prover.addProverTaskObserver(ptl);
             }

@@ -86,7 +86,19 @@ public class Services implements TermServices, LogicServices, ProofServices {
      */
     private JavaModel javaModel;
 
-    private NameRecorder nameRecorder;
+    /**
+     * Records the fresh-name proposals made while a rule is applied, so they can be stored on the
+     * node for reproducible reload. It is <em>per thread</em>: the proposals are recorded during
+     * the rule's compute phase, which -- under the multi-core prover -- runs concurrently on the
+     * workers, so each proving thread (the single single-core thread, or each worker) gets its own
+     * recorder. This makes the recorder prover-agnostic and free of races on a shared field,
+     * without {@link Services} having to know which prover is running. It is an <em>instance</em>
+     * {@link ThreadLocal} (not static), so a nested side proof, which runs on its own
+     * {@link Services}, keeps its own recorder. Lazily created; reset by
+     * {@link #saveNameRecorder(Node)} after each rule application.
+     */
+    private ThreadLocal<NameRecorder> nameRecorder =
+        ThreadLocal.withInitial(NameRecorder::new);
 
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
@@ -134,7 +146,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
             this.javaService = javaService.copy(this);
             this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
         }
-        nameRecorder = new NameRecorder();
     }
 
     private Services(Services s) {
@@ -147,6 +158,12 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.counters = s.counters;
         this.specRepos = s.specRepos;
         this.javaModel = s.javaModel;
+        // Share the (per-thread) recorder with the source: an overlay (see getOverlay) is the
+        // services the rule executor works through, and fresh-name proposals set on the base
+        // services -- e.g. by the proof replayer before re-applying a rule -- must be visible and
+        // consumable through it. This mirrors the pre-ThreadLocal field aliasing; per-thread
+        // isolation between proving threads is preserved because it is the ThreadLocal that is
+        // shared, not a recorder instance.
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
@@ -195,19 +212,29 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
+    /**
+     * The name recorder for the calling thread (see the {@link #nameRecorder} field).
+     *
+     * @return the calling thread's name recorder
+     */
     public NameRecorder getNameRecorder() {
-        return nameRecorder;
+        return nameRecorder.get();
     }
 
-
+    /**
+     * Stores the calling thread's recorded name proposals on the given node and starts a fresh
+     * recorder for that thread's next rule application.
+     *
+     * @param n the node to store the recorded proposals on
+     */
     public void saveNameRecorder(Node n) {
-        n.setNameRecorder(nameRecorder);
-        nameRecorder = new NameRecorder();
+        n.setNameRecorder(nameRecorder.get());
+        nameRecorder.set(new NameRecorder());
     }
 
 
     public void addNameProposal(Name proposal) {
-        nameRecorder.addProposal(proposal);
+        getNameRecorder().addProposal(proposal);
     }
 
 
@@ -253,7 +280,13 @@ public class Services implements TermServices, LogicServices, ProofServices {
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
+        // Detach this instance's recorder from earlier overlays/aliases, keeping the calling
+        // thread's current contents (mirrors the pre-ThreadLocal `nameRecorder =
+        // nameRecorder.copy()`): the copy is the basis of a NEW proof, whose recordings must not
+        // leak into recorders already stored on this services' nodes.
+        NameRecorder detached = nameRecorder.get().copy();
+        nameRecorder = ThreadLocal.withInitial(NameRecorder::new);
+        nameRecorder.set(detached);
         s.setJavaModel(getJavaModel());
         s.originFactory = originFactory;
         return s;
@@ -281,7 +314,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
             new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        s.nameRecorder = nameRecorder.copy();
+        // The copy starts from this thread's current recordings (mirrors the pre-ThreadLocal
+        // `s.nameRecorder = nameRecorder.copy()`).
+        s.nameRecorder.set(nameRecorder.get().copy());
         s.setJavaModel(getJavaModel());
         s.originFactory = originFactory;
         return s;
@@ -305,10 +340,35 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
-    /*
-     * returns an existing named counter, creates a new one otherwise
+    /**
+     * Returns the named proof-global counter, creating it if necessary.
+     *
+     * <p>
+     * Synchronized so that concurrent workers cannot lose a counter through
+     * a racing check-then-put on the shared counters map. The per-counter increment is atomic (see
+     * {@link Counter}); this only guards lookup/creation.
+     *
+     * @param name the counter's name
+     * @return the (possibly freshly created) counter
+     * @deprecated Do not introduce new proof-global counters; prefer removing the remaining ones. A
+     *             value drawn from such a counter is a function of how many times it has been
+     *             advanced -- i.e. of the whole proof's history, and under the parallel prover of
+     *             the worker schedule -- so any name or id derived from it that becomes part of the
+     *             proof is <em>not</em> reproducible across reload, prune-and-redo or
+     *             multi-threaded
+     *             runs (#3851). Derive names/ids from the goal-local proof state instead: the
+     *             smallest free index against the current namespace (see
+     *             {@link de.uka.ilkd.key.proof.VariableNameProposer},
+     *             {@link de.uka.ilkd.key.logic.VariableNamer}), a content-order number (see
+     *             {@link de.uka.ilkd.key.speclang.ContentOrderNumbering}), or a dedicated field on
+     *             the owning object (as the node serial number is now an
+     *             {@link java.util.concurrent.atomic.AtomicInteger} on
+     *             {@link de.uka.ilkd.key.proof.Proof#getNextNodeSerialNr()}). The only remaining
+     *             callers are the symbolic-execution term-label counters, which are expected to be
+     *             removed together with the {@code key.core.symbolic_execution} package.
      */
-    public Counter getCounter(String name) {
+    @Deprecated
+    public synchronized Counter getCounter(String name) {
         Counter c = counters.get(name);
         if (c != null) {
             return c;
@@ -462,7 +522,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         lookup.register(getProof());
         lookup.register(getNamespaces());
         lookup.register(getTermBuilder());
-        lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
         return lookup;
     }
@@ -470,6 +529,15 @@ public class Services implements TermServices, LogicServices, ProofServices {
     @NonNull
     public JavaService getJavaService() {
         assert javaService != null : "Java Services needs to initialized in advanced.";
+        return javaService;
+    }
+
+    /**
+     * @return the {@link JavaService}, or {@code null} if Java was never activated for this
+     *         {@link Services} (e.g. a pure first-order proof). Unlike {@link #getJavaService()}
+     *         this never asserts and is safe to call during disposal.
+     */
+    public @Nullable JavaService getJavaServiceOrNull() {
         return javaService;
     }
 

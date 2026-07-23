@@ -13,7 +13,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound at most once in the
@@ -27,7 +26,7 @@ public class BoundUniquenessChecker {
 
     private final HashSet<QuantifiableVariable> boundVars =
         new LinkedHashSet<>();
-    private ImmutableList<JTerm> terms = ImmutableSLList.nil();
+    private ImmutableList<JTerm> terms = ImmutableList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);

@@ -5,9 +5,9 @@ package de.uka.ilkd.key.scripts;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.KeYParser.*;
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser.*;
+import de.uka.ilkd.key.nparser.JavaKeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
@@ -30,8 +30,8 @@ import static org.key_project.util.java.StringUtil.trim;
 ///
 /// @author Alexander Weigl
 /// @version 1 (18.01.25)
-/// @see de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext
-class ExprEvaluator extends KeYParserBaseVisitor<Object> {
+/// @see de.uka.ilkd.key.nparser.JavaKeYParser.ProofScriptExpressionContext
+class ExprEvaluator extends JavaKeYParserBaseVisitor<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprEvaluator.class);
     private final EngineState state;
 
@@ -51,7 +51,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitChar_literal(KeYParser.Char_literalContext ctx) {
+    public Object visitChar_literal(JavaKeYParser.Char_literalContext ctx) {
         return ctx.getText().charAt(1); // skip "'"
     }
 
@@ -61,7 +61,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFloatLiteral(KeYParser.FloatLiteralContext ctx) {
+    public Object visitFloatLiteral(JavaKeYParser.FloatLiteralContext ctx) {
         return Float.parseFloat(ctx.getText());
     }
 
@@ -94,7 +94,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitTerm(KeYParser.TermContext ctx) {
+    public Object visitTerm(JavaKeYParser.TermContext ctx) {
         return evaluateExpression(ctx);
     }
 

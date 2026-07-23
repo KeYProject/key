@@ -24,7 +24,6 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.AfterEach;
@@ -84,10 +83,10 @@ public class TestApplyTaclet {
 
     private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return ImmutableSLList.nil();
+            return ImmutableList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return ImmutableSLList.singleton(cf0);
+        return ImmutableList.singleton(cf0);
     }
 
     @BeforeEach
@@ -162,7 +161,7 @@ public class TestApplyTaclet {
         assertEquals(seq.succedent().getFirst().formula(), fma.sub(1),
             "Wrong succedent after imp_right_add");
         ImmutableList<NoPosTacletApp> nfapp = goals.head().indexOfTaclets()
-                .getNoFindTaclet(new IHTacletFilter(true, ImmutableSLList.nil()), null);
+                .getNoFindTaclet(new IHTacletFilter(true, ImmutableList.nil()), null);
         JTerm aimpb = TacletForTests.parseTerm("A -> B");
         assertEquals(1, nfapp.size(), "Cut Rule should be inserted to TacletIndex.");
         assertEquals(
@@ -601,7 +600,7 @@ public class TestApplyTaclet {
 
         assertEquals(4, rApplist.size(), "Expected four rule applications.");
 
-        ImmutableList<TacletApp> appList = ImmutableSLList.nil();
+        ImmutableList<TacletApp> appList = ImmutableList.nil();
         for (TacletApp aRApplist : rApplist) {
             appList =
                 appList.prepend(aRApplist.findIfFormulaInstantiations(goal.sequent(), services));
@@ -633,7 +632,7 @@ public class TestApplyTaclet {
 
         assertEquals(3, rApplist.size(), "Expected three rule applications.");
 
-        ImmutableList<TacletApp> appList = ImmutableSLList.nil();
+        ImmutableList<TacletApp> appList = ImmutableList.nil();
         Iterator<TacletApp> appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             appList =
@@ -644,7 +643,7 @@ public class TestApplyTaclet {
 
         JTerm ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
         SequentFormula ifformula = new SequentFormula(ifterm);
-        ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
+        ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableList
                 .<AssumesFormulaInstantiation>nil()
                 .prepend(new AssumesFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();

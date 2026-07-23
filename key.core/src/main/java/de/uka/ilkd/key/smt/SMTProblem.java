@@ -17,7 +17,6 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Represents a problem that can be passed to a solver. This class was introduced because the SMT
@@ -157,7 +156,7 @@ public class SMTProblem {
     }
 
     public static JTerm sequentToTerm(Sequent s, Services services) {
-        ImmutableList<JTerm> ante = ImmutableSLList.nil();
+        ImmutableList<JTerm> ante = ImmutableList.nil();
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
@@ -165,7 +164,7 @@ public class SMTProblem {
             ante = ante.append((JTerm) f.formula());
         }
 
-        ImmutableList<JTerm> succ = ImmutableSLList.nil();
+        ImmutableList<JTerm> succ = ImmutableList.nil();
         succ = succ.append(tb.ff());
         for (SequentFormula f : s.succedent()) {
             succ = succ.append((JTerm) f.formula());
@@ -178,7 +177,7 @@ public class SMTProblem {
 
     private JTerm sequentToTerm(Sequent s) {
 
-        ImmutableList<JTerm> ante = ImmutableSLList.nil();
+        ImmutableList<JTerm> ante = ImmutableList.nil();
 
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
@@ -186,7 +185,7 @@ public class SMTProblem {
             ante = ante.append((JTerm) f.formula());
         }
 
-        ImmutableList<JTerm> succ = ImmutableSLList.nil();
+        ImmutableList<JTerm> succ = ImmutableList.nil();
         succ = succ.append(tb.ff());
         for (SequentFormula f : s.succedent()) {
             succ = succ.append((JTerm) f.formula());

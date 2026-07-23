@@ -207,8 +207,6 @@ public class KeYMediator {
             caches.getTermTacletAppIndexCache().clear();
             caches.getBetaCandidates().clear(); // TODO: Is this required since the strategy is
                                                 // instantiated everytime again?
-            caches.getIfThenElseMalusCache().clear(); // TODO: Is this required since the strategy
-                                                      // is instantiated everytime again?
         }
     }
 

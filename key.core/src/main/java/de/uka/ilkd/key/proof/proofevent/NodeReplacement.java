@@ -16,7 +16,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -178,7 +177,7 @@ public class NodeReplacement {
 
     private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
         Iterator<NodeChange> it = changes.iterator();
-        changes = ImmutableSLList.nil();
+        changes = ImmutableList.nil();
         NodeChange oldNC;
         PosInOccurrence oldPio;
 
@@ -205,7 +204,7 @@ public class NodeReplacement {
      */
     public Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
-            changes = ImmutableSLList.nil();
+            changes = ImmutableList.nil();
             addNodeChanges();
         }
         return changes.iterator();

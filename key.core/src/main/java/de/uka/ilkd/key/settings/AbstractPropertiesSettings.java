@@ -127,22 +127,24 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     }
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
-        PropertyEntry<Double> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseDouble, (it) -> (double) it);
+        PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble,
+            (it) -> ((Number) it).doubleValue());
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
+        // A stored numeric value may deserialize as Integer or Long depending on its magnitude and
+        // the settings format, so accept any Number rather than assuming a particular boxed type.
         PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
-            (it) -> Math.toIntExact((Long) it));
+            (it) -> Math.toIntExact(((Number) it).longValue()));
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
-        PropertyEntry<Float> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseFloat, (it) -> (float) (double) it);
+        PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat,
+            (it) -> ((Number) it).floatValue());
         propertyEntries.add(pe);
         return pe;
     }

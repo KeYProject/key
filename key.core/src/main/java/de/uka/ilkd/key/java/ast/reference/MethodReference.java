@@ -22,7 +22,6 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Method reference.
@@ -287,7 +286,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * determines the arguments types and constructs a signature of the current method
      */
     public ImmutableList<KeYJavaType> getMethodSignature(Services services, ExecutionContext ec) {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
             for (int i = arguments.size() - 1; i >= 0; i--) {

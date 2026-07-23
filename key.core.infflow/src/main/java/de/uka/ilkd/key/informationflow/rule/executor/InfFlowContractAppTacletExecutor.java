@@ -20,7 +20,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -92,7 +91,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     private void updateStrategyInfo(Goal goal, final JTerm applFormula) {
         ImmutableList<JTerm> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.nil();
+            applFormulas = ImmutableList.nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = strategyInfos -> {

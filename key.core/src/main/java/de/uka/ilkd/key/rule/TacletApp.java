@@ -541,7 +541,7 @@ public abstract class TacletApp implements ITacletApp {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.nil();
+        ImmutableList<String> proposals = ImmutableList.nil();
 
         for (final SchemaVariable variable : uninstantiatedVars()) {
             if (!(variable instanceof JOperatorSV operatorSv)) {
@@ -853,7 +853,7 @@ public abstract class TacletApp implements ITacletApp {
             // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
             // instantiations that should actually be nil().
             // So we replace null with nil() here as a bugfix.
-            p_list = ImmutableSLList.nil();
+            p_list = ImmutableList.nil();
         }
         assert ifInstsCorrectSize(p_list) && assumesFormulaInstantiations == null
                 : "If instantiations list has wrong size "
@@ -883,7 +883,7 @@ public abstract class TacletApp implements ITacletApp {
             "The if formulas have already been instantiated");
 
         if (taclet().assumesSequent().isEmpty()) {
-            return ImmutableSLList.<TacletApp>nil().prepend(this);
+            return ImmutableList.<TacletApp>singleton(this);
         }
 
         return findIfFormulaInstantiationsHelp(
@@ -891,7 +891,7 @@ public abstract class TacletApp implements ITacletApp {
             createSemisequentList(taclet().assumesSequent().antecedent()),
             AssumesFormulaInstSeq.createList(seq, false, services),
             AssumesFormulaInstSeq.createList(seq, true, services),
-            ImmutableSLList.nil(), matchConditions(), services);
+            ImmutableList.nil(), matchConditions(), services);
     }
 
     /**
@@ -924,9 +924,9 @@ public abstract class TacletApp implements ITacletApp {
                 // All formulas have been matched, collect the results
                 TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
                 if (res != null) {
-                    return ImmutableSLList.<TacletApp>nil().prepend(res);
+                    return ImmutableList.<TacletApp>singleton(res);
                 }
-                return ImmutableSLList.nil();
+                return ImmutableList.nil();
             } else {
                 // Change from succedent to antecedent
                 ruleSuccTail = ruleAntecTail;
@@ -942,7 +942,7 @@ public abstract class TacletApp implements ITacletApp {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        ImmutableList<TacletApp> res = ImmutableSLList.nil();
+        ImmutableList<TacletApp> res = ImmutableList.nil();
         Iterator<MatchResultInfo> itMC = mr.matchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
         for (final AssumesFormulaInstantiation instantiationCandidate : mr.candidates()) {
@@ -956,7 +956,7 @@ public abstract class TacletApp implements ITacletApp {
 
     private ImmutableList<SequentFormula> createSemisequentList(
             Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> res = ImmutableList.nil();
 
         for (SequentFormula p_s : p_ss) {
             res = res.prepend(p_s);

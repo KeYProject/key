@@ -1,3 +1,7 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
+
 plugins {
     //Support for IntelliJ IDEA
     //https://docs.gradle.org/current/userguide/idea_plugin.html
@@ -8,15 +12,13 @@ plugins {
     id("eclipse")  //support for Eclipse
 
     // Code formatting
-    id "com.diffplug.spotless" version "8.4.0"
+    alias(libs.plugins.spotless)
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.61"
+    alias(libs.plugins.checkerframework)
 
     // Plugin for publishing via the new Nexus API
-    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-
-    id "signing"
+    alias(libs.plugins.maven.publish) apply false
 }
 
 
@@ -36,18 +38,18 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "3.0.0$build"
+version = "3.1.0$build"
 
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
-    apply plugin: "maven-publish"
-    apply plugin: "signing"       // GPG signing of artifacts, required by maven central
     apply plugin: "idea"
     apply plugin: "eclipse"
 
     apply plugin: "com.diffplug.spotless"
     apply plugin: "org.checkerframework"
+    apply plugin: "com.vanniktech.maven.publish"
+    //apply plugin: "maven-publish"
 
     group = rootProject.group
     version = rootProject.version
@@ -59,41 +61,35 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url = "https://git.key-project.org/api/v4/projects/35/packages/maven/" }
+        //maven { url = "https://git.key-project.org/api/v4/projects/35/packages/maven/" }
+        //maven { url = "https://central.sonatype.com/repository/maven-snapshots/" }
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
+        implementation(libs.slf4j.api)
+        testImplementation(libs.logback.classic)
 
 
-        compileOnly("org.jspecify:jspecify:1.0.0")
-        testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.5-eisop1"
-        compileOnly "io.github.eisop:checker-qual:$eisop_version"
-        compileOnly "io.github.eisop:checker-util:$eisop_version"
-        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker:$eisop_version"
+        compileOnly(libs.jspecify)
+        testCompileOnly(libs.jspecify)
+        compileOnly(libs.checkerframework.qual)
+        compileOnly(libs.checkerframework.util)
+        testCompileOnly(libs.checkerframework.qual)
+        checkerFramework(libs.checkerframework.qual)
+        checkerFramework(libs.checkerframework)
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
-        testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation("ch.qos.logback:logback-classic:1.5.32")
-
-        testImplementation(platform("org.junit:junit-bom:6.0.3"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
-        testImplementation ("org.assertj:assertj-core:3.27.7")
-        testImplementation (project(':key.util'))
-        testImplementation (testFixtures(project(":key.util")))
+        testImplementation(platform(libs.junit.bom))
+        testImplementation(libs.junit.jupiter.api)
+        testImplementation(libs.junit.jupiter.params)
+        testRuntimeOnly(libs.junit.jupiter.engine)
+        testRuntimeOnly(libs.junit.platform.launcher)
+        testImplementation(libs.assertj.core)
+        testImplementation(project(':key.util'))
+        testImplementation(testFixtures(project(":key.util")))
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
-
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        testImplementation(libs.jackson.dataformat.yaml)
+        testImplementation(libs.jackson.datatype.jsr310)
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -121,6 +117,11 @@ subprojects {
         systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("report/runallproves").get().toString()
 
         systemProperty "key.disregardSettings", "true"
+        // Pin the whole test suite to the single-threaded prover, so no test silently runs on the
+        // multi-core prover (e.g. merge-rule, slicing and symbolic-execution tests rely on single
+        // core). Opt-in parallel tests (equivalence, stress, benchmark) set this property at runtime,
+        // which overrides the baseline within their fork.
+        systemProperty "key.prover.parallel", "false"
         maxHeapSize = "4g"
 
         forkEvery = 0 //default
@@ -135,7 +136,6 @@ subprojects {
         classpath = sourceSets.test.runtimeClasspath
     }
 
-
     test {
         // Before we switched to JUnit 5, we used JUnit 4 with a customized discovery of test class.
         // This discovery called AutoSuite and searched in the compiled classes. AutoSuite was
@@ -148,10 +148,10 @@ subprojects {
         }
 
         addTestListener(new TestListener() {
-                void afterTest(TestDescriptor desc, TestResult result) {
-                    logger.error("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
-                }
-            })
+            void afterTest(TestDescriptor desc, TestResult result) {
+                logger.error("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
+            }
+        })
 
         addTestListener(new TestListener() {
             void beforeTest(TestDescriptor descriptor) {
@@ -284,129 +284,81 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            if (project.name == 'recoder') {
-                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
-            } else {
-                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+        }
+    }
+
+    mavenPublishing {
+        publishToMavenCentral()
+        signAllPublications()
+
+        configure(new JavaLibrary(
+                new JavadocJar.Javadoc(),
+                new SourcesJar.Sources()
+        ))
+
+        pom {
+            name = project.name
+            description = project.description
+            url = 'https://key-project.org/'
+
+            licenses {
+                license {
+                    name = "GNU General Public License (GPL), Version 2"
+                    url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'key'
+                    name = 'KeY Developers'
+                    email = 'support@key-project.org'
+                    url = "https://www.key-project.org/about/people/"
+                }
+            }
+            scm {
+                connection = 'scm:git:git://github.com/keyproject/key.git'
+                developerConnection = 'scm:git:git://github.com/keyproject/key.git'
+                url = 'https://github.com/keyproject/key/'
             }
         }
     }
 
-    afterEvaluate { // required so project.description is non-null as set by sub build.gradle
-        publishing {
-            publications {
-                mavenJava(MavenPublication) {
-                    from components.java
-                    artifact sourcesJar
-                    artifact javadocJar
-                    pom {
-                        name = projects.name
-                        description = project.description
-                        url = 'https://key-project.org/'
-
-                        licenses {
-                            license {
-                                name = "GNU General Public License (GPL), Version 2"
-                                url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id = 'key'
-                                name = 'KeY Developers'
-                                email = 'support@key-project.org'
-                                url = "https://www.key-project.org/about/people/"
-                            }
-                        }
-                        scm {
-                            connection = 'scm:git:git://github.com/keyproject/key.git'
-                            developerConnection = 'scm:git:git://github.com/keyproject/key.git'
-                            url = 'https://github.com/keyproject/key/'
-                        }
-                    }
-                }
+    publishing {
+        repositories {
+            maven {
+                name = "LOCAL"
+                url= uri("$rootDir/local")
             }
-            repositories {
-                maven {
-                    name = "LOCAL"
-                    url= uri("$rootDir/local")
+
+            maven { // deployment to git.key-project.org/key-public/key
+                name = "KEYLAB"
+                url = uri("https://git.key-project.org/api/v4/projects/35/packages/maven")
+                credentials(HttpHeaderCredentials) {
+                    def userToken = envOrPropertyValue("GITLAB_USER_TOKEN")
+                    def deployToken = envOrPropertyValue("GITLAB_DEPLOY_TOKEN")
+                    def ciToken = envOrPropertyValue("GITLAB_CIJOB_TOKEN")
+
+                    if (userToken != "") {
+                        name = 'Private-Token'
+                        value = userToken
+                    } else if(deployToken != "") {
+                        name = 'Deploy-Token'
+                        value = deployToken
+                    }  else {
+                        name = 'Job-Token'
+                        value = ciToken
+                    }
                 }
-
-                maven { // deployment to git.key-project.org/key-public/key
-                    name = "KEYLAB"
-                    url = uri("https://git.key-project.org/api/v4/projects/35/packages/maven")
-                    credentials(HttpHeaderCredentials) {
-                        def userToken = envOrPropertyValue("GITLAB_USER_TOKEN")
-                        def deployToken = envOrPropertyValue("GITLAB_DEPLOY_TOKEN")
-                        def ciToken = envOrPropertyValue("GITLAB_CIJOB_TOKEN")
-
-                        if (userToken != "") {
-                            name = 'Private-Token'
-                            value = userToken
-                        } else if(deployToken != "") {
-                            name = 'Deploy-Token'
-                            value = deployToken
-                        }  else {
-                            name = 'Job-Token'
-                            value = ciToken
-                        }
-                    }
-                    authentication {
-                        header(HttpHeaderAuthentication)
-                    }
+                authentication {
+                    header(HttpHeaderAuthentication)
                 }
             }
         }
-        signing {
-            //sign publishing.publications.mavenJava
-        }
     }
 }
 
-signing {
-    // does not work
-    if(System.getenv("GPG_PRIVATE_KEY") == null) {
-        useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
-    } else{
-        useInMemoryPgpKeys(
-                System.getenv("SIGNING_KEY_ID"),
-                System.getenv("GPG_PRIVATE_KEY"),
-                System.getenv("GPG_PASSPHRASE")
-        )
-    }
-}
-
-nexusPublishing {
-    repositories {
-        central {
-            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
-            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
-
-            stagingProfileId.set("org.key-project")
-
-            /**
-             * To be able to publish things on Maven Central, you need two things:
-             *
-             * (1) a JIRA account with permission on group-id `org.key-project`
-             * (2) a keyserver-published GPG (w/o sub-keys)
-             *
-             * Your `$HOME/.gradle/gradle.properties` should like this:
-             * ```
-             * signing.keyId=YourKeyId
-             * signing.password=YourPublicKeyPassword
-             * ossrhUsername=your-jira-id
-             * ossrhPassword=your-jira-password
-             * ```
-             *
-             * You can test signing with `gradle sign`, and publish with `gradle publish`.
-             * https://central.sonatype.org/publish/publish-guide/
-             */
-            username = envOrPropertyValue("ossrhUsername")
-            password = envOrPropertyValue("ossrhPassword")
-        }
-    }
-}
 
 tasks.register('start'){
     description = "Use :key.ui:run instead"
@@ -438,9 +390,9 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2026 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
-        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links += "https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.18/"
         links += "https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
-        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.32/"
+        links +="https://www.javadoc.io/doc/ch.qos.logback/logback-classic/1.5.37/"
         links +="https://www.javadoc.io/doc/com.formdev/flatlaf/3.7/"
         links +="https://www.javadoc.io/doc/com.miglayout/miglayout-swing/11.4.3/"
         links +="https://www.javadoc.io/doc/com.squareup/javapoet/1.13.0/"
@@ -449,7 +401,7 @@ tasks.register('alldoc', Javadoc){
         links +="https://www.javadoc.io/doc/org.antlr/ST4/4.3.4/"
         links +="https://www.javadoc.io/doc/org.antlr/antlr4-runtime/4.13.2/"
         links +="https://www.javadoc.io/doc/org.jspecify/jspecify/1.0.0/"
-        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.17/"
+        links +="https://www.javadoc.io/doc/org.slf4j/slf4j-api/2.0.18/"
 
         linkSource()
         author()
@@ -473,10 +425,7 @@ tasks.register('alldoc', Javadoc){
         group("keyext.ui.testgen", "de.uka.ilkd.key.gui.testgen")
         group("keyext.exploration","org.key_project.exploration")
         group("keyext.caching", "de.uka.ilkd.key.gui.plugins.caching")
-        group("key.core.symbolic_execution",// "de.uka.ilkd.key.proof",
-                "de.uka.ilkd.key.rule.label", "de.uka.ilkd.key.strategy",
-                "de.uka.ilkd.key.symbolic_execution")
-        group("key.core.proof_references", "de.uka.ilkd.key.proof_references")*/
+        */
     }
 }
 

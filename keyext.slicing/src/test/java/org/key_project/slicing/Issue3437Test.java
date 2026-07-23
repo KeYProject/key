@@ -44,7 +44,7 @@ public class Issue3437Test {
                 .constructSlicer(control, proof, results, env.getUi());
         var newFile = replayer.slice();
         var env2 = KeYEnvironment.load(newFile);
-        var proof2 = env.getLoadedProof();
+        var proof2 = env2.getLoadedProof();
         assertTrue(proof2.closed());
 
         env.dispose();

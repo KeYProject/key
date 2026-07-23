@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.GenericParameter;
 
+import org.key_project.logic.HasMetaSpaceKey;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Sorted;
@@ -18,8 +19,8 @@ import org.jspecify.annotations.Nullable;
 /// The abstract declaration of a parametric function, e.g., `append<[E]>(List<[E]>, List<[E]>)`.
 ///
 /// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
-/// ImmutableList, Services)].
-public final class ParametricFunctionDecl implements Named, Sorted {
+/// ImmutableList, de.uka.ilkd.key.java.Services)].
+public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpaceKey {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;
     private final ImmutableArray<Sort> argSorts;
@@ -41,6 +42,12 @@ public final class ParametricFunctionDecl implements Named, Sorted {
         this.unique = unique;
         this.isRigid = isRigid;
         this.isSkolemConstant = isSkolemConstant;
+        for (var p : parameters) {
+            if (!p.variance().equals(GenericParameter.Variance.INVARIANT)) {
+                throw new IllegalArgumentException(
+                    "Co-/contravariance is not yet supported for parametric functions or predicates");
+            }
+        }
     }
 
     @Override
@@ -80,5 +87,10 @@ public final class ParametricFunctionDecl implements Named, Sorted {
     @Override
     public String toString() {
         return name().toString();
+    }
+
+    @Override
+    public String getMetaKey() {
+        return "pfun/" + name();
     }
 }

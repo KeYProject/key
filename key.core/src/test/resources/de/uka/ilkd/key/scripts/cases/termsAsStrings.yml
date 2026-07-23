@@ -1,0 +1,8 @@
+# Give arguments as strings ... requires a bit of care
+key: |  
+  \problem { ==> true }
+script: |
+  cut "1 > 0";
+goals:
+  - ==> 1 > 0, true
+  - 1 > 0 ==> true

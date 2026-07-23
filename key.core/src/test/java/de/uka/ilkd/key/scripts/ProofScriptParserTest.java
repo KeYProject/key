@@ -63,4 +63,20 @@ public class ProofScriptParserTest {
         assertThat(cmd2.positionalArgs()).hasSize(2);
         assertThat(cmd3.positionalArgs()).hasSize(2);
     }
+
+    /**
+     * The (legacy) {@link ScriptLineParser} must ignore carriage returns: a quoted value spanning a
+     * CRLF line break (as produced when a script file is checked out with Windows line endings)
+     * must
+     * not keep the stray '\r' inside the argument value.
+     */
+    @Test
+    void scriptLineParserIgnoresCarriageReturns() throws Exception {
+        String crlf = "select formula=\"line one\r\nline two\";\r\n";
+
+        var parser = new ScriptLineParser(new java.io.StringReader(crlf), null);
+        var cmd = parser.parseCommand();
+
+        assertThat(cmd.args().values()).noneMatch(v -> v.contains("\r"));
+    }
 }

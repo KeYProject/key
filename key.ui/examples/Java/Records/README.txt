@@ -1,7 +1,7 @@
 example.path = Java 25
 example.name = Records
 example.file = Use.key
-example.additionalFile.1 = src/Point.java
+example.additionalFile.1 = src/Point3d.java
 
 Example for the use of Java Records in KeY
 

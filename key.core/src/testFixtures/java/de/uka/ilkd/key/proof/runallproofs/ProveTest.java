@@ -225,8 +225,8 @@ public class ProveTest {
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script);
-            pse.execute(env.getUi(), env.getLoadedProof());
+            ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
+            pse.execute(env.getUi(), script);
         }
     }
 
@@ -282,7 +282,18 @@ public class ProveTest {
     protected StatisticsFile getStatisticsFile() throws IOException {
         if (!statisticsFile.isEmpty()) {
             if (statistics == null) {
-                statistics = new StatisticsFile(new File(statisticsFile));
+                // Always give each JVM its own statistics file
+                // (<statisticsFile-base>.<pid>.csv): under parallel test forks (testRAP)
+                // concurrent appends from separate processes to one shared path interleave
+                // mid-line. Combine and sort the per-process files after the run when a single
+                // listing is wanted. Insert the pid before the .csv extension so the per-fork
+                // file keeps a single .csv suffix (statisticsFile already ends in .csv).
+                long pid = ProcessHandle.current().pid();
+                String path = statisticsFile.endsWith(".csv")
+                        ? statisticsFile.substring(0, statisticsFile.length() - ".csv".length())
+                            + "." + pid + ".csv"
+                        : statisticsFile + "." + pid + ".csv";
+                statistics = new StatisticsFile(new File(path));
                 statistics.setUp(false);
             }
             return statistics;

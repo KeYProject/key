@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -16,6 +17,10 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * that for taclets is described using <code>\find</code>, and that can be modified by the rule).
  * Optionally, the projection can walk "upwards" towards the root of the term/formula
  */
+// WeakStable, not Stable: with stepsUpwards > 0 (e.g. FocusProjection.create(1)) this walks up
+// from the find subterm, so it reads the surrounding find formula -- valid only while that
+// formula is unchanged.
+@WeakStableCost
 public class FocusProjection implements ProjectionToTerm<Goal> {
 
     public static final ProjectionToTerm<Goal> INSTANCE = create(0);

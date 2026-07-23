@@ -16,7 +16,6 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.Choice;
@@ -64,8 +63,7 @@ public final class SideProofUtil {
                 : null;
         initConfig.setSettings(clonedSettings);
         initConfig.setTaclet2Builder(
-            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder()
-                    .clone());
+            new HashMap<>(sourceInitConfig.getTaclet2Builder()));
         initConfig.setTaclets(sourceInitConfig.getTaclets());
         // Create new ProofEnvironment and initialize it with values from initial one.
         ProofEnvironment env = new ProofEnvironment(initConfig);
@@ -125,6 +123,10 @@ public final class SideProofUtil {
         // Make sure that valid parameters are given
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);
+        // Side proofs run under a tight step/timeout budget; pin them to the single-threaded
+        // prover so their pass/fail outcome (and remaining open goals for term simplification)
+        // is deterministic regardless of the worker schedule.
+        starter.setAllowParallel(false);
         // Configure ProofStarter
         // TODO: Avoid proof environment use only InitConfig
         starter.init(sequentToProve, sideProofEnvironment, proofName);

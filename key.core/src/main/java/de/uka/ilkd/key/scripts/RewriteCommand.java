@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.IntIterator;
@@ -23,7 +24,6 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
@@ -48,6 +48,18 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author lulong, grebing, weigl
  */
+@Documentation(category = "Fundamental",
+    value = """
+            The `rewrite` command replaces occurrences of one term with another using rewrite taclets.
+            It searches for applicable rewrite rules that transform the `find` term into the `replace` term.
+
+            If some occurrences cannot be rewritten directly, the command applies a cut to establish
+            the replacement formula, ensuring the proof can continue.
+
+            #### Examples
+            - `rewrite find="x+y" replace="y+x";` //(mulbrich script syntax)
+            - `rewrite find=`y+x` replace=`y+x`;` //(psdbg)
+            """)
 public class RewriteCommand extends AbstractCommand {
 
     /**
@@ -109,7 +121,7 @@ public class RewriteCommand extends AbstractCommand {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = ImmutableList.nil();
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent
@@ -239,28 +251,17 @@ public class RewriteCommand extends AbstractCommand {
         }
     }
 
-    /**
-     * Parameters for the {@link RewriteCommand}
-     *
-     * @author luong, grebing, weigl
-     */
     public static class Parameters {
-        /**
-         * Term, which should be replaced
-         */
         @Option(value = "find")
+        @Documentation("The term pattern to search for and replace")
         public @MonotonicNonNull JTerm find;
 
-        /**
-         * Substitutent
-         */
         @Option(value = "replace")
+        @Documentation("The replacement term to substitute for the found term")
         public @MonotonicNonNull JTerm replace;
 
-        /**
-         * Formula, where to find {@see find}.
-         */
         @Option(value = "formula")
+        @Documentation("Optional top-level formula to restrict the search scope")
         public @Nullable JTerm formula;
     }
 }

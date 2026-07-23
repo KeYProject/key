@@ -5,7 +5,9 @@ package de.uka.ilkd.key.ui;
 
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.prover.engine.ProverCore;
@@ -43,8 +46,8 @@ import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.parsing.Location;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +62,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-    ImmutableList<Proof> proofStack = ImmutableSLList.nil();
+    ImmutableList<Proof> proofStack = ImmutableList.nil();
 
     final KeYMediator mediator;
 
@@ -150,9 +153,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             if (result != null) {
-                LOGGER.debug("{}", result);
                 if (result instanceof Throwable thrown) {
+                    LOGGER.error("Loading {} failed:\n{}", keyProblemFile,
+                        formatLoadError(thrown));
                     LOGGER.debug("Exception: ", thrown);
+                } else {
+                    LOGGER.error("Loading {} failed: {}", keyProblemFile, result);
                 }
                 System.exit(-1);
             }
@@ -166,10 +172,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                     var script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
-                            new ProofScriptEngine(script);
+                            new ProofScriptEngine(proof);
                         this.taskStarted(
                             new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                        pse.execute(this, proof);
+                        pse.execute(this, script);
                         // The start and end messages are fake to persuade the system ...
                         // All this here should refactored anyway ...
                         this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
@@ -258,7 +264,60 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public final void reportException(Object sender, ProofOblInput input, Exception e) {
+        LOGGER.error("Error while processing {}:\n{}", input, formatLoadError(e));
         LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{})", sender, input, e);
+    }
+
+    /**
+     * Renders a load/parse error in a human-readable, multi-line form for the command line: every
+     * contained problem with its message, its source location and - when the source is available -
+     * the offending line with a caret pointing at the column.
+     * <p>
+     * This reuses {@link ExceptionTools#getMessages(Throwable)} (the same extraction the GUI relies
+     * on) so the console reports the same concrete messages and positions as the dialog, without
+     * any dependency on the GUI.
+     *
+     * @param error the throwable describing the failure
+     * @return a formatted, possibly multi-line description
+     */
+    public static String formatLoadError(Throwable error) {
+        StringBuilder sb = new StringBuilder();
+        List<PositionedString> messages = ExceptionTools.getMessages(error);
+        for (PositionedString ps : messages) {
+            if (sb.length() > 0) {
+                sb.append(System.lineSeparator());
+            }
+            Location loc = ps.getLocation();
+            sb.append(ps.getText());
+            URI fileUri = loc.getFileUri();
+            if (fileUri != null && !loc.getPosition().isNegative()) {
+                sb.append(System.lineSeparator())
+                        .append("  at ").append(fileUri).append(':')
+                        .append(loc.getPosition().line()).append(':')
+                        .append(loc.getPosition().column());
+                appendSourceExcerpt(sb, fileUri, loc.getPosition());
+            } else if (fileUri != null) {
+                sb.append(System.lineSeparator()).append("  at ").append(fileUri);
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Appends the offending source line and a caret under the error column, if readable. */
+    private static void appendSourceExcerpt(StringBuilder sb, URI fileUri,
+            org.key_project.util.parsing.Position pos) {
+        try {
+            List<String> lines = Files.readAllLines(Path.of(fileUri));
+            int lineNo = pos.line();
+            if (lineNo >= 1 && lineNo <= lines.size()) {
+                String line = lines.get(lineNo - 1);
+                sb.append(System.lineSeparator()).append("    ").append(line);
+                sb.append(System.lineSeparator()).append("    ")
+                        .append(" ".repeat(Math.max(0, pos.column() - 1))).append('^');
+            }
+        } catch (Exception ignore) {
+            // best effort: no excerpt if the source cannot be read
+        }
     }
 
     @Override

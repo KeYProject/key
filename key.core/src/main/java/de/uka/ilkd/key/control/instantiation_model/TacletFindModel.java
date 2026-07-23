@@ -5,9 +5,9 @@ package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
@@ -15,11 +15,10 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.IdDeclaration;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
@@ -36,8 +35,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
@@ -117,7 +117,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         noEditRow = count - 1;
 
-        ImmutableList<String> proposals = ImmutableSLList.nil();
+        ImmutableList<String> proposals = ImmutableList.nil();
 
         for (SchemaVariable var : tacletApp.uninstantiatedVars()) {
 
@@ -184,7 +184,18 @@ public class TacletFindModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        return new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        JTerm result =
+            new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        // Validate the user-entered instantiation (e.g. reject generic sorts, see issue #3409). The
+        // set of checks lives in UserInputValidator. Unlike the (batch-parsed) \problem and JML
+        // boundaries, this field is validated live on every keystroke and its message is rendered
+        // as a single inline entry, so we surface the first problem; once the user fixes it, the
+        // next one (if any) appears on the next validation.
+        List<String> issues = UserInputValidator.validate(result, "an instantiation");
+        if (!issues.isEmpty()) {
+            throw new ParserException(issues.get(0), null);
+        }
+        return result;
     }
 
     /**
@@ -192,7 +203,7 @@ public class TacletFindModel extends AbstractTableModel {
      * function)
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
-        KeYParser.Id_declarationContext ctx =
+        JavaKeYParser.Id_declarationContext ctx =
             ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
         Sort sort =
             ctx.s != null ? services.getNamespaces().lookupSortOrAlias(ctx.s.getText()) : null;

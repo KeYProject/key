@@ -13,6 +13,7 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -22,6 +23,9 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * Binary feature that returns zero iff the replacewith- and find-parts of a Taclet are matched to
  * different terms.
  */
+// Stable: compares the find term against the taclet's replacewith template, both fixed for a given
+// rule application.
+@StableCost
 public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */

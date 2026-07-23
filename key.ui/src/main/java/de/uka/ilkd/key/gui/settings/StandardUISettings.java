@@ -75,6 +75,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkConfirmExit;
     private final JSpinner spAutoSaveProof;
     private final JCheckBox chkMinimizeInteraction;
+    private final JCheckBox chkUseClassicTacletDialog;
     private final JComboBox<String> spFontSizeTreeSequent;
     private final JCheckBox chkEnsureSourceConsistency;
     private final JTextArea txtClutterRules;
@@ -145,6 +146,13 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
             false, emptyValidator());
         chkEnsureSourceConsistency =
             addCheckBox("Ensure source consistency", "", true, emptyValidator());
+        chkUseClassicTacletDialog = addCheckBox("Use classic taclet instantiation dialog",
+            """
+                    Use the classic (pre-2026) dialog when completing an interactive taclet \
+                    application.
+                    Offered as a fallback for a migration period; the redesigned dialog is the \
+                    default.""",
+            false, emptyValidator());
     }
 
 
@@ -183,6 +191,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
         chkMinimizeInteraction.setSelected(generalSettings.getTacletFilter());
+        chkUseClassicTacletDialog.setSelected(vs.isUseClassicTacletDialog());
         spFontSizeTreeSequent.setSelectedIndex(vs.sizeIndex());
         notificationAfterMacro.setSelectedItem(vs.notificationAfterMacro());
 
@@ -219,6 +228,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
+        vs.setUseClassicTacletDialog(chkUseClassicTacletDialog.isSelected());
         vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
         vs.setNotificationAfterMacro((String) notificationAfterMacro.getSelectedItem());
         Config.DEFAULT.setDefaultFonts();

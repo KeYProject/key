@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -39,11 +40,12 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -64,6 +66,14 @@ public class Proof implements ProofObject<Goal>, Named {
     private final long creationTime = System.currentTimeMillis();
 
     /**
+     * Hands out {@link Node#serialNr() node serial numbers} for this proof. Monotonic and never
+     * reused within a session -- pruning leaves gaps, and reloading renumbers contiguously from
+     * zero -- so a node serial is a display/identity tag that never enters a sequent. Atomic so
+     * that nodes created on parallel worker threads still receive distinct serials.
+     */
+    private final AtomicInteger nodeSerialCounter = new AtomicInteger();
+
+    /**
      * name of the proof
      */
     private final Name name;
@@ -77,19 +87,21 @@ public class Proof implements ProofObject<Goal>, Named {
      * list with prooftree listeners of this proof attention: firing events makes use of array
      * list's random access nature
      */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Proof.class);
+
     private final List<ProofTreeListener> listenerList = new LinkedList<>();
 
     /**
      * list with the open goals of the proof
      */
-    private ImmutableList<Goal> openGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> openGoals = ImmutableList.nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches possible.
      * If the list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
      */
-    private ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> closedGoals = ImmutableList.nil();
 
     /**
      * declarations &c, read from a problem file or otherwise
@@ -143,6 +155,15 @@ public class Proof implements ProofObject<Goal>, Named {
      * object.
      */
     private boolean disposed = false;
+
+    /**
+     * Set once an {@link EssentialProofListener} failed while handling an event: the step that
+     * fired it may have left the proof or a goal inconsistent, so the running search is stopped
+     * (the provers poll this), no new search may be started, but the proof object stays intact so
+     * the user can still attempt to save it. Volatile: written from the (possibly worker) firing
+     * thread, read by the prover loop(s) and the auto-mode control.
+     */
+    private volatile boolean erroneous = false;
 
     /**
      * list of rule app listeners
@@ -250,7 +271,7 @@ public class Proof implements ProofObject<Goal>, Named {
             InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
+                    .createSuccSequent(ImmutableList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
@@ -278,6 +299,13 @@ public class Proof implements ProofObject<Goal>, Named {
         // Do required cleanup
         if (getServices() != null) {
             getServices().getSpecificationRepository().removeProof(this);
+            // Drop the global JavaParserFacade resolution cache. It is a WeakHashMap whose values
+            // strongly reference their own (weak) keys, so without this the proof's Services - and
+            // thus the whole proof tree - would leak through it. See JavaParserFactory#dispose.
+            var javaService = getServices().getJavaServiceOrNull();
+            if (javaService != null) {
+                javaService.getProgramFactory().dispose();
+            }
         }
         if (localMgt != null) {
             localMgt.removeProofListener(); // This is strongly required because the listener is
@@ -448,6 +476,16 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
+    /**
+     * Hands out the next serial number for a {@link Node} of this proof. See
+     * {@link #nodeSerialCounter} for the guarantees (monotonic, per-proof, prune leaves gaps).
+     *
+     * @return a fresh node serial number
+     */
+    public int getNextNodeSerialNr() {
+        return nodeSerialCounter.getAndIncrement();
+    }
+
 
     public ProofSettings getSettings() {
         return initConfig.getSettings();
@@ -509,7 +547,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @see Goal#isAutomatic()
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
+        ImmutableList<Goal> enabledGoals = ImmutableList.nil();
         for (Goal g : goals) {
             if (g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
@@ -567,7 +605,7 @@ public class Proof implements ProofObject<Goal>, Named {
         if (b) {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
-            fireProofGoalsAdded(ImmutableSLList.nil());
+            fireProofGoalsAdded(ImmutableList.nil());
         }
     }
 
@@ -680,7 +718,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     void removeOpenGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal openGoal : openGoals()) {
             if (!toBeRemoved.contains(openGoal.node())) {
                 newGoalList = newGoalList.append(openGoal);
@@ -697,7 +735,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param toBeRemoved the goals to remove
      */
     void removeClosedGoals(Collection<Node> toBeRemoved) {
-        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        ImmutableList<Goal> newGoalList = ImmutableList.nil();
         for (Goal closedGoal : closedGoals) {
             if (!toBeRemoved.contains(closedGoal.node())) {
                 newGoalList = newGoalList.prepend(closedGoal);
@@ -807,9 +845,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofExpanded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofExpanded(e));
         }
     }
 
@@ -819,9 +855,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofIsBeingPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofIsBeingPruned(e));
         }
     }
 
@@ -831,9 +865,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofPruned(e);
-            }
+            notifyListeners(listenerList, l -> l.proofPruned(e));
         }
     }
 
@@ -844,9 +876,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofStructureChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofStructureChanged(e));
         }
     }
 
@@ -857,9 +887,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalRemoved(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalRemoved(e));
         }
     }
 
@@ -870,9 +898,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsAdded(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsAdded(e));
         }
     }
 
@@ -881,7 +907,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * fires the event that new goals have been added to the list of goals
      */
     protected void fireProofGoalsAdded(Goal goal) {
-        fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
+        fireProofGoalsAdded(ImmutableList.<Goal>nil().prepend(goal));
     }
 
 
@@ -891,9 +917,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofGoalsChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.proofGoalsChanged(e));
         }
     }
 
@@ -908,9 +932,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.proofClosed(e);
-            }
+            notifyListeners(listenerList, l -> l.proofClosed(e));
         }
     }
 
@@ -922,9 +944,7 @@ public class Proof implements ProofObject<Goal>, Named {
     protected void fireNotesChanged(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) {
-                listener.notesChanged(e);
-            }
+            notifyListeners(listenerList, l -> l.notesChanged(e));
         }
     }
 
@@ -975,7 +995,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(Node node) {
+    public @Nullable Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1000,13 +1020,27 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the closed goal that belongs to the given node or null if the node is an inner one or
      *         an open goal
      */
-    public Goal getClosedGoal(Node node) {
+    public @Nullable Goal getClosedGoal(Node node) {
         for (final Goal result : closedGoals) {
             if (result.node() == node) {
                 return result;
             }
         }
         return null;
+    }
+
+    /**
+     * Get the goal (open or closed) belonging to the given node if it exists.
+     *
+     * @param node the Node where a corresponding goal is searched
+     * @return the goal that belongs to the given node or null if the node is an inner one
+     */
+    public @Nullable Goal getGoal(Node node) {
+        Goal g = getOpenGoal(node);
+        if (g == null) {
+            g = getClosedGoal(node);
+        }
+        return g;
     }
 
     /**
@@ -1039,7 +1073,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the goals below node that are contained in <code>fromGoals</code>
      */
     private static ImmutableList<Goal> getGoalsBelow(Node node, ImmutableList<Goal> fromGoals) {
-        ImmutableList<Goal> result = ImmutableSLList.nil();
+        ImmutableList<Goal> result = ImmutableList.nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : fromGoals) {
             // if list contains node, remove it to make the list faster later
@@ -1138,13 +1172,90 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * Notifies every listener of an event, isolating the proof from a listener that throws. The
+     * caller must hold the monitor of {@code listeners}.
+     *
+     * <p>
+     * A failing <em>non-essential</em> listener (a pure observer) is logged and unregistered, and
+     * the remaining listeners are still notified: its brokenness cannot corrupt the proof, so the
+     * search continues unaffected.
+     *
+     * <p>
+     * A failing {@link EssentialProofListener} is different: it is part of the proving machinery,
+     * so its failure means the step that just fired this event may already have left the proof or a
+     * goal inconsistent. Continuing to prove would build on a broken state. Such a failure instead
+     * {@linkplain #markErroneous marks the proof erroneous} -- which cooperatively stops the
+     * running search and blocks any new one -- while leaving the proof intact so it can still be
+     * saved. The essential listener is <em>not</em> unregistered (dropping it would merely hide the
+     * problem), and no further listeners are notified for this event.
+     *
+     * @param listeners the listeners to notify (a throwing non-essential listener is pruned)
+     * @param notify the notification to deliver to each listener
+     * @param <L> the listener type
+     * @return the pruned (broken, unregistered) listeners; empty if none. Callers that notified a
+     *         snapshot list must drop these from the live registration list themselves.
+     */
+    private <L> List<L> notifyListeners(List<L> listeners, Consumer<L> notify) {
+        List<L> broken = null;
+        for (L listener : listeners) {
+            try {
+                notify.accept(listener);
+            } catch (Exception e) {
+                if (listener instanceof EssentialProofListener) {
+                    markErroneous(listener.getClass().getName(), e);
+                    // The proof is now flagged; the prover will stop at its next check and no new
+                    // search can start. Do not touch the remaining listeners for this event.
+                    break;
+                }
+                LOGGER.error("proof listener {} threw while handling an event and will be "
+                    + "unregistered to keep the proof consistent", listener.getClass().getName(),
+                    e);
+                if (broken == null) {
+                    broken = new ArrayList<>();
+                }
+                broken.add(listener);
+            }
+        }
+        if (broken != null) {
+            listeners.removeAll(broken);
+            return broken;
+        }
+        return List.of();
+    }
+
+    /**
+     * @return whether this proof has been flagged as erroneous because an
+     *         {@link EssentialProofListener} failed (see {@link #notifyListeners}). An erroneous
+     *         proof stops its running search and refuses to start a new one, but may still be
+     *         saved.
+     */
+    @Override
+    public boolean isErroneous() {
+        return erroneous;
+    }
+
+    /**
+     * Flags this proof as {@linkplain #isErroneous() erroneous} after an essential-listener
+     * failure. Idempotent; only the first failure is logged.
+     *
+     * @param listenerName the failing listener's class name (for the log)
+     * @param cause the throwable it raised
+     */
+    private void markErroneous(String listenerName, Throwable cause) {
+        if (!erroneous) {
+            erroneous = true;
+            LOGGER.error("essential proof listener {} failed; the proof search is stopped and the "
+                + "proof is marked erroneous (no further search possible). The proof can still be "
+                + "saved for a later reload attempt.", listenerName, cause);
+        }
+    }
+
+    /**
      * fires the event that a rule has been applied
      */
     protected void fireRuleApplied(ProofEvent p_e) {
         synchronized (ruleAppListenerList) {
-            for (RuleAppListener ral : ruleAppListenerList) {
-                ral.ruleApplied(p_e);
-            }
+            notifyListeners(ruleAppListenerList, ral -> ral.ruleApplied(p_e));
         }
     }
 
@@ -1160,6 +1271,147 @@ public class Proof implements ProofObject<Goal>, Named {
     public void removeRuleAppListener(RuleAppListener p) {
         synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
             ruleAppListenerList.remove(p);
+        }
+    }
+
+    /**
+     * Detaches every registered {@link ProofTreeListener} and {@link RuleAppListener} that is not
+     * tagged {@link EssentialProofListener}, and returns a handle that re-attaches them when
+     * closed.
+     *
+     * <p>
+     * This is the foundation for safe automatic (and, later, multithreaded) proof search: pure
+     * observers &mdash; caching, slicing, origin labels, GUI tree models, &hellip; &mdash; are
+     * suspended for the duration of a run so that nothing unrelated to proving fires on a worker
+     * thread or mutates shared state concurrently. Essential bookkeeping listeners keep running.
+     * {@link ProofDisposedListener}s are untouched, as disposal is not part of a run.
+     *
+     * <p>
+     * Intended use is a try-with-resources scope around the prover's run:
+     *
+     * <pre>
+     * try (var ignored = proof.suspendNonEssentialListeners()) {
+     *     prover.start(proof, goals, ...);
+     * } // observers re-attached here; the caller then refreshes them from the final state
+     * </pre>
+     *
+     * Suspended listeners are re-attached on {@link ListenerSuspension#close()}; their relative
+     * firing order is not guaranteed to be preserved, which is sound because proof listeners are
+     * mutually independent.
+     *
+     * @return a handle whose {@link ListenerSuspension#close()} restores the suspended listeners;
+     *         restoration is idempotent
+     */
+    public ListenerSuspension suspendNonEssentialListeners() {
+        return new ListenerSuspension();
+    }
+
+    /**
+     * Handle returned by {@link Proof#suspendNonEssentialListeners()}. Closing it (idempotently)
+     * re-attaches the listeners that were suspended.
+     */
+    public final class ListenerSuspension implements AutoCloseable {
+        private final List<ProofTreeListener> suspendedTreeListeners = new ArrayList<>();
+        private final List<RuleAppListener> suspendedRuleAppListeners = new ArrayList<>();
+        /**
+         * Distinct non-essential per-goal listeners (e.g. the GUI proof-tree model's goal listener,
+         * which is attached to every open goal). Unlike the proof-level listener lists, these are
+         * registered per goal and would otherwise fire on the worker threads during a parallel run
+         * -- and touch EDT-only state. They are detached for the run's duration and re-attached on
+         * {@link #close()}, to the <em>current</em> open goals (the goal set changes during the
+         * run).
+         */
+        private final Set<GoalListener> suspendedGoalListeners =
+            Collections.newSetFromMap(new IdentityHashMap<>());
+        private boolean restored = false;
+        /**
+         * Whether the proof was already closed when the listeners were suspended. Used to decide on
+         * {@link #close()} whether a {@code proofClosed} event was missed by the suspended
+         * listeners.
+         */
+        private final boolean closedAtSuspension = closed();
+
+        private ListenerSuspension() {
+            synchronized (listenerList) {
+                for (ProofTreeListener l : listenerList) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedTreeListeners.add(l);
+                    }
+                }
+                listenerList.removeAll(suspendedTreeListeners);
+            }
+            synchronized (ruleAppListenerList) {
+                for (RuleAppListener l : ruleAppListenerList) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedRuleAppListeners.add(l);
+                    }
+                }
+                ruleAppListenerList.removeAll(suspendedRuleAppListeners);
+            }
+            // Detach non-essential goal listeners from every open goal. (Construction runs before
+            // any
+            // worker starts, so the open-goal set and the goals' listener lists are stable here.)
+            for (Goal g : openGoals()) {
+                for (GoalListener l : g.getGoalListeners()) {
+                    if (!(l instanceof EssentialProofListener)) {
+                        suspendedGoalListeners.add(l);
+                    }
+                }
+            }
+            for (Goal g : openGoals()) {
+                for (GoalListener l : suspendedGoalListeners) {
+                    g.removeGoalListener(l);
+                }
+            }
+        }
+
+        /** Re-attaches the suspended listeners. Idempotent: a second call does nothing. */
+        @Override
+        public void close() {
+            if (restored) {
+                return;
+            }
+            restored = true;
+            synchronized (listenerList) {
+                listenerList.addAll(suspendedTreeListeners);
+            }
+            synchronized (ruleAppListenerList) {
+                ruleAppListenerList.addAll(suspendedRuleAppListeners);
+            }
+            // Re-attach to the goals that are open now (the run may have closed some and created
+            // others); remove-then-add keeps it idempotent and avoids duplicates. The view itself
+            // is
+            // refreshed from the final state by the caller (the GUI's autoModeStopped handler
+            // rebuilds
+            // the modified subtrees on the EDT).
+            for (Goal g : openGoals()) {
+                for (GoalListener l : suspendedGoalListeners) {
+                    g.removeGoalListener(l);
+                    g.addGoalListener(l);
+                }
+            }
+            // If the proof closed while its non-essential listeners were suspended, the proofClosed
+            // event reached only the essential listeners; the suspended ones (e.g. the GUI's
+            // "proof closed" notification, the task and goal views) missed it. Re-deliver it to
+            // them now. This runs after the parallel run has joined all workers, so it is a single
+            // delivery on one thread -- the same context in which proofClosed fires for the
+            // single-threaded prover.
+            if (!closedAtSuspension && !mutedProofCloseEvents && closed()) {
+                ProofTreeEvent event = new ProofTreeEvent(Proof.this);
+                // go through notifyListeners for the same per-listener exception isolation every
+                // other proofClosed dispatch uses; a throwing GUI listener must not escape here and
+                // abort the parallel run's winddown
+                List<ProofTreeListener> broken =
+                    notifyListeners(suspendedTreeListeners, l -> l.proofClosed(event));
+                if (!broken.isEmpty()) {
+                    // notifyListeners pruned them from the suspension snapshot, which is about to
+                    // be discarded -- but they were already re-attached above, so unregister them
+                    // from the live list as well.
+                    synchronized (listenerList) {
+                        listenerList.removeAll(broken);
+                    }
+                }
+            }
         }
     }
 

@@ -18,7 +18,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -135,7 +134,7 @@ public class ProofObligationVars {
      */
     private ImmutableList<JTerm> buildFormalParamVars(Services services)
             throws IllegalArgumentException {
-        ImmutableList<JTerm> formalParamVars = ImmutableSLList.nil();
+        ImmutableList<JTerm> formalParamVars = ImmutableList.nil();
         for (JTerm param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());

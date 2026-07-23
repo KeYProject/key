@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -16,9 +17,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -33,23 +32,18 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial(ImmutableSLList.nil(), BigInteger.ONE);
+    public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
 
     public static Monomial create(Term monoTerm, Services services) {
-        final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
+        final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
         monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);
-        Monomial res;
-
-        synchronized (monomialCache) {
-            res = monomialCache.get(monoTerm);
-        }
+        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
+        Monomial res = monomialCache.get(monoTerm);
 
         if (res == null) {
             res = createHelp(monoTerm, services);
-            synchronized (monomialCache) {
-                monomialCache.put(monoTerm, res);
-            }
+            monomialCache.put(monoTerm, res);
         }
         return res;
     }
@@ -134,7 +128,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if (a.signum() == 0 || c.signum() == 0) {
-            return new Monomial(ImmutableSLList.nil(), BigInteger.ZERO);
+            return new Monomial(ImmutableList.nil(), BigInteger.ZERO);
         }
 
         return new Monomial(difference(m.parts, this.parts), LexPathOrdering.divide(a, c));
@@ -237,7 +231,7 @@ public class Monomial {
 
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
-        public ImmutableList<Term> parts = ImmutableSLList.nil();
+        public ImmutableList<Term> parts = ImmutableList.nil();
         private final Services services;
         private final Operator numbers, mul;
 

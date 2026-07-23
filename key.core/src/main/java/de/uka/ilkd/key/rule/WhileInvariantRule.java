@@ -315,7 +315,7 @@ public class WhileInvariantRule implements BuiltInRule {
             var anonUpdate = createLocalAnonUpdate(localOuts, services);
             localAnonUpdate = anonUpdate != null ? anonUpdate : tb.skip();
             // Term anonAssumption = null;
-            ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
+            ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableList.nil();
             for (LocationVariable heap : heapContext) {
                 final AnonUpdateData tAnon =
                     createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);
@@ -699,5 +699,20 @@ public class WhileInvariantRule implements BuiltInRule {
             useGoal.changeFormula(new SequentFormula(tb.applySequential(uAnon, guardFalseRestPsi)),
                 ruleApp.posInOccurrence());
         }
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                Loops can be handled by expanding or by using a loop invariant.
+                An invariant can be created manually or supplied by the JML specification.
+                Use of this rule creates three subgoals, two of which are new proof obligations:
+
+                1. It must be shown that the loop invariant is initially valid.
+
+                2. The loop body needs to preserve the invariant.
+
+                In the third subgoal, the loop invariant can be used.
+                """;
     }
 }

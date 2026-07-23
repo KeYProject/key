@@ -718,9 +718,12 @@ public final class IOUtil {
                 String protocol = url.getProtocol();
                 String userInfo = url.getUserInfo();
                 String host = url.getHost();
-                // A '+' in file names is not supported, since it is converted
-                // into a space ('%20') according to the URI standard.
-                String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
+                // URLDecoder decodes the application/x-www-form-urlencoded form, in which a
+                // literal '+' denotes a space. A URL path, however, never uses '+' for a space
+                // (it is percent-encoded as %20), so a '+' here is part of the file name and must
+                // be preserved. Protect it before decoding the remaining percent-escapes.
+                String path =
+                    URLDecoder.decode(url.getPath().replace("+", "%2B"), StandardCharsets.UTF_8);
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
@@ -734,6 +737,40 @@ public final class IOUtil {
             }
         } catch (URISyntaxException e) {
             return null;
+        }
+    }
+
+    public static URL makeMemoryURL(String data) {
+        try {
+            return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)),
+                new MemoryDataHandler(data));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final class MemoryDataHandler extends URLStreamHandler {
+        private final String data;
+
+        public MemoryDataHandler(String data) {
+            this.data = data;
+        }
+
+        @Override
+        protected URLConnection openConnection(URL u) throws IOException {
+            // perhaps check the hash code too?
+            if (!u.getProtocol().equals("memory")) {
+                throw new IOException("Unsupported protocol");
+            }
+            return new URLConnection(u) {
+                @Override
+                public void connect() {}
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(data.getBytes());
+                }
+            };
         }
     }
 

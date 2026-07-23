@@ -14,6 +14,7 @@ import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -22,6 +23,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * rule application must not be one side of an equation that is the instantiation of the first
  * if-formula. If the rule application is admissible, zero is returned.
  */
+@StableCost
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new CheckApplyEqFeature();

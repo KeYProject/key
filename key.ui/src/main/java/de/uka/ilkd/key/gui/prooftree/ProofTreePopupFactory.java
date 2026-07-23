@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
@@ -384,6 +385,9 @@ public final class ProofTreePopupFactory {
                                         .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
                     setEnabled(true);
                 }
+                if (context.invokedNode.lookup(ClosedBy.class) != null) {
+                    setEnabled(true);
+                }
             }
         }
 
@@ -484,6 +488,10 @@ public final class ProofTreePopupFactory {
 
                     @Override
                     public void eventException(Throwable throwable) {
+                        // Clear the "Cutting..." status and its indeterminate ("busy") progress
+                        // bar; the success path does this in eventEnd, and without it the bar
+                        // keeps animating forever after a failed cut.
+                        mediator.getUI().resetStatus(this);
                         mediator.startInterface(true);
 
                         mediator.notify(new ExceptionFailureEvent(

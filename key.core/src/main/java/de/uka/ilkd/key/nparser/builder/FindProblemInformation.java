@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
 
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
 
@@ -24,7 +26,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     private final @NonNull ProblemInformation information = new ProblemInformation();
 
     @Override
-    public Object visitFile(KeYParser.FileContext ctx) {
+    public Object visitFile(JavaKeYParser.FileContext ctx) {
         if (ctx.profile() != null) {
             information.setProfile(accept(ctx.profile()));
         }
@@ -36,16 +38,16 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
             it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
-        information.setJavaSource(acceptFirst(ctx.javaSource()));
+        information.setJavaSource(acceptFirst(ctx.programSource()));
         return null;
     }
 
     @Override
-    public Object visitProblem(KeYParser.ProblemContext ctx) {
+    public Object visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
                 information.setChooseContract(accept(ctx.chooseContract));
@@ -66,38 +68,49 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
 
     @Override
-    public String visitBootClassPath(KeYParser.BootClassPathContext ctx) {
-        return accept(ctx.string_value());
+    public String visitBootClassPath(JavaKeYParser.BootClassPathContext ctx) {
+        String value = accept(ctx.string_value());
+        if (value != null) {
+            information.putPathLocation(value, Location.fromToken(ctx.string_value().getStart()));
+        }
+        return value;
     }
 
     @Override
-    public List<String> visitClassPaths(KeYParser.ClassPathsContext ctx) {
-        return mapOf(ctx.string_value());
+    public List<String> visitClassPaths(JavaKeYParser.ClassPathsContext ctx) {
+        List<String> result = new ArrayList<>(ctx.string_value().size());
+        for (var sv : ctx.string_value()) {
+            String value = accept(sv);
+            result.add(value);
+            if (value != null) {
+                information.putPathLocation(value, Location.fromToken(sv.getStart()));
+            }
+        }
+        return result;
     }
 
     @Override
-    public String visitString_value(KeYParser.String_valueContext ctx) {
+    public String visitString_value(JavaKeYParser.String_valueContext ctx) {
         return ParsingFacade.getValueDocumentation(ctx);
     }
 
-
     @Override
-    public String visitJavaSource(KeYParser.JavaSourceContext ctx) {
-        return ctx.oneJavaSource() != null ? (String) accept(ctx.oneJavaSource()) : null;
+    public String visitProgramSource(JavaKeYParser.ProgramSourceContext ctx) {
+        return ctx.oneProgramSource() != null ? (String) accept(ctx.oneProgramSource()) : null;
     }
 
     @Override
-    public String visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
+    public String visitOneProgramSource(JavaKeYParser.OneProgramSourceContext ctx) {
         return StringUtil.trim(ctx.getText(), '"');
     }
 
     @Override
-    public Object visitProfile(KeYParser.ProfileContext ctx) {
+    public Object visitProfile(JavaKeYParser.ProfileContext ctx) {
         return accept(ctx.name);
     }
 
     @Override
-    public String visitPreferences(KeYParser.PreferencesContext ctx) {
+    public String visitPreferences(JavaKeYParser.PreferencesContext ctx) {
         return ctx.s != null ? (String) accept(ctx.s) : null;
     }
 

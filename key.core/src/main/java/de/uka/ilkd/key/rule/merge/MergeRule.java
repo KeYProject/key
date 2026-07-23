@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -41,7 +42,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -332,7 +332,7 @@ public class MergeRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
-        ImmutableList<JTerm> newElementaryUpdates = ImmutableSLList.nil();
+        ImmutableList<JTerm> newElementaryUpdates = ImmutableList.nil();
 
         // New constraints on introduced Skolem constants
         JTerm newAdditionalConstraints = null;
@@ -590,6 +590,14 @@ public class MergeRule implements BuiltInRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        // MergeRule links several goals into one and would therefore need to lock multiple goals
+        // at once. That is not yet safe under goal-level concurrency, so the rule is disabled while
+        // a multi-worker parallel run is active ON THIS PROOF -- single-threaded proving is
+        // unaffected, and so are other proofs in the same JVM (including single-core side proofs
+        // spawned by a worker of a parallel run).
+        if (ParallelProver.isMultiThreadedRunActive(goal.proof())) {
+            return false;
+        }
         return isOfAdmissibleForm(goal, pio, true);
     }
 
@@ -680,7 +688,7 @@ public class MergeRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> potentialPartners = ImmutableList.nil();
 
         for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {

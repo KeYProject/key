@@ -1,0 +1,25 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':key.util')
+    api project(':key.ncore')
+    api project(':key.ncore.calculus')
+    implementation(libs.jspecify)
+}
+
+checkerFramework {
+    if (System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}

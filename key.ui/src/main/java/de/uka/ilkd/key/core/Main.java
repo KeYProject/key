@@ -26,7 +26,9 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.prover.impl.ParallelProver;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -86,6 +88,19 @@ public final class Main implements Callable<Integer> {
         description = "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)",
         defaultValue = "0")
     private int autoSaveSteps = 0;
+
+    /**
+     * Number of worker threads for the multi-core prover. A value &gt;= 1 enables the multi-core
+     * prover (capped at the available processors); 0 leaves the persisted prover-mode setting
+     * untouched (single-core by default).
+     */
+    @Option(names = "--threads", paramLabel = "INT",
+        description = "run automatic proof search on the multi-core prover with INT worker threads "
+            + "(>= 1, capped at the available processors). Omit for the single-core prover. "
+            + "The single-core-only features (proof caching, slicing, merge rule) are off under "
+            + "multi-worker runs (more than one worker); note that proof caching and slicing do "
+            + "not record parallel runs even with a single worker.")
+    private int proverThreads = 0;
 
     /**
      * Lists all features currently marked as experimental. Unless invoked with
@@ -231,6 +246,9 @@ public final class Main implements Callable<Integer> {
     public Integer call() throws Exception {
         Debug.ENABLE_DEBUG = debug;
 
+        // weigl: the configuration folder is not fixed anymore since v3.0
+        LOGGER.info("The configuration folder is here {}", PathConfig.currentPaths.keyConfigDir);
+
         try {
             // weigl: You can set assertion status via the system class loader,
             // but can not get its current status. Here a workaround.
@@ -247,6 +265,19 @@ public final class Main implements Callable<Integer> {
 
         GeneralSettings.noPruningClosed = isNoPruningClosed;
         GeneralSettings.keepFileRepos = isKeepFileRepos;
+
+        if (proverThreads >= 1) {
+            // Apply --threads as a TRANSIENT process-scoped override via system properties.
+            // Mutating GeneralSettings here would fire a PropertyChange that
+            // ProofIndependentSettings turns into saveSettings(), permanently rewriting the user's
+            // persisted prover mode from a one-off CLI run. The run-selection seam
+            // (ParallelProver.isEnabled()/effectiveWorkerCount(), reached via AutoProvers.create)
+            // reads these properties first, so the override still takes effect for headless --auto
+            // and GUI automode without touching the settings file.
+            int workers = Math.min(proverThreads, Runtime.getRuntime().availableProcessors());
+            System.setProperty(ParallelProver.PARALLEL_PROPERTY, "true");
+            System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(workers));
+        }
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
@@ -448,25 +479,27 @@ public final class Main implements Callable<Integer> {
     }
 
     public static void ensureExamplesAvailable() {
-        File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
-                : new File(getExamplesDir());
-        if (!examplesDir.exists()) {
+        Path examplesDir =
+            getExamplesDir() == null ? ExampleChooser.lookForExamples() : getExamplesDir();
+        if (!Files.exists(examplesDir)) {
             examplesDir = setupExamples();
         }
-        setExamplesDir(examplesDir.getAbsolutePath());
+        if (examplesDir != null) {
+            setExamplesDir(examplesDir.toAbsolutePath());
+        }
     }
 
-    private static File setupExamples() {
+    private static @Nullable Path setupExamples() {
         try {
             URL examplesURL = Main.class.getResource("/examples.zip");
             if (examplesURL == null) {
                 throw new IOException("Missing examples.zip in resources");
             }
 
-            File tempDir = createTempDirectory();
+            Path tempDir = Files.createTempDirectory("key-examples");
 
             if (tempDir != null) {
-                IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath());
+                IOUtil.extractZip(examplesURL.openStream(), tempDir);
             }
             return tempDir;
         } catch (IOException e) {
@@ -524,9 +557,9 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static String EXAMPLE_DIR = null;
+    private static Path EXAMPLE_DIR = null;
 
-    public static @Nullable String getExamplesDir() {
+    public static @Nullable Path getExamplesDir() {
         return EXAMPLE_DIR;
     }
 
@@ -537,7 +570,7 @@ public final class Main implements Callable<Integer> {
      *
      * @param newExamplesDir The new examples directory to use.
      */
-    public static void setExamplesDir(String newExamplesDir) {
+    public static void setExamplesDir(Path newExamplesDir) {
         EXAMPLE_DIR = newExamplesDir;
     }
 }

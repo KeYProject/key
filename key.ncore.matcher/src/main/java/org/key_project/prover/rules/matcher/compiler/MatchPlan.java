@@ -1,0 +1,56 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.prover.rules.matcher.compiler;
+
+import java.util.List;
+
+import org.key_project.prover.rules.matcher.vm.MatchProgram;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
+
+/**
+ * A node of a <em>match plan</em>: a single, language-agnostic description of how to match one
+ * (sub)pattern, from which <em>both</em> back-ends are derived.
+ *
+ * <p>
+ * A match plan is built once per find pattern (the term shape a proof rule, called a taclet,
+ * applies to) when the rule base is loaded, by a per-language
+ * dispatch that composes plan nodes for each syntax construct. The point is that each construct is
+ * described in exactly one place: a node carries both
+ * <ul>
+ * <li>{@link #emit(List)}: the interpreted back-end; it appends the cursor-based
+ * {@link VMInstruction}s executed by {@code VMProgramInterpreter}; and</li>
+ * <li>{@link #compile()}: the compiled back-end; it builds a cursor-free {@link MatchProgram} that
+ * navigates the syntax element directly.</li>
+ * </ul>
+ * Adding a construct (or fixing its matching) is therefore done once, in the node, and both the
+ * interpreter and the compiler stay in sync by construction.
+ *
+ * <p>
+ * Both emissions are produced at plan-construction time (when the taclet base is loaded), not
+ * during proof search: matching runs the emitted {@code VMInstruction[]} or the compiled
+ * {@link MatchProgram}, with no plan-tree overhead.
+ */
+public interface MatchPlan {
+
+    /**
+     * Appends, to {@code out}, the {@link VMInstruction}s matching this (sub)pattern for the
+     * cursor-based interpreter. The cursor is expected to point at the element to be matched and,
+     * on completion of the appended instructions, to have advanced past it (to its next sibling),
+     * so that sibling plans can be appended directly after.
+     *
+     * @param out the instruction list being built
+     */
+    void emit(List<VMInstruction> out);
+
+    /**
+     * Builds the cursor-free compiled matcher for this (sub)pattern. The returned
+     * {@link MatchProgram} is applied to the syntax element to be matched (the same element the
+     * interpreter's cursor would point at) and returns the extended match result, or {@code null}
+     * on failure. Called at most once per plan, when the taclet's matcher is constructed; it may
+     * allocate and its result is not memoized.
+     *
+     * @return the compiled matcher for this plan node
+     */
+    MatchProgram compile();
+}

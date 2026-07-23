@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -44,18 +44,18 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitFile(KeYParser.FileContext ctx) {
+    public Object visitFile(JavaKeYParser.FileContext ctx) {
         return accept(ctx.decls());
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
         return null;
     }
 
     @Override
-    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         Sort sort;
@@ -77,11 +77,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             sort = sorts().lookup(ctx.name.getText());
             genericParams = null;
         }
-        for (KeYParser.Datatype_constructorContext constructorContext : ctx
+        for (JavaKeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
             Sort[] args = new Sort[constructorContext.sortId().size()];
             var argNames = constructorContext.argName;
+            var doc = processDocumentation(constructorContext.doc);
             for (int i = 0; i < args.length; i++) {
                 Sort argSort = accept(constructorContext.sortId(i));
                 args[i] = argSort;
@@ -105,10 +106,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                                 || !alreadyDefinedFn.argSorts().equals(ImmutableList.of(sort)))) {
                     // The condition checks whether there is already a function with the same name
                     // but different signature. This is necessarily true if there is a globally
-                    // defined function
-                    // of the same name and may or may not be true if there is another constructor
-                    // argument of the
-                    // same name.
+                    // defined function of the same name and may or may not be true if there
+                    // is another constructor argument of the same name.
                     semanticError(argNames.get(i), "Name already in namespace: %s" +
                         ". Identifiers in datatype definitions must be unique (also wrt. global functions).",
                         argName);
@@ -127,10 +126,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genericParams == null) {
                 var fn = new JFunction(name, sort, args, null, true, false);
                 functions().addSafely(fn);
+                docsSpace().setDocumentation(fn, doc);
             } else {
                 var fn = new ParametricFunctionDecl(name, genericParams, new ImmutableArray<>(args),
                     sort, null, true, true, false);
                 namespaces().parametricFunctions().add(fn);
+                docsSpace().setDocumentation(fn, doc);
             }
         }
         if (genericParams != null) {
@@ -142,10 +143,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitPred_decl(KeYParser.Pred_declContext ctx) {
+    public Object visitPred_decl(JavaKeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
         List<GenericParameter> params = ctx.formal_sort_param_decls() == null ? null
                 : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
+        String doc = processDocumentation(ctx.doc);
         List<Boolean> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         if (whereToBind != null && whereToBind.size() != argSorts.size()) {
@@ -182,6 +184,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (lookup(p.name()) == null) {
             functions().add(p);
+            docsSpace().setDocumentation(p, doc);
         } else {
             // weigl: agreement on KaKeY meeting: this should be an error.
             semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");
@@ -190,7 +193,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitFunc_decl(KeYParser.Func_declContext ctx) {
+    public Object visitFunc_decl(JavaKeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
         String funcName = accept(ctx.funcpred_name());
@@ -240,13 +243,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
+    public Object visitFunc_decls(JavaKeYParser.Func_declsContext ctx) {
         return mapOf(ctx.func_decl());
     }
 
 
     @Override
-    public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
+    public Object visitTransform_decl(JavaKeYParser.Transform_declContext ctx) {
         Sort retSort = ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId());
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
@@ -260,13 +263,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitTransform_decls(KeYParser.Transform_declsContext ctx) {
+    public Object visitTransform_decls(JavaKeYParser.Transform_declsContext ctx) {
         return mapOf(ctx.transform_decl());
     }
 
 
     @Override
-    public Object visitPred_decls(KeYParser.Pred_declsContext ctx) {
+    public Object visitPred_decls(JavaKeYParser.Pred_declsContext ctx) {
         return mapOf(ctx.pred_decl());
     }
 }

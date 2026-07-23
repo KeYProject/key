@@ -5,7 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.List;
 
-import de.uka.ilkd.key.parser.Location;
+import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

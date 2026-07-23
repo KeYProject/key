@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.*;
 
 import de.uka.ilkd.key.nparser.ChoiceInformation;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
@@ -39,14 +39,14 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         ctx.option_decls().forEach(this::accept);
         ctx.options_choice().forEach(this::accept);
         return null;
     }
 
     @Override
-    public Object visitChoice(KeYParser.ChoiceContext ctx) {
+    public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
         ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
@@ -56,13 +56,14 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         }
 
         seq().put(category, new HashSet<>(options));
-        choiceInformation.setDefaultOption(category, options.get(0));
-        options.forEach(it -> choices().add(new Choice(it, category)));
+        var choices = options.stream().map(it -> new Choice(it, category)).toList();
+        choices.forEach(it -> choices().add(it));
+        choiceInformation.setDefaultOption(category, choices.getFirst());
         return null;
     }
 
     @Override
-    public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
+    public Choice visitActivated_choice(JavaKeYParser.Activated_choiceContext ctx) {
         String cat = ctx.cat.getText();
         String ch = ctx.choice_.getText();
         if (activatedChoicesCategories().contains(cat)) {

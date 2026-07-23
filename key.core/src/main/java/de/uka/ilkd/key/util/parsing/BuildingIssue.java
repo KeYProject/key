@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -47,11 +48,23 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
         return fromToken(message, true, token, cause);
     }
 
-    public PositionedString asPositionedString() {
-        try {
-            return new PositionedString(message, new Location(new URI(sourceName), position));
-        } catch (URISyntaxException e) {
-            return null;
+    /**
+     * The source location of this issue (file + position). The file may be absent if the source
+     * cannot be resolved to a URL; the position may be {@link Position#UNDEFINED}.
+     */
+    public Location getLocation() {
+        URI uri = null;
+        if (sourceName != null) {
+            try {
+                uri = MiscTools.parseURL(sourceName).toURI();
+            } catch (Exception e) {
+                uri = null;
+            }
         }
+        return new Location(uri, position);
+    }
+
+    public PositionedString asPositionedString() {
+        return new PositionedString(message, getLocation());
     }
 }

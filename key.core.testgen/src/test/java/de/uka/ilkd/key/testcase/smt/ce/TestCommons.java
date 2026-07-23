@@ -20,9 +20,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SMTTestSettings;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,9 +65,12 @@ public abstract class TestCommons {
 
     protected boolean correctResult(String filepath, boolean isValid)
             throws ProblemLoaderException {
-        if (toolNotInstalled()) {
-            return true;
-        }
+        // Skip (rather than silently pass) when the solver is not available: a green result from a
+        // test that never actually ran the solver is misleading. Genuine solver/translation errors
+        // are deliberately NOT swallowed here, so real regressions still fail.
+        Assumptions.assumeFalse(toolNotInstalled(),
+            () -> "SMT solver " + getSolverType().getName()
+                + " is not installed/usable; skipping test.");
         SMTSolverResult result = checkFile(filepath);
         // System.gc();
         // unknown is always allowed. But wrong answers are not allowed

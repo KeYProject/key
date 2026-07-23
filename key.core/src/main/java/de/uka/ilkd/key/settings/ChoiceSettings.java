@@ -11,7 +11,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -31,12 +30,11 @@ public class ChoiceSettings extends AbstractSettings {
      * maps categories to a set of Strings(representing the choices which are options for this
      * category).
      */
-    private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
-    private Map<String, String> category2Default;
+    private Map<String, Set<String>> category2Choices = new TreeMap<>();
+    private Map<String, String> category2Default = new TreeMap<>();
 
 
     public ChoiceSettings() {
-        category2Default = new LinkedHashMap<>();
     }
 
 
@@ -77,16 +75,21 @@ public class ChoiceSettings extends AbstractSettings {
     }
 
     private static ImmutableSet<Choice> choiceMap2choiceSet(Map<String, String> ccc) {
-        ImmutableList<Choice> choices = ImmutableSLList.nil();
+        ImmutableList<Choice> choices = ImmutableList.nil();
         for (final Map.Entry<String, String> entry : ccc.entrySet()) {
             choices = choices.prepend(new Choice(new Name(entry.getValue()), entry.getKey()));
         }
         return DefaultImmutableSet.fromImmutableList(choices);
     }
 
-    private void setChoiceCategories(HashMap<String, Set<String>> c2C) {
+
+    public Map<String, Set<String>> getCategory2Choices() {
+        return category2Choices;
+    }
+
+    public void setChoiceCategories(Map<String, Set<String>> c2C) {
         var old = category2Choices;
-        this.category2Choices = new HashMap<>(c2C);
+        this.category2Choices = new TreeMap<>(c2C);
         firePropertyChange(PROP_CHOICE_CATEGORIES, old, category2Choices);
     }
 

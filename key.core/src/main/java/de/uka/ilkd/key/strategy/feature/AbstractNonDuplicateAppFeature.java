@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
@@ -21,6 +23,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
@@ -86,13 +90,37 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
-        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
+        if (!equalUpdateContext(inst0.getUpdateContext(), inst1.getUpdateContext())) {
             return false;
         }
 
         final var interesting0 = inst0.interesting();
         final var interesting1 = inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
+    }
+
+    /**
+     * Compare two update contexts modulo irrelevant term labels. Labels carry history (e.g.
+     * origin), and a label-sensitive comparison would let a duplicate escape the veto
+     * nondeterministically -- exactly what the surrounding duplicate check avoids. Matches the
+     * mod-label focus-term comparison in
+     * {@link NonDuplicateAppModPositionFeature#comparePio}, which shares this helper for its
+     * update-context part.
+     */
+    protected static boolean equalUpdateContext(ImmutableList<UpdateLabelPair> ctx0,
+            ImmutableList<UpdateLabelPair> ctx1) {
+        if (ctx0.size() != ctx1.size()) {
+            return false;
+        }
+        final var it0 = ctx0.iterator();
+        final var it1 = ctx1.iterator();
+        while (it0.hasNext()) {
+            if (!it0.next().update().equalsModProperty(it1.next().update(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean subset(ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
@@ -105,8 +133,18 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
-            if (instEntry1 == null
-                    || !entry0.value().getInstantiation().equals(instEntry1.getInstantiation())) {
+            if (instEntry1 == null) {
+                return false;
+            }
+            // instantiation terms are compared modulo term labels: labels carry history (e.g.
+            // origin) and would make the duplicate check miss semantically equal applications
+            final Object inst0 = entry0.value().getInstantiation();
+            final Object inst1 = instEntry1.getInstantiation();
+            if (inst0 instanceof JTerm term0 && inst1 instanceof JTerm term1) {
+                if (!term0.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    return false;
+                }
+            } else if (!inst0.equals(inst1)) {
                 return false;
             }
         }
@@ -125,9 +163,21 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
-        List<RuleApp> apps = cache.get(node, app.rule().name());
+        // A duplicate must agree on the focus term up to term labels (every comparePio variant,
+        // including the modulo-position one, implies this), so it shares the candidate's focus-term
+        // fingerprint and can only be in that bucket -- PROVIDED the fingerprint itself ignores
+        // term labels, matching the equality the buckets are probed with: a label-sensitive
+        // fingerprint would put a duplicate whose focus differs only in (history-dependent, e.g.
+        // origin) labels into a different bucket, where it would silently escape the veto.
+        // AppliedRuleAppsNameCache#focusFingerprint is label-insensitive by construction. A
+        // find-less application (pos == null) lands in bucket 0, where all find-less applications
+        // of
+        // this name live (a taclet name is either find or find-less, never both).
+        final int fingerprint = pos == null ? 0
+                : AppliedRuleAppsNameCache.focusFingerprint(pos.subTerm());
+        List<RuleApp> apps = cache.get(node, app.rule().name(), fingerprint);
 
-        // Check all rules with this name
+        // Check all rules with this name in the same fingerprint bucket
         for (RuleApp a : apps) {
             if (sameApplication(a, app, pos)) {
                 return false;

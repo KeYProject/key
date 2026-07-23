@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -38,16 +39,16 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
- * one node -- the root -- that has to be proved. Therefore it is divided up into several sub goals
+ * one node -- the root -- that has to be proved. Therefor it is divided up into several sub goals
  * and so on. A single goal is not divided into sub goals any longer if the contained sequent
  * becomes an axiom. A proof is closed if all leaves are closed. As the calculus works only on the
  * leaves of a tree, the goals are the additional information needed for the proof is only stored at
@@ -79,7 +80,7 @@ public final class Goal implements ProofGoal<Goal> {
      * list of all applied rule applications at this branch
      */
     private ImmutableList<RuleApp> appliedRuleApps =
-        ImmutableSLList.nil();
+        ImmutableList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -133,7 +134,7 @@ public final class Goal implements ProofGoal<Goal> {
             Services services) {
         this.node = node;
         this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
-        this.appliedRuleApps = ImmutableSLList.nil();
+        this.appliedRuleApps = ImmutableList.nil();
         this.goalStrategy = null;
         this.strategyInfos = new MapProperties();
         this.tagManager = new FormulaTagManager(this);
@@ -233,6 +234,18 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     /**
+     * Returns a snapshot of the goal listeners currently registered on this goal. Used by
+     * {@link Proof#suspendNonEssentialListeners()} to detach non-essential (e.g. GUI) goal
+     * listeners
+     * for the duration of a parallel run, so they do not fire on worker threads.
+     *
+     * @return a copy of this goal's registered {@link GoalListener}s
+     */
+    public List<GoalListener> getGoalListeners() {
+        return new ArrayList<>(listeners);
+    }
+
+    /**
      * informs all goal listeners about a change of the sequent to reduce unnecessary object
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
@@ -243,6 +256,15 @@ public final class Goal implements ProofGoal<Goal> {
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex.sequentChanged(sci);
+        // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
+        // assumes-bases on their matching round (see QueueRuleApplicationManager#parkedByOp).
+        RuleApplicationManager<Goal> m = ruleAppManager;
+        while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
+            m = d.getDelegate();
+        }
+        if (m instanceof QueueRuleApplicationManager qm) {
+            qm.sequentChanged(sci);
+        }
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
@@ -543,7 +565,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.nil();
+        ImmutableList<Goal> goalList = ImmutableList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced
@@ -596,6 +618,16 @@ public final class Goal implements ProofGoal<Goal> {
         node.getNodeInfo().setBranchLabel(s);
     }
 
+    /**
+     * Sets the branch label lazily: {@code labelSupplier} is evaluated only when the label is first
+     * read (display/save), keeping term stringification off the proof-search path.
+     *
+     * @param labelSupplier supplies the branch label on demand
+     */
+    public void setBranchLabel(Supplier<String> labelSupplier) {
+        node.getNodeInfo().setBranchLabel(labelSupplier);
+    }
+
     void pruneToParent() {
         setNode(node().parent());
         removeLastAppliedRuleApp();
@@ -628,6 +660,48 @@ public final class Goal implements ProofGoal<Goal> {
      */
     @Override
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+        final PendingRuleApp pending = computeRuleApp(ruleApp);
+        if (pending == null) {
+            return null;
+        }
+        return commitRuleApp(pending);
+    }
+
+    /**
+     * The result of {@link #computeRuleApp(RuleApp)}: everything a rule application produced that
+     * has
+     * not yet been committed to the (shared) proof. Created on the worker thread, consumed by
+     * {@link #commitRuleApp(PendingRuleApp)}.
+     */
+    public static final class PendingRuleApp {
+        private final RuleApp ruleApp;
+        private final NodeChangeJournal journal;
+        private final Node originalNode;
+        private final ImmutableList<Goal> goalList;
+
+        private PendingRuleApp(RuleApp ruleApp, NodeChangeJournal journal, Node originalNode,
+                ImmutableList<Goal> goalList) {
+            this.ruleApp = ruleApp;
+            this.journal = journal;
+            this.originalNode = originalNode;
+            this.goalList = goalList;
+        }
+    }
+
+    /**
+     * Compute phase of a rule application: run the rule executor (term construction, node
+     * splitting)
+     * without touching shared proof state. Safe to run concurrently for distinct goals &mdash; it
+     * mutates only this goal's own node subtree, the atomic node counter and the thread-safe
+     * strategy caches. The
+     * {@link #commitRuleApp(PendingRuleApp)} step then performs the shared mutation under the
+     * prover's commit lock. The plain {@link #apply(RuleApp)} runs the two back to back, so the
+     * single-threaded behaviour is unchanged.
+     *
+     * @param ruleApp the rule application to perform
+     * @return the pending application to be committed, or {@code null} if the rule aborted
+     */
+    public @Nullable PendingRuleApp computeRuleApp(final RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
@@ -635,10 +709,6 @@ public final class Goal implements ProofGoal<Goal> {
 
         final Node n = node;
 
-        /*
-         * wrap the services object into an overlay such that any addition to local symbols is
-         * caught.
-         */
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         ruleApp.checkApplicability();
@@ -649,30 +719,51 @@ public final class Goal implements ProofGoal<Goal> {
         } catch (RuleAbortException rae) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
+            // detach the journal: only the success path (via getRuleAppInfo) removes it, so an
+            // aborted application would otherwise leak the listener (inherited by subgoals on
+            // split)
+            removeGoalListener(journal);
             return null;
         } catch (IndexOutOfBoundsException e) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
+            removeGoalListener(journal);
             return null;
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
 
-        proof.getServices().saveNameRecorder(n);
+        return new PendingRuleApp(ruleApp, journal, n, goalList);
+    }
+
+    /**
+     * Commit phase of a rule application: the shared-state mutation (proof-tree update,
+     * name-recorder
+     * stashing and the {@code ruleApplied} event). The parallel prover runs this under its commit
+     * lock; the order of operations is identical to the original monolithic {@code apply}.
+     *
+     * @param pending the result of {@link #computeRuleApp(RuleApp)}
+     * @return the new goals
+     */
+    public ImmutableList<Goal> commitRuleApp(final PendingRuleApp pending) {
+        final Proof proof = proof();
+        final ImmutableList<Goal> goalList = pending.goalList;
+
+        proof.getServices().saveNameRecorder(pending.originalNode);
 
         if (goalList.isEmpty()) {
             proof.closeGoal(this);
         } else {
             proof.replace(this, goalList);
-            if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
-                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
+            if (pending.ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
+                    || pending.ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }
         }
 
         adaptNamespacesNewGoals(goalList);
-        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
+        final RuleAppInfo ruleAppInfo = pending.journal.getRuleAppInfo(pending.ruleApp);
         proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
     }
@@ -682,30 +773,32 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     /*
-     * when the new goals are created during splitting, their namespaces cannot be fixed yet as new
-     * symbols may still be added.
+     * When the new goals are created during splitting, their namespaces cannot be fixed yet as new
+     * symbols may still be added; this finalizes them once the rule application has committed.
      *
-     * Now, remember the freshly created symbols in the nodes and set fresh local namespaces.
-     *
-     * The
+     * The symbols introduced by this step are recorded in each new goal's node-local storage (which
+     * accumulates down the branch, see {@link Node}, this is also what proof saving/reloading
+     * uses), and
+     * each goal's local namespaces are then rebuilt from the immutable shared base plus that
+     * node-local storage: exactly the reconstruction resetLocalSymbols performs on pruning.
+     * The shared proof namespace is never modified, so under the parallel prover the
+     * workers' concurrent matching can read it lock-free; fresh names stay branch-locally unique by
+     * construction (finding unused names searches the goal-local namespaces), global uniqueness is
+     * not
+     * required, sibling branches reuse names by design.
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
+        // Only program variables and functions are harvested: these are the only namespace kinds
+        // rules register in a goal's local namespaces (logical variables, in particular, are
+        // registered proof-globally or occur only bound inside terms). A rule that registered a
+        // symbol of another kind goal-locally would lose it in the rebuild below.
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
         Collection<Function> newFunctions = localNamespaces.functions().elements();
 
-        localNamespaces.flushToParent();
-
-        boolean first = true;
         for (Goal goal : goalList) {
             goal.node().addLocalProgVars(newProgVars);
             goal.node().addLocalFunctions(newFunctions);
-
-            if (first) {
-                first = false;
-            } else {
-                goal.localNamespaces = localNamespaces.getParent().copy().copyWithParent();
-            }
-
+            goal.resetLocalSymbols();
         }
     }
 

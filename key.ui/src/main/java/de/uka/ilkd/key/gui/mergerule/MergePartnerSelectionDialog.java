@@ -30,7 +30,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -327,7 +326,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return All chosen merge partners.
      */
     public ImmutableList<MergePartner> getChosenCandidates() {
-        ImmutableSLList<MergePartner> result = ImmutableSLList.nil();
+        ImmutableList<MergePartner> result = ImmutableList.nil();
 
         if (chosenGoals != null) {
             return result.append(chosenGoals);
@@ -433,7 +432,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         final TermBuilder tb = services.getTermBuilder();
 
         Sequent toProve = JavaDLSequentKit.createSequent(seq.antecedent().asList(),
-            ImmutableSLList.singleton(new SequentFormula(formulaToProve)));
+            ImmutableList.singleton(new SequentFormula(formulaToProve)));
 
         for (SequentFormula succedentFormula : seq.succedent()) {
             final JTerm formula = (JTerm) succedentFormula.formula();
@@ -451,7 +450,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return An ImmutableList consisting of the elements in it.
      */
     private <T> ImmutableList<T> immutableListFromIterabe(Iterable<T> it) {
-        ImmutableList<T> result = ImmutableSLList.nil();
+        ImmutableList<T> result = ImmutableList.nil();
         for (T t : it) {
             result = result.prepend(t);
         }

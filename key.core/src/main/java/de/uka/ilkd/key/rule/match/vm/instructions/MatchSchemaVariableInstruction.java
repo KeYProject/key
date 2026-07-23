@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -20,6 +21,20 @@ import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
+/**
+ * Base of the schema-variable match instructions ({@code MatchVariableSVInstruction},
+ * {@code MatchProgramSVInstruction}, {@code MatchNonVariableSVInstruction}, ...): holds the schema
+ * variable and provides {@link #addInstantiation}, the common "instantiate or agree" step: a term
+ * candidate is checked for rigidness and either recorded as the schema variable's instantiation or
+ * compared (modulo renaming) against the instantiation it already has.
+ *
+ * <p>
+ * A candidate is either a term or a program element (an update's left-hand side, for example, is a
+ * program variable). The base routes each candidate to the typed method for its kind; a subclass
+ * implements {@link #match(JTerm, MatchResultInfo, LogicServices)} and, if its schema-variable
+ * kind can stand for program elements, overrides
+ * {@link #match(ProgramElement, MatchResultInfo, LogicServices)}.
+ */
 public abstract class MatchSchemaVariableInstruction implements MatchInstruction {
 
     protected final @NonNull OperatorSV op;
@@ -61,21 +76,52 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified
-     * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
-     * {@link MatchResultInfo}
+     * Routes the candidate to the typed match method for its kind. A candidate that is neither a
+     * term nor a program element matches no schema variable.
+     */
+    @Override
+    public final @Nullable MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
+            LogicServices services) {
+        if (actualElement instanceof JTerm term) {
+            return match(term, mc, services);
+        }
+        if (actualElement instanceof ProgramElement pe) {
+            return match(pe, mc, services);
+        }
+        return null;
+    }
+
+    /**
+     * Matches the schema variable against a term candidate.
+     *
+     * @param instantiationCandidate the {@link JTerm} to be matched
+     * @param mc the {@link MatchResultInfo} with the constraints accumulated so far
+     * @param services the {@link Services}
+     * @return the extended {@link MatchResultInfo}, or {@code null} if the schema variable does
+     *         not match the term
+     */
+    protected abstract @Nullable MatchResultInfo match(JTerm instantiationCandidate,
+            MatchResultInfo mc, LogicServices services);
+
+    /**
+     * Matches the schema variable against a program element. Most schema-variable kinds stand for
+     * terms and cannot match a program element, so this default fails; the program schema variable
+     * overrides it.
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchResultInfo} with additional constraints (e.g. previous matches of
-     *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
+     * @param mc the {@link MatchResultInfo} with the constraints accumulated so far
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchResultInfo} with
-     *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
-     *         added
+     * @return the extended {@link MatchResultInfo}, or {@code null} if the schema variable does
+     *         not match the program element
      */
     public @Nullable MatchResultInfo match(ProgramElement instantiationCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "matchSV(" + op.name() + ")";
     }
 }

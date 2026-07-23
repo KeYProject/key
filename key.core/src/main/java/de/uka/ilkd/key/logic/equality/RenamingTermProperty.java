@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -15,7 +16,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
@@ -59,8 +59,16 @@ public class RenamingTermProperty implements Property<Term> {
         if (term2 == term1) {
             return true;
         }
-        return unifyHelp(term1, term2, ImmutableSLList.nil(),
-            ImmutableSLList.nil(), null);
+        // Fast reject via the renaming-invariant hashCode (cached per term, see
+        // JTerm#hashCodeModRenaming): if it differs the terms cannot be equal modulo renaming, so
+        // the O(term) unifyHelp walk is skipped. Benefits every equals-mod-renaming caller
+        // (quantifier cost heuristics, taclet matching, sequent-redundancy checks).
+        if (term1 instanceof JTerm t1 && term2 instanceof JTerm t2
+                && t1.hashCodeModRenaming() != t2.hashCodeModRenaming()) {
+            return false;
+        }
+        return unifyHelp(term1, term2, ImmutableList.nil(),
+            ImmutableList.nil(), null);
     }
 
     /**
@@ -72,7 +80,7 @@ public class RenamingTermProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         // Labels can be completely ignored
-        return hashTermHelper(term, ImmutableSLList.nil(), 1);
+        return hashTermHelper(term, ImmutableList.nil(), 1);
     }
 
     // equals modulo renaming logic

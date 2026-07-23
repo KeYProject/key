@@ -403,7 +403,7 @@ public class SolverPropertiesLoader {
     /// Path for user-wide smt solver definitions. Precedence over classpath smt solver configs,
     /// overwritten by local configs.
     public static Path getUserSmtSolverPath() {
-        return PathConfig.getKeyConfigDir().resolve(SOLVER_LIST_FILE);
+        return PathConfig.getSettingsFile(SOLVER_LIST_FILE);
     }
 
 

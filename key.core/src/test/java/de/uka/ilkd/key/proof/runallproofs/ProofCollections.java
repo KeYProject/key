@@ -26,6 +26,143 @@ public class ProofCollections {
 
     public static final String ENV_KEY_RAP_FUN_KEEP = "KEY_RAP_FUN_KEEP";
 
+    /**
+     * A small curated set of representative proofs (heap, arithmetic, splitting, quantifier) for
+     * running the RunAllProofs machinery under the <em>multi-core</em> prover. Uses
+     * {@link ForkMode#NOFORK} so the proofs are proved in the test JVM, where the caller
+     * ({@code RunSmallProofsMt*wTest}) has enabled the parallel prover via the system properties;
+     * a forked run would not inherit those. Kept small so a 2- and 4-worker pass is affordable on
+     * CI. Reload is enabled, so it also checks that MT-built proofs save and reload.
+     *
+     * @return the small multi-core proof collection
+     * @throws IOException if the KeY settings cannot be read
+     */
+    public static ProofCollection smallMultiThreaded() throws IOException {
+        var settings = new ProofCollectionSettings(new Date());
+        settings.setBaseDirectory("../key.ui/examples/");
+        settings.setStatisticsFile("build/reports/runallproofs/runStatisticsMt.csv");
+        settings.setForkMode(ForkMode.NOFORK);
+        settings.setReloadEnabled(true);
+        settings.setTempDir("build/runallproofs_tmp");
+        settings.setVerboseOutput(true);
+        // Give the multi-core runs headroom over the standard 10000-step budget: the proof size
+        // varies a few percent with the worker count (rule-app age is part of the strategy cost,
+        // and generation timing differs across schedules), and median.key sits right at the
+        // standard budget -- enough to close on one runner and be cut off on another.
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties")
+            + "\n[Strategy]MaximumNumberOfAutomaticApplications=20000");
+
+        var c = new ProofCollection(settings);
+        // Stratified by prover subsystem, so that a change to one of them has a good chance of
+        // being exercised here. Rows are short-to-medium proofs from automaticJavaDL (known
+        // provable); the comment gives nodes/branches from a single-core reference run. The
+        // "branches" number is what matters for the multi-core prover: only proofs with many
+        // simultaneously open goals let several workers interleave.
+        var g = c.group("multithreaded_smoke");
+        // first-order logic / quantifiers
+        g.provable("standard_key/pred_log/tptp/SYN/SYN036p2.key"); // 1200n 72br
+        g.provable("standard_key/pred_log/tptp/PUZ/PUZ001p1.key"); // 1922n 61br
+        g.provable("standard_key/pred_log/steam1.key"); // 392n 32br
+        g.provable("standard_key/prop_log/allClausesLength5.key"); // 645n 16br
+        g.provable("standard_key/quantifiers/normalisation9.key"); // 45n 1br
+        // integer arithmetic
+        g.provable("standard_key/arith/median.key"); // 14942n 28br
+        g.provable("standard_key/arith/overflow_hija.key"); // 2682n 5br
+        g.provable("standard_key/arith/divisionAssoc.key"); // 816n 5br
+        g.provable("standard_key/arith/check_jmod.key"); // 742n 8br
+        g.provable("standard_key/inEqSimp/quadraticInEq.key"); // 1042n 33br
+        // heap / select-store (fields, arrays)
+        g.provable("heap/simple/select_store.key"); // 12n 1br
+        g.provable("heap/simple/arrays.key"); // 150n 7br
+        g.provable("standard_key/java_dl/arrayMax.key"); // 989n 19br
+        g.provable("heap/simple/object_creation.key"); // 182n 5br
+        g.provable("standard_key/java_dl/symmArray.key"); // 13517n 74br
+        // loop invariants
+        g.provable("heap/simple/loop1.key"); // 114n 3br
+        g.provable("heap/simple/loop2.key"); // 509n 8br
+        g.provable("heap/simple/selection_sort.key"); // 3330n 49br
+        g.provable("standard_key/java_dl/reverseArray2.key"); // 1016n 16br
+        g.provable("heap/saddleback_search/Saddleback_search.key"); // 31630n 143br
+        // method / operation contracts (incl. dependency and model fields)
+        g.provable("heap/simple/operation_contracts.key"); // 842n 22br
+        g.provable("heap/simple/dependency_contracts.key"); // 1057n 43br
+        g.provable("newBook/09.list_modelfield/ArrayList.remFirst.key"); // 2908n 42br
+        g.provable("heap/list/ArrayList_get_dep.key"); // 516n 20br
+        g.provable("heap/model_methods/CellTest_test.key"); // 690n 15br
+        // sequences and strings
+        g.provable("heap/simple/seq.key"); // 595n 6br
+        g.provable("heap/list_seq/ArrayList.contains.key"); // 1458n 19br
+        g.provable("standard_key/strings/stringCompileTimeConstant2.key"); // 922n 23br
+        g.provable("standard_key/strings/concat2.key"); // 55n 1br
+        g.provable("heap/comprehensions/sum1.key"); // 348n 6br
+        // wide splitting (many open goals -> real worker interleaving)
+        g.provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key"); // 3327n;
+                                                                                                // stale
+                                                                                                // dependency-contract
+                                                                                                // step
+                                                                                                // reproducer
+        g.provable("heap/list/ArrayList_add.key"); // 2844n 115br
+        g.provable("standard_key/java_dl/strassen/strassen.key"); // 1797n 79br
+        g.provable("standard_key/java_dl/switch/large_switch.key"); // 2607n 70br
+        g.provable("heap/javacard/arrayFillNonAtomic.key"); // 2634n 54br
+        g.provable("standard_key/java_dl/polishFlagSort.key"); // 2515n 47br
+        g.provable("heap/list/ArrayList_concatenate.key"); // 12082n 224br
+        // simplification / rewriting
+        g.provable("standard_key/polySimp/simplify8.key"); // 755n 1br
+        g.provable("standard_key/polySimp/simplify19.key"); // 3062n 1br
+        g.provable("standard_key/inEqSimp/division.key"); // 2205n 23br
+        g.provable("standard_key/inEqSimp/simplify5.key"); // 1459n 15br
+        return c;
+    }
+
+    /**
+     * The widest-splitting rows of {@link #smallMultiThreaded()}: proofs with many goals open at
+     * the same time, where the goal scheduling of the multi-core prover actually interleaves.
+     * Used by the 4-worker CI test, which stays small because CI runners only have few cores.
+     * Every row is listed three times: races are timing-dependent, so each extra run is another
+     * chance to hit one.
+     *
+     * @return the splitting-heavy multi-core proof collection
+     * @throws IOException if the KeY settings cannot be read
+     */
+    public static ProofCollection smallMultiThreadedSplitting() throws IOException {
+        var settings = new ProofCollectionSettings(new Date());
+        settings.setBaseDirectory("../key.ui/examples/");
+        settings.setStatisticsFile("build/reports/runallproofs/runStatisticsMt4w.csv");
+        settings.setForkMode(ForkMode.NOFORK);
+        settings.setReloadEnabled(true);
+        settings.setTempDir("build/runallproofs_tmp");
+        settings.setVerboseOutput(true);
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties")
+            + "\n[Strategy]MaximumNumberOfAutomaticApplications=20000");
+
+        var c = new ProofCollection(settings);
+        var g = c.group("multithreaded_splitting");
+        final String[] rows = {
+            // reproducer for the stale dependency-contract step (UseDependencyContractApp):
+            // flaked ~2/12 at 4 workers before the graceful-skip fix
+            "performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key",
+            "heap/list/ArrayList_add.key", // 115br
+            "standard_key/java_dl/strassen/strassen.key", // 79br
+            "standard_key/pred_log/tptp/SYN/SYN036p2.key", // 72br
+            "standard_key/java_dl/switch/large_switch.key", // 70br
+            "standard_key/pred_log/tptp/PUZ/PUZ001p1.key", // 61br
+            "heap/javacard/arrayFillNonAtomic.key", // 54br
+            "heap/simple/selection_sort.key", // 49br
+            "standard_key/java_dl/polishFlagSort.key", // 47br
+            "heap/simple/dependency_contracts.key", // 43br
+            "newBook/09.list_modelfield/ArrayList.remFirst.key", // 42br
+            "standard_key/inEqSimp/quadraticInEq.key", // 33br
+            "standard_key/pred_log/steam1.key", // 32br
+        };
+        for (int repetition = 0; repetition < 3; repetition++) {
+            for (String row : rows) {
+                g.provable(row);
+            }
+        }
+        return c;
+    }
+
     public static ProofCollection automaticJavaDL() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         /*
@@ -120,6 +257,9 @@ public class ProofCollections {
         oldBook.provable("standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key");
         oldBook.provable("standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");;
 
+        // Real literals
+        var reals = c.group("reals");
+        reals.provable("standard_key/reals/realLiterals.key");
 
         // Comprehension Tests
         var comprehensions = c.group("comprehensions");
@@ -165,6 +305,27 @@ public class ProofCollections {
             "performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key");
         performancePOConstruction.provable(
             "performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
+
+        // Symbolic-execution performance: straight-line code and (unrolled) bounded loops execute
+        // a long program with many parallel updates, which stresses the update-simplification
+        // machinery (\dropEffectlessElementaries). These close quickly with the targeted update
+        // simplification but degrade quadratically without it; straightline_10000 in particular is
+        // a regression canary -- fast as is, but it explodes if the quadratic behaviour returns.
+        var updateSimplificationPerformance = c.group("updateSimplificationPerformance");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_1000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_4000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/straightline_8000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/straightline_10000.key");
+        updateSimplificationPerformance
+                .provable("performance-test/updateSimplification/loop_2000.key");
+        // switched off due to memory problems in the CI
+        // updateSimplificationPerformance
+        // .provable("performance-test/updateSimplification/loop_5000.key");
 
 
         // Tests for rule application restrictions
@@ -351,18 +512,14 @@ public class ProofCollections {
         g.provable("heap/removeDups/contains.key");
         g.provable("heap/removeDups/removeDup.key");
         g.provable("heap/saddleback_search/Saddleback_search.key");
-        // TODO: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
-        // that.
-        g.loadable("heap/BoyerMoore/BM(BM__bm((I)).JML normal_behavior operation contract.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML accessible clause.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML model_behavior operation contract.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
+        // DONE: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
+        // that. YESSS, it runs with scripts now ...
+        g.provable("heap/BoyerMoore/BM.bm.key");
+        g.provable("heap/BoyerMoore/BM.count.accessible.key");
+        g.provable("heap/BoyerMoore/BM.count.key");
+        g.provable("heap/BoyerMoore/BM.monoLemma.key");
 
         g = c.group("quicksort");
-        g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
@@ -467,6 +624,30 @@ public class ProofCollections {
         g.provable("heap/vstte10_05_Queue/LinkedList_reverse.key");
         g.provable("heap/vstte10_05_Queue/LinkedList_tail.key");
 
+        g = c.group("FM2024Tutorial");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearchR.key");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_normal.key");
+        g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_exc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_ArrayList.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_find.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/ArrayList_add.proof");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_size_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_get_normal.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_get_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_inv_acc.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_swap.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_sort.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/ArrayList_binSearch.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_add.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_find.key");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_get.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_get_acc.proof");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_inv_acc.proof");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_LinkedList.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_newNode.proof");
+        g.provable("heap/FM2024Tutorial/ArrayList/LinkedList_size.key");
+        g.loadable("heap/FM2024Tutorial/ArrayList/LinkedList_size_acc.proof");
 
         g = c.group("WeideEtAl");
         g.provable("heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key");
@@ -653,6 +834,7 @@ public class ProofCollections {
         g.provable("../../key.core/src/test/resources/testcase/classpath/classpath.key");
         g.notprovable("heap/inconsistent_represents/MyClass_m.key");
         g.notprovable("heap/inconsistent_represents/MyClass_n.key");
+        g.provable("standard_key/java_dl/typeInference.key");
 
 
         g = c.group("FOL");
@@ -1017,6 +1199,7 @@ public class ProofCollections {
 
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
+        g.provable("standard_key/polymorphic/setExample.key");
 
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");

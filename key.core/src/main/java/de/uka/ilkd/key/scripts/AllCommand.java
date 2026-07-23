@@ -7,8 +7,18 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
+@Documentation(category = "Control", value = """
+        Executes a given block of script commands on all open goals.
+        The current goal is set to each open goal in turn while executing the block.
+        It expects exactly one positional argument, which is the block to be executed on each goal.
+
+        #### Examples:
+        * `onAll { smt solver="z3"; }`
+        * `onAll { auto; }`
+        """)
 public class AllCommand implements ProofScriptCommand {
     @Override
     public List<ProofScriptArgument> getArguments() {
@@ -39,14 +49,5 @@ public class AllCommand implements ProofScriptCommand {
     @Override
     public String getName() {
         return "onAll";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getDocumentation() {
-        return """
-                Applies the given command to all the open goals.""";
     }
 }

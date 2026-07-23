@@ -23,10 +23,17 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
+// Generates the find's ANCESTOR terms (upwards from the find position). The connectives along the
+// find path are stable for a surviving application, but a generated ancestor term as a whole also
+// carries the siblings of that path, which an independent rewrite can change while the find subterm
+// survives. So a feature summing over these ancestors is fixed only while the find FORMULA is
+// unchanged -- weakly stable, not fully stable.
+@WeakStableCost
 public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
     private final TermFeature cond;
@@ -46,7 +53,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     public static TermGenerator<Goal> upwardsWithIndex(TermFeature cond, final Services services) {
-        return new SuperTermWithIndexGenerator(cond) {
+        return new SuperTermWithIndexGenerator(cond, services) {
             @Override
             protected Iterator<Term> createIterator(
                     PosInOccurrence focus, MutableState mState) {
@@ -74,28 +81,27 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
-        private Services services;
-        private Operator binFunc;
+        // Both are fixed at construction from the proof's services (one generator is built per
+        // proof and shared by all goals). They used to be lazily filled by generate(), which runs
+        // during proof search: under the multi-core prover several workers raced that lazy write,
+        // and binFunc is a freshly created operator, so a worker could read a half-initialised or
+        // foreign operator. Computing them once in the constructor removes the race; the value is
+        // unchanged, since goal.proof().getServices() is the same services the strategy was built
+        // with.
+        private final Services services;
+        private final Operator binFunc;
 
-        protected SuperTermWithIndexGenerator(TermFeature cond) {
+        protected SuperTermWithIndexGenerator(TermFeature cond, Services services) {
             super(cond);
+            this.services = services;
+            final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
+            this.binFunc = new SuperTermGeneratedOp(numbers);
         }
 
         @Override
         public Iterator<Term> generate(RuleApp app,
                 PosInOccurrence pos, Goal goal,
                 MutableState mState) {
-            if (services == null) {
-                services = goal.proof().getServices();
-                final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
-
-                binFunc = new SuperTermGeneratedOp(numbers);
-
-                // binFunc = new Function
-                // ( new Name ( "SuperTermGenerated" ), Sort.ANY,
-                // new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
-            }
-
             return createIterator(pos, mState);
         }
 

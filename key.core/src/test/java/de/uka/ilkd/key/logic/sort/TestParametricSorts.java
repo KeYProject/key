@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -24,8 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestParametricSorts {
     private NamespaceSet nss;
@@ -50,7 +50,7 @@ class TestParametricSorts {
         nb.addSort("boolean").addSort("int")
                 .addSort("Seq").addSort("LocSet").addSort("double")
                 .addSort("float");
-
+        nss.sorts().add(JavaDLTheory.ANY);
     }
 
     private ParametricSortDecl addParametricSort(String name,
@@ -61,8 +61,8 @@ class TestParametricSorts {
             GenericSort genSort = (GenericSort) nss.sorts().lookup("G" + (i + 1));
             params = params.prepend(new GenericParameter(genSort, varia));
         }
-        ParametricSortDecl psd = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(),
-            params, "", "");
+        ParametricSortDecl psd =
+            new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(), params);
         nss.parametricSorts().add(psd);
         return psd;
     }
@@ -73,7 +73,7 @@ class TestParametricSorts {
         Sort intSort = nss.sorts().lookup("int");
 
         var someConst = new ParametricFunctionDecl(new Name("someConst"),
-            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.COVARIANT)),
+            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.INVARIANT)),
             new ImmutableArray<>(), g1, null, false, true, false);
         nss.parametricFunctions().add(someConst);
 
@@ -84,7 +84,7 @@ class TestParametricSorts {
             ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
 
         var head = new ParametricFunctionDecl(new Name("head"),
-            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.COVARIANT)),
+            ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.INVARIANT)),
             new ImmutableArray<>(listOfG1), g1, null, false, true, false);
         nss.parametricFunctions().add(head);
 
@@ -99,5 +99,35 @@ class TestParametricSorts {
         assertEquals("List<[int]>", ((JFunction) term.sub(0).op()).argSorts().get(0).toString());
         assertEquals("int", term.sub(0).op().sort(new Sort[0]).toString());
         assertSame(term.sub(0).sort(), term.sub(1).sort());
+    }
+
+    @Test
+    public void testCovariance() {
+        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
+        Sort intSort = nss.sorts().lookup("int");
+        Sort anySort = nss.sorts().lookup("any");
+
+        var intList = ParametricSortInstance.get(psd,
+            ImmutableList.of(new GenericArgument(intSort)), services);
+        var anyList = ParametricSortInstance.get(psd,
+            ImmutableList.of(new GenericArgument(anySort)), services);
+
+        assertTrue(intList.extendsTrans(anyList));
+        assertFalse(anyList.extendsTrans(intList));
+    }
+
+    @Test
+    public void testContravariance() {
+        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.CONTRAVARIANT);
+        Sort intSort = nss.sorts().lookup("int");
+        Sort anySort = nss.sorts().lookup("any");
+
+        var intList = ParametricSortInstance.get(psd,
+            ImmutableList.of(new GenericArgument(intSort)), services);
+        var anyList = ParametricSortInstance.get(psd,
+            ImmutableList.of(new GenericArgument(anySort)), services);
+
+        assertFalse(intList.extendsTrans(anyList));
+        assertTrue(anyList.extendsTrans(intList));
     }
 }

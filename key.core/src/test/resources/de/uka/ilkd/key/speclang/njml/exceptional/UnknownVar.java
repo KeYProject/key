@@ -1,5 +1,5 @@
 // exceptionClass: ParserException
-// msgContains: Name could not be resolved 'unknownVar'
+// msgContains: Cannot resolve 'unknownVar'
 // position: 12/9
 
 

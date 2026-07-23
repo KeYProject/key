@@ -458,6 +458,11 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnRealLiteral(RealLiteral x) {
+        layouter.print(x.getValue());
+    }
+
+    @Override
     public void performActionOnPackageSpecification(PackageSpecification x) {
         layouter.nl();
         layouter.keyWord("package");
@@ -1962,6 +1967,12 @@ public class PrettyPrinter implements Visitor {
                 layouter.print(text);
             }
         }
+
+        if (jmlAssert.getAssertionProof() != null) {
+            // For now: Just say that there is a script. It can be seen in the source pane anyways.
+            layouter.print(" \\by ...");
+        }
+
         layouter.end();
     }
 

@@ -136,6 +136,11 @@
   };
 
 
+  // A modality program that is a plain assignment with NO surrounding context block
+  // (no .. / ... markers): the whole program is a StatementBlock matched structurally.
+  TestMatchTaclet_nocontext_fixed_statements { \find (\<{ #slhs1 = #e; }\>post)
+            \replacewith (post) };
+
   TestMatchTaclet_nocontext  { \find (\<{{#slist}}\>post)
             \replacewith (\<{ #slist }\>post) };
 
@@ -188,6 +193,16 @@ testInsequentState_2 {
       \schemaVar \term int i;
       \find (i = 0 ==>)
       \replacewith (0 = i ==>)
+};
+
+// A context block with a list statement schema variable DIRECTLY as its active statement.
+// The compiled single-source program dispatch cannot express phase 3 for a variable-arity active
+// statement (phase 3 matches one source child per active statement), so buildProgramPlan returns
+// null for this context block and the matcher falls back to ContextStatementBlock.match.
+// See TestMatchTaclet#testListSVContextFallback.
+TestMatchTaclet_slist_context {
+      \find (\<{.. #slist ...}\>post)
+      \replacewith (\<{.. ...}\>post)
 };
 
 }

@@ -50,7 +50,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
@@ -123,7 +122,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     private ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
@@ -142,7 +141,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -158,7 +157,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a list with all implicit fields found in 'list'
      */
     private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         for (Field field : list) {
             if (field.isImplicit()) {
                 result = result.append(field);
@@ -262,30 +261,30 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * {@code <prepare>()} setting the arrays fields on their default value.
      *
      * @param length
-     *        the final public ProgramVariable {@code length} of the array
+     * the final public ProgramVariable {@code length} of the array
      * @param fields
-     *        the ImmutableList with fields of the current array
+     * the ImmutableList with fields of the current array
      * @param createTransient
-     *        a boolean indicating if a transient array has
-     *        to be created (this is special to JavaCard)
+     * a boolean indicating if a transient array has
+     * to be created (this is special to JavaCard)
      * @param transientType
-     *        a ProgramVariable identifying the kind of transient
+     * a ProgramVariable identifying the kind of transient
      * @return the StatementBlock which is the method's body <br>
-     *         </br>
+     * </br>
      *
-     *         <pre>
-     *  {@code
-     *  {
-     *    this.<nextToCreate> = this.<nextToCreate>.;
-     *    this.$initialized = false;
-     *    this.$created     = true;
-     *    this.$prepare();
-     *    this.$transient = transientType;
-     *    this.$initialized = true;
-     *    return this;
-     *   }
-     *   }
-     *         </pre>
+     * <pre>
+     * {@code
+     * {
+     * this.<nextToCreate> = this.<nextToCreate>.;
+     * this.$initialized = false;
+     * this.$created = true;
+     * this.$prepare();
+     * this.$transient = transientType;
+     * this.$initialized = true;
+     * return this;
+     * }
+     * }
+     * </pre>
      */
     private StatementBlock getCreateArrayHelperBody(
             ProgramVariable length,

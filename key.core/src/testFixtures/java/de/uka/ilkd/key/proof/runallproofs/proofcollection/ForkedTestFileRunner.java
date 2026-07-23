@@ -97,8 +97,18 @@ public abstract class ForkedTestFileRunner implements Serializable {
             new ProcessBuilder("java", "-classpath", System.getProperty("java.class.path"),
                 // pass through the value of key.disregardSettings
                 "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "="
-                    + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
+                    + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY),
+                // Run the forked proofs on the same prover the parent test selected, defaulting
+                // to the single-threaded prover. The forked JVM does not see the parent's system
+                // properties, so without this it would fall back to the persisted prover-mode
+                // preference (whatever the developer last set) and the regression suite could run
+                // non-deterministically on the parallel prover.
+                "-Dkey.prover.parallel=" + System.getProperty("key.prover.parallel", "false"));
         List<String> command = pb.command();
+        String parallelThreads = System.getProperty("key.prover.parallel.threads");
+        if (parallelThreads != null) {
+            command.add("-Dkey.prover.parallel.threads=" + parallelThreads);
+        }
 
         // TODO make sure no injection happens here?
         String forkMemory = settings.getForkMemory();

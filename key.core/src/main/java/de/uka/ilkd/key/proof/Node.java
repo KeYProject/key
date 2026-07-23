@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -26,7 +27,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
@@ -47,8 +47,6 @@ public class Node implements Iterable<Node> {
 
     private static final String CLOSED_GOAL = "Closed goal";
     private static final String CACHED_GOAL = "Closed goal (via cache)";
-
-    private static final String NODES = "nodes";
 
     /** the proof the node belongs to */
     private final Proof proof;
@@ -72,13 +70,13 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated program variables. It extends the list of the parent
      * node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableList.nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<Function> localFunctions = ImmutableList.nil();
 
     private boolean closed = false;
 
@@ -131,7 +129,7 @@ public class Node implements Iterable<Node> {
      */
     public Node(Proof proof) {
         this.proof = proof;
-        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
+        serialNr = proof.getNextNodeSerialNr();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -504,8 +502,8 @@ public class Node implements Iterable<Node> {
         return -1;
     }
 
-    public StringBuffer getUniqueTacletId() {
-        StringBuffer id = new StringBuffer();
+    public StringBuilder getUniqueTacletId() {
+        StringBuilder id = new StringBuilder(32);
         int c = 0;
         Node n = this;
 
@@ -837,5 +835,9 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    public Stream<Node> childrenStream() {
+        return children.stream();
     }
 }

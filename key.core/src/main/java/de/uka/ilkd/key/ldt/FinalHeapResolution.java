@@ -6,8 +6,6 @@ package de.uka.ilkd.key.ldt;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * A little helper class to resolve the settings for treatment of final fields.
@@ -23,8 +21,7 @@ import org.jspecify.annotations.NonNull;
  * @author Mattias Ulbrich
  */
 public class FinalHeapResolution {
-
-    private static final ThreadLocal<Boolean> finalEnabledVariable = new ThreadLocal<>();
+    private static volatile boolean finalEnabledVariable;
     private static final String SETTING = "finalFields";
     private static final String IMMUTABLE_OPTION = SETTING + ":immutable";
 
@@ -36,7 +33,7 @@ public class FinalHeapResolution {
      * @param initConfig the configuration to read the settings from
      * @return true if final fields are treated as immutable
      */
-    public static boolean isFinalEnabled(@NonNull InitConfig initConfig) {
+    public static boolean isFinalEnabled(InitConfig initConfig) {
         ProofSettings settings = initConfig.getSettings();
         if (settings == null) {
             settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
@@ -50,8 +47,18 @@ public class FinalHeapResolution {
      * @param settings the settings to read the settings from
      * @return true if final fields are treated as immutable
      */
-    public static boolean isFinalEnabled(@NonNull ProofSettings settings) {
-        return settings.getChoiceSettings().getDefaultChoices().get(SETTING)
+    public static boolean isFinalEnabled(ProofSettings settings) {
+        // When the finalFields choice is absent from the settings (e.g. a freshly
+        // created environment, or settings that predate this option), the taclet base
+        // still activates the *declaration default* of the category. That default is
+        // the first option listed in optionsDeclarations.key, which is "immutable"
+        // (see ChoiceFinder#visitChoice, which uses choices.getFirst()). Falling back
+        // to onHeap here would contradict the rules actually applied during symbolic
+        // execution and produce an inconsistent mix of final(o, f) and
+        // select(heap, o, f) for the very same field. The fallback must therefore
+        // match the declaration default.
+        return settings.getChoiceSettings().getDefaultChoices()
+                .getOrDefault(SETTING, IMMUTABLE_OPTION)
                 .equals(IMMUTABLE_OPTION);
     }
 
@@ -62,7 +69,7 @@ public class FinalHeapResolution {
      * @param initConfig the configuration to read the settings from
      */
     public static void rememberIfFinalEnabled(InitConfig initConfig) {
-        finalEnabledVariable.set(isFinalEnabled(initConfig));
+        finalEnabledVariable = isFinalEnabled(initConfig);
     }
 
     /**
@@ -74,7 +81,7 @@ public class FinalHeapResolution {
      */
 
     public static boolean recallIsFinalEnabled() {
-        Boolean bool = finalEnabledVariable.get();
+        Boolean bool = finalEnabledVariable;
         if (bool == null) {
             throw new IllegalStateException("Unset final enabled variable");
         }

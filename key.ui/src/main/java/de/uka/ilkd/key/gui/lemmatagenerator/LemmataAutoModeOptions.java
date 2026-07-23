@@ -75,7 +75,7 @@ public class LemmataAutoModeOptions {
     private final Path homePath;
 
     public LemmataAutoModeOptions() {
-        this(KeYConstants.INTERNAL_VERSION, PathConfig.getKeyConfigDir());
+        this(KeYConstants.INTERNAL_VERSION, PathConfig.currentPaths.keyConfigDir);
     }
 
     public LemmataAutoModeOptions(String internalVersion, Path homePath) {

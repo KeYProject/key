@@ -73,6 +73,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
+    /**
+     * Set once the dependency graph became incomplete and can no longer be trusted, after which
+     * {@link #analyze} refuses to return results (so no slice is built from a partial graph). Two
+     * causes: tracking threw (see {@link #ruleApplied(ProofEvent)}, after which {@link Proof} also
+     * unregisters this tracker), or the multi-core prover suspended this non-essential listener for
+     * a run and applied rules it never observed (see {@link #markIncompleteAfterParallelRun()}).
+     */
+    private boolean trackingDisabled = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -160,11 +168,13 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 }
             }
             if (!added) {
-                // should only happen if the formula is the initial proof obligation
-                if (!proof.root().sequent().contains(in.sequentFormula())) {
-                    throw new IllegalStateException(
-                        "found formula that was not produced by any rule! " + in.sequentFormula());
-                }
+                // Normally only the initial proof obligation reaches here. A formula that is
+                // neither
+                // produced by a tracked rule nor part of the root sequent means the tracker missed
+                // some rule applications -- e.g. it was suspended for the duration of a multi-core
+                // prover run. Degrade gracefully (treat it as an external input) instead of
+                // throwing,
+                // so slicing stays usable on a proof that was partly built without tracking.
                 TrackedFormula formula =
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
@@ -264,6 +274,24 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     @Override
     public void ruleApplied(ProofEvent e) {
+        if (trackingDisabled) {
+            return;
+        }
+        try {
+            trackRuleApplication(e);
+        } catch (RuntimeException ex) {
+            // Proof.fireRuleApplied isolates listeners: it logs this failure and unregisters the
+            // tracker, so a tracking error cannot break the ongoing proof search. Here we only
+            // record that tracking became incomplete, so that a later analyze() does not return a
+            // slice computed from the partial dependency graph; then rethrow for the proof to
+            // handle.
+            trackingDisabled = true;
+            analysisResults = null;
+            throw ex;
+        }
+    }
+
+    private void trackRuleApplication(ProofEvent e) {
         if (e.getSource() != proof) {
             throw new IllegalStateException(
                 "dependency tracker received rule application on wrong proof");
@@ -463,6 +491,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     /**
+     * Mark this tracker's dependency graph as incomplete because the multi-core prover suspended
+     * this (non-essential) listener for the duration of a run and applied rules it did not observe.
+     * After this, {@link #analyze} returns {@code null}, so a slice can never be built from the
+     * partial graph. Irreversible for this proof: the missed rules cannot be recovered.
+     */
+    public void markIncompleteAfterParallelRun() {
+        trackingDisabled = true;
+        analysisResults = null;
+    }
+
+    /**
      * Analyze the tracked proof using one or both analysis algorithms.
      * Returns null if the proof is not closed.
      *
@@ -471,6 +510,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return analysis results (null if proof is not closed)
      */
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
+        if (trackingDisabled) {
+            // the dependency graph is incomplete (tracking failure, or the multi-core prover
+            // suspended this listener for a run); do not return a slice built from a partial graph
+            return null;
+        }
         if (analysisResults != null
                 && analysisResults.didDependencyAnalysis == doDependencyAnalysis
                 && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps

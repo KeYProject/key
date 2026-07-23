@@ -49,7 +49,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -84,16 +83,6 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
      * This rule's name.
      */
     private static final Name NAME = new Name("InfFlow Block Contract (Internal)");
-
-    /**
-     * @see #getLastFocusTerm()
-     */
-    private JTerm lastFocusTerm;
-
-    /**
-     * @see #getLastInstantiation()
-     */
-    private Instantiation lastInstantiation;
 
     private InfFlowBlockContractInternalRule() {
         super();
@@ -131,28 +120,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
-        return lastFocusTerm;
-    }
-
-    @Override
-    protected void setLastFocusTerm(JTerm lastFocusTerm) {
-        this.lastFocusTerm = lastFocusTerm;
-    }
-
-    @Override
-    public Instantiation getLastInstantiation() {
-        return lastInstantiation;
-    }
-
-    @Override
     public Name name() {
         return NAME;
-    }
-
-    @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
-        this.lastInstantiation = lastInstantiation;
     }
 
     /**
@@ -422,7 +391,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -444,7 +413,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 

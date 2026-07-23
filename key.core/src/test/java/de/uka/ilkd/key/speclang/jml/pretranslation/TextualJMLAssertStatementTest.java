@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.parsing.Position;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

@@ -1,0 +1,48 @@
+# Fields the SharedStateLintTest flags but that are safe by design.
+# Format: fully.qualified.Class#field   # one-line justification
+# Every entry needs a justification; remove entries whose field disappears (the
+# test fails on stale entries). Before adding an entry, read the fix table in
+# key.core/src/main/java/de/uka/ilkd/key/prover/README.md -- most findings are
+# better fixed than allowlisted.
+
+# --- effectively final / no writers ---
+de.uka.ilkd.key.logic.VariableNamer#suggestive_off                              # assigned only at declaration, never reassigned; disabled-feature toggle
+de.uka.ilkd.key.rule.OneStepSimplifier#disableOSSRestriction                    # old-proof-loading flag; no writer exists in the codebase
+de.uka.ilkd.key.proof.init.AbstractProfile#defaultProfile                       # set at class-init; its only mutator setDefaultProfile is uncalled
+
+# --- filled once at class-init (JVM class-init locked), read-only afterwards ---
+de.uka.ilkd.key.logic.op.AbstractTermTransformer#NAME_TO_META_OP               # filled only by this class's own static-singleton initializers; read during single-threaded parsing
+de.uka.ilkd.key.logic.sort.ProgramSVSort#NAME2SORT                             # filled only by this class's static-singleton initializers; read during single-threaded taclet parsing
+de.uka.ilkd.key.proof.NodeInfo#symbolicExecNames                               # populated once in a static initializer, then read-only
+de.uka.ilkd.key.proof.init.FunctionalBlockContractPO#TRANSACTION_TAGS          # two constant entries from the static initializer, then read-only
+de.uka.ilkd.key.proof.init.FunctionalLoopContractPO#TRANSACTION_TAGS           # two constant entries from the static initializer, then read-only
+de.uka.ilkd.key.proof.init.FunctionalOperationContractPO#TRANSACTION_TAGS      # two constant entries from the static initializer, then read-only
+de.uka.ilkd.key.proof.init.ProofInitServiceUtil#resolver                       # built once at class load, read-only (get) afterwards
+de.uka.ilkd.key.proof.io.AbstractProblemLoader#mismatchErrors                  # filled once in a static block; read-only parser-message lookup table
+de.uka.ilkd.key.proof.io.AbstractProblemLoader#missedErrors                    # filled once in a static block; read-only parser-message lookup table
+de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition#STD_FURTHER_DEFAULTS # built once in a static block; strategy-config data, not on the proving path
+de.uka.ilkd.key.rule.merge.MergeProcedure#CONCRETE_RULES                       # assigned once in a static block (immutable list); merges run single-core only
+
+# --- all reads and writes hold a lock ---
+de.uka.ilkd.key.logic.op.QualifierWrapper#INSTANCES                            # accessed exclusively inside the synchronized static get()
+de.uka.ilkd.key.proof.calculus.JavaDLSequentKit#INSTANCE                       # assigned once at class-init; reads via synchronized getInstance()
+de.uka.ilkd.key.proof.init.JavaProfile#defaultInstance                         # lazy singleton; every access inside synchronized getDefaultInstance()
+de.uka.ilkd.key.proof.init.JavaProfile#defaultInstancePermissions              # lazy singleton; every access inside synchronized getDefaultInstance()
+de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCache     # every read/write inside synchronized(joinCacheMonitor)
+de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCacheOld  # every read/write inside synchronized(joinCacheMonitor)
+
+# --- written only during single-threaded setup/loading, never by proof-search workers ---
+de.uka.ilkd.key.logic.sort.ArraySort#aSH                                       # mutated only via getArraySort during type modeling at load time; NOT safe for callers during proving
+de.uka.ilkd.key.proof.init.BaseConfigCache#baseInputConfig                     # mutated only inside ProblemInitializer during single-threaded setup
+de.uka.ilkd.key.proof.init.BaseConfigCache#baseInputConfigHash                 # mutated only inside ProblemInitializer during single-threaded setup
+de.uka.ilkd.key.proof.init.JavaProfile#DEFAULT                                 # lazily set once from a single GUI class-init; workers only read the built strategy
+de.uka.ilkd.key.proof.io.AutoSaver#defaultSaveInterval                         # set at startup/settings change; read at proof setup, not by workers
+de.uka.ilkd.key.proof.io.AutoSaver#defaultSaveClosedProof                      # set at startup/settings change; read at proof setup, not by workers
+de.uka.ilkd.key.proof.io.AutoSaver#DEFAULT_INSTANCE                            # set at startup/settings change; read at proof setup, not by workers
+de.uka.ilkd.key.proof.io.ProofSaver#listeners                                  # registered at setup; save path only reads (toArray); workers never touch it
+de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse#INSTANCE               # lazy singleton first built single-threaded at load; merges run single-core only
+de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent#INSTANCE       # lazy singleton first built single-threaded at load; merges run single-core only
+de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening#INSTANCE             # lazy singleton first built single-threaded at load; merges run single-core only
+
+# --- deliberate thread-safe design (documented in the field's javadoc) ---
+de.uka.ilkd.key.rule.UseOperationContractRule#lastInstantiation                # volatile immutable snapshot; a stale read only recomputes, never mixes goals

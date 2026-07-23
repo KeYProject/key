@@ -173,6 +173,35 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      * @param currentSequent the current sequent (the one of the new goal)
      * @return the PosInOccurrence object describing where to add the formula
      */
+    @Override
+    public ImmutableList<SequentChangeInfo> getResultSequentChanges(Goal goal, RuleApp ruleApp) {
+        final TermLabelState termLabelState = new TermLabelState();
+        final Services services = goal.getOverlayServices();
+        final TacletApp tacletApp = (TacletApp) ruleApp;
+        final MatchResultInfo mc = tacletApp.matchConditions();
+
+        final ImmutableList<SequentChangeInfo> newSequentsForGoals = checkAssumesGoals(goal,
+            tacletApp.assumesFormulaInstantiations(), mc, taclet.goalTemplates().size());
+
+        ImmutableList<SequentChangeInfo> result = ImmutableList.nil();
+        final Iterator<SequentChangeInfo> it = newSequentsForGoals.iterator();
+        for (var gt : taclet.goalTemplates()) {
+            final SequentChangeInfo currentSequent = it.next();
+            applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
+                goal, tacletApp, services);
+            final PosInOccurrence posWhereToAdd =
+                updatePositionInformation(tacletApp, gt, currentSequent);
+            applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd,
+                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
+            TermLabelManager.mergeLabels(currentSequent, services);
+            result = result.append(currentSequent);
+        }
+        while (it.hasNext()) {
+            result = result.append(it.next());
+        }
+        return result;
+    }
+
     private PosInOccurrence updatePositionInformation(
             TacletApp tacletApp, TacletGoalTemplate gt,
             SequentChangeInfo currentSequent) {

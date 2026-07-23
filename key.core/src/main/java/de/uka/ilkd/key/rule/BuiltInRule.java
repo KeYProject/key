@@ -26,9 +26,4 @@ public interface BuiltInRule extends org.key_project.prover.rules.IBuiltInRule<G
     default RuleExecutor<Goal> getExecutor() {
         return this;
     }
-
-    @Override
-    default @Nullable String getOrigin() {
-        return "defined in Java: " + getClass().getName();
-    }
 }

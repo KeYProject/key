@@ -15,9 +15,8 @@ import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.Taclet;
-import org.key_project.util.LRUCache;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
@@ -32,9 +31,18 @@ import org.key_project.util.collection.ImmutableSLList;
  * <li>Non-toplevel, but not below updates or programs and not below "bad" operators that we do not
  * know (defined by <code>TermTacletAppIndexCacheSet.isAcceptedOperator</code>). In this case we
  * also have to distinguish different prefixes of a position, i.e., different sets of variables that
- * are bound above a position.</li>
+ * are bound above a position, and different <em>polarities</em> of a position: rewrite taclets can
+ * be restricted to positions of antecedent or succedent polarity
+ * ({@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix}), so the applicable taclets — the cached
+ * index contents — differ between a positive, a negative and a polarity-less occurrence of the same
+ * term. (Sharing entries across polarities used to make the reported rule apps depend on which
+ * occurrence happened to be indexed first — across all goals sharing this cache — and thereby made
+ * proof search depend on the goal scheduling order, i.e. nondeterministic under the parallel
+ * prover.)</li>
  * <li>Below updates, but not below programs. We do not cache at all in such places.</li>
- * <li>Below programs. Again, we also have to distinguish different prefixes of a position.</li>
+ * <li>Below programs. Again, we also have to distinguish different prefixes of a position. (No
+ * polarity distinction is needed here: a modality above the position vetoes all
+ * application-restricted rewrite taclets and makes the polarity indefinite.)</li>
  * <li>Below other "bad" operators. We do not cache at all in such places.</li>
  * </ul>
  * </p>
@@ -75,23 +83,38 @@ public class TermTacletAppIndexCacheSet {
     private final ITermTacletAppIndexCache succCache;
 
     /**
-     * cache for locations that are not below updates, programs or in the scope of binders
+     * caches for locations that are not below updates, programs or in the scope of binders, by
+     * position polarity (indexed by {@code polarity + 1} for polarity -1, 0, 1)
      */
-    private final ITermTacletAppIndexCache topLevelCacheEmptyPrefix;
+    private final ITermTacletAppIndexCache[] topLevelCachesEmptyPrefix =
+        new ITermTacletAppIndexCache[3];
 
     /**
      * caches for locations that are not below updates or programs, but in the scope of binders.
-     * this is a mapping from <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
+     * this is a mapping from (binder prefix, position polarity) to <code>TopLevelCache</code>
+     *
+     * <p>
+     * One cache set is shared across the sibling goals of a proof branch (TacletAppIndex.copyWith
+     * hands on the same instance), so these prefix caches are read and written concurrently on the
+     * parallel matching path -- hence ConcurrentLruCache. The exact (not striped) flavour is used
+     * to
+     * preserve the original global LRU eviction: re-creating an evicted sub-cache orphans its
+     * instance-specific entries in the shared backend, and the number of distinct quantifier
+     * prefixes is small (eviction rarely fires), so exact eviction avoids extra backend churn at
+     * negligible lock cost.
      */
-    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
-        new LRUCache<>(
-            MAX_CACHE_ENTRIES);
+    private final ConcurrentLruCache<TopLevelCacheKey, ITermTacletAppIndexCache> topLevelCaches =
+        new ConcurrentLruCache<>(MAX_CACHE_ENTRIES);
+
+    /** key of the {@link #topLevelCaches} map: binder prefix plus position polarity */
+    private record TopLevelCacheKey(ImmutableList<QuantifiableVariable> prefix, int polarity) {
+    }
 
     /**
      * cache for locations that are below updates, but not below programs or in the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-        new BelowUpdateCache(ImmutableSLList.nil());
+        new BelowUpdateCache(ImmutableList.nil());
 
     /**
      * cache for locations that are below programs, but not in the scope of binders
@@ -102,21 +125,26 @@ public class TermTacletAppIndexCacheSet {
      * caches for locations that are both below programs and in the scope of binders. this is a
      * mapping from <code>IList<QuantifiedVariable></code> to <code>BelowProgCache</code>
      */
-    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
-        new LRUCache<>(
-            MAX_CACHE_ENTRIES);
+    private final ConcurrentLruCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
+        new ConcurrentLruCache<>(MAX_CACHE_ENTRIES);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
         assert cache != null;
         this.cache = cache;
-        antecCache = new TopLevelCache(ImmutableSLList.nil(), cache);
-        succCache = new TopLevelCache(ImmutableSLList.nil(), cache);
-        topLevelCacheEmptyPrefix =
-            new TopLevelCache(ImmutableSLList.nil(), cache);
+        // the top-level formulas of antecedent and succedent start with definite polarity;
+        // these two instances are distinct from the (nested) topLevelCachesEmptyPrefix ones
+        // because top-level positions index different taclets (antecedent/succedent taclets)
+        // than proper subterm positions (rewrite taclets)
+        antecCache = new TopLevelCache(ImmutableList.nil(), -1, cache);
+        succCache = new TopLevelCache(ImmutableList.nil(), +1, cache);
+        for (int polarity = -1; polarity <= 1; polarity++) {
+            topLevelCachesEmptyPrefix[polarity + 1] =
+                new TopLevelCache(ImmutableList.nil(), polarity, cache);
+        }
         belowProgCacheEmptyPrefix =
-            new BelowProgCache(ImmutableSLList.nil(), cache);
+            new BelowProgCache(ImmutableList.nil(), cache);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -152,19 +180,41 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return the cache for locations that are not below updates or programs and in the scope of
-     *         binders binding <code>prefix</code> (which might be empty)
+     * @return the cache for locations of the given polarity that are not below updates or programs
+     *         and in the scope of binders binding <code>prefix</code> (which might be empty)
      */
-    private ITermTacletAppIndexCache getTopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
+    private ITermTacletAppIndexCache getTopLevelCache(ImmutableList<QuantifiableVariable> prefix,
+            int polarity) {
         if (prefix.isEmpty()) {
-            return topLevelCacheEmptyPrefix;
+            return topLevelCachesEmptyPrefix[polarity + 1];
         }
-        ITermTacletAppIndexCache res = topLevelCaches.get(prefix);
-        if (res == null) {
-            res = new TopLevelCache(prefix, cache);
-            topLevelCaches.put(prefix, res);
+        final TopLevelCacheKey key = new TopLevelCacheKey(prefix, polarity);
+        // computeIfAbsent is atomic on the ConcurrentLruCache, so concurrent misses share one
+        // sub-cache instance instead of racing to create duplicates that orphan backend entries.
+        return topLevelCaches.computeIfAbsent(key,
+            k -> new TopLevelCache(k.prefix(), k.polarity(), cache));
+    }
+
+    /**
+     * The polarity of the <code>subtermIndex</code>-th direct subterm of a term with top operator
+     * <code>op</code>, given the polarity of the term itself: negation and the left-hand side of an
+     * implication flip the polarity, the other junctors (and the branches of a conditional) keep
+     * it, and any other operator makes it indefinite. This mirrors the polarity computation of
+     * {@link de.uka.ilkd.key.rule.RewriteTaclet#checkPrefix}, which decides the applicability of
+     * polarity-restricted rewrite taclets — the reason polarity is part of the cache state.
+     */
+    private static int childPolarity(Operator op, int subtermIndex, int polarity) {
+        if (polarity == 0) {
+            return 0;
         }
-        return res;
+        if (op == Junctor.NOT || (op == Junctor.IMP && subtermIndex == 0)) {
+            return -polarity;
+        }
+        if (op == Junctor.AND || op == Junctor.OR || (op == Junctor.IMP && subtermIndex != 0)
+                || (op == IfThenElse.IF_THEN_ELSE && subtermIndex != 0)) {
+            return polarity;
+        }
+        return 0;
     }
 
     /**
@@ -175,12 +225,9 @@ public class TermTacletAppIndexCacheSet {
         if (prefix.isEmpty()) {
             return belowProgCacheEmptyPrefix;
         }
-        ITermTacletAppIndexCache res = belowProgCaches.get(prefix);
-        if (res == null) {
-            res = new BelowProgCache(prefix, cache);
-            belowProgCaches.put(prefix, res);
-        }
-        return res;
+        // computeIfAbsent is atomic: concurrent misses share one sub-cache instance (see
+        // getTopLevelCache).
+        return belowProgCaches.computeIfAbsent(prefix, p -> new BelowProgCache(p, cache));
     }
 
     /**
@@ -221,9 +268,16 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
 
     private class TopLevelCache extends PrefixTermTacletAppIndexCacheImpl {
-        protected TopLevelCache(ImmutableList<QuantifiableVariable> prefix,
+        /**
+         * the polarity of the positions this cache is responsible for: -1 for antecedent-like,
+         * 1 for succedent-like, 0 for indefinite polarity
+         */
+        private final int polarity;
+
+        protected TopLevelCache(ImmutableList<QuantifiableVariable> prefix, int polarity,
                 Map<CacheKey, TermTacletAppIndex> cache) {
             super(prefix, cache);
+            this.polarity = polarity;
         }
 
         @Override
@@ -238,7 +292,8 @@ public class TermTacletAppIndexCacheSet {
             }
 
             if (isAcceptedOperator(op)) {
-                return getTopLevelCache(getExtendedPrefix(t, subtermIndex));
+                return getTopLevelCache(getExtendedPrefix(t, subtermIndex),
+                    childPolarity(op, subtermIndex, polarity));
             }
 
             return noCache;
@@ -246,7 +301,7 @@ public class TermTacletAppIndexCacheSet {
 
         @Override
         protected String name() {
-            return "TopLevelCache" + getPrefix();
+            return "TopLevelCache" + getPrefix() + "/" + polarity;
         }
     }
 

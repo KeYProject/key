@@ -6,8 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -19,61 +17,32 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public final class DependencyContractFeature extends BinaryFeature {
-
-    private void removePreviouslyUsedSteps(JTerm focus, Goal goal,
-            List<PosInOccurrence> steps) {
-        for (RuleApp app : goal.appliedRuleApps()) {
-            if (app.rule() instanceof UseDependencyContractRule
-                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(app.posInOccurrence().subTerm(),
-                        focus)) {
-                final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-                for (PosInOccurrence ifInst : bapp.assumesInsts()) {
-                    steps.remove(ifInst);
-                }
-            }
-        }
-    }
 
     @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
             PosInOccurrence pos,
             Goal p_goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-        final JTerm focus = (JTerm) pos.subTerm();
 
-        // determine possible steps
         final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         final Services services = goal.proof().getServices();
         List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
                 : HeapContext.getModifiableHeaps(services, false);
 
-        final List<PosInOccurrence> steps =
-            UseDependencyContractRule.getSteps(heapContext, pos, goal.sequent(), services);
-        if (steps.isEmpty()) {
+        // the rule's step policy, shared with the completion of the application, see chooseStep
+        final PosInOccurrence step =
+            UseDependencyContractRule.chooseStep(pos, goal, heapContext, services);
+        if (step == null) {
             return false;
         }
 
-        // remove previously used steps
-        removePreviouslyUsedSteps(focus, goal, steps);
-
-        if (steps.isEmpty()) {
-            return false;
-        }
-
-        if (pos.isTopLevel() && focus.sort() == JavaDLTheory.FORMULA
-                && pos.isInAntec() == steps.get(0).isInAntec()) {
-            return false;
-        }
-
-        // instantiate with arbitrary remaining step
-        bapp = bapp.setAssumesInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
+        bapp = bapp.setAssumesInsts(ImmutableList.singleton(step));
         return true;
     }
 }

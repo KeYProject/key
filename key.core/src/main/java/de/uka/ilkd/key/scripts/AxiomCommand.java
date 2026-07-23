@@ -9,22 +9,27 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-/**
- * The axiom command takes one argument: a formula to which the command is applied.
- *
- * @see AssumeCommand The assume command is a synonym for the axiom command.
- *
- * @deprecated This command is deprecated and should not be used in new scripts. It is kept for
- *             compatibility reasons.
- *             Use the {@link AssumeCommand} "assume" instead.
- */
+/// Deprecated command for adding formulas as axioms to the proof.
+/// This is an alias for the `assume` command and should not be used in new scripts.
+///
+/// @see AssumeCommand
+/// @deprecated Use `assume` instead
 @Deprecated(forRemoval = true)
+@Documentation(category = "Control", value = """
+        This command is deprecated and should not be used in new scripts.
+        Use the equivalent `assume` command instead.
+
+        The axiom command adds a formula to the current sequent without proof obligation,
+        effectively assuming it to be true. This is unsound and should only be used for
+        testing or debugging purposes.
+        """)
 public class AxiomCommand extends AssumeCommand {
     private static final Name TACLET_NAME = new Name("cut");
 

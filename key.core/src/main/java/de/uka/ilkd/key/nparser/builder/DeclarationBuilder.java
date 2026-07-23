@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -12,10 +14,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 
 import org.key_project.logic.Choice;
+import org.key_project.logic.HasMetaSpaceKey;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -54,7 +56,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
             ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
@@ -62,17 +64,16 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        // boolean freeAdt = ctx.FREE() != null;
+    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         var name = ctx.name.getText();
-        var doc = ctx.DOC_COMMENT() != null
-                ? ctx.DOC_COMMENT().getText()
-                : null;
+        var doc = processDocumentation(ctx.doc);
         var origin = BuilderHelpers.getPosition(ctx);
         List<GenericParameter> typeParameters = accept(ctx.formal_sort_param_decls());
         if (typeParameters == null) {
-            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false);
             sorts().addSafely(s);
+            docsSpace().setDocumentation(s, doc);
+            docsSpace().setOrigin(s, origin);
         } else {
             var doubled = CollectionUtil.findDuplicates(typeParameters);
             if (!doubled.isEmpty()) {
@@ -81,22 +82,25 @@ public class DeclarationBuilder extends DefaultBuilder {
                     doubled.getFirst());
             }
             var s = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(),
-                ImmutableList.fromList(typeParameters), doc, origin);
+                ImmutableList.fromList(typeParameters));
             namespaces().parametricSorts().addSafely(s);
+            docsSpace().setDocumentation(s, doc);
+            docsSpace().setOrigin(s, origin);
         }
         return null;
     }
 
     @Override
-    public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
-        for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
-            List<String> varNames = accept(ctx.simple_ident_comma_list(i));
-            KeYJavaType kjt = accept(ctx.keyjavatype(i));
+    public Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
+        for (int i = 0; i < ctx.simple_ident_comma_list_with_docs().size(); i++) {
+            var c = ctx.simple_ident_comma_list_with_docs(i);
+            List<String> varNames = c.simple_ident_with_doc()
+                    .stream().map(it -> (String) accept(it.simple_ident())).toList();
+            KeYJavaType kjt = accept(ctx.typemapping(i));
             assert varNames != null;
             for (String varName : varNames) {
                 if (varName.equals("null")) {
-                    semanticError(ctx.simple_ident_comma_list(i),
-                        "Function '" + varName + "' is already defined!");
+                    semanticError(c, "Function '" + varName + "' is already defined!");
                 }
                 ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
@@ -104,8 +108,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                     // commented out as pv do not have unique name (at the moment)
                     // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
                     // getColumn())
-                    if (!(name instanceof ProgramVariable)
-                            || !((ProgramVariable) name).getKeYJavaType().equals(kjt)) {
+                    if (!(name instanceof ProgramVariable pv)
+                            || !(pv.getKeYJavaType().equals(kjt))) {
                         programVariables().add(new LocationVariable(pvName, kjt));
                     }
                 } else {
@@ -118,43 +122,52 @@ public class DeclarationBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitChoice(KeYParser.ChoiceContext ctx) {
+    public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
-        for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
+        String catDoc = processDocumentation(ctx.maindoc);
+        docsSpace().setDocumentation(new HasMetaSpaceKey.OptionCategory(cat), catDoc);
+
+        for (JavaKeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
             String name = cat + ":" + catctx.getText();
+
             Choice c = choices().lookup(new Name(name));
             if (c == null) {
                 c = new Choice(catctx.getText(), cat);
                 choices().add(c);
+
+                var doc = processDocumentation(optdecl.DOC_COMMENT);
+                docsSpace().setDocumentation(c, doc);
             }
             category2Default.putIfAbsent(cat, name);
         }
+
         category2Default.computeIfAbsent(cat, it -> {
-            choices().add(new Choice("On", cat));
-            choices().add(new Choice("Off", cat));
+            choices().add(new Choice(cat + ":On", cat));
+            choices().add(new Choice(cat + ":Off", cat));
             return cat + ":On";
         });
+
         return null;
     }
 
     @Override
-    public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
-        for (KeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
+    public Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
+        for (JavaKeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
             c.accept(this);
         }
         return null;
     }
 
     @Override
-    public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
+    public Object visitOne_sort_decl(JavaKeYParser.One_sort_declContext ctx) {
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
-        var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
+        var sectionDoc = processDocumentation(ctx.DOC_COMMENT());
 
         ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                 : Immutables.createSetFrom(sortExt);
@@ -176,8 +189,8 @@ public class DeclarationBuilder extends DefaultBuilder {
         }
 
         if (ctx.sortIds != null) {
-            for (var idCtx : ctx.sortIds.simple_ident_dots()) {
-                String sortId = accept(idCtx);
+            for (var idCtx : ctx.sortIds.simple_ident_dots_with_docs()) {
+                String sortId = accept(idCtx.simple_ident_dots());
                 Name sortName = new Name(sortId);
 
 
@@ -190,9 +203,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                     Sort s = null;
                     if (isGenericSort) {
                         try {
-                            var gs = new GenericSort(sortName, ext, oneOf, documentation,
-                                BuilderHelpers.getPosition(idCtx));
-                            s = gs;
+                            s = new GenericSort(sortName, ext, oneOf);
                         } catch (GenericSupersortException e) {
                             semanticError(ctx, "Illegal sort given");
                         }
@@ -200,16 +211,18 @@ public class DeclarationBuilder extends DefaultBuilder {
                         s = JavaDLTheory.ANY;
                     } else {
                         if (isProxySort) {
-                            var ps = new ProxySort(sortName, ext, documentation,
-                                BuilderHelpers.getPosition(idCtx));
-                            s = ps;
+                            s = new ProxySort(sortName, ext);
                         } else {
-                            var si = new SortImpl(sortName, ext, isAbstractSort,
-                                documentation, BuilderHelpers.getPosition(idCtx));
-                            s = si;
+                            s = new SortImpl(sortName, ext, isAbstractSort);
                         }
                     }
                     assert s != null;
+                    String doc = processDocumentation(idCtx.DOC_COMMENT());
+                    String origin = BuilderHelpers.getPosition(idCtx);
+                    docsSpace().setOrigin(s, origin);
+                    docsSpace().setDocumentation(s,
+                        Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                                .collect(Collectors.joining("\n")));
                     sorts().add(s);
                     createdSorts.add(s);
                 } else {
@@ -220,7 +233,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                         "Sort declaration of {} in {} is ignored due to collision (already "
                             + "present in {}).",
                         sortName, BuilderHelpers.getPosition(ctx),
-                        existingSort.getOrigin());
+                        docsSpace().findOrigin(existingSort));
                 }
             }
         } else {
@@ -243,35 +256,42 @@ public class DeclarationBuilder extends DefaultBuilder {
                     "Cannot declare parametric sort %s, as a sort of the same name has already been declared",
                     sortName);
             }
-            var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params,
-                documentation, BuilderHelpers.getPosition(declCtx));
+            var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params);
             namespaces().parametricSorts().addSafely(sortDecl);
+            docsSpace().setOrigin(sortDecl, BuilderHelpers.getPosition(declCtx));
+            var doc = processDocumentation(declCtx.DOC_COMMENT());
+            docsSpace().setDocumentation(sortDecl,
+                Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                        .collect(Collectors.joining("\n")));
         }
         return createdSorts;
     }
 
     @Override
-    public Object visitOption_decls(KeYParser.Option_declsContext ctx) {
+    public Object visitOption_decls(JavaKeYParser.Option_declsContext ctx) {
         return mapOf(ctx.choice());
     }
 
     @Override
-    public List<Sort> visitExtends_sorts(KeYParser.Extends_sortsContext ctx) {
+    public List<Sort> visitExtends_sorts(JavaKeYParser.Extends_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
 
     @Override
-    public List<Sort> visitOneof_sorts(KeYParser.Oneof_sortsContext ctx) {
+    public List<Sort> visitOneof_sorts(JavaKeYParser.Oneof_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
 
 
     @Override
-    public Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
-        for (String id : this.<String>mapOf(ctx.simple_ident())) {
+    public Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
+        for (JavaKeYParser.Simple_ident_with_docContext iddoc : ctx.id) {
+            String id = accept(iddoc.simple_ident());
+            String doc = processDocumentation(iddoc.DOC_COMMENT());
             RuleSet h = new RuleSet(new Name(id));
             if (ruleSets().lookup(new Name(id)) == null) {
                 ruleSets().add(h);
+                docsSpace().setDocumentation(h, doc);
             }
         }
         return null;
@@ -279,9 +299,8 @@ public class DeclarationBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
+    public Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
         return null;
     }
-
 
 }

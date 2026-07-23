@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * User action to start auto mode on a specific goal.
@@ -58,7 +57,7 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
             // which implements the functionality.
             // No functionality is allowed in this method body!
             mediator.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
-                ImmutableSLList.<Goal>nil().prepend(invokedGoal));
+                ImmutableList.<Goal>singleton(invokedGoal));
         }
     }
 }

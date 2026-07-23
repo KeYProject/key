@@ -1,0 +1,100 @@
+# Version catalog for KeY project
+# See https://docs.gradle.org/current/userguide/platforms.html
+
+[versions]
+# Plugins
+spotless = "8.7.0"
+checkerframework-gradle = "0.6.61"
+maven-publish = "0.37.0"
+shadow = "9.4.3"
+
+# Core dependencies
+slf4j = "2.0.18"
+logback = "1.5.37"
+jspecify = "1.0.0"
+eisop = "3.49.5-eisop1"
+assertj = "3.27.7"
+junit = "6.1.1"
+jackson = "2.21.4"
+
+# ANTLR
+antlr = "4.13.2"
+stringtemplate = "4.3.4"
+
+# Java parsing and analysis
+javapoet = "1.13.0"
+javaparser = "3.28.0-K13.6"
+truth = "1.4.5"
+
+# UI and CLI
+flatlaf = "3.7.1"
+miglayout = "11.4.3"
+picocli = "4.7.7"
+docking-frames = "1.1.3p1"
+
+# External tools
+scala-isabelle = "0.4.5"
+
+[libraries]
+# SLF4J and logging
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+# JSpecify (nullability annotations)
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+# EISOP Checker Framework
+checkerframework-qual = { module = "io.github.eisop:checker-qual", version.ref = "eisop" }
+checkerframework-util = { module = "io.github.eisop:checker-util", version.ref = "eisop" }
+checkerframework = { module = "io.github.eisop:checker", version.ref = "eisop" }
+
+# Testing
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# Jackson (JSON/YAML)
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+
+# ANTLR
+antlr4 = { module = "org.antlr:antlr4", version.ref = "antlr" }
+antlr4-runtime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+stringtemplate = { module = "org.antlr:ST4", version.ref = "stringtemplate" }
+
+# Java source code processing
+javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
+javaparser-core = { module = "org.key-project.proofjava:javaparser-core", version.ref = "javaparser" }
+javaparser-core-serialization = { module = "org.key-project.proofjava:javaparser-core-serialization", version.ref = "javaparser" }
+javaparser-symbol-solver-core = { module = "org.key-project.proofjava:javaparser-symbol-solver-core", version.ref = "javaparser" }
+
+# Testing utilities
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
+
+# UI components
+flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
+miglayout-swing = { module = "com.miglayout:miglayout-swing", version.ref = "miglayout" }
+docking-frames-common = { module = "org.key-project:docking-frames-common", version.ref = "docking-frames" }
+docking-frames-core = { module = "org.key-project:docking-frames-core", version.ref = "docking-frames" }
+
+# CLI
+picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
+
+# External tools
+scala-isabelle = { module = "de.unruh:scala-isabelle_2.13", version.ref = "scala-isabelle" }
+
+[bundles]
+# Common testing dependencies
+testing = ["junit-jupiter-api", "junit-jupiter-params", "junit-jupiter-engine", "junit-platform-launcher", "assertj-core"]
+checkerframework = ["checkerframework-qual", "checkerframework-util"]
+jackson = ["jackson-dataformat-yaml", "jackson-datatype-jsr310"]
+javaparser = ["javaparser-core", "javaparser-core-serialization", "javaparser-symbol-solver-core"]
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+checkerframework = { id = "org.checkerframework", version.ref = "checkerframework-gradle" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

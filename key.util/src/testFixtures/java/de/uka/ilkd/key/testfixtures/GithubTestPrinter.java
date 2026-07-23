@@ -18,11 +18,11 @@ import org.junit.jupiter.api.extension.TestWatcher;
 /// @author Alexander Weigl
 /// @version 1 (2026-02-23)
 public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterAllCallback {
-    private static final boolean ENABLED = "true".equals(System.getenv("CI"));
+    private static final boolean DISABLED = !"true".equals(System.getenv("CI"));
 
     @Override
     public void testAborted(ExtensionContext context, Throwable cause) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
         System.out.format("::error title=Test aborted %s::Test %s#%s aborted due to \"%s: %s\"%n",
@@ -34,7 +34,7 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
 
     @Override
     public void testDisabled(ExtensionContext context, Optional<String> reason) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
         System.out.format("::notice title=Disabled test %s::Test %s#%s disabled due to %s%n",
@@ -46,7 +46,7 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
         System.out.format("::error title=Test failed %s::Test %s#%s aborted due to \"%s: %s\"%n",
@@ -58,7 +58,7 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
 
     @Override
     public void testSuccessful(ExtensionContext context) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
         System.out.format("::debug::SUCCESS:%s%n", context.getDisplayName());
@@ -67,7 +67,7 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
         System.out.format("::group::%s%n", context.getDisplayName());
@@ -75,9 +75,9 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
 
     @Override
     public void afterAll(ExtensionContext context) {
-        if (ENABLED) {
+        if (DISABLED) {
             return;
         }
-        System.out.format("::endgroup::");
+        System.out.format("::endgroup::%n");
     }
 }

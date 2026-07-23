@@ -36,6 +36,7 @@ class TranslationTest {
         sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("Seq"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("LocSet"), ImmutableSet.empty(), false));
         services.activateJava(null);
         converter = services.getJavaService().getConverter(null);
         services.getJavaService().parseSpecialClasses();

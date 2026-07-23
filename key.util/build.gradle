@@ -5,25 +5,24 @@ plugins {
 description = "Utility library of the key-project"
 
 dependencies {
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation(libs.jspecify)
 
     // we also export these dependency into src/test/java.
     testFixturesApi(project(':key.util'))
 
-    testFixturesApi(platform("org.junit:junit-bom:6.0.3"))
-    testFixturesApi("org.junit.jupiter:junit-jupiter-api")
-    testFixturesApi("org.junit.jupiter:junit-jupiter-params")
-    testFixturesApi("org.assertj:assertj-core:3.27.7")
-    testFixturesApi("org.jspecify:jspecify:1.0.0")
+    testFixturesApi(platform(libs.junit.bom))
+    testFixturesApi(libs.junit.jupiter.api)
+    testFixturesApi(libs.junit.jupiter.params)
+    testFixturesApi(libs.assertj.core)
+    testFixturesApi(libs.jspecify)
 
-    testFixturesApi("ch.qos.logback:logback-classic:1.5.32")
+    testFixturesApi(libs.logback.classic)
 
     // test fixtures
-    testFixturesApi("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3")
-    testFixturesApi("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
+    testFixturesApi(libs.jackson.dataformat.yaml)
+    testFixturesApi(libs.jackson.datatype.jsr310)
 
-    def eisop_version = "3.49.5-eisop1"
-    testFixturesCompileOnly( "io.github.eisop:checker-qual:$eisop_version")
+    testFixturesCompileOnly(libs.checkerframework.qual)
 }
 
 checkerFramework {

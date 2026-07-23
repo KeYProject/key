@@ -21,7 +21,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -167,7 +166,7 @@ public class ContractFactoryTest {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 

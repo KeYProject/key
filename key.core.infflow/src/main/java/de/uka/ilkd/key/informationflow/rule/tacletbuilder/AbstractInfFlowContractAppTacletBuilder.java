@@ -32,7 +32,6 @@ import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Builds the rule which inserts information flow contract applications.
@@ -198,7 +197,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         JTerm selfAtPostSV = (appData.pre.self == appData.post.self ? selfAtPreSV
                 : createTermSV(appData.post.self, schemaPrefix, services));
 
-        ImmutableList<JTerm> localVarsAtPostSVs = ImmutableSLList.nil();
+        ImmutableList<JTerm> localVarsAtPostSVs = ImmutableList.nil();
         Iterator<JTerm> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
         Iterator<JTerm> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (JTerm appDataPostLocalVar : appData.post.localVars) {
@@ -262,10 +261,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         // create sequents
         Sequent assumesSeq =
             JavaDLSequentKit.createAnteSequent(
-                ImmutableSLList.singleton(new SequentFormula(schemaAssumes)));
+                ImmutableList.singleton(new SequentFormula(schemaAssumes)));
         Sequent replaceWithSeq =
             JavaDLSequentKit.createAnteSequent(
-                ImmutableSLList.singleton(new SequentFormula(replaceWithTerm)));
+                ImmutableList.singleton(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =
@@ -274,9 +273,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY));
-        tacletBuilder.setIfSequent(assumesSeq);
+        tacletBuilder.setAssumesSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
-            ImmutableSLList.nil(), schemaFind);
+            ImmutableList.nil(), schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name(IF_CONTRACT_APPLICATION)));
         tacletBuilder.setSurviveSmbExec(true);
@@ -311,7 +310,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
             prefixBuilder.build();
             return new InfFlowContractAppTaclet(name,
-                new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                new TacletApplPart(assumesSeq, applicationRestriction, varsNew, varsNotFreeIn,
                     varsNewDependingOn,
                     variableConditions),
                 goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),

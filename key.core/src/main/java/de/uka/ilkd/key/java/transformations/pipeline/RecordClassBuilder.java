@@ -136,6 +136,10 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
             fullConstructor.getBody().get().getStatements().add(0, compactConstructor.getBody());
         }
 
+        for (var compactConstructor : recordDeclaration.getCompactConstructors()) {
+            compactConstructor.remove();
+        }
+
         var type = recordDeclaration.getNameAsString();
         // var marker = new KeYMarkerStatement(MarkerStatementHelper.KIND_ASSUME);
         var fieldParamEqual = recordDeclaration.getParameters()

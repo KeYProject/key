@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Encapsulates information describing changes to a proof tree, and used to notify proof tree
@@ -16,7 +15,7 @@ public class ProofTreeEvent {
     private final Proof source;
     private Node node;
     private Goal goal;
-    private ImmutableList<Goal> goals = ImmutableSLList.nil();
+    private ImmutableList<Goal> goals = ImmutableList.nil();
 
     /**
      * Create ProofTreeEvent for an event that happens at the specified node.

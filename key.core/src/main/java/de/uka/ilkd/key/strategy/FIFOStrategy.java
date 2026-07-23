@@ -40,7 +40,9 @@ public class FIFOStrategy implements JavaStrategy {
             PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
-        return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
+        // FIFO ordering is purely the goal age, which RuleAppContainer.withAge adds once per
+        // container, so the age-free strategy cost is zero.
+        return NumberRuleAppCost.getZeroCost();
     }
 
     /**

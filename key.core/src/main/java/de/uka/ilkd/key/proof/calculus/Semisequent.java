@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import org.key_project.prover.sequent.SemisequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 class Semisequent extends org.key_project.prover.sequent.Semisequent {
 
@@ -63,7 +62,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
         @Override
         public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
             final SemisequentChangeInfo sci = new SemisequentChangeInfo(
-                ImmutableSLList.singleton(sequentFormula));
+                ImmutableList.singleton(sequentFormula));
             sci.addedFormula(0, sequentFormula);
             return sci;
         }
@@ -117,7 +116,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          */
         @Override
         public SemisequentChangeInfo remove(int idx) {
-            return new SemisequentChangeInfo(ImmutableSLList.nil());
+            return new SemisequentChangeInfo(ImmutableList.nil());
         }
 
         /**

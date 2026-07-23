@@ -63,17 +63,36 @@ public abstract class JavaASTWalker {
      *        the JavaProgramElement the walker is at
      */
     protected void walk(ProgramElement node) {
+        if (done()) {
+            return;
+        }
         if (node instanceof NonTerminalProgramElement nonTerminalNode) {
             depth++;
-            for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
-                if (nonTerminalNode.getChildAt(i) != null) {
-                    walk(nonTerminalNode.getChildAt(i));
+            final int childCount = nonTerminalNode.getChildCount();
+            for (int i = 0; i < childCount && !done(); i++) {
+                final ProgramElement child = nonTerminalNode.getChildAt(i);
+                if (child != null) {
+                    walk(child);
                 }
             }
             depth--;
         }
         // Otherwise, the node is left, so perform the action
         doAction(node);
+    }
+
+    /**
+     * Whether the walk has already collected everything it needs and may therefore stop early.
+     * Default <code>false</code>, i.e. a full traversal. Subclasses that only look for a bounded
+     * set
+     * of nodes can override this to short-circuit; it is consulted before each node and between
+     * siblings, so the work saved is the unvisited remainder of the AST. Returning a constant
+     * <code>false</code> leaves traversal behaviour unchanged.
+     *
+     * @return true iff the walk may stop
+     */
+    protected boolean done() {
+        return false;
     }
 
     /**

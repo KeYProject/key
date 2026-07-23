@@ -25,10 +25,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -51,6 +51,21 @@ public abstract class TacletExecutor
 
     protected TacletExecutor(Taclet taclet) {
         super(taclet);
+    }
+
+    /**
+     * Computes the sequents that applying this taclet would produce, <em>without changing the
+     * proof</em>: no goals or nodes are created, no rules or program variables are added, and the
+     * real namespaces are left untouched (instantiation uses the goal's overlay services). Intended
+     * for a non-committing preview of a rule application.
+     *
+     * @param goal the goal the taclet would be applied to
+     * @param ruleApp the (complete) taclet application to preview
+     * @return one {@link SequentChangeInfo} per resulting goal, or an empty list if previewing is
+     *         not supported for this kind of taclet
+     */
+    public ImmutableList<SequentChangeInfo> getResultSequentChanges(Goal goal, RuleApp ruleApp) {
+        return ImmutableList.nil();
     }
 
     @Override
@@ -138,7 +153,7 @@ public abstract class TacletExecutor
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
 
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> replacements = ImmutableList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
@@ -167,8 +182,8 @@ public abstract class TacletExecutor
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
-            tacletToAdd = tacletToAdd
-                    .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
+            String name = tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId();
+            tacletToAdd = tacletToAdd.setName(name);
 
 
             // the new Taclet may contain variables with a known
@@ -213,7 +228,7 @@ public abstract class TacletExecutor
             LogicServices p_services,
             MatchResultInfo matchCond) {
         final Services services = (Services) p_services;
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
+        ImmutableList<RenamingTable> renamings = ImmutableList.nil();
         for (final SchemaVariable sv : pvs) {
             final LocationVariable inst =
                 (LocationVariable) matchCond.getInstantiations().getInstantiation(sv);

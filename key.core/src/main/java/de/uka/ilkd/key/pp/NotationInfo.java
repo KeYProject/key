@@ -297,6 +297,9 @@ public final class NotationInfo {
             PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(doubleLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 
+        final RealLDT realLDT = services.getTypeConverter().getRealLDT();
+        tbl.put(realLDT.getRealNumberSymbol(), new Notation.RealLiteral());
+
 
         // heap operators
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();

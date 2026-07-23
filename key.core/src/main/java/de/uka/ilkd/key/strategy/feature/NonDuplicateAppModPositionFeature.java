@@ -5,11 +5,9 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -34,10 +32,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             return true;
         }
 
-        final ImmutableList<UpdateLabelPair> oldUpdateContext =
-            oldApp.instantiations().getUpdateContext();
-        final ImmutableList<UpdateLabelPair> newUpdateContext =
-            newApp.instantiations().getUpdateContext();
-        return oldUpdateContext.equals(newUpdateContext);
+        // compare the update terms modulo term labels: labels carry history (e.g. origin), and a
+        // duplicate check that is sensitive to them misses semantically equal applications
+        return equalUpdateContext(oldApp.instantiations().getUpdateContext(),
+            newApp.instantiations().getUpdateContext());
     }
 }

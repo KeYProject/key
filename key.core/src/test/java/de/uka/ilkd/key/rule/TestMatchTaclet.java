@@ -28,7 +28,7 @@ import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,6 +128,22 @@ public class TestMatchTaclet {
 
 
     @Test
+    public void testListSVDirectActiveStatement() {
+        // A context block with a list statement schema variable (#slist) DIRECTLY as its active
+        // statement: the block is variable-arity, so the compiled context match takes its
+        // cursor-walking phase 3 (a greedy list-SV run) instead of the one-child-per-statement
+        // fast path. Also a regression guard for the plan bridges, which must never invoke
+        // ListSVPlan.compile() standalone (it throws).
+        JTerm match = TacletForTests.parseTerm("\\<{ return 1==2; return 1==3; }\\>A");
+        FindTaclet taclet =
+            (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_slist_context").taclet();
+        MatchResultInfo mc =
+            taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services);
+        assertNotNull(mc, "the #slist context taclet should match the whole block");
+    }
+
+
+    @Test
     public void testVarOccursInIfAndAddRule() {
 
         JTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
@@ -137,8 +153,8 @@ public class TestMatchTaclet {
         // therefore no match should be found
 
         Sequent seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(match.sub(0))),
-            ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(match.sub(0))),
+            ImmutableList.nil());
 
         assertEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -148,8 +164,8 @@ public class TestMatchTaclet {
 
         // we bind the free variable now a match should be found
         seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(match)),
-            ImmutableSLList.nil());
+            ImmutableList.singleton(new SequentFormula(match)),
+            ImmutableList.nil());
 
         assertNotEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -258,15 +274,15 @@ public class TestMatchTaclet {
         JTerm closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
         JTerm closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
         Sequent seq = JavaDLSequentKit.createSequent(
-            ImmutableSLList.singleton(new SequentFormula(closeable_one)),
-            ImmutableSLList.singleton(new SequentFormula(closeable_two)));
+            ImmutableList.singleton(new SequentFormula(closeable_one)),
+            ImmutableList.singleton(new SequentFormula(closeable_two)));
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
         PosInOccurrence pio =
             new PosInOccurrence(new SequentFormula(closeable_two), PosInTerm.getTopLevel(), false);
 
         TacletApp tacletApp =
-            index.getSuccedentTaclet(pio, new IHTacletFilter(true, ImmutableSLList.nil()), services)
+            index.getSuccedentTaclet(pio, new IHTacletFilter(true, ImmutableList.nil()), services)
                     .iterator().next();
         assertTrue(tacletApp.findIfFormulaInstantiations(seq, services).size() > 0,
             "Match should be possible(modulo renaming)");
@@ -373,6 +389,19 @@ public class TestMatchTaclet {
         MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "No context matching corrupt.");
+    }
+
+    @Test
+    public void testNoContextFixedStatementMatching() {
+        // a modality program that is a plain StatementBlock (no .. / ... context markers) whose
+        // statements are fixed (non-list): the whole block is matched structurally, exact size
+        JTerm match =
+            TacletForTests.parseTerm("\\<{ i = 1; }\\>true ", services, services.getNamespaces());
+        FindTaclet taclet = (FindTaclet) TacletForTests
+                .getTaclet("TestMatchTaclet_nocontext_fixed_statements").taclet();
+        MatchResultInfo mc =
+            (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
+        assertNotNull(mc, "non-context fixed-statement program should match");
     }
 
     @Test

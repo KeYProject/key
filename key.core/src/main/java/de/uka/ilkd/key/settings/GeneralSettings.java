@@ -48,6 +48,14 @@ public class GeneralSettings extends AbstractSettings {
      */
     private static final String ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
 
+    /** Whether automatic proof search uses the multi-core (parallel) prover. */
+    public static final String PARALLEL_PROVER_ENABLED = "ParallelProverEnabled";
+    /** The number of worker threads the multi-core prover uses. */
+    public static final String PARALLEL_PROVER_THREADS = "ParallelProverThreadCount";
+
+    /** Default worker count when the multi-core prover is first enabled. */
+    public static final int PARALLEL_PROVER_THREADS_DEFAULT = 4;
+
     /** Default value for {@link #getJmlEnabledKeys()} */
     public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
 
@@ -83,6 +91,24 @@ public class GeneralSettings extends AbstractSettings {
      * source code. Toggles between SimpleFilerepo (false) and DiskFileRepo (true).
      */
     private boolean ensureSourceConsistency = true;
+
+    /**
+     * Whether automatic proof search uses the multi-core (parallel) prover instead of the legacy
+     * single-threaded one. Single-core is the safe fallback and keeps the single-core-only features
+     * (proof caching, slicing, merge rule, ...) available.
+     * <p>
+     * Single-core by default: the multi-core prover is opt-in (enable it in the settings, or via
+     * {@code -Dkey.prover.parallel=true}). It has to stay disabled by default so proofs built with
+     * the single-core-only features keep working out of the box.
+     */
+    private boolean parallelProverEnabled = false;
+
+    /**
+     * Number of worker threads for the multi-core prover. Only relevant when
+     * {@link #parallelProverEnabled} is set; the effective count is clamped to the available
+     * processors.
+     */
+    private int parallelProverThreadCount = PARALLEL_PROVER_THREADS_DEFAULT;
 
     GeneralSettings() {
         // addSettingsListener(AutoSaver.settingsListener);
@@ -120,6 +146,21 @@ public class GeneralSettings extends AbstractSettings {
 
     public boolean isEnsureSourceConsistency() {
         return ensureSourceConsistency;
+    }
+
+    /**
+     * @return whether automatic proof search uses the multi-core (parallel) prover
+     */
+    public boolean isParallelProverEnabled() {
+        return parallelProverEnabled;
+    }
+
+    /**
+     * @return the configured number of worker threads for the multi-core prover (not yet clamped to
+     *         the available processors)
+     */
+    public int getParallelProverThreadCount() {
+        return parallelProverThreadCount;
     }
 
     // setter
@@ -165,6 +206,18 @@ public class GeneralSettings extends AbstractSettings {
         firePropertyChange(ENSURE_SOURCE_CONSISTENCY, old, ensureSourceConsistency);
     }
 
+    public void setParallelProverEnabled(boolean b) {
+        var old = parallelProverEnabled;
+        parallelProverEnabled = b;
+        firePropertyChange(PARALLEL_PROVER_ENABLED, old, parallelProverEnabled);
+    }
+
+    public void setParallelProverThreadCount(int count) {
+        var old = parallelProverThreadCount;
+        parallelProverThreadCount = Math.max(1, count);
+        firePropertyChange(PARALLEL_PROVER_THREADS, old, parallelProverThreadCount);
+    }
+
     /**
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
@@ -208,6 +261,20 @@ public class GeneralSettings extends AbstractSettings {
             setEnsureSourceConsistency(Boolean.parseBoolean(val));
         }
 
+        val = props.getProperty(prefix + PARALLEL_PROVER_ENABLED);
+        if (val != null) {
+            setParallelProverEnabled(Boolean.parseBoolean(val));
+        }
+
+        val = props.getProperty(prefix + PARALLEL_PROVER_THREADS);
+        if (val != null) {
+            try {
+                setParallelProverThreadCount(Integer.parseInt(val));
+            } catch (NumberFormatException e) {
+                setParallelProverThreadCount(PARALLEL_PROVER_THREADS_DEFAULT);
+            }
+        }
+
         {
             String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
             if (sysProp != null) {
@@ -241,6 +308,9 @@ public class GeneralSettings extends AbstractSettings {
         props.setProperty(prefix + AUTO_SAVE, String.valueOf(autoSave));
         props.setProperty(prefix + ENSURE_SOURCE_CONSISTENCY,
             String.valueOf(ensureSourceConsistency));
+        props.setProperty(prefix + PARALLEL_PROVER_ENABLED, String.valueOf(parallelProverEnabled));
+        props.setProperty(prefix + PARALLEL_PROVER_THREADS,
+            String.valueOf(parallelProverThreadCount));
         props.setProperty(KEY_JML_ENABLED_KEYS, String.join(",", jmlEnabledKeys));
     }
 
@@ -259,6 +329,9 @@ public class GeneralSettings extends AbstractSettings {
             setAutoSave(0);
         }
         setEnsureSourceConsistency(props.getBool(ENSURE_SOURCE_CONSISTENCY));
+        setParallelProverEnabled(props.getBool(PARALLEL_PROVER_ENABLED, false));
+        setParallelProverThreadCount(
+            props.getInt(PARALLEL_PROVER_THREADS, PARALLEL_PROVER_THREADS_DEFAULT));
 
         var sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
         if (sysProp != null) {
@@ -277,6 +350,8 @@ public class GeneralSettings extends AbstractSettings {
         props.set(USE_JML_KEY, useJML);
         props.set(AUTO_SAVE, autoSave);
         props.set(ENSURE_SOURCE_CONSISTENCY, ensureSourceConsistency);
+        props.set(PARALLEL_PROVER_ENABLED, parallelProverEnabled);
+        props.set(PARALLEL_PROVER_THREADS, parallelProverThreadCount);
         props.set(KEY_JML_ENABLED_KEYS, jmlEnabledKeys.stream().toList());
     }
 }

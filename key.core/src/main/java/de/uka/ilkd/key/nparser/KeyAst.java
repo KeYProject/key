@@ -7,24 +7,31 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.scripts.ScriptBlock;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.speclang.njml.JmlParserBaseVisitor;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -48,7 +55,7 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
 
-    final @NonNull T ctx;
+    public final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
@@ -78,8 +85,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     }
 
     /// An AST representing a complete KeY file.
-    public static class File extends KeyAst<KeYParser.FileContext> {
-        File(KeYParser.FileContext ctx) {
+    public static class File extends KeyAst<JavaKeYParser.FileContext> {
+        File(JavaKeYParser.FileContext ctx) {
             super(ctx);
         }
 
@@ -110,7 +117,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          */
         public @Nullable ProofScript findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
-                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
+                JavaKeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
                 if (pctx.STRING_LITERAL() != null) {
                     var ctx = pctx.STRING_LITERAL().getSymbol();
@@ -156,7 +163,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         /// This token also marks the end of the parse tree (EOF) but not the end of the file.
         /// Positional information of the token is used to set up the proof replayer.
         public @Nullable Token findProof() {
-            KeYParser.ProofContext a = ctx.proof();
+            JavaKeYParser.ProofContext a = ctx.proof();
             if (a != null) {
                 return a.PROOF().getSymbol();
             }
@@ -169,16 +176,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * the regular classpath, the Java source file to load,
          * include statements to load other files, configuration of options,
          * declarations of sorts, program variables, schema variables, predicates, and more.
-         * See the grammar (KeYParser.g4) for more possible elements.
+         * See the grammar (JavaKeYParser.g4) for more possible elements.
          */
         public KeyAst.@Nullable Declarations getProblemHeader() {
-            final KeYParser.DeclsContext decls = ctx.decls();
+            final JavaKeYParser.DeclsContext decls = ctx.decls();
             return new KeyAst.Declarations(decls);
         }
     }
 
-    public static class ConfigurationFile extends KeyAst<KeYParser.CfileContext> {
-        ConfigurationFile(KeYParser.CfileContext ctx) {
+    public static class ConfigurationFile extends KeyAst<JavaKeYParser.CfileContext> {
+        ConfigurationFile(JavaKeYParser.CfileContext ctx) {
             super(ctx);
         }
 
@@ -187,6 +194,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             List<Object> res = cfg.visitCfile(ctx);
             if (!res.isEmpty())
                 return (Configuration) res.getFirst();
+            else
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
+
+        public List<Configuration> asConfigurationList() {
+            final var cfg = new ConfigurationBuilder();
+            List<Object> res = cfg.visitCfile(ctx);
+            if (!res.isEmpty())
+                return (List<Configuration>) res.getFirst();
             else
                 throw new RuntimeException("Error in configuration. Source: "
                     + ctx.start.getTokenSource().getSourceName());
@@ -213,21 +230,87 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class JMLProofScript extends KeyAst<JmlParser.AssertionProofContext> {
 
-    public static class Term extends KeyAst<KeYParser.TermContext> {
-        Term(KeYParser.TermContext ctx) {
+        private static class ObtainedVarsVisitor extends JmlParserBaseVisitor<Void> {
+            private ImmutableList<LocationVariable> collectedVars = ImmutableList.of();
+            private final JmlIO io;
+
+            private ObtainedVarsVisitor(JmlIO io) {
+                this.io = io;
+            }
+
+            @Override
+            public Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
+                if (ctx.obtain != null) {
+                    KeYJavaType type = io.translateType(ctx.typespec());
+                    ProgramElementName name = new ProgramElementName(ctx.var.getText());
+                    collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
+                }
+                return null;
+            }
+        }
+
+        private static class TermCollectionVisitor extends JmlParserBaseVisitor<Void> {
+            private ImmutableList<JmlParser.ExpressionContext> collectedTerms = ImmutableList.of();
+
+            @Override
+            public Void visitExpression(JmlParser.ExpressionContext ctx) {
+                collectedTerms = collectedTerms.prepend(ctx);
+                return null;
+            }
+        }
+
+        private ImmutableList<LocationVariable> obtainedProgramVars;
+
+        public JMLProofScript(JmlParser.@NonNull AssertionProofContext ctx) {
+            super(ctx);
+        }
+
+        public static JMLProofScript fromContext(JmlParser.AssertionProofContext ctx) {
+            if (ctx == null) {
+                return null;
+            } else {
+                return new JMLProofScript(ctx);
+            }
+        }
+
+        public ImmutableList<LocationVariable> getObtainedProgramVars(JmlIO io) {
+            if (obtainedProgramVars == null) {
+                var visitor = new ObtainedVarsVisitor(io);
+                ctx.accept(visitor);
+                obtainedProgramVars = visitor.collectedVars;
+            }
+            return obtainedProgramVars;
+        }
+
+        /**
+         * returns a list of all term parse trees in this proof script.
+         *
+         * Todo: Consider caching the result if this is called very often.
+         */
+        public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+            TermCollectionVisitor visitor = new TermCollectionVisitor();
+            ctx.accept(visitor);
+            return visitor.collectedTerms.reverse();
+        }
+    }
+
+
+    public static class Term extends KeyAst<JavaKeYParser.TermContext> {
+        Term(JavaKeYParser.TermContext ctx) {
             super(ctx);
         }
     }
 
-    public static class Seq extends KeyAst<KeYParser.SeqContext> {
-        Seq(KeYParser.SeqContext ctx) {
+    public static class Seq extends KeyAst<JavaKeYParser.SeqContext> {
+        Seq(JavaKeYParser.SeqContext ctx) {
             super(ctx);
         }
     }
 
-    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
-        public Taclet(KeYParser.TacletContext taclet) {
+    public static class Taclet extends KeyAst<JavaKeYParser.TacletContext> {
+        public Taclet(JavaKeYParser.TacletContext taclet) {
             super(taclet);
         }
     }
@@ -238,8 +321,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
      * @author Alexander Weigl
      * @version 1 (23.04.24)
      */
-    public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
-        ProofScript(KeYParser.@NonNull ProofScriptContext ctx) {
+    public static class ProofScript extends KeyAst<JavaKeYParser.ProofScriptContext> {
+        ProofScript(JavaKeYParser.@NonNull ProofScriptContext ctx) {
             super(ctx);
         }
 
@@ -269,12 +352,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         private static List<ScriptCommandAst> asAst(URI file,
-                List<KeYParser.ProofScriptCommandContext> cmds) {
+                List<JavaKeYParser.ProofScriptCommandContext> cmds) {
             return cmds.stream().map(it -> asAst(file, it)).toList();
         }
 
         public static @NonNull ScriptBlock asAst(URI file,
-                KeYParser.ProofScriptCodeBlockContext ctx) {
+                JavaKeYParser.ProofScriptCodeBlockContext ctx) {
             var loc = new Location(file, Position.fromToken(ctx.start));
             final var proofScriptCommandContexts = ctx.proofScript().proofScriptCommand();
             final List<ScriptCommandAst> list =
@@ -285,7 +368,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         private static @NonNull ScriptCommandAst asAst(URI file,
-                KeYParser.ProofScriptCommandContext it) {
+                JavaKeYParser.ProofScriptCommandContext it) {
             var loc = new Location(file, Position.fromToken(it.start));
             var nargs = new HashMap<String, Object>();
             var pargs = new ArrayList<>();
@@ -313,17 +396,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     /// Represents the user declarations in a KeY file.
     ///
     /// @author weigl
-    public static class Declarations extends KeyAst<KeYParser.DeclsContext> {
-        protected Declarations(KeYParser.DeclsContext ctx) {
+    public static class Declarations extends KeyAst<JavaKeYParser.DeclsContext> {
+        protected Declarations(JavaKeYParser.DeclsContext ctx) {
             super(ctx);
         }
 
-        public java.io.@Nullable File getJavaSourceLocation() {
+        public Path getJavaSourceLocation() {
             try {
-                KeYParser.String_valueContext value =
-                    ctx.javaSource(0).oneJavaSource().string_value(0);
+                JavaKeYParser.String_valueContext value =
+                    ctx.programSource(0).oneProgramSource().string_value(0);
                 String v = ParsingFacade.getValueDocumentation(value);
-                return new java.io.File(v);
+                var location = Location.fromToken(ctx.start);
+                var keyFile = Paths.get(location.fileUri());
+                return keyFile.getParent().resolve(v);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 {
                     return null;
@@ -333,9 +418,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         /// Prints the definitions, independent of paths, to the given {@link PrintWriter}.
         public void printDefinitions(PrintWriter out) {
-            ctx.accept(new KeYParserBaseVisitor<@Nullable Object>() {
+            ctx.accept(new JavaKeYParserBaseVisitor<@Nullable Object>() {
                 @Override
-                public @Nullable Object visitOne_include(KeYParser.One_includeContext ctx) {
+                public @Nullable Object visitOne_include(JavaKeYParser.One_includeContext ctx) {
                     if (ctx.absfile != null) {
                         out.printf("\\include %s;", ctx.absfile.getText());
                     }
@@ -343,82 +428,86 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
                 @Override
-                public @Nullable Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
+                public @Nullable Object visitOptions_choice(
+                        JavaKeYParser.Options_choiceContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitOption_decls(KeYParser.Option_declsContext ctx) {
+                public @Nullable Object visitOption_decls(JavaKeYParser.Option_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
+                public @Nullable Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
+                public @Nullable Object visitProg_var_decls(
+                        JavaKeYParser.Prog_var_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
                 public @Nullable Object visitSchema_var_decls(
-                        KeYParser.Schema_var_declsContext ctx) {
+                        JavaKeYParser.Schema_var_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitPred_decls(KeYParser.Pred_declsContext ctx) {
+                public @Nullable Object visitPred_decls(JavaKeYParser.Pred_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
+                public @Nullable Object visitFunc_decls(JavaKeYParser.Func_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitTransform_decls(KeYParser.Transform_declsContext ctx) {
+                public @Nullable Object visitTransform_decls(
+                        JavaKeYParser.Transform_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitDatatype_decls(KeYParser.Datatype_declsContext ctx) {
-                    printAsIs(ctx);
-                    return null;
-                }
-
-
-                @Override
-                public @Nullable Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
+                public @Nullable Object visitDatatype_decls(
+                        JavaKeYParser.Datatype_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
 
                 @Override
-                public @Nullable Object visitContracts(KeYParser.ContractsContext ctx) {
+                public @Nullable Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+
+                @Override
+                public @Nullable Object visitContracts(JavaKeYParser.ContractsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitInvariants(KeYParser.InvariantsContext ctx) {
+                public @Nullable Object visitInvariants(JavaKeYParser.InvariantsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
                 @Override
-                public @Nullable Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
+                public @Nullable Object visitRulesOrAxioms(JavaKeYParser.RulesOrAxiomsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }

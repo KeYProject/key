@@ -11,6 +11,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -35,13 +36,13 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
@@ -93,7 +94,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
 
     private ImmutableSet<JTerm> addEqualDefs(ImmutableSet<JTerm> terms, Goal g) {
-        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        ImmutableList<JTerm> result = ImmutableList.nil();
 
         for (SequentFormula cf : g.sequent().antecedent()) {
             final JTerm formula = (JTerm) cf.formula();
@@ -184,7 +185,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {
             return new Pair<>(TB.empty(),
-                ImmutableSLList.nil());
+                ImmutableList.nil());
         } else if (op == heapLDT.getStore()) {
             final JTerm h = heapTerm.sub(0);
             final JTerm o = heapTerm.sub(1);
@@ -324,6 +325,64 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         return null;
     }
 
+    /**
+     * Chooses the step for an application of this rule at {@code pos} on {@code goal}: the earlier
+     * occurrence of the dependency term the contract is applied relative to. The choice is this
+     * rule's step policy: of the candidate steps {@code goal}'s sequent offers, drop those an
+     * earlier application of this rule on the same focus term already used, and take the first that
+     * remains. Applications therefore walk the candidates one per application, in order.
+     * <p>
+     * A step is a position in {@code goal}'s sequent, so it only means something for {@code goal}.
+     * The policy lives here so that the strategy's cost computation
+     * ({@code DependencyContractFeature}) and the completion of an application
+     * ({@link UseDependencyContractApp#computeStep}) make the same choice.
+     *
+     * @param pos the position the contract is applied at
+     * @param goal the goal whose sequent and already-applied rules the choice is made against
+     * @param heapContext the heap contexts of the application
+     * @param services the services
+     * @return the chosen step, or {@code null} if the policy offers none on {@code goal}
+     */
+    public static @Nullable PosInOccurrence chooseStep(
+            PosInOccurrence pos, Goal goal,
+            List<LocationVariable> heapContext, Services services) {
+        final JTerm focus = (JTerm) pos.subTerm();
+        final List<PosInOccurrence> steps = getSteps(heapContext, pos, goal.sequent(), services);
+        removePreviouslyUsedSteps(focus, goal, steps);
+        if (steps.isEmpty()) {
+            return null;
+        }
+        // a top-level formula as focus with the first step on the same side is the configuration
+        // the strategy rejects as not applicable
+        if (pos.isTopLevel() && focus.sort() == JavaDLTheory.FORMULA
+                && pos.isInAntec() == steps.get(0).isInAntec()) {
+            return null;
+        }
+        return steps.get(0);
+    }
+
+    /**
+     * Removes from {@code steps} every step an already-applied application of this rule on the same
+     * focus term used, so one contract application is not repeated with a step it already had.
+     *
+     * @param focus the focus term of the prospective application
+     * @param goal the goal whose applied rule applications are inspected
+     * @param steps the candidate steps; used entries are removed in place
+     */
+    public static void removePreviouslyUsedSteps(JTerm focus, Goal goal,
+            List<PosInOccurrence> steps) {
+        for (RuleApp app : goal.appliedRuleApps()) {
+            if (app.rule() instanceof UseDependencyContractRule
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(
+                        app.posInOccurrence().subTerm(), focus)) {
+                final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
+                for (PosInOccurrence ifInst : bapp.assumesInsts()) {
+                    steps.remove(ifInst);
+                }
+            }
+        }
+    }
+
 
     /**
      * Returns the dependency contracts which are applicable for the passed target.
@@ -417,7 +476,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             selfTerm = focus.sub(target.getHeapCount(services) * target.getStateCount());
         }
 
-        ImmutableList<JTerm> paramTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> paramTerms = ImmutableList.nil();
         for (int i = target.getHeapCount(services) * target.getStateCount()
                 + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
@@ -462,7 +521,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         int heapExprIndex = 0;
         boolean useful = false;
         ImmutableList<PosInOccurrence> ifInsts =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         int hc = 0;
         for (LocationVariable heap : heaps) {
             if (hc >= obsHeapCount) {
@@ -605,5 +664,16 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                                Methods and model fields may be annotated with an accessible clause. This defines a dependency contract describing the heap locations its value may depend on.
+
+                If the heap changes in locations the symbol does not depend on, its value remains unchanged. This rules adds an according implication for a heap-dependent symbol to the sequent's antecedent.
+
+                In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted) to avoid endless loops.</entry>
+                """;
     }
 }

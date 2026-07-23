@@ -1,13 +1,10 @@
 parser grammar KeYTermParser;
 
 
-options { tokenVocab = KeYLexer; }
 import KeYCommonParser;
 term
    : parallel_term
    ; // weigl: should normally be equivalence_term
-   
-   //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
    
 parallel_term
    : a = elementary_update_term (PARALLEL b = elementary_update_term)*
@@ -83,29 +80,13 @@ unary_minus_term
 atom_prefix
    : update_term
    | substitution_term
-   | locset_term
    | cast_term
    | unary_minus_term
    | bracket_term
    ;
 
 bracket_term
-   : primitive_labeled_term (bracket_suffix_heap)* attribute*
-   ;
-
-bracket_suffix_heap
-   : brace_suffix (AT heap = bracket_term)?
-   ;
-
-brace_suffix
-   : LBRACKET target = term ASSIGN val = term RBRACKET # bracket_access_heap_update
-   | LBRACKET id = simple_ident args = argument_list RBRACKET # bracket_access_heap_term
-   | LBRACKET STAR RBRACKET # bracket_access_star
-   | LBRACKET indexTerm = term (DOTRANGE rangeTo = term)? RBRACKET # bracket_access_indexrange
-   ;
-
-primitive_labeled_term
-   : primitive_term (LGUILLEMETS labels = label RGUILLEMETS)?
+   : primitive_term attribute*
    ;
 
 termParen
@@ -136,7 +117,6 @@ boolean_literal
 
 literals
    : boolean_literal
-   | char_literal
    | integer
    | floatnum
    | string_literal
@@ -164,10 +144,6 @@ argument_list
    : LPAREN (term (COMMA term)*)? RPAREN
    ;
 
-integer_with_minux
-   : MINUS? integer
-   ;
-
 integer
    : (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
    ;
@@ -179,14 +155,6 @@ floatnum
    | (MINUS)? REAL_LITERAL # realLiteral
    ;
 
-char_literal
-   : CHAR_LITERAL
-   ;
-
-location_term
-   : LPAREN obj = equivalence_term COMMA field = equivalence_term RPAREN
-   ;
-
 ifThenElseTerm
    : IF LPAREN condF = term RPAREN THEN LPAREN thenT = term RPAREN ELSE LPAREN elseT = term RPAREN
    ;
@@ -195,16 +163,12 @@ ifExThenElseTerm
    : IFEX exVars = bound_variables LPAREN condF = term RPAREN THEN LPAREN thenT = term RPAREN ELSE LPAREN elseT = term RPAREN
    ;
 
-locset_term
-   : LBRACE (l = location_term (COMMA l = location_term)*)? RBRACE
-   ;
-
 /**
  * Access: a.b.c@f, T.staticQ()
  */ accessterm
    :
    // OLD
-   (sortId DOUBLECOLON)? firstName = simple_ident
+   (sortId DOUBLECOLON)? firstName = simple_ident formal_sort_args?
 /*Faster version
   simple_ident_dots
   ( EMPTYBRACKETS*
@@ -217,19 +181,10 @@ locset_term
 
 attribute
    : DOT STAR # attribute_star
-   | DOT id = simple_ident call? (AT heap = bracket_term)? # attribute_simple
-   | DOT LPAREN sort = sortId DOUBLECOLON id = simple_ident RPAREN call? (AT heap = bracket_term)? # attribute_complex
+   | DOT id = simple_ident call? # attribute_simple
+   | DOT LPAREN sort = sortId DOUBLECOLON id = simple_ident RPAREN call? # attribute_complex
    ;
 
 call
    : ((LBRACE boundVars = bound_variables RBRACE)? argument_list)
    ;
-
-label
-   : l = single_label (COMMA l = single_label)*
-   ;
-
-single_label
-   : (name = IDENT | star = STAR) (LPAREN (string_value (COMMA string_value)*)? RPAREN)?
-   ;
-

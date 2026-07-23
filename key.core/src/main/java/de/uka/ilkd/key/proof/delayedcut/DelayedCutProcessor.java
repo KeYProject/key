@@ -24,7 +24,6 @@ import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -434,7 +433,7 @@ public class DelayedCutProcessor implements Runnable {
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
      */
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
-        ImmutableList<NodeGoalPair> list = ImmutableSLList.nil();
+        ImmutableList<NodeGoalPair> list = ImmutableList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =
                 list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));

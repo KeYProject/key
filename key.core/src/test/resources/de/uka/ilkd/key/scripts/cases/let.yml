@@ -1,0 +1,7 @@
+key: |
+  \problem { 1+0 = 2+0 }
+script: |
+  let @p1: "1+0";
+  rule add_zero_right on: @p1;
+goals:
+  - ==> 1 = 2 + 0

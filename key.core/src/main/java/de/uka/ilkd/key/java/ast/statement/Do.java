@@ -12,7 +12,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Do.
@@ -44,7 +43,7 @@ public class Do extends LoopStatement {
     }
 
     public Do(PositionInfo pi, List<Comment> comments, Guard guard, Statement body) {
-        super(pi, comments, null, null, guard, body, ImmutableSLList.nil());
+        super(pi, comments, null, null, guard, body, ImmutableList.nil());
     }
 
     public Do(PositionInfo pi, List<Comment> comments, Guard guard, Statement body,

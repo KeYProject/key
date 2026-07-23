@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
@@ -39,10 +40,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,16 +62,24 @@ public class QueryExpand implements BuiltInRule {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpand.class);
     public static final QueryExpand INSTANCE = new QueryExpand();
 
-    private static final int DEFAULT_MAP_SIZE = 200;
-
     private static final Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
-
     /**
-     * Stores a number that indicates the time when term occurred for the first time where this rule
-     * was applicable. The time is the number of rules applied on this branch.
+     * Branch-local record of the goal time (number of rules applied on the branch) at which each
+     * query term first became expandable. Kept in the goal's strategy info -- cloned per split and
+     * pruned with the branch -- rather than in a JVM-global map, which made the recorded age depend
+     * on which branch (or which earlier proof in the same JVM) reached the term first, i.e.
+     * schedule-dependent under the parallel prover. The value is a plain {@link Map} used
+     * copy-on-write (never mutated in place), so reads are O(1) and split siblings can safely share
+     * one instance until a writer swaps in a fresh copy. Consumed by {@code QueryExpandCost}.
      */
-    private final WeakHashMap<JTerm, Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
+    private static final Property<Map<JTerm, Long>> QUERY_INTRODUCTION_TIMES = queryTimesProperty();
+
+    @SuppressWarnings("unchecked")
+    private static Property<Map<JTerm, Long>> queryTimesProperty() {
+        return new Property<>((Class<Map<JTerm, Long>>) (Class<?>) Map.class,
+            "queryIntroductionTimes");
+    }
 
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
@@ -282,9 +291,9 @@ public class QueryExpand implements BuiltInRule {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
-        final ImmutableSLList<QuantifiableVariable> instVars;
+        final ImmutableList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
-            instVars = ImmutableSLList.nil();
+            instVars = ImmutableList.nil();
         } else {
             instVars = null;
         }
@@ -656,20 +665,30 @@ public class QueryExpand implements BuiltInRule {
     }
 
     private void storeTimeOfQuery(JTerm query, Goal goal) {
-        if (timeOfTerm.get(query) == null) {
-            timeOfTerm.put(query, goal.getTime());
+        final Map<JTerm, Long> times = goal.getStrategyInfo(QUERY_INTRODUCTION_TIMES);
+        if (times != null && times.containsKey(query)) {
+            return;
         }
+        // Copy-on-write: never mutate the map in place, so sibling goals (which share it via the
+        // shallow strategyInfos clone made at a split) are unaffected; the fresh map goes into this
+        // goal's own strategy info, with an undo that restores the previous one when the branch is
+        // pruned.
+        final Map<JTerm, Long> updated = times == null ? new HashMap<>() : new HashMap<>(times);
+        updated.put(query, goal.getTime());
+        final Map<JTerm, Long> previous = times;
+        goal.addStrategyInfo(QUERY_INTRODUCTION_TIMES, updated,
+            strategyInfos -> strategyInfos.put(QUERY_INTRODUCTION_TIMES, previous));
     }
 
-    public Long getTimeOfQuery(JTerm t) {
+    public Long getTimeOfQuery(JTerm t, Goal goal) {
         if (t == null || !(t.op() instanceof IProgramMethod)) {
             LOGGER.warn(
                 "QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is: {}",
                 (t != null ? t : "null"));
             return null;
         }
-        return timeOfTerm.get(t);
-
+        final Map<JTerm, Long> times = goal.getStrategyInfo(QUERY_INTRODUCTION_TIMES);
+        return times == null ? null : times.get(t);
     }
 
     @Override
@@ -683,5 +702,16 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                The QueryExpand rule allows to apply contracts or to symbolically execute a query
+                expression in the logic. It replaces the query expression by a new constant and
+                constructs a box formula in the antecedent 'defining' the constant as the result of
+                a method call. The method call is encoded directly as a method call in the box modality.
+                The query is invoked in a context equal to the container type of the query method.
+                """;
     }
 }

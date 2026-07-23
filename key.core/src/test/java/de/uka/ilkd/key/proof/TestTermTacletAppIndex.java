@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -19,11 +21,12 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.LRUCache;
+import org.key_project.prover.strategy.NewRuleListener;
+import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +88,7 @@ public class TestTermTacletAppIndex {
     }
 
     private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache =
-        new LRUCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
+        new ConcurrentLruCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     private TermTacletAppIndexCacheSet realCache =
         new TermTacletAppIndexCacheSet(termTacletAppIndexCache);
@@ -171,7 +174,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -185,7 +188,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex2(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -198,7 +201,7 @@ public class TestTermTacletAppIndex {
 
     private void checkTermIndex3(PosInOccurrence pio,
             TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.nil();
+        ImmutableList<Taclet> listA = ImmutableList.nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
         ImmutableList<Taclet> listD = listB.prepend(remove_ff.taclet());
@@ -217,6 +220,115 @@ public class TestTermTacletAppIndex {
         for (NoPosTacletApp aP_toCheck : p_toCheck) {
             assertTrue(p_template.contains(aP_toCheck.taclet()));
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------
+    // Single-taclet re-index via a one-taclet "mini index" (TacletAppIndex.updateIndices) must
+    // produce exactly the same apps -- same order, same listener firing -- as the SetRuleFilter
+    // path that scans the full operator buckets. These tests pin that equivalence.
+    // ----------------------------------------------------------------------------------------------
+
+    /** Records, in order, the apps reported to a {@link NewRuleListener}. */
+    private static final class RecordingListener implements NewRuleListener {
+        final List<String> fired = new ArrayList<>();
+
+        @Override
+        public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+            fired.add(rule.rule().name() + "@" + pos);
+        }
+
+        @Override
+        public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+            for (RuleApp r : rules) {
+                ruleAdded(r, pos);
+            }
+        }
+    }
+
+    /** Normal unit test: the documented {@code checkTermIndex3} result, via the mini-index path. */
+    @Test
+    public void testReindexViaMiniIndex() {
+        Services serv = TacletForTests.services();
+
+        TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
+        ruleIdx.add(remove_f);
+        ruleIdx.add(remove_zero);
+
+        JTerm term = TacletForTests.parseTerm("f(f(zero))=one");
+        SequentFormula cfma = new SequentFormula(term);
+        PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
+
+        TermTacletAppIndex termIdx = TermTacletAppIndex.create(pio, serv, ruleIdx,
+            NullNewRuleListener.INSTANCE, TacletFilter.TRUE, noCache);
+
+        TacletIndex mini = new SingleThreadedTacletIndex();
+        mini.add(remove_ff);
+        termIdx =
+            termIdx.addTaclets(TacletFilter.TRUE, pio, serv, mini, NullNewRuleListener.INSTANCE);
+
+        checkTermIndex3(pio, termIdx);
+    }
+
+    /** Differential test: mini-index path == SetRuleFilter path, across taclets and both sides. */
+    @Test
+    public void testMiniIndexEquivalentToFilterPath() {
+        Services serv = TacletForTests.services();
+        NoPosTacletApp[] toAdd = { remove_f, remove_ff, remove_zero, ruleRewriteNonH1H2,
+            ruleAntecH1, ruleSucc, ruleMisMatch, notfreeconflict };
+
+        for (String termStr : new String[] { "f(f(f(zero)))=one", "f(zero)=one" }) {
+            SequentFormula cfma = new SequentFormula(TacletForTests.parseTerm(termStr));
+            for (boolean antec : new boolean[] { true, false }) {
+                PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+                for (NoPosTacletApp t : toAdd) {
+                    assertMiniIndexMatchesFilter(serv, pio, t);
+                }
+            }
+        }
+    }
+
+    private void assertMiniIndexMatchesFilter(Services serv, PosInOccurrence pio,
+            NoPosTacletApp toAdd) {
+        final String msg = toAdd.taclet().name() + (pio.isInAntec() ? " (antec)" : " (succ)");
+
+        TacletIndex fullIdx = TacletIndexKit.getKit().createTacletIndex();
+        TermTacletAppIndex base = TermTacletAppIndex.create(pio, serv, fullIdx,
+            NullNewRuleListener.INSTANCE, TacletFilter.TRUE, noCache);
+
+        // OLD: SetRuleFilter selecting toAdd out of the full index
+        fullIdx.add(toAdd);
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(toAdd.taclet());
+        RecordingListener recOld = new RecordingListener();
+        TermTacletAppIndex idxOld = base.addTaclets(filter, pio, serv, fullIdx, recOld);
+
+        // NEW: one-taclet mini-index + accept-all filter
+        TacletIndex mini = new SingleThreadedTacletIndex();
+        mini.add(toAdd);
+        RecordingListener recNew = new RecordingListener();
+        TermTacletAppIndex idxNew = base.addTaclets(TacletFilter.TRUE, pio, serv, mini, recNew);
+
+        assertEquals(recOld.fired, recNew.fired, "fired apps differ: " + msg);
+        assertSameAppsEverywhere(pio, idxOld, idxNew, msg);
+    }
+
+    private void assertSameAppsEverywhere(PosInOccurrence pos, TermTacletAppIndex a,
+            TermTacletAppIndex b, String msg) {
+        assertEquals(appNames(a.getTacletAppAt(pos, TacletFilter.TRUE)),
+            appNames(b.getTacletAppAt(pos, TacletFilter.TRUE)),
+            "apps differ at " + pos + ": " + msg);
+        final JTerm t = (JTerm) pos.subTerm();
+        for (int i = 0; i < t.arity(); i++) {
+            assertSameAppsEverywhere(pos.down(i), a, b, msg);
+        }
+    }
+
+    private static List<String> appNames(ImmutableList<NoPosTacletApp> apps) {
+        List<String> res = new ArrayList<>();
+        for (NoPosTacletApp a : apps) {
+            res.add(a.taclet().name().toString());
+        }
+        return res;
     }
 
 }

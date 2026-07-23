@@ -12,6 +12,8 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
@@ -87,9 +89,21 @@ public class SaveNewNameCommand extends AbstractCommand {
         }
     }
 
+    @Documentation(category = "Internal",
+        value = """
+                Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
+                introduced by the last rule which matches certain criteria into an abbreviation for
+                later use. A nice use case is a manual loop invariant rule application, where the newly
+                introduced anonymizing Skolem constants can be saved for later interactive instantiations. As for
+                the let command, it is not allowed to call this command multiple times with the same name
+                argument (all names used for remembering instantiations are "final").
+                """)
     public static class Parameters {
-        @Option(value = "#2")
+        @Documentation("The abbreviation to store the new name under, must start with @")
+        @Argument
         public String abbreviation;
+
+        @Documentation("A regular expression to match the new name against, must match exactly one name")
         @Option(value = "matches")
         public String matches;
     }

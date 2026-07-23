@@ -369,7 +369,13 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     @Override
     public void applySettings(MainWindow window) {
-        settings.setDefaultChoices(category2Choice);
+        // Apply to the global default choice settings - that is what (re)loading a problem reads to
+        // build a new proof. When a proof is loaded, getChoiceSettings() hands this panel a
+        // detached
+        // copy initialised from that proof (so it can show the proof's active options), and writing
+        // the edited choices only into that copy silently dropped them: changing e.g. the integer
+        // semantics and reloading kept the old taclet option. Write through to the global settings.
+        ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(category2Choice);
     }
 
     /**

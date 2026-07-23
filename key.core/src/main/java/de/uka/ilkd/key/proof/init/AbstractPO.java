@@ -28,7 +28,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -292,7 +291,6 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
-        var choices = Collections.unmodifiableSet(proofConfig.getActivatedChoices().toSet());
         for (ClassAxiom axiom : axioms) {
             final Vertex node = getVertexFor(axiom.getKJT().getSort(), axiom.getTarget(), axiom);
             if (node.index == -1) {
@@ -301,13 +299,13 @@ public abstract class AbstractPO implements IPersistablePO {
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
             for (Taclet axiomTaclet : axiom.getTaclets(
                 DefaultImmutableSet.fromImmutableList(
-                    scc == null ? ImmutableSLList.nil() : scc),
+                    scc == null ? ImmutableList.nil() : scc),
                 proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: " + axiom.getName();
                 // only include if choices are appropriate
-                if (axiomTaclet.getChoices().eval(choices)) {
-                    register(axiomTaclet, proofConfig);
-                }
+                // weigl: register always! choices are evaluated as late as possible.
+                // This would technically allow to change Taclet options after loading.
+                register(axiomTaclet, proofConfig);
             }
         }
 
@@ -354,7 +352,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         if (node.index == node.lowLink) {
             ImmutableList<Pair<Sort, IObserverFunction>> scc =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             Vertex sccMember;
             do {
                 sccMember = stack.pop();
@@ -424,7 +422,9 @@ public abstract class AbstractPO implements IPersistablePO {
             }
             proofs[i] = createProof(poNames != null ? poNames[i] : name, poTerms[i], ic);
             if (taclets != null) {
-                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
+                var filteredTaclets = proofs[i].getInitConfig().filterTaclets(taclets);
+                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets()
+                        .addTaclets(filteredTaclets);
             }
         }
 

@@ -397,6 +397,7 @@ public class DropdownSelectionButton {
             }
             menuItem.setEnabled(true);
             menuItem.setText(item.toString());
+            menuItem.setToolTipText(item.getValue(Action.SHORT_DESCRIPTION).toString());
             menuItem.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
             menuItems.add(menuItem);
         }

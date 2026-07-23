@@ -36,7 +36,6 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 public class TriggeredInstantiations implements TermGenerator<Goal> {
@@ -45,9 +44,19 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return new TriggeredInstantiations(skipConditions);
     }
 
-    private Sequent last = JavaDLSequentKit.getInstance().getEmptySequent();
-    private Set<JTerm> lastCandidates = new HashSet<>();
-    private ImmutableSet<JTerm> lastAxioms = DefaultImmutableSet.nil();
+    private record CandidateCache(Sequent last, Set<JTerm> candidates, ImmutableSet<JTerm> axioms) {
+    }
+
+    /**
+     * Per-thread candidate cache. This term generator is shared across the parallel prover's
+     * workers
+     * (one instance per strategy) and {@link #generate} runs concurrently off the commit lock, so a
+     * shared cache would race -- and a check-then-act on the sequent could hand back another goal's
+     * candidates. ThreadLocal keeps the per-thread caching without any sharing.
+     */
+    private final ThreadLocal<CandidateCache> candidateCache = ThreadLocal.withInitial(
+        () -> new CandidateCache(JavaDLSequentKit.getInstance().getEmptySequent(), new HashSet<>(),
+            DefaultImmutableSet.nil()));
 
     private final boolean checkConditions;
 
@@ -77,24 +86,18 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
 
 
             final Sequent seq = goal.sequent();
-            if (seq != last) {
+            final CandidateCache cached = candidateCache.get();
+            if (seq != cached.last()) {
                 terms = new HashSet<>();
                 axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (JTerm axiom : axiomSet) {
                     axioms = axioms.add(axiom);
                 }
-
-                synchronized (this) {
-                    last = seq;
-                    lastCandidates = terms;
-                    lastAxioms = axioms;
-                }
+                candidateCache.set(new CandidateCache(seq, terms, axioms));
             } else {
-                synchronized (this) {
-                    terms = lastCandidates;
-                    axioms = lastAxioms;
-                }
+                terms = cached.candidates();
+                axioms = cached.axioms();
             }
 
             if (taclet.hasTrigger()) {
@@ -125,10 +128,10 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
                 } else {
                     // at the moment instantiations with more than one
                     // missing taclet variable not supported
-                    return ImmutableSLList.<org.key_project.logic.Term>nil().iterator();
+                    return ImmutableList.<org.key_project.logic.Term>nil().iterator();
                 }
             } else {
-                return ImmutableSLList.<org.key_project.logic.Term>nil().iterator();
+                return ImmutableList.<org.key_project.logic.Term>nil().iterator();
             }
 
         } else {
@@ -216,7 +219,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     private ImmutableList<JTerm> instantiateConditions(Services services, TacletApp app,
             final JTerm middle) {
         ImmutableList<JTerm> conditions;
-        conditions = ImmutableSLList.nil();
+        conditions = ImmutableList.nil();
         for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
             conditions =
                 conditions.append(

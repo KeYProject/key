@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,6 +184,16 @@ public final class IconFactory {
     // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
     private static final HashMap<String, Icon> cache = new HashMap<>();
+
+    /**
+     * Additional horizontal space in pixels reserved for the overlay letter in
+     * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
+     */
+    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+    /**
+     * Additional horizontal space in pixels for wider auto buttons.
+     */
+    public static final int TOOLBAR_EXTRA_WIDTH = 14;
 
     private IconFactory() {
     }
@@ -364,6 +375,61 @@ public final class IconFactory {
     public static Icon autoModeStopLogo(int size) {
         // return scaleIcon(autoModeStop, size, size);
         return AUTO_MODE_STOP.load(size);
+    }
+
+    /**
+     * Creates an icon with a play button and a letter overlay.
+     * <p>
+     * Used for automation actions to distinguish different modes visually. The base icon is the
+     * standard green play button ({@link #autoModeStartLogo(int)}), with a bold italic letter
+     * overlaid in the bottom-right corner.
+     * </p>
+     *
+     * @param size the size of the icon in pixels
+     * @param letter the letter to overlay (e.g., "R" for Run, "F" for Full, "P" for Prepare), or
+     *        {@code null} for just the play button
+     * @return the composite icon with letter overlay
+     */
+    public static Icon automationWithOverlay(int size, String letter) {
+        Icon baseIcon = autoModeStartLogo(size);
+        return iconWithOverlay(baseIcon, letter);
+    }
+
+    public static Icon iconWithOverlay(Icon baseIcon, String letter) {
+        BufferedImage image =
+            new BufferedImage(
+                baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE + 2 * TOOLBAR_EXTRA_WIDTH,
+                baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+        // Draw base icon
+        baseIcon.paintIcon(null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
+
+        if (letter == null) {
+            return new ImageIcon(image);
+        }
+
+        // Draw letter overlay
+        g2d.setColor(Color.BLACK);
+        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC,
+            (int) (baseIcon.getIconHeight() * 0.9f));
+        g2d.setFont(font);
+
+        FontMetrics fm = g2d.getFontMetrics();
+        int textWidth = fm.stringWidth(letter);
+        int textHeight = fm.getAscent() - fm.getDescent();
+
+        // Position letter in bottom-right corner
+        int x = baseIcon.getIconWidth() - textWidth;
+
+        g2d.drawString(letter, x + TOOLBAR_INDICATOR_EXTRA_SPACE + TOOLBAR_EXTRA_WIDTH,
+            baseIcon.getIconHeight());
+        g2d.dispose();
+
+        return new ImageIcon(image);
     }
 
     public static Icon selectDecProcArrow(int size) {

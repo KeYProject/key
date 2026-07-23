@@ -24,7 +24,6 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 class Instantiation {
@@ -55,27 +54,32 @@ class Instantiation {
         addInstances(sequentToTerms(seq), services);
     }
 
-    private static Term lastQuantifiedFormula = null;
-    private static Sequent lastSequent = null;
-    private static Instantiation lastResult = null;
+    private record Cached(Term qf, Sequent seq, Instantiation result) {
+    }
+
+    /**
+     * Per-thread single-entry cache for {@link #create}. The parallel prover computes quantifier
+     * cost concurrently, so a shared static cache would hand the same {@link Instantiation} (with
+     * its
+     * mutable {@code instancesWithCosts}) to several workers and race them. ThreadLocal confines
+     * the
+     * cache -- and thereby each returned Instantiation -- to one worker, and also drops the
+     * cross-proof class-level lock.
+     */
+    private static final ThreadLocal<Cached> lastCreate = new ThreadLocal<>();
 
     static Instantiation create(Term qf, Sequent seq, Services services) {
-        synchronized (Instantiation.class) {
-            if (qf == lastQuantifiedFormula && seq == lastSequent) {
-                return lastResult;
-            }
+        final Cached cached = lastCreate.get();
+        if (cached != null && qf == cached.qf() && seq == cached.seq()) {
+            return cached.result();
         }
         final Instantiation result = new Instantiation(qf, seq, services);
-        synchronized (Instantiation.class) {
-            lastQuantifiedFormula = qf;
-            lastSequent = seq;
-            lastResult = result;
-        }
+        lastCreate.set(new Cached(qf, seq, result));
         return result;
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-        ImmutableList<Term> res = ImmutableSLList.nil();
+        ImmutableList<Term> res = ImmutableList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
@@ -150,7 +154,7 @@ class Instantiation {
      */
     private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,
             TermServices services) {
-        ImmutableList<JTerm> assertLits = ImmutableSLList.nil();
+        ImmutableList<JTerm> assertLits = ImmutableList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final var op = atom.op();

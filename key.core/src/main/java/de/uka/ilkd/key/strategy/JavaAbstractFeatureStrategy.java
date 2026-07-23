@@ -26,7 +26,6 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -67,7 +66,7 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
     }
 
     protected TacletFilter getFilterFor(String[] p_names) {
-        ImmutableList<RuleSet> heur = ImmutableSLList.nil();
+        ImmutableList<RuleSet> heur = ImmutableList.nil();
         for (int i = 0; i != p_names.length; ++i) {
             heur = heur.prepend(getHeuristic(p_names[i]));
         }

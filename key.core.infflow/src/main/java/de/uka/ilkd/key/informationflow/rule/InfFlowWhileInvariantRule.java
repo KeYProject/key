@@ -41,7 +41,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -299,7 +298,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> localOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> localOuts = ImmutableList.nil();
         for (final JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -321,7 +320,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JTerm> localOuts = ImmutableSLList.nil();
+        ImmutableList<JTerm> localOuts = ImmutableList.nil();
         for (final JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 

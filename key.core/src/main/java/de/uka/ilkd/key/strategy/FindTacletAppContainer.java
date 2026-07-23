@@ -37,23 +37,50 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final PosInOccurrence applicationPosition;
 
     /**
+     * Cache for {@link #getPosInOccurrence(Goal)}: the position re-targeted to the current
+     * version of the formula. Rebuilding it on every query forces a fresh walk to the
+     * (possibly deep) find position each time the subterm is accessed. The cache is only
+     * an optimization, the container stays observably immutable.
+     *
+     * <p>
+     * {@code volatile}: a container instance is shared across the sibling goals of a split
+     * (the rule-app queue is copied by reference), so concurrently-owned goals may query it on
+     * different worker threads. The recompute guard in {@link #getPosInOccurrence(Goal)} keeps the
+     * returned value correct under any interleaving (a cached value that does not match the queried
+     * formula is rebuilt), but {@code volatile} is still needed for safe publication of the cached
+     * {@link PosInOccurrence} -- without it a reader could observe the reference before the
+     * object's
+     * fields are visible.
+     */
+    private volatile PosInOccurrence currentPositionCache;
+
+    /**
      * Creates a FindTacletAppContainer for applying a find taclet.
      *
      * @param app the taclet application
      * @param pio the position in occurrence
-     * @param cost the rule application cost
+     * @param ageFreeCost the rule application cost without the goal-age term
+     * @param cost the rule application cost (age-free cost plus the goal-age term)
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
     FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
-            RuleAppCost cost, Goal goal,
+            RuleAppCost ageFreeCost, boolean ageFreeCostIsRegular, RuleAppCost cost, Goal goal,
             long age) {
-        super(app, cost, age);
+        super(app, ageFreeCost, ageFreeCostIsRegular, cost, age);
         applicationPosition = pio;
 
         final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
         assert posTag != null : "No formula tag found for " + pio;
         positionTag = posTag;
+    }
+
+    /**
+     * @return the original position for which this container was created (a stable key for the
+     *         deterministic queue tie-break, see {@link RuleAppContainer#compareTo})
+     */
+    PosInOccurrence getApplicationPosition() {
+        return applicationPosition;
     }
 
 
@@ -66,6 +93,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
         PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
+    }
+
+    /**
+     * {@inheritDoc} The find formula is unchanged iff the formula now carried by this container's
+     * position tag is identity-equal to the one present when the container was created. (Terms are
+     * immutable, so any rewrite -- including an independent sibling rewrite that {@link
+     * #isStillApplicable} tolerates -- yields a fresh formula object.)
+     */
+    @Override
+    protected boolean findFormulaUnchanged(Goal p_goal) {
+        final PosInOccurrence cur = getPosInOccurrence(p_goal);
+        return cur != null && cur.sequentFormula() == applicationPosition.sequentFormula();
     }
 
 
@@ -176,7 +215,12 @@ public class FindTacletAppContainer extends TacletAppContainer {
         final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;
-        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+        PosInOccurrence cached = currentPositionCache;
+        if (cached == null || cached.sequentFormula() != topPos.sequentFormula()) {
+            cached = applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+            currentPositionCache = cached;
+        }
+        return cached;
     }
 
 }

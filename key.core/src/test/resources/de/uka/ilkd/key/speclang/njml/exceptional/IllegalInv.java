@@ -1,5 +1,5 @@
 // exceptionClass: ParserException
-// msgContains: mismatched input ';'
+// msgContains: expected, but found ';'
 // position: 17/19
 // verbose: true
 // broken: false

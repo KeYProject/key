@@ -22,7 +22,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -131,7 +130,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<LocationVariable> replaceVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> replaceVars = ImmutableList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
@@ -139,12 +138,36 @@ public final class ClassAxiomImpl extends ClassAxiom {
         JTerm rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
-        final int c = services.getCounter("classAxiom").getCountPlusPlus();
+        final int c = classAxiomNumber(services);
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);
         final RuleSet ruleSet = new RuleSet(new Name("classAxiom"));
         return taclets
                 .add(TG.generateAxiomTaclet(tacletName, rep, replaceVars, kjt, ruleSet, services));
+    }
+
+    /**
+     * This axiom's stable, order-independent number among the class axioms declared in its type.
+     * Derived from the axioms' content (not from a proof-global counter), so the generated taclet
+     * name is reproducible across runs, reloads and prune-and-redo (#3851). See
+     * {@link ContentOrderNumbering}.
+     *
+     * @param services used to look up the sibling class axioms of this type
+     * @return this axiom's content-order number
+     */
+    private int classAxiomNumber(Services services) {
+        ImmutableList<ClassAxiomImpl> group = ImmutableList.<ClassAxiomImpl>nil().prepend(this);
+        for (ClassAxiom ax : services.getSpecificationRepository().getClassAxiomsForType(kjt)) {
+            if (ax instanceof ClassAxiomImpl impl) {
+                group = group.prepend(impl);
+            }
+        }
+        return new ContentOrderNumbering<>(group, ClassAxiomImpl::contentKey).numberOf(this);
+    }
+
+    /** A deterministic, content-derived key identifying this axiom (its formula). */
+    private String contentKey() {
+        return originalRep.toString();
     }
 
 

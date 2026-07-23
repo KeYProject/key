@@ -9,9 +9,14 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 
-public class ScriptTreeParser {
+/// Parses proof script source code into a tree structure of [ScriptNode]s.
+/// Handles nested block structures and branch management commands.
+///
+/// @author Mattias Ulbrich
+@Deprecated
+class ScriptTreeParser {
 
-    public static ScriptNode parse(Reader reader) throws IOException, ScriptException {
+    private static ScriptNode parse(Reader reader) throws IOException, ScriptException {
 
         ScriptNode root = null;
         ScriptNode last = null;

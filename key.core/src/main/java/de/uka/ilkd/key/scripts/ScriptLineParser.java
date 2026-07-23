@@ -9,16 +9,18 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 
 /**
+ * This class was used to parse script lines before the parsing was integrated into the general
+ * ANTLR parser for KeY files.
  *
  * @author mattias ulbrich
- *
  */
+@Deprecated
 class ScriptLineParser {
 
     /**
@@ -155,6 +157,10 @@ class ScriptLineParser {
                     }
                 }
                 case '\r' -> {
+                    // ignore a carriage return entirely (CRLF line endings): without the
+                    // 'continue' it would fall through to the append below and end up inside the
+                    // command, breaking scripts parsed from files checked out with CRLF.
+                    continue;
                 }
                 case '"', '\'' -> {
                     switch (state) {
@@ -248,7 +254,8 @@ class ScriptLineParser {
     }
 
     private Location getLocation() {
-        return new Location(fileURI, Position.newOneBased(line, col));
+        Position pos = line >= 1 ? Position.newOneBased(line, col) : Position.UNDEFINED;
+        return new Location(fileURI, pos);
     }
 
     public int getOffset() {

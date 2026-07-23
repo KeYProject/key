@@ -25,7 +25,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
         + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
-        + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials"
+        + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials,"
         + "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2,"
         + "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq,"
         + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
@@ -35,8 +35,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete,"
         + "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx,"
-        + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,polySimp_normalise,"
-        + "polySimp_directEquations";
+        + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,inEqSimp_nonLin_multiply,"
+        + "polySimp_normalise,polySimp_directEquations";
 
     /**
      * default max number of displayed tooltip lines is 40
@@ -102,6 +102,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * confirm exiting by default
      */
     private static final String CONFIRM_EXIT = "ConfirmExit";
+
+    /**
+     * use the classic (pre-2026) taclet instantiation dialog instead of the redesigned one
+     */
+    private static final String USE_CLASSIC_TACLET_DIALOG = "UseClassicTacletDialog";
 
     /**
      * Heatmap options property
@@ -201,6 +206,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> hidePackagePrefix =
         createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private final PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private final PropertyEntry<Boolean> useClassicTacletDialog =
+        createBooleanProperty(USE_CLASSIC_TACLET_DIALOG, false);
     private final PropertyEntry<Boolean> showLoadExamplesDialog =
         createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
     private final PropertyEntry<Boolean> showWholeTaclet =
@@ -508,6 +515,21 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setConfirmExit(boolean confirmExit) {
         this.confirmExit.set(confirmExit);
+    }
+
+    /**
+     * Whether to use the classic (pre-2026) taclet instantiation dialog instead of the redesigned
+     * one. Provided as a fallback for a migration period; the redesigned dialog is the default.
+     */
+    public boolean isUseClassicTacletDialog() {
+        return useClassicTacletDialog.get();
+    }
+
+    /**
+     * Set whether to use the classic taclet instantiation dialog instead of the redesigned one.
+     */
+    public void setUseClassicTacletDialog(boolean b) {
+        this.useClassicTacletDialog.set(b);
     }
 
     public boolean getShowUninstantiatedTaclet() {

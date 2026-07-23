@@ -19,11 +19,12 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -44,6 +45,15 @@ public class MediatorProofControl extends AbstractProofControl {
 
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
+
+    /**
+     * True while an automode/macro run is active or still winding down; released only when the
+     * worker's background task has truly ended. Prevents a second run from starting on the same
+     * proof before the first has fully stopped -- fast-clicking the auto button otherwise overlaps
+     * two provers on one proof and corrupts it.
+     */
+    private final java.util.concurrent.atomic.AtomicBoolean autoModeActive =
+        new java.util.concurrent.atomic.AtomicBoolean(false);
 
     public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
@@ -78,9 +88,20 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+        if (proof.isErroneous()) {
+            // The proof was marked erroneous by a failing essential proof listener; it may be
+            // inconsistent, so refuse a new run. Saving the proof for a later reload is still fine.
+            ui.notify(new GeneralInformationEvent(
+                "This proof is marked erroneous (an essential proof listener failed) and cannot be "
+                    + "continued. You can still save it and try to reload it later."));
+            return;
+        }
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
+        }
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
         }
         worker = new AutoModeWorker(proof, goals, ptl);
         ui.getMediator().initiateAutoMode(proof, true, false);
@@ -137,8 +158,12 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+        if (!autoModeActive.compareAndSet(false, true)) {
+            return; // a run is still active or winding down; do not overlap it
+        }
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+        worker.setOnTerminated(() -> autoModeActive.set(false));
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
@@ -157,17 +182,24 @@ public class MediatorProofControl extends AbstractProofControl {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
-        private final ApplyStrategy applyStrategy;
+        private final ProverCore<Proof, Goal> applyStrategy;
         private ProofSearchInformation<Proof, Goal> info;
+        private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
                 ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
-            this.applyStrategy = new ApplyStrategy(
+            // Route through AutoProvers so the GUI auto button (and the proof-tree / context-menu
+            // "start auto" actions that funnel through here) run on whichever prover the user has
+            // selected -- single-core or multi-core. Historically this was hardcoded to
+            // ApplyStrategy
+            // only because no alternative engine existed.
+            this.applyStrategy = AutoProvers.create(
                 proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
-                        .create());
+                        .create(),
+                proof.getInitConfig().getProfile());
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
@@ -189,16 +221,28 @@ public class MediatorProofControl extends AbstractProofControl {
             } finally {
                 // make it possible to free memory and falsify the isAutoMode() property
                 worker = null;
+                if (!backgroundStarted) {
+                    // doInBackground never ran (cancelled before it started); release the guard
+                    // here.
+                    autoModeActive.set(false);
+                }
                 // Clear strategy
                 synchronized (applyStrategy) {// wait for apply Strategy to terminate
                     applyStrategy.removeProverTaskObserver(ui);
                     applyStrategy.clear();
                 }
                 ui.getMediator().finishAutoMode(proof, true, true, null);
-                emitInteractiveAutoMode(initialGoals, proof, info);
-
-                if (info.getException() != null) {
-                    notifyException(info.getException());
+                // 'info' is assigned in doInBackground only after applyStrategy.start() returns; on
+                // a Stop (cancel), done() can run before that assignment completes, so it may still
+                // be null here. The synchronized(applyStrategy) above already guarantees the run
+                // has
+                // finished (the prover holds its own monitor for the whole run); this guard just
+                // avoids an EDT NullPointerException in the narrow assignment race.
+                if (info != null) {
+                    emitInteractiveAutoMode(initialGoals, proof, info);
+                    if (info.getException() != null) {
+                        notifyException(info.getException());
+                    }
                 }
             }
         }
@@ -215,14 +259,19 @@ public class MediatorProofControl extends AbstractProofControl {
 
         @Override
         protected ProofSearchInformation<Proof, Goal> doInBackground() {
-            boolean stopMode =
-                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
-                        .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            backgroundStarted = true;
+            try {
+                boolean stopMode =
+                    proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                            .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
-            info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
-                ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
-            return info;
+                info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
+                    ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+                return info;
+            } finally {
+                autoModeActive.set(false);
+            }
         }
     }
 }

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -53,6 +54,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +71,7 @@ public final class ProblemInitializer {
      */
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    private @Nullable Configuration additionalProfileOptions;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -82,13 +85,22 @@ public final class ProblemInitializer {
     }
 
     public ProblemInitializer(Profile profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("Given profile is null");
-        }
+        this(null, new Services(Objects.requireNonNull(profile, "Given profile is null")), null);
+    }
 
-        this.progMon = null;
-        this.listener = null;
-        this.services = new Services(Objects.requireNonNull(profile));
+    public ProblemInitializer(Profile profile, @Nullable Configuration additionalProfileOptions) {
+        this(profile);
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object which is passed to the provided profile, during construction of the
+    /// `initConfig`.
+    public @Nullable Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
     }
 
     private void progressStarted(Object sender) {
@@ -271,13 +283,27 @@ public final class ProblemInitializer {
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
             } catch (BuildingExceptions e) {
-                throw new ProofInputException("Failed to parse file: " + javaPath, e);
+                // Include the concrete parse problems in the message (not just the path), so the
+                // reason is visible even where only the message is shown (logs, plain getMessage).
+                throw new ProofInputException(
+                    "Failed to parse Java source in " + javaPath + ":\n" + e.getMessage(), e);
             }
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
                 initialFile));
+
+        // Pre-materialise the default execution context (the synthetic __Default__ class) here,
+        // single-threaded, so the matcher never has to register it lazily during proving. Otherwise
+        // the first match of a context-block modality without an explicit execution context would
+        // parse and register __Default__ on the proving path (see
+        // ContextStatementBlock#matchInnerExecutionContext and
+        // JavaInfo#getDefaultExecutionContext),
+        // which races under the parallel prover. Materialising it now keeps the Java type model
+        // fixed once proving starts. Unconditional on purpose: inline-program proofs can need it
+        // even when javaPath is null, and it is a no-op when already created.
+        initConfig.getServices().getJavaInfo().getDefaultExecutionContext();
     }
 
     /**
@@ -443,7 +469,7 @@ public final class ProblemInitializer {
             for (RuleSource tacletBase : tacletBases) {
                 KeYFile tacletBaseFile = new KeYFile(
                     "taclet base (%s)".formatted(tacletBase.file().getFileName()),
-                    tacletBase, progMon, profile);
+                    tacletBase, progMon, profile, null);
                 readEnvInput(tacletBaseFile, config);
             }
         }
@@ -454,7 +480,6 @@ public final class ProblemInitializer {
         // cache the last used init config
         BaseConfigCache.setBaseInputConfig(config, inputDigest);
         config = config.copy();
-        profile.prepareInitConfig(config);
         return config;
     }
 
@@ -476,7 +501,17 @@ public final class ProblemInitializer {
             ic.setHeader(uf.getProblemHeader());
         }
 
+        // applied after envInput/KeYUserProblemFile was read, and its setting are active.
+        var warnings = ic.getProfile()
+                .prepareInitConfig(ic, additionalProfileOptions);
+        addWarnings(warnings);
+
         return ic;
+    }
+
+    private void addWarnings(List<String> warnings) {
+        this.warnings =
+            this.warnings.add(warnings.stream().map(PositionedString::new).toList());
     }
 
     private void print(Proof firstProof) {
@@ -605,9 +640,8 @@ public final class ProblemInitializer {
             if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
                 for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
                     final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                    if (pv instanceof LocationVariable) {
-                        heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                            services);
+                    if (pv instanceof LocationVariable lv) {
+                        heapLDT.getFieldSymbolForPV(lv, initConfig.getServices());
                     }
                 }
             }

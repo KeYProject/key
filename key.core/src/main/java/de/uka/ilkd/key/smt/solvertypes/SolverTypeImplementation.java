@@ -10,6 +10,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -483,9 +484,66 @@ public final class SolverTypeImplementation implements SolverType {
             isSupportedVersion = false;
             return false;
         }
-        isSupportedVersion = installedVersion.compareTo(getMinimumSupportedVersion()) >= 0;
+        isSupportedVersion = isAtLeast(installedVersion, getMinimumSupportedVersion());
         return isSupportedVersion;
     }
+
+    /**
+     * Decides whether {@code installed} denotes a version that is at least {@code minimum}.
+     * <p>
+     * Both strings may carry surrounding text (e.g. {@code "Z3 version 4.13.0 - 64 bit"}); the
+     * first dotted numeric token of each is extracted and compared component by component
+     * numerically. This avoids the pitfalls of the previous purely lexicographic comparison, under
+     * which e.g. {@code "4.13.0"} sorted before {@code "4.4.1"}. If no numeric version can be
+     * extracted from either side, we fall back to the lexicographic comparison so behaviour does
+     * not silently change for solvers with non-numeric version strings.
+     *
+     * @param installed the raw version string reported by the solver
+     * @param minimum the configured minimum supported version (may be empty for "no constraint")
+     * @return true iff {@code installed} is greater than or equal to {@code minimum}
+     */
+    static boolean isAtLeast(String installed, String minimum) {
+        if (minimum == null || minimum.isBlank()) {
+            return true;
+        }
+        int[] iv = extractVersion(installed);
+        int[] mv = extractVersion(minimum);
+        if (iv == null || mv == null) {
+            // Cannot parse a numeric version from one of the sides: keep the old behaviour.
+            return installed.compareTo(minimum) >= 0;
+        }
+        for (int i = 0; i < Math.max(iv.length, mv.length); i++) {
+            int a = i < iv.length ? iv[i] : 0;
+            int b = i < mv.length ? mv[i] : 0;
+            if (a != b) {
+                return a > b;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Extracts the first dotted numeric token (e.g. {@code 4.13.0}) from the given string and
+     * returns its components, or {@code null} if the string contains no such token.
+     */
+    private static int @Nullable [] extractVersion(String s) {
+        var matcher = VERSION_PATTERN.matcher(s);
+        if (!matcher.find()) {
+            return null;
+        }
+        String[] parts = matcher.group(1).split("\\.");
+        int[] result = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            try {
+                result[i] = Integer.parseInt(parts[i]);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return result;
+    }
+
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+(?:\\.\\d+)*)");
 
     @Override
     public boolean supportHasBeenChecked() {

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.executor.javadl;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -25,6 +26,30 @@ public class NoFindTacletExecutor extends TacletExecutor {
 
     public NoFindTacletExecutor(NoFindTaclet taclet) {
         super(taclet);
+    }
+
+    @Override
+    public ImmutableList<SequentChangeInfo> getResultSequentChanges(Goal goal, RuleApp ruleApp) {
+        final TermLabelState termLabelState = new TermLabelState();
+        final Services services = goal.getOverlayServices();
+        final TacletApp tacletApp = (TacletApp) ruleApp;
+        final MatchConditions mc = tacletApp.matchConditions();
+
+        final ImmutableList<SequentChangeInfo> newSequentsForGoals = checkAssumesGoals(goal,
+            tacletApp.assumesFormulaInstantiations(), mc, taclet.goalTemplates().size());
+
+        ImmutableList<SequentChangeInfo> result = ImmutableList.nil();
+        final Iterator<SequentChangeInfo> it = newSequentsForGoals.iterator();
+        for (var gt : taclet.goalTemplates()) {
+            final SequentChangeInfo currentSequent = it.next();
+            applyAdd(termLabelState, gt.sequent(), currentSequent, mc, goal, tacletApp);
+            TermLabelManager.mergeLabels(currentSequent, services);
+            result = result.append(currentSequent);
+        }
+        while (it.hasNext()) {
+            result = result.append(it.next());
+        }
+        return result;
     }
 
     /**

@@ -69,14 +69,13 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         final TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
-            new TacletApplPart(ifseq,
+            new TacletApplPart(assumesSeq,
                 applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY), varsNew,
                 varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, (Sequent) find,
             prefixBuilder.getPrefixMap(),
             choices, tacletAnnotations);
-        t.setOrigin(origin);
         return t;
     }
 

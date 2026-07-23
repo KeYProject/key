@@ -17,10 +17,15 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
-/** Class encoding the instructions of the matching vm */
+/**
+ * The factory for the Java-DL match instructions: static creation methods for every instruction
+ * kind used when a find pattern's matcher is built (schema variables by kind, term labels,
+ * programs, bound-variable binding, cursor moves, and the generic identity / node-kind checks from
+ * the framework). Both back-ends obtain their instructions here: the interpreter emits them into
+ * its instruction stream, the compiled matcher applies element-based ones directly.
+ */
 public final class JavaDLMatchVMInstructionSet {
 
     public static GotoNextInstruction gotoNextInstruction() {
@@ -61,10 +66,6 @@ public final class JavaDLMatchVMInstructionSet {
     public static MatchInstruction matchAndBindVariables(
             ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
-    }
-
-    public static VMInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
-        return new UnbindVariablesInstruction();
     }
 
     /**

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -13,7 +15,6 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -28,6 +29,22 @@ public class HandleArith {
 
     private HandleArith() {}
 
+    /** The operator of {@code t} after stripping leading negations. */
+    private static Operator strippedOp(JTerm t) {
+        Operator op = t.op();
+        while (op == Junctor.NOT) {
+            t = t.sub(0);
+            op = t.op();
+        }
+        return op;
+    }
+
+    /** Whether {@code t} (ignoring leading negations) is an integer {@code >=} or {@code <=}. */
+    private static boolean isArithComparison(JTerm t, IntegerLDT ig) {
+        final Operator op = strippedOp(t);
+        return op == ig.getGreaterOrEquals() || op == ig.getLessOrEquals();
+    }
+
     /**
      * try to prove atom by using polynomial
      *
@@ -36,18 +53,23 @@ public class HandleArith {
      *         <code>problem</code> if it cann't be proved.
      */
     public static JTerm provedByArith(JTerm problem, Services services) {
-        final LRUCache<JTerm, JTerm> provedByArithCache =
-            services.getCaches().getProvedByArithFstCache();
-        JTerm result;
-        synchronized (provedByArithCache) {
-            result = provedByArithCache.get(problem);
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        if (!isArithComparison(problem, integerLDT) && strippedOp(problem) != Equality.EQUALS) {
+            // neither an (in)equality nor an equality: formatArithTerm yields false and
+            // provedArithEqual returns the problem unchanged -- bail before locking the cache.
+            return problem;
         }
+        final Map<JTerm, JTerm> provedByArithCache =
+            services.getCaches().getProvedByArithFstCache();
+        // ConcurrentLruCache is internally synchronized; get/put are individually atomic, so no
+        // external lock is needed (the get and put here are already separate critical sections --
+        // two racing misses may both compute and put, last write wins, exactly as before).
+        JTerm result = provedByArithCache.get(problem);
         if (result != null) {
             return result;
         }
 
         TermBuilder tb = services.getTermBuilder();
-        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
         final JTerm trueT = tb.tt();
         final JTerm falseT = tb.ff();
@@ -75,11 +97,9 @@ public class HandleArith {
 
 
 
-    private static void putInTermCache(final LRUCache<JTerm, JTerm> provedByArithCache,
+    private static void putInTermCache(final Map<JTerm, JTerm> provedByArithCache,
             final JTerm key, final JTerm value) {
-        synchronized (provedByArithCache) {
-            provedByArithCache.put(key, value);
-        }
+        provedByArithCache.put(key, value);
     }
 
     /**
@@ -127,19 +147,22 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static JTerm provedByArith(JTerm problem, JTerm axiom, Services services) {
-        final Pair<JTerm, JTerm> key = new Pair<>(problem, axiom);
-        final LRUCache<Pair<JTerm, JTerm>, JTerm> provedByArithCache =
-            services.getCaches().getProvedByArithSndCache();
-        JTerm result;
-        synchronized (provedByArithCache) {
-            result = provedByArithCache.get(key);
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        if (!isArithComparison(problem, integerLDT) || !isArithComparison(axiom, integerLDT)) {
+            // not an arithmetic implication: formatArithTerm would yield false for one side and
+            // this method returns the unproved problem -- bail before allocating the key and
+            // taking the cache lock.
+            return problem;
         }
+        final Pair<JTerm, JTerm> key = new Pair<>(problem, axiom);
+        final Map<Pair<JTerm, JTerm>, JTerm> provedByArithCache =
+            services.getCaches().getProvedByArithSndCache();
+        JTerm result = provedByArithCache.get(key);
         if (result != null) {
             return result;
         }
 
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final ServiceCaches caches = services.getCaches();
 
         final JTerm cd = formatArithTerm(problem, tb, integerLDT, caches);
@@ -148,9 +171,7 @@ public class HandleArith {
         final JTerm falseT = tb.ff();
 
         if (cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE) {
-            synchronized (provedByArithCache) {
-                provedByArithCache.put(key, problem);
-            }
+            provedByArithCache.put(key, problem);
             return problem;
         }
         Function addfun = integerLDT.getAdd();
@@ -158,9 +179,7 @@ public class HandleArith {
             tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), cd.sub(1)));
         JTerm res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
-            synchronized (provedByArithCache) {
-                provedByArithCache.put(key, trueT);
-            }
+            provedByArithCache.put(key, trueT);
             return trueT;
         }
         JTerm t0 = formatArithTerm(tb.not(problem), tb, integerLDT, caches);
@@ -168,14 +187,10 @@ public class HandleArith {
             tb.geq(tb.func(addfun, t0.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), t0.sub(1)));
         res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
-            synchronized (provedByArithCache) {
-                provedByArithCache.put(key, falseT);
-            }
+            provedByArithCache.put(key, falseT);
             return falseT;
         }
-        synchronized (provedByArithCache) {
-            provedByArithCache.put(key, problem);
-        }
+        provedByArithCache.put(key, problem);
         return problem;
     }
 
@@ -189,11 +204,8 @@ public class HandleArith {
      */
     private static JTerm formatArithTerm(final JTerm problem, TermBuilder tb, IntegerLDT ig,
             ServiceCaches caches) {
-        final LRUCache<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();
-        JTerm pro;
-        synchronized (formattedTermCache) {
-            pro = formattedTermCache.get(problem);
-        }
+        final Map<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();
+        JTerm pro = formattedTermCache.get(problem);
         if (pro != null) {
             return pro;
         }

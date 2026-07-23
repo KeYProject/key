@@ -5,7 +5,9 @@ package de.uka.ilkd.key.java;
 
 import java.nio.file.Path;
 
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import org.junit.jupiter.api.Assertions;
@@ -25,11 +27,33 @@ public class TestJavaDLASTExtensions {
         var message = "Something with type resolution in method frames is corrupt. "
             + "The type TestJavaCardDLExtensions should not be found in the default scope as it is "
             + "declared inside package sub1.";
-        Assertions.assertThrows(UnsolvedSymbolException.class,
+        // The unresolved type now surfaces as a located BuildingException whose cause is
+        // the original UnsolvedSymbolException (instead of the raw, location-less exception).
+        var ex = Assertions.assertThrows(BuildingException.class,
             () -> HelperClassForTests
                     .parseThrowException(
                         testpath.resolve("typeResolutionInMethodFrameNotResolvable.key")),
             message);
+        assertUnsolvedType(ex);
+    }
+
+    /**
+     * Checks that the given exception carries the original {@link UnsolvedSymbolException} and that
+     * its (now no longer hidden) message mentions the unresolvable type.
+     */
+    private static void assertUnsolvedType(BuildingException ex) {
+        Assertions.assertTrue(ExceptionTools.getMessage(ex).contains("Cannot resolve"),
+            "the message should expose the unresolved symbol in user-facing wording, but was: "
+                + ExceptionTools.getMessage(ex));
+        boolean hasUnsolvedCause = false;
+        for (Throwable c = ex; c != null; c = c.getCause()) {
+            if (c instanceof UnsolvedSymbolException) {
+                hasUnsolvedCause = true;
+                break;
+            }
+        }
+        Assertions.assertTrue(hasUnsolvedCause,
+            "the original UnsolvedSymbolException should be preserved as cause");
     }
 
     @Test
@@ -52,11 +76,12 @@ public class TestJavaDLASTExtensions {
         var message = "Something with type resolution in method frames is corrupt. "
             + "The type TestJavaCardDLExtensions should not be found as it is "
             + "declared inside package sub1, but resolved in package sub2 (redirect by method-frame)";
-        Assertions.assertThrows(UnsolvedSymbolException.class,
+        var ex = Assertions.assertThrows(BuildingException.class,
             () -> HelperClassForTests
                     .parseThrowException(
                         testpath.resolve("typeResolutionInNestedMethodFrameNotResolvable.key")),
             message);
+        assertUnsolvedType(ex);
     }
 
     @Test

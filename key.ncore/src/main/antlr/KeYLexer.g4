@@ -18,23 +18,20 @@ lexer grammar KeYLexer;
    static {
       modNames.put("\\<","diamond");
       modNames.put("\\diamond","diamond");
-      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\[","box");
       modNames.put("\\box","box");
+
+      modPairs.put("\\modality","\\endmodality");
+      modPairs.put("\\diamond","\\endmodality");
+      modPairs.put("\\box","\\endmodality");
+
+      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\box_transaction","box_transaction");
       modNames.put("\\[[","throughout");
       modNames.put("\\throughout","throughout");
       modNames.put("\\throughout_transaction","throughout_transaction");
 
-      modPairs.put("\\<","\\>");
-      modPairs.put("\\[","\\]");
-
-      //modPairs.put("\\[[","\\]]");
-
-      modPairs.put("\\modality","\\endmodality");
-      modPairs.put("\\diamond","\\endmodality");
       modPairs.put("\\diamond_transaction","\\endmodality");
-      modPairs.put("\\box","\\endmodality");
       modPairs.put("\\box_transaction","\\endmodality");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
@@ -44,7 +41,7 @@ lexer grammar KeYLexer;
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
-       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceeded by an '('
+       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
            for (int k = 1; k <= MAX_K; k++) {
                int codePoint = _input.LA(k);
                if (Character.isWhitespace(codePoint)) continue;
@@ -67,6 +64,21 @@ lexer grammar KeYLexer;
           return t;
         }
         return super.nextToken();
+    }
+
+    /**
+     * Called when, while scanning the body of a modality, another modality-opening keyword is
+     * encountered. A modality body is a (schematic) program and must never contain a nested
+     * modality, so this means the current modality's closing {@code \endmodality} (or {@code \>} /
+     * {@code \]}) is missing. Fail the token at its start (the modality opening) -- mirroring the
+     * behaviour at end-of-file -- so the error is reported there instead of running on to the next,
+     * unrelated {@code \endmodality}. (See issue #3867.)
+     */
+    private void unterminatedModality() {
+        throw new org.key_project.util.parsing.UnterminatedModalityException(
+            "Missing '\\endmodality': this modality is not terminated (another modality opening "
+                + "was found before its closing keyword).",
+            _tokenStartLine, _tokenStartCharPositionInLine, getSourceName());
     }
 
 }
@@ -94,8 +106,10 @@ ONEOF
 ABSTRACT
    : '\\abstract'
    ;
+ALIAS: '\\alias';
+
    // Keywords used in schema variable declarations
-   
+  
 SCHEMAVARIABLES
    : '\\schemaVariables'
    ;
@@ -139,18 +153,9 @@ SKOLEMTERM
 SKOLEMFORMULA
    : '\\skolemFormula'
    ;
-
-TERMLABEL
-   : '\\termlabel'
-   ;
-   // Keywords used in program variable declarations
    
 PROGRAMVARIABLES
    : '\\programVariables'
-   ;
-
-SAME_OBSERVER
-   : '\\sameObserver'
    ;
 
 VARCOND
@@ -161,20 +166,8 @@ APPLY_UPDATE_ON_RIGID
    : '\\applyUpdateOnRigid'
    ;
 
-DEPENDINGON
-   : '\\dependingOn'
-   ;
-
-DISJOINTMODULONULL
-   : '\\disjointModuloNull'
-   ;
-
 DROP_EFFECTLESS_ELEMENTARIES
    : '\\dropEffectlessElementaries'
-   ;
-
-DROP_EFFECTLESS_STORES
-   : '\\dropEffectlessStores'
    ;
 
 SIMPLIFY_IF_THEN_ELSE_UPDATE
@@ -187,10 +180,6 @@ HASSORT
 
 ISINDUCTVAR
    : '\\isInductVar'
-   ;
-
-ISOBSERVER
-   : '\\isObserver'
    ;
 
 DIFFERENT
@@ -213,10 +202,6 @@ NEW_TYPE_OF
    : '\\newTypeOf'
    ;
 
-NEW_DEPENDING_ON
-   : '\\newDependingOn'
-   ;
-
 HAS_ELEMENTARY_SORT
    : '\\hasElementarySort'
    ;
@@ -224,10 +209,6 @@ HAS_ELEMENTARY_SORT
    
 NOT_
    : '\\not'
-   ;
-
-NOTFREEIN
-   : '\\notFreeIn'
    ;
 
 SAME
@@ -317,10 +298,14 @@ FALSE
    : 'false'
    ;
    // Keywords related to taclets
-   
+
 SAMEUPDATELEVEL
    : '\\sameUpdateLevel'
-   ; // TODO: make default
+   ;
+
+IGNOREUPDATELEVEL
+   : '\\ignoreUpdateLevel'
+   ;
    
 INSEQUENTSTATE
    : '\\inSequentState'
@@ -631,6 +616,9 @@ GREATEREQUAL
    | '\u2265'
    ;
 
+OPENTYPEPARAMS : '<' '[';
+CLOSETYPEPARAMS : ']' '>';
+
 WS
    : [ \t\n\r\u00a0]+ -> channel (HIDDEN)
    ; //U+00A0 = non breakable whitespace
@@ -718,6 +706,8 @@ fragment IDCHAR
    | '$'
    ;
 
+MATCH_IDENT: '?' IDENT?;
+
 IDENT
    : ((LETTER | '_' | '#' | '$') (IDCHAR)*)
    ;
@@ -760,10 +750,6 @@ MODALITYB
    : '\\[' -> more , pushMode (modBox)
    ;
 
-MODALITYBB
-   : '\\[[' -> more , pushMode (modBoxBox)
-   ;
-
 MODAILITYGENERIC1
    : '\\box' -> more , pushMode (modGeneric)
    ;
@@ -776,16 +762,26 @@ MODAILITYGENERIC4
    : '\\modality' -> more , pushMode (modGeneric)
    ;
 
-MODAILITYGENERIC6
-   : '\\throughout' -> more , pushMode (modGeneric)
-   ;
-   //BACKSLASH:  '\\';
-   
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
+
 ERROR_CHAR
    : .
    ;
 
+/**
+ * A modality-opening keyword. Inside a modality body (a schematic program) such a keyword can only
+ * mean that the current modality was not terminated; see {@link #unterminatedModality}.
+ */
+fragment MODALITY_OPEN
+   : '\\modality' | '\\diamond_transaction' | '\\box_transaction' | '\\diamond' | '\\box'
+   | '\\throughout_transaction' | '\\throughout' | '\\<' | '\\[[' | '\\['
+   ;
+
 mode modDiamond;
+MODALITYD_NESTED
+   : MODALITY_OPEN { unterminatedModality (); } -> more
+   ;
+
 MODALITYD_END
    : '\\>' -> type (MODALITY) , popMode
    ;
@@ -802,6 +798,14 @@ MODALITYD_COMMENT
    : [\\] [*] -> more , pushMode (modComment)
    ;
 
+MODALITYD_LINE_COMMENT
+   : '//' -> more , pushMode (modLineComment)
+   ;
+
+MODALITYD_BLOCK_COMMENT
+   : '/*' -> more , pushMode (modComment)
+   ;
+
 MODALITYD_ANY
    : . -> more
    ;
@@ -809,6 +813,10 @@ MODALITYD_ANY
 mode modGeneric;
 MODALITYG_END
    : '\\endmodality' -> type (MODALITY) , popMode
+   ;
+
+MODALITYG_NESTED
+   : MODALITY_OPEN { unterminatedModality (); } -> more
    ;
 
 MODALITYG_STRING
@@ -823,6 +831,14 @@ MODALITYG_COMMENT
    : [\\] [*] -> more , pushMode (modComment)
    ;
 
+MODALITYG_LINE_COMMENT
+   : '//' -> more , pushMode (modLineComment)
+   ;
+
+MODALITYG_BLOCK_COMMENT
+   : '/*' -> more , pushMode (modComment)
+   ;
+
 MODALITYG_ANY
    : . -> more
    ;
@@ -830,6 +846,10 @@ MODALITYG_ANY
 mode modBox;
 MODALITYB_END
    : '\\]' -> type (MODALITY) , popMode
+   ;
+
+MODALITYB_NESTED
+   : MODALITY_OPEN { unterminatedModality (); } -> more
    ;
 
 MODALITYB_STRING
@@ -842,6 +862,14 @@ MODALITYB_CHAR
 
 MODALITYB_COMMENT
    : [\\] [*] -> more , pushMode (modComment)
+   ;
+
+MODALITYB_LINE_COMMENT
+   : '//' -> more , pushMode (modLineComment)
+   ;
+
+MODALITYB_BLOCK_COMMENT
+   : '/*' -> more , pushMode (modComment)
    ;
 
 MODALITYB_ANY
@@ -897,6 +925,17 @@ MOD_COMMENT_END
    ;
 
 MOD_COMMENT_ANY
+   : . -> more
+   ;
+
+// Java line comment inside a modality body: consume up to (and including) the end of line so that
+// a modality opening/closing keyword in the comment is not mistaken for real syntax.
+mode modLineComment;
+MOD_LINE_COMMENT_END
+   : ('\n' | EOF) -> more , popMode
+   ;
+
+MOD_LINE_COMMENT_ANY
    : . -> more
    ;
 

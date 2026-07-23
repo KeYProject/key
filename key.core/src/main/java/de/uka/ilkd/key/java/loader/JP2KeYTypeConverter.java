@@ -474,7 +474,7 @@ public class JP2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -491,7 +491,7 @@ public class JP2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        ImmutableList<Field> result = ImmutableList.nil();
         for (Object aList : list) {
             Object pe = aList;
             if (pe instanceof FieldDeclaration) {

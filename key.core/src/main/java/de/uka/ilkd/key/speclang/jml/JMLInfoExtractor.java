@@ -15,7 +15,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -84,7 +83,7 @@ public final class JMLInfoExtractor {
     }
 
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
-        ImmutableList<Comment> coms = ImmutableSLList.nil();
+        ImmutableList<Comment> coms = ImmutableList.nil();
 
         // Either method is attached to the method itself ...
         Comment[] methodComments = method.getComments();

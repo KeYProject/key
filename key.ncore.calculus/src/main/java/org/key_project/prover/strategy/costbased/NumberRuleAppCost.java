@@ -3,17 +3,26 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.strategy.costbased;
 
-import org.key_project.util.LRUCache;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost(0);
-    /// Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
-    private static final LRUCache<Integer, NumberRuleAppCost> cache =
-        new LRUCache<>(255);
+
+    /// Pre-allocated instances for frequently occurring cost values.
+    /// The array is filled once during class initialization and
+    /// only read afterwards, so access needs no synchronization. This method is critical as
+    /// it is called for every feature evaluation.
+    private static final int CACHE_LOW = -8192;
+    private static final int CACHE_HIGH = 8192;
+    private static final IntRuleAppCost[] CACHE = new IntRuleAppCost[CACHE_HIGH - CACHE_LOW];
+
+    static {
+        for (int i = 0; i < CACHE.length; i++) {
+            CACHE[i] = new IntRuleAppCost(CACHE_LOW + i);
+        }
+    }
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
@@ -23,20 +32,10 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         if (p_cost == 0) {
             return getZeroCost();
         }
-
-        NumberRuleAppCost ac;
-        synchronized (cache) { // Ensure thread save access which is required for parallel proofs
-                               // (e.g. in Eclipse)
-            ac = cache.get(p_cost);
-            if (ac != null) {
-                return ac;
-            }
-
-            ac = new IntRuleAppCost(p_cost);
-            cache.put(p_cost, ac);
+        if (p_cost >= CACHE_LOW && p_cost < CACHE_HIGH) {
+            return CACHE[p_cost - CACHE_LOW];
         }
-
-        return ac;
+        return new IntRuleAppCost(p_cost);
     }
 
     public static RuleAppCost create(long p_cost) {

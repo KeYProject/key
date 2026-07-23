@@ -10,11 +10,11 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ public class TestGoal {
     @Test
     public void testSetBack0() {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
-            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
+            ImmutableList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
 
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
@@ -84,10 +84,55 @@ public class TestGoal {
 
     }
 
+    /**
+     * Regression test for the pruning bug where taclets introduced (e.g. via {@code \addrules}) at
+     * the leaf of a branch other than the one the pruning descends first ("firstLeaf") kept their
+     * justification registered in the {@link InitConfig}. On the next automatic run a fresh taclet
+     * with the same name would then be registered, causing
+     * "A rule named ... has already been registered."
+     * <p>
+     * The locally introduced taclets are stored on the node at which they were introduced, so the
+     * deregistration during pruning must iterate the node itself, not its parent.
+     */
+    @Test
+    public void testSetBackRemovesJustificationOfResidualBranch() {
+        Sequent seq = JavaDLSequentKit.createSuccSequent(
+            ImmutableList.of(new SequentFormula(TacletForTests.parseTerm("A"))));
+        final InitConfig initConfig =
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
+        proof = new Proof("", seq, null, initConfig.createTacletIndex(),
+            initConfig.createBuiltInRuleIndex(), initConfig);
+
+        Goal g = proof.openGoals().head();
+        ImmutableList<Goal> lg = g.split(2);
+        // split() reuses 'this' (g) for the first child node and clones for the rest, prepending
+        // the clones to the result list. Hence lg.head() is attached to the second child (a
+        // residual leaf during pruning) and lg.tail().head() is g, attached to the first child
+        // (firstLeaf).
+        final Goal residualGoal = lg.head();
+        final Goal firstGoal = lg.tail().head();
+        proof.add(residualGoal);
+
+        final var onFirst = TacletForTests.lookupTaclet("imp_right").taclet();
+        final var onResidual = TacletForTests.lookupTaclet("or_left").taclet();
+        firstGoal.addTaclet(onFirst, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        residualGoal.addTaclet(onResidual, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        assertNotNull(initConfig.getJustifInfo().getJustification(onFirst));
+        assertNotNull(initConfig.getJustifInfo().getJustification(onResidual));
+
+        proof.pruneProof(proof.root());
+
+        assertNull(initConfig.getJustifInfo().getJustification(onFirst),
+            "justification of taclet introduced on the firstLeaf branch must be removed on prune");
+        assertNull(initConfig.getJustifInfo().getJustification(onResidual),
+            "justification of taclet introduced on a residual branch leaf must be removed on prune");
+    }
+
     @Test
     public void testSetBack1() throws Exception {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
-            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
+            ImmutableList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
         Node root = new Node(proof, seq);
         proof.setRoot(root);
         Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),

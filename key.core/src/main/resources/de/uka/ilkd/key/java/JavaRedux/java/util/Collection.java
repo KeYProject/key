@@ -46,7 +46,7 @@ public interface Collection extends java.lang.Iterable
      @ assignable \nothing;
      @ determines \result \by seq, arg0;
      @*/
-   public boolean contains(String arg0);
+   public boolean contains(java.lang.String arg0);
    public boolean containsAll(java.util.Collection arg0);
    
    public java.util.Iterator iterator();

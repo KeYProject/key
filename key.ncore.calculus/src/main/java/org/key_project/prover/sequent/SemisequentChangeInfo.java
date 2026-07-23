@@ -4,20 +4,19 @@
 package org.key_project.prover.sequent;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class SemisequentChangeInfo {
     /// contains the added formulas to the semisequent
-    private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> added = ImmutableList.nil();
     /// contains the removed formulas from the semisequent
-    private ImmutableList<SequentFormula> removed = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> removed = ImmutableList.nil();
     /// contains the modified formulas from the semisequent
-    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.nil();
+    private ImmutableList<FormulaChangeInfo> modified = ImmutableList.nil();
     /// stores the redundance free formula list of the semisequent
-    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableList.nil();
     /// contains formulas that have been tried to add, but which have been rejected due to already
     /// existing formulas in the sequent subsuming these formulas
-    private ImmutableList<SequentFormula> rejected = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> rejected = ImmutableList.nil();
 
     ///
     private int lastFormulaIndex = -1;

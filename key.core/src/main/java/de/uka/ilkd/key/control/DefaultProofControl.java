@@ -25,15 +25,20 @@ import org.key_project.util.collection.ImmutableList;
  * @author Martin Hentschel
  */
 public class DefaultProofControl extends AbstractProofControl {
+    private static final org.slf4j.Logger LOGGER =
+        org.slf4j.LoggerFactory.getLogger(DefaultProofControl.class);
+
     /**
      * The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      */
     private final UserInterfaceControl ui;
 
     /**
-     * The currently running {@link Thread}.
+     * The currently running {@link Thread}, or {@code null} if no auto mode / macro run is active.
+     * {@code volatile} so the null-out from the run thread's {@code finally} is visible to callers
+     * of {@link #isInAutoMode()} / {@link #startAutoMode} / {@link #runMacro} on other threads.
      */
-    private Thread autoModeThread;
+    private volatile Thread autoModeThread;
 
     /**
      * Constructor.
@@ -66,6 +71,12 @@ public class DefaultProofControl extends AbstractProofControl {
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
             ProverTaskListener ptl) {
+        if (proof.isErroneous()) {
+            // A previous run marked the proof erroneous (an essential proof listener failed); it
+            // may be inconsistent, so no new search is started. The proof can still be saved.
+            LOGGER.warn("Refusing to start auto mode: proof {} is marked erroneous.", proof.name());
+            return;
+        }
         if (!isInAutoMode()) {
             autoModeThread = new AutoModeThread(proof, goals, ptl);
             autoModeThread.start();
@@ -132,8 +143,15 @@ public class DefaultProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void runMacro(Node node, ProofMacro macro,
+    public synchronized void runMacro(Node node, ProofMacro macro,
             PosInOccurrence posInOcc) {
+        Proof proof = node.proof();
+        if (proof.isErroneous()) {
+            // A previous run marked the proof erroneous (an essential proof listener failed); it
+            // may be inconsistent, so no new search is started. The proof can still be saved.
+            LOGGER.warn("Refusing to run macro: proof {} is marked erroneous.", proof.name());
+            return;
+        }
         if (!isInAutoMode()) {
             autoModeThread = new MacroThread(node, macro, posInOcc);
             autoModeThread.start();

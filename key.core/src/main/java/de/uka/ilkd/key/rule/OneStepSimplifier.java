@@ -3,12 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -42,10 +37,9 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
-import org.key_project.util.LRUCache;
+import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
@@ -65,6 +59,10 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
+    /**
+     * Lock stripes for the OSS caches; OSS runs concurrently on every worker, so split the lock.
+     */
+    private static final int OSS_CACHE_STRIPES = 16;
 
     /**
      * Represents a list of rule applications performed in one OSS step.
@@ -80,20 +78,34 @@ public final class OneStepSimplifier implements BuiltInRule {
      * would not improve prover performance. I tested it for "simplify_literals", "cast_del", and
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
-    private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
+    private static final ImmutableList<String> ruleSets = ImmutableList.<String>nil()
             .append("concrete").append("concrete_java").append("update_elim")
             .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
     private static final boolean[] bottomUp = { false, false, false, true, true, true, false };
-    private final Map<SequentFormula, Boolean> applicabilityCache =
-        new LRUCache<>(APPLICABILITY_CACHE_SIZE);
+    // OSS is shared per proof and runs concurrently on every parallel-prover worker. Its two caches
+    // are PURE (the value is a function of the key: "does this formula simplify?" / "this term is
+    // irreducible"), so eviction order is irrelevant to the result and a striped (lower-contention)
+    // cache is sound. They are therefore the only state the hot path (isApplicable/apply) touches
+    // besides the goal it owns, so that path needs no lock.
+    private final StripedLruCache<SequentFormula, Boolean> applicabilityCache =
+        new StripedLruCache<>(APPLICABILITY_CACHE_SIZE, OSS_CACHE_STRIPES);
+
+    /**
+     * Guards the (re)build/teardown of the per-proof state below (refresh/initIndices/
+     * shutdownIndices). That family runs at proof setup / settings changes, never concurrently with
+     * proving (e.g. ProofStarter calls refreshOSS just before starting the prover), so the hot path
+     * may read {@link #indices}/{@link #active} lock-free; the volatile modifiers and the
+     * publish-after-build in initIndices give the necessary visibility.
+     */
+    private final Object refreshLock = new Object();
 
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
-    private TacletIndex[] indices;
-    private Map<JTerm, JTerm>[] notSimplifiableCaches;
-    private boolean active;
+    private volatile TacletIndex[] indices;
+    private volatile StripedLruCache<JTerm, JTerm>[] notSimplifiableCaches;
+    private volatile boolean active;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -121,7 +133,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableList<Taclet> tacletsForRuleSet(Proof proof, String ruleSetName,
             ImmutableList<String> excludedRuleSetNames) {
         assert !proof.openGoals().isEmpty();
-        ImmutableList<Taclet> result = ImmutableSLList.nil();
+        ImmutableList<Taclet> result = ImmutableList.nil();
 
         // collect apps present in all open goals
         Set<NoPosTacletApp> allApps =
@@ -190,18 +202,23 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.nil();
-            indices = new TacletIndex[ruleSets.size()];
-            notSimplifiableCaches = (Map<JTerm, JTerm>[]) new LRUCache[indices.length];
+            appsTakenOver = ImmutableList.nil();
+            // Build into locals, then publish to the volatile fields in one write each, so a
+            // (hypothetical) concurrent reader never sees a half-filled array.
+            final TacletIndex[] newIndices = new TacletIndex[ruleSets.size()];
+            final StripedLruCache<JTerm, JTerm>[] newCaches =
+                (StripedLruCache<JTerm, JTerm>[]) new StripedLruCache[newIndices.length];
             int i = 0;
-            ImmutableList<String> done = ImmutableSLList.nil();
+            ImmutableList<String> done = ImmutableList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
-                indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
-                notSimplifiableCaches[i] = new LRUCache<>(DEFAULT_CACHE_SIZE);
+                newIndices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
+                newCaches[i] = new StripedLruCache<>(DEFAULT_CACHE_SIZE, OSS_CACHE_STRIPES);
                 i++;
                 done = done.prepend(ruleSet);
             }
+            indices = newIndices;
+            notSimplifiableCaches = newCaches;
         }
     }
 
@@ -210,23 +227,25 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Deactivate one-step simplification: clear caches, restore taclets to the goals' taclet
      * indices.
      */
-    public synchronized void shutdownIndices() {
-        if (lastProof != null) {
-            if (!lastProof.isDisposed()) {
-                // We need to treat all goals here instead of just open goals;
-                // otherwise pruning a (partially) closed proof leads to errors where
-                // some rule applications are missing.
-                for (Goal g : lastProof.allGoals()) {
-                    g.ruleAppIndex().addNoPosTacletApp(appsTakenOver);
-                    g.getRuleAppManager().clearCache();
-                    g.ruleAppIndex().clearIndexes();
+    public void shutdownIndices() {
+        synchronized (refreshLock) {
+            if (lastProof != null) {
+                if (!lastProof.isDisposed()) {
+                    // We need to treat all goals here instead of just open goals;
+                    // otherwise pruning a (partially) closed proof leads to errors where
+                    // some rule applications are missing.
+                    for (Goal g : lastProof.allGoals()) {
+                        g.ruleAppIndex().addNoPosTacletApp(appsTakenOver);
+                        g.getRuleAppManager().clearCache();
+                        g.ruleAppIndex().clearIndexes();
+                    }
                 }
+                applicabilityCache.clear();
+                lastProof = null;
+                appsTakenOver = null;
+                indices = null;
+                notSimplifiableCaches = null;
             }
-            applicabilityCache.clear();
-            lastProof = null;
-            appsTakenOver = null;
-            indices = null;
-            notSimplifiableCaches = null;
         }
     }
 
@@ -430,7 +449,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 inAntecedent); // It is required to create a new PosInOccurrence because formula and
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
-        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableList.nil();
         ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
@@ -497,7 +516,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             new ArrayList<>(seq.size());
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> list = ImmutableList.nil();
         SequentFormula simplifiedCf = cf;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(simplifiedCf, ossPIO.isInAntec(),
@@ -513,7 +532,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence[] ifInstsArr =
             ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
-            ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
+            ImmutableList.<PosInOccurrence>nil().append(ifInstsArr);
         return new Instantiation(list.head(), list.size(), immutableIfInsts);
     }
 
@@ -521,7 +540,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Tells whether the passed formula can be simplified
      */
-    private synchronized boolean applicableTo(Services services,
+    private boolean applicableTo(Services services,
             SequentFormula cf,
             boolean inAntecedent, Goal goal, RuleApp ruleApp) {
         final Boolean b = applicabilityCache.get(cf);
@@ -538,22 +557,24 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private synchronized void refresh(Proof proof) {
-        ProofSettings settings = proof.getSettings();
-        if (settings == null) {
-            settings = ProofSettings.DEFAULT_SETTINGS;
-        }
+    private void refresh(Proof proof) {
+        synchronized (refreshLock) {
+            ProofSettings settings = proof.getSettings();
+            if (settings == null) {
+                settings = ProofSettings.DEFAULT_SETTINGS;
+            }
 
-        final boolean newActive = settings.getStrategySettings().getActiveStrategyProperties()
-                .get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+            final boolean newActive = settings.getStrategySettings().getActiveStrategyProperties()
+                    .get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
 
-        if (active != newActive || lastProof != proof || // The setting or proof has changed.
-                (isShutdown() && !proof.closed())) { // A closed proof was pruned.
-            active = newActive;
-            if (active && proof != null && !proof.closed()) {
-                initIndices(proof);
-            } else {
-                shutdownIndices();
+            if (active != newActive || lastProof != proof || // The setting or proof has changed.
+                    (isShutdown() && !proof.closed())) { // A closed proof was pruned.
+                active = newActive;
+                if (active && proof != null && !proof.closed()) {
+                    initIndices(proof);
+                } else {
+                    shutdownIndices();
+                }
             }
         }
     }
@@ -601,7 +622,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";
@@ -619,9 +640,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             ImmutableList<PosInOccurrence> ifInsts =
                 ((OneStepSimplifierRuleApp) ruleApp).assumesInsts();
             ImmutableList<SequentFormula> anteFormulas =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             ImmutableList<SequentFormula> succFormulas =
-                ImmutableSLList.nil();
+                ImmutableList.nil();
             if (ifInsts != null) {
                 for (PosInOccurrence it : ifInsts) {
                     if (it.isInAntec()) {
@@ -681,9 +702,13 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     public Set<NoPosTacletApp> getCapturedTaclets() {
         Set<NoPosTacletApp> result = new LinkedHashSet<>();
-        synchronized (this) {
-            for (TacletIndex index : indices) {
-                result.addAll(index.allNoPosTacletApps());
+        // Guard against a concurrent refresh/shutdown nulling or rebuilding the index array.
+        synchronized (refreshLock) {
+            final TacletIndex[] currentIndices = indices;
+            if (currentIndices != null) {
+                for (TacletIndex index : currentIndices) {
+                    result.addAll(index.allNoPosTacletApps());
+                }
             }
         }
         return result;
@@ -794,5 +819,29 @@ public final class OneStepSimplifier implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
+    }
+
+
+    @Override
+    public String getDocumentation() {
+        return """
+                The One Step Simplifier (OSS) aggregates the application of simplification rules into a single rule. This is done to make the calculus more efficient.
+
+                You can activate/deactivate the simplifier by toggling the menu entry Options->One Step Simplifier. An active OSS makes the proof faster, a deactivated more transparent.
+
+                In particular, the OSS performs normalisation and simplification on updated terms:
+                  * Updates on terms without modality are resolved.
+                  * Updates without effects are dropped.
+                  * Sequential updates are merged into one parallel update.
+
+                Technical Information:
+                The OSS aggregates the rules from the following heuristics (-> Taclet Base):
+                  concrete,
+                  update_elim,
+                  update_apply_on_update,
+                  update_apply,
+                  update_join,
+                  elimQuantifier
+                  """;
     }
 }

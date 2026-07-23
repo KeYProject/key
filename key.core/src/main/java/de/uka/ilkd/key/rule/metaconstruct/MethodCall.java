@@ -42,15 +42,24 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Symbolically executes a method invocation
+ * Symbolically executes a method invocation.
+ *
+ * <p>
+ * This class is intentionally {@code final}. Its {@link #transform} runs on a fresh per-call copy
+ * (see there) so that the instance shared via the taclet base is never mutated and concurrent
+ * method-call expansions in the parallel prover do not race on the scratch instance fields. That
+ * delegation copies {@code this} by constructing a plain {@code MethodCall}; if a subclass existed
+ * and overrode any of the transform helpers, the copy would silently drop the override and run the
+ * wrong transformation. Forbidding subclasses keeps the copy faithful and the thread-safety
+ * argument sound. Behaviour is varied through the taclet/{@link ProgramElement} arguments, not by
+ * subclassing, so nothing is lost.
  */
-public class MethodCall extends ProgramTransformer {
+public final class MethodCall extends ProgramTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 
     private final SchemaVariable resultVar;
@@ -110,7 +119,7 @@ public class MethodCall extends ProgramTransformer {
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
             Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> result = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result =
@@ -184,7 +193,14 @@ public class MethodCall extends ProgramTransformer {
     }
 
     /**
-     * performs the program transformation needed for symbolic program execution
+     * Performs the program transformation needed for symbolic program execution.
+     *
+     * <p>
+     * The actual work ({@link #transformImpl}) fills several scratch instance fields. Because this
+     * transformer object is part of the shared taclet base, running it on {@code this} would race
+     * across concurrent workers (the parallel prover). We therefore run on a fresh, per-call copy:
+     * its scratch fields are confined to this invocation, and it is throwaway state &mdash; never
+     * inserted into any AST. (MethodCall has no subclasses, so the copy faithfully replaces this.)
      *
      * @param services the Services with all necessary information about the java programs
      * @param svInst the instantiations esp. of the inner and outer label
@@ -192,6 +208,12 @@ public class MethodCall extends ProgramTransformer {
      */
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
+        return new MethodCall((ProgramSV) execContextSV, resultVar, body())
+                .transformImpl(pe, services, svInst);
+    }
+
+    private ProgramElement[] transformImpl(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {

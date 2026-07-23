@@ -1071,7 +1071,7 @@ public class MergeRuleUtils {
             PosInOccurrence pio, Services services) {
 
         ImmutableList<SequentFormula> pathConditionSet =
-            ImmutableSLList.nil();
+            ImmutableList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         var selected = pio.subTerm();
@@ -1110,7 +1110,7 @@ public class MergeRuleUtils {
      */
     public static ImmutableList<SymbolicExecutionState> sequentsToSEPairs(
             Iterable<MergePartner> sequentInfos) {
-        ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
+        ImmutableList<SymbolicExecutionState> result = ImmutableList.nil();
         for (MergePartner sequentInfo : sequentInfos) {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
@@ -1232,7 +1232,12 @@ public class MergeRuleUtils {
                 "MergeRule: Unexpected type of Operator involved in name clash: " +
                     mergeStateOp + " : " + mergeStateOp.getClass().getSimpleName());
         }
-        thisGoalNamespaces.flushToParent();
+        // The renamed operator stays in the goal's top namespace layer: every lookup during the
+        // remaining merge application searches the whole layer chain, and only symbols in the top
+        // layer are harvested into the node-local symbol storage when the rule application
+        // commits. That storage is what the goal's namespaces are rebuilt from after the commit
+        // and after every prune -- the renamed operator occurs in the merged sequent, so it must
+        // be part of it.
         return newOp1;
     }
 
@@ -1351,7 +1356,7 @@ public class MergeRuleUtils {
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-        ImmutableList<JTerm> elementaries = ImmutableSLList.nil();
+        ImmutableList<JTerm> elementaries = ImmutableList.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {
             final String newName = tb.newName(stripIndex(loc.name().toString()));
@@ -1505,8 +1510,8 @@ public class MergeRuleUtils {
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
-            JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
-                ImmutableSLList.singleton(new SequentFormula(toProve))),
+            JavaDLSequentKit.createSequent(ImmutableList.nil(),
+                ImmutableList.singleton(new SequentFormula(toProve))),
             services, doSplit, sideProofName, timeout);
     }
 
@@ -1632,7 +1637,7 @@ public class MergeRuleUtils {
         if (openGoals.isEmpty()) {
             return tb.tt();
         } else {
-            ImmutableList<JTerm> goalImplications = ImmutableSLList.nil();
+            ImmutableList<JTerm> goalImplications = ImmutableList.nil();
             for (Goal goal : openGoals) {
                 JTerm goalImplication = sequentToFormula(goal.sequent(), services);
                 goalImplications = goalImplications.append(goalImplication);
@@ -1654,8 +1659,8 @@ public class MergeRuleUtils {
     private static JTerm sequentToFormula(Sequent sequent, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        ImmutableList<JTerm> negAntecedentForms = ImmutableSLList.nil();
-        ImmutableList<JTerm> succedentForms = ImmutableSLList.nil();
+        ImmutableList<JTerm> negAntecedentForms = ImmutableList.nil();
+        ImmutableList<JTerm> succedentForms = ImmutableList.nil();
 
         // Shift antecedent formulae to the succedent by negation
         for (SequentFormula sf : sequent.antecedent().asList()) {

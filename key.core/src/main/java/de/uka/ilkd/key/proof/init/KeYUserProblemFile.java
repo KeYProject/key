@@ -6,8 +6,10 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.List;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.UserInputValidator;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -19,12 +21,15 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
@@ -96,8 +101,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         initConfig.setSettings(settings);
 
         ChoiceInformation ci = getParseContext().getChoices();
-        settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
-        initConfig.setActivatedChoices(settings.getChoiceSettings().getDefaultChoicesAsSet());
+        initConfig.computeDefaults(ci);
 
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
@@ -137,6 +141,17 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             }
         } catch (Exception e) {
             throw new ProofInputException(e);
+        }
+
+        // Validate the user-supplied problem (e.g. reject generic sorts that must not occur in a
+        // concrete sequent, see issue #3409). The set of checks lives in UserInputValidator.
+        List<String> issues = UserInputValidator.validate(problem, "a \\problem");
+        if (!issues.isEmpty()) {
+            // Bundle into a BuildingExceptions so that ExceptionTools#getMessages (used by both the
+            // GUI IssueDialog and the console) reports each rejected sort as its own entry.
+            throw new ProofInputException(new BuildingExceptions(issues.stream()
+                    .map(msg -> BuildingIssue.createError(msg, (ParserRuleContext) null, null))
+                    .toList()));
         }
     }
 
@@ -222,19 +237,27 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>
+     * A {@link Profile} passed at construction time is <em>enforced</em>: the {@code \profile}
+     * declaration of the loaded file is not even read then. Pass {@code null} at construction to
+     * respect the file's declaration (with {@link #getDefaultProfile()} as fallback).
+     * </p>
      */
     @Override
     public Profile getProfile() {
-        try {
-            Profile profile = readProfileFromFile();
-            if (profile != null) {
-                return profile;
-            } else {
-                return getDefaultProfile();
-            }
-        } catch (Exception e) {
-            return getDefaultProfile();
+        if (profile != null) {
+            return profile; // enforced profile
         }
+        try {
+            profile = readProfileFromFile();
+        } catch (Exception e) {
+        }
+
+        if (profile == null) {
+            profile = getDefaultProfile();
+        }
+        return profile;
     }
 
     /**
@@ -257,15 +280,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /// returns the user-local definition given in the file.
     public KeyAst.@Nullable Declarations getProblemHeader() {
         return getParseContext().getProblemHeader();
-    }
-
-    /**
-     * Returns the default {@link Profile} which was defined by a constructor.
-     *
-     * @return The default {@link Profile}.
-     */
-    private Profile getDefaultProfile() {
-        return super.getProfile();
     }
 
     /**

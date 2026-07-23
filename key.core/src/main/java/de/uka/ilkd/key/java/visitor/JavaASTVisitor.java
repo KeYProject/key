@@ -60,6 +60,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     protected void walk(ProgramElement node) {
         super.walk(node);
+        if (done()) {
+            return;
+        }
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
                 services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
@@ -470,6 +473,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnIntLiteral(IntLiteral x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnRealLiteral(RealLiteral x) {
         doDefaultAction(x);
     }
 

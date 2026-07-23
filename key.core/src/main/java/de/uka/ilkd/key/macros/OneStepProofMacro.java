@@ -46,6 +46,14 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
+    protected boolean allowParallel() {
+        // OneStepStrategy's step counter is inherently sequential ("exactly one step"): with
+        // several workers, each concurrently started goal could win the one step, applying more
+        // than one. Pin to the single-threaded prover.
+        return false;
+    }
+
+    @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new OneStepStrategy(proof.getActiveStrategy());

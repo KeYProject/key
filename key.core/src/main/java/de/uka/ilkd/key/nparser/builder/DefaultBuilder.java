@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -19,7 +21,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.JavaKeYParser;
 
 import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
@@ -30,10 +32,11 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -62,17 +65,17 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public List<String> visitPvset(KeYParser.PvsetContext ctx) {
+    public List<String> visitPvset(JavaKeYParser.PvsetContext ctx) {
         return mapOf(ctx.varId());
     }
 
     @Override
-    public List<RuleSet> visitRulesets(KeYParser.RulesetsContext ctx) {
+    public List<RuleSet> visitRulesets(JavaKeYParser.RulesetsContext ctx) {
         return mapOf(ctx.ruleset());
     }
 
     @Override
-    public RuleSet visitRuleset(KeYParser.RulesetContext ctx) {
+    public RuleSet visitRuleset(JavaKeYParser.RulesetContext ctx) {
         String id = ctx.IDENT().getText();
         RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
@@ -82,7 +85,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public String visitSimple_ident_dots(KeYParser.Simple_ident_dotsContext ctx) {
+    public String visitSimple_ident_dots(JavaKeYParser.Simple_ident_dotsContext ctx) {
         return ctx.getText();
     }
 
@@ -110,7 +113,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /*
-     * @Override public Integer visitLocation_ident(KeYParser.Location_identContext ctx) { var id =
+     * @Override public Integer visitLocation_ident(JavaKeYParser.Location_identContext ctx) { var
+     * id =
      * accept(ctx.simple_ident()); if ("Location".equals(id)) { return LOCATION_MODIFIER; } else if
      * (!"Location".equals(id)) { semanticError(ctx,
      * "%s Attribute of a Non Rigid Function can only be 'Location'", id); } return NORMAL_NONRIGID;
@@ -118,12 +122,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      */
 
     @Override
-    public List<Sort> visitArg_sorts_or_formula(KeYParser.Arg_sorts_or_formulaContext ctx) {
+    public List<Sort> visitArg_sorts_or_formula(JavaKeYParser.Arg_sorts_or_formulaContext ctx) {
         return mapOf(ctx.arg_sorts_or_formula_helper());
     }
 
     @Override
-    public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
+    public Sort visitArg_sorts_or_formula_helper(
+            JavaKeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
             return JavaDLTheory.FORMULA;
         } else {
@@ -132,7 +137,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /*
-     * @Override public Sort visitAny_sortId(KeYParser.Any_sortIdContext ctx) { Pair<Sort, Type> p =
+     * @Override public Sort visitAny_sortId(JavaKeYParser.Any_sortIdContext ctx) { Pair<Sort, Type>
+     * p =
      * accept(ctx.any_sortId_help()); return toArraySort(p, ctx.EMPTYBRACKETS().size()); }
      */
 
@@ -144,7 +150,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *        the String with the symbols name
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName,
-            KeYParser.Formal_sort_argsContext genericArgsCtxt) {
+            JavaKeYParser.Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
         Operator[] operators =
             { schemaVariables().lookup(name), variables().lookup(name),
@@ -248,8 +254,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().choices();
     }
 
+    protected org.key_project.logic.MetaSpace docsSpace() {
+        return namespaces().docs();
+    }
+
+
     @Override
-    public String visitString_value(KeYParser.String_valueContext ctx) {
+    public String visitString_value(JavaKeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1);
     }
 
@@ -270,7 +281,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitVarIds(KeYParser.VarIdsContext ctx) {
+    public Object visitVarIds(JavaKeYParser.VarIdsContext ctx) {
         Collection<String> ids = accept(ctx.simple_ident_comma_list());
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
@@ -286,34 +297,35 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public Object visitSimple_ident_dots_comma_list(
-            KeYParser.Simple_ident_dots_comma_listContext ctx) {
+            JavaKeYParser.Simple_ident_dots_comma_listContext ctx) {
         return mapOf(ctx.simple_ident_dots());
     }
 
     @Override
-    public String visitSimple_ident(KeYParser.Simple_identContext ctx) {
-        return ctx.IDENT().getText();
+    public String visitSimple_ident(JavaKeYParser.Simple_identContext ctx) {
+        return ctx.getText();
     }
 
     @Override
-    public List<String> visitSimple_ident_comma_list(KeYParser.Simple_ident_comma_listContext ctx) {
+    public List<String> visitSimple_ident_comma_list(
+            JavaKeYParser.Simple_ident_comma_listContext ctx) {
         return mapOf(ctx.simple_ident());
     }
 
     @Override
-    public List<Boolean> visitWhere_to_bind(KeYParser.Where_to_bindContext ctx) {
+    public List<Boolean> visitWhere_to_bind(JavaKeYParser.Where_to_bindContext ctx) {
         List<Boolean> list = new ArrayList<>(ctx.children.size());
         ctx.b.forEach(it -> list.add(it.getText().equalsIgnoreCase("true")));
         return list;
     }
 
     @Override
-    public List<Sort> visitArg_sorts(KeYParser.Arg_sortsContext ctx) {
+    public List<Sort> visitArg_sorts(JavaKeYParser.Arg_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
 
     @Override
-    public Sort visitSortId(KeYParser.SortIdContext ctx) {
+    public Sort visitSortId(JavaKeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
         if (ctx.formal_sort_args() != null) {
             // parametric sorts should be instantiated
@@ -362,13 +374,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return s;
     }
 
-    private ImmutableList<GenericArgument> getGenericArgs(KeYParser.Formal_sort_argsContext ctx,
+    private ImmutableList<GenericArgument> getGenericArgs(JavaKeYParser.Formal_sort_argsContext ctx,
             ImmutableList<GenericParameter> params) {
         if (ctx.sortId().size() != params.size()) {
             semanticError(ctx, "Expected %d sort arguments, got only %d",
                 params.size(), ctx.sortId().size());
         }
-        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        ImmutableList<GenericArgument> args = ImmutableList.nil();
         for (int i = params.size() - 1; i >= 0; i--) {
             var arg = ctx.sortId(i);
             var sort = visitSortId(arg);
@@ -378,7 +390,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
+    public KeYJavaType visitTypemapping(JavaKeYParser.TypemappingContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
@@ -424,19 +436,19 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
+    public Object visitFuncpred_name(JavaKeYParser.Funcpred_nameContext ctx) {
         return ctx.getText();
     }
 
     @Override
     public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
-            KeYParser.Formal_sort_param_declsContext ctx) {
+            JavaKeYParser.Formal_sort_param_declsContext ctx) {
         return mapOf(ctx.formal_sort_param_decl());
     }
 
     @Override
     public @Nullable GenericParameter visitFormal_sort_param_decl(
-            KeYParser.Formal_sort_param_declContext ctx) {
+            JavaKeYParser.Formal_sort_param_declContext ctx) {
 
         GenericParameter.Variance variance;
         if (ctx.PLUS() != null) {
@@ -457,4 +469,28 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
         return new GenericParameter((GenericSort) paramSort, variance);
     }
+
+
+    protected String processDocumentation(TerminalNode terminalNode) {
+        if (terminalNode != null)
+            return processDocumentation(terminalNode.getSymbol());
+        return null;
+    }
+
+    protected String processDocumentation(List<Token> maindoc) {
+        return maindoc.stream().map(this::processDocumentation).collect(Collectors.joining("\n\n"));
+    }
+
+    protected String processDocumentation(Token doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        var text = doc.getText();
+        int prefix = doc.getCharPositionInLine() + 2;
+        Pattern REMOVE_INDENT = Pattern.compile("^[ ]{1," + prefix + "}", Pattern.MULTILINE);
+        text = text.strip().substring(3, text.length() - 2);
+        return REMOVE_INDENT.matcher(text).replaceAll("").trim();
+    }
+
 }

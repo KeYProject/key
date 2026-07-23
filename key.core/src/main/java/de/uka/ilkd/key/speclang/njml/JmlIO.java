@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.UserInputValidator;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -19,9 +22,11 @@ import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -47,7 +52,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class JmlIO {
 
-    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
+    private ImmutableList<PositionedString> warnings = ImmutableList.nil();
 
     private final Services services;
 
@@ -177,7 +182,31 @@ public class JmlIO {
         Object obj = ctx.accept(visitor);
         ImmutableList<PositionedString> newWarnings = ImmutableList.fromList(visitor.getWarnings());
         warnings = warnings.prepend(newWarnings);
+        // Validate the user-supplied JML term (e.g. reject generic sorts, see issue #3409). The set
+        // of checks lives in UserInputValidator.
+        List<String> issues = UserInputValidator.validate(termOf(obj), "a JML expression");
+        if (!issues.isEmpty()) {
+            // Bundle into a BuildingExceptions so that every rejected sort is reported separately
+            // (ExceptionTools#getMessages, used by the GUI IssueDialog and the console).
+            throw new BuildingExceptions(issues.stream()
+                    .map(msg -> BuildingIssue.createError(msg, ctx, null))
+                    .toList());
+        }
         return obj;
+    }
+
+    /** Extracts the {@link JTerm} carried by a JML interpretation result, if any. */
+    private static @Nullable JTerm termOf(Object obj) {
+        if (obj instanceof SLExpression e && e.isTerm()) {
+            return e.getTerm();
+        }
+        if (obj instanceof JTerm t) {
+            return t;
+        }
+        if (obj instanceof Pair<?, ?> p && p.second instanceof JTerm t) {
+            return t;
+        }
+        return null;
     }
 
     /**
@@ -197,6 +226,22 @@ public class JmlIO {
         } else {
             return (JTerm) interpret;
         }
+    }
+
+    /**
+     * Interpret the given parse tree as an KeYJavaType in the current context.
+     * May return null if the KJT cannot be resolved.
+     */
+    public @Nullable KeYJavaType translateType(JmlParser.TypespecContext ctx) {
+        Object interpreted = interpret(ctx);
+        return switch (interpreted) {
+            case SLExpression slExpression -> slExpression.getType();
+            case Sort sort -> services.getJavaInfo().getKeYJavaType(sort);
+            case KeYJavaType kjt -> kjt;
+            case Type type -> services.getJavaInfo().getKeYJavaType(type);
+            default -> throw new IllegalArgumentException("Cannot translate to KeYJavaType: " +
+                interpreted + " of class " + interpreted.getClass());
+        };
     }
 
     /**
@@ -394,7 +439,7 @@ public class JmlIO {
         this.specMathMode = null;
         clearWarnings();
         exceptionVariable(null);
-        parameters(ImmutableSLList.nil());
+        parameters(ImmutableList.nil());
         return this;
     }
 
@@ -408,6 +453,7 @@ public class JmlIO {
     }
 
     public void clearWarnings() {
-        warnings = ImmutableSLList.nil();
+        warnings = ImmutableList.nil();
     }
+
 }

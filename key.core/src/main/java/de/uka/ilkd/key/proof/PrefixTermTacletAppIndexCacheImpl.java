@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented using a common
- * backend <code>LRUCache</code> (the backend is stored in <code>TermTacletAppIndexCacheSet</code>).
+ * backend cache (a {@code ConcurrentLruCache}, stored in <code>TermTacletAppIndexCacheSet</code>).
  * The backend is accessed in a way that guarantees that two distinct instances of this class never
  * interfere, by choosing cache keys that are specific for a particular instance of
  * <code>PrefixTermTacletAppIndexCacheImpl</code> and cannot be created by other instances. This
- * ensures that it is safe to use one instance of <code>LRUCache</code> for many instances of
+ * ensures that it is safe to use one instance of that backend cache for many instances of
  * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different proof branches,
  * different locations).
  */
@@ -36,7 +36,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
 
     @Override
     public TermTacletAppIndex getIndexForTerm(Term t) {
-        return cache.get(getQueryKey(t));
+        return cache.get(new CacheKey(this, t));
     }
 
     private int hits = 0;
@@ -56,7 +56,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
 
     @Override
     public void putIndexForTerm(Term t, TermTacletAppIndex index) {
-        cache.put(getNewKey(t), index);
+        cache.put(new CacheKey(this, t), index);
     }
 
     /**
@@ -65,42 +65,39 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     protected abstract String name();
 
     /**
-     * @return a freshly created key for the term <code>t</code> that can be stored in the
-     *         <code>cache</code>
+     * Key into the shared backend index cache, made instance-specific by {@code parent} so that the
+     * single backend map can be shared across many index-cache instances (different proofs,
+     * branches
+     * and locations) without them interfering.
+     *
+     * <p>
+     * Immutable on purpose. An earlier version reused one mutable key per cache instance to save
+     * the
+     * per-lookup allocation, but that key was shared across the parallel-prover workers (sibling
+     * goals share the {@link TermTacletAppIndexCacheSet}) and they raced on it &mdash; one worker
+     * overwriting the term while another did its {@code cache.get} returned the index for the wrong
+     * term, surfacing as an {@code IndexOutOfBoundsException} in the index update (or, worse, a
+     * silently wrong match). A fresh immutable key per call has no shared mutable state to get
+     * wrong.
      */
-    private CacheKey getNewKey(Term t) {
-        return new CacheKey(this, t);
-    }
-
-    /**
-     * @return a key for the term <code>t</code> that can be used for cache queries. Calling this
-     *         method twice will return the same object (with different attribute values), i.e., the
-     *         result is not supposed to be stored anywhere
-     */
-    private CacheKey getQueryKey(Term t) {
-        queryCacheKey.analysedTerm = t;
-        return queryCacheKey;
-    }
-
-    private final CacheKey queryCacheKey = new CacheKey(this, null);
-
     public static final class CacheKey {
         private final PrefixTermTacletAppIndexCacheImpl parent;
-        public Term analysedTerm;
+        private final Term analysedTerm;
 
         public CacheKey(PrefixTermTacletAppIndexCacheImpl parent, Term analysedTerm) {
             this.parent = parent;
             this.analysedTerm = analysedTerm;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof CacheKey objKey)) {
                 return false;
             }
-
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 
+        @Override
         public int hashCode() {
             return parent.hashCode() * 3784831 + analysedTerm.hashCode();
         }

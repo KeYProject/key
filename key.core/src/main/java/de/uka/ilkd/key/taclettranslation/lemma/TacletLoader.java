@@ -6,7 +6,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 public abstract class TacletLoader {
@@ -82,8 +81,8 @@ public abstract class TacletLoader {
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
-        ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
-        HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
+        ImmutableList<Taclet> newTaclets = ImmutableList.nil();
+        Map<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
             if (taclet.equals(tacletToProve)) {
@@ -177,7 +176,9 @@ public abstract class TacletLoader {
 
             ImmutableList<Taclet> listAfter = initConfig.getTaclets();
 
-            return listAfter.take(sizeBefore);
+            // weigl: This implementation is no good. It assumes that the new Taclets are
+            // prepended to the Taclet lists. This does have to be the case!
+            return listAfter.skip(sizeBefore);
         }
 
         @Override

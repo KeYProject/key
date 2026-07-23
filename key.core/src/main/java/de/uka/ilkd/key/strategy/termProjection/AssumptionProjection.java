@@ -10,6 +10,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
@@ -17,6 +18,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * Term projection that delivers the assumptions of a taclet application (the formulas that the
  * \assumes clause of the taclet refers to).
  */
+@StableCost
 public class AssumptionProjection implements ProjectionToTerm<Goal> {
 
     private final int no;
@@ -40,6 +42,6 @@ public class AssumptionProjection implements ProjectionToTerm<Goal> {
                     + " but got "
                     + app;
 
-        return tapp.assumesFormulaInstantiations().take(no).head().getSequentFormula().formula();
+        return tapp.assumesFormulaInstantiations().get(no).getSequentFormula().formula();
     }
 }

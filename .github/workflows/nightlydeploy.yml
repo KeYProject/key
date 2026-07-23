@@ -17,15 +17,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'gradle'
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -57,22 +55,24 @@ jobs:
         run: |
           gh release delete nightly --yes --cleanup-tag 
 
+
       - name: Create nightly release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create --generate-notes --title "Nightly Release" \
-             --prerelease --notes-start-tag KEY-2.12.3 \
+             --prerelease --notes-start-tag KEY-3.0.0-rc \
              nightly key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
 
-      - run: export GPG_TTY=$(tty)
-      - name: Upload to SNAPSHOT repository
-        run: ./gradlew --parallel publishMavenJavaPublicationToKEYLABRepository
+
+      - name: Upload to MAVEN CENTRAL SNAPSHOT repository
+        run: |
+          ./gradlew publishAndReleaseToMavenCentral publishMavenPublicationToKEYLABRepository
         env:
           BUILD_NUMBER: "SNAPSHOT"
           GITLAB_DEPLOY_TOKEN: ${{ secrets.GITLAB_DEPLOY_TOKEN }}
-#          SIGNING_KEY_ID: ${{secrents.SIGNING_KEY_ID}}
-#          GPG_PRIVATE_KEY: ${{secrents.GPG_PRIVATE_KEY}}
-#          GPG_PASSPHRASE: ${{secrents.GPG_PASSPHRASE}}
-
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.GPG_PRIVATE_KEY}}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.GPG_PASSPHRASE}}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}

@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -20,6 +20,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -27,8 +28,29 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class LexPathOrdering implements TermOrdering {
 
+    /**
+     * Per-comparison memo, scoped to one top-level {@link #compare(Term, Term)} call. The
+     * recursion of {@link #compareHelp} visits the pair-DAG of the two terms; on large terms with
+     * structural sharing that DAG has far more distinct pairs than the bounded global
+     * {@link #cache} can hold, so the LRU is evicted mid-comparison and memoization collapses,
+     * measured 2000M compareHelp calls (960M recomputations, 134s) for 1.68M comparisons on
+     * an ips4o goal at 6000 proof steps. An unbounded per-call map restores true DAG complexity
+     * (same run: 92M calls, 7.8s, byte-identical results). ThreadLocal because a LexPathOrdering
+     * instance is shared across parallel-prover workers; the map is reused (cleared) per call, so
+     * small comparisons pay only an empty-map lookup.
+     */
+    private final ThreadLocal<java.util.HashMap<CacheKey, CompRes>> callMemo =
+        ThreadLocal.withInitial(java.util.HashMap::new);
+
     public int compare(Term p_a, Term p_b) {
-        final CompRes res = compareHelp(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        memo.clear(); // scope the memo to this top-level comparison
+        final CompRes res;
+        try {
+            res = compareHelp(p_a, p_b);
+        } finally {
+            memo.clear();
+        }
         if (res.lt()) {
             return -1;
         } else if (res.gt()) {
@@ -75,19 +97,33 @@ public class LexPathOrdering implements TermOrdering {
     }
 
 
-    private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();
+    /**
+     * Comparison-result cache, a thread-safe bounded LRU. A {@link LexPathOrdering} lives in a
+     * per-proof strategy cost feature ({@code SmallerThanFeature}) shared across all goals, and the
+     * parallel prover evaluates rule-application cost concurrently, so this cache is read and
+     * written by several workers at once. The cached {@link CompRes} is a pure
+     * function of the key (the ordering of two fixed terms is fully determined by them), so
+     * eviction order never changes a result, only the hit rate. We therefore use the
+     * lower-contention {@link StripedLruCache} (per-segment locking) rather than the single-lock
+     * {@code ConcurrentLruCache}.
+     */
+    private final StripedLruCache<CacheKey, CompRes> cache =
+        new StripedLruCache<>(10000, 16);
 
 
     private CompRes compareHelp(Term p_a, Term p_b) {
         final CacheKey key = new CacheKey(p_a, p_b);
+        final java.util.HashMap<CacheKey, CompRes> memo = callMemo.get();
+        final CompRes local = memo.get(key);
+        if (local != null) {
+            return local;
+        }
         CompRes res = cache.get(key);
         if (res == null) {
             res = compareHelp2(p_a, p_b);
-            if (cache.size() > 100000) {
-                cache.clear();
-            }
             cache.put(key, res);
         }
+        memo.put(key, res);
         return res;
     }
 
@@ -248,7 +284,13 @@ public class LexPathOrdering implements TermOrdering {
      * Hashmap from <code>Sort</code> to <code>Integer</code>, storing the lengths of maximal paths
      * from a sort to the top element of the sort lattice.
      */
-    private final WeakHashMap<Sort, Integer> sortDepthCache = new WeakHashMap<>();
+    // Thread-safe: shared via the per-proof cost feature and read/written by parallel workers (see
+    // the comparison cache above). A WeakHashMap even mutates on get (stale-entry expunge), so
+    // plain
+    // concurrent access would corrupt it; the synchronized wrapper makes each op atomic (the
+    // get-then-put is a benign idempotent recompute), keeping the weak-key semantics.
+    private final Map<Sort, Integer> sortDepthCache =
+        Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * @return the length of the longest path from <code>s</code> to the top element of the sort

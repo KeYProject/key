@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -13,6 +15,8 @@ import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
@@ -79,12 +83,21 @@ public class NewLocalVarsCondition implements VariableCondition {
 
         var vars = MiscTools.getLocalOuts(body, services);
         List<VariableDeclaration> decls = new ArrayList<>(vars.size());
-        ImmutableList<JTerm> updatesBefore = ImmutableSLList.nil();
-        ImmutableList<JTerm> updatesFrame = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesBefore = ImmutableList.nil();
+        ImmutableList<JTerm> updatesFrame = ImmutableList.nil();
         var tb = services.getTermBuilder();
+        // Names of "before" variables generated within this single application; needed because
+        // the new variables are not yet registered in the namespaces while we build them.
+        final Set<String> reserved = new HashSet<>();
         for (var v : vars) {
-            final var newName =
-                services.getVariableNamer().getTemporaryNameProposal(v.name() + "_before");
+            // Deterministically derive a unique name from the current proof state instead of
+            // using getVariableNamer().getTemporaryNameProposal(), which appends a '#'-index
+            // taken from a proof-global counter. That counter is advanced as a side effect of
+            // (speculative) taclet matching, so the number of increments differs between a
+            // freshly created proof and a reloaded/pruned-and-reapplied one. The resulting name
+            // mismatch (e.g. k_before#0 vs. k_before#1) breaks the slicing mechanism, which
+            // relies on formula equivalence across reloads. See issue #3834.
+            final var newName = uniqueBeforeName(v.name() + "_before", services, reserved);
             KeYJavaType type = v.getKeYJavaType();
             var locVar = new LocationVariable(newName, type);
             var spec = new VariableSpecification(locVar);
@@ -104,6 +117,28 @@ public class NewLocalVarsCondition implements VariableCondition {
                         services)
                     .add(updateBeforeSV, tb.parallel(updatesBefore), services)
                     .add(updateFrameSV, tb.parallel(updatesFrame), services));
+    }
+
+    /**
+     * Produces a fresh {@link ProgramElementName} for a "before" variable that is deterministic
+     * w.r.t. the current proof state. The name is unique with respect to all current namespaces of
+     * {@code services} as well as the names already handed out within the current rule application
+     * ({@code reserved}). Unlike
+     * {@link de.uka.ilkd.key.logic.VariableNamer#getTemporaryNameProposal(String)}, this does not
+     * depend on a mutable proof-global counter, so it stays stable across proof reloads and
+     * prune/reapply cycles (issue #3834).
+     *
+     * @param basename the desired base name, e.g. {@code "k_before"}
+     * @param services the services whose namespaces are consulted for collisions
+     * @param reserved names already used within the current application; the chosen name is added
+     * @return a fresh, collision-free name
+     */
+    private static ProgramElementName uniqueBeforeName(String basename, Services services,
+            Set<String> reserved) {
+        final String candidate =
+            TermBuilder.freeName(basename, services.getNamespaces(), reserved);
+        reserved.add(candidate);
+        return new ProgramElementName(candidate);
     }
 
     @Override

@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.HasLocation;
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+
+import com.github.javaparser.ast.Node;
 
 /**
  * This exception class is mainly thrown by Recoder2KeY and its companions.
@@ -29,6 +31,17 @@ public class ConvertException extends RuntimeException implements HasLocation {
         this.location = location;
     }
 
+    /**
+     * Create a conversion exception that points to the source location of the given JavaParser
+     * node. This helps the user to locate the origin of the conversion problem in the input file.
+     *
+     * @param message the error message
+     * @param node the JavaParser node the conversion failed on
+     */
+    public ConvertException(String message, Node node) {
+        this(message, JavaSourceLocations.locationFromNode(node));
+    }
+
     @Override
     public Location getLocation() {
         return location;
@@ -36,6 +49,11 @@ public class ConvertException extends RuntimeException implements HasLocation {
 
     @Override
     public String getMessage() {
-        return super.getMessage() + "\n" + location.toString();
+        // Only append the location if it actually carries information; otherwise the
+        // bare "[<unknown>:??]" suffix just clutters the message.
+        if (location == null || location.equals(Location.UNDEFINED)) {
+            return super.getMessage();
+        }
+        return super.getMessage() + "\n" + location;
     }
 }
