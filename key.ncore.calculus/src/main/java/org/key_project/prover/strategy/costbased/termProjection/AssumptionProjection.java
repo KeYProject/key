@@ -35,6 +35,6 @@ public class AssumptionProjection<G extends ProofGoal<G>> implements ProjectionT
                     + " but got "
                     + app;
 
-        return tapp.assumesFormulaInstantiations().take(no).head().getSequentFormula().formula();
+        return tapp.assumesFormulaInstantiations().skip(no).head().getSequentFormula().formula();
     }
 }

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.strategy.Strategy;
-
 import org.key_project.util.lookup.Property;
 
 import org.jspecify.annotations.Nullable;

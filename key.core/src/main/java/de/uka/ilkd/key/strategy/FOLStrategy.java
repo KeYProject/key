@@ -121,7 +121,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
             not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE,
-                t -> StaticFeatureCollection.eq((TermBuffer) t)))));
+                StaticFeatureCollection::eq))));
 
         bindRuleSet(d, "update_elim",
             add(longConst(-8000), ScaleFeature.createScaled(findDepthFeature, 10.0)));

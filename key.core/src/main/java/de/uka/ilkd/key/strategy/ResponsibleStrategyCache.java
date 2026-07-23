@@ -34,14 +34,14 @@ public class ResponsibleStrategyCache {
     // the result stays reproducible. A plain map here corrupts under concurrent writes and made
     // the strategy return an inconsistent set between two evaluations of the same feature term,
     // which broke the BackTrackingManager's determinism check (a worker AssertionError).
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
-            new ConcurrentHashMap<>();
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
-            new ConcurrentHashMap<>();
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> approvalRuleToStrategyMap =
-            new ConcurrentHashMap<>();
-    private final Map<Name, ComponentStrategy> nameToStrategyMap =
-            new HashMap<Name, ComponentStrategy>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> costRuleToStrategyMap =
+        new ConcurrentHashMap<>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> instantiationRuleToStrategyMap =
+        new ConcurrentHashMap<>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> approvalRuleToStrategyMap =
+        new ConcurrentHashMap<>();
+    private final Map<Name, ComponentStrategy<Goal>> nameToStrategyMap =
+        new HashMap<>();
 
     public ResponsibleStrategyCache(List<ComponentStrategy<Goal>> strategies) {
         initialize(StrategyAspect.Cost, strategies);
@@ -95,7 +95,7 @@ public class ResponsibleStrategyCache {
         // function only reads the responsibility maps (built once in the constructor, read-only
         // afterward) and the strategies list, so it is a pure function of the rule.
         return ruleToStrategyMap.computeIfAbsent(rule, r -> {
-            LinkedHashSet<ComponentStrategy> strats = new LinkedHashSet<>();
+            LinkedHashSet<ComponentStrategy<Goal>> strats = new LinkedHashSet<>();
             if (r instanceof BuiltInRule bir) {
                 for (var cs : strategies) {
                     if (cs.isResponsibleFor(bir)) {
@@ -119,7 +119,7 @@ public class ResponsibleStrategyCache {
     }
 
     /// Returns the strategy with the given [Name]
-    public ComponentStrategy getStrategyByName(Name name) {
+    public ComponentStrategy<Goal> getStrategyByName(Name name) {
         return nameToStrategyMap.get(name);
     }
 }

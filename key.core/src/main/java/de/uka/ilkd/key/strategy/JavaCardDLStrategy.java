@@ -68,7 +68,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
 
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        this.strategyProperties = strategyProperties.clone();
 
         this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
@@ -80,8 +80,6 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
         approvalF = add(setupApprovalF(), approvalDispatcher);
-
-        computeCost(null, null, null);
     }
 
 
@@ -91,9 +89,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
     @Override
     public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        set.addAll(getDispatcher(aspect).ruleSets());
-        return set;
+        return new HashSet<>(getDispatcher(aspect).ruleSets());
     }
 
     @Override

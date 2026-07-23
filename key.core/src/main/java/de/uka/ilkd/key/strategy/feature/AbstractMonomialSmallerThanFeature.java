@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;

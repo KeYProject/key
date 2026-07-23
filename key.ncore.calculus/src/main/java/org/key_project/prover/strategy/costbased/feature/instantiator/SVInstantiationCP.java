@@ -17,7 +17,7 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -113,7 +113,7 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
 
-            return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();
+            return ImmutableList.singleton(branch).iterator();
         }
 
     }

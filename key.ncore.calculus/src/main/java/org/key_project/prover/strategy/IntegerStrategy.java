@@ -28,6 +28,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGe
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 
 public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
@@ -40,9 +41,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private final RuleSetDispatchFeature costComputationDispatcher;
-    private final RuleSetDispatchFeature approvalDispatcher;
-    private final RuleSetDispatchFeature instantiationDispatcher;
+    private @MonotonicNonNull RuleSetDispatchFeature costComputationDispatcher;
+    private @MonotonicNonNull RuleSetDispatchFeature approvalDispatcher;
+    private @MonotonicNonNull RuleSetDispatchFeature instantiationDispatcher;
 
     /// Useful [TermFeature] collections
     protected final ArithTermFeatures tf;
@@ -53,11 +54,14 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     private final boolean divAndModuloReasoningEnabled;
     private final boolean stopAtFirstNonCloseableGoal;
 
+    private final IIntLdt numbers;
+
     FeatureConstants<G> featureConstants;
 
     public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
             boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
-            boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants) {
+            boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants,
+            IIntLdt numbers) {
         this.tf = tf;
         this.ff = ff;
         this.nonLinearArithmeticEnabled = nonLinearArithmeticEnabled;
@@ -66,6 +70,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         this.featureConstants = featureConstants;
 
+        this.numbers = numbers;
+    }
+
+    protected void init() {
         // setup cost computations
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
@@ -96,51 +104,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         return d;
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
-
-        if (arithNonLinInferences() || arithDefOps()) {
-            // The InEquationMultFeature bounding enforced here is what prevents
-            // cross-multiplication from running in circles: only products that are
-            // bounded by the left side of an inequation already present in the
-            // sequent are approved, so the derivable monomials are capped. In
-            // DefOps mode the check is stricter (exact match only) to avoid the
-            // saturation blow-up acceptable for Model Search.
-            // baseCost is zero on the approval dispatcher: approval only distinguishes
-            // finite (approved) from infinite (rejected), so the base cost is irrelevant
-            // here and left out to keep the approval decision identical to stock.
-            setupMultiplyInequations(d, longConst(0), inftyConst(), !arithNonLinInferences());
-        }
-        // these taclets are not supposed to be applied with metavariable
-        // instantiations
-        // I'll keep it here for the moment as documentation, but comment it out
-        // as meta variables are no longer part of KeY 2.x
-        /*
-         * bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) ); bindRuleSet ( d,
-         * "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
-         *
-         * bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) ); bindRuleSet
-         * ( d, "inEqSimp_nonLin_divide", isInstantiated ( "divY" ) ); bindRuleSet ( d,
-         * "inEqSimp_nonLin_pos", isInstantiated ( "divY" ) ); bindRuleSet ( d,
-         * "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
-         *
-         * bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
-         */
-        setupNewSymApproval(d, numbers);
-
-
-        bindRuleSet(d, "defOps_div", NonDuplicateAppModPositionFeature.INSTANCE);
-        bindRuleSet(d, "defOps_jdiv", NonDuplicateAppModPositionFeature.INSTANCE);
-
-        if (arithNonLinInferences()) {
-            setupInEqCaseDistinctionsApproval(d);
-        }
-
-        return d;
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
     }
-
-    protected abstract IIntLdt intLDT();
 
     private boolean arithNonLinInferences() {
         return nonLinearArithmeticEnabled;
@@ -157,7 +124,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IIntLdt numbers = intLDT();
 
         bindRuleSet(d, "simplify_int", inftyConst());
 
@@ -218,10 +184,18 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     protected RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IIntLdt numbers = intLDT();
 
-        if (arithNonLinInferences()) {
-            setupMultiplyInequations(d, inftyConst());
+        if (arithNonLinInferences() || arithDefOps()) {
+            // The InEquationMultFeature bounding enforced here is what prevents
+            // cross-multiplication from running in circles: only products that are
+            // bounded by the left side of an inequation already present in the
+            // sequent are approved, so the derivable monomials are capped. In
+            // DefOps mode the check is stricter (exact match only) to avoid the
+            // saturation blow-up acceptable for Model Search.
+            // baseCost is zero on the approval dispatcher: approval only distinguishes
+            // finite (approved) from infinite (rejected), so the base cost is irrelevant
+            // here and left out to keep the approval decision identical to stock.
+            setupMultiplyInequations(d, longConst(0), inftyConst(), !arithNonLinInferences());
         }
         // these taclets are not supposed to be applied with metavariable
         // instantiations
@@ -238,9 +212,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
          *
          * bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
          */
-
         setupNewSymApproval(d, numbers);
-
 
         bindRuleSet(d, "defOps_div", featureConstants.nonDuplicateAppModPositionFeature());
 
@@ -532,7 +504,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     // give cost infinity to those incomplete rule applications that will
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
-    private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d, IIntLdt numbers) {
+    private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d) {
         // category "direct equations"
 
         setupPullOutGcd(d, "polySimp_pullOutGcd", false);
@@ -1050,7 +1022,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     /// rule applications that will never be instantiated (so that these applications can be removed
     /// from the queue and do not have to be considered again).
     private void setupInstantiationWithoutRetry(RuleSetDispatchFeature d) {
-        setupPolySimpInstantiationWithoutRetry(d, intLDT());
+        setupPolySimpInstantiationWithoutRetry(d);
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 

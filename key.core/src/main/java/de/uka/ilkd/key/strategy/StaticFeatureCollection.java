@@ -359,7 +359,8 @@ public abstract class StaticFeatureCollection {
         return add(op(op), sub(sub0, sub1));
     }
 
-    protected static TermFeature eq(TermBuffer t) {
+    protected static TermFeature eq(
+            org.key_project.prover.strategy.costbased.termProjection.TermBuffer<Goal> t) {
         return EqTermFeature.create(t);
     }
 

@@ -10,13 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
@@ -63,7 +61,7 @@ public class RuleSetDispatchFeature implements Feature {
         }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        for (Feature partialF : featuresFor(((TacletApp) app).taclet())) {
+        for (Feature partialF : featuresFor(tapp.taclet())) {
             res = res.add(partialF.computeCost(app, pos, goal, mState));
             if (res instanceof TopRuleAppCost) {
                 break;

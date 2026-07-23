@@ -12,15 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.AbstractNonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.CostClassifiable;
 import org.key_project.prover.strategy.costbased.CostLocality;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
-import org.key_project.prover.strategy.costbased.feature.VolatileCost;
-import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
+import org.key_project.prover.strategy.costbased.feature.*;
 
 import org.jspecify.annotations.Nullable;
 

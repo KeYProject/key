@@ -59,15 +59,12 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
                                 .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
-            new JavaFeatureConstants());
+            new JavaFeatureConstants(), proof.getServices().getTypeConverter().getIntegerLDT());
         this.proof = proof;
+        init();
     }
 
     @Override
-    protected IIntLdt intLDT() {
-        return proof.getServices().getTypeConverter().getIntegerLDT();
-    }
-
     protected RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = super.setupApprovalDispatcher();
 

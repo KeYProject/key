@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -25,6 +24,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;

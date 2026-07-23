@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
