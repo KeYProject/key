@@ -61,9 +61,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create --generate-notes --title "KeY-3.0.0-rc" \
-             --prerelease --notes-start-tag KEY-2.12.3 \
-             KEY-3.0.0-rc key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
+          gh release create --generate-notes --title "KeY-3.0.0" \
+            --notes-start-tag KEY-2.12.3 \
+             KeY-3.0.0 key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
 
 
       - name: Upload to MAVEN CENTRAL SNAPSHOT repository
