@@ -42,8 +42,7 @@ public class OpenFileAction extends MainWindowAction {
         if (result == JFileChooser.APPROVE_OPTION) {
             Path file = fc.getSelectedFile().toPath();
             lastSelectedPath = fc.getSelectedFile();
-            KeYFileChooser.getFileChooser("Select file to load proof or problem")
-                    .setSelectedFile(lastSelectedPath);
+
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
