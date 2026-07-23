@@ -33,10 +33,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * The first scenario guards pruning a subtree that was <em>produced by many workers</em>: a
  * parallel run is stopped by a tiny step budget, the resulting partial subtree is pruned back to
  * the root, and a second parallel run must then close the proof &mdash; a corrupted tree from the
- * prune would show up as an inconsistent goal set, a failure to close, or an exception. (This was
- * formerly phrased via {@link de.uka.ilkd.key.macros.TryCloseMacro}, but that macro deliberately
- * pins itself to the single-threaded prover &mdash; see {@code AutoProvers.create} &mdash; so the
- * prune-after-parallel-exploration scenario is exercised directly here.)
+ * prune would show up as an inconsistent goal set, a failure to close, or an exception.
  *
  * <p>
  * The second scenario runs {@link FinishSymbolicExecutionMacro} on the parallel prover: its filter
@@ -86,7 +83,7 @@ public class MtMacroStressTest {
      * Each repetition: run the parallel prover with a tiny step budget at a high worker count
      * (produces a partial, many-worker-built subtree), prune that subtree back to the root, assert
      * the goal set is consistent, then run the parallel prover to completion and assert the proof
-     * closes -- proving the prune left a consistent, completable tree.
+     * closes, which proves that the prune left a consistent, completable tree.
      */
     @Test
     void pruneOfParallelSubtreeStaysSafeUnderManyWorkers() throws Exception {

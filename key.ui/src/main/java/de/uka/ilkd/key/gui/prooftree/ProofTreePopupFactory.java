@@ -488,9 +488,8 @@ public final class ProofTreePopupFactory {
 
                     @Override
                     public void eventException(Throwable throwable) {
-                        // Clear the "Cutting..." status and its indeterminate ("busy") progress
-                        // bar; the success path does this in eventEnd, and without it the bar
-                        // keeps animating forever after a failed cut.
+                        // Clear the "Cutting..." status text; the success path does
+                        // this in eventEnd
                         mediator.getUI().resetStatus(this);
                         mediator.startInterface(true);
 

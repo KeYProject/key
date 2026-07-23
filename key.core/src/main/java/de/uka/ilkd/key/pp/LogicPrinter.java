@@ -90,6 +90,9 @@ public class LogicPrinter {
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
         QuantifiableVariablePrintMode.NORMAL;
 
+    // Stop printing after maxChar characters; -1 prints whole term independent of size
+    private int maxChar = -1;
+
     private enum QuantifiableVariablePrintMode {
         NORMAL, WITH_OUT_DECLARATION
     }
@@ -156,6 +159,37 @@ public class LogicPrinter {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
             NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
+
+
+    /**
+     * converts a term to a String
+     *
+     * @param t a term.
+     * @param maxChar number of characters to be printed (-1 = unlimited
+     * @param services the Services class with information about the logic
+     * @return the printed semisequent.
+     */
+    public static String quickPrintTerm(JTerm t, int maxChar, Services services) {
+        LogicPrinter p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
+            NotationInfo.DEFAULT_UNICODE_ENABLED,
+            NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
+        p.setMaxChar(maxChar);
+        p.layouter().beginC();
+        p.printTerm(t);
+        p.layouter().end();
+        final String result = p.result();
+        return result + (result.length() >= maxChar ? "..." : "");
+    }
+
+    /**
+     * sets the maximal number of characters to be printed
+     *
+     * @param maxChar number of characters to be printed (-1 = unlimited)
+     */
+    public void setMaxChar(int maxChar) {
+        this.maxChar = maxChar;
+    }
+
 
     /**
      * Converts a term to a string.
@@ -821,7 +855,9 @@ public class LogicPrinter {
             if (parens) {
                 layouter.print("(");
             }
-            notation.print(t, this);
+            if (maxChar == -1 || layouter.backend().count() < maxChar) {
+                notation.print(t, this);
+            }
             if (parens) {
                 layouter.print(")");
             }

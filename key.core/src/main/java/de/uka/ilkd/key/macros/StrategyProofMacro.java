@@ -110,7 +110,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         //
         // The observer to handle the progress bar
         final ProofMacroListener pml =
-            new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
+            new ProgressBarListener(1, getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if (posInOcc != null) {
