@@ -37,7 +37,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
-import org.key_project.util.StripedLruCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Immutables;
@@ -59,16 +58,34 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
-    /**
-     * Lock stripes for the OSS caches; OSS runs concurrently on every worker, so split the lock.
-     */
-    private static final int OSS_CACHE_STRIPES = 16;
 
     /**
      * Represents a list of rule applications performed in one OSS step.
      */
     public static final class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
+    }
+
+    /**
+     * A bounded, access-ordered LRU map for use by a single thread only. It is deliberately not
+     * synchronised: each worker holds its own instance through a {@link ThreadLocal}, so no two
+     * threads ever touch the same map and no lock is needed. Eviction order is irrelevant because
+     * the cached value is a pure function of the key.
+     * It is an inner class to prevent reuse in thread-unsafe contexts.
+     */
+    private static final class LRU<K, V> extends LinkedHashMap<K, V> {
+        private static final long serialVersionUID = 1L;
+        private final int maxEntries;
+
+        LRU(int maxEntries) {
+            super(maxEntries + 1, 1.0F, true);
+            this.maxEntries = maxEntries;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > maxEntries;
+        }
     }
 
     private static final Name NAME = new Name("One Step Simplification");
@@ -79,18 +96,26 @@ public final class OneStepSimplifier implements BuiltInRule {
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets = ImmutableList.<String>nil()
-            .append("concrete").append("concrete_java").append("update_elim")
+            .append("concrete").append("simplify_select_elim_store").append("concrete_java")
+            .append("update_elim")
             .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
-    private static final boolean[] bottomUp = { false, false, false, true, true, true, false };
-    // OSS is shared per proof and runs concurrently on every parallel-prover worker. Its two caches
-    // are PURE (the value is a function of the key: "does this formula simplify?" / "this term is
-    // irreducible"), so eviction order is irrelevant to the result and a striped (lower-contention)
-    // cache is sound. They are therefore the only state the hot path (isApplicable/apply) touches
-    // besides the goal it owns, so that path needs no lock.
-    private final StripedLruCache<SequentFormula, Boolean> applicabilityCache =
-        new StripedLruCache<>(APPLICABILITY_CACHE_SIZE, OSS_CACHE_STRIPES);
+    private static final boolean[] bottomUp =
+        { false, false, false, false, true, true, true, false };
+
+    /**
+     * Applicability cache that is lock-free. Lock-freeness is achieved by using thread-local caches
+     * which
+     * keeps the wrapped unsynchronized (and by itself thread unsafe cache) thread-safe.
+     * The reduction of locking improves performance for OSS heavy proofs by up-to 20% in
+     * single-core
+     * and multi-core. The multi-core case looses the cache sharing among goals but this
+     * disadvantage
+     * is more than equalized by removing locking.
+     */
+    private volatile ThreadLocal<LRU<SequentFormula, Boolean>> applicabilityCache =
+        newApplicabilityCache();
 
     /**
      * Guards the (re)build/teardown of the per-proof state below (refresh/initIndices/
@@ -104,7 +129,9 @@ public final class OneStepSimplifier implements BuiltInRule {
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
     private volatile TacletIndex[] indices;
-    private volatile StripedLruCache<JTerm, JTerm>[] notSimplifiableCaches;
+    // The per-worker "irreducible term" cache (one LRU per rule set); same goal-independence and
+    // swap-on-proof-change rationale as applicabilityCache above.
+    private volatile ThreadLocal<LRU<JTerm, JTerm>[]> notSimplifiableCaches;
     private volatile boolean active;
 
     // -------------------------------------------------------------------------
@@ -193,32 +220,46 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
 
+    /** A fresh, empty per-worker applicability cache (one {@link LRU} map per worker thread). */
+    private static ThreadLocal<LRU<SequentFormula, Boolean>> newApplicabilityCache() {
+        return ThreadLocal.withInitial(() -> new LRU<>(APPLICABILITY_CACHE_SIZE));
+    }
+
+    /** A fresh, empty per-worker not-simplifiable cache (one {@link LRU} map per rule set). */
+    @SuppressWarnings("unchecked")
+    private static ThreadLocal<LRU<JTerm, JTerm>[]> newNotSimplifiableCaches() {
+        return ThreadLocal.withInitial(() -> {
+            final LRU<JTerm, JTerm>[] caches = (LRU<JTerm, JTerm>[]) new LRU[ruleSets.size()];
+            for (int i = 0; i < caches.length; i++) {
+                caches[i] = new LRU<>(DEFAULT_CACHE_SIZE);
+            }
+            return caches;
+        });
+    }
+
     /**
      * If the rule is applied to a different proof than last time, then clear all caches and
      * initialise the taclet indices.
      */
-    @SuppressWarnings("unchecked")
     private void initIndices(Proof proof) {
         if (proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
             appsTakenOver = ImmutableList.nil();
-            // Build into locals, then publish to the volatile fields in one write each, so a
+            // Build into a local, then publish to the volatile field in one write, so a
             // (hypothetical) concurrent reader never sees a half-filled array.
             final TacletIndex[] newIndices = new TacletIndex[ruleSets.size()];
-            final StripedLruCache<JTerm, JTerm>[] newCaches =
-                (StripedLruCache<JTerm, JTerm>[]) new StripedLruCache[newIndices.length];
             int i = 0;
             ImmutableList<String> done = ImmutableList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
                 newIndices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
-                newCaches[i] = new StripedLruCache<>(DEFAULT_CACHE_SIZE, OSS_CACHE_STRIPES);
                 i++;
                 done = done.prepend(ruleSet);
             }
             indices = newIndices;
-            notSimplifiableCaches = newCaches;
+            // Install fresh per-worker maps for the new proof; the previous ThreadLocal is dropped.
+            notSimplifiableCaches = newNotSimplifiableCaches();
         }
     }
 
@@ -240,7 +281,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                         g.ruleAppIndex().clearIndexes();
                     }
                 }
-                applicabilityCache.clear();
+                // Drop every worker's applicability map by installing a fresh ThreadLocal.
+                applicabilityCache = newApplicabilityCache();
                 lastProof = null;
                 appsTakenOver = null;
                 indices = null;
@@ -323,7 +365,8 @@ public final class OneStepSimplifier implements BuiltInRule {
             PosInOccurrence pos,
             int indexNr, Protocol protocol) {
         final JTerm term = (JTerm) pos.subTerm();
-        if (notSimplifiableCaches[indexNr].get(term) != null) {
+        final LRU<JTerm, JTerm> cache = notSimplifiableCaches.get()[indexNr];
+        if (cache.get(term) != null) {
             return null;
         }
 
@@ -341,7 +384,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
 
         if (result == null) {
-            notSimplifiableCaches[indexNr].put(term, term);
+            cache.put(term, term);
         }
 
         return result;
@@ -543,7 +586,8 @@ public final class OneStepSimplifier implements BuiltInRule {
     private boolean applicableTo(Services services,
             SequentFormula cf,
             boolean inAntecedent, Goal goal, RuleApp ruleApp) {
-        final Boolean b = applicabilityCache.get(cf);
+        final LRU<SequentFormula, Boolean> cache = applicabilityCache.get();
+        final Boolean b = cache.get(cf);
         if (b != null) {
             return b;
         } else {
@@ -552,7 +596,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 simplifyConstrainedFormula(cf,
                     inAntecedent, null, null, null, goal, ruleApp);
             final boolean result = simplifiedCf != null && !simplifiedCf.equals(cf);
-            applicabilityCache.put(cf, result);
+            cache.put(cf, result);
             return result;
         }
     }
@@ -782,8 +826,12 @@ public final class OneStepSimplifier implements BuiltInRule {
          */
         @Override
         public int hashCode() {
-            return term.op().hashCode(); // Allow more conflicts to ensure that naming and term
-                                         // labels are ignored.
+            // The hash of the equivalence used by equals (equality modulo renaming), cached on
+            // the term. A well-spread, equals-consistent hash matters here: the replace-known
+            // context holds one entry per context formula and is probed for every subterm of
+            // the formula being simplified, so hash collisions turn each probe into a scan of
+            // all colliding context formulas.
+            return ((JTerm) term).hashCodeModRenaming();
         }
 
         /**

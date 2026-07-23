@@ -34,6 +34,12 @@ class UniTrigger implements Trigger {
      * only be matched by (two-sided) unification, not by basic matching.
      */
     private final boolean onlyUnify;
+    /**
+     * If {@code true} the trigger contains a metavariable in place of a ground subterm (a
+     * heap-generalized array read) and is matched by unification even against ground terms, so the
+     * metavariable can bind to any heap. Plain triggers use syntactic matching on ground terms.
+     */
+    private final boolean matchByUnification;
     private final boolean isElementOfMultitrigger;
 
     // A TriggersSet is cached per proof (ServiceCaches.triggerSetCache) and thus shared across the
@@ -41,19 +47,20 @@ class UniTrigger implements Trigger {
     // exact ConcurrentLruCache is used (not the striped one): the cached substitutions are
     // expensive
     // to recompute, so the better hit rate of exact LRU eviction outweighs the trivial contention
-    // on
-    // get/put. The get-then-put below stays non-atomic on purpose (the expensive matching runs
-    // outside the lock); at worst two workers redundantly compute the same (pure) result.
+    // on get/put. The get-then-put below stays non-atomic on purpose (the expensive matching
+    // run outside the lock); at worst two workers redundantly compute the same (pure) result.
     private final ConcurrentLruCache<Term, ImmutableSet<Substitution>> matchResults =
         new ConcurrentLruCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> universalVariables,
             boolean onlyUnify,
-            boolean isElementOfMultitrigger, TriggersSet owningTriggerSet) {
+            boolean isElementOfMultitrigger, boolean matchByUnification,
+            TriggersSet owningTriggerSet) {
         this.trigger = trigger;
         this.universalVariables = universalVariables;
         this.onlyUnify = onlyUnify;
         this.isElementOfMultitrigger = isElementOfMultitrigger;
+        this.matchByUnification = matchByUnification;
         this.owningTriggerSet = owningTriggerSet;
     }
 
@@ -78,7 +85,8 @@ class UniTrigger implements Trigger {
 
     private ImmutableSet<Substitution> computeSubstitutionsForTerm(Term target, Services services) {
         ImmutableSet<Substitution> subs = DefaultImmutableSet.nil();
-        if (target.freeVars().size() > 0 || target.op() instanceof Quantifier) {
+        if (target.freeVars().size() > 0 || target.op() instanceof Quantifier
+                || matchByUnification) {
             subs = Matching.twoSidedMatching(this, target, services);
         } else if (!onlyUnify) {
             subs = Matching.basicMatching(this, target);
@@ -148,8 +156,7 @@ class UniTrigger implements Trigger {
     /**
      * Worklist reachability check (originally adapted from EqualityConstraint): starting from the
      * term bound to {@code var}, follow variable bindings transitively and report whether
-     * {@code var}
-     * is reached again -- i.e. whether its definition is cyclic.
+     * {@code var} is reached again -- i.e. whether its definition is cyclic.
      */
     private static boolean reachesItself(
             ImmutableMap<QuantifiableVariable, Term> varMap,

@@ -55,13 +55,13 @@ import org.jspecify.annotations.Nullable;
  * {@link TermGenerator} it holds is at least as local. A generator that walks below the find
  * ({@code SubtermGenerator}) is find-local; one that walks up to the find's ancestors
  * ({@code SuperTermGenerator}) is {@link WeakStableCost}; one that reads the whole sequent
- * ({@code SequentFormulasGenerator}) is non-local. The walk follows only {@link Feature}- and
- * {@link TermGenerator}-typed references, never arbitrary objects: the live feature tree holds
- * mutable scratch state (e.g. TermBuffers) that must not be traversed.
+ * ({@code SequentFormulasGenerator}) is non-local. The walk follows every value that is itself
+ * cost-classifiable, projections and buffers included, and never arbitrary objects: the live
+ * feature tree holds mutable scratch state that must not be traversed.
  *
  * <p>
  * Optional verification (<code>-Dkey.strategy.costReuse.verify</code>): when reuse is applied also
- * recompute the cost and log a warning on any mismatch -- a development aid to catch a feature that
+ * recompute the cost and log a warning on any mismatch, a development aid to catch a feature that
  * is mis-classified local (it should then get {@link VolatileCost}).
  */
 public final class CostReuse {

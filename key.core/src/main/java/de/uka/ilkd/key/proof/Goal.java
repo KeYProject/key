@@ -257,7 +257,8 @@ public final class Goal implements ProofGoal<Goal> {
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex.sequentChanged(sci);
         // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
-        // assumes-bases on their matching round (see QueueRuleApplicationManager#parkedByOp).
+        // assumes-bases on their matching round (see the parked field of
+        // QueueRuleApplicationManager).
         RuleApplicationManager<Goal> m = ruleAppManager;
         while (m instanceof DelegationBasedRuleApplicationManager<Goal> d) {
             m = d.getDelegate();

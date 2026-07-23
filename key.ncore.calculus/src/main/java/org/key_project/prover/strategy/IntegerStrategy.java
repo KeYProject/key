@@ -31,12 +31,26 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 
+/// This strategy implements reasoning for integer arithmetics. In particular,
+/// it supports linear integer arithmetics via Gaussian elimination,
+/// Fourier-Motzkin; and non-linear integer reasoning via cross-multiplication
+/// and Gröbner basis.
 public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
         implements ComponentStrategy<G> {
+
+    /// Reads better than a bare boolean at the call sites of [#setupMultiplyInequations].
+    private static final boolean AT_APPROVAL = true;
+    private static final boolean AT_COST = false;
+
     public static final Name NAME = new Name("Integer Strategy");
 
     /// Magic constants
     private static final int IN_EQ_SIMP_NON_LIN_COST = 1000;
+
+    /// Caps how often a cross multiplication is applied on a branch.
+    /// Justified by empirical measurements. Candidate to be exposed in
+    /// a settings strategy pane (not the strategy pane)
+    private static final int BRANCH_MULT_CAP = 8;
     private static final int POLY_DIVISION_COST = -2250;
 
     /// The features defining the three phases: cost computation, approval,
@@ -49,9 +63,20 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
 
+    /// enum for the different arithmetic treatments
+    private enum ArithTreatment {
+        /// Non-linear arithmetic switched off.
+        BASIC,
+        /// Inequations are cross-multiplied but only in a bound and capped manner.
+        /// Division and modulo are expanded by their defining axioms.
+        DEF_OPS,
+        /// Cross-multiplication is admitted more freely, and equation splitting, case
+        /// distinctions and cuts are added on top.
+        MODEL_SEARCH
+    }
+
     /// configuration options extracted from [StrategyProperties]
-    private final boolean nonLinearArithmeticEnabled;
-    private final boolean divAndModuloReasoningEnabled;
+    private final ArithTreatment arith;
     private final boolean stopAtFirstNonCloseableGoal;
 
     private final IIntLdt numbers;
@@ -97,7 +122,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // cost; Basic keeps them uninstantiated at infinity. Model Search stays
         // byte-identical because this reproduces the value inEqSimp_nonLin gave it.
         bindRuleSet(d, "inEqSimp_nonLin_multiply",
-            arithNonLinInferences() || arithDefOps() ? longConst(IN_EQ_SIMP_NON_LIN_COST)
+            arith != ArithTreatment.BASIC ? longConst(IN_EQ_SIMP_NON_LIN_COST)
                     : inftyConst());
 
         disableInstantiate();
@@ -178,47 +203,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // never be instantiated (so that these applications can be removed from
         // the queue and do not have to be considered again).
         setupInstantiationWithoutRetry(d);
-
-        return d;
-    }
-
-    protected RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
-        if (arithNonLinInferences() || arithDefOps()) {
-            // The InEquationMultFeature bounding enforced here is what prevents
-            // cross-multiplication from running in circles: only products that are
-            // bounded by the left side of an inequation already present in the
-            // sequent are approved, so the derivable monomials are capped. In
-            // DefOps mode the check is stricter (exact match only) to avoid the
-            // saturation blow-up acceptable for Model Search.
-            // baseCost is zero on the approval dispatcher: approval only distinguishes
-            // finite (approved) from infinite (rejected), so the base cost is irrelevant
-            // here and left out to keep the approval decision identical to stock.
-            setupMultiplyInequations(d, longConst(0), inftyConst(), !arithNonLinInferences());
-        }
-        // these taclets are not supposed to be applied with metavariable
-        // instantiations
-        // I'll keep it here for the moment as documentation, but comment it out
-        // as meta variables are no longer part of KeY 2.x
-        /*
-         * bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) ); bindRuleSet ( d,
-         * "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
-         *
-         * bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) ); bindRuleSet
-         * ( d, "inEqSimp_nonLin_divide", isInstantiated ( "divY" ) ); bindRuleSet ( d,
-         * "inEqSimp_nonLin_pos", isInstantiated ( "divY" ) ); bindRuleSet ( d,
-         * "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
-         *
-         * bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
-         */
-        setupNewSymApproval(d, numbers);
-
-        bindRuleSet(d, "defOps_div", featureConstants.nonDuplicateAppModPositionFeature());
-
-        if (arithNonLinInferences()) {
-            setupInEqCaseDistinctionsApproval(d);
-        }
 
         return d;
     }
@@ -331,17 +315,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         bindRuleSet(d, "inEqSimp_forNormalisation", -1100);
         bindRuleSet(d, "inEqSimp_special_nonLin", -1400);
 
-        if (arithNonLinInferences()) {
+        if (arith == ArithTreatment.MODEL_SEARCH) {
             bindRuleSet(d, "inEqSimp_nonLin", IN_EQ_SIMP_NON_LIN_COST);
         } else {
             bindRuleSet(d, "inEqSimp_nonLin", inftyConst());
         }
-        // Cross-multiplication of inequations is now driven exclusively through the
-        // inEqSimp_nonLin_multiply rule set (the multiply_2_inEq* taclets no longer
-        // carry inEqSimp_nonLin). This keeps inEqSimp_nonLin at its stock cost so that
-        // splitEquationSucc and DefOps proofs that never cross-multiply stay on their
-        // stock search path. See setupInEqSimp for the per-mode binding.
-        // polynomial division, simplification of fractions and mods
         bindRuleSet(d, "polyDivision", POLY_DIVISION_COST);
     }
 
@@ -663,36 +641,23 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         // category "handling of non-linear inequations"
 
-        if (arithNonLinInferences()) {
-            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100), false);
+        if (arith == ArithTreatment.MODEL_SEARCH) {
+            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100),
+                AT_COST);
 
             bindRuleSet(d, "inEqSimp_split_eq",
                 add(featureConstants.topLevelFindSucc(), longConst(-100)));
 
             bindRuleSet(d, "inEqSimp_signCases", not(isInstantiated("signCasesLeft")));
-        } else if (arithDefOps()) {
+        } else if (arith == ArithTreatment.DEF_OPS) {
             // DefOps also cross-multiplies inequations, but - unlike Model Search - does
             // no equation splitting, case distinctions or cuts, and only multiplies when
             // the product exactly matches the left side of an inequation already in the
-            // sequent (onlyExactlyBounded, enforced at approval). This terminates: the
-            // monomial ordering is degree-graded, so products (which equal an existing
-            // left side) and all monomials of the resulting right side stay within the
-            // degree of the existing left sides - a finite monomial universe. DefOps
-            // proofs without integer inequations enqueue no multiply candidates and keep
-            // their stock search path.
-            //
-            // Note: inEqSimp_split_eq and inEqSimp_signCases are deliberately NOT bound
-            // here. Since the multiply_2_inEq* taclets no longer carry inEqSimp_nonLin,
-            // that rule set keeps its stock (infinite) DefOps cost, which already switches
-            // splitEquationSucc off exactly as in stock DefOps.
-            //
-            // notAllowed is finite (not infinity): an app whose \assumes is not yet matched
-            // takes this branch, and needs a finite cost to survive long enough for the
-            // assumes-completion machinery to match it and re-evaluate as exactly bounded.
-            // Non-exactly-bounded apps are ultimately rejected by the approval dispatcher.
-            // The value matches the Model Search convention above; raising it does not
-            // measurably reduce the (inherent) reordering of arithmetic proofs.
-            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100), true);
+            // sequent, which the approval dispatcher enforces. DefOps proofs without
+            // integer inequations enqueue no multiply candidates and keep their stock
+            // search path.
+            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100),
+                AT_COST);
         } else {
             // Basic arithmetic: cross-multiplication is off. inEqSimp_nonLin used to be
             // the off-switch via the (now removed) tag on the multiply taclets, so the
@@ -737,6 +702,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     G goal, MutableState mState) {
                 return tOne;
             }
+
         };
 
         final Term tTwo = zTerm("2");
@@ -754,6 +720,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     G goal, MutableState mState) {
                 return tTwo;
             }
+
         };
 
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
@@ -798,14 +765,21 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
      *        rule set); zero for the approval dispatcher, {@link #IN_EQ_SIMP_NON_LIN_COST} for
      *        the cost dispatcher
      * @param notAllowedF the costs in case the multiplication is not allowed
-     * @param onlyExactlyBounded if true, only products that exactly match the left side of
-     *        an inequation already present in the sequent are allowed (used in DefOps mode:
-     *        multiplication strictly directed at existing goal monomials); if false, products
-     *        that are merely subsumed by an existing left side are admitted as well (Model
-     *        Search: more speculative saturation)
+     * @param atApproval whether the features are bound to the approval dispatcher, which is the
+     *        only place a limit can be enforced that depends on how far the proof has come: a
+     *        candidate's cost is computed when it enters the queue, while the sequent and the
+     *        branch keep growing until it is applied
      */
     private void setupMultiplyInequations(RuleSetDispatchFeature d, Feature baseCost,
-            Feature notAllowedF, boolean onlyExactlyBounded) {
+            Feature notAllowedF, boolean atApproval) {
+        // In DefOps a product is admitted only when it exactly matches the left side of an
+        // inequation already in the sequent, so multiplication stays directed at monomials the
+        // proof is asking about. Model Search also admits products merely subsumed by such a
+        // left side, and saturates more speculatively.
+        final boolean onlyExactlyBounded = arith == ArithTreatment.DEF_OPS;
+        // The branch limit exists to stop DefOps saturating; Model Search is expected to
+        // saturate and keeps its unlimited behaviour.
+        final boolean capBranch = atApproval && arith == ArithTreatment.DEF_OPS;
         final TermBuffer<G> intRel = new TermBuffer<>();
 
         /*
@@ -850,6 +824,16 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                      */
                     not(createTermSmallerThanFeature(featureConstants.focusProjection(0),
                         AssumptionProjection.create(0))),
+                    onlyExactlyBounded
+                            ? ifZero(add(applyTF("multLeft", tf.linearMonomial),
+                                applyTF("multFacLeft", tf.linearMonomial)), longConst(0),
+                                notAllowedF)
+                            : longConst(0),
+
+                    capBranch
+                            ? ifZero(BranchMultiplicationCountFeature.atMost("multiply_2_inEq",
+                                BRANCH_MULT_CAP), longConst(0), notAllowedF)
+                            : longConst(0),
                     ifZero(exactlyBounded, longConst(0),
                         onlyExactlyBounded ? notAllowedF
                                 : ifZero(totallyBounded, longConst(100), notAllowedF))
@@ -870,7 +854,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         setupSquaresAreNonNegative(d);
 
-        if (arithNonLinInferences()) {
+        if (arith == ArithTreatment.MODEL_SEARCH) {
             setupInEqCaseDistinctions(d);
         }
     }
@@ -964,7 +948,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     // //////////////////////////////////////////////////////////////////////////
 
     protected void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
-        if (arithDefOps()) {
+        if (arith != ArithTreatment.BASIC) {
             // the axiom defining division only has to be inserted once, because
             // it adds equations to the antecedent
             bindRuleSet(d, "defOps_div",

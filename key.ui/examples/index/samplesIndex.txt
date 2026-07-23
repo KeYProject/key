@@ -20,6 +20,10 @@ firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
+# FM 2024 Tutorial
+heap/FM2024Tutorial/BinarySearch/README.txt
+heap/FM2024Tutorial/ArrayList/README.txt
+
 # Java Features
 Java/MultiCatch/README.txt
 Java/Records/README.txt

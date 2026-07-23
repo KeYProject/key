@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -263,6 +264,61 @@ public class TestTriggersSet {
             actual.add(tr.getTriggerTerm());
         }
         assertEquals(expected, actual);
+    }
+
+    /** The trigger terms of a multi-trigger's elements. */
+    private static Set<Term> elementTerms(Trigger trigger) {
+        final Set<Term> terms = new HashSet<>();
+        for (final Trigger element : ((MultiTrigger) trigger).elements()) {
+            terms.add(element.getTriggerTerm());
+        }
+        return terms;
+    }
+
+    @Test
+    public void elementsWithDisjointVariablesYieldOneMultiTrigger() {
+        // forall x. forall y. (pr(x) | ps(y)): neither literal covers both clause variables, so
+        // each is an element, and their only cover is the pair.
+        final JTerm all = parseTerm("\\forall r x;(\\forall s y;(pr(x) | ps(y)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        final Trigger multi = triggers.iterator().next();
+        assertTrue(multi instanceof MultiTrigger, "the one trigger is the covering pair");
+        final JTerm clause = all.sub(0).sub(0);
+        final Set<Term> expected = new HashSet<>();
+        expected.add(clause.sub(0)); // pr(x)
+        expected.add(clause.sub(1)); // ps(y)
+        assertEquals(expected, elementTerms(multi));
+    }
+
+    @Test
+    public void aLiteralCoveringAllVariablesSuppressesTheCoverSearch() {
+        // forall x. forall y. (pr(x) | prs(x,y)): prs(x,y) covers both variables and is a
+        // uni-trigger; pr(x) alone covers nothing further, so no multi-trigger arises.
+        final JTerm all = parseTerm("\\forall r x;(\\forall s y;(pr(x) | prs(x,y)))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(1, triggers.size());
+        final Trigger uni = triggers.iterator().next();
+        assertFalse(uni instanceof MultiTrigger, "the covering literal is a plain uni-trigger");
+        assertEquals(all.sub(0).sub(0).sub(1), uni.getTriggerTerm()); // prs(x,y)
+    }
+
+    @Test
+    public void overlappingElementsYieldEveryMinimalCover() {
+        // forall x,y,z. (prs(x,y) | pst(y,z) | prt(x,z)): each pair of literals covers all three
+        // variables and no literal is redundant in its pair, so the three pairs are exactly the
+        // minimal covers; the triple is not minimal and must not appear.
+        final JTerm all = parseTerm(
+            "\\forall r x;(\\forall s y;(\\forall t z;(prs(x,y) | pst(y,z) | prt(x,z))))");
+        final ImmutableSet<Trigger> triggers =
+            TriggersSet.create(all, proof.getServices()).getAllTriggers();
+        assertEquals(3, triggers.size());
+        for (final Trigger trigger : triggers) {
+            assertTrue(trigger instanceof MultiTrigger, "every cover is a pair of elements");
+            assertEquals(2, elementTerms(trigger).size(), "minimal covers have two elements");
+        }
     }
 
     @Test

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -138,10 +137,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     JTerm attributeTerm;
                     if (attribute.isModel()) {
-                        List<LocationVariable> heaps = new ArrayList<>();
-                        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
-                            heaps.add(h);
-                        }
+                        List<LocationVariable> heaps =
+                            HeapContext.getModifiableHeaps(services, false);
                         JTerm[] subs = new JTerm[fieldSymbol.arity()];
                         for (int j = 0; j < heaps.size(); j++) {
                             subs[j] = services.getTermBuilder().var(heaps.get(j));

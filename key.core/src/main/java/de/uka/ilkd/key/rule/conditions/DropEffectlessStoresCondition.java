@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -16,8 +19,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 
@@ -38,16 +39,18 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     private static JTerm dropEffectlessStoresHelper(JTerm heapTerm, TermServices services,
-            ImmutableSet<Pair<JTerm, JTerm>> overwrittenLocs, Function store) {
+            Set<Pair<JTerm, JTerm>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final JTerm subHeapTerm = heapTerm.sub(0);
             final JTerm objTerm = heapTerm.sub(1);
             final JTerm fieldTerm = heapTerm.sub(2);
             final JTerm valueTerm = heapTerm.sub(3);
             final Pair<JTerm, JTerm> loc = new Pair<>(objTerm, fieldTerm);
+            final boolean overwrittenAbove = overwrittenLocs.contains(loc);
+            overwrittenLocs.add(loc);
             final JTerm newSubHeapTerm =
-                dropEffectlessStoresHelper(subHeapTerm, services, overwrittenLocs.add(loc), store);
-            if (overwrittenLocs.contains(loc)) {
+                dropEffectlessStoresHelper(subHeapTerm, services, overwrittenLocs, store);
+            if (overwrittenAbove) {
                 return newSubHeapTerm == null ? subHeapTerm : newSubHeapTerm;
             } else {
                 return newSubHeapTerm == null ? null
@@ -63,8 +66,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     private static JTerm dropEffectlessStores(JTerm t, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
-        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
-            heapLDT.getStore());
+        return dropEffectlessStoresHelper(t, services, new LinkedHashSet<>(), heapLDT.getStore());
     }
 
 

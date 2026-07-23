@@ -49,6 +49,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
                     PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
+
         };
     }
 
@@ -59,6 +60,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
                     PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
+
         };
     }
 
@@ -80,6 +82,8 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         return !(cond.compute(t, mState, services) instanceof TopRuleAppCost);
     }
 
+    // same data flow as the enclosing class: ancestors of the focus position
+    @WeakStableCost
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
         // Both are fixed at construction from the proof's services (one generator is built per
         // proof and shared by all goals). They used to be lazily filled by generate(), which runs

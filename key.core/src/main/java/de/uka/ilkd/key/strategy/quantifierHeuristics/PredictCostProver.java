@@ -10,19 +10,18 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 
-import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
-
 /**
- * TODO: rewrite, this seems pretty inefficient ...
+ * Predicts the cost of instantiating a quantified formula with a candidate term. The instantiated
+ * matrix is read as a conjunction of clauses. Each clause is refined against the literals already
+ * known true on the sequent, dropping a literal that is false and marking the clause true once one
+ * of its literals is proved. The predicted cost combines the sizes of the clauses that remain, so
+ * an instantiation that leaves fewer open clauses is cheaper.
  */
 public class PredictCostProver {
 
@@ -30,16 +29,25 @@ public class PredictCostProver {
 
     private final JTerm trueT, falseT;
 
-    /** assume that all literal in <code>assertLiterals</code> are true */
+    /** The literals assumed to be true on the sequent. */
     private ImmutableSet<JTerm> assertLiterals;
 
-    /** clauses from <code>instance</code> of CNF */
+    /** The clauses of the instantiated matrix, a conjunction of disjunctions. */
     private Set<Clause> clauses = new LinkedHashSet<>();
 
     private final Services services;
 
-    private PredictCostProver(JTerm instance, ImmutableSet<JTerm> assertList, Services services) {
+    /**
+     * Equality reasoning over the sequent's assumed equalities, built once and shared across the
+     * cost predictions of all candidate instantiations. Lets a clause literal already satisfied by
+     * an assumed equality be recognised, so the instance is not proposed as a useful step.
+     */
+    private final Congruence congruence;
+
+    private PredictCostProver(JTerm instance, ImmutableSet<JTerm> assertList, Congruence congruence,
+            Services services) {
         this.assertLiterals = assertList;
+        this.congruence = congruence;
         this.services = services;
         this.tb = services.getTermBuilder();
         this.trueT = tb.tt();
@@ -47,20 +55,99 @@ public class PredictCostProver {
         initClauses(instance);
     }
 
-    public static long computerInstanceCost(Substitution sub, JTerm matrix,
-            ImmutableSet<JTerm> assertList, Services services) {
+    /**
+     * Predicts the cost of instantiating a quantified formula's matrix with a candidate
+     * substitution.
+     *
+     * @param sub a ground substitution for the quantified variables
+     * @param matrix the matrix of the quantified formula
+     * @param assertList the literals assumed to be true on the sequent, already normalised through
+     *        {@code congruence}
+     * @param congruence equality reasoning over the sequent's assumed equalities
+     * @param services access to the theory operators
+     * @return the predicted cost, or -1 if the substitution is not ground or every clause is proved
+     *         true
+     */
+    static long computerInstanceCost(Substitution sub, JTerm matrix,
+            ImmutableSet<JTerm> assertList, Congruence congruence, Services services) {
 
         if (!sub.isGround()) {
             // non-ground substitutions not supported yet
             return -1;
         } else {
             final PredictCostProver prover = new PredictCostProver(
-                (JTerm) sub.applyWithoutCasts(matrix, services), assertList, services);
+                (JTerm) sub.applyWithoutCasts(matrix, services), assertList, congruence, services);
             return prover.cost();
         }
     }
 
-    // init context
+    /**
+     * The axioms of one sequent prepared for repeated predictions: the congruence built from
+     * them and the literals normalized by it. Opaque outside this package, so the congruence
+     * type stays internal; build once per sequent and reuse for every candidate instance.
+     */
+    public static final class PreparedAxioms {
+        private final Congruence congruence;
+        private final ImmutableSet<JTerm> normalized;
+
+        private PreparedAxioms(Congruence congruence, ImmutableSet<JTerm> normalized) {
+            this.congruence = congruence;
+            this.normalized = normalized;
+        }
+    }
+
+    /**
+     * Prepares the given literals for repeated predictions over one sequent.
+     *
+     * @param assertList the literals assumed to be true on the sequent
+     * @param services access to the theory operators
+     * @return the prepared axioms
+     */
+    public static PreparedAxioms prepare(ImmutableSet<JTerm> assertList, Services services) {
+        final Congruence congruence = new Congruence(assertList, services);
+        ImmutableSet<JTerm> normalized = assertList;
+        if (!congruence.isTrivial()) {
+            ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
+            for (final JTerm lit : assertList) {
+                res = res.add(congruence.normalize(lit));
+            }
+            normalized = res;
+        }
+        return new PreparedAxioms(congruence, normalized);
+    }
+
+    /**
+     * As the congruence-taking entry point, with the axioms prepared by {@link #prepare}.
+     *
+     * @param sub a ground substitution for the quantified variables
+     * @param matrix the matrix of the quantified formula
+     * @param axioms the prepared axioms of the sequent
+     * @param services access to the theory operators
+     * @return the predicted cost, or -1 if the substitution is not ground or every clause is
+     *         proved true
+     */
+    public static long computerInstanceCost(Substitution sub, JTerm matrix, PreparedAxioms axioms,
+            Services services) {
+        return computerInstanceCost(sub, matrix, axioms.normalized, axioms.congruence, services);
+    }
+
+    /**
+     * Convenience entry point for callers without a shared congruence: builds one from
+     * {@code assertList} and normalises the literals, then predicts the cost. The quantifier
+     * instantiation path shares one congruence per sequent instead and calls the overload above.
+     *
+     * @param sub a ground substitution for the quantified variables
+     * @param matrix the matrix of the quantified formula
+     * @param assertList the literals assumed to be true on the sequent
+     * @param services access to the theory operators
+     * @return the predicted cost
+     */
+    public static long computerInstanceCost(Substitution sub, JTerm matrix,
+            ImmutableSet<JTerm> assertList, Services services) {
+        return computerInstanceCost(sub, matrix, prepare(assertList, services), services);
+    }
+
+    /** Splits the instantiated matrix into its clauses. */
     private void initClauses(JTerm instance) {
 
         for (var t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
@@ -71,6 +158,12 @@ public class PredictCostProver {
         }
     }
 
+    /**
+     * Gathers the disjuncts of a clause into a literal set.
+     *
+     * @param set the disjuncts of a clause
+     * @return the clause's literals, wrapped in a one-element set
+     */
     private ImmutableSet<ImmutableSet<JTerm>> createClause(
             ImmutableSet<org.key_project.logic.Term> set) {
         final ImmutableSet<ImmutableSet<JTerm>> nil = DefaultImmutableSet.nil();
@@ -85,119 +178,111 @@ public class PredictCostProver {
         return res;
     }
 
-    // end
-
-    // (2)self-proved rule
     /**
-     * If the given <code>problem</code>'s operation is equal,or mathmetic operation(=,>=, <=), this
-     * method will try to prove it by finding the relation between its two subterms.
+     * Checks whether <code>problem</code> holds on its own. The literal is stripped of its leading
+     * negations and offered to each theory support; the first support that reaches a verdict wins,
+     * and the stripped negations are re-applied to it.
+     *
+     * @param problem the literal to decide
+     * @return <code>trueT</code> if the literal is proved true, <code>falseT</code> if proved
+     *         false,
+     *         and <code>problem</code> if undecided
      */
     private JTerm provedBySelf(JTerm problem) {
         boolean negated = false;
         JTerm pro = problem;
-        Operator op = pro.op();
-        while (op == Junctor.NOT) {
-            negated = !negated;
-            pro = pro.sub(0);
-            op = pro.op();
-        }
-        if ((op == Equality.EQUALS || op == Equality.EQV)) {
-            Term term = pro.sub(0);
-            Term formula = pro.sub(1);
-            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
-                return negated ? falseT : trueT;
-            }
-        }
-        JTerm arithRes = HandleArith.provedByArith(pro, services);
-        if (TriggerUtils.isTrueOrFalse(arithRes)) {
-            return negated ? tb.not(arithRes) : arithRes;
-        } else {
-            return problem;
-        }
-    }
-
-    // (3)equal rule
-    /***
-     * @return trueT if problem is equal axiom, false if problem's negation is equal axiom.
-     *         Otherwise retrun problem.
-     */
-    private JTerm directConsequenceOrContradictionOfAxiom(JTerm problem, JTerm axiom) {
-        boolean negated = false;
-        JTerm pro = problem;
         while (pro.op() == Junctor.NOT) {
+            negated = !negated;
             pro = pro.sub(0);
-            negated = !negated;
         }
-        JTerm ax = axiom;
-        while (ax.op() == Junctor.NOT) {
-            ax = ax.sub(0);
-            negated = !negated;
-        }
-        if (RENAMING_TERM_PROPERTY.equalsModThisProperty(pro, ax)) {
-            return negated ? falseT : trueT;
+        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
+            QuantifierTheorySupport.LiteralDecision decision =
+                support.decideStrippedSelf(pro, services);
+            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
+                if (negated) {
+                    decision = decision.negate();
+                }
+                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+            }
         }
         return problem;
     }
 
-    // (4)combine provedByequal and provedByArith .
     /**
-     * @param problem
-     * @param axiom
-     * @return if axiom conduct problem then return trueT. If axiom conduct negation of problem
-     *         return fastT. Otherwise, return problem
+     * Checks whether <code>problem</code> follows from the assumed-true <code>axiom</code> by
+     * offering both to each theory support. The first support that reaches a verdict wins.
+     *
+     * @param problem the literal to decide
+     * @param axiom a literal assumed to be true
+     * @return <code>trueT</code> if the axiom proves the problem, <code>falseT</code> if it proves
+     *         the problem's negation, and <code>problem</code> if undecided
      */
     private JTerm provedByAnother(JTerm problem, JTerm axiom) {
-        JTerm res = directConsequenceOrContradictionOfAxiom(problem, axiom);
-        if (TriggerUtils.isTrueOrFalse(res)) {
-            return res;
+        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
+            final QuantifierTheorySupport.LiteralDecision decision =
+                support.decideFromAxiom(problem, axiom, services);
+            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
+                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+            }
         }
-        return HandleArith.provedByArith(problem, axiom, services);
+        return problem;
     }
 
-    // (5) combine rules
     /**
-     * try to prove <code>problem</code> by know <code>assertLits</code>
+     * Checks whether <code>problem</code> holds, first on its own and then from each assumed
+     * literal
+     * in turn.
      *
-     * @param problem a literal to be proved
-     * @param assertLits a set of term assertLiterals in which all literals are true
-     * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
-     *         false, and <code>atom</code> if it cann't be proved.
+     * @param problem a literal to decide
+     * @param assertLits literals assumed to be true
+     * @return <code>trueT</code> if the literal is proved true, <code>falseT</code> if proved
+     *         false,
+     *         and the literal itself if neither
      */
     private JTerm proveLiteral(JTerm problem, Iterable<? extends JTerm> assertLits) {
-        JTerm res;
-        /*
-         * res = provedFromCache(problem, cache); if (res.equals(trueT) || res.equals(falseT)) {
-         * return res; }
-         */
-        res = provedBySelf(problem);
+        final JTerm normProblem = congruence.normalize(problem);
+        JTerm res = provedBySelf(normProblem);
         if (TriggerUtils.isTrueOrFalse(res)) {
-            // addToCache(problem,res,cache);
             return res;
         }
         for (JTerm t : assertLits) {
-            res = provedByAnother(problem, t);
+            res = provedByAnother(normProblem, t);
             if (TriggerUtils.isTrueOrFalse(res)) {
-                // addToCache(problem, res,cache);
                 return res;
             }
         }
         return problem;
     }
 
-    // end
+    /**
+     * Normalises the literals of a clause reduced to a single literal, before it is assumed for the
+     * remaining clauses, so later decisions match it modulo the congruence.
+     *
+     * @param lits the literals to normalise
+     * @return the normalised literals, or {@code lits} unchanged when the congruence is trivial
+     */
+    private ImmutableSet<JTerm> normalizeLiterals(ImmutableSet<JTerm> lits) {
+        if (congruence.isTrivial()) {
+            return lits;
+        }
+        ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
+        for (final JTerm l : lits) {
+            res = res.add(congruence.normalize(l));
+        }
+        return res;
+    }
 
-    // cost computation
-    /** do two step refinement and return the cost */
+    /** Returns the predicted cost by refining the clauses against the asserted literals. */
     private long cost() {
         return firstRefine();
     }
 
     /**
-     * refine every clause, by assume assertList are true and if a clause's cost is 0 which means it
-     * is refined to false, then cost 0 returned. If every clause's cost is -1 which means every
-     * clause is refined to true, cost -1 returned. Otherwise, multiply of every cost is return.
-     * Beside, if a clause is refined to a situation that only one literal is left, the literal will
-     * be add to assertLiterals.
+     * Refines every clause against the asserted literals and combines the results into a cost. A
+     * clause refined to false makes the whole instance cost 0. Clauses refined to true are dropped.
+     * The sizes of the remaining clauses are multiplied. A clause left with a single literal adds
+     * that literal to the asserted literals. When every clause is dropped and nothing was added the
+     * instance is trivially true and the cost is -1.
      */
     private long firstRefine() {
         long cost = 1;
@@ -216,7 +301,7 @@ public class PredictCostProver {
             }
             if (c.literals.size() == 1) {
                 assertChanged = true;
-                assertLiterals = assertLiterals.union(c.literals);
+                assertLiterals = assertLiterals.union(normalizeLiterals(c.literals));
             } else {
                 res.add(c);
             }
@@ -232,23 +317,9 @@ public class PredictCostProver {
         return cost;
     }
 
-    /** A sat() procedure with back searching */
-    /*
-     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[] cls, int index) { long
-     * cost = 1; for ( int i = index; i < cls.length; i++ ) { Clause c = (Clause)cls[i]; final
-     * SetOf<Term> ls = c.refine ( assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
-     * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i + 1 ); final
-     * Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) { SetOf<Term> nextLits =
-     * SetAsListOf.<Term>nil().union ( assertLits ); nextLits = nextLits.add ( it.next () ); final
-     * Map nextCache = new HashMap (); nextCache.putAll ( cache ); long nextCost = secondRefine (
-     * nextLits, nextCache, cls, i + 1 ); cost = cost + nextCost;
-     *
-     * } } return cost; }
-     */
-
     private class Clause implements Iterable<JTerm> {
 
-        /** all literals contains in this clause */
+        /** The literals of this clause. */
         private ImmutableSet<JTerm> literals;
 
         public Clause(ImmutableSet<JTerm> lits) {
@@ -258,9 +329,6 @@ public class PredictCostProver {
         @Override
         public boolean equals(Object o) {
             if (!(o instanceof Clause other)) {
-                return false;
-            }
-            if (other.literals.size() != literals.size()) {
                 return false;
             }
             return literals.equals(other.literals);
@@ -277,8 +345,8 @@ public class PredictCostProver {
         }
 
         /**
-         * @return 0 if this clause is refine to false. 1 if true. Otherwise,return the number of
-         *         literals it left.
+         * @return 0 if this clause refined to false, -1 if it refined to true, otherwise the number
+         *         of literals it still has
          */
         public long cost() {
             if (literals.size() == 1 && literals.contains(falseT)) {
@@ -290,21 +358,15 @@ public class PredictCostProver {
             return literals.size();
         }
 
-        /**
-         * Refine this clause in two process, first try to refined by itself, @see selfRefine.
-         * Second refine this clause by assuming assertLiteras are true
-         */
+        /** Refine this clause by assuming the asserted literals are true. */
         public void firstRefine() {
-            // if (selfRefine(literals)) {
-            // literals = SetAsListOf.<Term>nil().add(trueT);
-            // return;
-            // }
             literals = this.refine(assertLiterals);
         }
 
         /**
-         * Refine literals in this clause, but it does not change literlas, only return literals
-         * that can't be removed by refining
+         * Returns the literals of this clause that refining against the asserted literals cannot
+         * remove. A single {@code trueT} means the clause is true, a single {@code falseT} means it
+         * is false.
          */
         public ImmutableSet<JTerm> refine(Iterable<? extends JTerm> assertLits) {
             ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
@@ -323,36 +385,6 @@ public class PredictCostProver {
                 res = res.add(falseT);
             }
             return res;
-        }
-
-        /**
-         * This method is used for detect where a clause can be simply refined to to true. And it is
-         * implemented like this. Assume that the clause contains two literals Li and Lj. If
-         * (!Li->Lj) which is acturally (Li|Lj), is true, and the clasue is true.
-         * provedByAnthoer(Lj,!Li) is used to proved (!Li->Lj). Some examples are (!a|a) which is
-         * (!!a->a) and (a>=1|a<=0) which is !a>=1->a<=0
-         */
-        public boolean selfRefine(ImmutableSet<JTerm> lits) {
-            if (lits.size() <= 1) {
-                return false;
-            }
-            JTerm[] terms = lits.toArray(new JTerm[lits.size()]);
-            ImmutableSet<JTerm> next = lits.remove(terms[0]);
-            boolean opNot = terms[0].op() == Junctor.NOT;
-            JTerm axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
-            for (int j = 1; j < terms.length; j++) {
-                JTerm pro = provedByAnother(terms[j], axiom);
-                final Operator op = pro.op();
-                if (op == Junctor.TRUE) {
-                    return true;
-                }
-                if (op == Junctor.FALSE
-                        && terms[0].equalsModProperty(terms[j], IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    next = next.remove(terms[j]);
-                    literals = literals.remove(terms[j]);
-                }
-            }
-            return selfRefine(next);
         }
 
         @Override

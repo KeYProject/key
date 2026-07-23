@@ -42,7 +42,8 @@ public class HandleArith {
     /** Whether {@code t} (ignoring leading negations) is an integer {@code >=} or {@code <=}. */
     private static boolean isArithComparison(JTerm t, IntegerLDT ig) {
         final Operator op = strippedOp(t);
-        return op == ig.getGreaterOrEquals() || op == ig.getLessOrEquals();
+        return op == ig.getGreaterOrEquals() || op == ig.getLessOrEquals()
+                || op == ig.getLessThan() || op == ig.getGreaterThan();
     }
 
     /**
@@ -53,7 +54,14 @@ public class HandleArith {
      *         <code>problem</code> if it cann't be proved.
      */
     public static JTerm provedByArith(JTerm problem, Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        return provedByArith(problem, services.getTypeConverter().getIntegerLDT(), services);
+    }
+
+    /**
+     * The variant of {@link #provedByArith(JTerm, Services)} taking the integer theory, which
+     * one decision consults several times.
+     */
+    static JTerm provedByArith(JTerm problem, IntegerLDT integerLDT, Services services) {
         if (!isArithComparison(problem, integerLDT) && strippedOp(problem) != Equality.EQUALS) {
             // neither an (in)equality nor an equality: formatArithTerm yields false and
             // provedArithEqual returns the problem unchanged -- bail before locking the cache.
@@ -147,7 +155,16 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static JTerm provedByArith(JTerm problem, JTerm axiom, Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        return provedByArith(problem, axiom, services.getTypeConverter().getIntegerLDT(),
+            services);
+    }
+
+    /**
+     * The variant of {@link #provedByArith(JTerm, JTerm, Services)} taking the integer theory,
+     * which one decision consults several times.
+     */
+    static JTerm provedByArith(JTerm problem, JTerm axiom, IntegerLDT integerLDT,
+            Services services) {
         if (!isArithComparison(problem, integerLDT) || !isArithComparison(axiom, integerLDT)) {
             // not an arithmetic implication: formatArithTerm would yield false for one side and
             // this method returns the unproved problem -- bail before allocating the key and
@@ -220,22 +237,40 @@ public class HandleArith {
         }
         final Function geq = ig.getGreaterOrEquals();
         final Function leq = ig.getLessOrEquals();
+        final Function lt = ig.getLessThan();
+        final Function gt = ig.getGreaterThan();
+        final Function add = ig.getAdd();
         final JTerm falseT = tb.ff();
 
+        // A strict comparison is rewritten to a non-strict one over the integers (a < b becomes
+        // a <= b - 1), so that all four comparisons reduce to the same >= form and can be
+        // compared as polynomials. sub(0) and sub(1) are the two compared terms.
         if (op == geq) {
             if (opNot) {
-                pro = tb.geq(pro.sub(1), tb.func(ig.getAdd(), pro.sub(0), ig.one()));
+                pro = tb.geq(pro.sub(1), tb.func(add, pro.sub(0), ig.one()));
+            }
+        } else if (op == leq) {
+            if (opNot) {
+                pro = tb.geq(pro.sub(0), tb.func(add, pro.sub(1), ig.one()));
+            } else {
+                pro = tb.geq(pro.sub(1), pro.sub(0));
+            }
+        } else if (op == lt) {
+            // a < b is b >= a + 1; its negation is a >= b
+            if (opNot) {
+                pro = tb.geq(pro.sub(0), pro.sub(1));
+            } else {
+                pro = tb.geq(pro.sub(1), tb.func(add, pro.sub(0), ig.one()));
+            }
+        } else if (op == gt) {
+            // a > b is a >= b + 1; its negation is b >= a
+            if (opNot) {
+                pro = tb.geq(pro.sub(1), pro.sub(0));
+            } else {
+                pro = tb.geq(pro.sub(0), tb.func(add, pro.sub(1), ig.one()));
             }
         } else {
-            if (op == leq) {
-                if (opNot) {
-                    pro = tb.geq(pro.sub(0), tb.func(ig.getAdd(), pro.sub(1), ig.one()));
-                } else {
-                    pro = tb.geq(pro.sub(1), pro.sub(0));
-                }
-            } else {
-                pro = falseT;
-            }
+            pro = falseT;
         }
 
         putInTermCache(formattedTermCache, problem, pro);

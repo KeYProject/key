@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,11 +45,19 @@ public final class TypeConverter {
     private final TermBuilder tb;
     private final Services services;
 
-    // Maps LDT names to LDT instances.
+    // Maps LDT names to LDT instances. The map stays sorted by name so that getLDTFor visits
+    // the theories in a fixed order, independent of the run.
     private final Map<Name, LDT> LDTs = new TreeMap<>();
 
+    // The typed accessors below are called at high frequency from the proof-search strategy
+    // (for example by the arithmetic heuristics for every candidate weighing), so lookups go
+    // through this class-keyed map: a class hashes by identity, so a lookup costs no name
+    // comparison. The map is filled generically when the theories are created; adding a new
+    // theory needs no change in this class.
+    private final Map<Class<? extends LDT>, LDT> ldtsByClass = new HashMap<>();
+
+    /** the heap theory, kept directly because this class itself uses it throughout */
     private HeapLDT heapLDT = null;
-    // private IntegerLDT integerLDT = null;
 
     TypeConverter(Services s) {
         this.services = s;
@@ -61,8 +70,22 @@ public final class TypeConverter {
 
     private void init(Map<Name, LDT> map) {
         LDTs.putAll(map);
-        heapLDT = getHeapLDT();
-        // integerLDT = getIntegerLDT();
+        for (LDT ldt : map.values()) {
+            ldtsByClass.put(ldt.getClass(), ldt);
+        }
+        heapLDT = getLDT(HeapLDT.class);
+    }
+
+    /**
+     * The theory of the given class, or {@code null} if no such theory is registered. Theories
+     * are looked up by their exact class.
+     *
+     * @param ldtClass the class of the theory
+     * @return the theory instance of that class
+     * @param <T> the type of the theory
+     */
+    public <T extends LDT> T getLDT(Class<T> ldtClass) {
+        return ldtClass.cast(ldtsByClass.get(ldtClass));
     }
 
 
@@ -81,55 +104,57 @@ public final class TypeConverter {
     }
 
     public JavaDLTheory getJavaDLTheory() {
-        return (JavaDLTheory) getLDT(JavaDLTheory.NAME);
+        return getLDT(JavaDLTheory.class);
     }
 
     public IntegerLDT getIntegerLDT() {
-        return (IntegerLDT) getLDT(IntegerLDT.NAME);
+        return getLDT(IntegerLDT.class);
     }
 
     public FloatLDT getFloatLDT() {
-        return (FloatLDT) getLDT(FloatLDT.NAME);
+        return getLDT(FloatLDT.class);
     }
 
     public DoubleLDT getDoubleLDT() {
-        return (DoubleLDT) getLDT(DoubleLDT.NAME);
+        return getLDT(DoubleLDT.class);
     }
 
     public RealLDT getRealLDT() {
-        return (RealLDT) getLDT(RealLDT.NAME);
+        return getLDT(RealLDT.class);
     }
 
     public BooleanLDT getBooleanLDT() {
-        return (BooleanLDT) getLDT(BooleanLDT.NAME);
+        return getLDT(BooleanLDT.class);
     }
 
     public LocSetLDT getLocSetLDT() {
-        return (LocSetLDT) getLDT(LocSetLDT.NAME);
+        return getLDT(LocSetLDT.class);
     }
 
     public HeapLDT getHeapLDT() {
-        return (HeapLDT) getLDT(HeapLDT.NAME);
+        return heapLDT;
     }
 
+
+
     public PermissionLDT getPermissionLDT() {
-        return (PermissionLDT) getLDT(PermissionLDT.NAME);
+        return getLDT(PermissionLDT.class);
     }
 
     public SeqLDT getSeqLDT() {
-        return (SeqLDT) getLDT(SeqLDT.NAME);
+        return getLDT(SeqLDT.class);
     }
 
     public SortLDT getSortLDT() {
-        return (SortLDT) getLDT(SortLDT.NAME);
+        return getLDT(SortLDT.class);
     }
 
     public MapLDT getMapLDT() {
-        return (MapLDT) getLDT(MapLDT.NAME);
+        return getLDT(MapLDT.class);
     }
 
     public CharListLDT getCharListLDT() {
-        return (CharListLDT) getLDT(CharListLDT.NAME);
+        return getLDT(CharListLDT.class);
     }
 
     public Collection<LDT> getLDTs() {

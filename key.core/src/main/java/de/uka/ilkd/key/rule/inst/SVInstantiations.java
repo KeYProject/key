@@ -81,6 +81,9 @@ public class SVInstantiations
     /** additional conditions for the generic sorts */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
+    private ContextStatementBlockInstantiation contextInstantiationCache;
+    private boolean contextInstantiationCached;
+
     /** creates a new SVInstantiations object with an empty map */
     private SVInstantiations() {
         genericSortConditions = ImmutableList.nil();
@@ -431,8 +434,13 @@ public class SVInstantiations
      * returns the instantiation entry for the context "schema variable" or null if non such exists
      */
     public ContextStatementBlockInstantiation getContextInstantiation() {
-        final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
-        return entry == null ? null : (ContextStatementBlockInstantiation) entry.getInstantiation();
+        if (!contextInstantiationCached) {
+            final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
+            contextInstantiationCache = entry == null ? null
+                    : (ContextStatementBlockInstantiation) entry.getInstantiation();
+            contextInstantiationCached = true;
+        }
+        return contextInstantiationCache;
     }
 
     /**

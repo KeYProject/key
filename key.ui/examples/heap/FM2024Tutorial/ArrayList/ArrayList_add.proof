@@ -88,7 +88,4 @@
 
 \proofScript {
   macro autopilot;
-  rule Class_invariant_axiom_for_ArrayList occ=1;
-  macro "split-prop";
-  auto all=true steps=10000;
 }

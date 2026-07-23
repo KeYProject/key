@@ -100,6 +100,19 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
 
     /**
+     * Fast rejection for the label-insensitive comparisons of this class: two terms that are
+     * equal up to term labels are in particular equal up to renaming of bound variables
+     * (renaming equality ignores labels), so their cached renaming hash is equal, and a
+     * differing hash proves inequality without walking the terms. Terms carrying a program are
+     * left to the full comparison: their renaming hash would walk the whole program, which is
+     * expensive for terms that live only a few rounds.
+     */
+    private static boolean cannotBeEqualModLabels(JTerm a, JTerm b) {
+        return !a.containsJavaBlockRecursive() && !b.containsJavaBlockRecursive()
+                && a.hashCodeModRenaming() != b.hashCodeModRenaming();
+    }
+
+    /**
      * Compare two update contexts modulo irrelevant term labels. Labels carry history (e.g.
      * origin), and a label-sensitive comparison would let a duplicate escape the veto
      * nondeterministically -- exactly what the surrounding duplicate check avoids. Matches the
@@ -115,8 +128,12 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final var it0 = ctx0.iterator();
         final var it1 = ctx1.iterator();
         while (it0.hasNext()) {
-            if (!it0.next().update().equalsModProperty(it1.next().update(),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            final JTerm u0 = it0.next().update();
+            final JTerm u1 = it1.next().update();
+            if (cannotBeEqualModLabels(u0, u1)) {
+                return false;
+            }
+            if (!u0.equalsModProperty(u1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return false;
             }
         }
@@ -141,7 +158,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             final Object inst0 = entry0.value().getInstantiation();
             final Object inst1 = instEntry1.getInstantiation();
             if (inst0 instanceof JTerm term0 && inst1 instanceof JTerm term1) {
-                if (!term0.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (cannotBeEqualModLabels(term0, term1)
+                        || !term0.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
             } else if (!inst0.equals(inst1)) {

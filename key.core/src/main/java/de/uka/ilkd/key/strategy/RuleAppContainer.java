@@ -53,7 +53,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     @Override
     public final int compareTo(RuleAppContainer o) {
         // PRIMARY key: cost. This is where proof-search order is chiefly decided; the cost carries
-        // the candidate's goal-age (see AgeFeature -- older/younger candidates get different cost),
+        // the candidate's goal-age (see AgeFeature: older and younger candidates cost differently),
         // and age in turn depends on WHEN the candidate was born, e.g. when its parked assumes-base
         // was woken (see QueueRuleApplicationManager's goal-local determinism invariant). Aging is
         // deterministic per goal, so cost is deterministic per goal.
@@ -63,7 +63,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         }
         // SECONDARY key (equal cost only): order deterministically by content so the search does
         // not
-        // depend on the (timing-dependent) order in which candidates were generated/selected -- a
+        // depend on the (timing-dependent) order in which candidates were generated/selected; a
         // source of run-to-run proof variance under concurrent goal processing. Uses only stable
         // keys (rule, operator and schema-variable names; structural positions and instantiations);
         // never object hashCodes or toString(), which can embed identity (e.g. term-label hashes).
@@ -73,9 +73,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // to explain the overall search order. It only breaks exact cost ties; the bulk of the
         // order
         // comes from cost (above), which the tie-break never sees. Cost (aging) and this tie-break
-        // together keep the multi-worker search deterministic -- the tie-break alone is not the
+        // together keep the multi-worker search deterministic; the tie-break alone is not the
         // whole story, so a change that leaves this method intact can still reorder the proof by
-        // shifting costs/ages (e.g. by changing candidate birth timing).
+        // shifting costs/ages (e.g. by changing the round in which a candidate is created).
         return compareByContent(this, o);
     }
 
@@ -89,12 +89,12 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // surface from the queue in generation order, which follows the sequent/term structure;
         // ordering ties by position keeps that exploration policy (and thereby proof sizes) close
         // to the historical one. Rule-name-first regressed large proofs badly (TimSort.binarySort
-        // doubled): at every tie an alphabetically early rule -- often a split -- beat the
+        // doubled): at every tie an alphabetically early rule, often a split, beat the
         // position-order winner, causing splits too early in the search.
         //
         // Taclet apps are queued as NoPosTacletApps whose posInOccurrence() is null: their
         // application position lives in the container, so it is the container position that has
-        // to be compared -- otherwise two apps of the same taclet at different positions (with
+        // to be compared; otherwise two apps of the same taclet at different positions (with
         // equal instantiations) tie, and their order falls back to the history-dependent heap
         // insertion order. The position also has to be compared before the rule apps are
         // shortcut-compared by identity: one and the same NoPosTacletApp object is indexed at
@@ -122,7 +122,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         // Known blind spots, all reached only for two equal-cost apps at the same position (and,
         // for taclets, with equal instantiation names): compareByName compares operator
         // names/arity/subterms but NOT bound variables, and a modality's program block is a
-        // non-subterm child it does not walk -- so two focus terms differing only in bound-variable
+        // non-subterm child it does not walk, so two focus terms differing only in bound-variable
         // names or in an embedded program tie (they are then alpha-/program-equivalent for search
         // purposes). Built-in (non-taclet) apps are ordered here only by rule name and position, so
         // several apps of the same built-in rule at one position (e.g. multiple
@@ -149,7 +149,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * from the schema-variable map, so two apps of the same taclet at the same focus that use
      * different assumes-formulas (e.g. {@code applyEq} instances rewriting with two different
      * equations) are still tied after {@link #compareInstantiations}; without this comparison the
-     * queue order of such candidates — and thereby proof search — would depend on the
+     * queue order of such candidates, and thereby proof search, would depend on the
      * (history-dependent) order in which they were inserted into the queue.
      */
     private static int compareAssumesInstantiations(TacletApp a, TacletApp b) {
@@ -186,7 +186,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
                     return c;
                 }
             }
-            c = compareByName(fa.getSequentFormula().formula(), fb.getSequentFormula().formula());
+            c = compareFormulasByName(fa.getSequentFormula().formula(),
+                fb.getSequentFormula().formula());
             if (c != 0) {
                 return c;
             }
@@ -225,7 +226,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         if (a.sequentFormula() == b.sequentFormula()) {
             return 0;
         }
-        return compareByName(a.sequentFormula().formula(), b.sequentFormula().formula());
+        return compareFormulasByName(a.sequentFormula().formula(), b.sequentFormula().formula());
     }
 
     private static int compareInstantiations(TacletApp a, TacletApp b) {
@@ -235,8 +236,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
             return 0;
         }
         // The maps iterate in build order, which differs between code paths (fresh match,
-        // re-expansion, assumes completion) even for equal content. Compare canonically -- sizes,
-        // then the entries sorted by schema-variable name -- so that the result is a consistent
+        // re-expansion, assumes completion) even for equal content. Compare canonically: sizes,
+        // then the entries sorted by schema-variable name, so that the result is a consistent
         // total order: an order-sensitive walk compares mismatched keys and turns compareTo
         // asymmetric for content-equal apps, which silently corrupts the ordering of the whole
         // rule-app queue (a leftist heap merges by pairwise comparisons).
@@ -282,11 +283,30 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         return String.valueOf(va).compareTo(String.valueOf(vb));
     }
 
-    /** Structural order on terms by operator names only -- stable across runs (unlike hashCode). */
-    private static int compareByName(Term a, Term b) {
+    /**
+     * Order on whole sequent formulas: by the cached structural name hash first
+     * ({@link Term#nameHash()}), then by the structural name walk of
+     * {@link #compareByName(Term, Term)}. The hash is a pure function of the operator structure
+     * (so the resulting order is stable across runs, as required for the tie-break) and is cached
+     * on term instances, making it an O(1) discriminator: only hash collisions ever pay the walk,
+     * which then keeps the order total and consistent.
+     */
+    static int compareFormulasByName(Term a, Term b) {
+        if (a == b) {
+            return 0;
+        }
+        final int c = Integer.compare(a.nameHash(), b.nameHash());
+        if (c != 0) {
+            return c;
+        }
+        return compareByName(a, b);
+    }
+
+    /** Structural order on terms by operator names only, stable across runs (unlike hashCode). */
+    static int compareByName(Term a, Term b) {
         // Identical (shared) subterms compare equal without a walk. Terms are structurally shared,
         // so on large focus/instantiation terms (e.g. deep heap sequents) this skips whole
-        // subtrees -- the dominant cost of tie-breaking equal-cost rule apps. Order-preserving:
+        // subtrees, the dominant cost of tie-breaking equal-cost rule apps. Order-preserving:
         // a == b implies the full comparison would yield 0.
         if (a == b) {
             return 0;
@@ -330,7 +350,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Add the goal-age term to a strategy-computed cost. Age (the goal time, i.e. number of rules
      * applied so far) is a single first-class component of every container's cost, contributed here
-     * rather than inside any {@link de.uka.ilkd.key.strategy.Strategy#computeCost} -- so a strategy
+     * rather than inside any {@link de.uka.ilkd.key.strategy.Strategy#computeCost}, so a strategy
      * (and each of its components) computes only its age-free cost, and age is added exactly once
      * per queued container regardless of how strategies are composed. {@code Top} stays
      * {@code Top}.

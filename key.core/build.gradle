@@ -412,6 +412,11 @@ tasks.register("testRAP", Test) {
     systemProperty 'key.matcher.compiled',
         (project.findProperty('matcher.compiled')
                 ?: System.getProperty('key.matcher.compiled', 'false'))
+    // forward the cost-reuse verification switch to the proof runs in each fork; default off,
+    // enable with -PcostReuse.verify=true (or -Dkey.strategy.costReuse.verify=true)
+    systemProperty 'key.strategy.costReuse.verify',
+        (project.findProperty('costReuse.verify')
+                ?: System.getProperty('key.strategy.costReuse.verify', 'false'))
     // (statistics are always written per-process, <statisticsFile>.<pid>.csv; see
     // ProveTest.getStatisticsFile -- combine the per-fork files after the run.)
     // set heap size for the test JVM(s) (overridable with -PrapHeap=8g for the large examples)

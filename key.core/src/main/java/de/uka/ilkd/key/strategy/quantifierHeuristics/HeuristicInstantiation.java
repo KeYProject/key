@@ -22,9 +22,27 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 public class HeuristicInstantiation implements TermGenerator<Goal> {
 
-    public final static TermGenerator<Goal> INSTANCE = new HeuristicInstantiation();
+    private static final HeuristicInstantiation THEORY = new HeuristicInstantiation(false);
+    private static final HeuristicInstantiation CLASSIC = new HeuristicInstantiation(true);
 
-    private HeuristicInstantiation() {}
+    /** whether instances are computed with the classic trigger selection */
+    private final boolean classicTriggers;
+
+    private HeuristicInstantiation(boolean classicTriggers) {
+        this.classicTriggers = classicTriggers;
+    }
+
+    /**
+     * The generator for the given setting of the trigger option. The setting is fixed at
+     * strategy construction, like every other strategy option; reading it per generated
+     * instance would take a synchronized settings lookup in the middle of proof search.
+     *
+     * @param classicTriggers whether the classic trigger selection is in effect
+     * @return the generator
+     */
+    public static TermGenerator<Goal> forOption(boolean classicTriggers) {
+        return classicTriggers ? CLASSIC : THEORY;
+    }
 
     @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
@@ -33,7 +51,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
 
         final Term qf = pos.sequentFormula().formula();
         final Instantiation ia =
-            Instantiation.create(qf, goal.sequent(), goal.proof().getServices());
+            Instantiation.create(qf, goal.sequent(), goal.proof().getServices(), classicTriggers);
         final QuantifiableVariable var = qf.varsBoundHere(0).last();
         assert var != null;
         return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());

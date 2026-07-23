@@ -39,6 +39,13 @@ public final class GenericOperatorHead implements MatchHead {
     }
 
     @Override
+    public Object topOperatorDescriptor() {
+        // this head accepts exactly one operator (reference identity), so the operator itself
+        // is the family
+        return op;
+    }
+
+    @Override
     public String toString() {
         return op.name().toString();
     }
