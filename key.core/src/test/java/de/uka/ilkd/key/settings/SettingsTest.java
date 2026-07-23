@@ -102,6 +102,7 @@ class SettingsTest {
                                 "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
                                 "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
                                 "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+                                "TRIGGERS_OPTIONS_KEY" : "TRIGGERS_BEST",
                                 "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
                                 "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
                                 "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",

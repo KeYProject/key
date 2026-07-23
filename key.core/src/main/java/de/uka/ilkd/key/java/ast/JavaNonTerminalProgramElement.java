@@ -89,10 +89,16 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
     @Override
     protected int computeHashCode() {
-        int localHash = 17 * super.computeHashCode();
+        // Fold the children with a multiplier that is 3 (mod 8): such a multiplier has maximal
+        // multiplicative order modulo 2^32, so its powers mix the low bits. The previous 17 is
+        // 1 (mod 16), so 17^n stayed 1 (mod 16) and barely moved the low bits -- structurally
+        // repetitive programs then accumulated near-linear low bits and collided into the same hash
+        // buckets. Equal programs still get equal hashes, so this only redistributes, never breaks.
+        final int mult = 0x01000193;
+        int localHash = mult * super.computeHashCode();
         for (int i = 0, sz = getChildCount(); i < sz; i++) {
             final ProgramElement pe = getChildAt(i);
-            localHash = 17 * localHash + (pe == null ? 0 : pe.hashCode());
+            localHash = mult * localHash + (pe == null ? 0 : pe.hashCode());
         }
         return localHash;
     }

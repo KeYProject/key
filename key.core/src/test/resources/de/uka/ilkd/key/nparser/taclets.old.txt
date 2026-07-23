@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Jul 09 09:36:44 CEST 2026
+# Date: Wed Jul 22 17:10:12 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -5820,7 +5820,7 @@ dismissNonSelectedField {
 \find(select<[alpha]>(store(h,o,f1,x),u,f2))
 \varcond(\differentFields (f1 (Field term), f2 (Field term)))
 \replacewith(select<[alpha]>(h,u,f2)) 
-\heuristics(simplify)
+\heuristics(simplify_select_elim_store)
 Choices: programRules:Java}
 -----------------------------------------------------
 == dismissNonSelectedFieldEQ (dismissNonSelectedFieldEQ) =========================================
@@ -5829,7 +5829,7 @@ dismissNonSelectedFieldEQ {
 \find(select<[alpha]>(EQ,u,f2))
 \sameUpdateLevel\varcond(\differentFields (f1 (Field term), f2 (Field term)))
 \replacewith(select<[alpha]>(h,u,f2)) 
-\heuristics(simplify)
+\heuristics(simplify_select_elim_store)
 Choices: programRules:Java}
 -----------------------------------------------------
 == distr_existsAnd1 (distr_existsAnd1) =========================================
@@ -15910,6 +15910,22 @@ selectOfCreateEQ {
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
+== selectOfCreateReduce (selectOfCreateReduce) =========================================
+selectOfCreateReduce {
+\assumes ([]==>[equals(o,null)]) 
+\find(select<[beta]>(create(h,o),o,f))
+\sameUpdateLevel\replacewith(if-then-else(equals(f,java.lang.Object::#$created),cast<[beta]>(TRUE),select<[beta]>(h,o,f))) 
+\heuristics(simplify_select_concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== selectOfCreateReduceConcrete (selectOfCreateReduceConcrete) =========================================
+selectOfCreateReduceConcrete {
+\assumes ([]==>[equals(o,null)]) 
+\find(select<[beta]>(create(h,o),o,java.lang.Object::#$created))
+\sameUpdateLevel\replacewith(cast<[beta]>(TRUE)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == selectOfMemset (selectOfMemset) =========================================
 selectOfMemset {
 \find(select<[beta]>(memset(h,s,x),o,f))
@@ -15938,6 +15954,13 @@ selectOfStoreEQ {
 \find(select<[beta]>(EQ,o2,f2))
 \sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2))) 
 \heuristics(simplify_heap_high_costs)
+Choices: programRules:Java}
+-----------------------------------------------------
+== selectOfStoreSameLoc (selectOfStoreSameLoc) =========================================
+selectOfStoreSameLoc {
+\find(select<[beta]>(store(h,o,f,x),o,f))
+\replacewith(if-then-else(not(equals(f,java.lang.Object::#$created)),cast<[beta]>(x),select<[beta]>(h,o,f))) 
+\heuristics(simplify_select_concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == seqConcatUnfoldLeft (seqConcatUnfold) =========================================
@@ -16562,6 +16585,14 @@ Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
+== simplifySelectOfMemsetWithArrayRangeDiffArray (simplifySelectOfMemsetWithArrayRangeDiffArray) =========================================
+simplifySelectOfMemsetWithArrayRangeDiffArray {
+\assumes ([]==>[equals(o,o2)]) 
+\find(select<[beta]>(memset(h,arrayRange(o,low,high),x),o2,f))
+\sameUpdateLevel\replacewith(select<[beta]>(h,o2,f)) 
+\heuristics(simplify_select_elim_store)
+Choices: programRules:Java}
+-----------------------------------------------------
 == simplifySelectOfStore (simplifySelectOfStore) =========================================
 simplifySelectOfStore {
 \find(equals(select<[beta]>(store(h,o,f,x),o2,f2),sk)==>)
@@ -16571,6 +16602,14 @@ simplifySelectOfStore {
 \heuristics(concrete)
 Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::#$created))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
 \heuristics(simplify_select)
+Choices: programRules:Java}
+-----------------------------------------------------
+== simplifySelectOfStoreDiffObjects (simplifySelectOfStoreDiffObjects) =========================================
+simplifySelectOfStoreDiffObjects {
+\assumes ([]==>[equals(o,o2)]) 
+\find(select<[beta]>(store(h,o,f,x),o2,f))
+\sameUpdateLevel\replacewith(select<[beta]>(h,o2,f)) 
+\heuristics(simplify_select_elim_store)
 Choices: programRules:Java}
 -----------------------------------------------------
 == simplifySelectOfStoreEQ (simplifySelectOfStoreEQ) =========================================

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
@@ -34,6 +35,19 @@ public class JFOLStrategyFactory implements StrategyFactory {
             with terms that occur in a sequent, also if this<br>\
             might cause proof splitting.</html>""";
 
+    public static final String TOOL_TIP_TRIGGERS_BEST =
+        "<html>Instantiate quantified formulas using knowledge about arrays and the heap, with the"
+            + " most informative ordering of the instances to try. Recommended.<br>"
+            + "Adds a small per-step cost on very large proof states.</html>";
+    public static final String TOOL_TIP_TRIGGERS_GOOD =
+        "<html>Instantiate quantified formulas using knowledge about arrays and the heap, with a"
+            + " lighter-weight ordering of the instances.<br>"
+            + "Close to <i>Best</i>, with less per-step overhead on large proof states.</html>";
+    public static final String TOOL_TIP_TRIGGERS_CLASSIC =
+        "<html>Instantiate quantified formulas without the knowledge about arrays and the heap, and"
+            + " without ordering the instances.<br>"
+            + "The previous behaviour; use only if a proof was tuned to it.</html>";
+
     @Override
     public Strategy<Goal> create(Proof proof, StrategyProperties strategyProperties) {
         return new JFOLStrategy(proof, strategyProperties);
@@ -41,7 +55,8 @@ public class JFOLStrategyFactory implements StrategyFactory {
 
     private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {
         return new OneOfStrategyPropertyDefinition(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-            "Quantifier treatment", 2,
+            "Quantifier treatment", null, 2,
+            new AbstractStrategyPropertyDefinition[] { getTheorySupport() },
             new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None",
                 TOOL_TIP_QUANTIFIER_NONE, 2, 4),
             new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING,
@@ -51,6 +66,17 @@ public class JFOLStrategyFactory implements StrategyFactory {
                 TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS, 2, 4),
             new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free",
                 TOOL_TIP_QUANTIFIER_FREE, 6, 2));
+    }
+
+    private static OneOfStrategyPropertyDefinition getTheorySupport() {
+        return new OneOfStrategyPropertyDefinition(StrategyProperties.TRIGGERS_OPTIONS_KEY,
+            "Theory support:",
+            new StrategyPropertyValueDefinition(StrategyProperties.TRIGGERS_BEST, "Best",
+                TOOL_TIP_TRIGGERS_BEST),
+            new StrategyPropertyValueDefinition(StrategyProperties.TRIGGERS_GOOD, "Good",
+                TOOL_TIP_TRIGGERS_GOOD),
+            new StrategyPropertyValueDefinition(StrategyProperties.TRIGGERS_CLASSIC, "Classic",
+                TOOL_TIP_TRIGGERS_CLASSIC));
     }
 
     @Override

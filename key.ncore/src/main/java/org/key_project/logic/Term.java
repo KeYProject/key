@@ -46,6 +46,18 @@ public interface Term extends LogicElement, Sorted {
     /// The set of free quantifiable variables occurring in this term.
     ImmutableSet<? extends QuantifiableVariable> freeVars();
 
+    /// A hash folded from the operator names and arities of this term and all its subterms, and
+    /// nothing else. It ignores term labels and object identity, so unlike [#hashCode()] it is
+    /// the same in every run. Terms equal up to labels share it; a different value means they
+    /// differ.
+    int nameHash();
+
+    /// A hash folded from the operators, arities, bound variables, programs (Java blocks) and
+    /// subterm structure of this term, ignoring only term labels. Unlike [#nameHash()] it
+    /// distinguishes modalities by their program; unlike [#hashCode()] it ignores term labels, so
+    /// it is the same in every run. Terms equal up to labels share it. Cached.
+    int labelAgnosticHash();
+
     /// Returns a serial number for a term. The serial number is not persistent.
     int serialNumber();
 

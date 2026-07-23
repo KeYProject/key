@@ -31,8 +31,11 @@ public class PosInOccurrence {
     }
 
     /// compute hash lazily: instances of [PosInOccurrence] are often created by descending a term
-    /// computing it eagerly in the constructor is wasted effort for unused instances
-    private short hashCode;
+    /// computing it eagerly in the constructor is wasted effort for unused instances.
+    /// Full 32 bit wide: a 16-bit hash has only 65536 values, far fewer than the positions
+    /// occurring in a large sequent, so position-keyed hash maps degenerated into collision
+    /// chains. The wider field costs no memory, the object's alignment padding absorbs it.
+    private int hashCode;
 
     /// the constrained formula the pos in occurrence describes
     private final SequentFormula sequentFormula;
@@ -206,9 +209,9 @@ public class PosInOccurrence {
 
     @Override
     public int hashCode() {
-        short h = hashCode;
+        int h = hashCode;
         if (h == 0) {
-            h = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
+            h = sequentFormula.hashCode() * 13 + posInTerm.hashCode();
             if (h == 0) {
                 h = 1;
             }

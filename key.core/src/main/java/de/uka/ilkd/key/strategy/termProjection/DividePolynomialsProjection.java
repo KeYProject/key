@@ -43,6 +43,7 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
                     divide(numerator.getCoefficient().negate(), denominator).negate();
                 return numerator.setCoefficient(newRightCoeff).toTerm(services);
             }
+
         };
     }
 

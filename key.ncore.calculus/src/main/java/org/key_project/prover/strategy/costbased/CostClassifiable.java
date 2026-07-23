@@ -29,7 +29,17 @@ public interface CostClassifiable {
      * annotation-driven default is what the vast majority use.
      */
     default CostLocality locality() {
-        final Class<?> c = getClass();
+        Class<?> c = getClass();
+        // An anonymous class carries no annotation of its own and cannot be annotated; its
+        // locality is that of the class it extends, so the lookup climbs to the first named
+        // class. Named classes do not inherit: a subclass declares its own locality, because
+        // its overrides may change what the cost depends on.
+        while (c != null && c.isAnonymousClass() && !hasLocalityAnnotation(c)) {
+            c = c.getSuperclass();
+        }
+        if (c == null) {
+            return CostLocality.VOLATILE;
+        }
         if (c.isAnnotationPresent(VolatileCost.class)) {
             return CostLocality.VOLATILE;
         }
@@ -40,5 +50,11 @@ public interface CostClassifiable {
             return CostLocality.STABLE;
         }
         return CostLocality.VOLATILE;
+    }
+
+    private static boolean hasLocalityAnnotation(Class<?> c) {
+        return c.isAnnotationPresent(VolatileCost.class)
+                || c.isAnnotationPresent(WeakStableCost.class)
+                || c.isAnnotationPresent(StableCost.class);
     }
 }

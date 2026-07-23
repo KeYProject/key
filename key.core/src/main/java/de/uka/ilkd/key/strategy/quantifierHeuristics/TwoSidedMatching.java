@@ -16,13 +16,11 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
- * Matching triggers within another quantifier expression. Problems with the current implementation:
- * <p>
- * * the usage of EqualityConstraint for unification implies that a variable is never instantiated
- * with non-rigid terms
- * <p>
- * * it is unclear whether certain instantiations are lost due to too strict type checks in
- * EqualityConstraint
+ * Matching triggers within another quantifier expression. The unification through
+ * EqualityConstraint binds a metavariable to ground non-rigid terms as well: the metavariable
+ * stands for a quantifier instance, and soundness rests on the wary substitution applied when
+ * the taclet is applied, not on the matching. A known limitation: it is unclear whether certain
+ * instantiations are lost due to too strict type checks in EqualityConstraint.
  */
 class TwoSidedMatching {
 

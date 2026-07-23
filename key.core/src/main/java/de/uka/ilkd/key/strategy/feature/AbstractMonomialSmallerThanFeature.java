@@ -32,8 +32,32 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
     /**
      * if {@code op} is a Skolem constant the returned introduction time is the number of taclets
-     * applied before and including the taclet by which its was introduced. <ctrong>For all other
+     * applied before and including the taclet by which it was introduced. <strong>For all other
      * operators the returned value is -1</strong>
+     *
+     * <p>
+     * Although this reads the goal, the value is a constant for every operator a cost evaluation
+     * can encounter, which is what makes features built on it {@code StableCost}-classifiable:
+     * <ol>
+     * <li>The compared terms are instantiation terms of the taclet app, so an operator seen here
+     * either occurs in the goal's sequent or is the app's own fresh {@code SkolemTermSV}
+     * instantiation.</li>
+     * <li>A sequent operator with a {@code polySimp_newSmallSym} introducer: that application is
+     * already part of the goal's applied-rule sequence (a symbol cannot occur before the
+     * application that created it), and its position there never changes; every goal in which the
+     * symbol occurs lies below the introduction and so agrees on that position. The value is the
+     * same at every evaluation.</li>
+     * <li>A sequent operator without such an introducer answers {@code -1}, and stays {@code -1}:
+     * skolem instantiations are always fresh symbols ({@code TacletApp.createSkolemConstant}), so
+     * no later application can become the introducer of an already existing operator.</li>
+     * <li>An app's own fresh skolem symbol answers {@code -1} for as long as the app exists: its
+     * introducer would be the app itself, which is unapplied while the app is pending, and once
+     * applied the app is consumed, so no further evaluation of it takes place.</li>
+     * </ol>
+     * Case 4 is also the reason the {@code -1} answer must not be cached below: for that symbol
+     * the answer changes the moment the introducing taclet is applied, and a frozen {@code -1}
+     * would then leak into evaluations of other apps.
+     * </p>
      *
      * @param op the Operator whose introduction time is queried
      * @param goal the Goal whose state is queried

@@ -385,7 +385,8 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction = InstantiationCostScalerFeature
-                    .create(InstantiationCost.create(varInst), allowQuantifierSplitting());
+                    .create(InstantiationCost.create(varInst, classicTriggers()),
+                        allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
                 SumFeature.createSum(FocusInAntecFeature.getInstance(),
@@ -393,8 +394,13 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                         add(ff.quantifiedClauseSet,
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable)),
-                    forEach(varInst, HeuristicInstantiation.INSTANCE,
-                        add(instantiate("t", varInst), branchPrediction, longConst(10)))));
+                    forEach(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                        add(instantiate("t", varInst),
+                            add(branchPrediction, longConst(10),
+                                // orders candidates of one predicted-cost band by their
+                                // connection to the sequent instead of formula position
+                                InstantiationTieBreakFeature.create(varInst,
+                                    triggersOption()))))));
             final TermBuffer splitInst = new TermBuffer();
 
             bindRuleSet(d, "triggered",
@@ -413,8 +419,10 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.INSTANCE, not(eq(instOf("t"), varInst)))),
-                InstantiationCostScalerFeature.create(InstantiationCost.create(instOf("t")),
+                not(sum(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                    not(eq(instOf("t"), varInst)))),
+                InstantiationCostScalerFeature.create(
+                    InstantiationCost.create(instOf("t"), classicTriggers()),
                     longConst(0))));
 
             final TermBuffer splitInst = new TermBuffer();
@@ -595,6 +603,16 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             return sequentContainsNoPrograms();
         }
         return inftyConst();
+    }
+
+    /** the value of the trigger option, fixed when this strategy was constructed */
+    private String triggersOption() {
+        return strategyProperties.getProperty(StrategyProperties.TRIGGERS_OPTIONS_KEY);
+    }
+
+    /** whether the classic trigger selection is in effect for this strategy */
+    private boolean classicTriggers() {
+        return StrategyProperties.TRIGGERS_CLASSIC.equals(triggersOption());
     }
 
     private boolean quantifierInstantiatedEnabled() {

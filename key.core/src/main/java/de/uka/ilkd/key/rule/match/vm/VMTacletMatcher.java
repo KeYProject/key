@@ -29,6 +29,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.compiler.PatternKeySource;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.sequent.Sequent;
@@ -76,6 +77,12 @@ public class VMTacletMatcher implements TacletMatcher {
     /** the matcher for the taclet's assumes formulas */
     private final HashMap<Term, @NonNull MatchProgram> assumesMatchPrograms =
         new HashMap<>();
+    /**
+     * per assumes formula, the summary of how it accepts terms, for indexing (see
+     * {@link #assumesKeySource}); computed once here so it comes from the same dispatch as the
+     * match programs above
+     */
+    private final HashMap<Term, @NonNull PatternKeySource> assumesKeySources = new HashMap<>();
 
     /**
      * the variable conditions of the taclet that need to be satisfied by found schema variable
@@ -133,7 +140,43 @@ public class VMTacletMatcher implements TacletMatcher {
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
                 matchProgramFor((JTerm) sf.formula(), useInterpreter));
+            assumesKeySources.put(sf.formula(), keySourceFor((JTerm) sf.formula()));
         }
+    }
+
+    /**
+     * The key source of an assumes pattern. Almost always the summary the plan framework
+     * derives; the one Java-DL correction made here: a pattern whose top is an update
+     * application gets no key. The top of a candidate is observed with its leading updates
+     * removed (the find's update context, see {@link #matchUpdateContext}), so a top key
+     * naming an update application could never meet a candidate's key. Deriving the summary
+     * of the pattern's stripped core instead would let such a pattern park; it is not keyed
+     * at all, so the base simply stays in the queue.
+     */
+    private static PatternKeySource keySourceFor(JTerm pattern) {
+        if (pattern.op() instanceof UpdateApplication) {
+            return PatternKeySource.Unkeyable.INSTANCE;
+        }
+        return JavaMatchPlanBuilder.keySource(pattern);
+    }
+
+    /**
+     * Summarizes how the given {@code \assumes} formula of this taclet accepts terms, for
+     * indexing candidates that wait for such a formula (see {@link PatternKeySource}). The
+     * summary is derived from the same dispatch as the formula's matcher, so it cannot drift
+     * from what {@link #matchAssumes} accepts.
+     *
+     * @param assumesFormula a formula of the taclet's {@code \assumes} sequent
+     * @return the formula's key source
+     * @throws IllegalArgumentException if the formula is not an assumes formula of this taclet
+     */
+    public PatternKeySource assumesKeySource(Term assumesFormula) {
+        final PatternKeySource source = assumesKeySources.get(assumesFormula);
+        if (source == null) {
+            throw new IllegalArgumentException(
+                "not an assumes formula of this taclet: " + assumesFormula);
+        }
+        return source;
     }
 
     /**

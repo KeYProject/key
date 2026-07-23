@@ -31,7 +31,10 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  */
 public final class ElementaryUpdateHead implements MatchHead {
 
-    /** the pattern's update operator; kept for {@link #toString} only. */
+    /**
+     * the pattern's update operator; the operator family in {@link #topOperatorDescriptor} and
+     * the name in {@link #toString}.
+     */
     private final ElementaryUpdate op;
     private final MatchInstruction lhsMatcher;
     /** whether the left-hand side is a schema variable (it advances by sibling, not by descent). */
@@ -73,6 +76,13 @@ public final class ElementaryUpdateHead implements MatchHead {
                 services) -> ((Term) element).op() instanceof ElementaryUpdate actualElUp
                         ? lhs.match(actualElUp.lhs(), mc, services)
                         : null;
+    }
+
+    @Override
+    public @Nullable ElementaryUpdate topOperatorDescriptor() {
+        // interned per left-hand side: a concrete lhs fixes one operator, a schema-variable
+        // lhs accepts many, which no single family describes
+        return lhsIsSchemaVariable ? null : op;
     }
 
     @Override

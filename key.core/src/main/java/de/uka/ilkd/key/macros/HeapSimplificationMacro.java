@@ -43,6 +43,9 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "selectCreatedOfStore", "selectCreatedOfCreate", "selectCreatedOfAnon",
         "selectCreatedOfMemset",
 
+        "selectOfStoreSameLoc", "selectOfCreateReduce", "simplifySelectOfStoreDiffFields",
+        "simplifySelectOfStoreDiffObjects",
+
         "dismissNonSelectedField", "dismissNonSelectedFieldEQ", "replaceKnownSelect",
         "dropEffectlessStores", "memsetEmpty", "selectCreatedOfAnonAsFormula",
 

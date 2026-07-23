@@ -8,23 +8,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.logic.op.Operator;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.RuleApplicationManager;
@@ -49,36 +40,41 @@ import org.jspecify.annotations.Nullable;
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
  * {@link Feature#computeCost(RuleApp, PosInOccurrence, ProofGoal, MutableState)}).
  *
- * <h2>Determinism invariant — assumes-base parking is goal-local (do not break under MT)</h2>
+ * <h2>Why the set-aside state of this class belongs to one goal only</h2>
  *
- * The assumes-base parking/wake state ({@link #parkedByOp} / {@link #pendingWakeOps}) is
- * <strong>strictly goal-local</strong>: exactly one manager instance per {@link Goal}, deep-copied
- * on split ({@link #clone()}), built only from insertion-ordered structures ({@link LinkedHashMap}
- * /
- * {@link ArrayList} / {@link LinkedHashSet}) with interned-operator keys. This is not merely a
- * thread-safety measure -- it is load-bearing for <em>proof reproducibility</em>. A
- * rule-application
- * candidate's <em>birth-age</em> (the age baked into its {@link RuleAppContainer} when it enters
- * the
- * queue) is fixed by <em>which round</em> its assumes-base is woken (see {@link #parkedByOp}), and
- * that age drives the cost/tie-break ordering of the entire search. A goal's wake volume and timing
- * are a pure function of that goal's own deterministic rule- and sequent-change history,
- * independent
- * of thread scheduling; that is exactly what keeps the multi-worker prover byte-identical to the
- * single-threaded one on this path (the residual MT variance was root-caused elsewhere -- shared
- * caches, the veto fingerprint, naming, the tie-break -- and never to parking).
+ * Some vocabulary first. A {@link Goal} is one open branch of the proof, and its
+ * {@code Sequent} is the collection of formulas that this branch currently consists of. The
+ * automatic proof search runs in <em>rounds</em>: in each round it asks this manager for the next
+ * rule application, performs it, and thereby changes the sequent. The <em>age</em> of a goal is
+ * the number of rule applications performed on it so far ({@code Goal.getTime()}).
  *
  * <p>
- * <strong>Therefore, for anyone evolving the multi-core prover:</strong> the wake path must stay
- * <em>goal-confined</em> and {@link #sequentChanged} events must be delivered in the goal's own
- * order. Any optimization that perturbs a goal's wake/birth timing -- a wake cache shared across
- * goals, speculative cross-goal base reuse, or coalesced/reordered {@code sequentChanged}
- * notifications -- would <strong>silently change proofs</strong> (they would diverge, not crash,
- * and
- * no test that only checks closure would notice). The goal-locality of the copy is pinned by
- * {@code QueueRuleApplicationManagerParkingLocalityTest}; end-to-end determinism (single-threaded
- * ==
- * parallel) is pinned by {@code ProofEquivalenceTest} / {@code MtDeterminismCiTest}.
+ * A {@link RuleAppContainer} stores one possible rule application together with its cost, and the
+ * cost includes the age the goal had when the container was created. The round in which a
+ * container is created therefore decides its cost, the cost decides the order in which this
+ * manager returns candidates, and that order decides which proof is found.
+ *
+ * <p>
+ * Candidates that cannot be applied yet are set aside rather than kept in the queue, and are put
+ * back in a later round (see {@link ParkedBases}). The round in which one is put back decides when
+ * it
+ * is created anew, and so, by the paragraph above, it decides the proof. This is why
+ * the parking state ({@link ParkedBases}) belongs to a single goal: there is one manager per
+ * goal, it is copied when a goal splits into two ({@link #clone()}), and it uses only collections
+ * that keep insertion order ({@link LinkedHashMap}, {@link ArrayList}, {@link LinkedHashSet}).
+ * A goal then sets aside and puts back candidates as a function of its own rule applications
+ * alone, independent of how threads happen to be scheduled. That is what lets the prover find the
+ * same proof whether it uses one worker thread or several.
+ *
+ * <p>
+ * <strong>For anyone changing this class:</strong> this state must not be shared between goals,
+ * and {@link #sequentChanged} must be called in the order in which the goal changed its sequent.
+ * Sharing the state across goals, reusing candidates of one goal in another, or combining or
+ * reordering {@code sequentChanged} calls changes ages, hence costs, hence proofs. Such a change
+ * does not cause a crash, and a test that only checks whether a proof closes does not notice it.
+ * {@code QueueRuleApplicationManagerParkingLocalityTest} checks that a copy shares no state with
+ * its original. {@code ProofEquivalenceTest} and {@code MtDeterminismCiTest} check that several
+ * worker threads find the same proof as one.
  */
 @NullMarked
 public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
@@ -113,57 +109,12 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     private long nextRuleTime;
 
     /**
-     * Parked assumes-incomplete taclet bases, indexed by the concrete top operator(s) of their
-     * {@code \assumes} formulas. Such bases re-expand to nothing (no new assumes match) on almost
-     * every round (profiling: 96.8% of queue pops fail at the unmatched {@code \assumes}, and
-     * 97-99.6% of the resulting re-expansions yield no new instance -- the dominant remaining queue
-     * churn), so instead of re-popping and re-expanding them each round they are parked here and
-     * woken only when a formula they could match appears. A base is stored under each of its wake
-     * operators and woken when any of them is added/modified. Insertion-ordered for determinism;
-     * {@code null} until the first base is parked.
-     * <p>
-     * Sound (byte-identical) by construction, unlike the earlier sequent-growth heuristic:
-     * <ul>
-     * <li>Only <em>effectively-indexable</em> bases are parked -- every {@code \assumes} formula's
-     * top operator is concrete or a schema variable already bound by the find-match (see
-     * {@link #assumesWakeOps}). Bases with an unbound-generic top (which would match any formula)
-     * are never parked; they stay in the active queue and re-expand every round exactly as without
-     * parking.</li>
-     * <li>A parked base is woken (re-inserted into the active queue) on exactly the round a formula
-     * with a matching top operator is added or modified ({@link #sequentChanged}/{@code
-     * pendingWakeOps}) -- the same round its non-parked counterpart would first see that formula as
-     * "new" and re-expand to the instance. So the instance enters the queue at the identical round,
-     * with the identical (current) age and cost, and the proof is byte-identical.</li>
-     * <li>The wake set is a sound <em>superset</em>: it walks the changed formula's update-prefix
-     * spine of operators (the assumes matcher strips the update context before matching, see
-     * {@code VMTacletMatcher.matchUpdateContext}). Over-waking is harmless -- a spuriously woken
-     * base
-     * is popped, re-expands to nothing, and is re-parked, exactly as a non-parked base would behave
-     * that round. Only <em>missing</em> a wake would diverge, and that cannot happen for an
-     * effectively-indexable base.</li>
-     * <li>All structures are insertion-ordered ({@link LinkedHashMap}/{@link ArrayList}/
-     * {@link LinkedHashSet}) so parking introduces no non-determinism.</li>
-     * </ul>
+     * Candidates that are currently set aside because their {@code \assumes} formulas have no
+     * match in the sequent yet, together with the machinery to file and wake them; see
+     * {@link ParkedBases}. One instance per manager, replaced on {@link #clearCache()},
+     * deep-copied on {@link #clone()}.
      */
-    // The per-operator buckets are plain ArrayLists, not sets, while small. A base is parked at
-    // most
-    // once per bucket (removed from all its buckets when woken; see unindexParked) and
-    // RuleAppContainer uses identity equality, so there is nothing to de-duplicate -- whereas a set
-    // would spend a whole LinkedHashMap (16-slot table + a 40-byte Entry per element) to hold a
-    // handful of refs. A bucket that grows past {@link #BUCKET_SET_THRESHOLD} is switched to a
-    // LinkedHashSet so the by-value unindexParked stays O(1) (see park).
-    private @Nullable LinkedHashMap<Operator, Collection<RuleAppContainer>> parkedByOp = null;
-    /**
-     * Bucket size at which a per-operator parking bucket is promoted from ArrayList to
-     * LinkedHashSet.
-     */
-    private static final int BUCKET_SET_THRESHOLD = 16;
-    /**
-     * Top operators (along the update-prefix spine) of formulas added/modified since the previous
-     * round; the wake candidates consumed at the start of the next round. Insertion-ordered for
-     * determinism; {@code null} until the first change is recorded.
-     */
-    private @Nullable LinkedHashSet<Operator> pendingWakeOps = null;
+    private ParkedBases parking = new ParkedBases();
 
     @Override
     public void setGoal(Goal p_goal) {
@@ -177,8 +128,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     public void clearCache() {
         queue = null;
         previousMinimum = null;
-        parkedByOp = null;
-        pendingWakeOps = null;
+        parking = new ParkedBases();
         if (goal != null) {
             goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
         }
@@ -379,14 +329,9 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
          */
         ImmutableList<RuleAppContainer> workingList = ImmutableList.nil();
 
-        // Wake parked assumes-bases whose \assumes top operator matches a formula added/modified
-        // since the last round, re-inserting them into the active queue so they re-expand during
-        // THIS
-        // round -- the identical round their non-parked counterparts would first see that formula
-        // as
-        // new. No completeness net is needed (or wanted): an effectively-indexable base is always
-        // woken on its matching round, and a late re-injection would surface its instance at the
-        // wrong round, the very divergence parking must avoid.
+        // Put back every parked base that a formula added or changed since the last round could
+        // match, so it re-expands in this round. This is the round in which an un-parked copy
+        // would first see that formula as new (see the comment on the parking field).
         wakeParkedBases();
 
         /*
@@ -464,13 +409,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                      */
                     final ImmutableList<RuleAppContainer> further =
                         minRuleAppContainer.createFurtherApps(goal);
-                    // Empty assumes yield (the re-expansion is just the re-costed base itself, with
-                    // the now-current age): if the base is effectively indexable, park it instead
-                    // of
-                    // re-adding so it stops being re-popped every round. Park further.head() (the
-                    // freshly re-costed container) so the parked age advances exactly as the
-                    // non-parked base's would, keeping later assumes matches from re-deriving stale
-                    // instances. A non-indexable base falls through and is re-added unchanged.
+                    // The re-expansion produced only the re-costed base itself: park it if it
+                    // can be keyed, re-add it unchanged otherwise (see ParkedBases#park).
                     if (further.size() == 1
                             && further.head() instanceof TacletAppContainer base
                             && !base.getTacletApp().assumesInstantionsComplete()
@@ -505,187 +445,61 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     // ---------------------------------------------------------------------------------------------
-    // Assumes-base parking (see parkedByOp)
+    // Assumes-base parking (see the parking field)
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Park an assumes-incomplete base, indexing it under the top operator(s) of its
-     * {@code \assumes}
-     * formulas so it can be woken when a matching formula appears.
+     * Set the given base aside; see {@link ParkedBases#park}.
      *
-     * @param base the re-costed base container to park (carries the current age)
-     * @return {@code true} if the base was parked; {@code false} if it is not effectively indexable
-     *         (an unbound-generic {@code \assumes} top), in which case the caller must keep it in
-     *         the
-     *         active queue
+     * @return {@code true} if the base was parked, {@code false} if it cannot be parked and the
+     *         caller must keep it in the queue
      */
     private boolean park(TacletAppContainer base) {
-        final List<Operator> ops = assumesWakeOps(base);
-        if (ops == null) {
-            return false;
-        }
-        if (parkedByOp == null) {
-            parkedByOp = new LinkedHashMap<>();
-        }
-        for (Operator op : ops) {
-            Collection<RuleAppContainer> bucket = parkedByOp.get(op);
-            if (bucket == null) {
-                bucket = new ArrayList<>(4);
-                parkedByOp.put(op, bucket);
-            }
-            bucket.add(base);
-            // unindexParked removes by value -- O(n) on a list. A few operators can collect
-            // thousands of parked bases (e.g. the update operator on long straight-line proofs),
-            // which would make wake/unpark O(n^2). Once a bucket grows past the threshold, switch
-            // it
-            // to a LinkedHashSet for O(1) removal; small buckets (the vast majority) stay
-            // ArrayLists
-            // for the memory saving. Both preserve insertion order, so the woken set is unchanged.
-            if (bucket.size() == BUCKET_SET_THRESHOLD && bucket instanceof ArrayList) {
-                parkedByOp.put(op, new LinkedHashSet<>(bucket));
-            }
-        }
-        return true;
+        return parking.park(base, goal);
     }
 
     /**
-     * Re-insert into the active queue every parked base waiting on an operator that was added or
-     * modified since the previous round (see {@link #pendingWakeOps}). Woken bases are collected in
-     * insertion order (deterministic) and removed from all their index buckets.
+     * Put back into the queue every parked base that a formula changed since the previous round
+     * could match; see {@link ParkedBases#drainWoken()}.
      */
     private void wakeParkedBases() {
-        if (pendingWakeOps == null) {
-            return;
-        }
-        if (parkedByOp != null && !parkedByOp.isEmpty()) {
-            LinkedHashSet<RuleAppContainer> woken = null;
-            for (Operator op : pendingWakeOps) {
-                final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
-                if (bucket != null) {
-                    if (woken == null) {
-                        woken = new LinkedHashSet<>();
-                    }
-                    woken.addAll(bucket);
-                }
-            }
-            if (woken != null) {
-                for (RuleAppContainer c : woken) {
-                    unindexParked(c);
-                }
-                var time = System.nanoTime();
-                try {
-                    queue = queue.insert(woken.iterator());
-                } finally {
-                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
-                }
-            }
-        }
-        pendingWakeOps.clear();
-    }
-
-    /** Remove a woken container from every operator bucket it was parked under. */
-    private void unindexParked(RuleAppContainer c) {
-        if (parkedByOp == null || !(c instanceof TacletAppContainer tac)) {
-            return;
-        }
-        final List<Operator> ops = assumesWakeOps(tac);
-        if (ops == null) {
-            return;
-        }
-        for (Operator op : ops) {
-            final Collection<RuleAppContainer> bucket = parkedByOp.get(op);
-            if (bucket != null) {
-                bucket.remove(c);
-                if (bucket.isEmpty()) {
-                    parkedByOp.remove(op);
-                }
+        final Collection<RuleAppContainer> woken = parking.drainWoken();
+        if (!woken.isEmpty()) {
+            var time = System.nanoTime();
+            try {
+                queue = queue.insert(woken.iterator());
+            } finally {
+                PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
             }
         }
     }
 
     /**
-     * The concrete top operator(s) of the {@code \assumes} formulas of the given base, resolved
-     * through the find-match's schema-variable instantiations.
-     *
-     * @return the wake operators, or {@code null} if the base is <em>not</em> effectively indexable
-     *         -- i.e. some {@code \assumes} formula has a top that is an unbound schema variable
-     *         (it
-     *         would match any formula, so no precise wake operator exists) or has no
-     *         {@code \assumes}
-     *         formulas at all
-     */
-    private static @Nullable List<Operator> assumesWakeOps(TacletAppContainer base) {
-        final NoPosTacletApp app = base.getTacletApp();
-        final Sequent assumesSeq = app.taclet().assumesSequent();
-        if (assumesSeq.isEmpty()) {
-            return null;
-        }
-        final SVInstantiations insts = app.instantiations();
-        final List<Operator> ops = new ArrayList<>(assumesSeq.size());
-        for (SequentFormula sf : assumesSeq) {
-            Operator op = sf.formula().op();
-            if (op instanceof SchemaVariable sv) {
-                final Object inst = insts.getInstantiation(sv);
-                if (!(inst instanceof JTerm instTerm)) {
-                    return null; // unbound (or non-term) generic top -> not indexable
-                }
-                op = instTerm.op();
-                if (op instanceof SchemaVariable) {
-                    return null; // still schematic -> not indexable
-                }
-            }
-            ops.add(op);
-        }
-        return ops;
-    }
-
-    /**
-     * Record, for the next round's wake-up, the top operators of every formula added or modified by
-     * this sequent change. The assumes matcher strips the update context before matching, so the
-     * whole update-prefix spine of each changed formula is recorded -- a sound superset of the
-     * operators a parked base could match (see {@link #parkedByOp}). Called by {@code Goal} on
-     * every sequent change.
+     * Called by {@code Goal} whenever it adds or changes a formula in the sequent. Records the
+     * wake keys of each such formula (see {@link ParkedBases#recordWakeKeysOf}), so that
+     * {@link #wakeParkedBases()} can wake the matching bases at the start of the next round.
      * <p>
-     * <strong>Determinism invariant (see the class Javadoc):</strong> these events must be
-     * delivered
-     * in the goal's <em>own</em> order. The wake operators recorded here decide which parked bases
-     * are re-inserted next round, and thus the birth-age of the resulting candidates; reordering or
-     * coalescing {@code sequentChanged} deliveries across a goal's history would change wake timing
-     * and silently diverge the proof.
+     * The calls for one goal must arrive in the order in which that goal changed its sequent.
+     * These records decide which bases are woken in which round, and so, as the class comment
+     * explains, they decide the proof. Combining or reordering the calls would change the proof.
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        recordWakeOps(sci.addedFormulas(true));
-        recordWakeOps(sci.addedFormulas(false));
-        recordModifiedWakeOps(sci.modifiedFormulas(true));
-        recordModifiedWakeOps(sci.modifiedFormulas(false));
+        recordWakeKeys(sci.addedFormulas(true), true);
+        recordWakeKeys(sci.addedFormulas(false), false);
+        recordModifiedWakeKeys(sci.modifiedFormulas(true), true);
+        recordModifiedWakeKeys(sci.modifiedFormulas(false), false);
     }
 
-    private void recordWakeOps(ImmutableList<SequentFormula> added) {
+    private void recordWakeKeys(ImmutableList<SequentFormula> added, boolean inAntecedent) {
         for (SequentFormula sf : added) {
-            recordSpineOps(sf.formula());
+            parking.recordWakeKeysOf(sf.formula(), inAntecedent);
         }
     }
 
-    private void recordModifiedWakeOps(ImmutableList<FormulaChangeInfo> modified) {
+    private void recordModifiedWakeKeys(ImmutableList<FormulaChangeInfo> modified,
+            boolean inAntecedent) {
         for (FormulaChangeInfo fci : modified) {
-            recordSpineOps(fci.newFormula().formula());
-        }
-    }
-
-    /** Add the operators along a formula's update-application spine to {@link #pendingWakeOps}. */
-    private void recordSpineOps(org.key_project.logic.Term formula) {
-        if (pendingWakeOps == null) {
-            pendingWakeOps = new LinkedHashSet<>();
-        }
-        org.key_project.logic.Term t = formula;
-        while (true) {
-            final Operator op = t.op();
-            pendingWakeOps.add(op);
-            if (op instanceof UpdateApplication && t instanceof JTerm jt) {
-                t = UpdateApplication.getTarget(jt);
-            } else {
-                break;
-            }
+            parking.recordWakeKeysOf(fci.newFormula().formula(), inAntecedent);
         }
     }
 
@@ -696,36 +510,20 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     /**
-     * Copies this manager for a split goal. The parking/wake structures MUST be
-     * <em>deep</em>-copied
-     * (fresh outer map/set + fresh per-operator buckets), so each split sibling parks and wakes
-     * independently: sharing them would let one sibling's wake shift another sibling's candidate
-     * birth-ages and silently change that branch's proof. This deep copy is the enforcement of the
-     * goal-local determinism invariant documented on the class; see also
-     * {@code QueueRuleApplicationManagerParkingLocalityTest}. The contained
-     * {@link RuleAppContainer}s
-     * and {@link Operator}s are immutable and may be shared.
+     * Copies this manager when its goal splits into two. Each copy gets its own parking state
+     * ({@link ParkedBases#copy()}), so that the two new goals park and wake independently. If
+     * they shared this state, one goal waking a base would change the round in which it enters
+     * the other goal's queue, and so change that goal's proof (see the class comment). The
+     * stored {@link RuleAppContainer}s are never modified in place, so the copies may share
+     * them. {@code QueueRuleApplicationManagerParkingLocalityTest} checks that this copy is
+     * deep enough.
      */
     @Override
     public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
         res.queue = queue;
         res.previousMinimum = previousMinimum;
-        // deep-copy the goal-local parking structures (see the method Javadoc and the class-level
-        // determinism invariant); the contained containers and operators are immutable and shared
-        if (parkedByOp != null) {
-            final LinkedHashMap<Operator, Collection<RuleAppContainer>> copy =
-                new LinkedHashMap<>(parkedByOp.size());
-            for (Map.Entry<Operator, Collection<RuleAppContainer>> e : parkedByOp.entrySet()) {
-                final Collection<RuleAppContainer> v = e.getValue();
-                copy.put(e.getKey(),
-                    v instanceof LinkedHashSet ? new LinkedHashSet<>(v) : new ArrayList<>(v));
-            }
-            res.parkedByOp = copy;
-        }
-        if (pendingWakeOps != null) {
-            res.pendingWakeOps = new LinkedHashSet<>(pendingWakeOps);
-        }
+        res.parking = parking.copy();
         return res;
     }
 

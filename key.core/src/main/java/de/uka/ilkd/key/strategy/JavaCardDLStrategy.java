@@ -298,6 +298,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                 applyTF(sub(FocusProjection.INSTANCE, 0),
                     not(SimplifiedSelectTermFeature.create(heapLDT))),
                 longConst(-5600)));
+        bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
+        bindRuleSet(d, "simplify_select_elim_store", longConst(-7000));
         bindRuleSet(d, "apply_auxiliary_eq",
             // replace skolem constant by it's computed value
             add(isSelectSkolemConstantTerm("t1"), longConst(-5500)));

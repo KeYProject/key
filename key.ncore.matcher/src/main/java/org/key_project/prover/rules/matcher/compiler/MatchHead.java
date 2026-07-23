@@ -8,6 +8,8 @@ import java.util.List;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The operator-specific "head" of an {@link OperatorPlan}: it checks the operator of a term and any
  * operator-specific data (e.g. a modal-operator kind, a parametric function's generic arguments,
@@ -37,4 +39,22 @@ public interface MatchHead {
      * @return the compiled head matcher
      */
     MatchProgram compileHeadCheck();
+
+    /**
+     * The operator family this head accepts, as a key for indexing: two terms this head could
+     * accept must yield equal descriptors, and a term whose top operator is of a different
+     * family must yield a different one. A head that checks its operator by identity returns the
+     * operator itself; a head that accepts a whole family (for example every instance of a
+     * parametric function) returns the family's representative (its base). Returns {@code null}
+     * if the head cannot be summarized by one family (for example a schematic modality kind,
+     * which stands for several kinds at once); clients must then not index by this head.
+     * <p>
+     * This method is deliberately abstract: whoever adds a head for a new operator kind must
+     * state its family here, next to the matching rule the family has to agree with. See
+     * {@link MatchPlanBuilder#keySourceFor} for the consumer.
+     *
+     * @return the operator family descriptor, or {@code null} if there is none
+     */
+    @Nullable
+    Object topOperatorDescriptor();
 }
