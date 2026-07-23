@@ -45,18 +45,19 @@ public class InstantiationFileHandler {
         }
 
         Path prev = PathConfig.previousPaths.keyConfigDir.resolve("instantiations");
-        try {
-            Files.createDirectories(cur);
-            try (var files = Files.walk(prev)) {
-                files.forEach(path -> {
-                    try {
-                        Files.copy(path, cur.resolve(path.relativize(prev)));
-                    } catch (IOException ignore) {
-                    }
-                });
+        if (Files.exists(prev)) {
+            try {
+                Files.createDirectories(cur);
+                try (var files = Files.walk(prev)) {
+                    files.forEach(path -> {
+                        try {
+                            Files.copy(path, cur.resolve(path.relativize(prev)));
+                        } catch (IOException ignore) {
+                        }
+                    });
+                }
+            } catch (IOException ignore) {
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
         return cur;
     }
