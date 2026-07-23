@@ -181,8 +181,8 @@ public class TacletMatchDialog extends ApplyTacletDialog {
         ButtonListener listener = new ButtonListener();
         cancelButton.addActionListener(listener);
         applyButton.addActionListener(listener);
-        buttons.add(cancelButton);
         buttons.add(applyButton);
+        buttons.add(cancelButton);
         footer.add(buttons, BorderLayout.EAST);
 
         setStatus(model[current()].getStatusString());
