@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
@@ -38,6 +37,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.Properties.Property;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;

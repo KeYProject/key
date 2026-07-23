@@ -24,8 +24,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.util.properties.MapProperties;
-import de.uka.ilkd.key.util.properties.Properties;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
@@ -42,6 +40,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.prover.strategy.Strategy;
+import org.key_project.util.Properties;
+import org.key_project.util.Properties.Property;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;

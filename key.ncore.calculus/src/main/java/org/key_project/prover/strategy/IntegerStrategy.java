@@ -47,10 +47,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     /// Magic constants
     private static final int IN_EQ_SIMP_NON_LIN_COST = 1000;
 
-    /// Caps how often a cross multiplication is applied on a branch.
-    /// Justified by empirical measurements. Candidate to be exposed in
-    /// a settings strategy pane (not the strategy pane)
-    private static final int BRANCH_MULT_CAP = 8;
     private static final int POLY_DIVISION_COST = -2250;
 
     /// The features defining the three phases: cost computation, approval,
@@ -64,7 +60,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     protected final IFormulaTermFeatures ff;
 
     /// enum for the different arithmetic treatments
-    private enum ArithTreatment {
+    protected enum ArithTreatment {
         /// Non-linear arithmetic switched off.
         BASIC,
         /// Inequations are cross-multiplied but only in a bound and capped manner.
@@ -76,7 +72,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     /// configuration options extracted from [StrategyProperties]
-    private final ArithTreatment arith;
+    protected final ArithTreatment arith;
     private final boolean stopAtFirstNonCloseableGoal;
 
     private final IIntLdt numbers;
@@ -89,8 +85,14 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             IIntLdt numbers) {
         this.tf = tf;
         this.ff = ff;
-        this.nonLinearArithmeticEnabled = nonLinearArithmeticEnabled;
-        this.divAndModuloReasoningEnabled = divAndModuloReasoningEnabled;
+        // determine configuration
+        if (nonLinearArithmeticEnabled) {
+            arith = ArithTreatment.MODEL_SEARCH;
+        } else if (divAndModuloReasoningEnabled) {
+            arith = ArithTreatment.DEF_OPS;
+        } else {
+            arith = ArithTreatment.BASIC;
+        }
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
 
         this.featureConstants = featureConstants;
@@ -129,17 +131,51 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         return d;
     }
 
+
+    protected RuleSetDispatchFeature setupApprovalDispatcher() {
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+
+        if (arith != ArithTreatment.BASIC) {
+            // The InEquationMultFeature bounding enforced here is what prevents
+            // cross-multiplication from running in circles: only products that are
+            // bounded by the left side of an inequation already present in the
+            // sequent are approved, so the derivable monomials are capped. In
+            // DefOps mode the check is stricter (exact match only) to avoid the
+            // saturation blow-up acceptable for Model Search.
+            // baseCost is zero on the approval dispatcher: approval only distinguishes
+            // finite (approved) from infinite (rejected), so the base cost is irrelevant
+            // here and left out to keep the approval decision identical to stock.
+            setupMultiplyInequations(d, longConst(0), inftyConst(), AT_APPROVAL);
+        }
+        // these taclets are not supposed to be applied with metavariable
+        // instantiations
+        // I'll keep it here for the moment as documentation, but comment it out
+        // as meta variables are no longer part of KeY 2.x
+        /*
+         * bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) ); bindRuleSet ( d,
+         * "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
+         *
+         * bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) ); bindRuleSet
+         * ( d, "inEqSimp_nonLin_divide", isInstantiated ( "divY" ) ); bindRuleSet ( d,
+         * "inEqSimp_nonLin_pos", isInstantiated ( "divY" ) ); bindRuleSet ( d,
+         * "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
+         *
+         * bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
+         */
+        setupNewSymApproval(d, numbers);
+
+        bindRuleSet(d, "defOps_div", featureConstants.nonDuplicateAppModPositionFeature());
+
+        if (arith == ArithTreatment.MODEL_SEARCH) {
+            setupInEqCaseDistinctionsApproval(d);
+        }
+
+        return d;
+    }
+
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
-    }
-
-    private boolean arithNonLinInferences() {
-        return nonLinearArithmeticEnabled;
-    }
-
-    protected boolean arithDefOps() {
-        return divAndModuloReasoningEnabled;
     }
 
     @Override
@@ -831,8 +867,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                             : longConst(0),
 
                     capBranch
-                            ? ifZero(BranchMultiplicationCountFeature.atMost("multiply_2_inEq",
-                                BRANCH_MULT_CAP), longConst(0), notAllowedF)
+                            ? ifZero(getBranchCountFeatureFor("multiply_2_inEq"), longConst(0),
+                                notAllowedF)
                             : longConst(0),
                     ifZero(exactlyBounded, longConst(0),
                         onlyExactlyBounded ? notAllowedF
@@ -848,6 +884,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                  */
                 ), notAllowedF)));
     }
+
+    protected abstract Feature getBranchCountFeatureFor(String prefix);
 
     private void setupInEqSimpInstantiation(RuleSetDispatchFeature d) {
         // category "handling of non-linear inequations"

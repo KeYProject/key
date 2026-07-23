@@ -48,6 +48,11 @@ import org.jspecify.annotations.NonNull;
 public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements ComponentStrategy<Goal> {
     private final Proof proof;
 
+    /// Caps how often a cross multiplication is applied on a branch.
+    /// Justified by empirical measurements. Candidate to be exposed in
+    /// a settings strategy pane (not the strategy pane)
+    private static final int BRANCH_MULT_CAP = 8;
+
     public JavaIntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff, Proof proof,
             StrategyProperties strategyProperties) {
         super(tf, ff, StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
@@ -84,7 +89,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     protected void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
         super.setupDefOpsPrimaryCategories(d);
-        if (arithDefOps()) {
+        if (arith == ArithTreatment.DEF_OPS) {
             bindRuleSet(d, "defOps_jdiv",
                 SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
                     applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
@@ -100,7 +105,11 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
             bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
                 applyTF("divDenom", tf.literal), longConst(-4000)));
         }
+    }
 
+    @Override
+    protected Feature getBranchCountFeatureFor(String prefix) {
+        return BranchMultiplicationCountFeature.atMost(prefix, BRANCH_MULT_CAP);
     }
 
     @Override
