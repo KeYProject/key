@@ -5,11 +5,12 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
@@ -42,7 +43,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The visibility of the class invariant (null for default visibility).
      */
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     /**
      * The original invariant from which the class invariant is derived.
      */
@@ -77,7 +78,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
+            ModifierKind visibility, JTerm inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -88,22 +89,28 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
      * @param visibility the visibility of the invariant (null for default visibility)
+     *        TODO weigl: what is the "default visibility"?
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
+            ModifierKind visibility, JTerm inv, LocationVariable selfVar,
             boolean free) {
-        assert name != null && !name.isEmpty();
-        assert displayName != null && !displayName.isEmpty();
-        assert kjt != null;
-        assert inv != null;
-        this.name = name;
-        this.displayName = displayName;
-        this.kjt = kjt;
-        this.visibility = visibility;
-        this.originalInv = inv;
+
+        this.name = Objects.requireNonNull(name);
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("name must not be blank");
+        }
+
+        this.displayName = Objects.requireNonNull(displayName);
+        if (displayName.isEmpty()) {
+            throw new IllegalArgumentException("displayName must not be empty");
+        }
+
+        this.kjt = Objects.requireNonNull(kjt);
+        this.visibility = Objects.requireNonNullElse(visibility, ModifierKind.PUBLIC);
+        this.originalInv = Objects.requireNonNull(inv);
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
@@ -186,7 +193,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 

@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -34,6 +33,8 @@ import org.key_project.util.collection.Pair;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.ast.declaration.ModifierKind.*;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides
@@ -481,14 +482,18 @@ public final class JavaInfo {
         // TODO: package information not yet available
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
-        final VisibilityModifier visibility = ax.getVisibility();
-        if (VisibilityModifier.isPublic(visibility)) {
+        final ModifierKind visibility = ax.getVisibility();
+        assert visibility != null && visibility.isVisibility();
+
+        if (PUBLIC == visibility) {
             return true;
         }
-        if (VisibilityModifier.allowsInheritance(visibility)) {
+
+        if (visibility.allowsInheritance()) {
             return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
         }
-        if (VisibilityModifier.isPackageVisible(visibility)) {
+
+        if (visibility == PROTECTED || visibility == JML_PACKAGE) {
             return visibleToPackage;
         } else {
             return kjt.equals(visibleTo);

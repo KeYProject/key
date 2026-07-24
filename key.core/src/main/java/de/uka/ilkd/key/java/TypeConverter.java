@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
@@ -161,8 +160,7 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private JTerm translateOperator(Operator op,
-            ExecutionContext ec) {
+    private JTerm translateOperator(Operator op, ExecutionContext ec) {
 
         final JTerm[] subs = new JTerm[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
@@ -170,19 +168,23 @@ public final class TypeConverter {
         }
 
         // hack: convert object singleton to location singleton
-        if (op instanceof Singleton) {
-            assert heapLDT.getSortOfSelect(subs[0].op()) != null
-                    : "unexpected argument of \\singleton: " + subs[0];
-            return tb.singleton(subs[0].sub(1), subs[0].sub(2));
+        if (op instanceof LogicFunctionalOperator o) {
+            if (o.getFunction() == LogicFunctionalOperator.LogicFunction.Singleton) {
+                assert heapLDT.getSortOfSelect(subs[0].op()) != null
+                        : "unexpected argument of \\singleton: " + subs[0];
+                return tb.singleton(subs[0].sub(1), subs[0].sub(2));
+            }
         }
 
         LDT responsibleLDT = getResponsibleLDT(op, subs, services, ec);
         if (responsibleLDT != null) {
             return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
-        } else if (op instanceof Equals) {
+        } else if (op instanceof BinaryOperator bo
+                && bo.getKind() == BinaryOperatorKind.EQUALS) {
             assert subs.length == 2;
             return tb.equals(subs[0], subs[1]);
-        } else if (op instanceof NotEquals) {
+        } else if (op instanceof BinaryOperator bo
+                && bo.getKind() == BinaryOperatorKind.NOT_EQUALS) {
             assert subs.length == 2;
             return tb.not(tb.equals(subs[0], subs[1]));
         } else if (op instanceof Conditional) {
@@ -400,17 +402,6 @@ public final class TypeConverter {
             }
         }
     }
-
-    public static boolean isArithmeticOperator(Operator op) {
-        return op instanceof Divide || op instanceof Times || op instanceof Plus
-                || op instanceof Minus
-                || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
-                || op instanceof BinaryAnd || op instanceof BinaryNot || op instanceof BinaryOr
-                || op instanceof BinaryXOr || op instanceof Negative || op instanceof PreIncrement
-                || op instanceof PostIncrement || op instanceof PreDecrement
-                || op instanceof PostDecrement;
-    }
-
 
     // TODO Adapt for @Reals
     /**

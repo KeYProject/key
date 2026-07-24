@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.IGuard;
 import de.uka.ilkd.key.java.ast.statement.While;
@@ -35,6 +35,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LESS_THAN;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -118,9 +120,9 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         // the guard is expected to be of the form "i < x" and we want to retrieve "i".
         assert guard.getChildCount() == 1 : "child count: " + guard.getChildCount();
         ProgramElement guardStatement = guard.getChildAt(0);
-        skipIndex = !(guardStatement instanceof LessThan);
+        skipIndex = !(guardStatement instanceof BinaryOperator b && b.getKind() == LESS_THAN);
         Expression loopIndex =
-            skipIndex ? null : (Expression) ((LessThan) guard.getChildAt(0)).getChildAt(0);
+            skipIndex ? null : (Expression) ((BinaryOperator) guard.getChildAt(0)).getChildAt(0);
         skipIndex = skipIndex || !(loopIndex instanceof ProgramVariable);
         final JTerm loopIdxVar = skipIndex ? null : tb.var((ProgramVariable) loopIndex);
 
@@ -131,8 +133,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         // get the second statement if possible
         Statement last =
             (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1);
-        skipValues = skipValues || !(last instanceof CopyAssignment);
-        CopyAssignment assignment = skipValues ? null : ((CopyAssignment) last);
+        skipValues = skipValues || !(last instanceof Assignment);
+        Assignment assignment = skipValues ? null : ((Assignment) last);
         ProgramElement lhs = skipValues ? null : assignment.getChildAt(0);
         skipValues = skipValues || !(lhs instanceof ProgramVariable);
         final JTerm valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);

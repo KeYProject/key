@@ -15,15 +15,15 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.modifier.*;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
@@ -86,6 +86,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
+import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
+import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.*;
+import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.NEGATIVE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.*;
 import static java.lang.String.format;
 
@@ -235,20 +238,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Expression expr = accept(n.getValue());
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        return switch (n.getOperator()) {
-            case ASSIGN -> new CopyAssignment(pi, c, target, expr);
-            case PLUS -> new PlusAssignment(pi, c, target, expr);
-            case MINUS -> new MinusAssignment(pi, c, target, expr);
-            case MULTIPLY -> new TimesAssignment(pi, c, target, expr);
-            case DIVIDE -> new DivideAssignment(pi, c, target, expr);
-            case BINARY_AND -> new BinaryAndAssignment(pi, c, target, expr);
-            case BINARY_OR -> new BinaryOrAssignment(pi, c, target, expr);
-            case XOR -> new BinaryXOrAssignment(pi, c, target, expr);
-            case REMAINDER -> new ModuloAssignment(pi, c, target, expr);
-            case LEFT_SHIFT -> new ShiftLeftAssignment(pi, c, target, expr);
-            case SIGNED_RIGHT_SHIFT -> new ShiftRightAssignment(pi, c, target, expr);
-            case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRightAssignment(pi, c, target, expr);
+        var op = switch (n.getOperator()) {
+            case ASSIGN -> AssignmentKind.COPY;
+            case PLUS -> AssignmentKind.PLUS;
+            case MINUS -> AssignmentKind.MINUS;
+            case MULTIPLY -> AssignmentKind.TIMES;
+            case DIVIDE -> AssignmentKind.DIVIDE;
+            case BINARY_AND -> AssignmentKind.BINARY_AND;
+            case BINARY_OR -> AssignmentKind.BINARY_OR;
+            case XOR -> AssignmentKind.BINARY_XOR;
+            case REMAINDER -> AssignmentKind.MODULO;
+            case LEFT_SHIFT -> AssignmentKind.SHIFT_LEFT;
+            case SIGNED_RIGHT_SHIFT -> AssignmentKind.SHIFT_RIGHT;
+            case UNSIGNED_RIGHT_SHIFT -> AssignmentKind.UNSIGNED_SHIFT_RIGHT;
         };
+        return new Assignment(pi, c, op, target, expr);
     }
 
     @Override
@@ -257,27 +261,28 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Expression rhs = (Expression) n.getRight().accept(this, arg);
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        return switch (n.getOperator()) {
-            case OR -> new LogicalOr(pi, c, lhs, rhs);
-            case AND -> new LogicalAnd(pi, c, lhs, rhs);
-            case BINARY_OR -> new BinaryOr(pi, c, lhs, rhs);
-            case BINARY_AND -> new BinaryAnd(pi, c, lhs, rhs);
-            case XOR -> new BinaryXOr(pi, c, lhs, rhs);
-            case EQUALS -> new Equals(pi, c, lhs, rhs);
-            case NOT_EQUALS -> new NotEquals(pi, c, lhs, rhs);
-            case LESS -> new LessThan(pi, c, lhs, rhs);
-            case GREATER -> new GreaterThan(pi, c, lhs, rhs);
-            case LESS_EQUALS -> new LessOrEquals(pi, c, lhs, rhs);
-            case GREATER_EQUALS -> new GreaterOrEquals(pi, c, lhs, rhs);
-            case LEFT_SHIFT -> new ShiftLeft(pi, c, lhs, rhs);
-            case SIGNED_RIGHT_SHIFT -> new ShiftRight(pi, c, lhs, rhs);
-            case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRight(pi, c, lhs, rhs);
-            case PLUS -> new Plus(pi, c, lhs, rhs);
-            case MINUS -> new Minus(pi, c, lhs, rhs);
-            case MULTIPLY -> new Times(pi, c, lhs, rhs);
-            case DIVIDE -> new Divide(pi, c, lhs, rhs);
-            case REMAINDER -> new Modulo(pi, c, lhs, rhs);
+        var op = switch (n.getOperator()) {
+            case OR -> BinaryOperatorKind.LOGICAL_OR;
+            case AND -> BinaryOperatorKind.LOGICAL_AND;
+            case BINARY_OR -> BinaryOperatorKind.BINARY_OR;
+            case BINARY_AND -> BinaryOperatorKind.BINARY_AND;
+            case XOR -> BinaryOperatorKind.BINARY_XOR;
+            case EQUALS -> BinaryOperatorKind.EQUALS;
+            case NOT_EQUALS -> BinaryOperatorKind.NOT_EQUALS;
+            case LESS -> BinaryOperatorKind.LESS_THAN;
+            case GREATER -> BinaryOperatorKind.GREATER_THAN;
+            case LESS_EQUALS -> BinaryOperatorKind.LESS_OR_EQUALS;
+            case GREATER_EQUALS -> BinaryOperatorKind.GREATER_OR_EQUALS;
+            case LEFT_SHIFT -> BinaryOperatorKind.SHIFT_LEFT;
+            case SIGNED_RIGHT_SHIFT -> BinaryOperatorKind.SHIFT_RIGHT;
+            case UNSIGNED_RIGHT_SHIFT -> BinaryOperatorKind.UNSIGNED_SHIFT_RIGHT;
+            case PLUS -> BinaryOperatorKind.PLUS;
+            case MINUS -> BinaryOperatorKind.MINUS;
+            case MULTIPLY -> BinaryOperatorKind.TIMES;
+            case DIVIDE -> BinaryOperatorKind.DIVIDE;
+            case REMAINDER -> BinaryOperatorKind.MODULO;
         };
+        return new BinaryOperator(pi, c, op, lhs, rhs);
     }
 
     @Override
@@ -621,6 +626,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ExpressionStmt n, Void arg) {
+
         return accept(n.getExpression());
     }
 
@@ -656,7 +662,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     && rlt.getKeYJavaType().getSort() == services.getTypeConverter().getSeqLDT()
                             .targetSort()) {
                 Expression child = (Expression) n.scope().accept(this, null);
-                return new SeqLength(pi, c, child);
+                return new LogicFunctionalOperator(pi, c, SeqLength, child);
             }
         }
         try {
@@ -762,11 +768,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return switch (n.getKind()) {
             case MarkerStatementHelper.KIND_ASSERT -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(Kind.ASSERT, construct, pi);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
             }
             case MarkerStatementHelper.KIND_ASSUME -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(Kind.ASSUME, construct, pi);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
             }
             case MarkerStatementHelper.KIND_SET -> {
                 KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
@@ -909,8 +915,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         StatementBlock body = accept(n.getBody());
         de.uka.ilkd.key.java.ast.declaration.Modifier[] mods =
-            n.isStatic() ? new de.uka.ilkd.key.java.ast.declaration.Modifier[] { new Static() }
-                    : new de.uka.ilkd.key.java.ast.declaration.Modifier[0];
+            n.isStatic()
+                    ? createModifierList(ModifierKind.STATIC)
+                    : createModifierList();
         return new ClassInitializer(mods, body, pi, c);
     }
 
@@ -1357,19 +1364,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 }
                 return new IntLiteral(pi, c, -num.intValue());
             }
-            return new Negative(pi, c, accept(expr));
+            return new UnaryOperator(pi, c, NEGATIVE, accept(expr));
         }
+
         Expression child = accept(n.getExpression());
-        return switch (n.getOperator()) {
-            case PLUS -> new Positive(pi, c, child);
-            case MINUS -> throw new IllegalStateException();
-            case PREFIX_INCREMENT -> new PreIncrement(pi, c, child);
-            case PREFIX_DECREMENT -> new PreDecrement(pi, c, child);
-            case LOGICAL_COMPLEMENT -> new LogicalNot(pi, c, child);
-            case BITWISE_COMPLEMENT -> new BinaryNot(pi, c, child);
-            case POSTFIX_INCREMENT -> new PostIncrement(pi, c, child);
-            case POSTFIX_DECREMENT -> new PostDecrement(pi, c, child);
+        var op = switch (n.getOperator()) {
+            case PLUS -> UnaryOperatorKind.POSITIVE;
+            case MINUS -> UnaryOperatorKind.NEGATIVE;
+            case PREFIX_INCREMENT -> UnaryOperatorKind.PRE_INCREMENT;
+            case PREFIX_DECREMENT -> UnaryOperatorKind.PRE_DECREMENT;
+            case LOGICAL_COMPLEMENT -> UnaryOperatorKind.LOGICAL_NOT;
+            case BITWISE_COMPLEMENT -> UnaryOperatorKind.BINARY_NOT;
+            case POSTFIX_INCREMENT -> UnaryOperatorKind.POST_INCREMENT;
+            case POSTFIX_DECREMENT -> UnaryOperatorKind.POST_DECREMENT;
         };
+        return new UnaryOperator(pi, c, op, child);
     }
 
     @Override
@@ -1596,56 +1605,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return null;
         }
 
-        return switch ((Modifier.DefaultKeyword) k) {
-            case PUBLIC -> new Public(pi, c);
-            case PROTECTED -> new Protected(pi, c);
-            case PRIVATE -> new Private(pi, c);
-            case ABSTRACT -> new Abstract(pi, c);
-            case STATIC -> new Static(pi, c);
-            case FINAL -> new Final(pi, c);
-            case TRANSIENT -> new Transient(pi, c);
-            case VOLATILE -> new Volatile(pi, c);
-            case SYNCHRONIZED -> new Synchronized(pi, c);
-            case NATIVE -> new Native(pi, c);
-            case STRICTFP -> new StrictFp(pi, c);
-            case TRANSITIVE -> new Modifiers.TRANSITIVE(pi, c);
-            case SEALED -> new Modifiers.SEALED(pi, c);
-            case NON_SEALED -> new Modifiers.NON_SEALED(pi, c);
-            case JML_PACKAGE -> new Modifiers.JML_PACKAGE(pi, c);
-            case JML_PURE -> new Modifiers.JML_PURE(pi, c);
-            case JML_STRICTLY_PURE -> new Modifiers.JML_STRICTLY_PURE(pi, c);
-            case JML_HELPER -> new Modifiers.JML_HELPER(pi, c);
-            case JML_INSTANCE -> new Modifiers.JML_INSTANCE(pi, c);
-            case JML_NULLABLE_BY_DEFAULT -> new Modifiers.JML_NULLABLE_BY_DEFAULT(pi, c);
-            case JML_NON_NULL -> new Modifiers.JML_NON_NULL(pi, c);
-            case JML_NULLABLE -> new Modifiers.JML_NULLABLE(pi, c);
-            case JML_GHOST -> new Ghost(pi, c);
-            case JML_MODEL -> new Model(pi, c);
-            case JML_TWO_STATE -> new TwoState(pi, c);
-            case JML_SPEC_PUBLIC -> new Modifiers.JML_SPEC_PUBLIC(pi, c);
-            case JML_SPEC_PACKAGE -> new Modifiers.JML_SPEC_PACKAGE(pi, c);
-            case JML_SPEC_PROTECTED -> new Modifiers.JML_SPEC_PROTECTED(pi, c);
-            case JML_SPEC_PRIVATE -> new Modifiers.JML_SPEC_PRIVATE(pi, c);
-            case JML_NO_STATE -> new NoState(pi, c);
-            case JML_NON_NULL_BY_DEFAULT -> new Modifiers.JML_NON_NULL_BY_DEFAULT(pi, c);
-            case JML_NON_NULL_ELEMENTS -> new Modifiers.JML_NON_NULL_ELEMENTS(pi, c);
-            case JML_UNPARSABLE_MODIFIERS -> new Modifiers.JML_UNPARSABLE_MODIFIERS(pi, c);
-            case JML_CODE_BIGINT_MATH -> new Modifiers.JML_CODE_BIGINT_MATH(pi, c);
-            case JML_CODE_JAVA_MATH -> new Modifiers.JML_CODE_JAVA_MATH(pi, c);
-            case JML_CODE_SAFE_MATH -> new Modifiers.JML_CODE_SAFE_MATH(pi, c);
-            case JML_SPEC_BIGINT_MATH -> new Modifiers.JML_SPEC_BIGINT_MATH(pi, c);
-            case JML_SPEC_JAVA_MATH -> new Modifiers.JML_SPEC_JAVA_MATH(pi, c);
-            case JML_SPEC_SAFE_MATH -> new Modifiers.JML_SPEC_SAFE_MATH(pi, c);
-            case JML_CODE -> new Modifiers.JML_CODE(pi, c);
-            case JML_OT_PEER -> new Modifiers.JML_OT_PEER(pi, c);
-            case JML_OT_REP -> new Modifiers.JML_OT_REP(pi, c);
-            case JML_OT_READ_ONLY -> new Modifiers.JML_OT_READ_ONLY(pi, c);
-            case DEFAULT -> new Modifiers.DEFAULT(pi, c);
-            default -> {
-                reportUnsupportedElement(n);
-                yield null;
-            }
-        };
+        var kind = ModifierKind.valueOf(
+            ((Modifier.DefaultKeyword) k).name());
+        if (kind == null) {
+            reportUnsupportedElement(n);
+        }
+        return new de.uka.ilkd.key.java.ast.declaration.Modifier(pi, c, kind);
     }
 
 
@@ -1794,37 +1759,40 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ImmutableArray<Expression> args = map(arguments);
 
-        return switch (name) {
-            case "\\all_objects" -> new AllObjects(pi, c, args.get(0));
-            case "\\all_fields" -> new AllFields(pi, c, args.get(0));
-            case "\\intersect" -> new Intersect(pi, c, args.get(0), args.get(1));
-            case "\\set_union" -> new SetUnion(pi, c, args.get(0), args.get(1));
-            case "\\singleton" -> new Singleton(pi, c, args.get(0));
-            case "\\set_minus" -> new SetMinus(pi, c, args.get(0), args.get(1));
-            case "\\seq_sub" -> new SeqSub(pi, c, args.get(0), args.get(1), args.get(2));
-            case "\\seq_reverse" -> new SeqReverse(pi, c, args.get(0));
-            case "\\seq_singleton" -> new SeqSingleton(pi, c, args.get(0));
-            case "\\seq_length" -> new SeqLength(pi, c, args.get(0));
-            case "\\indexOf" -> new SeqIndexOf(pi, c, args.get(0), args.get(1));
-            case "\\seq_concat" -> new SeqConcat(pi, c, args.get(0), args.get(1));
-            case "\\seq_get" -> new SeqGet(pi, c, args.get(0), args.get(1));
-            case "\\seq_upd" -> new SeqPut(pi, c, args.get(0), args.get(1), args.get(2));
-            default -> {
-                if (name.startsWith("\\dl_")) {
-                    name = name.substring(4);
-                }
-                Function named =
-                    services.getNamespaces().functions()
-                            .lookup(new org.key_project.logic.Name(name));
-                if (named == null) {
-
-                    yield reportError(n, format(
-                        "In an embedded DL expression, %s is not a known DL function name.", name));
-                }
-                yield new DLEmbeddedExpression(pi, c, (JFunction) named, args);
-
-            }
+        var fn = switch (name) {
+            case "\\all_objects" -> AllObjects;
+            case "\\all_fields" -> AllFields;
+            case "\\intersect" -> Intersect;
+            case "\\set_union" -> SetUnion;
+            case "\\singleton" -> Singleton;
+            case "\\set_minus" -> SetMinus;
+            case "\\seq_sub" -> SeqSub;
+            case "\\seq_reverse" -> SeqReverse;
+            case "\\seq_singleton" -> SeqSingleton;
+            case "\\seq_length" -> SeqLength;
+            case "\\indexOf" -> SeqIndexOf;
+            case "\\seq_concat" -> SeqConcat;
+            case "\\seq_get" -> SeqGet;
+            case "\\seq_upd" -> SeqPut;
+            default -> null;
         };
+
+        if (fn != null) {
+            return new LogicFunctionalOperator(pi, c, fn, args);
+        }
+
+        if (name.startsWith("\\dl_")) {
+            name = name.substring(4);
+        }
+
+        Function named =
+            services.getNamespaces().functions()
+                    .lookup(new org.key_project.logic.Name(name));
+        if (named == null) {
+            return reportError(n, format(
+                "In an embedded DL expression, %s is not a known DL function name.", name));
+        }
+        return new DLEmbeddedExpression(pi, c, (JFunction) named, args);
     }
 
     private ImmutableArray<Expression> map(

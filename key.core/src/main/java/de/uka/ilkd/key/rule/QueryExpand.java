@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -45,6 +45,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
 
 
 /**
@@ -208,7 +210,7 @@ public class QueryExpand implements BuiltInRule {
 
         stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
 
-        final CopyAssignment assignment = new CopyAssignment(result, mr);
+        final Assignment assignment = new Assignment(COPY, result, mr);
 
         stmnt.add(assignment);
 

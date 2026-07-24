@@ -7,17 +7,15 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -42,8 +40,6 @@ public interface Visitor {
 
     void performActionOnProgramVariable(ProgramVariable x);
 
-    void performActionOnIProgramVariable(IProgramVariable x);
-
     void performActionOnSchemaVariable(SchemaVariable x);
 
     void performActionOnProgramMethod(IProgramMethod x);
@@ -60,31 +56,7 @@ public interface Visitor {
 
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
 
-    void performActionOnSingleton(Singleton x);
-
-    void performActionOnSetUnion(SetUnion x);
-
-    void performActionOnIntersect(Intersect x);
-
-    void performActionOnSetMinus(SetMinus x);
-
-    void performActionOnAllFields(AllFields x);
-
-    void performActionOnAllObjects(AllObjects allObjects);
-
     void performActionOnEmptySeqLiteral(EmptySeqLiteral x);
-
-    void performActionOnSeqSingleton(SeqSingleton x);
-
-    void performActionOnSeqConcat(SeqConcat x);
-
-    void performActionOnSeqIndexOf(SeqIndexOf x);
-
-    void performActionOnSeqSub(SeqSub x);
-
-    void performActionOnSeqReverse(SeqReverse x);
-
-    void performActionOnSeqPut(SeqPut seqPut);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
@@ -178,63 +150,9 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnBinaryAnd(BinaryAnd x);
-
-    void performActionOnBinaryAndAssignment(BinaryAndAssignment x);
-
-    void performActionOnBinaryOrAssignment(BinaryOrAssignment x);
-
-    void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
-
-    void performActionOnCopyAssignment(CopyAssignment x);
-
     void performActionOnSetStatement(SetStatement x);
 
-    void performActionOnDivideAssignment(DivideAssignment x);
-
-    void performActionOnMinusAssignment(MinusAssignment x);
-
-    void performActionOnModuloAssignment(ModuloAssignment x);
-
-    void performActionOnPlusAssignment(PlusAssignment x);
-
-    void performActionOnPostDecrement(PostDecrement x);
-
-    void performActionOnPostIncrement(PostIncrement x);
-
-    void performActionOnPreDecrement(PreDecrement x);
-
-    void performActionOnPreIncrement(PreIncrement x);
-
-    void performActionOnShiftLeftAssignment(ShiftLeftAssignment x);
-
-    void performActionOnShiftRightAssignment(ShiftRightAssignment x);
-
-    void performActionOnTimesAssignment(TimesAssignment x);
-
-    void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x);
-
-    void performActionOnBinaryNot(BinaryNot x);
-
-    void performActionOnBinaryOr(BinaryOr x);
-
-    void performActionOnBinaryXOr(BinaryXOr x);
-
     void performActionOnConditional(Conditional x);
-
-    void performActionOnDivide(Divide x);
-
-    void performActionOnEquals(Equals x);
-
-    void performActionOnGreaterOrEquals(GreaterOrEquals x);
-
-    void performActionOnGreaterThan(GreaterThan x);
-
-    void performActionOnLessOrEquals(LessOrEquals x);
-
-    void performActionOnLessThan(LessThan x);
-
-    void performActionOnNotEquals(NotEquals x);
 
     void performActionOnNewArray(NewArray x);
 
@@ -245,30 +163,6 @@ public interface Visitor {
     void performActionOnNew(New x);
 
     void performActionOnTypeCast(TypeCast x);
-
-    void performActionOnLogicalAnd(LogicalAnd x);
-
-    void performActionOnLogicalNot(LogicalNot x);
-
-    void performActionOnLogicalOr(LogicalOr x);
-
-    void performActionOnMinus(Minus x);
-
-    void performActionOnModulo(Modulo x);
-
-    void performActionOnNegative(Negative x);
-
-    void performActionOnPlus(Plus x);
-
-    void performActionOnPositive(Positive x);
-
-    void performActionOnShiftLeft(ShiftLeft x);
-
-    void performActionOnShiftRight(ShiftRight x);
-
-    void performActionOnTimes(Times x);
-
-    void performActionOnUnsignedShiftRight(UnsignedShiftRight x);
 
     void performActionOnArrayReference(ArrayReference x);
 
@@ -283,8 +177,6 @@ public interface Visitor {
     void performActionOnSchematicFieldReference(SchematicFieldReference x);
 
     void performActionOnVariableReference(VariableReference x);
-
-    void performActionOnMethod(IProgramMethod x);
 
     void performActionOnSuperConstructorReference(SuperConstructorReference x);
 
@@ -372,10 +264,6 @@ public interface Visitor {
 
     void performActionOnMergeContract(MergeContract x);
 
-    void performActionOnSeqLength(SeqLength seqLength);
-
-    void performActionOnSeqGet(SeqGet seqGet);
-
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
     void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
@@ -416,6 +304,11 @@ public interface Visitor {
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
-    void performActionOnSubtype(Subtype subtype);
+    void performActionOnBinaryOperator(BinaryOperator op);
 
+    void performActionOnUnaryOperator(UnaryOperator op);
+
+    void performActionOnLogicFunctionalOperator(LogicFunctionalOperator op);
+
+    void performActionOnAssignment(Assignment assignment);
 }

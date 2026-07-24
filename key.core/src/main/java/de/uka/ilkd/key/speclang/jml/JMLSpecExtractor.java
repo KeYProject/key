@@ -4,16 +4,21 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.*;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
@@ -34,9 +39,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import org.key_project.util.collection.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -55,7 +57,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
-    /** The default signals only clause for errors and runtime exceptions. **/
+    /**
+     * The default signals only clause for errors and runtime exceptions.
+     **/
     private static final String DEFAULT_SIGNALS_ONLY =
         format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
     /**
@@ -181,20 +185,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // add invariants for non_null fields
         for (MemberDeclaration member : td.getMembers()) {
             if (member instanceof FieldDeclaration) {
-                VisibilityModifier visibility = null;
+                ModifierKind visibility = null;
                 for (Modifier mod : member.getModifiers()) {
-                    if (mod instanceof VisibilityModifier) {
-                        visibility = (VisibilityModifier) mod;
+                    visibility = mod.getKind();
+                    if (visibility.isVisibility()) {
                         break;
                     }
                 }
                 // check for spec_* modifiers (bug #1280)
                 if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                    Modifiers.JML_SPEC_PUBLIC.class)) {
-                    visibility = new Public();
+                    ModifierKind.JML_SPEC_PUBLIC)) {
+                    visibility = ModifierKind.PUBLIC;
                 } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                    Modifiers.JML_SPEC_PROTECTED.class)) {
-                    visibility = new Protected();
+                    ModifierKind.JML_SPEC_PROTECTED)) {
+                    visibility = ModifierKind.PROTECTED;
                 }
 
                 for (FieldSpecification field : ((FieldDeclaration) member)
@@ -291,7 +295,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
             if (c instanceof TextualJMLMethodDecl m) {
-                if (pm.getMethodDeclaration().containsModifier(Model.class)) {
+                if (pm.getMethodDeclaration().containsModifier(ModifierKind.JML_MODEL)) {
                     modelMethodDefinition = m.getMethodDefinition();
                     break;
                 }

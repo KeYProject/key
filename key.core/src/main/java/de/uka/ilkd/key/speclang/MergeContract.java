@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -38,7 +38,7 @@ public interface MergeContract extends SpecificationElement {
     MergeProcedure getInstantiatedMergeProcedure(Services services);
 
     @Override
-    default VisibilityModifier getVisibility() {
+    default ModifierKind getVisibility() {
         assert false : "Method getVisibility() is unimplemented for MergeContract";
         return null;
     }

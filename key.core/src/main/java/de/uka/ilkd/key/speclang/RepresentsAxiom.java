@@ -11,7 +11,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -37,7 +37,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     private final JTerm originalPre;
     private final JTerm originalRep;
     private final LocationVariable originalSelfVar;
@@ -48,14 +48,14 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<LocationVariable> originalParamVars;
 
     public RepresentsAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
+            ModifierKind visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
     public RepresentsAxiom(String name, String displayName, IObserverFunction target,
-            KeYJavaType kjt, VisibilityModifier visibility, JTerm pre, JTerm rep,
+            KeYJavaType kjt, ModifierKind visibility, JTerm pre, JTerm rep,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
@@ -139,7 +139,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 
@@ -227,11 +227,11 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (!target.equals(ax.target) || !kjt.equals(ax.kjt)) {
             throw new RuntimeException("Tried to conjoin incompatible represents axioms.");
         }
-        VisibilityModifier minVisibility = visibility == null
-                ? (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null)
+        ModifierKind minVisibility = visibility == null
+                ? (ModifierKind.PRIVATE == ax.visibility ? ax.visibility : null)
                 : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
         JTerm newRep = tb.and(originalRep, ax.originalRep);
-        JTerm newPre = null;
+        JTerm newPre;
         if (originalPre == null) {
             newPre = ax.originalPre;
         } else if (ax.originalPre == null) {
