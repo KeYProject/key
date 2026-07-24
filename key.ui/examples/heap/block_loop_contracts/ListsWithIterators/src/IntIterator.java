@@ -1,6 +1,6 @@
 import java.util.Iterator;
 
-public class IntIterator implements Iterator {
+public final class IntIterator implements Iterator {
 
     private final IntLinkedList list;
     private /*@nullable@*/ IntNode next;

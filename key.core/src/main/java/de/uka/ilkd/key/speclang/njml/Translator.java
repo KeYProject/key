@@ -1513,7 +1513,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryValues(JmlParser.PrimaryValuesContext ctx) {
-        return termFactory.values(this.containerType);
+        return termFactory.values();
     }
 
     @Override
