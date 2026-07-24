@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -131,7 +132,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
         contract.replaceEnhancedForVariables(services);
 
-        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar =
+            tb.selfVar(pm, new TypeRef(getCalleeKeYJavaType()), makeNamesUnique);
         register(selfVar, services);
         final JTerm selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -368,7 +370,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final TermBuilder tb) {
         final TermLabelState termLabelState = new TermLabelState();
         final KeYJavaType kjt = getCalleeKeYJavaType();
-        final TypeRef ref = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
+        final TypeRef ref = new TypeRef(new ProgramElementName(kjt.getName()),
+            new ImmutableArray<>(), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(ref, getProgramMethod(), selfVar);
 
         // TODO (DD): HACK
@@ -413,7 +416,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final TermBuilder tb) {
         final LocationVariable exceptionParameter = KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal("e"),
-            variables.exception.getKeYJavaType());
+            variables.exception.getTypeReference());
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);

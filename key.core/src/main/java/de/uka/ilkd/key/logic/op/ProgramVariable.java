@@ -44,7 +44,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         ParsableVariable, ReferenceSuffix, ProgramInLogic {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 
-    private final KeYJavaType type;
+    private final TypeReference type;
     private final boolean isStatic;
     private final boolean isModel;
     private final boolean isGhost;
@@ -54,10 +54,10 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     // the program variable denotes a field
     private final KeYJavaType containingType;
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+    protected ProgramVariable(ProgramElementName name, Sort s, TypeReference t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
             boolean isFinal) {
-        super(name, s == null ? t.getSort() : s, false);
+        super(name, s == null ? t.getKeYJavaType().getSort() : s, false);
         this.type = t;
         this.containingType = containingType;
         this.isStatic = isStatic;
@@ -70,17 +70,15 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         assert sort() != JavaDLTheory.UPDATE;
     }
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+    protected ProgramVariable(ProgramElementName name, Sort s, TypeReference t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
-
 
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {
         return (ProgramElementName) name();
     }
-
 
     /**
      * returns true iff the program variable has been declared as static
@@ -88,7 +86,6 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     public boolean isStatic() {
         return isStatic;
     }
-
 
     /**
      * returns true iff the program variable has been declared as model
@@ -104,14 +101,12 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return isGhost;
     }
 
-
     /**
      * returns true iff the program variable has been declared as final
      */
     public boolean isFinal() {
         return isFinal;
     }
-
 
     /**
      * returns true iff the program variable is a member
@@ -120,7 +115,6 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return containingType != null;
     }
 
-
     /**
      * returns the KeYJavaType where the program variable is declared or null if the program
      * variable denotes not a field
@@ -128,7 +122,6 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     public KeYJavaType getContainerType() {
         return containingType;
     }
-
 
     @Override
     public SourceElement getFirstElement() {
@@ -145,18 +138,15 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return this;
     }
 
-
     @Override
     public Comment[] getComments() {
         return new Comment[0];
     }
 
-
     @Override
     public void visit(Visitor v) {
         v.performActionOnProgramVariable(this);
     }
-
 
     @Override
     public Position getStartPosition() {
@@ -175,33 +165,29 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return PositionInfo.UNDEFINED;
     }
 
-
     @Override
-    public KeYJavaType getKeYJavaType() {
+    public TypeReference getTypeReference() {
         return type;
     }
 
+    @Override
+    public KeYJavaType getKeYJavaType() {
+        return type != null ? type.getKeYJavaType() : null;
+    }
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return getKeYJavaType();
     }
 
-
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
 
-
-    /**
-     * We do not have a prefix, so fake it! This way we implement ReferencePrefix
-     *
-     * @author VK
-     */
     @Override
     public ReferencePrefix getReferencePrefix() {
-        return null;
+        return type.getReferencePrefix();
     }
 
     @Override
@@ -213,16 +199,15 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         }
     }
 
-
     public String proofToString() {
-        final Type javaType = type.getJavaType();
+        final Type javaType = getKeYJavaType().getJavaType();
         final String typeName;
         if (javaType instanceof ArrayType) {
             typeName = ((ArrayType) javaType).getAlternativeNameRepresentation();
         } else if (javaType != null) {
             typeName = javaType.getFullName();
         } else {
-            typeName = type.getSort().name().toString();
+            typeName = getKeYJavaType().getSort().name().toString();
         }
         return typeName + " " + name() + ";\n";
     }

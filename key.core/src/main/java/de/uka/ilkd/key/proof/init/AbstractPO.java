@@ -31,11 +31,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract proof obligation implementing common functionality.
  */
 public abstract class AbstractPO implements IPersistablePO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPO.class);
 
     protected TermBuilder tb;
     protected final InitConfig environmentConfig;

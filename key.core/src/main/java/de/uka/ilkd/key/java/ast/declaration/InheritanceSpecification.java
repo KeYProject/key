@@ -12,6 +12,9 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Inheritance specification.
  *
@@ -20,6 +23,8 @@ import org.key_project.util.collection.ImmutableArray;
 
 public abstract class InheritanceSpecification extends JavaNonTerminalProgramElement
         implements TypeReferenceContainer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InheritanceSpecification.class);
 
     /**
      * Supertypes.

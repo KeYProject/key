@@ -18,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -196,9 +197,10 @@ public class TestMiscTools {
     public void testLocalOuts() {
         var services = TacletForTests.services().copy(false);
         KeYJavaType intKjt = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
-        var x = new LocationVariable(new ProgramElementName("x"), intKjt);
-        var y = new LocationVariable(new ProgramElementName("y"), intKjt);
-        var z = new LocationVariable(new ProgramElementName("z"), intKjt);
+        var intRef = new TypeRef(intKjt);
+        var x = new LocationVariable(new ProgramElementName("x"), intRef);
+        var y = new LocationVariable(new ProgramElementName("y"), intRef);
+        var z = new LocationVariable(new ProgramElementName("z"), intRef);
         var stmt1 = new CopyAssignment(x, y);
         var lexer = JmlFacade.createLexer("set z = 1;");
         var parser = JmlFacade.createParser(lexer);

@@ -349,7 +349,7 @@ public final class MethodCall extends ProgramTransformer {
             if (newContextAsExp.getKeYJavaType(services, execContext) != targetType) {
                 castedThisVar = KeYJavaASTFactory.declare(
                     new ProgramElementName(services.getTermBuilder().newName("target")),
-                    KeYJavaASTFactory.cast(newContextAsExp, targetType), targetType);
+                    KeYJavaASTFactory.cast(newContextAsExp, targetType), new TypeRef(targetType));
 
                 localContext = (ReferencePrefix) castedThisVar.getVariableSpecifications().get(0)
                         .getProgramVariable();
@@ -402,7 +402,7 @@ public final class MethodCall extends ProgramTransformer {
 
             final IProgramVariable paramVar = KeYJavaASTFactory.localVariable(services,
                 originalParamVar.getProgramElementName().toString(),
-                originalParamVar.getKeYJavaType());
+                originalParamVar.getTypeReference());
 
             // this condition checks whether this is the last formal parameter
             // and is used

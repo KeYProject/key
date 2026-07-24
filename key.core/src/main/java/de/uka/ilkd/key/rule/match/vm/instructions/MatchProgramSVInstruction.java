@@ -108,4 +108,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "MatchProgramSVInstruction";
+    }
 }

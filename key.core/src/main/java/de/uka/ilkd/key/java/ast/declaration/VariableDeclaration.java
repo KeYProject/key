@@ -28,7 +28,6 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Type reference.
      */
-
     protected final TypeReference typeReference;
 
     /**
@@ -41,7 +40,6 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      */
-
     protected VariableDeclaration() {
         typeReference = null;
         parentIsInterfaceDeclaration = false;

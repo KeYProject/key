@@ -11,9 +11,8 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
-import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -98,14 +97,10 @@ public class NewLocalVarsCondition implements VariableCondition {
             // mismatch (e.g. k_before#0 vs. k_before#1) breaks the slicing mechanism, which
             // relies on formula equivalence across reloads. See issue #3834.
             final var newName = uniqueBeforeName(v.name() + "_before", services, reserved);
-            KeYJavaType type = v.getKeYJavaType();
-            var locVar = new LocationVariable(newName, type);
+            TypeReference typeRef = v.getTypeReference();
+            var locVar = new LocationVariable(newName, typeRef);
             var spec = new VariableSpecification(locVar);
-            int dim = 0;
-            if (type.getJavaType() instanceof ArrayType at) {
-                dim = at.getDimension();
-            }
-            decls.add(new LocalVariableDeclaration(new TypeRef(type, dim), spec));
+            decls.add(new LocalVariableDeclaration(typeRef, spec));
             updatesBefore = updatesBefore.append(tb.elementary(tb.var(locVar), tb.var(v)));
             updatesFrame = updatesFrame.append(tb.elementary(tb.var(v), tb.var(locVar)));
         }

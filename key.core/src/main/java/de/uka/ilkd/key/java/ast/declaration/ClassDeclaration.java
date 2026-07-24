@@ -18,6 +18,9 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * There are several types of class declarations:
  * <ul>
@@ -58,6 +61,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 
 public class ClassDeclaration extends TypeDeclaration implements Statement {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassDeclaration.class);
 
     protected final Extends extending;
 
@@ -256,9 +260,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());
             }
         }
+
         if (extending != null && !extending.getSupertypes().isEmpty()) {
             types = types.prepend(extending.getSupertypes().get(0).getKeYJavaType());
         }
+
         return types;
     }
 

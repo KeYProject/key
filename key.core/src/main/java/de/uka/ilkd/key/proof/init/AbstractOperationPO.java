@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.statement.Try;
@@ -40,6 +41,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -78,6 +81,7 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  */
 public abstract class AbstractOperationPO extends AbstractPO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationPO.class);
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
     protected InitConfig proofConfig;
@@ -397,7 +401,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, makeNamesUnique);
-        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar =
+            tb.selfVar(pm, new TypeRef(getCalleeKeYJavaType()), makeNamesUnique);
         final LocationVariable resultVar = tb.resultVar(pm, makeNamesUnique);
         final LocationVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
@@ -898,7 +903,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final KeYJavaType eType = javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE);
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
+        final ProgramVariable eVar = new LocationVariable(ePEN, new TypeRef(eType));
 
         final StatementBlock sb2;
         if (exceptionVar == null) {
@@ -1009,7 +1014,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                 LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
+                    new LocationVariable(pen, paramVar.getTypeReference());
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {

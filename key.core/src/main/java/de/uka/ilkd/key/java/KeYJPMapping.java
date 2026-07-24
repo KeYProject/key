@@ -261,24 +261,24 @@ public class KeYJPMapping {
         @Override
         public boolean equals(Object o) {
             if (o instanceof ResolvedTypeWrapper other) {
-                final boolean eq = resolvedType.equals(other.resolvedType);
-                if (eq && resolvedType.isReferenceType()) {
+                if (resolvedType.isReferenceType()) {
                     if (!other.resolvedType.isReferenceType()) {
                         return false; // should not be reachable as then eq is false, but ...
                     }
                     return resolvedType.asReferenceType().getQualifiedName()
                             .equals(other.resolvedType.asReferenceType().getQualifiedName());
                 }
-                return eq;
+
+                return resolvedType.equals(other.resolvedType);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return resolvedType.hashCode() + (resolvedType.isReferenceType()
+            return resolvedType.isReferenceType()
                     ? resolvedType.asReferenceType().getQualifiedName().hashCode()
-                    : 0);
+                    : resolvedType.hashCode();
         }
 
     }

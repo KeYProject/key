@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -32,7 +33,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      */
     private static @Nullable LocationVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
             boolean isStaticContext) {
-        return isStaticContext ? null : tb.selfVar(classType, false);
+        return isStaticContext ? null : tb.selfVar(new TypeRef(classType), false);
     }
 
     /**

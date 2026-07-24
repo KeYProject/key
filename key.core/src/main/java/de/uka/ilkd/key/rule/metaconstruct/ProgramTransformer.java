@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -154,6 +156,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     // -------------some methods to pretend being a type reference --------
 
 
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return null;
     }
@@ -162,37 +165,49 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return this;
     }
 
+    @Override
+    public ImmutableArray<Annotation> getAnnotations() {
+        return new ImmutableArray<>();
+    }
 
+    @Override
     public int getDimensions() {
         return 0;
     }
 
 
+    @Override
     public int getTypeReferenceCount() {
         return 0;
     }
 
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         return this;
     }
 
+    @Override
     public PackageReference getPackageReference() {
         return null;
     }
 
+    @Override
     public int getExpressionCount() {
         return 0;
     }
 
+    @Override
     public Expression getExpressionAt(int index) {
         return null;
     }
 
 
+    @Override
     public ProgramElementName getProgramElementName() {
         return new ProgramElementName(toString());
     }
 
+    @Override
     public String getName() {
         return toString();
     }
@@ -203,15 +218,18 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
         v.performActionOnProgramMetaConstruct(this);
     }
 
     /** to String */
+    @Override
     public String toString() {
         return name + "( " + body + ");";
     }
 
+    @Override
     public KeYJavaType getKeYJavaType() {
         return null;
     }
@@ -220,6 +238,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return getKeYJavaType();
     }
 
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
@@ -244,5 +263,4 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         return ImmutableList.nil();
     }
-
 }

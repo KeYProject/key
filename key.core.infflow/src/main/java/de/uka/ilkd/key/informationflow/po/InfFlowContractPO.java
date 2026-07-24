@@ -12,6 +12,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
@@ -50,7 +51,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // generate proof obligation variables
         final IProgramMethod pm = contract.getTarget();
-        symbExecVars = new ProofObligationVars(pm, contract.getKJT(), environmentServices);
+        symbExecVars =
+            new ProofObligationVars(pm, new TypeRef(contract.getKJT()), environmentServices);
 
         assert (symbExecVars.pre.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, environmentServices);

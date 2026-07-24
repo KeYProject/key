@@ -322,7 +322,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             final Services services) {
         Goal validityGoal = result.tail().tail().head();
         final ProgramVariable exceptionParameter =
-            createLocalVariable("e", variables.exception.getKeYJavaType(), services);
+            createLocalVariable("e", variables.exception.getTypeReference(), services);
         configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
             preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
             conditionsAndClausesBuilder.terms);

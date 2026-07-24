@@ -448,7 +448,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             // Remember current flags.
             for (Entry<ProgramVariable, ProgramVariable> entry : oldFlags.entrySet()) {
                 newStatements.add(KeYJavaASTFactory.declare(entry.getValue(), entry.getKey(),
-                    entry.getValue().getKeYJavaType()));
+                    entry.getValue().getTypeReference()));
             }
 
             // Reset flags.
@@ -479,7 +479,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             new LocationVariable(
                 new ProgramElementName(
                     flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
-                flag.getKeYJavaType()));
+                flag.getTypeReference()));
     }
 
     private void changed() {

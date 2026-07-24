@@ -328,7 +328,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(usageAssumptions, freePostcondition));
         final LocationVariable exceptionParameter =
-            createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
+            createLocalVariable("e", vars[0].exception.getTypeReference(), services);
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
             nextRemembranceUpdate, anonOutHeaps, modifiableClauses,
             freeModifiableClauses,

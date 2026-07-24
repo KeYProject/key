@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
@@ -119,6 +120,11 @@ public interface Visitor {
     void performActionOnClassDeclaration(ClassDeclaration x);
 
     void performActionOnInterfaceDeclaration(InterfaceDeclaration x);
+
+    void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x);
+
+    void performActionOnAnnotationInterfaceMemberDeclaration(
+            AnnotationInterfaceMemberDeclaration x);
 
     void performActionOnFieldDeclaration(FieldDeclaration x);
 
@@ -327,6 +333,8 @@ public interface Visitor {
     void performActionOnGuard(Guard x);
 
     void performActionOnLoopInit(LoopInit x);
+
+    void performActionOnAnnotation(Annotation annot);
 
     void performActionOnAssert(Assert assert1);
 

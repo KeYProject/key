@@ -41,6 +41,7 @@ import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserAnnotationDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -91,7 +92,11 @@ public class KeYProgModelInfo {
     private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
         if (type.isReferenceType()) {
-            return type.asReferenceType().getAllMethods();
+            var tr = type.asReferenceType();
+
+            if (!tr.getTypeDeclaration().orElseThrow().isAnnotation()) {
+                return tr.getAllMethods();
+            }
         }
         return Collections.emptyList();
     }
@@ -164,6 +169,10 @@ public class KeYProgModelInfo {
                 // Interfaces can't be final
                 return false;
             }
+            if (td.isAnnotation()) {
+                // Interfaces can't be final
+                return false;
+            }
             if (td instanceof ResolvedLogicalType) {
                 // Logic types are not final? Just following primitive types here
                 return false;
@@ -224,7 +233,18 @@ public class KeYProgModelInfo {
         if (!type.isReferenceType()) {
             return result;
         }
-        var rml = type.asReferenceType().getDeclaredMethods();
+
+        var refType = type.asReferenceType();
+
+        // methods for annotation declarations are currently not implemented in
+        // javaparser
+        if (refType.getTypeDeclaration()
+                .map(d -> d instanceof JavaParserAnnotationDeclaration)
+                .orElse(false)) {
+            return result;
+        }
+
+        var rml = refType.getDeclaredMethods();
         result.ensureCapacity(rml.size());
         for (MethodUsage methodUsage : rml) {
             if (methodUsage.getDeclaration() instanceof JavaParserMethodDeclaration) {

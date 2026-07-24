@@ -31,7 +31,6 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     protected final TypeReference typeReference;
 
-
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
@@ -121,6 +120,4 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return getTypeReference().getKeYJavaType();
     }
-
-
 }

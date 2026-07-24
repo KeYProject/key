@@ -13,5 +13,4 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 public interface ReferencePrefix extends ProgramElement {
 
     ReferencePrefix getReferencePrefix();
-
 }

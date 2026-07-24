@@ -4,13 +4,14 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 
-
 import java.util.Objects;
 
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -21,33 +22,36 @@ public class TypeRef extends TypeReferenceImp {
     /**
      * creates a type reference for the given KeYJavaType with dimension 0 and creates a suitable
      * package reference prefix from the KeYJavaType. If this is not desired use the constructor
-     * TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as last
+     * TypeRef(ProgramElementName, ImmutableArray<AnnotationExpression>, int, ReferencePrefix,
+     * KeYJavaType) and take null as last
      * argument.
      */
     public TypeRef(@NonNull KeYJavaType kjt) {
-        this(kjt, 0);
+        this(kjt, new ImmutableArray<>(), 0);
     }
 
     /**
      * creates a type reference for the given KeYJavaType and the given dimension and creates a
      * suitable package reference prefix from the KeYJavaType. If this is not desired use the
-     * constructor TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as
+     * constructor TypeRef(ProgramElementName, ImmutableArray<AnnotationExpression>, int,
+     * ReferencePrefix, KeYJavaType) and take null as
      * last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt, int dim) {
-        super(new ProgramElementName(kjt.getName()), dim, kjt.createPackagePrefix());
+    public TypeRef(@NonNull KeYJavaType kjt, ImmutableArray<Annotation> annotations,
+            int dim) {
+        super(new ProgramElementName(kjt.getName()), annotations, dim, kjt.createPackagePrefix());
         this.kjt = kjt;
     }
-
 
     public TypeRef(ExtList children, KeYJavaType kjt, int dim) {
         super(children, dim);
         this.kjt = kjt;
     }
 
-    public TypeRef(ProgramElementName name, int dimension, ReferencePrefix prefix,
+    public TypeRef(ProgramElementName name, ImmutableArray<Annotation> annotations,
+            int dimension, ReferencePrefix prefix,
             KeYJavaType kjt) {
-        super(name, dimension, prefix);
+        super(name, annotations, dimension, prefix);
         this.kjt = kjt;
     }
 

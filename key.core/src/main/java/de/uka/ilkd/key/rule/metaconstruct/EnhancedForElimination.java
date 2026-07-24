@@ -193,14 +193,15 @@ public class EnhancedForElimination extends ProgramTransformer {
         final JavaInfo ji = services.getJavaInfo();
 
         // T[] arr = exp;
-        final KeYJavaType arrayType = expression.getKeYJavaType(services, data.execContext());
+        final TypeReference arrayType =
+            new TypeRef(expression.getKeYJavaType(services, data.execContext()));
         final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services, ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
 
         data.setHead(KeYJavaASTFactory.block(arrAssignment));
 
         // for(int i; i < arr.length; i++)
-        final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
+        final TypeReference intType = new TypeRef(ji.getPrimitiveKeYJavaType("int"));
         data.setIndexVariable(KeYJavaASTFactory.localVariable(services, INDEX, intType));
         final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, data.indexVariable());
         final IGuard guard =
@@ -243,13 +244,13 @@ public class EnhancedForElimination extends ProgramTransformer {
                 ImmutableList.nil(), data.execContext().getTypeReference().getKeYJavaType());
 
         // local variable "it"
-        final KeYJavaType iteratorType = iteratorMethod.getReturnType();
+        final TypeReference iteratorType = new TypeRef(iteratorMethod.getReturnType());
         ProgramVariable iteratorVariable =
             KeYJavaASTFactory.localVariable(services, IT, iteratorType);
 
         // local variable "values"
-        final KeYJavaType seqType =
-            services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        final TypeReference seqType =
+            new TypeRef(services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ));
         data.setValuesVariable(KeYJavaASTFactory.localVariable(services, VALUES, seqType));
 
         // ghost \seq values = \seq_empty

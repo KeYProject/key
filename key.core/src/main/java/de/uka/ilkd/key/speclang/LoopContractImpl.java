@@ -365,7 +365,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             LocationVariable rem = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal(
                     variable.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                variable.getKeYJavaType());
+                variable.getTypeReference());
             vars.variables.remembranceLocalVariables.put((LocationVariable) variable, rem);
         }
         return vars;
