@@ -30,6 +30,8 @@ public class OpenFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser fc = new KeYFileChooser(lastSelectedPath);
         fc.setDialogTitle("Select file to load proof or problem");
+        fc.setSelectedFile(KeYFileChooser.getFileChooser("Select file to load proof or problem")
+                .getSelectedFile());
         KeYFileChooserLoadingOptions options = fc.addLoadingOptions();
         fc.addBookmarkPanel();
         fc.prepare();

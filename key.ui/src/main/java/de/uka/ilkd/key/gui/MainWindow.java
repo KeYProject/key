@@ -332,7 +332,14 @@ public final class MainWindow extends JFrame {
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
         // Postpone load for faster UI creation.
-        SwingUtilities.invokeLater(recentFileMenu::loadEntries);
+        SwingUtilities.invokeLater(() -> {
+            recentFileMenu.loadEntries();
+            // otherwise open most recent cannot be used with a fresh started KeY
+            if (openMostRecentFileAction != null) {
+                // should always be the case, but better safe than sorry
+                openMostRecentFileAction.updateEnabledStatus();
+            }
+        });
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);

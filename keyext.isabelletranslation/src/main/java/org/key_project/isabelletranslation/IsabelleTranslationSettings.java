@@ -156,7 +156,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         isabellePath = Path.of(props.getProperty(isabellePathKey));
         Path newTranslationPath = Path.of(props.getProperty(translationPathKey));
-        if (newTranslationPath != translationPath) {
+        if (!newTranslationPath.equals(translationPath)) {
             translationPath = newTranslationPath;
             createSessionFiles();
         }
@@ -180,7 +180,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
         Path newTranslationPath =
             Path.of(props.getString(translationPathKey, translationPath.toString()));
-        if (newTranslationPath != translationPath) {
+        if (!newTranslationPath.equals(translationPath)) {
             translationPath = newTranslationPath;
             createSessionFiles();
         }

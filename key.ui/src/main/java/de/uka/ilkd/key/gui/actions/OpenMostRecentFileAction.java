@@ -27,9 +27,13 @@ public final class OpenMostRecentFileAction extends MainWindowAction
         setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
+        updateEnabledStatus();
+        mainWindow.getMediator().addKeYSelectionListener(this);
+    }
+
+    public void updateEnabledStatus() {
         setEnabled(mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null);
-        mainWindow.getMediator().addKeYSelectionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {

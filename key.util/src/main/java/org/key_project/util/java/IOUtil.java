@@ -908,11 +908,11 @@ public final class IOUtil {
     public static String safePathRelativeTo(Path source, Path basePath) {
         if (Objects.equals(source.getRoot(), basePath.getRoot())) {
             // required on Windows
-            var abs = source.toAbsolutePath();
+            var abs = source.toAbsolutePath().normalize();
             return safePath(basePath.relativize(abs));
         } else {
             // fallback: return absolute path
-            return safePath(source.toAbsolutePath());
+            return safePath(source.toAbsolutePath().normalize());
         }
     }
 }
