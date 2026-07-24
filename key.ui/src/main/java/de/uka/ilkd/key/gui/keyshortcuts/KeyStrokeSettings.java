@@ -196,7 +196,6 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());
             LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());

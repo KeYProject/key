@@ -183,7 +183,7 @@ public class RecentFileMenu {
     /**
      * read the recent files from the given properties file
      */
-    public final void loadFrom(Path filename) {
+    final void loadFrom(Path filename) {
         try {
             if (!Files.exists(filename)) {
                 return;

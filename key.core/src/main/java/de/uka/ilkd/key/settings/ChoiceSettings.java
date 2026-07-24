@@ -97,9 +97,12 @@ public class ChoiceSettings extends AbstractSettings {
      * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
      * entries of <code>category2Choices</code> are no longer present in <code>choiceNS</code>
      *
+     * @param choiceNS the choices declared by the loaded problem file
+     * @param defaults the default choice of each category
      * @param remove remove entries not present in <code>choiceNS</code>
      */
-    public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
+    public void updateChoices(Namespace<Choice> choiceNS, Map<String, Choice> defaults,
+            boolean remove) {
         // Translate the given namespace into a map of 'string -> list[string]'
         HashMap<String, Set<String>> c2C = new LinkedHashMap<>();
         for (Choice c : choiceNS.allElements()) {
@@ -118,11 +121,11 @@ public class ChoiceSettings extends AbstractSettings {
             }
         }
 
+        // ensure that default values are set if a key is present
         var defaultTmp = new HashMap<>(category2Default);
         for (var pair : category2Default.entrySet()) {
             var s = pair.getKey();
             var v = pair.getValue();
-            // if key is known then the default value should exist
             if (category2Choices.containsKey(s)) {
                 if (!category2Choices.get(s).contains(v)) {
                     defaultTmp.put(s, category2Choices.get(s).iterator().next());
@@ -131,6 +134,16 @@ public class ChoiceSettings extends AbstractSettings {
                 defaultTmp.remove(s);
             }
         }
+
+        for (var category : category2Choices.keySet()) {
+            if (!defaultTmp.containsKey(category)) {
+                var declared = defaults.get(category);
+                if (declared != null) {
+                    defaultTmp.put(category, declared.name().toString());
+                }
+            }
+        }
+
         setDefaultChoices(defaultTmp);
     }
 

@@ -256,7 +256,7 @@ public class KeYFile implements EnvInput {
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
             Path parentDirectory = file.file().getParent();
-            bootClassPathFile = parentDirectory.resolve(bootClassPathFile);
+            bootClassPathFile = parentDirectory.resolve(bootClassPathFile).normalize();
         }
         if (!Files.isDirectory(bootClassPathFile)) {
             // Report the missing directory at the \bootclasspath declaration in the .key file,
@@ -297,7 +297,7 @@ public class KeYFile implements EnvInput {
             } else {
                 var f = Paths.get(normalizeStoredPath(cp));
                 if (!f.isAbsolute()) {
-                    f = parentDirectory.resolve(f);
+                    f = parentDirectory.resolve(f).normalize();
                 }
                 if (!Files.exists(f)) {
                     // Point at the \classpath declaration in the .key file instead of letting the
@@ -321,7 +321,7 @@ public class KeYFile implements EnvInput {
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
                 Path parent = file.file().getParent();
-                absFile = parent.resolve(javaPath);
+                absFile = parent.resolve(javaPath).normalize();
             }
             if (!Files.exists(absFile)) {
                 throw new ProofInputException(String.format(

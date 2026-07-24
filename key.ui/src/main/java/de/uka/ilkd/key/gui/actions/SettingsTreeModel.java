@@ -12,12 +12,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
 
 import org.key_project.logic.Choice;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,18 +32,21 @@ import org.key_project.logic.Choice;
 
 public class SettingsTreeModel extends DefaultTreeModel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsTreeModel.class);
+
     private static final long serialVersionUID = -3282304543262262159L;
 
     private final ProofSettings proofSettings;
 
     private final ProofIndependentSettings independentSettings;
+    private final Proof proof;
     private OptionContentNode tacletOptionsItem;
 
-    public SettingsTreeModel(ProofSettings proofSettings,
-            ProofIndependentSettings independentSettings) {
+    public SettingsTreeModel(Proof proof) {
         super(new DefaultMutableTreeNode("All Settings"));
-        this.proofSettings = proofSettings;
-        this.independentSettings = independentSettings;
+        this.proof = proof;
+        this.proofSettings = proof == null ? null : proof.getSettings();
+        this.independentSettings = ProofIndependentSettings.DEFAULT_INSTANCE;
         generateTree();
     }
 
@@ -56,7 +63,6 @@ public class SettingsTreeModel extends DefaultTreeModel {
                     "These are the proof dependent settings.");
             root.add(proofSettingsNode);
 
-            // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
             ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
             tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
             proofSettingsNode.add(tacletOptionsItem);
@@ -99,8 +105,23 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private Properties getChoicesAsProperties(ChoiceSettings settings) {
         Properties prop = new Properties();
 
-        for (Choice choice : settings.getDefaultChoicesAsSet()) {
+        // Issue https://github.com/KeYProject/key/issues/3934 revealed a bug that the
+        // choices in proof settings were inconsistent with the actual settings the proof uses
+        // (determined by initConfig). We use the authorative source here and log inconsistencies
+        // for
+        // bug finding
+
+        // settings.getDefaultChoicesAsSet()
+        for (Choice choice : proof.getInitConfig().getActivatedChoices()) {
             prop.put(choice.category(), choice.name());
+
+            final String choiceName = settings.getDefaultChoices().get(choice.category());
+            if (choiceName != null && !choiceName.equals(choice.name().toString())) {
+                LOGGER.warn("Inconsistent proof settings for taclet option " + choice.category());
+            } else if (choiceName == null) {
+                LOGGER.warn("Taclet option active in proof but unknown by its choice settings "
+                    + choice.category());
+            }
         }
 
         return prop;

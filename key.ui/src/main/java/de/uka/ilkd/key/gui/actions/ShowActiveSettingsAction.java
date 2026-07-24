@@ -14,8 +14,6 @@ import javax.swing.tree.TreePath;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * for debugging - opens a window with the settings from current Proof and the default settings
@@ -36,11 +34,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     }
 
     private ViewSettingsDialog showDialog() {
-        ProofSettings settings =
-            (getMediator().getSelectedProof() == null) ? null
-                    : getMediator().getSelectedProof().getSettings();
-        SettingsTreeModel model =
-            new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
+        SettingsTreeModel model = new SettingsTreeModel(getMediator().getSelectedProof());
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
         dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(mainWindow);

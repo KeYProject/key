@@ -1,6 +1,4 @@
-repositories {
-    mavenCentral()
-}
+description = "Compiling Matching Algorithm of the KeY theorem prover"
 
 dependencies {
     api project(':key.util')

@@ -256,6 +256,7 @@ public class TestFile implements Serializable {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
             ProofSaver.saveToFile(proofFile, loadedProof);
+            loadedProof.dispose();
             reloadProof(proofFile);
             if (verbose) {
                 LOGGER.debug("... success: reloaded.");

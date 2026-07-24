@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml)
 
+![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20snapshots)
 ![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20central)
 
 
@@ -29,7 +30,7 @@ Feel free to use the project templates to get started using KeY:
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java 21 or newer
+* Java 17 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
     * [Z3](https://github.com/Z3Prover/z3#z3)

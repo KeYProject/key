@@ -229,7 +229,7 @@ public class ProofSettings {
                     loadSettingsFromJSONStream(in);
                 }
             } catch (Exception e) {
-                LOGGER.warn("No proof-settings could be loaded, using defaults", e);
+                LOGGER.warn("No proof settings could be loaded, using defaults");
             }
         }
     }
