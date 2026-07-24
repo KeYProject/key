@@ -466,6 +466,13 @@ public class LexPathOrdering implements TermOrdering {
                 return 7;
             }
 
+
+            if (opStr.equals("msetSingle")) {
+                return 6;
+            }
+            if (opStr.equals("msetSum")) {
+                return 7;
+            }
             return null;
         }
     }

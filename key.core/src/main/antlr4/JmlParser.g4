@@ -356,6 +356,7 @@ jmlprimary
   | java_math_expression                                                              #primaryJavaMathExpression
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
+  | msetrangeterm                                                                     #pignore8
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
   | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
@@ -426,6 +427,7 @@ safe_math_expression: (SAFE_MATH LPAREN expression RPAREN);
 bigint_math_expression: (BIGINT_MATH LPAREN expression RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
+msetrangeterm: LPAREN MSET quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 quantifiedvardecls: typespec quantifiedvariabledeclarator (COMMA quantifiedvariabledeclarator)*;
 boundvarmodifiers: (NON_NULL | NULLABLE);

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
@@ -12,17 +12,12 @@ import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -190,6 +185,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
+
+
     @Override
     public void performActionOnIntersect(Intersect x) {
         doDefaultAction(x);
@@ -239,6 +236,32 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     public void performActionOnSeqPut(SeqPut x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnEmptyMSetLiteral(EmptyMSetLiteral x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetUnion(MSetUnion x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetIntersect(MSetIntersect x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetSum(MSetSum x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnMSetDiff(MSetDiff x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetSingle(MSetSingle x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetMul(MSetMul x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetCard(MSetCard x) { doDefaultAction(x); }
 
     @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {

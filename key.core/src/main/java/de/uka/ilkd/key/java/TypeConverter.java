@@ -145,6 +145,10 @@ public final class TypeConverter {
         return getLDT(SeqLDT.class);
     }
 
+    public MSetLDT getMSetLDT() {
+        return (MSetLDT) getLDT(MSetLDT.NAME);
+    }
+
     public SortLDT getSortLDT() {
         return getLDT(SortLDT.class);
     }
