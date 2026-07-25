@@ -33,10 +33,10 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @throws IOException on any I/O error
      */
     public static void saveToFile(File file, Proof proof) throws IOException {
-        saveProofObligationToFile(file.toPath(), proof);
+        saveToFile(file.toPath(), proof);
     }
 
-    public static void saveToFile(Path file, Proof proof) throws IOException {
+    public static void saveToFile(Path file, Proof proof) {
         ProofSaver saver = new ProofSaver(proof, file);
         saver.save();
     }
