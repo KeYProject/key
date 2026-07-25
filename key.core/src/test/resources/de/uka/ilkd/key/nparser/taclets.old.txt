@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Wed Jul 22 17:10:12 CEST 2026
+# Date: Sat Jul 25 10:22:38 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1006,7 +1006,7 @@ Choices: true}
 apply_eq_boolean_rigid {
 \assumes ([]==>[equals(br,TRUE)]) 
 \find(br)
-\sameUpdateLevel\replacewith(FALSE) 
+\replacewith(FALSE) 
 \heuristics(apply_equations)
 Choices: true}
 -----------------------------------------------------
@@ -1014,7 +1014,7 @@ Choices: true}
 apply_eq_boolean_rigid_2 {
 \assumes ([]==>[equals(br,FALSE)]) 
 \find(br)
-\sameUpdateLevel\replacewith(TRUE) 
+\replacewith(TRUE) 
 \heuristics(apply_equations)
 Choices: true}
 -----------------------------------------------------
