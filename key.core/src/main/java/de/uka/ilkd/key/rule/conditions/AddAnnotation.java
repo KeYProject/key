@@ -22,7 +22,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -127,14 +126,10 @@ public final class AddAnnotation implements VariableCondition {
     }
 
     private static TypeReference addAnnotation(TypeReference tRef, Annotation annotation) {
-        var arr = new Annotation[tRef.getAnnotations().size() + 1];
-        tRef.getAnnotations().arraycopy(0, arr, 1, arr.length - 1);
-        arr[0] = annotation;
-        var newAnnots = new ImmutableArray<>(arr);
-
         return new TypeRef(
             tRef.getProgramElementName(),
-            newAnnots, tRef.getDimensions(),
+            tRef.getAnnotations().append(annotation),
+            tRef.getDimensions(),
             tRef.getReferencePrefix(),
             tRef.getKeYJavaType());
     }

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
@@ -29,5 +29,5 @@ public interface TypeReference extends TypeReferenceInfix, TypeReferenceContaine
 
     KeYJavaType getKeYJavaType();
 
-    ImmutableArray<Annotation> getAnnotations();
+    ImmutableList<Annotation> getAnnotations();
 }

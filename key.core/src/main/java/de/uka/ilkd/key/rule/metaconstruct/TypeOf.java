@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 public class TypeOf extends ProgramTransformer {
 
@@ -38,7 +38,7 @@ public class TypeOf extends ProgramTransformer {
             ec = insts.getContextInstantiation().activeStatementContext();
         }
         KeYJavaType kjt = null;
-        ImmutableArray<Annotation> annotations = null;
+        ImmutableList<Annotation> annotations = null;
         if (pe instanceof Expression) {
             kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
         } else {
@@ -46,7 +46,7 @@ public class TypeOf extends ProgramTransformer {
             annotations = ((TypeRef) pe).getAnnotations();
         }
 
-        annotations = annotations == null ? new ImmutableArray<>() : annotations;
+        annotations = annotations == null ? ImmutableList.of() : annotations;
 
         assert kjt != null;
 

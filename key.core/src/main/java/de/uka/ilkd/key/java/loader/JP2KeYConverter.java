@@ -725,7 +725,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(TypeExpr n, Void arg) {
         ResolvedType rt = n.calculateResolvedType();
         KeYJavaType kjt = getKeYJavaType(rt);
-        return new TypeRef(kjt, map(n.getType().getAnnotations()), 0);
+        ImmutableArray<Annotation> annots = map(n.getType().getAnnotations());
+        return new TypeRef(kjt, annots.toImmutableList(), 0);
     }
 
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
@@ -1151,7 +1152,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             type.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
         ProgramElementName name = createProgramElementName(type.getName());
         KeYJavaType resolvedType = getKeYJavaType(type.resolve());
-        return new TypeRef(name, map(type.getAnnotations()), 0, prefix, resolvedType);
+        ImmutableArray<Annotation> annots = map(type.getAnnotations());
+        return new TypeRef(name, annots.toImmutableList(), 0, prefix, resolvedType);
     }
 
     private ParameterDeclaration visitNoMap(Parameter n) {
@@ -1191,7 +1193,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public TypeReference visit(PrimitiveType n, Void arg) {
-        return new TypeRef(getKeYJavaType(n.resolve()), map(n.getAnnotations()), 0);
+        ImmutableArray<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
     }
 
     @Override
@@ -1216,7 +1219,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } catch (IllegalStateException e) {
             System.out.println(e);
         }
-        return new TypeRef(getKeYJavaType(n.resolve()), map(n.getAnnotations()), 0);
+
+        ImmutableArray<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
     }
 
     @Override
@@ -1540,7 +1545,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VoidType n, Void arg) {
-        return new TypeRef(getKeYJavaType(n.resolve()), map(n.annotations()), 0);
+        ImmutableArray<Annotation> annots = map(n.annotations());
+        return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
     }
 
     @Override
@@ -2207,7 +2213,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(VarType n, Void arg) {
         var kjt = getKeYJavaType(n.resolve());
-        return new TypeRef(kjt, map(n.getAnnotations()), 0);
+        ImmutableArray<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(kjt, annots.toImmutableList(), 0);
     }
 
     @Override

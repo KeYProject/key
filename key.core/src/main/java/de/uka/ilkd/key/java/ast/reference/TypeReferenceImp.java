@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
@@ -43,7 +43,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Annotations.
      */
-    protected final ImmutableArray<Annotation> annotations;
+    protected final ImmutableList<Annotation> annotations;
 
 
     /**
@@ -60,19 +60,18 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         super(children);
         prefix = children.get(ReferencePrefix.class);
         name = children.get(ProgramElementName.class);
-        annotations = new ImmutableArray<>(
-            children.collect(Annotation.class));
+        annotations = ImmutableList.of(children.collect(Annotation.class));
         dimensions = dim;
     }
 
 
     protected TypeReferenceImp(ProgramElementName name) {
-        this(name, new ImmutableArray<>(), 0, null);
+        this(name, ImmutableList.of(), 0, null);
     }
 
     protected TypeReferenceImp(
             ProgramElementName name,
-            ImmutableArray<Annotation> annotations,
+            ImmutableList<Annotation> annotations,
             int dimension,
             ReferencePrefix prefix) {
         this.name = name;
@@ -134,7 +133,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public ImmutableArray<Annotation> getAnnotations() {
+    public ImmutableList<Annotation> getAnnotations() {
         return annotations;
     }
 

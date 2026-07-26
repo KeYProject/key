@@ -18,7 +18,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -100,7 +100,7 @@ public final class RemoveAnnotation implements VariableCondition {
 
         return new TypeRef(
             tRef.getProgramElementName(),
-            new ImmutableArray<>(filtered), tRef.getDimensions(),
+            ImmutableList.of(filtered), tRef.getDimensions(),
             tRef.getReferencePrefix(),
             tRef.getKeYJavaType());
     }

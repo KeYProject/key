@@ -74,6 +74,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -1973,7 +1974,7 @@ public abstract class KeYJavaASTFactory {
     public static ProgramElement declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init,
             final ProgramElementName typeName, final int dimensions,
-            final ImmutableArray<Annotation> annotations,
+            final ImmutableList<Annotation> annotations,
             final ReferencePrefix typePrefix, final KeYJavaType baseType) {
         final TypeRef typeRef =
             new TypeRef(typeName, annotations, dimensions, typePrefix, baseType);
@@ -2674,7 +2675,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link TypeRef} for <code>dimensions</code> dimensions of <code>type</code>
      */
     public static TypeRef typeRef(final KeYJavaType type, final int dimensions,
-            final ImmutableArray<Annotation> annotations) {
+            final ImmutableList<Annotation> annotations) {
         return new TypeRef(type, annotations, dimensions);
     }
 

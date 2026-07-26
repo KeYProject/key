@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -397,7 +397,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final TermBuilder tb) {
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()),
-            new ImmutableArray<>(), 0, selfVar, kjt);
+            ImmutableList.of(), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
         JModality.JavaModalityKind kind = contract.getModalityKind();
         JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock());

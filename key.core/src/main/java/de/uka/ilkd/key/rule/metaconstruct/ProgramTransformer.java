@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -166,8 +165,8 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public ImmutableArray<Annotation> getAnnotations() {
-        return new ImmutableArray<>();
+    public ImmutableList<Annotation> getAnnotations() {
+        return ImmutableList.of();
     }
 
     @Override

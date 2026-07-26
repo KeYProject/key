@@ -107,8 +107,8 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<Annotation> getAnnotations() {
-        return new ImmutableArray<>();
+    public ImmutableList<Annotation> getAnnotations() {
+        return ImmutableList.of();
     }
 
     @Override
