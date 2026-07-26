@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Jul 25 10:22:38 CEST 2026
+# Date: Sun Jul 26 12:13:22 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -14968,7 +14968,7 @@ Choices: integerSimplificationRules:full}
 pullOut {
 \find(t)
 \sameUpdateLevel\add [equals(t,sk)]==>[] \replacewith(sk) 
-\heuristics(semantics_blasting)
+\heuristics(pull_out_heap)
 Choices: true}
 -----------------------------------------------------
 == pullOutSelect (pullOutSelect) =========================================
@@ -18790,6 +18790,14 @@ wellFormedCreate {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== wellFormedCreateEQ (wellFormedCreateEQ) =========================================
+wellFormedCreateEQ {
+\assumes ([equals(create(h,o),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\replacewith(wellFormed(h)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == wellFormedMemsetArrayObject (wellFormedMemsetArrayObject) =========================================
 wellFormedMemsetArrayObject {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
@@ -18803,6 +18811,15 @@ wellFormedMemsetArrayPrimitive {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
+\heuristics(simplify_enlarging)
+Choices: programRules:Java}
+-----------------------------------------------------
+== wellFormedStoreArraEQ (wellFormedStoreArraEQ) =========================================
+wellFormedStoreArraEQ {
+\assumes ([equals(store(h,o,arr(idx),x),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha))
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::#$created),TRUE),arrayStoreValid(o,x))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18826,7 +18843,8 @@ Choices: programRules:Java}
 wellFormedStoreLocSetEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\replacewith(and(wellFormed(h),createdInHeap(x,h))) 
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha))
+\replacewith(and(wellFormed(h),createdInHeap(x,h))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18863,11 +18881,20 @@ wellFormedStorePrimitiveArray {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== wellFormedStorePrimitiveArrayEQ (wellFormedStorePrimitiveArrayEQ) =========================================
+wellFormedStorePrimitiveArrayEQ {
+\assumes ([equals(store(h,o,arr(idx),x),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\replacewith(wellFormed(h)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == wellFormedStorePrimitiveEQ (wellFormedStorePrimitiveEQ) =========================================
 wellFormedStorePrimitiveEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\varcond(\not\sub(beta, java.lang.Object), \not\sub(beta, LocSet))
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
