@@ -1071,12 +1071,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(NormalAnnotationExpr n, Void arg) {
-        // TODO
-        return super.visit(n, arg);
-    }
-
-    @Override
     public Object visit(NullLiteralExpr n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -1245,11 +1239,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Expression expr = accepto(n.getExpression());
         return new Return(expr, pi, c);
-    }
-
-    @Override
-    public Object visit(SingleMemberAnnotationExpr n, Void arg) {
-        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -2147,6 +2136,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final var ref = new ReferenceTypeImpl(n.resolve());
         var kjt = createOrCachedKeyJavaType(ref);
         return new MarkerAnnotation(kjt);
+    }
+
+    @Override
+    public Object visit(NormalAnnotationExpr n, Void arg) {
+        return reportUnsupportedElement(n);
+    }
+
+    @Override
+    public Object visit(SingleMemberAnnotationExpr n, Void arg) {
+        return reportUnsupportedElement(n);
     }
 
     @Override

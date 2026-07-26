@@ -1,8 +1,7 @@
 \profile "Java Profile";
 
-\settings // Proof-Settings-Config-File
-{ 
-    "Choice" : { 
+\settings {
+    "Choice" : {
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
         "assertions" : "assertions:on",
@@ -25,17 +24,17 @@
         "soundDefaultContracts" : "soundDefaultContracts:on",
         "wdChecks" : "wdChecks:off",
         "wdOperator" : "wdOperator:L"
-     },
-    "Labels" : { 
+    },
+    "Labels" : {
         "UseOriginLabels" : true
-     },
-    "NewSMT" : { 
+    },
+    "NewSMT" : {
         
-     },
-    "SMTSettings" : { 
-        "SelectedTaclets" : [ 
+    },
+    "SMTSettings" : {
+        "SelectedTaclets" : [
             
-         ],
+        ],
         "UseBuiltUniqueness" : false,
         "explicitTypeHierarchy" : false,
         "instantiateHierarchyAssumptions" : true,
@@ -45,17 +44,16 @@
         "maxGenericSorts" : 2,
         "useConstantsForBigOrSmallIntegers" : true,
         "useUninterpretedMultiplication" : true
-     },
-    "Strategy" : { 
-        "ActiveStrategy" : "JavaCardDLStrategy",
+    },
+    "Strategy" : {
+        "ActiveStrategy" : "Modular JavaDL Strategy",
         "MaximumNumberOfAutomaticApplications" : 7000,
         "Timeout" : -1,
-        "options" : { 
+        "options" : {
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
             "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
             "DEP_OPTIONS_KEY" : "DEP_ON",
-            "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
             "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
@@ -72,26 +70,31 @@
             "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
             "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
             "VBT_PHASE" : "VBT_SYM_EX"
-         }
-     }
- } 
+        }
+    }
+} 
+
+
 
 \proofObligation 
-// Proof-Obligation settings
-{ 
+// 
+{
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
-    "name" : "undomSymm",
- }
+    "name" : "undomSymm"
+}
 
 \proof {
 (keyLog "0" (keyUser "boby" ) (keyVersion "fb96158cd902ea794b07f245944d17da701055e2"))
+(keyLog "1" (keyUser "boby" ) (keyVersion "cf128534574c3a8fc4bba8f6439d1bbe7854a214"))
 
-(autoModeTime "22")
+(autoModeTime "61")
 
 (branch "dummy ID"
-(rule "undomDef" (formula "1") (term "0") (newnames "f_x,f_y") (userinteraction))
+(rule "undomDef" (formula "1") (term "0") (newnames "f_commEqLeft,f_commEqRight") (userinteraction))
 (rule "undomDef" (formula "1") (term "1") (userinteraction))
 (rule "eqSymm" (formula "1") (term "0,1,0"))
+(rule "commute_and" (formula "1") (term "0,1"))
+(rule "eqSymm" (formula "1") (term "0,1,1"))
 (rule "commute_and" (formula "1") (term "0,1"))
  (builtin "One Step Simplification" (formula "1"))
 (rule "closeTrue" (formula "1"))
