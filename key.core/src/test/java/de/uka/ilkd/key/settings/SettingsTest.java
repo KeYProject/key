@@ -90,6 +90,7 @@ class SettingsTest {
                                 "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
                                 "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
                                 "DEP_OPTIONS_KEY" : "DEP_ON",
+                                "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
                                 "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
                                 "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
                                 "MPS_OPTIONS_KEY" : "MPS_MERGE",

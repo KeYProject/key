@@ -54,6 +54,12 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         + "proofs even for simple problems. This option can,<br>"
         + "nevertheless, be meaningful to keep the complexity<br>"
         + "of proofs small and support interactive proving." + "</html>";
+    public static final String TOOL_TIP_HEAP_REDUCTION_NORMAL = "<html>"
+        + "Keep heap size in updates small." + "</html>";
+    public static final String TOOL_TIP_HEAP_REDUCTION_DELAYED = "<html>"
+        + "Keep heap size in updates at a medium size." + "</html>";
+    public static final String TOOL_TIP_HEAP_REDUCTION_OFF =
+        "<html>Keep the heap in an update as it is.</html>";
     public static final String TOOL_TIP_CLASSAXIOM_FREE =
         "<html>Expand class axioms (such as invariants) freely.</html>";
     public static final String TOOL_TIP_CLASSAXIOM_DELAYED =
@@ -161,6 +167,18 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 TOOL_TIP_PROOF_SPLITTING_OFF));
     }
 
+    private static OneOfStrategyPropertyDefinition getHeapReduction() {
+        return new OneOfStrategyPropertyDefinition(StrategyProperties.HEAP_REDUCTION_OPTIONS_KEY,
+            "Heap reduction",
+            new StrategyPropertyValueDefinition(StrategyProperties.HEAP_REDUCTION_NORMAL, "Normal",
+                TOOL_TIP_HEAP_REDUCTION_NORMAL),
+            new StrategyPropertyValueDefinition(StrategyProperties.HEAP_REDUCTION_DELAYED,
+                "Delayed",
+                TOOL_TIP_HEAP_REDUCTION_DELAYED),
+            new StrategyPropertyValueDefinition(StrategyProperties.HEAP_REDUCTION_OFF, "Off",
+                TOOL_TIP_HEAP_REDUCTION_OFF));
+    }
+
     private static OneOfStrategyPropertyDefinition getDependencyContracts() {
         return new OneOfStrategyPropertyDefinition(StrategyProperties.DEP_OPTIONS_KEY,
             "Dependency contracts",
@@ -226,11 +244,12 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition ossUsage = getOssUsage();
         final OneOfStrategyPropertyDefinition proofSplitting = getProofSplitting();
         final OneOfStrategyPropertyDefinition dependencyContracts = getDependencyContracts();
+        final OneOfStrategyPropertyDefinition heapReduction = getHeapReduction();
         final OneOfStrategyPropertyDefinition queryTreatment = getQueryTreatment();
         final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
         final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
         // Model
         return new StrategySettingsDefinition("Java DL Options", ossUsage, proofSplitting,
-            dependencyContracts, queryTreatment, classAxiom, autoInduction);
+            dependencyContracts, heapReduction, queryTreatment, classAxiom, autoInduction);
     }
 }
