@@ -340,9 +340,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 applyTF("distSummand1", tf.polynomial),
                 ifZero(applyTF("distCoeff", tf.monomial), longConst(-15),
                     applyTF("distCoeff", tf.polynomial)),
-                applyTF("distSummand0", tf.polynomial),
-
-                applyTF("distSummand1", tf.polynomial), longConst(-35)));
+                longConst(-35)));
 
         // category "direct equations"
 
