@@ -61,7 +61,7 @@ class AntecSuccPrefixChecker implements Checker {
         if (pio.posInTerm() != null) {
             final PIOPathIterator it = pio.iterator();
             while (pol != 0 && it.next() != -1) {
-                pol = checkOperator(pio.subTerm().op(), it.getChild(), pol);
+                pol = checkOperator(it.getSubTerm().op(), it.getChild(), pol);
             }
         }
 
