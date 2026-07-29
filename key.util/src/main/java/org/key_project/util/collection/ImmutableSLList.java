@@ -101,7 +101,7 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
         ImmutableList<T> list = this;
         for (int i = 0; i < elems; i++) {
             seq.add(list.head());
-            list = tail();
+            list = list.tail();
         }
         return ImmutableList.fromList(seq);
     }
