@@ -33,6 +33,8 @@ import org.key_project.util.collection.ImmutableArray;
  * Generates the terms upward a given (usually the find-)position and
  * allows to iterate over those in order to check e.g. whether the
  * position is below an update or quantifier.
+ *
+ * As it only looks upwards, the computed cost is weak stable
  */
 @WeakStableCost
 public abstract class SuperTermGenerator implements TermGenerator<Goal> {
