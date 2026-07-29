@@ -217,6 +217,20 @@ public class TestSLListOfString {
         assertEquals("[Dies,ist,ein,Test]", newList.toString());
     }
 
+    @Test
+    public void testTake() {
+        ImmutableList<String> newList = ImmutableList.nil();
+
+        for (int i = str.length - 1; i >= 0; i--) {
+            newList = newList.prepend(str[i]);
+        }
+
+        ImmutableList<String> expected = ImmutableList.of(str[0], str[1], str[2]);
+        ImmutableList<String> actual = newList.take(3);
+        assertEquals(3, actual.size());
+        assertEquals(expected, actual);
+    }
+
 
     public static void performanceTest(int n) {
         LOGGER.info("Performance Test for " + n + " elements");
