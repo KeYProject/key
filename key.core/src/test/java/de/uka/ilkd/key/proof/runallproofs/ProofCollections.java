@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
 /**
- * This class configuress the "runAllProofs" test runs.
+ * This class configures the "runAllProofs" test runs.
  *
  * The ProofCollection objects are created and configured in the two methods
  * #automaticJavaDL() and #automaticInfFlow(). You can add new files
@@ -297,6 +297,11 @@ public class ProofCollections {
             "performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key");
         performance.provable(
             "performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
+        performance.provable("performance-test/updateSimplification/heap_array_25.key");
+        performance.provable("performance-test/updateSimplification/heap_array_50.key");
+        performance.provable("performance-test/updateSimplification/heap_array_100.key");
+        performance.provable("performance-test/updateSimplification/heap_array_200.key");
+        performance.provable("performance-test/updateSimplification/heap_array_400.key");
 
         // Test performance of PO construction
         var performancePOConstruction = c.group("performancePOConstruction");

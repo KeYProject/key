@@ -20,6 +20,8 @@ import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -30,6 +32,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 
 import org.jspecify.annotations.NonNull;
 
@@ -64,7 +69,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
 
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        this.strategyProperties = strategyProperties.clone();
 
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
@@ -151,10 +156,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return the minimal length before the heap term is pulled out in an eequation
+     *         length <code>0</code> means no pull out happens at all
+     */
+    private int getHeapSizeBound() {
+        return switch (strategyProperties.getProperty(
+            StrategyProperties.HEAP_REDUCTION_OPTIONS_KEY,
+            StrategyProperties.HEAP_REDUCTION_NORMAL)) {
+            case StrategyProperties.HEAP_REDUCTION_NORMAL ->
+                StrategyProperties.HEAP_REDUCTION_NORMAL_BOUND;
+            case StrategyProperties.HEAP_REDUCTION_DELAYED ->
+                StrategyProperties.HEAP_REDUCTION_DELAYED_BOUND;
+            default -> 0;
+        };
+    }
+
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
+
+        final int pullOutHeapSize = getHeapSizeBound();
+        bindRuleSet(d, "pull_out_heap",
+            pullOutHeapSize <= 0 ? inftyConst() : pullOutHeap(pullOutHeapSize));
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "javaIntegerSemantics",
@@ -301,20 +326,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
         bindRuleSet(d, "simplify_select_elim_store", longConst(-7000));
         bindRuleSet(d, "apply_auxiliary_eq",
-            // replace skolem constant by it's computed value
+            // replace a skolem constant by its computed value
             add(isSelectSkolemConstantTerm("t1"), longConst(-5500)));
+        // hide an auxiliary equation once the skolem constant has been replaced by its value
+        final Feature hideReplacedAuxiliaryEq = add(isSelectSkolemConstantTerm("auxiliarySK"),
+            applyTF("result",
+                rec(any(),
+                    add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
+            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))));
+
+        final int pullOutHeapBound = getHeapSizeBound();
         bindRuleSet(d, "hide_auxiliary_eq",
-            // hide auxiliary equation after the skolem constants have
-            // been replaced by it's computed value
-            add(isSelectSkolemConstantTerm("auxiliarySK"),
-                applyTF("result",
-                    rec(any(),
-                        add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-                not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))),
-                longConst(-5400)));
+            pullOutHeapBound <= 0 ? add(hideReplacedAuxiliaryEq, longConst(-5400))
+                    : ifZero(hideReplacedAuxiliaryEq, longConst(-5400),
+                        ifZero(isTermAPulledOutHeap(),
+                            ifZero(isSkolemConstantUsedElsewhereInSequent(), longConst(-5400),
+                                longConst(HIDE_DEFERRAL_COST)),
+                            inftyConst())));
         bindRuleSet(d, "hide_auxiliary_eq_const",
-            // hide auxiliary equation after the skolem constatns have
-            // been replaced by it's computed value
+            // hide an auxiliary equation once the skolem constant has been replaced by its
+            // value
             add(isSelectSkolemConstantTerm("auxiliarySK"), longConst(-500)));
     }
 
@@ -330,6 +361,65 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                 bindRuleSet(d, "userTaclets" + i, inftyConst());
             }
         }
+    }
+
+    private Feature pullOutHeap(int minHeapSizeForPullout) {
+        final TermFeature chain =
+            TermPredicateTermFeature.create(
+                t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
+        final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
+        return add(applyTF(FocusProjection.INSTANCE, chain), updateValue, longConst(-30000));
+    }
+
+
+    /**
+     * @param t a term describing a heap
+     * @param bound the heap length at which a pullout will be performed (and we can stop counting)
+     * @return the number of nested heap operations (max value is that of <code>bound</code>)
+     */
+    private int getHeapTermSize(Term t, int bound) {
+        int length = 0;
+        while (length < bound && t.arity() > 0
+                && (t.op() == heapLDT.getStore() || t.op() == heapLDT.getCreate()
+                        || t.op() == heapLDT.getAnon())) {
+            length++;
+            t = t.sub(0);
+        }
+        return length;
+    }
+
+    /**
+     * Defers application of hiding equations. It is realised as a finite cost so that
+     * the rule is deferred and not abandoned in the approval stage.
+     */
+    private static final long HIDE_DEFERRAL_COST = 30000;
+
+    /**
+     * cheap check if the equation to be hidden is of the required shape
+     * this check is cheap and run before the more expensive check whether the skolem constant still
+     * occurs in the sequent
+     *
+     * @return we only want to hid equations that describe a heap and were the result of a former
+     *         pullout
+     */
+    private Feature isTermAPulledOutHeap() {
+        return add(applyTF("result", op(heapLDT.getStore())),
+            applyTF("auxiliarySK", add(constantTermFeature(),
+                TermPredicateTermFeature.create(t -> t.op() instanceof Function f
+                        && f.isSkolemConstant()))));
+    }
+
+    /**
+     * expensive check ensuring that the Skolem constant of teh equation to be hidden is no longer
+     * in the
+     * sequent
+     */
+    private Feature isSkolemConstantUsedElsewhereInSequent() {
+        final TermBuffer sf = new TermBuffer();
+        return add(sequentContainsNoPrograms(),
+            sum(sf, SequentFormulasGenerator.sequent(),
+                or(eq(sf, FocusFormulaProjection.INSTANCE),
+                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
@@ -404,6 +494,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
+
+        final int pullOutHeapBound = getHeapSizeBound();
+        if (pullOutHeapBound > 0) {
+            bindRuleSet(d, "hide_auxiliary_eq",
+                ifZero(isSelectSkolemConstantTerm("auxiliarySK"), longConst(0),
+                    isSkolemConstantUsedElsewhereInSequent()));
+        }
 
         setupClassAxiomApproval(d);
 
