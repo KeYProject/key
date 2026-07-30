@@ -314,7 +314,24 @@ public class TacletPBuilder extends ExpressionBuilder {
                 ImmutableList<Taclet> rules = ImmutableList.nil();
                 for (var r : tgt.rules()) {
                     if (r instanceof FindTaclet ft) {
-                        rules = rules.append(ft.setFind(replace(ft.find(), eqTerm, eqSVTerm)));
+                        TacletBuilder<? extends Taclet> builder = taclet2Builder.get(ft).copy();
+                        Taclet newTaclet = switch (builder) {
+                            case AntecTacletBuilder atb -> {
+                                atb.setFind((Sequent) replace(atb.getFind(), eqTerm, eqSVTerm));
+                                yield atb.getTaclet();
+                            }
+                            case SuccTacletBuilder stb -> {
+                                stb.setFind((Sequent) replace(stb.getFind(), eqTerm, eqSVTerm));
+                                yield stb.getTaclet();
+                            }
+                            case RewriteTacletBuilder<?> rtb -> {
+                                rtb.setFind((JTerm) replace(rtb.getFind(), eqTerm, eqSVTerm));
+                                yield rtb.getTaclet();
+                            }
+                            default -> throw new UnsupportedOperationException();
+                        };
+                        rules = rules.append(newTaclet);
+                        taclet2Builder.put(newTaclet, builder);
                     } else {
                         rules = rules.append((Taclet) r);
                     }

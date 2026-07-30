@@ -8,7 +8,6 @@ import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
@@ -76,18 +75,6 @@ public class SuccTaclet extends FindTaclet {
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
         return new SuccTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-            (Sequent) find,
-            prefixMap, choices, tacletAnnotations);
-    }
-
-    @Override
-    public FindTaclet setFind(SyntaxElement find) {
-        final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
-                varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
-        return new SuccTaclet(name, applPart, goalTemplates(), getRuleSets(), attrs,
             (Sequent) find,
             prefixMap, choices, tacletAnnotations);
     }
