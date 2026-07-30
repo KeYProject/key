@@ -285,7 +285,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         TermSV eqSV = SchemaVariableFactory.createTermSV(new Name("EQ"), eqTerm.sort());
         schemaVariables().add(eqSV);
         JTerm eqSVTerm = TB.var(eqSV);
-        var assumesSeq = fb.assumesSequent();
+        var assumesSeq = replace(fb.assumesSequent(), eqTerm, eqSVTerm);
         assumesSeq = assumesSeq
                 .addFormula(new SequentFormula(TB.equals(eqTerm, eqSVTerm)), true, false).sequent();
         fb.setAssumesSequent(assumesSeq);
@@ -309,11 +309,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
             ImmutableList.nil();
         for (var tgt : fb.goalTemplates()) {
+            ChoiceExpr soc = fb.getGoal2Choices().get(tgt);
             if (tgt.rules() != null && !tgt.rules().isEmpty()) {
                 ImmutableList<Taclet> rules = ImmutableList.nil();
                 for (var r : tgt.rules()) {
                     if (r instanceof FindTaclet ft) {
-                        ft.setFind(replace(ft.find(), eqTerm, eqSVTerm));
+                        rules = rules.append(ft.setFind(replace(ft.find(), eqTerm, eqSVTerm)));
                     } else {
                         rules = rules.append((Taclet) r);
                     }
@@ -328,12 +329,13 @@ public class TacletPBuilder extends ExpressionBuilder {
                         default -> tgt;
                     };
                 goalSpecs = goalSpecs.append(newGoalSpec);
+                if (soc != null) {
+                    fb.getGoal2Choices().remove(tgt);
+                    fb.getGoal2Choices().put((TacletGoalTemplate) newGoalSpec, soc);
+                }
             } else {
                 goalSpecs = goalSpecs.append(tgt);
             }
-            ChoiceExpr soc = fb.getGoal2Choices().get(tgt);
-            if (soc != null)
-                fb.addGoal2ChoicesMapping((TacletGoalTemplate) tgt, soc);
         }
         fb.setTacletGoalTemplates(goalSpecs);
         setSchemaVariables(schemaVariables().parent());

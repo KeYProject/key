@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Jul 25 10:22:38 CEST 2026
+# Date: Thu Jul 30 16:48:13 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -9678,12 +9678,12 @@ getOfSeqConcat {
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
-== getOfSeqConcatEQ (getOfSeqConcat) =========================================
+== getOfSeqConcatEQ (getOfSeqConcatEQ) =========================================
 getOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
 \sameUpdateLevel\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<[alpha]>(seq,idx),seqGet<[alpha]>(seq2,sub(idx,seqLen(seq))))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqDef (getOfSeqDef) =========================================
@@ -9710,12 +9710,12 @@ getOfSeqReverse {
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
-== getOfSeqReverseEQ (getOfSeqReverse) =========================================
+== getOfSeqReverseEQ (getOfSeqReverseEQ) =========================================
 getOfSeqReverseEQ {
 \assumes ([equals(seqReverse(seq),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
 \sameUpdateLevel\replacewith(seqGet<[alpha]>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingleton (getOfSeqSingleton) =========================================
@@ -9732,12 +9732,12 @@ getOfSeqSingletonConcrete {
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
-== getOfSeqSingletonEQ (getOfSeqSingleton) =========================================
+== getOfSeqSingletonEQ (getOfSeqSingletonEQ) =========================================
 getOfSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
 \sameUpdateLevel\replacewith(if-then-else(equals(idx,Z(0(#))),cast<[alpha]>(x),cast<[alpha]>(seqGetOutside))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSub (getOfSeqSub) =========================================
@@ -9747,12 +9747,12 @@ getOfSeqSub {
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
-== getOfSeqSubEQ (getOfSeqSub) =========================================
+== getOfSeqSubEQ (getOfSeqSubEQ) =========================================
 getOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
 \sameUpdateLevel\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<[alpha]>(seq,add(idx,from)),cast<[alpha]>(seqGetOutside))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqUpd (getOfSeqUpd) =========================================
@@ -12119,7 +12119,7 @@ lenOfSeqConcat {
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
-== lenOfSeqConcatEQ (lenOfSeqConcat) =========================================
+== lenOfSeqConcatEQ (lenOfSeqConcatEQ) =========================================
 lenOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqLen(EQ))
@@ -12149,7 +12149,7 @@ lenOfSeqEmpty {
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
-== lenOfSeqEmptyEQ (lenOfSeqEmpty) =========================================
+== lenOfSeqEmptyEQ (lenOfSeqEmptyEQ) =========================================
 lenOfSeqEmptyEQ {
 \assumes ([equals(seqEmpty,EQ)]==>[]) 
 \find(seqLen(EQ))
@@ -12164,7 +12164,7 @@ lenOfSeqReverse {
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
-== lenOfSeqReverseEQ (lenOfSeqReverse) =========================================
+== lenOfSeqReverseEQ (lenOfSeqReverseEQ) =========================================
 lenOfSeqReverseEQ {
 \assumes ([equals(seqReverse(seq),EQ)]==>[]) 
 \find(seqLen(EQ))
@@ -12179,7 +12179,7 @@ lenOfSeqSingleton {
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
-== lenOfSeqSingletonEQ (lenOfSeqSingleton) =========================================
+== lenOfSeqSingletonEQ (lenOfSeqSingletonEQ) =========================================
 lenOfSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqLen(EQ))
@@ -12194,12 +12194,12 @@ lenOfSeqSub {
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
-== lenOfSeqSubEQ (lenOfSeqSub) =========================================
+== lenOfSeqSubEQ (lenOfSeqSubEQ) =========================================
 lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-
+\heuristics(obsolete)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
@@ -12218,8 +12218,8 @@ Choices: Strings:on}
 -----------------------------------------------------
 == lengthReplaceEQ (lengthReplaceEQ) =========================================
 lengthReplaceEQ {
-\assumes ([equals(clReplace(str,searchChar,replaceChar),newStr)]==>[]) 
-\find(seqLen(newStr))
+\assumes ([equals(clReplace(str,searchChar,replaceChar),EQ)]==>[]) 
+\find(seqLen(EQ))
 \sameUpdateLevel\replacewith(seqLen(str)) 
 \heuristics(stringsSimplify)
 Choices: Strings:on}
@@ -14002,18 +14002,18 @@ onlyCreatedObjectsAreInLocSetsEQ {
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
-== onlyCreatedObjectsAreInLocSetsEQFinal (onlyCreatedObjectsAreInLocSetsEQFinal) =========================================
-onlyCreatedObjectsAreInLocSetsEQFinal {
-\assumes ([wellFormed(h),equals(final<[LocSet]>(o,f),EQ)]==>[]) 
-\find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
-\heuristics(inReachableStateImplication)
-Choices: programRules:Java}
------------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinal (onlyCreatedObjectsAreInLocSetsFinal) =========================================
 onlyCreatedObjectsAreInLocSetsFinal {
 \assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,final<[LocSet]>(o,f))==>)
+\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: programRules:Java}
+-----------------------------------------------------
+== onlyCreatedObjectsAreInLocSetsFinalEQ (onlyCreatedObjectsAreInLocSetsFinalEQ) =========================================
+onlyCreatedObjectsAreInLocSetsFinalEQ {
+\assumes ([wellFormed(h),equals(final<[LocSet]>(o,f),EQ)]==>[]) 
+\find(elementOf(o2,f2,EQ)==>)
 \add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
@@ -15066,8 +15066,8 @@ Choices: reach:on}
 -----------------------------------------------------
 == reachDependenciesStoreEQ (reachDependenciesStoreEQ) =========================================
 reachDependenciesStoreEQ {
-\assumes ([equals(store(h,o3,f,x),h2)]==>[]) 
-\find(reach(h2,s,o,o2,n))
+\assumes ([equals(store(h,o3,f,x),EQ)]==>[]) 
+\find(reach(EQ,s,o,o2,n))
 \sameUpdateLevel\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (LocSet term)), \notFreeIn(nv (variable), x (any term)), \notFreeIn(nv (variable), f (Field term)), \notFreeIn(nv (variable), o3 (java.lang.Object term)), \notFreeIn(nv (variable), h (Heap term)))
 \add [not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
 \add []==>[not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))] 
@@ -15084,8 +15084,8 @@ Choices: reach:on}
 -----------------------------------------------------
 == reachDependenciesStoreSimpleEQ (reachDependenciesStoreSimpleEQ) =========================================
 reachDependenciesStoreSimpleEQ {
-\assumes ([equals(store(h,o3,f2,x),h2)]==>[]) 
-\find(reach(h2,allObjects(f),o,o2,n))
+\assumes ([equals(store(h,o3,f2,x),EQ)]==>[]) 
+\find(reach(EQ,allObjects(f),o,o2,n))
 \sameUpdateLevel\varcond(\metaDisjoint f (Field term), f2 (Field term))
 \replacewith(reach(h,allObjects(f),o,o2,n)) 
 \heuristics(simplify)
@@ -15162,8 +15162,8 @@ reach_does_not_depend_on_fresh_locs {
 \heuristics(simplify)
 Choices: reach:on}
 -----------------------------------------------------
-== reach_does_not_depend_on_fresh_locs_EQ (reach_does_not_depend_on_fresh_locs_EQ) =========================================
-reach_does_not_depend_on_fresh_locs_EQ {
+== reach_does_not_depend_on_fresh_locsEQ (reach_does_not_depend_on_fresh_locsEQ) =========================================
+reach_does_not_depend_on_fresh_locsEQ {
 \assumes ([equals(anon(h,empty,h2),EQ)]==>[equals(o,null)]) 
 \find(reach(EQ,s,o,o2,n))
 \sameUpdateLevel\add []==>[and(wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE))] ;
@@ -15196,14 +15196,6 @@ reference_type_cast {
 \heuristics(simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
-== referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
-referencedObjectIsCreatedRighFinalEQ {
-\assumes ([equals(final<[deltaObject]>(o,f),EQ)]==>[equals(EQ,null)]) 
-\find(==>equals(select<[boolean]>(h,EQ,java.lang.Object::#$created),TRUE))
-\add []==>[or(equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE),equals(o,null))] 
-\heuristics(concrete)
-Choices: programRules:Java}
------------------------------------------------------
 == referencedObjectIsCreatedRight (referencedObjectIsCreatedRight) =========================================
 referencedObjectIsCreatedRight {
 \assumes ([]==>[equals(select<[deltaObject]>(h,o,f),null)]) 
@@ -15226,6 +15218,14 @@ referencedObjectIsCreatedRightFinal {
 \find(==>equals(select<[boolean]>(h,final<[deltaObject]>(o,f),java.lang.Object::#$created),TRUE))
 \replacewith([]==>[or(equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE),equals(o,null))]) 
 \heuristics(simplify_enlarging)
+Choices: programRules:Java}
+-----------------------------------------------------
+== referencedObjectIsCreatedRightFinalEQ (referencedObjectIsCreatedRightFinalEQ) =========================================
+referencedObjectIsCreatedRightFinalEQ {
+\assumes ([equals(final<[deltaObject]>(o,f),EQ)]==>[equals(EQ,null)]) 
+\find(==>equals(select<[boolean]>(h,EQ,java.lang.Object::#$created),TRUE))
+\replacewith([]==>[or(equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE),equals(o,null))]) 
+\heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == regExAxiom (regExAxiom) =========================================
@@ -15688,6 +15688,14 @@ sElementOfSSetMinus {
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
+== sElementOfSSetMinusEQ (sElementOfSSetMinusEQ) =========================================
+sElementOfSSetMinusEQ {
+\assumes ([equals(sSetMinus<[T]>(s,t),EQ)]==>[]) 
+\find(sElementOf<[T]>(a,EQ))
+\sameUpdateLevel\replacewith(and(sElementOf<[T]>(a,s),not(sElementOf<[T]>(a,t)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
 == sElementOfSSingleton (sElementOfSSingleton) =========================================
 sElementOfSSingleton {
 \find(sElementOf<[T]>(a,sSingleton<[T]>(b)))
@@ -15707,14 +15715,6 @@ sElementOfSUnionEQ {
 \assumes ([equals(sUnion<[T]>(s,t),EQ)]==>[]) 
 \find(sElementOf<[T]>(a,EQ))
 \sameUpdateLevel\replacewith(or(sElementOf<[T]>(a,s),sElementOf<[T]>(a,t))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSetMinusEQ (sElementOfSetMinusEQ) =========================================
-sElementOfSetMinusEQ {
-\assumes ([equals(sSetMinus<[T]>(s,t),EQ)]==>[]) 
-\find(sElementOf<[T]>(a,EQ))
-\sameUpdateLevel\replacewith(and(sElementOf<[T]>(a,s),not(sElementOf<[T]>(a,t)))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -17070,7 +17070,7 @@ subSeqCompleteSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),u))
 \sameUpdateLevel\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
-\heuristics(concrete, no_self_application)
+\heuristics(no_self_application, concrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqConcat (subSeqConcat) =========================================
@@ -17085,7 +17085,7 @@ subSeqConcatEQ {
 \assumes ([equals(seqConcat(s1,s2),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
 \sameUpdateLevel\replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqEmpty (subSeqEmpty) =========================================
@@ -17129,7 +17129,7 @@ subSeqSingleton2EQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
 \sameUpdateLevel\replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
-\heuristics(simplify_enlarging, no_self_application)
+\heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqSingletonEQ (subSeqSingletonEQ) =========================================
@@ -17140,22 +17140,6 @@ subSeqSingletonEQ {
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
-== subSeqTailEQL (subSeqTail) =========================================
-subSeqTailEQL {
-\assumes ([equals(seqLen(seq),EQ)]==>[]) 
-\find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(Z(1(#)),EQ)))
-\sameUpdateLevel\replacewith(seq) 
-\heuristics(concrete)
-Choices: sequences:on}
------------------------------------------------------
-== subSeqTailEQR (subSeqTail) =========================================
-subSeqTailEQR {
-\assumes ([equals(seqLen(seq),EQ)]==>[]) 
-\find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(EQ,Z(1(#)))))
-\sameUpdateLevel\replacewith(seq) 
-\heuristics(concrete)
-Choices: sequences:on}
------------------------------------------------------
 == subSeqTailL (subSeqTail) =========================================
 subSeqTailL {
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(Z(1(#)),seqLen(seq))))
@@ -17163,10 +17147,26 @@ subSeqTailL {
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
+== subSeqTailLEQ (subSeqTailEQ) =========================================
+subSeqTailLEQ {
+\assumes ([equals(seqLen(seq),EQ)]==>[]) 
+\find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(Z(1(#)),EQ)))
+\sameUpdateLevel\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
 == subSeqTailR (subSeqTail) =========================================
 subSeqTailR {
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(seqLen(seq),Z(1(#)))))
 \replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subSeqTailREQ (subSeqTailEQ) =========================================
+subSeqTailREQ {
+\assumes ([equals(seqLen(seq),EQ)]==>[]) 
+\find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(EQ,Z(1(#)))))
+\sameUpdateLevel\replacewith(seq) 
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -17228,6 +17228,14 @@ subsetOfIntersectWithItSelf1 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== subsetOfIntersectWithItSelf1EQ (subsetOfIntersectWithItSelf1EQ) =========================================
+subsetOfIntersectWithItSelf1EQ {
+\assumes ([equals(intersect(s,s2),EQ)]==>[]) 
+\find(subset(s,EQ))
+\sameUpdateLevel\replacewith(subset(s,s2)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == subsetOfIntersectWithItSelf2 (subsetOfIntersectWithItSelf2) =========================================
 subsetOfIntersectWithItSelf2 {
 \find(subset(s,intersect(s2,s)))
@@ -17235,16 +17243,8 @@ subsetOfIntersectWithItSelf2 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
-== subsetOfIntersectWithItSelfEQ1 (subsetOfIntersectWithItSelfEQ1) =========================================
-subsetOfIntersectWithItSelfEQ1 {
-\assumes ([equals(intersect(s,s2),EQ)]==>[]) 
-\find(subset(s,EQ))
-\sameUpdateLevel\replacewith(subset(s,s2)) 
-\heuristics(concrete)
-Choices: programRules:Java}
------------------------------------------------------
-== subsetOfIntersectWithItSelfEQ2 (subsetOfIntersectWithItSelfEQ2) =========================================
-subsetOfIntersectWithItSelfEQ2 {
+== subsetOfIntersectWithItSelf2EQ (subsetOfIntersectWithItSelf2EQ) =========================================
+subsetOfIntersectWithItSelf2EQ {
 \assumes ([equals(intersect(s2,s),EQ)]==>[]) 
 \find(subset(s,EQ))
 \sameUpdateLevel\replacewith(subset(s,s2)) 
@@ -17265,6 +17265,14 @@ subsetOfUnionWithItSelf1 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== subsetOfUnionWithItSelf1EQ (subsetOfUnionWithItSelf1EQ) =========================================
+subsetOfUnionWithItSelf1EQ {
+\assumes ([equals(union(s,s2),EQ)]==>[]) 
+\find(subset(s,EQ))
+\sameUpdateLevel\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == subsetOfUnionWithItSelf2 (subsetOfUnionWithItSelf2) =========================================
 subsetOfUnionWithItSelf2 {
 \find(subset(s,union(s2,s)))
@@ -17272,16 +17280,8 @@ subsetOfUnionWithItSelf2 {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
-== subsetOfUnionWithItSelfEQ1 (subsetOfUnionWithItSelfEQ1) =========================================
-subsetOfUnionWithItSelfEQ1 {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(subset(s,EQ))
-\sameUpdateLevel\replacewith(true) 
-\heuristics(concrete)
-Choices: programRules:Java}
------------------------------------------------------
-== subsetOfUnionWithItSelfEQ2 (subsetOfUnionWithItSelfEQ2) =========================================
-subsetOfUnionWithItSelfEQ2 {
+== subsetOfUnionWithItSelf2EQ (subsetOfUnionWithItSelf2EQ) =========================================
+subsetOfUnionWithItSelf2EQ {
 \assumes ([equals(union(s2,s),EQ)]==>[]) 
 \find(subset(s,EQ))
 \sameUpdateLevel\replacewith(true) 
@@ -18826,7 +18826,8 @@ Choices: programRules:Java}
 wellFormedStoreLocSetEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\replacewith(and(wellFormed(h),createdInHeap(x,h))) 
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha))
+\replacewith(and(wellFormed(h),createdInHeap(x,h))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18867,7 +18868,7 @@ Choices: programRules:Java}
 wellFormedStorePrimitiveEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\varcond(\not\sub(beta, java.lang.Object), \not\sub(beta, LocSet))
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
