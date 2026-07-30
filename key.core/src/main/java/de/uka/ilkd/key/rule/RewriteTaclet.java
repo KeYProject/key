@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -207,6 +208,18 @@ public class RewriteTaclet extends FindTaclet {
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
             (JTerm) find,
+            prefixMap, choices, getSurviveSymbExec(), tacletAnnotations);
+    }
+
+    @Override
+    public RewriteTaclet setFind(SyntaxElement find) {
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
+
+        return new RewriteTaclet(name, applPart, goalTemplates, getRuleSets(), attrs, (JTerm) find,
             prefixMap, choices, getSurviveSymbExec(), tacletAnnotations);
     }
 }

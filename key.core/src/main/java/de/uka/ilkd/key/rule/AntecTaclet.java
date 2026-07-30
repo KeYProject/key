@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.TacletPrefix;
@@ -74,6 +75,18 @@ public class AntecTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
+            (Sequent) find, prefixMap, choices, tacletAnnotations);
+    }
+
+    @Override
+    public FindTaclet setFind(SyntaxElement find) {
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
+
+        return new AntecTaclet(name, applPart, goalTemplates(), getRuleSets(), attrs,
             (Sequent) find, prefixMap, choices, tacletAnnotations);
     }
 }

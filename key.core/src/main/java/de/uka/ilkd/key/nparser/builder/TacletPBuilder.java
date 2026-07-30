@@ -104,8 +104,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         ChoiceExpr choices = accept(ctx.choices);
         this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
-        List<Taclet> seq = mapOf(ctx.taclet());
-        topLevelTaclets.addAll(seq);
+        List<List<Taclet>> seq = this.mapOf(ctx.taclet());
+        topLevelTaclets.addAll(seq.stream().flatMap(Collection::stream).toList());
         disableJavaSchemaMode();
         return null;
     }
@@ -144,7 +144,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Taclet visitTaclet(JavaKeYParser.TacletContext ctx) {
+    public List<Taclet> visitTaclet(JavaKeYParser.TacletContext ctx) {
         Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
@@ -178,7 +178,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
             registerTaclet(ctx, r, doc, origin);
             currentTBuilder.pop();
-            return r;
+            return List.of(r);
         }
 
         // schema var decls
@@ -243,12 +243,125 @@ public class TacletPBuilder extends ExpressionBuilder {
             Taclet r = peekTBuilder().getTaclet();
             String doc = processDocumentation(ctx.doc);
             registerTaclet(ctx, r, doc, origin);
+            List<Taclet> res = new LinkedList<>();
+            res.add(r);
+            if (ctx.modifiers().generateEQ() != null && !ctx.modifiers().generateEQ().isEmpty()) {
+                if (ctx.modifiers().generateEQ().size() != 1) {
+                    semanticError(ctx.modifiers(),
+                        "A taclet may have at most one \\generateEQ declaration.");
+                }
+                JavaKeYParser.GenerateEQContext generateEQContext =
+                    ctx.modifiers().generateEQ().getFirst();
+                JTerm eqTerm = accept(generateEQContext.term());
+                if (eqTerm == null) {
+                    semanticError(generateEQContext.term(), "failed to build term.");
+                } else {
+                    List<RuleSet> rs = generateEQContext.ruleset().isEmpty() ? null
+                            : mapOf(generateEQContext.ruleset());
+                    var eqTB =
+                        generateEQTaclet(b, eqTerm, rs == null ? null : ImmutableList.fromList(rs));
+                    Taclet eqTaclet = eqTB.getTaclet();
+                    res.add(eqTaclet);
+                    currentTBuilder.push(eqTB);
+                    registerTaclet(ctx, eqTaclet, doc, origin);
+                    currentTBuilder.pop();
+                }
+            }
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
-            return r;
+            return res;
         } catch (RuntimeException e) {
             throw new BuildingException(ctx, e);
         }
+    }
+
+    private TacletBuilder<? extends Taclet> generateEQTaclet(TacletBuilder<? extends Taclet> tb,
+            JTerm eqTerm, ImmutableList<RuleSet> ruleSets) {
+        var fb = tb.copy();
+        var TB = services.getTermBuilder();
+        setSchemaVariables(new Namespace<>(schemaVariables()));
+        fb.setName(new Name(fb.getName() + "EQ"));
+        fb.setDisplayName(fb.getTaclet().displayName() + "EQ");
+        TermSV eqSV = SchemaVariableFactory.createTermSV(new Name("EQ"), eqTerm.sort());
+        schemaVariables().add(eqSV);
+        JTerm eqSVTerm = TB.var(eqSV);
+        var assumesSeq = fb.assumesSequent();
+        assumesSeq = assumesSeq
+                .addFormula(new SequentFormula(TB.equals(eqTerm, eqSVTerm)), true, false).sequent();
+        fb.setAssumesSequent(assumesSeq);
+        if (ruleSets != null)
+            fb.setRuleSets(ruleSets);
+        switch (fb) {
+            case AntecTacletBuilder atb -> {
+                atb.setFind((Sequent) replace(atb.getFind(), eqTerm, eqSVTerm));
+            }
+            case SuccTacletBuilder stb -> {
+                stb.setFind((Sequent) replace(stb.getFind(), eqTerm, eqSVTerm));
+            }
+            case RewriteTacletBuilder<?> rb -> {
+                rb.setFind((JTerm) replace(rb.getFind(), eqTerm, eqSVTerm));
+                rb.setApplicationRestriction(rb.getTaclet().applicationRestriction()
+                        .combine(ApplicationRestriction.SAME_UPDATE_LEVEL));
+            }
+            default -> {
+            }
+        }
+        ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
+            ImmutableList.nil();
+        for (var tgt : fb.goalTemplates()) {
+            if (tgt.rules() != null && !tgt.rules().isEmpty()) {
+                ImmutableList<Taclet> rules = ImmutableList.nil();
+                for (var r : tgt.rules()) {
+                    if (r instanceof FindTaclet ft) {
+                        ft.setFind(replace(ft.find(), eqTerm, eqSVTerm));
+                    } else {
+                        rules = rules.append((Taclet) r);
+                    }
+                }
+                org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate newGoalSpec =
+                    switch (tgt) {
+                        case AntecSuccTacletGoalTemplate astg ->
+                            new AntecSuccTacletGoalTemplate(astg.sequent(), rules,
+                                astg.replaceWith(), astg.addedProgVars());
+                        case RewriteTacletGoalTemplate rtg -> new RewriteTacletGoalTemplate(
+                            rtg.sequent(), rules, rtg.replaceWith(), rtg.addedProgVars());
+                        default -> tgt;
+                    };
+                goalSpecs = goalSpecs.append(newGoalSpec);
+            } else {
+                goalSpecs = goalSpecs.append(tgt);
+            }
+            ChoiceExpr soc = fb.getGoal2Choices().get(tgt);
+            if (soc != null)
+                fb.addGoal2ChoicesMapping((TacletGoalTemplate) tgt, soc);
+        }
+        fb.setTacletGoalTemplates(goalSpecs);
+        setSchemaVariables(schemaVariables().parent());
+        return fb;
+    }
+
+    private SyntaxElement replace(SyntaxElement se, JTerm find, JTerm to) {
+        if (se instanceof Sequent seq)
+            return replace(seq, find, to);
+        if (se instanceof JTerm t)
+            return replace(t, find, to);
+        return se;
+    }
+
+    private Sequent replace(Sequent se, JTerm find, JTerm to) {
+        ImmutableList<SequentFormula> ante = ImmutableList.nil();
+        for (var sf : se.antecedent().asList()) {
+            ante = ante.append(new SequentFormula(replace((JTerm) sf.formula(), find, to)));
+        }
+        ImmutableList<SequentFormula> succ = ImmutableList.nil();
+        for (var sf : se.succedent().asList()) {
+            succ = succ.append(new SequentFormula(replace((JTerm) sf.formula(), find, to)));
+        }
+        return JavaDLSequentKit.createSequent(ante, succ);
+    }
+
+    private JTerm replace(JTerm se, JTerm find, JTerm to) {
+        return GenericTermReplacer.replace(se, t -> t.equals(find), (ignored) -> to, services);
     }
 
     private void registerTaclet(JavaKeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
@@ -863,8 +976,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ImmutableList<Taclet> visitTacletlist(JavaKeYParser.TacletlistContext ctx) {
-        List<Taclet> taclets = mapOf(ctx.taclet());
-        return ImmutableList.fromList(taclets);
+        List<List<Taclet>> taclets = mapOf(ctx.taclet());
+        return ImmutableList.fromList(taclets.stream().flatMap(Collection::stream).toList());
     }
 
     private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
@@ -1077,14 +1190,14 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (variables().lookup(v.name()) != null) {
-            semanticError(null, "Schema variables shadows previous declared variable: %s.",
+            semanticError(ctx, "Schema variables shadows previous declared variable: %s.",
                 v.name());
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
             JOperatorSV old = (JOperatorSV) schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort())) {
-                semanticError(null,
+                semanticError(ctx,
                     "Schema variables clashes with previous declared schema variable: %s.",
                     v.name());
             }

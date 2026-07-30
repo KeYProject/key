@@ -319,6 +319,10 @@ SUCCEDENTPOLARITY
    : '\\succedentPolarity'
    ;
 
+GENERATE_EQ
+    : '\\generateEQ'
+    ;
+
 CLOSEGOAL
    : '\\closegoal'
    ;

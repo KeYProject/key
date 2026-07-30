@@ -163,4 +163,6 @@ public abstract class FindTaclet extends Taclet {
         }
         return tacletAsString;
     }
+
+    public abstract FindTaclet setFind(SyntaxElement find);
 }
