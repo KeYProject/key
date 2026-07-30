@@ -43,7 +43,7 @@
 }
 
 \proofObligation {
-	"name": "subSeqTailEQL",
+	"name": "subSeqTailLEQ",
 	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
  }
 
