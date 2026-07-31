@@ -260,7 +260,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                     List<RuleSet> rs = generateEQContext.ruleset().isEmpty() ? null
                             : mapOf(generateEQContext.ruleset());
                     var eqTB =
-                        generateEQTaclet(b, eqTerm, rs == null ? null : ImmutableList.fromList(rs));
+                        generateEQTaclet(generateEQContext, b, eqTerm,
+                            rs == null ? null : ImmutableList.fromList(rs));
                     Taclet eqTaclet = eqTB.getTaclet();
                     res.add(eqTaclet);
                     currentTBuilder.push(eqTB);
@@ -281,7 +282,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     /// @param eqTerm the term to look for in the assumes sequent
     /// @param ruleSets overriding rule sets
     /// @return a [TacletBuilder] for the EQ taclet
-    private TacletBuilder<? extends Taclet> generateEQTaclet(TacletBuilder<? extends Taclet> tb,
+    private TacletBuilder<? extends Taclet> generateEQTaclet(JavaKeYParser.GenerateEQContext ctx,
+            TacletBuilder<? extends Taclet> tb,
             JTerm eqTerm, @Nullable ImmutableList<RuleSet> ruleSets) {
         var fb = tb.copy();
         var TB = services.getTermBuilder();
@@ -301,21 +303,32 @@ public class TacletPBuilder extends ExpressionBuilder {
         fb.setAssumesSequent(assumesSeq);
         if (ruleSets != null)
             fb.setRuleSets(ruleSets);
+        boolean changed = false;
         switch (fb) {
             case AntecTacletBuilder atb -> {
-                atb.setFind((Sequent) replace(atb.getFind(), eqTerm, eqSVTerm));
+                Sequent replaced = (Sequent) replace(atb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(atb.getFind());
+                atb.setFind(replaced);
             }
             case SuccTacletBuilder stb -> {
-                stb.setFind((Sequent) replace(stb.getFind(), eqTerm, eqSVTerm));
+                Sequent replaced = (Sequent) replace(stb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(stb.getFind());
+                stb.setFind(replaced);
             }
             case RewriteTacletBuilder<?> rb -> {
-                rb.setFind((JTerm) replace(rb.getFind(), eqTerm, eqSVTerm));
+                JTerm replaced = (JTerm) replace(rb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(rb.getFind());
+                rb.setFind(replaced);
                 // Add the default `\sameUpdateLevel`
                 rb.setApplicationRestriction(rb.getTaclet().applicationRestriction()
                         .combine(ApplicationRestriction.SAME_UPDATE_LEVEL));
             }
             default -> {
             }
+        }
+        if (!changed) {
+            semanticError(ctx,
+                "The term in \\generateEQ was not found in the taclet's \\find part");
         }
         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
             ImmutableList.nil();
