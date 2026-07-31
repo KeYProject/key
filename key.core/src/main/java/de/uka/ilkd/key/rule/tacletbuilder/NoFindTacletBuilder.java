@@ -92,6 +92,6 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         rb.setTacletGoalTemplates(goals);
         rb.setTrigger(attrs.trigger());
         rb.setRuleSets(ruleSets);
-        return null;
+        return rb;
     }
 }

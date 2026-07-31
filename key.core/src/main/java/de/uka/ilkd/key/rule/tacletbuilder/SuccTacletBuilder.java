@@ -113,9 +113,10 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         }
         rb.setFind((Sequent) find);
         rb.setChoices(choices);
-        rb.goal2Choices =
-            (java.util.HashMap<TacletGoalTemplate, org.key_project.logic.ChoiceExpr>) goal2Choices
-                    .clone();
+        if (goal2Choices != null)
+            rb.goal2Choices =
+                (java.util.HashMap<TacletGoalTemplate, org.key_project.logic.ChoiceExpr>) goal2Choices
+                        .clone();
         return rb;
     }
 }
