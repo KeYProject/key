@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Jul 30 18:35:03 CEST 2026
+# Date: Fri Jul 31 08:31:54 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -15224,7 +15224,7 @@ Choices: programRules:Java}
 referencedObjectIsCreatedRightFinalEQ {
 \assumes ([equals(final<[deltaObject]>(o,f),EQ)]==>[equals(EQ,null)]) 
 \find(==>equals(select<[boolean]>(h,EQ,java.lang.Object::#$created),TRUE))
-\replacewith([]==>[or(equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE),equals(o,null))]) 
+\add []==>[or(equals(select<[boolean]>(h,o,java.lang.Object::#$created),TRUE),equals(o,null))] 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18787,6 +18787,14 @@ Choices: programRules:Java}
 wellFormedCreate {
 \find(wellFormed(create(h,o)))
 \succedentPolarity\replacewith(wellFormed(h)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== wellFormedCreateEQ (wellFormedCreateEQ) =========================================
+wellFormedCreateEQ {
+\assumes ([equals(create(h,o),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
