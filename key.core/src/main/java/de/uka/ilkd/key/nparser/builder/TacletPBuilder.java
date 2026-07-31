@@ -246,6 +246,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             List<Taclet> res = new LinkedList<>();
             res.add(r);
             if (ctx.modifiers().generateEQ() != null && !ctx.modifiers().generateEQ().isEmpty()) {
+                // Generate EQ taclet
                 if (ctx.modifiers().generateEQ().size() != 1) {
                     semanticError(ctx.modifiers(),
                         "A taclet may have at most one \\generateEQ declaration.");
@@ -275,17 +276,26 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
+    /// Generate the EQ version of the taclet represented by `tb`.
+    /// @param tb builder of the original taclet
+    /// @param eqTerm the term to look for in the assumes sequent
+    /// @param ruleSets overriding rule sets
+    /// @return a [TacletBuilder] for the EQ taclet
     private TacletBuilder<? extends Taclet> generateEQTaclet(TacletBuilder<? extends Taclet> tb,
-            JTerm eqTerm, ImmutableList<RuleSet> ruleSets) {
+            JTerm eqTerm, @Nullable ImmutableList<RuleSet> ruleSets) {
         var fb = tb.copy();
         var TB = services.getTermBuilder();
         setSchemaVariables(new Namespace<>(schemaVariables()));
+        // Extend name and display name by "EQ"
         fb.setName(new Name(fb.getName() + "EQ"));
         fb.setDisplayName(fb.getTaclet().displayName() + "EQ");
+        // We add the SV "EQ"
         TermSV eqSV = SchemaVariableFactory.createTermSV(new Name("EQ"), eqTerm.sort());
         schemaVariables().add(eqSV);
         JTerm eqSVTerm = TB.var(eqSV);
+        // Replace `eqTerm` by `EQ` in existing `\assumes`
         var assumesSeq = replace(fb.assumesSequent(), eqTerm, eqSVTerm);
+        // Add `eqTerm = EQ ==>` to `\assumes`
         assumesSeq = assumesSeq
                 .addFormula(new SequentFormula(TB.equals(eqTerm, eqSVTerm)), true, false).sequent();
         fb.setAssumesSequent(assumesSeq);
@@ -300,6 +310,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
             case RewriteTacletBuilder<?> rb -> {
                 rb.setFind((JTerm) replace(rb.getFind(), eqTerm, eqSVTerm));
+                // Add the default `\sameUpdateLevel`
                 rb.setApplicationRestriction(rb.getTaclet().applicationRestriction()
                         .combine(ApplicationRestriction.SAME_UPDATE_LEVEL));
             }
@@ -308,6 +319,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
             ImmutableList.nil();
+        // We need to replace `eqTerm` by `EQ` in the `\find` parts of added rules as well
         for (var tgt : fb.goalTemplates()) {
             ChoiceExpr soc = fb.getGoal2Choices().get(tgt);
             if (tgt.rules() != null && !tgt.rules().isEmpty()) {
@@ -333,9 +345,11 @@ public class TacletPBuilder extends ExpressionBuilder {
                         rules = rules.append(newTaclet);
                         taclet2Builder.put(newTaclet, builder);
                     } else {
+                        // No `\find` -> keep original
                         rules = rules.append((Taclet) r);
                     }
                 }
+                // Update added rules of goal template
                 org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate newGoalSpec =
                     switch (tgt) {
                         case AntecSuccTacletGoalTemplate astg ->
@@ -351,6 +365,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                     fb.getGoal2Choices().put((TacletGoalTemplate) newGoalSpec, soc);
                 }
             } else {
+                // Keep original goal spec
                 goalSpecs = goalSpecs.append(tgt);
             }
         }
