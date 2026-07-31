@@ -59,7 +59,7 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
         final MatchConditions matchCond = (MatchConditions) matchResultInfo;
         final SVInstantiations inst = matchCond.getInstantiations();
 
-        final JTerm t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
+        final JTerm t = inst.getTermInstantiation(op, services);
         if (t != null) {
             // An already instantiated schema variable accepts a candidate exactly when it is
             // equal to the instantiation modulo renaming. The proof-search queue relies on this:
