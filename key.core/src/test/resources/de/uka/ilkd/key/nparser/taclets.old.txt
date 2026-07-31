@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Jul 31 08:31:54 CEST 2026
+# Date: Fri Jul 31 08:38:16 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -18822,6 +18822,15 @@ wellFormedStoreArray {
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
+== wellFormedStoreArrayEQ (wellFormedStoreArrayEQ) =========================================
+wellFormedStoreArrayEQ {
+\assumes ([equals(store(h,o,arr(idx),x),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha))
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::#$created),TRUE),arrayStoreValid(o,x))))) 
+\heuristics(simplify_enlarging)
+Choices: programRules:Java}
+-----------------------------------------------------
 == wellFormedStoreLocSet (wellFormedStoreLocSet) =========================================
 wellFormedStoreLocSet {
 \find(wellFormed(store(h,o,f,x)))
@@ -18868,6 +18877,15 @@ Choices: programRules:Java}
 wellFormedStorePrimitiveArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\replacewith(wellFormed(h)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== wellFormedStorePrimitiveArrayEQ (wellFormedStorePrimitiveArrayEQ) =========================================
+wellFormedStorePrimitiveArrayEQ {
+\assumes ([equals(store(h,o,arr(idx),x),EQ)]==>[]) 
+\find(wellFormed(EQ))
+\sameUpdateLevel\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
