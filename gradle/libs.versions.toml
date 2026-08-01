@@ -3,19 +3,19 @@
 
 [versions]
 # Plugins
-spotless = "8.7.0"
+spotless = "8.9.0"
 checkerframework-gradle = "0.6.61"
 maven-publish = "0.37.0"
-shadow = "9.4.3"
+shadow = "9.6.1"
 
 # Core dependencies
 slf4j = "2.0.18"
-logback = "1.5.37"
+logback = "1.6.1"
 jspecify = "1.0.0"
 eisop = "3.49.5-eisop1"
 assertj = "3.27.7"
-junit = "6.1.1"
-jackson = "2.21.4"
+junit = "6.1.2"
+jackson = "2.21.5"
 
 # ANTLR
 antlr = "4.13.2"
@@ -27,7 +27,7 @@ javaparser = "3.28.0-K13.6"
 truth = "1.4.5"
 
 # UI and CLI
-flatlaf = "3.7.1"
+flatlaf = "3.7.2"
 miglayout = "11.4.3"
 picocli = "4.7.7"
 docking-frames = "1.1.3p1"
