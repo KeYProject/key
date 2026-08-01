@@ -339,7 +339,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      */
     private static OpReplacer createOpReplacer(final ProgramVariable index,
             final ProgramVariable values, Services services) {
-        final Map<SyntaxElement, SyntaxElement> replacementMap = new HashMap<>();
+        final Map<SyntaxElement, SyntaxElement> replacementMap = new LinkedHashMap<>();
         if (index != null) {
             replacementMap.put(services.getTermBuilder().index(),
                 services.getTermBuilder().var(index));
@@ -624,8 +624,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
 
         if (head != null) {
-            Map<JTerm, JTerm> preReplacementMap = new HashMap<>();
-            Map<JTerm, JTerm> postReplacementMap = new HashMap<>();
+            Map<JTerm, JTerm> preReplacementMap = new LinkedHashMap<>();
+            Map<JTerm, JTerm> postReplacementMap = new LinkedHashMap<>();
             for (int i = 0; i < head.getStatementCount(); ++i) {
                 Statement stmt = head.getStatementAt(i);
                 if (stmt instanceof LocalVariableDeclaration decl) {
