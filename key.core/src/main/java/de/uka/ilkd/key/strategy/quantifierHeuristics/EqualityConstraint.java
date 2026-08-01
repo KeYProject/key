@@ -42,9 +42,6 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
 @Deprecated
 public class EqualityConstraint implements Constraint {
 
-    /** contains a boolean value */
-    private static final BooleanContainer CONSTRAINTBOOLEANCONTAINER = new BooleanContainer();
-
     /**
      * stores constraint content as a mapping from Metavariable to Term
      */
@@ -209,7 +206,7 @@ public class EqualityConstraint implements Constraint {
      */
     @Override
     public Constraint unify(JTerm t1, JTerm t2, Services services) {
-        return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
+        return unify(t1, t2, services, new BooleanContainer());
     }
 
     /**
@@ -651,7 +648,7 @@ public class EqualityConstraint implements Constraint {
      */
     @Override
     public Constraint join(Constraint co, Services services) {
-        return join(co, services, CONSTRAINTBOOLEANCONTAINER);
+        return join(co, services, new BooleanContainer());
     }
 
 
@@ -683,40 +680,9 @@ public class EqualityConstraint implements Constraint {
             return co.join(this, services);
         }
 
-        final ECPair cacheKey;
-
-        lookup: synchronized (joinCacheMonitor) {
-            ecPair0.set(this, co);
-            Constraint res = joinCache.get(ecPair0);
-
-            if (res == null) {
-                cacheKey = ecPair0.copy();
-                res = joinCacheOld.get(cacheKey);
-                if (res == null) {
-                    break lookup;
-                }
-                joinCache.put(cacheKey, res);
-            }
-
-            unchanged.setVal(this == res);
-            return res;
-        }
-
         final Constraint res = joinHelp((EqualityConstraint) co, services);
-
         unchanged.setVal(res == this);
-
-        synchronized (joinCacheMonitor) {
-            if (joinCache.size() > 1000) {
-                joinCacheOld.clear();
-                final Map<ECPair, Constraint> t = joinCacheOld;
-                joinCacheOld = joinCache;
-                joinCache = t;
-            }
-
-            joinCache.put(cacheKey, res);
-            return res;
-        }
+        return res;
     }
 
 
@@ -824,48 +790,6 @@ public class EqualityConstraint implements Constraint {
         return map.toString();
     }
 
-
-    private static final class ECPair {
-        private Constraint first;
-        private Constraint second;
-        private int hash;
-
-        public boolean equals(Object o) {
-            if (!(o instanceof ECPair e)) {
-                return false;
-            }
-            return first == e.first && second == e.second;
-        }
-
-        public void set(Constraint first, Constraint second) {
-            this.first = first;
-            this.second = second;
-            this.hash = first.hashCode() + second.hashCode();
-        }
-
-        public int hashCode() {
-            return hash;
-        }
-
-        public ECPair copy() {
-            return new ECPair(first, second, hash);
-        }
-
-        public ECPair(Constraint first, Constraint second, int hash) {
-            this.first = first;
-            this.second = second;
-            this.hash = hash;
-        }
-    }
-
-    private static final Object joinCacheMonitor = new Object();
-
-    // the methods using these caches seem not to be used anymore otherwise refactor and move it
-    // into ServiceCaches
-    private static Map<ECPair, Constraint> joinCache = new ConcurrentLruCache<>(0);
-    private static Map<ECPair, Constraint> joinCacheOld = new ConcurrentLruCache<>(0);
-
-    private static final ECPair ecPair0 = new ECPair(null, null, 0);
 
     @Override
     public int hashCode() {

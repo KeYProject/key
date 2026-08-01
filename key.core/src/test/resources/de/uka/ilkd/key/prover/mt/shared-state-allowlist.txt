@@ -28,8 +28,6 @@ de.uka.ilkd.key.logic.op.QualifierWrapper#INSTANCES                            #
 de.uka.ilkd.key.proof.calculus.JavaDLSequentKit#INSTANCE                       # assigned once at class-init; reads via synchronized getInstance()
 de.uka.ilkd.key.proof.init.JavaProfile#defaultInstance                         # lazy singleton; every access inside synchronized getDefaultInstance()
 de.uka.ilkd.key.proof.init.JavaProfile#defaultInstancePermissions              # lazy singleton; every access inside synchronized getDefaultInstance()
-de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCache     # every read/write inside synchronized(joinCacheMonitor)
-de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCacheOld  # every read/write inside synchronized(joinCacheMonitor)
 
 # --- written only during single-threaded setup/loading, never by proof-search workers ---
 de.uka.ilkd.key.logic.sort.ArraySort#aSH                                       # mutated only via getArraySort during type modeling at load time; NOT safe for callers during proving
