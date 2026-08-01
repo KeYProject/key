@@ -264,8 +264,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 mainWindow.displayResults(info.toString());
             }
         }
-        // this seems to be a good place to free some memory
-        Runtime.getRuntime().gc();
     }
 
     /**

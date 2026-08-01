@@ -229,12 +229,15 @@ public class GoalList extends JList<Goal> implements TabPanel {
                         }
                     }); // do not print term labels
             try {
+                sp.setMaxChar(MAX_DISPLAYED_SEQUENT_LENGTH);
                 sp.printSequent(seq);
                 // Only read the result once printing has completed: result() returns the raw
                 // backend buffer without flushing, so on a failed print it would yield a
                 // truncated/empty sequent. Read it here on the success path instead.
                 res = sp.result().replace('\n', ' ');
-                res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
+                if (res.length() > MAX_DISPLAYED_SEQUENT_LENGTH) {
+                    res = res.substring(0, MAX_DISPLAYED_SEQUENT_LENGTH) + "...";
+                }
             } catch (Exception ex) {
                 LOGGER.warn("GoalList: Problem printing sequent.", ex);
                 res = "<unable to print sequent>";

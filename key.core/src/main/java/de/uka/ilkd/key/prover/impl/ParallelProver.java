@@ -305,11 +305,11 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         this.nonCloseableGoal = null;
         this.firstError.set(null);
 
-        // size 0 -> the status line shows an indeterminate ("busy") bar: the parallel prover does
-        // not report a meaningful per-step progress value (workers commit concurrently), so a
-        // determinate bar would either sit at zero or need thread-unsafe cross-worker counting.
+        // the status line shows an indeterminate ("busy") bar (<code>size == -1</code>):
+        // the parallel prover does not report a meaningful per-step progress value (workers
+        // commit concurrently)
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
-            PROCESSING_STRATEGY, 0));
+            PROCESSING_STRATEGY, -1));
 
         ApplyStrategyInfo<Proof, Goal> result = runParallel(goals);
 

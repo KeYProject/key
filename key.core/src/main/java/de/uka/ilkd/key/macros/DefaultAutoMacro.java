@@ -74,7 +74,7 @@ public class DefaultAutoMacro extends AbstractProofMacro {
             AutoProvers.create(goalChooser, proof.getInitConfig().getProfile());
 
         final ProofMacroListener pml =
-            new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
+            new ProgressBarListener(1, getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
 
         try {

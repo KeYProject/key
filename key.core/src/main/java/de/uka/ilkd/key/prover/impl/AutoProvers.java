@@ -44,16 +44,6 @@ public final class AutoProvers {
      * Creates the auto-prover selected by the current configuration, optionally forcing the
      * single-threaded prover.
      *
-     * <p>
-     * {@code allowParallel == false} pins the run to {@link ApplyStrategy} even when the multi-core
-     * prover is enabled. This is for drivers that close one goal at a time under a tight per-goal
-     * step budget (notably {@link de.uka.ilkd.key.macros.TryCloseMacro}): there is no parallelism
-     * to
-     * gain from a single goal, and several workers exploring one goal's subtree apply rules in a
-     * different, less step-efficient order than the single-threaded prover -- which can exhaust the
-     * budget before the goal closes. The wide, generously-budgeted runs (interactive automode and
-     * most macros) keep using the parallel prover, where it pays off.
-     *
      * @param goalChooser the goal chooser to use
      * @param profile the profile of the proof to be processed
      * @param allowParallel whether the parallel prover may be used at all for this run
