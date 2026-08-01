@@ -21,6 +21,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.Nullable;
 
@@ -94,8 +95,16 @@ public final class CostReuse {
     }
 
     /**
-     * @param strategy the goal's strategy; classified against its cost dispatchers (only used to
-     *        obtain those -- never dereferenced beyond {@link #dispatchers})
+     * Secondary cache key for cost reuse eligibility is the strategy as a strategy change
+     * invalidates the previously established eligibility
+     */
+    public record ConditionalEligibility(Strategy<?> strategy, Eligibility verdict) {
+    }
+
+    /**
+     * determines the eligibility of a taclet for cost reuse
+     *
+     * @param strategy the goal's strategy
      * @param proof the proof being worked on; supplies the per-proof classification cache
      * @param taclet the taclet whose cost is a candidate for reuse
      * @return how the taclet may reuse its cost, or {@code null} if it is not eligible at all.
@@ -108,20 +117,16 @@ public final class CostReuse {
         if (disp.isEmpty()) {
             return null;
         }
-        // The verdict is cached in the PROOF's ServiceCaches, NOT a static map: a taclet's locality
-        // depends on the cost dispatchers in force (which differ with the taclet options), while
-        // Taclet#equals is only name + find term. A cache shared across proofs would let one option
-        // set read another's verdict for a same-named but structurally different taclet -- exactly
-        // the static-cache hazard ServiceCaches exists to avoid. Per proof, it is also freed with
-        // the proof. (ELIGIBLE => at least the top-level NonDuplicateApp veto, so the empty-veto
-        // INELIGIBLE acts as the "not eligible" sentinel, the map forbidding null values.)
-        final Map<Taclet, Object> cache = proof.getServices().getCaches()
+        final Map<Taclet, ConditionalEligibility> cache = proof.getServices().getCaches()
                 .getCostReuseClassificationCache();
-        final Object e = cache.computeIfAbsent(taclet, t -> {
-            final Eligibility res = classify(disp, t);
-            return res == null ? INELIGIBLE : res;
-        });
-        return e == INELIGIBLE ? null : (Eligibility) e;
+        final ConditionalEligibility cached = cache.get(taclet);
+        if (cached instanceof ConditionalEligibility c &&
+                c.strategy() == strategy) { // cached result only valid if strategy did not change
+            return c.verdict() == INELIGIBLE ? null : (Eligibility) c.verdict();
+        }
+        final Eligibility res = classify(disp, taclet);
+        cache.put(taclet, new ConditionalEligibility(strategy, res == null ? INELIGIBLE : res));
+        return res;
     }
 
     private static @Nullable Eligibility classify(List<RuleSetDispatchFeature> dispatchers,
@@ -161,8 +166,8 @@ public final class CostReuse {
         }
         switch (localityOf(f)) {
             case VOLATILE -> local[0] = false;
-            // Transparent: recurse into every child component -- a Feature, TermGenerator or
-            // ProjectionToTerm, all of which receive the goal -- and stay local only if they all
+            // Transparent: recurse into every child component; a Feature, TermGenerator or
+            // ProjectionToTerm, all of which receive the goal, and stay local only if they all
             // are. WEAK_STABLE additionally reads the whole find formula, so reuse is gated on
             // that formula being unchanged (see Eligibility). Children are discovered reflectively
             // (see forEachChild), so authors annotate locality and never enumerate children.
@@ -221,7 +226,7 @@ public final class CostReuse {
                 follow(e, action);
             }
         }
-        // Everything else is not a cost component and is not traversed -- notably TermFeature (its
+        // Everything else is not a cost component and is not traversed, notably TermFeature (its
         // compute() has no goal, so it is stable by construction), plus Name, RuleAppCost, ...
     }
 
@@ -235,12 +240,12 @@ public final class CostReuse {
     }
 
     /**
-     * The cost dispatchers to classify against, taken from the strategy of the goal being costed.
-     * Must NOT be cached across strategies: different goals/proofs use different strategy instances
+     * The cost dispatchers to classify against, taken from the strategy of the goal on which
+     * the costs should be computed.
+     * Must not be cached across strategies: different goals/proofs use different strategy instances
      * (and some are not {@link ModularJavaDLStrategy} at all). A stale or empty cached value would
      * make the {@link #walk} traverse nothing and thus classify every taclet as (wrongly) local.
-     * When the strategy exposes no cost dispatchers, the taclet is treated as ineligible (see
-     * {@link #vetoesIfEligible}) -- never as trivially local.
+     * When the strategy exposes no cost dispatchers, the taclet is treated as ineligible.
      */
     private static List<RuleSetDispatchFeature> dispatchers(Strategy<?> strategy) {
         return strategy instanceof ModularJavaDLStrategy m ? m.costRuleSetDispatchers() : List.of();
