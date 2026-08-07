@@ -20,10 +20,10 @@ import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.parsing.LocatableException;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.IdentityHashSet;
+import org.key_project.util.parsing.LocatableException;
 import org.key_project.util.parsing.Location;
 
 /**

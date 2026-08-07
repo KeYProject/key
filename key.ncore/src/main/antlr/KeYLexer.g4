@@ -4,6 +4,8 @@ lexer grammar KeYLexer;
 {
     import java.util.HashMap;
     import java.util.LinkedHashMap;
+    import org.key_project.util.parsing.LocatableException;
+    import org.key_project.util.parsing.Location;
 }
 @ annotateclass
 { @SuppressWarnings("all") }
@@ -627,12 +629,18 @@ GREATEREQUAL
 
 // This syntax has been deprecated
 OPENTYPEPARAMS : '<' '[' {
- Runnable run = () -> { throw new RecognitionException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.", this, _input, null); };
+ Runnable run = () -> {
+				 emit();
+				 throw new LocatableException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.",
+					 Location.fromToken(_token)); };
  run.run();
 };
 
 CLOSETYPEPARAMS : ']' '>' {
- Runnable run = () -> { throw new RecognitionException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.", this, _input, null); };
+ Runnable run = () -> {
+ 				 emit();
+ 				 throw new LocatableException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.",
+ 					 Location.fromToken(_token)); };
  run.run();
 };
 
