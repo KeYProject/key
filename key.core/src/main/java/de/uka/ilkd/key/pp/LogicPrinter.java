@@ -1024,14 +1024,14 @@ public class LogicPrinter {
                 layouter.markEndKeyword();
             }
             if (t.op() instanceof ParametricFunctionInstance pfi) {
-                layouter.print("<[");
+                layouter.print("<");
                 for (int i = 0; i < pfi.getArgs().size(); ++i) {
                     var arg = pfi.getArgs().get(i);
                     if (i > 0)
                         layouter.print(", ");
                     printSort(arg.sort());
                 }
-                layouter.print("]>");
+                layouter.print(">");
             }
             if (!t.boundVars().isEmpty()) {
                 layouter.print("{").beginC(0);

@@ -30,9 +30,9 @@ sortId
 
 formal_sort_args
 :
-    OPENTYPEPARAMS
+    LESS // OPENTYPEPARAMS
     sortId (COMMA sortId)*
-    CLOSETYPEPARAMS
+    GREATER // CLOSETYPEPARAMS
 ;
 
 simple_ident_dots

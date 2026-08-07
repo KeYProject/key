@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -67,8 +68,8 @@ public class ParametricFunctionInstance extends JFunction {
 
     private static Name makeName(ParametricFunctionDecl base,
             ImmutableList<GenericArgument> parameters) {
-        // The [ ] are produced by the list's toString method.
-        return new Name(base.name() + "<" + parameters + ">");
+        // TODO // The [ ] are produced by the list's toString method.
+        return new Name(base.name() + "<" + parameters.stream().map(Object::toString).collect(Collectors.joining(",")) + ">");
     }
 
     /// Instantiates the arguments of `base` with the instantiations for the generic sorts in

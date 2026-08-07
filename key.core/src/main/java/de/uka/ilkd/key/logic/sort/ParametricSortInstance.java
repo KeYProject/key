@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -62,8 +63,8 @@ public final class ParametricSortInstance extends AbstractSort {
 
     private static Name makeName(ParametricSortDecl base,
             ImmutableList<GenericArgument> parameters) {
-        // The [ ] are produced by the list's toString method.
-        return new Name(base.name() + "<" + parameters + ">");
+        // OLD: // The [ ] are produced by the list's toString method.
+        return new Name(base.name() + "<" + parameters.stream().map(Object::toString).collect(Collectors.joining(",")) + ">");
     }
 
     public ParametricSortDecl getBase() {
