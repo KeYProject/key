@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Jul 31 08:38:16 CEST 2026
+# Date: Fri Aug 07 13:53:49 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -12199,7 +12199,7 @@ lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(obsolete)
+\heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
