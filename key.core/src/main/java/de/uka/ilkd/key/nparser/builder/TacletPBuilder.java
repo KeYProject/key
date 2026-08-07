@@ -265,7 +265,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (gen.eqGenerator() != null) {
                 if (eq > 0) {
                     semanticError(ctx,
-                        "A taclet may have at most one \\generate(EQ(...)) declaration.");
+                        "A taclet may have at most one \\generate(\\EQ(...)) declaration.");
                     continue;
                 }
                 lst.add(generateEQTaclet(gen.eqGenerator(), tb, doc, origin));

@@ -324,7 +324,7 @@ GENERATE
     ;
 
 GENERATE_EQ
-    : 'EQ'
+    : '\\EQ'
     ;
 
 CLOSEGOAL
