@@ -265,7 +265,7 @@ public class KeYJPMapping {
                     if (!other.resolvedType.isReferenceType()) {
                         return false;
                     }
-                    
+
                     return resolvedType.asReferenceType().getQualifiedName()
                             .equals(other.resolvedType.asReferenceType().getQualifiedName());
                 }
