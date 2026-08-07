@@ -245,29 +245,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             registerTaclet(ctx, r, doc, origin);
             List<Taclet> res = new LinkedList<>();
             res.add(r);
-            if (ctx.modifiers().generateEQ() != null && !ctx.modifiers().generateEQ().isEmpty()) {
-                // Generate EQ taclet
-                if (ctx.modifiers().generateEQ().size() != 1) {
-                    semanticError(ctx.modifiers(),
-                        "A taclet may have at most one \\generateEQ declaration.");
-                }
-                JavaKeYParser.GenerateEQContext generateEQContext =
-                    ctx.modifiers().generateEQ().getFirst();
-                JTerm eqTerm = accept(generateEQContext.term());
-                if (eqTerm == null) {
-                    semanticError(generateEQContext.term(), "failed to build term.");
-                } else {
-                    List<RuleSet> rs = generateEQContext.ruleset().isEmpty() ? null
-                            : mapOf(generateEQContext.ruleset());
-                    var eqTB =
-                        generateEQTaclet(generateEQContext, b, eqTerm,
-                            rs == null ? null : ImmutableList.fromList(rs));
-                    Taclet eqTaclet = eqTB.getTaclet();
-                    res.add(eqTaclet);
-                    currentTBuilder.push(eqTB);
-                    registerTaclet(ctx, eqTaclet, doc, origin);
-                    currentTBuilder.pop();
-                }
+            for (var gens : ctx.modifiers().generate()) {
+                res.addAll(generateTaclets(gens, b, doc, origin));
             }
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
@@ -277,14 +256,37 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
+    private List<Taclet> generateTaclets(JavaKeYParser.GenerateContext ctx,
+            TacletBuilder<? extends Taclet> tb,
+            String doc, String origin) {
+        var lst = new LinkedList<Taclet>();
+        int eq = 0;
+        for (var gen : ctx.generator()) {
+            if (gen.eqGenerator() != null) {
+                if (eq > 0) {
+                    semanticError(ctx,
+                        "A taclet may have at most one \\generate(EQ(...)) declaration.");
+                    continue;
+                }
+                lst.add(generateEQTaclet(gen.eqGenerator(), tb, doc, origin));
+                eq++;
+            }
+        }
+        return lst;
+    }
+
     /// Generate the EQ version of the taclet represented by `tb`.
     /// @param tb builder of the original taclet
-    /// @param eqTerm the term to look for in the assumes sequent
-    /// @param ruleSets overriding rule sets
     /// @return a [TacletBuilder] for the EQ taclet
-    private TacletBuilder<? extends Taclet> generateEQTaclet(JavaKeYParser.GenerateEQContext ctx,
-            TacletBuilder<? extends Taclet> tb,
-            JTerm eqTerm, @Nullable ImmutableList<RuleSet> ruleSets) {
+    private Taclet generateEQTaclet(JavaKeYParser.EqGeneratorContext ctx,
+            TacletBuilder<? extends Taclet> tb, String doc, String origin) {
+        JTerm eqTerm = accept(ctx.term());
+        if (eqTerm == null) {
+            semanticError(ctx.term(), "failed to build term.");
+        }
+        List<RuleSet> rs = ctx.ruleset().isEmpty() ? null
+                : mapOf(ctx.ruleset());
+        ImmutableList<RuleSet> ruleSets = rs == null ? null : ImmutableList.fromList(rs);
         var fb = tb.copy();
         var TB = services.getTermBuilder();
         setSchemaVariables(new Namespace<>(schemaVariables()));
@@ -328,7 +330,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         if (!changed) {
             semanticError(ctx,
-                "The term in \\generateEQ was not found in the taclet's \\find part");
+                "The term in \\generate(EQ(...)) was not found in the taclet's \\find part");
         }
         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
             ImmutableList.nil();
@@ -384,7 +386,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         fb.setTacletGoalTemplates(goalSpecs);
         setSchemaVariables(schemaVariables().parent());
-        return fb;
+        Taclet eqTaclet = fb.getTaclet();
+        currentTBuilder.push(fb);
+        registerTaclet(ctx, eqTaclet, doc, origin);
+        currentTBuilder.pop();
+        return eqTaclet;
     }
 
     private SyntaxElement replace(SyntaxElement se, JTerm find, JTerm to) {

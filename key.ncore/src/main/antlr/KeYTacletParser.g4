@@ -110,12 +110,21 @@ triggers
    ;
 
 modifiers
-   : (rs = rulesets | NONINTERACTIVE | DISPLAYNAME dname = string_value | HELPTEXT htext = string_value | triggers | generateEQ)*
+   : (rs = rulesets | NONINTERACTIVE | DISPLAYNAME dname = string_value | HELPTEXT htext = string_value | triggers | generate)*
    ;
    //TODO Split
 
-generateEQ
-    : GENERATE_EQ LPAREN term (COLON (ruleset (COMMA ruleset)*))? RPAREN;
+generate
+    : GENERATE LPAREN generator (COMMA generator)* RPAREN
+    ;
+
+generator
+    : eqGenerator
+    ;
+
+eqGenerator
+    : GENERATE_EQ LPAREN term (COLON (ruleset (COMMA ruleset)*))? RPAREN
+    ;
 
 one_schema_var_decl
    : MODALOPERATOR one_schema_modal_op_decl
