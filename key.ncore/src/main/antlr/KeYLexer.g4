@@ -607,17 +607,34 @@ PLUS
    : '+'
    ;
 
-GREATER
-   : '>'
+/* Special casing for ">=" and ">>" which need to be parsed as two tokens.
+ * If there is no space between the two characters, we need to check if the next character is '=' or '>'.
+ * If it is, we need to parse ">" as a special token indicating the continuation, it is "GREATER" otherwise.
+ */
+GREATER_CONTD
+   : '>' { ">=".indexOf((char)_input.LA(1)) >= 0 }?
    ;
+
+// The non-special ">" symbol
+GREATER
+    : '>'
+    ;
 
 GREATEREQUAL
-   : '>' '='
-   | '\u2265'
+   : // '>' '=' this is superseded by GREATER_DONTD above
+   '\u2265'
    ;
 
-OPENTYPEPARAMS : '<' '[';
-CLOSETYPEPARAMS : ']' '>';
+// This syntax has been deprecated
+OPENTYPEPARAMS : '<' '[' {
+ Runnable run = () -> { throw new RecognitionException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.", this, _input, null); };
+ run.run();
+};
+
+CLOSETYPEPARAMS : ']' '>' {
+ Runnable run = () -> { throw new RecognitionException("Type arguments are given in <...>, the old syntax with <[...]> is no longer supported.", this, _input, null); };
+ run.run();
+};
 
 WS
    : [ \t\n\r\u00a0]+ -> channel (HIDDEN)
@@ -643,8 +660,8 @@ LGUILLEMETS
    ;
 
 RGUILLEMETS
-   : '>' '>'
-   | '»'
+   : // '>' '>' superseded by GREATER_DIRECTLY_FOLLOWED_BY GREATERs
+     '»'
    | '›'
    ;
 

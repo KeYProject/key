@@ -112,7 +112,7 @@ brace_suffix:
   | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
 ;
 primitive_labeled_term:
-  primitive_term ( LGUILLEMETS labels= label RGUILLEMETS )?;
+  primitive_term ( LGUILLEMETS labels= label (RGUILLEMETS | GREATER_CONTD GREATER))?;
 
 /*
 weigl, 2021-03-12:
