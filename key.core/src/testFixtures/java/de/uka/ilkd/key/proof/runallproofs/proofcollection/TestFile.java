@@ -191,7 +191,8 @@ public class TestFile implements Serializable {
                     }
                 }
 
-                assertFalse(replayResult.hasErrors(), "Loading problem file " + keyFile + " failed");
+                assertFalse(replayResult.hasErrors(),
+                    "Loading problem file " + keyFile + " failed");
 
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {
