@@ -27,8 +27,8 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * A sort is reported when {@link Sort#containsGenericSort()} holds. This catches a generic sort
  * even
- * when it is nested inside a parametric sort (e.g. {@code List<[E]>}, or the result sort of
- * {@code select<[E]>(...)}), not only when a term's own sort is itself a generic sort.
+ * when it is nested inside a parametric sort (e.g. {@code List<E>}, or the result sort of
+ * {@code select<E>(...)}), not only when a term's own sort is itself a generic sort.
  *
  * @author KeY developers
  */

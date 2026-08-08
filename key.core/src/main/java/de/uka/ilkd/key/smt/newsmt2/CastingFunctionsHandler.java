@@ -20,7 +20,7 @@ import org.key_project.logic.sort.Sort;
  * coerced, i.e.
  *
  * <pre>
- *     f<[T]>(params) = cast<[T]>(f<[any]>(params))
+ *     f<T>(params) = cast<T>(f<any>(params))
  * </pre>
  *
  * Currently these are: seqGet and (heap-) select.

@@ -16,7 +16,7 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
-/// Abstract declaration of a parametric sort, e.g., `List<[E]>`.
+/// Abstract declaration of a parametric sort, e.g., `List<E>`.
 ///
 /// Get instantiated versions using [ParametricSortInstance#get(ParametricSortDecl, ImmutableList,
 /// Services)].
