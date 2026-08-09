@@ -35,7 +35,8 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
     public Set<SchemaVariable> collectSchemaVariables() {
 
-        Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(rtb.ifSequent()));
+        Set<SchemaVariable> result =
+            new LinkedHashSet<>(collectSchemaVariables(rtb.assumesSequent()));
 
         if (rtb instanceof FindTacletBuilder) {
             result.addAll(collectSchemaVariables(rtb.getFind()));

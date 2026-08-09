@@ -124,7 +124,7 @@ public class TacletPrefixBuilder {
     }
 
     public void build() {
-        visit(tacletBuilder.ifSequent());
+        visit(tacletBuilder.assumesSequent());
 
         if (tacletBuilder instanceof FindTacletBuilder findBuilder) {
             @SuppressWarnings("unchecked")
@@ -187,7 +187,7 @@ public class TacletPrefixBuilder {
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
         TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
-        svc.visit(tacletBuilder.ifSequent());
+        svc.visit(tacletBuilder.assumesSequent());
         for (var tacletGoalTemplate : tacletBuilder.goalTemplates()) {
             // if (tmpl instanceof RewriteTacletGoalTemplate) {
             // RewriteTacletGoalTemplate

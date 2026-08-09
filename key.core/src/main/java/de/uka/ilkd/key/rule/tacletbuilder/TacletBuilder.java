@@ -274,7 +274,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         ruleSets = rs;
     }
 
-    public Sequent ifSequent() {
+    public Sequent assumesSequent() {
         return assumesSeq;
     }
 
@@ -301,6 +301,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      * IllegalStateException.
      */
     public abstract T getTaclet();
+
+    public abstract TacletBuilder<T> copy();
 
     public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {

@@ -104,8 +104,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         ChoiceExpr choices = accept(ctx.choices);
         this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
-        List<Taclet> seq = mapOf(ctx.taclet());
-        topLevelTaclets.addAll(seq);
+        List<List<Taclet>> seq = this.mapOf(ctx.taclet());
+        topLevelTaclets.addAll(seq.stream().flatMap(Collection::stream).toList());
         disableJavaSchemaMode();
         return null;
     }
@@ -144,7 +144,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Taclet visitTaclet(JavaKeYParser.TacletContext ctx) {
+    public List<Taclet> visitTaclet(JavaKeYParser.TacletContext ctx) {
         Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
@@ -178,7 +178,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
             registerTaclet(ctx, r, doc, origin);
             currentTBuilder.pop();
-            return r;
+            return List.of(r);
         }
 
         // schema var decls
@@ -243,12 +243,178 @@ public class TacletPBuilder extends ExpressionBuilder {
             Taclet r = peekTBuilder().getTaclet();
             String doc = processDocumentation(ctx.doc);
             registerTaclet(ctx, r, doc, origin);
+            List<Taclet> res = new LinkedList<>();
+            res.add(r);
+            for (var gens : ctx.modifiers().generate()) {
+                res.addAll(generateTaclets(gens, b, doc, origin));
+            }
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
-            return r;
+            return res;
         } catch (RuntimeException e) {
             throw new BuildingException(ctx, e);
         }
+    }
+
+    private List<Taclet> generateTaclets(JavaKeYParser.GenerateContext ctx,
+            TacletBuilder<? extends Taclet> tb,
+            String doc, String origin) {
+        var lst = new LinkedList<Taclet>();
+        int eq = 0;
+        for (var gen : ctx.generator()) {
+            if (gen.eqGenerator() != null) {
+                if (eq > 0) {
+                    semanticError(ctx,
+                        "A taclet may have at most one \\generate(\\EQ(...)) declaration.");
+                    continue;
+                }
+                lst.add(generateEQTaclet(gen.eqGenerator(), tb, doc, origin));
+                eq++;
+            }
+        }
+        return lst;
+    }
+
+    /// Generate the EQ version of the taclet represented by `tb`.
+    /// @param tb builder of the original taclet
+    /// @return a [TacletBuilder] for the EQ taclet
+    private Taclet generateEQTaclet(JavaKeYParser.EqGeneratorContext ctx,
+            TacletBuilder<? extends Taclet> tb, String doc, String origin) {
+        JTerm eqTerm = accept(ctx.term());
+        if (eqTerm == null) {
+            semanticError(ctx.term(), "failed to build term.");
+        }
+        List<RuleSet> rs = ctx.ruleset().isEmpty() ? null
+                : mapOf(ctx.ruleset());
+        ImmutableList<RuleSet> ruleSets = rs == null ? null : ImmutableList.fromList(rs);
+        var fb = tb.copy();
+        var TB = services.getTermBuilder();
+        setSchemaVariables(new Namespace<>(schemaVariables()));
+        // Extend name and display name by "EQ"
+        fb.setName(new Name(fb.getName() + "EQ"));
+        fb.setDisplayName(fb.getTaclet().displayName() + "EQ");
+        // We add the SV "EQ"
+        TermSV eqSV = SchemaVariableFactory.createTermSV(new Name("EQ"), eqTerm.sort());
+        schemaVariables().add(eqSV);
+        JTerm eqSVTerm = TB.var(eqSV);
+        // Replace `eqTerm` by `EQ` in existing `\assumes`
+        var assumesSeq = replace(fb.assumesSequent(), eqTerm, eqSVTerm);
+        // Add `eqTerm = EQ ==>` to `\assumes`
+        assumesSeq = assumesSeq
+                .addFormula(new SequentFormula(TB.equals(eqTerm, eqSVTerm)), true, false).sequent();
+        fb.setAssumesSequent(assumesSeq);
+        if (ruleSets != null)
+            fb.setRuleSets(ruleSets);
+        boolean changed = false;
+        switch (fb) {
+            case AntecTacletBuilder atb -> {
+                Sequent replaced = (Sequent) replace(atb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(atb.getFind());
+                atb.setFind(replaced);
+            }
+            case SuccTacletBuilder stb -> {
+                Sequent replaced = (Sequent) replace(stb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(stb.getFind());
+                stb.setFind(replaced);
+            }
+            case RewriteTacletBuilder<?> rb -> {
+                JTerm replaced = (JTerm) replace(rb.getFind(), eqTerm, eqSVTerm);
+                changed = !replaced.equals(rb.getFind());
+                rb.setFind(replaced);
+                // Add the default `\sameUpdateLevel`
+                rb.setApplicationRestriction(rb.getTaclet().applicationRestriction()
+                        .combine(ApplicationRestriction.SAME_UPDATE_LEVEL));
+            }
+            default -> {
+            }
+        }
+        if (!changed) {
+            semanticError(ctx,
+                "The term in \\generate(EQ(...)) was not found in the taclet's \\find part");
+        }
+        ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalSpecs =
+            ImmutableList.nil();
+        // We need to replace `eqTerm` by `EQ` in the `\find` parts of added rules as well
+        for (var tgt : fb.goalTemplates()) {
+            ChoiceExpr soc = fb.getGoal2Choices().get(tgt);
+            if (tgt.rules() != null && !tgt.rules().isEmpty()) {
+                ImmutableList<Taclet> rules = ImmutableList.nil();
+                for (var r : tgt.rules()) {
+                    if (r instanceof FindTaclet ft) {
+                        TacletBuilder<? extends Taclet> builder = taclet2Builder.get(ft).copy();
+                        Taclet newTaclet = switch (builder) {
+                            case AntecTacletBuilder atb -> {
+                                atb.setFind((Sequent) replace(atb.getFind(), eqTerm, eqSVTerm));
+                                yield atb.getTaclet();
+                            }
+                            case SuccTacletBuilder stb -> {
+                                stb.setFind((Sequent) replace(stb.getFind(), eqTerm, eqSVTerm));
+                                yield stb.getTaclet();
+                            }
+                            case RewriteTacletBuilder<?> rtb -> {
+                                rtb.setFind((JTerm) replace(rtb.getFind(), eqTerm, eqSVTerm));
+                                yield rtb.getTaclet();
+                            }
+                            default -> throw new UnsupportedOperationException();
+                        };
+                        rules = rules.append(newTaclet);
+                        taclet2Builder.put(newTaclet, builder);
+                    } else {
+                        // No `\find` -> keep original
+                        rules = rules.append((Taclet) r);
+                    }
+                }
+                // Update added rules of goal template
+                org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate newGoalSpec =
+                    switch (tgt) {
+                        case AntecSuccTacletGoalTemplate astg ->
+                            new AntecSuccTacletGoalTemplate(astg.sequent(), rules,
+                                astg.replaceWith(), astg.addedProgVars());
+                        case RewriteTacletGoalTemplate rtg -> new RewriteTacletGoalTemplate(
+                            rtg.sequent(), rules, rtg.replaceWith(), rtg.addedProgVars());
+                        default -> tgt;
+                    };
+                goalSpecs = goalSpecs.append(newGoalSpec);
+                if (soc != null) {
+                    fb.getGoal2Choices().remove(tgt);
+                    fb.getGoal2Choices().put((TacletGoalTemplate) newGoalSpec, soc);
+                }
+            } else {
+                // Keep original goal spec
+                goalSpecs = goalSpecs.append(tgt);
+            }
+        }
+        fb.setTacletGoalTemplates(goalSpecs);
+        setSchemaVariables(schemaVariables().parent());
+        Taclet eqTaclet = fb.getTaclet();
+        currentTBuilder.push(fb);
+        registerTaclet(ctx, eqTaclet, doc, origin);
+        currentTBuilder.pop();
+        return eqTaclet;
+    }
+
+    private SyntaxElement replace(SyntaxElement se, JTerm find, JTerm to) {
+        if (se instanceof Sequent seq)
+            return replace(seq, find, to);
+        if (se instanceof JTerm t)
+            return replace(t, find, to);
+        return se;
+    }
+
+    private Sequent replace(Sequent se, JTerm find, JTerm to) {
+        ImmutableList<SequentFormula> ante = ImmutableList.nil();
+        for (var sf : se.antecedent().asList()) {
+            ante = ante.append(new SequentFormula(replace((JTerm) sf.formula(), find, to)));
+        }
+        ImmutableList<SequentFormula> succ = ImmutableList.nil();
+        for (var sf : se.succedent().asList()) {
+            succ = succ.append(new SequentFormula(replace((JTerm) sf.formula(), find, to)));
+        }
+        return JavaDLSequentKit.createSequent(ante, succ);
+    }
+
+    private JTerm replace(JTerm se, JTerm find, JTerm to) {
+        return GenericTermReplacer.replace(se, t -> t.equals(find), (ignored) -> to, services);
     }
 
     private void registerTaclet(JavaKeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
@@ -863,8 +1029,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ImmutableList<Taclet> visitTacletlist(JavaKeYParser.TacletlistContext ctx) {
-        List<Taclet> taclets = mapOf(ctx.taclet());
-        return ImmutableList.fromList(taclets);
+        List<List<Taclet>> taclets = mapOf(ctx.taclet());
+        return ImmutableList.fromList(taclets.stream().flatMap(Collection::stream).toList());
     }
 
     private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
@@ -1077,14 +1243,14 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (variables().lookup(v.name()) != null) {
-            semanticError(null, "Schema variables shadows previous declared variable: %s.",
+            semanticError(ctx, "Schema variables shadows previous declared variable: %s.",
                 v.name());
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
             JOperatorSV old = (JOperatorSV) schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort())) {
-                semanticError(null,
+                semanticError(ctx,
                     "Schema variables clashes with previous declared schema variable: %s.",
                     v.name());
             }
