@@ -820,10 +820,10 @@ public final class MainWindow extends JFrame {
                 IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "S")),
             new MacroAutomationAction(this,
                 new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
-                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P"))
-        // when it is finished ... new MacroAutomationAction(this ... ScriptMacro ... "J" (*J*ML
-        // scripts)
-        );
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.ScriptAwareMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "J")));
     }
 
     /**
