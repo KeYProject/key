@@ -66,13 +66,13 @@ public class InstantiationTieBreakFeature implements Feature {
 
         final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;
         if (strategy == null) {
-            // classic orders instances by their position in the sequent alone
+            // the classic treatment orders instances by their position in the sequent alone
             return NumberRuleAppCost.getZeroCost();
         }
 
         final Term formula = pos.sequentFormula().formula();
         final Term instance = varInst.toTerm(app, pos, jgoal, mState);
         return Instantiation.computeTieBreak(instance, formula, goal.sequent(), jgoal,
-            (Services) goal.proof().getServices(), false, strategy);
+            (Services) goal.proof().getServices(), TriggerTreatment.BEST, strategy);
     }
 }

@@ -17,5 +17,31 @@ public interface Trigger {
     ImmutableSet<Substitution> getSubstitutionsFromTerms(
             ImmutableSet<Term> targetTerm, Services services);
 
+    /**
+     * As above, and where {@code basicMatching} is set a theory-provided trigger is matched by
+     * {@link BasicMatching} as well as unified. Only that matching lets a theory solve a
+     * array index, and only it binds a metavariable to a term the trigger never read.
+     *
+     * @param targetTerm the terms to match against
+     * @param services access to the theory's operators
+     * @param basicMatching whether a theory-provided trigger is also matched by
+     *        {@link BasicMatching}
+     * @return the substitutions found
+     */
+    default ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
+            Services services, boolean basicMatching) {
+        return getSubstitutionsFromTerms(targetTerm, services);
+    }
+
     Term getTriggerTerm();
+
+    /**
+     * Whether this trigger is a theory's generalization of another one rather than a term of the
+     * formula itself.
+     *
+     * @return whether the trigger was derived
+     */
+    default boolean isTheoryProvided() {
+        return false;
+    }
 }

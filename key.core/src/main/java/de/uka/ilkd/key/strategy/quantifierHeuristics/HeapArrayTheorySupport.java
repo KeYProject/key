@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 
-import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
@@ -21,7 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Support for the heap theory and array reads.
  *
- * Rejects the bare array-index constructor {@code arr(i)} (a coordinate, not a read) and reads of
+ * Rejects the bare array-index constructor {@code arr(i)} (an index, not a read) and reads of
  * the implicit {@code $created} field, and provides array-read triggers generalized over the heap
  * so that a read written for one heap in a quantified formula matches the reads a proof produces
  * over its many other heaps.
@@ -44,10 +43,21 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
                 .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
             return true;
         }
-        // the array-index constructor arr(i) alone is a coordinate, not a read: matching on it
+        // the array-index constructor arr(i) alone is an index, not a read: matching on it
         // instantiates with every index literal of any array on any heap. The enclosing select is
         // the meaningful trigger (see the generalized variants provided below).
         return candidate.op() == heapLDT.getArr();
+    }
+
+    /**
+     * An array index gives way to the read around it: alone it matches every integer term on the
+     * sequent, while the read says which access is meant. Both are registered, so no instantiation
+     * is lost.
+     */
+    @Override
+    public boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
+        return enclosing != null
+                && enclosing.op() == services.getTypeConverter().getHeapLDT().getArr();
     }
 
     /**
@@ -58,22 +68,11 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * @param services access to the heap theory operators and term construction
      * @return the generalized read triggers, possibly empty
      */
-    /**
-     * An array index gives way to the read around it. Taking the index alone as a trigger matches
-     * it against every term of its sort on the sequent, while the read says which observation is
-     * meant; the read is registered as well, so an instantiation reachable through either one
-     * stays reachable.
-     */
-    @Override
-    public boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
-        return enclosing != null
-                && enclosing.op() == services.getTypeConverter().getHeapLDT().getArr();
-    }
-
     @Override
     public List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
-        return dimensionVariants(term, clauseVariables, services);
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory) {
+        return dimensionVariants(term, clauseVariables, services, metavariableFactory);
     }
 
     /**
@@ -92,9 +91,11 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      *
      * For a select chain over an array-sorted base this method therefore rebuilds the access path
      * once per depth, with the component sort of the base's array type at that depth and a fresh
-     * heap wildcard per level: for {@code x[i][i_1]} the triggers {@code x[i]} and
-     * {@code x[i][i_1]}, each carrying the sorts a ground read of that depth actually has. Prefixes
-     * that bind only part of the clause variables enter the multi-trigger pool as usual.
+     * metavariable per level: for {@code x[i][i_1]} the triggers {@code select(H0, x, arr(i))}
+     * and {@code select(H1, select(H0, x, arr(i)), arr(i_1))}, whose metavariables {@code H0} and
+     * {@code H1} each stand for any heap, and each carrying the sorts a ground read of that depth
+     * actually has. Prefixes that bind only part of the clause variables enter the multi-trigger
+     * pool as usual.
      *
      * @param term an accepted array read trigger
      * @param clauseVariables the quantified variables of the clause the trigger belongs to
@@ -102,23 +103,24 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * @return one generalized read trigger per array dimension, possibly empty
      */
     private List<JTerm> dimensionVariants(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
         final List<JTerm> variants = new ArrayList<>();
         // decompose the select chain: walk through the object position collecting the arr
-        // coordinates, innermost first
-        final List<JTerm> coordinates = new ArrayList<>();
+        // array indices, innermost first
+        final List<JTerm> arrayIndices = new ArrayList<>();
         JTerm base = term;
         while (heapLDT.isSelectOp(base.op()) && base.sub(2).op() == heapLDT.getArr()) {
-            coordinates.add(0, base.sub(2).sub(0));
+            arrayIndices.add(0, base.sub(2).sub(0));
             base = base.sub(1);
         }
-        if (coordinates.isEmpty() || !(base.sort() instanceof ArraySort)) {
+        if (arrayIndices.isEmpty() || !(base.sort() instanceof ArraySort)) {
             return variants;
         }
         boolean anyVar = false;
-        for (final JTerm c : coordinates) {
+        for (final JTerm c : arrayIndices) {
             if (!TriggerUtils.intersect(c.freeVars(), clauseVariables).isEmpty()) {
                 anyVar = true;
             }
@@ -129,14 +131,13 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
         // rebuild the path bottom-up with the array's component sorts
         Sort sort = base.sort();
         JTerm read = base;
-        for (int depth = 0; depth < coordinates.size(); depth++) {
+        for (int depth = 0; depth < arrayIndices.size(); depth++) {
             if (!(sort instanceof ArraySort arraySort)) {
                 break;
             }
             sort = arraySort.elementSort();
-            final JTerm heapVar =
-                tb.var(heapWildcard(term, clauseVariables, heapLDT.targetSort(), "_d" + depth));
-            final JTerm arrField = tb.func(heapLDT.getArr(), coordinates.get(depth));
+            final JTerm heapVar = tb.var(metavariableFactory.fresh(heapLDT.targetSort()));
+            final JTerm arrField = tb.func(heapLDT.getArr(), arrayIndices.get(depth));
             read = tb.select(sort, heapVar, read, arrField);
             if (!TriggerUtils.intersect(read.freeVars(), clauseVariables).isEmpty()
                     && !read.equals(term)) {
@@ -146,27 +147,5 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
         return variants;
     }
 
-    /**
-     * A fresh heap-sorted metavariable standing for "any heap" in a generalized trigger. Its name
-     * is derived from the quantified variables of the read (plus a caller-chosen suffix to keep
-     * several wildcards of one trigger apart) rather than from creation order, so that the
-     * metavariable ordering (and through it the unification result and the chosen instances) does
-     * not depend on which goal builds its trigger set first.
-     *
-     * @param select the read the wildcard is built for
-     * @param clauseVariables the quantified variables of the clause the read belongs to
-     * @param heapSort the sort of heaps
-     * @param suffix keeps several wildcards of one trigger apart
-     * @return a fresh heap-sorted metavariable
-     */
-    private static Metavariable heapWildcard(JTerm select,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Sort heapSort, String suffix) {
-        final StringBuilder name = new StringBuilder("heapWildcard");
-        for (final QuantifiableVariable v : TriggerUtils.intersect(select.freeVars(),
-            clauseVariables)) {
-            name.append('_').append(v.name());
-        }
-        name.append(suffix);
-        return new Metavariable(new Name(name.toString()), heapSort);
-    }
+
 }

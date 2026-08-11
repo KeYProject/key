@@ -48,7 +48,8 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
      */
     @Override
     public List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory) {
         return List.of();
     }
 

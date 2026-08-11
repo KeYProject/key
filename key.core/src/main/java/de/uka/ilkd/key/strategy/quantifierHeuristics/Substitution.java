@@ -35,6 +35,12 @@ public class Substitution {
         varMap = map;
     }
 
+    /**
+     * Whether a metavariable of the trigger had to stand for a term to obtain this substitution.
+     * Such a match is weaker than one whose structures agreed throughout: the trigger says nothing
+     * about the position the metavariable covered.
+     */
+
     public ImmutableMap<QuantifiableVariable, Term> getVarMap() {
         return varMap;
     }
