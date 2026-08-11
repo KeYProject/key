@@ -184,11 +184,21 @@ public class RewriteTaclet extends FindTaclet {
         return polarity;
     }
 
-
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
-        return res.append(applicationRestriction().toString());
+        return res.append(applicationRestriction().toString(needsSameUpdateLevel()));
+    }
+
+    private boolean needsSameUpdateLevel() {
+        if (!assumesSequent.isEmpty()) {
+            return true;
+        }
+        for (var tgt : goalTemplates) {
+            if (!tgt.sequent().isEmpty())
+                return true;
+        }
+        return false;
     }
 
     public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,
