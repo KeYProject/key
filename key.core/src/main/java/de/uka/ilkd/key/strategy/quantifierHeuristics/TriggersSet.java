@@ -17,8 +17,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -70,6 +72,21 @@ public class TriggersSet {
      * register unequal copies of the same triggers.
      */
     private final Set<JTerm> theoryTriggersProvidedFor = new HashSet<>();
+    /**
+     * Hands the supports their metavariables, counted within this set. The set is built from the
+     * quantified formula alone, so the same formula always yields the same names, and no two
+     * derived triggers share one. See {@link QuantifierTheorySupport.MetavariableFactory}.
+     */
+    private final QuantifierTheorySupport.MetavariableFactory metavariableFactory =
+        new QuantifierTheorySupport.MetavariableFactory() {
+            private int created;
+
+            @Override
+            public Metavariable fresh(Sort sort) {
+                return new Metavariable(new Name("unifier_derived_" + created++), sort);
+            }
+        };
+
     /** All universal variables of the formula. */
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -374,7 +391,7 @@ public class TriggersSet {
             if (theoryTriggersProvidedFor.add(term)) {
                 for (final QuantifierTheorySupport support : supports) {
                     for (final JTerm derived : support.provideTriggers(term, clauseVariables,
-                        services)) {
+                        services, metavariableFactory)) {
                         registerUniTrigger(derived, true);
                     }
                 }

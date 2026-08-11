@@ -53,7 +53,8 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      */
     @Override
     public List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory) {
         return List.of();
     }
 
@@ -124,7 +125,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     /**
      * Solves {@code pattern = instance} for the single variable the pattern is affine in.
      *
-     * A trigger coordinate is typically written relative to an offset, as {@code base + t}, while
+     * A trigger array index is typically written relative to an offset, as {@code base + t}, while
      * the terms a proof produces are absolute. Decomposing both sides as polynomials turns the
      * match into an equation: with the pattern {@code k*t + rest} and the instance {@code s}, the
      * variable is {@code (s - rest) / k}. That division has to be exact, since a non-integer
@@ -141,23 +142,29 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     @Override
     public ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
             ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
-        final Sort integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Sort integerSort = integerLDT.targetSort();
+        // The decomposition below allocates, and matching asks after every failed comparison, so
+        // the cheap tests come first: only a term built by the polynomial operators can be affine.
         if (pattern.sort() != integerSort || instance.sort() != integerSort
+                || !hasPolynomialStructure(pattern, integerLDT)
                 || !instance.freeVars().isEmpty() || pattern.freeVars().isEmpty()) {
             return null;
         }
-        for (var free : pattern.freeVars()) {
+        for (final QuantifiableVariable free : pattern.freeVars()) {
             if (varMap.get(free) != null) {
                 return null;
             }
         }
 
         final Polynomial patternPoly = Polynomial.create(pattern, services);
+        Polynomial rest = Polynomial.ZERO.add(patternPoly.getConstantTerm());
         Monomial linear = null;
         QuantifiableVariable variable = null;
-        for (Monomial part : patternPoly.getParts()) {
+        for (final Monomial part : patternPoly.getParts()) {
             final ImmutableList<Term> atoms = part.getParts();
             if (atoms.stream().allMatch(a -> a.freeVars().isEmpty())) {
+                rest = rest.add(part);
                 continue;
             }
             if (atoms.size() != 1 || linear != null
@@ -171,27 +178,17 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
             return null;
         }
 
-        Polynomial rest = zero(services).add(patternPoly.getConstantTerm());
-        for (Monomial part : patternPoly.getParts()) {
-            if (part != linear) {
-                rest = rest.add(part);
-            }
-        }
         final Polynomial solution = divideExactly(
-            Polynomial.create(instance, services).sub(rest), linear.getCoefficient(), services);
+            Polynomial.create(instance, services).sub(rest), linear.getCoefficient());
         return solution == null ? null : varMap.put(variable, solution.toTerm(services));
     }
 
-    private static Polynomial zero(Services services) {
-        return Polynomial.create(services.getTermBuilder().zero(), services);
-    }
-
     /** Divides every coefficient by the divisor, or returns null when a division is not exact. */
-    private static Polynomial divideExactly(Polynomial p, BigInteger divisor, Services services) {
+    private static Polynomial divideExactly(Polynomial p, BigInteger divisor) {
         if (divisor.signum() == 0 || p.getConstantTerm().remainder(divisor).signum() != 0) {
             return null;
         }
-        Polynomial result = zero(services).add(p.getConstantTerm().divide(divisor));
+        Polynomial result = Polynomial.ZERO.add(p.getConstantTerm().divide(divisor));
         for (Monomial part : p.getParts()) {
             if (part.getCoefficient().remainder(divisor).signum() != 0) {
                 return null;

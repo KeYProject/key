@@ -45,10 +45,16 @@ class MultiTrigger implements Trigger {
     @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
             Services services) {
+        return getSubstitutionsFromTerms(targetTerms, services, true);
+    }
+
+    @Override
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
+            Services services, boolean basicMatching) {
         ImmutableList<Substitution> total = ImmutableList.nil();
 
         final ImmutableSet<Substitution> combined =
-            combineElementSubstitutions(elements.iterator(), targetTerms, services);
+            combineElementSubstitutions(elements.iterator(), targetTerms, services, basicMatching);
 
         for (Substitution sub : combined) {
             if (sub.isTotalOn(clauseVariables)) {
@@ -66,13 +72,13 @@ class MultiTrigger implements Trigger {
      */
     private ImmutableSet<Substitution> combineElementSubstitutions(
             Iterator<? extends Trigger> remainingElements, ImmutableSet<Term> terms,
-            Services services) {
+            Services services, boolean basicMatching) {
         ImmutableList<Substitution> result = ImmutableList.nil();
         if (remainingElements.hasNext()) {
             ImmutableSet<Substitution> headSubs =
                 remainingElements.next().getSubstitutionsFromTerms(terms, services);
             ImmutableSet<Substitution> tailSubs =
-                combineElementSubstitutions(remainingElements, terms, services);
+                combineElementSubstitutions(remainingElements, terms, services, basicMatching);
             if (tailSubs.isEmpty()) {
                 return headSubs;
             } else if (headSubs.isEmpty()) {
@@ -130,6 +136,16 @@ class MultiTrigger implements Trigger {
     @Override
     public String toString() {
         return String.valueOf(elements);
+    }
+
+    @Override
+    public boolean isTheoryProvided() {
+        for (final Trigger element : elements) {
+            if (element.isTheoryProvided()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

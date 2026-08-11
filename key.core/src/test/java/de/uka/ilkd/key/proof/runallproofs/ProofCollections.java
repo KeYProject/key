@@ -524,6 +524,8 @@ public class ProofCollections {
         g.provable("heap/BoyerMoore/BM.count.accessible.key");
         g.provable("heap/BoyerMoore/BM.count.key");
         g.provable("heap/BoyerMoore/BM.monoLemma.key");
+        g.provable("heap/Adjacency/project.key");
+        g.provable("heap/Adjacency/distinct.key");
 
         g = c.group("quicksort");
         g.setDirectory("heap/quicksort");

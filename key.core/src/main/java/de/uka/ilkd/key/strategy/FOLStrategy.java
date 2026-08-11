@@ -397,7 +397,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction = InstantiationCostScalerFeature
-                    .create(InstantiationCost.create(varInst, classicTriggers()),
+                    .create(InstantiationCost.create(varInst, triggerTreatment()),
                         allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
@@ -406,7 +406,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                         add(ff.quantifiedClauseSet,
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable)),
-                    forEach(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                    forEach(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
                         add(instantiate("t", varInst),
                             add(branchPrediction,
                                 CostBand.DEFAULT.at(10),
@@ -432,11 +432,11 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                not(sum(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
                     not(eq(instOf("t"), varInst)))),
                 InstantiationCostScalerFeature.create(
-                    InstantiationCost.create(instOf("t"), classicTriggers()),
-                    CostBand.DEFAULT.cost())));
+                    InstantiationCost.create(instOf("t"), triggerTreatment()),
+                    longConst(0))));
 
             final TermBuffer splitInst = new TermBuffer();
             bindRuleSet(d, "triggered",
@@ -628,9 +628,9 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         return strategyProperties.getProperty(StrategyProperties.TRIGGERS_OPTIONS_KEY);
     }
 
-    /** whether the classic trigger selection is in effect for this strategy */
-    private boolean classicTriggers() {
-        return StrategyProperties.TRIGGERS_CLASSIC.equals(triggersOption());
+    /** how much the quantifier heuristic is told about the theories in this strategy */
+    private TriggerTreatment triggerTreatment() {
+        return TriggerTreatment.forOption(triggersOption());
     }
 
     private boolean quantifierInstantiatedEnabled() {

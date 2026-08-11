@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -122,10 +123,52 @@ interface QuantifierTheorySupport {
      * @param term an accepted trigger term
      * @param clauseVariables the quantified variables of the clause the trigger belongs to
      * @param services access to the theory operators
+     * @param metavariableFactory supplies the metavariables a derived trigger needs
      * @return derived triggers, possibly empty
      */
     List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services);
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory);
+
+    /**
+     * The instance candidates this theory supplies for a subterm of the quantified formula. They
+     * are used for the quantified variable directly, not through a trigger.
+     *
+     * Matching binds the quantified variable to a subterm of the term it matched, so it cannot
+     * produce an instance that occurs in no trigger position. Such an instance has to come from a
+     * theory instead. An array read is one case: the index a store writes is what collapses the
+     * read, and it is ground, so no trigger contains it.
+     *
+     * The caller descends through the matrix and passes every subterm, so an implementation
+     * decides on the subterm alone. A candidate is costed like a matched one.
+     *
+     * @param subterm a subterm of the quantified formula's matrix
+     * @param variable the quantified variable an instance is sought for
+     * @param services access to the theory operators
+     * @return the candidate instances, possibly empty
+     */
+    default List<JTerm> provideInstances(JTerm subterm, QuantifiableVariable variable,
+            Services services) {
+        return List.of();
+    }
+
+    /**
+     * Hands out the metavariables a derived trigger puts in place of a ground subterm.
+     *
+     * The names are counted within one {@link TriggersSet}, which is built from the quantified
+     * formula alone, so the same formula always yields the same names and no two derived triggers
+     * share one. That matters because two metavariables of equal name are still distinct and are
+     * then ordered by a creation counter shared across the whole prover, which would make the
+     * order, and through it the instances chosen, depend on which goal built its trigger set
+     * first. A support must therefore take its metavariables from here rather than name them.
+     */
+    interface MetavariableFactory {
+        /**
+         * @param sort the sort the metavariable stands for
+         * @return a metavariable distinct from every other one of its trigger set
+         */
+        Metavariable fresh(Sort sort);
+    }
 
     /**
      * Checks whether the literal holds on its own, for cost prediction. The literal is passed

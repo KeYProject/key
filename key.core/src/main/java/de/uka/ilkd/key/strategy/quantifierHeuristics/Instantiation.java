@@ -71,92 +71,78 @@ class Instantiation {
     /** The sequent, kept for the tie-break view. */
     private final Sequent sequent;
 
+    /** How much this instantiation is told about the theories. */
+    private final TriggerTreatment treatment;
+
     /** The services, kept for the tie-break view. */
     private final Services services;
 
-    private Instantiation(Term allterm, Sequent seq, Services services, boolean classic) {
+    private Instantiation(Term allterm, Sequent seq, Services services,
+            TriggerTreatment treatment) {
         this.sequent = seq;
         this.services = services;
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
-        triggersSet = TriggersSet.create((JTerm) allterm, services, classic);
+        this.treatment = treatment;
+        triggersSet = TriggersSet.create((JTerm) allterm, services, treatment.isClassic());
         assumedLiterals = initAssertLiterals(seq, services);
         congruence = new Congruence(assumedLiterals, services);
         assumedLiterals = normalizeAll(assumedLiterals);
         addInstances(sequentToTerms(seq), services);
-        // write-coordinate candidates are part of the theory-aware selection, dropped in classic
-        if (!classic) {
-            addStoreCoordinateInstances((JTerm) matrix, services);
+        // the theories' instance candidates are part of the theory-aware selection, dropped in
+        // classic
+        if (!treatment.isClassic()) {
+            addTheoryInstances((JTerm) matrix, TriggersSet.THEORY_SUPPORTS, services);
         }
     }
 
     /**
-     * Heap-aware instance candidates from write coordinates: where the matrix reads an array
-     * through a built-up heap, {@code select(... store(h, o, arr(c), v) ..., o, arr(j))} with
-     * quantified index {@code j}, the written index {@code c} is a candidate for {@code j}.
-     * Instantiating with it lets the select collapse by the select-over-store rules, which is
-     * how such a quantified formula speaks about the stored value. Trigger matching cannot
-     * produce these candidates: the store coordinate contains no quantified variable, so no
-     * trigger binds {@code j} to it. The candidates go through the same cost computation as
-     * matched ones, so useless coordinates are excluded or ranked down as usual.
+     * Adds the instance candidates the theories supply for {@code term} and descends into its
+     * subterms.
+     *
+     * Matching binds the quantified variable to a subterm of the term it matched, so it never
+     * produces an instance that stands in no trigger position. A theory supplies such an instance
+     * directly. Which subterms yield one depends on the theory, the descent over the matrix does
+     * not, so every support is called on every subterm. A supplied candidate is costed like a
+     * matched one.
+     *
+     * @param term a subterm of the matrix
+     * @param supports the theories to consult
+     * @param services access to the theories
      */
-    private void addStoreCoordinateInstances(JTerm term, Services services) {
-        final var heapLDT = services.getTypeConverter().getHeapLDT();
-        // isSelectOp tests the operator directly. Do not build getSelect(term.sort()): that
-        // constructs a select of the subterm's sort, which fails for e.g. the Null sort.
-        if (heapLDT.isSelectOp(term.op())) {
-            final JTerm field = term.sub(2);
-            if (field.op() == heapLDT.getArr() && field.freeVars().contains(firstVar)) {
-                collectWrittenIndices(term.sub(0), term.sub(1), services);
+    private void addTheoryInstances(JTerm term, List<? extends QuantifierTheorySupport> supports,
+            Services services) {
+        for (final QuantifierTheorySupport support : supports) {
+            for (final JTerm inst : support.provideInstances(term, firstVar, services)) {
+                final ImmutableMap<QuantifiableVariable, Term> varMap =
+                    DefaultImmutableMap.<QuantifiableVariable, Term>nilMap().put(firstVar, inst);
+                addInstance(new Substitution(varMap), services, 0);
             }
         }
         for (int i = 0; i < term.arity(); i++) {
-            addStoreCoordinateInstances(term.sub(i), services);
+            addTheoryInstances(term.sub(i), supports, services);
         }
     }
 
-    /** Adds every ground index written on {@code obj}'s array fields in {@code heap}. */
-    private void collectWrittenIndices(JTerm heap, JTerm obj, Services services) {
-        final var heapLDT = services.getTypeConverter().getHeapLDT();
-        if (heap.sort() != heapLDT.targetSort()) {
-            return;
-        }
-        if (heap.op() == heapLDT.getStore()) {
-            final JTerm field = heap.sub(2);
-            if (heap.sub(1).equals(obj) && field.op() == heapLDT.getArr()
-                    && field.freeVars().isEmpty()) {
-                final ImmutableMap<QuantifiableVariable, Term> varMap =
-                    DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()
-                            .put(firstVar, field.sub(0));
-                addInstance(new Substitution(varMap), services);
-            }
-        }
-        for (int i = 0; i < heap.arity(); i++) {
-            collectWrittenIndices(heap.sub(i), obj, services);
-        }
-    }
-
-    private record Cached(Proof proof, Term qf, Sequent seq, boolean classic,
+    private record Cached(Proof proof, Term qf, Sequent seq, TriggerTreatment treatment,
             Instantiation result) {
     }
 
     /**
      * Per-thread single-entry cache for {@link #create}. The parallel prover computes quantifier
-     * cost concurrently, so a shared static cache would hand the same {@link Instantiation} (with
-     * its
-     * mutable {@code instancesWithCosts}) to several workers and race them. ThreadLocal confines
-     * the
-     * cache -- and thereby each returned Instantiation -- to one worker, and also drops the
-     * cross-proof class-level lock.
+     * cost concurrently, so a shared cache would hand the same {@link Instantiation}, with its
+     * mutable {@code instancesWithCosts}, to several workers at once. Confining it to one worker
+     * also drops the cross-proof lock the class used to take.
      */
     private static final ThreadLocal<Cached> lastCreate = new ThreadLocal<>();
 
-    static Instantiation create(Term qf, Sequent seq, Services services, boolean classic) {
+    static Instantiation create(Term qf, Sequent seq, Services services,
+            TriggerTreatment treatment) {
         final Proof proof = services.getProof();
         final Cached cached = lastCreate.get();
         if (cached != null && qf == cached.qf() && seq == cached.seq()
-                && classic == cached.classic()) {
+                && treatment == cached.treatment()) {
             return cached.result();
         }
         if (cached != null && proof != cached.proof()) {
@@ -164,8 +150,8 @@ class Instantiation {
             // proof's sequent stays reachable only while this entry is in use.
             lastCreate.remove();
         }
-        final Instantiation result = new Instantiation(qf, seq, services, classic);
-        lastCreate.set(new Cached(proof, qf, seq, classic, result));
+        final Instantiation result = new Instantiation(qf, seq, services, treatment);
+        lastCreate.set(new Cached(proof, qf, seq, treatment, result));
         return result;
     }
 
@@ -184,29 +170,77 @@ class Instantiation {
      * @param terms the sequent terms the triggers are matched against
      */
     private void addInstances(ImmutableSet<Term> terms, Services services) {
+        boolean matchedByOwnTerms = false;
         for (final Trigger t : triggersSet.getAllTriggers()) {
+            if (t.isTheoryProvided()) {
+                continue;
+            }
             for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) {
-                addInstance(sub, services);
+                addInstance(sub, services,
+                    sub.isSolvedByTheory() ? SOLVED_POSITION_SURCHARGE : 0);
+                matchedByOwnTerms = true;
+            }
+        }
+        // Basic matching binds the trigger's metavariable to a term the trigger never read, so
+        // the instance speaks about a state the formula does not name. Where none of the formula's
+        // own terms match the sequent it is all there is, and costs what it predicts. Where they
+        // do match, it is offered behind them, so the search takes it only if nothing cheaper
+        // closes the goal. Only the cheapest offer for an instance is recorded.
+        for (final Trigger t : triggersSet.getAllTriggers()) {
+            if (!t.isTheoryProvided()) {
+                continue;
+            }
+            final ImmutableSet<Substitution> unified =
+                t.getSubstitutionsFromTerms(terms, services, false);
+            for (final Substitution sub : unified) {
+                addInstance(sub, services, 0);
+            }
+            if (treatment.allowsBasicMatchingOfTheoryTriggers()) {
+                final long surcharge = matchedByOwnTerms ? THEORY_TRIGGER_SURCHARGE : 0;
+                for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services, true)) {
+                    if (!unified.contains(sub)) {
+                        addInstance(sub, services, surcharge);
+                    }
+                }
             }
         }
     }
 
-    private void addInstance(Substitution sub, Services services) {
-        final long cost =
-            PredictCostProver.computerInstanceCost(sub, (JTerm) getMatrix(),
-                assumedLiterals, congruence, services);
-        if (cost != -1) {
-            addInstance(sub, cost);
-        }
-    }
+    /**
+     * What an instance costs on top of its prediction when only basic matching of a
+     * theory-provided trigger produces it, and the formula's own terms do match the sequent.
+     *
+     * A predicted cost is a product of clause sizes (see {@link PredictCostProver}), so any
+     * surcharge above that range puts such instances behind the supported ones; the exact value
+     * does not matter.
+     */
+    private static final long THEORY_TRIGGER_SURCHARGE = 10000L;
 
     /**
-     * Pre-normalises the assumed literals once through the congruence, so each candidate's cost
-     * prediction reuses the result instead of re-normalising them.
-     *
-     * @param lits the assumed literals
-     * @return the normalised literals, or {@code lits} unchanged when the congruence is trivial
+     * What an instance costs on top of its prediction when a theory solved a disagreeing position
+     * to obtain it. The instance is then a term the matched term does not contain, so it is
+     * offered behind those the two terms produced by agreeing throughout.
      */
+    private static final long SOLVED_POSITION_SURCHARGE = 10000L;
+
+
+    /**
+     * @param sub the instantiation found
+     * @param services access to the theories
+     * @param surcharge what the instance costs on top of its prediction, zero where one of the
+     *        formula's own terms produced it
+     */
+    private void addInstance(Substitution sub, Services services, long surcharge) {
+        long cost =
+            PredictCostProver.computerInstanceCost(sub, (JTerm) getMatrix(),
+                assumedLiterals, congruence, services);
+        if (cost == -1) {
+            return;
+        }
+        addInstance(sub, cost + surcharge);
+    }
+
+    /** Normalizes every literal by the congruence, so equal atoms coincide. */
     private ImmutableSet<JTerm> normalizeAll(ImmutableSet<JTerm> lits) {
         if (congruence.isTrivial()) {
             return lits;
@@ -218,19 +252,6 @@ class Instantiation {
         return res;
     }
 
-    /**
-     * Records the instance chosen by <code>sub</code> for the quantified variable with its
-     * predicted cost, keeping the least cost when the instance is recorded already.
-     *
-     * The same instance can be found through different triggers whose matches differ only in term
-     * labels: one match picks the term up with an origin label, another without. Term equality is
-     * label sensitive, so both variants would enter the table as separate candidates, and the
-     * labels would decide which of the two is enumerated first. The table keeps one entry per
-     * instance up to term labels: a later variant merges into the entry of the first one found.
-     *
-     * @param sub the substitution providing the instance
-     * @param cost the predicted cost of the instance
-     */
     private void addInstance(Substitution sub, long cost) {
         final Term inst =
             sub.getSubstitutedTerm(firstVar);
@@ -288,8 +309,8 @@ class Instantiation {
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services,
-            boolean classic) {
-        return create(form, seq, services, classic).computeCostHelp(inst);
+            TriggerTreatment treatment) {
+        return create(form, seq, services, treatment).computeCostHelp(inst);
     }
 
     private RuleAppCost computeCostHelp(Term inst) {
@@ -320,14 +341,14 @@ class Instantiation {
      * @param seq the sequent
      * @param goal the goal, for the branch history the generation signal needs
      * @param services access to the theory operators
-     * @param classic whether the classic trigger selection is active
+     * @param treatment how much the heuristic is told about the theories
      * @param strategy the tie-break strategy
      * @return the tie-break cost
      */
     static RuleAppCost computeTieBreak(Term inst, Term form, Sequent seq,
-            Goal goal, Services services, boolean classic,
+            Goal goal, Services services, TriggerTreatment treatment,
             QuantifierInstantiationTieBreak strategy) {
-        return create(form, seq, services, classic).tieBreak(inst, goal, strategy);
+        return create(form, seq, services, treatment).tieBreak(inst, goal, strategy);
     }
 
     /**
