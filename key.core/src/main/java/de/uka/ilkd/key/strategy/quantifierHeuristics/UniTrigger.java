@@ -89,7 +89,7 @@ class UniTrigger implements Trigger {
                 || matchByUnification) {
             subs = Matching.twoSidedMatching(this, target, services);
         } else if (!onlyUnify) {
-            subs = Matching.basicMatching(this, target);
+            subs = Matching.basicMatching(this, target, services);
         }
         return subs;
     }

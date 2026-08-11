@@ -58,6 +58,18 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * @param services access to the heap theory operators and term construction
      * @return the generalized read triggers, possibly empty
      */
+    /**
+     * An array index gives way to the read around it. Taking the index alone as a trigger matches
+     * it against every term of its sort on the sequent, while the read says which observation is
+     * meant; the read is registered as well, so an instantiation reachable through either one
+     * stays reachable.
+     */
+    @Override
+    public boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
+        return enclosing != null
+                && enclosing.op() == services.getTypeConverter().getHeapLDT().getArr();
+    }
+
     @Override
     public List<JTerm> provideTriggers(JTerm term,
             ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
