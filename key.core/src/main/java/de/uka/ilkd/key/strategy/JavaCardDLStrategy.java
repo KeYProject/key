@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -180,6 +181,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         final int pullOutHeapSize = getHeapSizeBound();
         bindRuleSet(d, "pull_out_heap",
             pullOutHeapSize <= 0 ? inftyConst() : pullOutHeap(pullOutHeapSize));
+        bindRuleSet(d, "derive_inequality", longConst(-2000));
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "javaIntegerSemantics",
@@ -491,6 +493,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     private RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
+        // Only derive a disequality that is not known yet. The same disequality follows from
+        // every location the two objects read differently, so a duplicate-application check does
+        // not recognise those derivations as duplicates: their instantiations differ while their
+        // conclusion does not. Comparing the conclusion against the succedent does.
+        final TermBuffer succedentFormula = new TermBuffer();
+        final TermBuffer firstObject = new TermBuffer();
+        final TermBuffer secondObject = new TermBuffer();
+        bindRuleSet(d, "derive_inequality",
+            let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
+                sum(succedentFormula, SequentFormulasGenerator.succedent(),
+                    not(applyTF(succedentFormula,
+                        or(opSub(Equality.EQUALS, eq(firstObject), eq(secondObject)),
+                            opSub(Equality.EQUALS, eq(secondObject), eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
