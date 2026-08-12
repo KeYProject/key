@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
@@ -175,8 +176,9 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      *
      * @param jnte the {@link JavaNonTerminalProgramElement} to be compared
      * @param se the {@link SyntaxElement} to be compared
-     * @return {@code true} iff {@code se} is of the same class and has the same number of children
-     *         as {@code jnte}
+     * @return {@code true} iff {@code se} is of the same class and for a
+     *         {@link ProgramElementWithKind} from
+     *         the same kind and has the same number of children as {@code jnte}
      */
     private boolean handleJavaNonTerminalProgramElements(JavaNonTerminalProgramElement jnte,
             SyntaxElement se) {
@@ -190,6 +192,11 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
             return true;
         }
         if (se.getClass() != jnte.getClass()) {
+            return false;
+        }
+        if (se instanceof ProgramElementWithKind<?> seWithKind
+                && jnte instanceof ProgramElementWithKind<?> jnteWithKind
+                && seWithKind.getKind() != jnteWithKind.getKind()) {
             return false;
         }
         final JavaNonTerminalProgramElement other = (JavaNonTerminalProgramElement) se;
