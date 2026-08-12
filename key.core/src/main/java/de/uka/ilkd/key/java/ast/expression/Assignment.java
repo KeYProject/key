@@ -10,8 +10,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -30,7 +32,8 @@ import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY
  * An assignment is an operator with side-effects.
  */
 @NullMarked
-public final class Assignment extends Operator implements ExpressionStatement {
+public final class Assignment extends Operator
+        implements ExpressionStatement, ProgramElementWithKind<AssignmentKind> {
     public enum AssignmentKind {
         COPY(""),
         BINARY_OR("|"),

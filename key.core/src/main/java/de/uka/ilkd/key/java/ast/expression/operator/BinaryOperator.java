@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -22,7 +23,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-public final class BinaryOperator extends Operator {
+public final class BinaryOperator extends Operator
+        implements ProgramElementWithKind<BinaryOperatorKind> {
     private final BinaryOperatorKind kind;
 
     public BinaryOperator(BinaryOperatorKind binaryOperatorKind, ExtList operands) {
