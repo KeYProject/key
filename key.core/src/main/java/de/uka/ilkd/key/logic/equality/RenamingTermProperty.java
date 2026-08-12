@@ -340,6 +340,8 @@ public class RenamingTermProperty implements Property<Term> {
             hashCode = 17 * hashCode + hashJavaBlock(mod);
         } else if (op instanceof ProgramVariable pv) {
             hashCode = 17 * hashCode + pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY);
+        } else {
+            hashCode = 17 * hashCode + op.name().hashCode();
         }
 
         return recursiveHelper(term, nameAbstractionList, hashCode);

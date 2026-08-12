@@ -211,8 +211,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedPSV && visitedPSV.isListSV()))) {
-            final JTerm newTerm = svInst.getTermInstantiation(visitedSV,
-                svInst.getExecutionContext(), services);
+            final JTerm newTerm = svInst.getTermInstantiation(visitedSV, services);
             pushNew(newTerm);
         } else {
             // instantiation of java block
