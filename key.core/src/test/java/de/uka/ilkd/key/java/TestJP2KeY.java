@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -128,7 +129,8 @@ public class TestJP2KeY {
     @Test
     public void testReadBlockWithContext() {
         IProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-            TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+            new TypeRef(
+                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT)));
         var list = Collections.singletonList(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =

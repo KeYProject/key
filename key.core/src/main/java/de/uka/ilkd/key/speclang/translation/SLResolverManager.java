@@ -19,6 +19,8 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves property calls of any kind. Keeps a list of resolvers doing the actual work, and a stack
@@ -26,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * in forall() or select() subtrees).
  */
 public abstract class SLResolverManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SLResolverManager.class);
 
     public final SLExceptionFactory excManager;
 

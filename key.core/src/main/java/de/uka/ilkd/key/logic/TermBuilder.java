@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
@@ -38,6 +40,8 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
+
+import static de.uka.ilkd.key.java.KeYJavaASTFactory.typeRef;
 
 /**
  * <p>
@@ -208,38 +212,40 @@ public class TermBuilder {
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique) {
-        return selfVar(kjt, makeNameUnique, "");
+    public LocationVariable selfVar(TypeReference typeRef, boolean makeNameUnique) {
+        return selfVar(typeRef, makeNameUnique, "");
     }
 
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique, String postfix) {
+    public LocationVariable selfVar(TypeReference typeRef, boolean makeNameUnique, String postfix) {
         String name = "self" + postfix;
-        return locationVariable(name, kjt, makeNameUnique);
+        return locationVariable(name, typeRef, makeNameUnique);
     }
 
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique,
+    public LocationVariable selfVar(IProgramMethod pm, TypeReference typeRef,
+            boolean makeNameUnique,
             String postfix) {
         if (pm.isStatic()) {
             return null;
         } else {
-            return selfVar(kjt, makeNameUnique, postfix);
+            return selfVar(typeRef, makeNameUnique, postfix);
         }
     }
 
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique) {
+    public LocationVariable selfVar(IProgramMethod pm, TypeReference typeRef,
+            boolean makeNameUnique) {
         if (pm.isStatic()) {
             return null;
         } else {
-            return selfVar(kjt, makeNameUnique);
+            return selfVar(typeRef, makeNameUnique);
         }
     }
 
@@ -258,7 +264,8 @@ public class TermBuilder {
             } else {
                 name = String.valueOf(paramType.getSort().name().toString().charAt(0));
             }
-            final LocationVariable paramVar = locationVariable(name, paramType, makeNamesUnique);
+            final LocationVariable paramVar =
+                locationVariable(name, new TypeRef(paramType), makeNamesUnique);
             result = result.append(paramVar);
         }
         return result;
@@ -273,7 +280,8 @@ public class TermBuilder {
         ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (LocationVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(paramVar.name() + postfix);
-            LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
+            LocationVariable formalParamVar =
+                new LocationVariable(pen, paramVar.getTypeReference());
             result = result.append(formalParamVar);
         }
         return result;
@@ -295,7 +303,7 @@ public class TermBuilder {
             return null;
         } else {
             name += "_" + pm.getName();
-            return locationVariable(name, pm.getReturnType(), makeNameUnique);
+            return locationVariable(name, new TypeRef(pm.getReturnType()), makeNameUnique);
         }
     }
 
@@ -313,7 +321,8 @@ public class TermBuilder {
      */
     public LocationVariable excVar(String name, IProgramMethod pm, boolean makeNameUnique) {
         return locationVariable(name,
-            services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE), makeNameUnique);
+            new TypeRef(services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE)),
+            makeNameUnique);
     }
 
     /**
@@ -338,7 +347,7 @@ public class TermBuilder {
         if (kjt == null) {
             kjt = new KeYJavaType(sort);
         }
-        return atPreVar(baseName, kjt, makeNameUnique);
+        return atPreVar(baseName, new TypeRef(kjt), makeNameUnique);
     }
 
     /**
@@ -346,12 +355,13 @@ public class TermBuilder {
      * namespaces.
      *
      * @param baseName the base name to use
-     * @param kjt the type of the variable
+     * @param typeRef the type of the variable
      * @param makeNameUnique whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
-    public LocationVariable atPreVar(String baseName, KeYJavaType kjt, boolean makeNameUnique) {
-        return locationVariable(baseName + "AtPre", kjt, makeNameUnique);
+    public LocationVariable atPreVar(String baseName, TypeReference typeRef,
+            boolean makeNameUnique) {
+        return locationVariable(baseName + "AtPre", typeRef, makeNameUnique);
     }
 
     /**
@@ -364,7 +374,7 @@ public class TermBuilder {
      * @return a location variable for the given name and type
      */
     public LocationVariable locationVariable(String baseName, Sort sort, boolean makeNameUnique) {
-        return locationVariable(baseName, new KeYJavaType(sort), makeNameUnique);
+        return locationVariable(baseName, new TypeRef(new KeYJavaType(sort)), makeNameUnique);
     }
 
     /**
@@ -372,16 +382,16 @@ public class TermBuilder {
      * the namespaces.
      *
      * @param baseName the base name to use
-     * @param kjt the type of the variable
+     * @param typeRef the type of the variable
      * @param makeNameUnique whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
-    public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
+    public LocationVariable locationVariable(String baseName, TypeReference typeRef,
             boolean makeNameUnique) {
         if (makeNameUnique) {
             baseName = newName(baseName);
         }
-        return new LocationVariable(new ProgramElementName(baseName), kjt);
+        return new LocationVariable(new ProgramElementName(baseName), typeRef);
     }
 
     // -------------------------------------------------------------------------

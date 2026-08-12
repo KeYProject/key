@@ -80,7 +80,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         accessPath = rp;
     }
 
-
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
@@ -210,6 +209,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             if (index == 0) {
                 return anonymousClass;
             }
+            index--;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

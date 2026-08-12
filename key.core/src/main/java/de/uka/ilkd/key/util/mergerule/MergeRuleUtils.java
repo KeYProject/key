@@ -1394,7 +1394,7 @@ public class MergeRuleUtils {
     public static LocationVariable rename(Name newName, LocationVariable lv) {
         if (lv.getKeYJavaType() != null) {
             return new LocationVariable(new ProgramElementName(newName.toString()),
-                lv.getKeYJavaType(),
+                lv.getTypeReference(),
                 lv.getContainerType(), lv.isStatic(), lv.isModel());
         } else {
             return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());

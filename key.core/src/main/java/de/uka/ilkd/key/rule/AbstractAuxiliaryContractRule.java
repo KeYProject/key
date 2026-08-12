@@ -7,8 +7,8 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -139,14 +139,14 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      *
      * @param nameBase a base name.
-     * @param type a type.
+     * @param typeRef a {@link TypeReference}.
      * @param services services.
      * @return a new local variable with the specified base name of the specified type.
      */
     protected static LocationVariable createLocalVariable(final String nameBase,
-            final KeYJavaType type, final Services services) {
+            final TypeReference typeRef, final Services services) {
         return KeYJavaASTFactory.localVariable(
-            services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
+            services.getVariableNamer().getTemporaryNameProposal(nameBase), typeRef);
     }
 
     /**

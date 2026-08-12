@@ -19,8 +19,8 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -161,7 +161,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         var app = (InfFlowBlockContractInternalBuiltInRuleApp) application;
 
         final ProgramVariable exceptionParameter =
-            createLocalVariable("e", variables.exception.getKeYJavaType(), services);
+            createLocalVariable("e", variables.exception.getTypeReference(), services);
         validityGoal.setBranchLabel("Information Flow Validity");
 
         // clear goal
@@ -372,7 +372,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
-        KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+        TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
@@ -395,7 +395,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
-            KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
 
             String name = tb.newName(varTerm + "_Before");
             LocationVariable varAtPostVar =
@@ -417,7 +417,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
-            KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
 
             String name = tb.newName(varTerm + "_After");
             LocationVariable varAtPostVar =

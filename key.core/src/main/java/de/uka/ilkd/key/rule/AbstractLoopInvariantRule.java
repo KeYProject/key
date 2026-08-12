@@ -195,7 +195,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
             final LocationVariable pvBeforeLoop =
-                new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
+                new LocationVariable(new ProgramElementName(pvBeforeLoopName),
+                    pv.getTypeReference());
             progVarNS.addSafely(pvBeforeLoop);
             beforeLoopUpdate =
                 tb.parallel(beforeLoopUpdate, tb.elementary(pvBeforeLoop, tb.var(pv)));

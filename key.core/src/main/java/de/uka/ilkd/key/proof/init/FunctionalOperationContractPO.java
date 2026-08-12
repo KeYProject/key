@@ -35,6 +35,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
@@ -61,6 +63,8 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(FunctionalOperationContractPO.class);
     public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
@@ -150,7 +154,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             // construct what would be produced from rule instanceCreationAssignment
             final Expression init =
                 (Expression) (new CreateObject(n)).transform(n, services, svInst)[0];
-            final Statement assignTmp = declare(selfVar, init, type);
+            final Statement assignTmp = declare(selfVar, init, new TypeRef(type));
             result[0] = new StatementBlock(assignTmp);
 
             // try block

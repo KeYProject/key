@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
@@ -24,6 +23,8 @@ import de.uka.ilkd.key.java.ast.reference.SuperConstructorReference;
 import de.uka.ilkd.key.java.ast.reference.SuperReference;
 import de.uka.ilkd.key.java.ast.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -60,7 +61,7 @@ public class EvaluateArgs extends ProgramTransformer {
             Services services, ExecutionContext ec) {
 
         final VariableNamer varNamer = services.getVariableNamer();
-        final KeYJavaType t = e.getKeYJavaType(services, ec);
+        final TypeReference t = new TypeRef(e.getKeYJavaType(services, ec));
         final ProgramElementName name =
             VariableNamer.parseName(varNamer.getSuggestiveNameProposalForSchemaVariable(e));
         final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);

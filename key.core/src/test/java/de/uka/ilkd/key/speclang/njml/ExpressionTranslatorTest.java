@@ -8,6 +8,7 @@ import java.util.HashMap;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -45,10 +46,11 @@ public class ExpressionTranslatorTest {
     @ParameterizedTest
     @CsvFileSource(resources = "exprs.txt", delimiter = '^')
     public void parseAndInterpret(String expr) {
-        KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
-        LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
-        LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
-        LocationVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
+        var kjt = new KeYJavaType(JavaDLTheory.ANY);
+        var tRef = new TypeRef(kjt);
+        LocationVariable self = new LocationVariable(new ProgramElementName("self"), tRef);
+        LocationVariable result = new LocationVariable(new ProgramElementName("result"), tRef);
+        LocationVariable exc = new LocationVariable(new ProgramElementName("exc"), tRef);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         lexer._mode = JmlLexer.expr;
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));

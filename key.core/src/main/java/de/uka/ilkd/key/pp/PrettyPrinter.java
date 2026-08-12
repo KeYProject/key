@@ -174,7 +174,7 @@ public class PrettyPrinter implements Visitor {
      *
      * @param list a program element list.
      */
-    protected void writeKeywordList(ImmutableArray<Modifier> list) {
+    protected <T extends Modifier> void writeKeywordList(ImmutableArray<T> list) {
         for (int i = 0; i < list.size(); i++) {
             if (i != 0) {
                 layouter.brk();
@@ -621,8 +621,18 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnTypeReference(TypeReference x, boolean fullTypeNames) {
         if (x.getKeYJavaType() != null
                 && x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
+            for (Annotation annot : x.getAnnotations()) {
+                performActionOnAnnotation(annot);
+                layouter.print(" ");
+            }
+
             performActionOnArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
         } else if (x.getProgramElementName() != null) {
+            for (Annotation expr : x.getAnnotations()) {
+                performActionOnAnnotation(expr);
+                layouter.print(" ");
+            }
+
             printTypeReference(x.getReferencePrefix(), x.getKeYJavaType(),
                 x.getProgramElementName(), fullTypeNames);
         }
@@ -731,6 +741,49 @@ public class PrettyPrinter implements Visitor {
             layouter.brk();
             performActionOnImplements(x.getImplementedTypes());
         }
+        // not an anonymous class
+        if (x.getProgramElementName() != null) {
+            layouter.print(" ");
+        }
+        layouter.end();
+
+        performActionOnMemberDeclarations(x.getMembers());
+    }
+
+    @Override
+    public void performActionOnAnnotationInterfaceMemberDeclaration(
+            AnnotationInterfaceMemberDeclaration x) {
+        layouter.beginI();
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+            layouter.print(" ");
+        }
+
+        performActionOnTypeReference(x.getTypeRef());
+        layouter.print(" ");
+        performActionOnProgramElementName(x.getProgramElementName());
+        layouter.end();
+    }
+
+    @Override
+    public void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x) {
+        layouter.beginC();
+        layouter.beginC(0);
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+        }
+        if (x.getProgramElementName() != null) {
+            if (hasMods) {
+                layouter.print(" ");
+            }
+            layouter.keyWord("@interface").print(" ");
+            performActionOnProgramElementName(x.getProgramElementName());
+        }
+        layouter.end();
         // not an anonymous class
         if (x.getProgramElementName() != null) {
             layouter.print(" ");
@@ -1458,6 +1511,7 @@ public class PrettyPrinter implements Visitor {
         if (addParentheses) {
             layouter.print("(");
         }
+
         layouter.print("new ");
 
         x.getTypeReference().visit(this);
@@ -1716,6 +1770,12 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnThen(Then x) {
         handleBlockOrSingleStatement(x.getBody());
+    }
+
+    @Override
+    public void performActionOnAnnotation(Annotation x) {
+        layouter.print("@");
+        layouter.print(x.getKeyJavaType().getFullName());
     }
 
     @Override

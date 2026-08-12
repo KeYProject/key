@@ -43,6 +43,7 @@ public class ArrayPostDecl extends ProgramTransformer {
         return new ProgramElement[] { KeYJavaASTFactory.declare(modifiers, variable,
             var.getInitializer(), originalTypeReference.getProgramElementName(),
             originalTypeReference.getDimensions() + var.getDimensions(),
+            originalTypeReference.getAnnotations(),
             originalTypeReference.getReferencePrefix(), variable.getKeYJavaType()) };
     }
 

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.java.ast.statement.If;
@@ -110,7 +111,7 @@ public class InitArrayCreation extends InitArray {
             }
 
             final LocalVariableDeclaration argDecl =
-                KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
+                KeYJavaASTFactory.declare(name, dimExpr.get(i), new TypeRef(intType));
             pvars[i] = (ProgramVariable) argDecl.getVariables().get(0).getProgramVariable();
 
             bodyStmnts.add(argDecl);
@@ -145,7 +146,8 @@ public class InitArrayCreation extends InitArray {
                 services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
             final ProgramElementName name = varNamer.getTemporaryNameProposal("i");
             final LocalVariableDeclaration forInit =
-                KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(), intType);
+                KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(),
+                    new TypeRef(intType));
 
             final ProgramVariable pv =
                 (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();

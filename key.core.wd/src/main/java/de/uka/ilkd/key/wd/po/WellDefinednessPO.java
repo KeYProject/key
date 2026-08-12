@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -83,9 +84,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static LocationVariable createSelf(IProgramMethod pm, KeYJavaType selfKJT,
             TermServices services) {
         if (pm == null) {
-            return services.getTermBuilder().selfVar(selfKJT, false);
+            return services.getTermBuilder().selfVar(new TypeRef(selfKJT), false);
         } else {
-            return services.getTermBuilder().selfVar(pm, selfKJT, true);
+            return services.getTermBuilder().selfVar(pm, new TypeRef(selfKJT), true);
         }
     }
 

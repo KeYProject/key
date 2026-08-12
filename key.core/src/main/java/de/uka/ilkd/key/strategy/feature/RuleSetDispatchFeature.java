@@ -26,7 +26,8 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Feature for relating rule sets with feature terms. Given a taclet application, this feature will
@@ -35,6 +36,7 @@ import org.jspecify.annotations.NonNull;
  * the different rule set features.
  */
 public class RuleSetDispatchFeature implements Feature {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleSetDispatchFeature.class);
 
     private static final Feature[] NO_FEATURES = new Feature[0];
 

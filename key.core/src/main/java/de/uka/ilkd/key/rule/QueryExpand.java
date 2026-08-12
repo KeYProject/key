@@ -165,12 +165,14 @@ public class QueryExpand implements BuiltInRule {
             callee = null;
             offset = 0;
         } else {
-            callee = new LocationVariable(new ProgramElementName(calleeName), calleeType);
+            callee =
+                new LocationVariable(new ProgramElementName(calleeName), new TypeRef(calleeType));
             offset = 1;
         }
 
         final ProgramVariable result =
-            new LocationVariable(new ProgramElementName(progResultName), progResultType);
+            new LocationVariable(new ProgramElementName(progResultName),
+                new TypeRef(progResultType));
 
 
         final MethodReference mr =
@@ -206,7 +208,7 @@ public class QueryExpand implements BuiltInRule {
 
         ArrayList<ProgramElement> stmnt = new ArrayList<>();
 
-        stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
+        stmnt.add(KeYJavaASTFactory.declare(result, new TypeRef(progResultType)));
 
         final CopyAssignment assignment = new CopyAssignment(result, mr);
 
@@ -264,7 +266,7 @@ public class QueryExpand implements BuiltInRule {
             final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName,
-                pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
+                pdecl.getVariableSpecification().getProgramVariable().getTypeReference());
             progvarsNS.addSafely(args[i]);
             i++;
         }

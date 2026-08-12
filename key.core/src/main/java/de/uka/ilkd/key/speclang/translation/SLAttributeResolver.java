@@ -22,16 +22,19 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Resolver for attributes (i.e., fields).
  */
 public final class SLAttributeResolver extends SLExpressionResolver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SLAttributeResolver.class);
 
     public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager,
             KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
-
 
     private ProgramVariable lookupVisibleAttribute(String name, KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
@@ -53,6 +56,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         if (sups.isEmpty() && !containingType.equals(javaInfo.getJavaLangObject())) {
             sups = sups.prepend(javaInfo.getJavaLangObject());
         }
+
         for (KeYJavaType sup : sups) {
             final ProgramVariable res = lookupVisibleAttribute(name, sup);
             if (res != null) {

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -74,12 +75,13 @@ public class SetStatementTest {
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        var selfVar = new LocationVariable(new ProgramElementName("self"), testClassType);
+        var selfVar = new LocationVariable(
+            new ProgramElementName("self"), new TypeRef(testClassType));
 
         var normalLocal = new LocationVariable(new ProgramElementName("normalLocal"),
-            javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
+            new TypeRef(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT)));
         var ghostLocal = new LocationVariable(new ProgramElementName("ghostLocal"),
-            javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT), true, false);
+            new TypeRef(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT)), true, false);
 
         jmlIO = new JmlIO(services)
                 .context(Context.inClass(testClassType, false, services.getTermBuilder()))

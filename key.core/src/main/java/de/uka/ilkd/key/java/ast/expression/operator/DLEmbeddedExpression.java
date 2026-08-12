@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -121,7 +122,7 @@ public class DLEmbeddedExpression extends Operator {
         final ProgramElementName programName =
             qualifier.isEmpty() ? new ProgramElementName(name)
                     : new ProgramElementName(name, qualifier);
-        TypeRef tr = new TypeRef(programName, 0, null, containingClass);
+        TypeRef tr = new TypeRef(programName, ImmutableList.of(), 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {

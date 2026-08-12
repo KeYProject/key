@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
@@ -50,6 +51,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 import static java.lang.String.format;
@@ -66,6 +69,7 @@ import static java.util.Objects.requireNonNull;
  * @version 1 (5/10/20)
  */
 class Translator extends JmlParserBaseVisitor<Object> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Translator.class);
 
     private final static String[] DISCOURAGED_CLAUSE_NAMES =
         { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
@@ -2524,7 +2528,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String latticeType = ctx.latticetype.getText();
         KeYJavaType phType = accept(ctx.typespec());
         String phName = ctx.phName.getText();
-        LocationVariable placeholder = new LocationVariable(new ProgramElementName(phName), phType);
+        LocationVariable placeholder =
+            new LocationVariable(new ProgramElementName(phName), new TypeRef(phType));
         resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
         ImmutableList<SLExpression> expr = listOf(ctx.predicate());
 

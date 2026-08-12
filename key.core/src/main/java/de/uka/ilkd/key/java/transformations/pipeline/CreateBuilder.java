@@ -90,9 +90,10 @@ public class CreateBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
-        if (td instanceof ClassOrInterfaceDeclaration
-                && ((ClassOrInterfaceDeclaration) td).isInterface()) {
-            // Interfaces can't have fields, so nothing to set
+        if (td.isAnnotationDeclaration()
+                || td.isClassOrInterfaceDeclaration()
+                        && ((ClassOrInterfaceDeclaration) td).isInterface()) {
+            // Interfaces and Annotations can't have fields, so nothing to set
             return;
         }
         td.addMember(createMethod(td));

@@ -23,7 +23,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * The JavaDL theory class provides access to function symvols, sorts that are part of the core
+ * The JavaDL theory class provides access to function symbols, sorts that are part of the core
  * logic
  * like cast or instanceof functions.
  */

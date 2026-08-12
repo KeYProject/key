@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.TransactionStatement;
@@ -144,7 +145,7 @@ public final class WhileInvariantTransformer {
                 getNewLocalvariable("break_" + breakCounter++, "boolean", services);
             b.setProgramVariable(newVar);
             stmnt.add(KeYJavaASTFactory.declare(newVar, BooleanLiteral.FALSE,
-                javaInfo.getKeYJavaType("boolean")));
+                new TypeRef(javaInfo.getKeYJavaType("boolean"))));
             numberOfBreaks++;
             Statement s;
             if (b.getBreak().getLabel() != null) {
@@ -182,7 +183,7 @@ public final class WhileInvariantTransformer {
                 post, rule, ruleApp, goal, applicationPos, services));
 
             if (returnType != null) {
-                stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType));
+                stmnt.add(KeYJavaASTFactory.declare(returnExpression, new TypeRef(returnType)));
             }
         }
 
@@ -196,10 +197,10 @@ public final class WhileInvariantTransformer {
 
         // we catch all exceptions
         stmnt.add(KeYJavaASTFactory.declare(excFlag, BooleanLiteral.FALSE,
-            javaInfo.getKeYJavaType("boolean")));
+            new TypeRef(javaInfo.getKeYJavaType("boolean"))));
         excFlagTerm = typeConv.convertToLogicElement(excFlag);
         stmnt.add(KeYJavaASTFactory.declare(thrownException,
-            javaInfo.getKeYJavaType("java.lang.Throwable")));
+            new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable"))));
 
         resultSubterms.add(normalCaseAndContinue(termLabelState, services, applicationPos, rule,
             ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm, breakFlagTerm,
@@ -286,7 +287,8 @@ public final class WhileInvariantTransformer {
     private ProgramVariable getNewLocalvariable(String varNameBase, KeYJavaType varType,
             Services services) {
         return KeYJavaASTFactory.localVariable(
-            services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
+            services.getVariableNamer().getTemporaryNameProposal(varNameBase),
+            new TypeRef(varType));
 
     }
 
@@ -330,7 +332,7 @@ public final class WhileInvariantTransformer {
 
     private Statement returnFlagDecl(ProgramVariable returnFlag, SVInstantiations svInst) {
         return KeYJavaASTFactory.declare(returnFlag, BooleanLiteral.FALSE,
-            javaInfo.getKeYJavaType("boolean"));
+            new TypeRef(javaInfo.getKeYJavaType("boolean")));
     }
 
     private JTerm returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
@@ -353,12 +355,12 @@ public final class WhileInvariantTransformer {
 
     private Statement breakFlagDecl(ProgramVariable breakFlag) {
         return KeYJavaASTFactory.declare(breakFlag, BooleanLiteral.FALSE,
-            javaInfo.getKeYJavaType("boolean"));
+            new TypeRef(javaInfo.getKeYJavaType("boolean")));
     }
 
     private Statement contFlagDecl(ProgramVariable contFlag) {
         return KeYJavaASTFactory.declare(contFlag, BooleanLiteral.FALSE,
-            javaInfo.getKeYJavaType("boolean"));
+            new TypeRef(javaInfo.getKeYJavaType("boolean")));
     }
 
     private JTerm breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, JTerm post,

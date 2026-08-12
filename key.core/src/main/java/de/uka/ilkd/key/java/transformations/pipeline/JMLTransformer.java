@@ -63,7 +63,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 ///
 /// You can access attached JML information using the {@link DataKey} in
 /// [JMLTransformer#KEY_SPEC_CASE],
-/// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
+/// [JMLTransformer#KEY_CLASS_SPEC], and [JMLTransformer#KEY_LOOP_SPEC].
 ///
 /// JMLModifier are reduced to *normal* modifier of
 /// {@link com.github.javaparser.ast.Modifier.DefaultKeyword}.

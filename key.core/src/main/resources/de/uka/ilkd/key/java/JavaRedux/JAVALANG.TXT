@@ -1,5 +1,9 @@
 java.lang.Object
 java.lang.annotation.Annotation
+java.lang.annotation.ElementType
+java.lang.annotation.Retention
+java.lang.annotation.RetentionPolicy
+java.lang.annotation.Target
 java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
 java.lang.ArrayStoreException
@@ -58,4 +62,3 @@ java.util.ListIteratorImpl
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList
-

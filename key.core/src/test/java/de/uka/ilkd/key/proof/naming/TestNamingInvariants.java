@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -161,7 +162,7 @@ public class TestNamingInvariants {
             final Name pvName = new Name("harnessPv");
             final LocationVariable pv = new LocationVariable(
                 new de.uka.ilkd.key.logic.ProgramElementName(pvName.toString()),
-                services.getJavaInfo().getKeYJavaType("int"));
+                new TypeRef(services.getJavaInfo().getKeYJavaType("int")));
             goal.addProgramVariable(pv);
 
             assertNotNull(goal.getLocalNamespaces().programVariables().lookup(pvName),
