@@ -1388,8 +1388,12 @@ public class TermBuilder {
 
     public JTerm singleton(JTerm o, JTerm f) {
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        return func(locSetLDT.getSingleton(),
-            func(locSetLDT.getPair(), o, f));
+        return func(locSetLDT.getSingleton(), locSetPair(o, f));
+    }
+
+    public JTerm locSetPair(JTerm o, JTerm f) {
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getPair(), o, f);
     }
 
     public JTerm union(JTerm s1, JTerm s2) {
@@ -1496,7 +1500,7 @@ public class TermBuilder {
         if (s.op() == ldt.getEmpty()) {
             return ff();
         } else {
-            return func(ldt.getElementOf(), o, f, s);
+            return func(ldt.getElementOf(), locSetPair(o, f), s);
         }
     }
 

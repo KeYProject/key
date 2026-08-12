@@ -61,14 +61,14 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testLocationSets() throws Exception {
         String pp = "{(a, testTermParserHeap.A::#f)}";
-        String verbose = "singleton(a,testTermParserHeap.A::#f)";
+        String verbose = "singleton<[Loc]>(pair<[Object, Field]>(a,testTermParserHeap.A::#f))";
         comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
 
-        comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
+        comparePrettySyntaxAgainstVerboseSyntax("{}", "empty<[Loc]>");
 
         pp = "{(a, testTermParserHeap.A::#f), (a, testTermParserHeap.A::#f), (a, testTermParserHeap.A::#f)}";
         JTerm expected = parseTerm(
-            "union(union(singleton(a,testTermParserHeap.A::#f),singleton(a,testTermParserHeap.A::#f)),singleton(a,testTermParserHeap.A::#f))");
+            "union<[Loc]>(union<[Loc]>(singleton<[Loc]>(pair<[Object, Field]>(a,testTermParserHeap.A::#f)),singleton<[Loc]>(pair<[Object, Field]>(a,testTermParserHeap.A::#f))),singleton<[Loc]>(pair<[Object, Field]>(a,testTermParserHeap.A::#f)))");
         verifyParsing(expected, pp);
     }
 
@@ -92,11 +92,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         String complicatedHeapPretty =
             "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
         String complicatedHeapVerbose =
-            "anon(memset(create(store(heap, a, testTermParserHeap.A::#f, 4), a), empty, 1), allLocs, heap)";
+            "anon(memset(create(store(heap, a, testTermParserHeap.A::#f, 4), a), empty<[Loc]>, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
 
         String prettySyntax = "a.f@h[anon({}, h2)]";
-        String verboseSyntax = "select<[int]>(anon(h, empty, h2), a, testTermParserHeap.A::#f)";
+        String verboseSyntax =
+            "select<[int]>(anon(h, empty<[Loc]>, h2), a, testTermParserHeap.A::#f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         /*

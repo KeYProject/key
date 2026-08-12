@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -70,9 +72,9 @@ public final class LocSetLDT extends LDT {
         subset = getInstantiatedFunction("subset", services);
         disjoint = getInstantiatedFunction("disjoint", services);
         createdInHeap = addFunction(services, "createdInHeap");
-        pair = getInstantiatedFunction("pair", services, ImmutableList.of(
+        pair = getInstantiatedFunction("pair", services, ImmutableList.fromList(List.of(
             new GenericArgument(services.getNamespaces().sorts().lookup("java.lang.Object")),
-            new GenericArgument(services.getNamespaces().sorts().lookup("Field"))));
+            new GenericArgument(services.getNamespaces().sorts().lookup("Field")))));
     }
 
     private Function getInstantiatedFunction(String name, Services services,
@@ -85,9 +87,9 @@ public final class LocSetLDT extends LDT {
         return getInstantiatedFunction(
             name,
             services,
-            ImmutableList.of(
+            ImmutableList.fromList(List.of(
                 new GenericArgument(
-                    services.getNamespaces().sortAliases().lookup("Loc").aliasedSort())));
+                    services.getNamespaces().sortAliases().lookup("Loc").aliasedSort()))));
     }
 
     public Function getEmpty() {
