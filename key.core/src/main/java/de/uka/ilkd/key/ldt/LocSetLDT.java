@@ -18,14 +18,14 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 
 public final class LocSetLDT extends LDT {
@@ -50,6 +50,7 @@ public final class LocSetLDT extends LDT {
     private final Function subset;
     private final Function disjoint;
     private final Function createdInHeap;
+    private final Function pair;
 
 
     public LocSetLDT(Services services) {
@@ -69,10 +70,24 @@ public final class LocSetLDT extends LDT {
         subset = getInstantiatedFunction("subset", services);
         disjoint = getInstantiatedFunction("disjoint", services);
         createdInHeap = addFunction(services, "createdInHeap");
+        pair = getInstantiatedFunction("pair", services, ImmutableList.of(
+            new GenericArgument(services.getNamespaces().sorts().lookup("java.lang.Object")),
+            new GenericArgument(services.getNamespaces().sorts().lookup("Field"))));
+    }
+
+    private Function getInstantiatedFunction(String name, Services services,
+            ImmutableList<GenericArgument> args) {
+        return ParametricFunctionInstance.get(addParametricFunction(services, name), args,
+            services);
     }
 
     private Function getInstantiatedFunction(String name, Services services) {
-        return ParametricFunctionInstance.get(addParametricFunction(services, name), ImmutableList.of(new GenericArgument(targetSort())), services);
+        return getInstantiatedFunction(
+            name,
+            services,
+            ImmutableList.of(
+                new GenericArgument(
+                    services.getNamespaces().sortAliases().lookup("Loc").aliasedSort())));
     }
 
     public Function getEmpty() {
@@ -149,6 +164,9 @@ public final class LocSetLDT extends LDT {
         return createdInHeap;
     }
 
+    public Function getPair() {
+        return pair;
+    }
 
     @Override
     public boolean isResponsible(Operator op, JTerm[] subs,

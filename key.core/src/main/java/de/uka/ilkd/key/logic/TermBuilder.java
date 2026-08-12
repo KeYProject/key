@@ -1387,7 +1387,9 @@ public class TermBuilder {
     }
 
     public JTerm singleton(JTerm o, JTerm f) {
-        return func(services.getTypeConverter().getLocSetLDT().getSingleton(), o, f);
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getSingleton(),
+            func(locSetLDT.getPair(), o, f));
     }
 
     public JTerm union(JTerm s1, JTerm s2) {
