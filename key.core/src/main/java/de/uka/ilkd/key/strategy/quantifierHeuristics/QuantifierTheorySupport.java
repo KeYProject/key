@@ -9,19 +9,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A theory's contribution to quantifier instantiation.
  *
  * The instantiation heuristic needs knowledge that is specific to each theory at two points. When
- * choosing triggers: what counts as coordinate or connective material rather than a meaningful
- * observation (an array index, an integer comparison), and which derived triggers make an
- * observation matchable against the terms a proof actually produces (a read generalized over the
- * heaps of a symbolic execution). And when predicting the cost of an instantiation: whether a
- * literal is proved true or false, from itself or from an assumed literal, by the theory's own
- * reasoning (arithmetic comparisons, equality up to renaming). This interface isolates that
+ * choosing triggers: which subterms are unfit on their own (an array index, an integer
+ * comparison), and which further triggers to derive so that a read matches the terms a proof
+ * produces. And when predicting the cost of an instantiation: whether a literal is proved true or
+ * false, from itself or from an assumed literal, by the theory's own reasoning (arithmetic
+ * comparisons, equality up to renaming). This interface isolates that
  * knowledge. Registering a new support in {@link TriggersSet#THEORY_SUPPORTS} is the only change
  * needed to teach the heuristic about a further theory; {@link TriggersSet} and
  * {@link PredictCostProver} stay untouched.
@@ -63,8 +65,50 @@ interface QuantifierTheorySupport {
     }
 
     /**
+     * Solves a trigger subterm against a ground instance when syntactic matching has failed.
+     *
+     * Basic matching compares the two structures, so a trigger whose array index is written
+     * against an offset never matches an instance written absolutely: a read of
+     * {@code base + t} does not match one of {@code x}, since {@code x - base} occurs nowhere in
+     * the proof. A theory that can invert its own index expressions solves the equation for the
+     * variable instead.
+     *
+     * Instantiating a universally quantified formula with any term is sound, so a solution that
+     * turns out not to reproduce the instance costs an instantiation and nothing else.
+     *
+     * @param pattern a trigger subterm, containing at least one variable not yet bound in
+     *        {@code varMap}
+     * @param instance the ground term it should match
+     * @param varMap the bindings established so far
+     * @param services access to the theory's operators
+     * @return the extended bindings, or null when this theory cannot solve the equation
+     */
+    default ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
+            ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
+        return null;
+    }
+
+    /**
+     * Whether a candidate should give way to the term enclosing it, when that term yields a
+     * trigger of its own.
+     *
+     * Unlike {@link #rejectsAsTrigger}, this is a preference and not a veto. An array index
+     * matches every integer term on the sequent, while the read around it says which access is
+     * meant. Where no enclosing term yields a trigger the candidate is used anyway, since a
+     * clause without a trigger is never instantiated.
+     *
+     * @param candidate a trigger candidate
+     * @param enclosing the term the candidate is an argument of, null at the top of a literal
+     * @param services access to the theory's operators
+     * @return whether an enclosing trigger is preferable to this candidate
+     */
+    default boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
+        return false;
+    }
+
+    /**
      * Whether {@code candidate} must not be used as a standalone trigger, because for this theory
-     * it is coordinate or connective material rather than a meaningful observation.
+     * it is an array index or a connective rather than a read.
      *
      * @param candidate a subterm that contains the quantified variables and is a trigger candidate
      * @param services access to the theory operators
@@ -79,10 +123,30 @@ interface QuantifierTheorySupport {
      * @param term an accepted trigger term
      * @param clauseVariables the quantified variables of the clause the trigger belongs to
      * @param services access to the theory operators
+     * @param metavariableFactory supplies the metavariables a derived trigger needs
      * @return derived triggers, possibly empty
      */
     List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services);
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory);
+
+    /**
+     * Hands out the metavariables a derived trigger puts in place of a ground subterm.
+     *
+     * The names are counted within one {@link TriggersSet}, which is built from the quantified
+     * formula alone, so the same formula always yields the same names and no two derived triggers
+     * share one. That matters because two metavariables of equal name are still distinct and are
+     * then ordered by a creation counter shared across the whole prover, which would make the
+     * order, and through it the instances chosen, depend on which goal built its trigger set
+     * first. A support must therefore take its metavariables from here rather than name them.
+     */
+    interface MetavariableFactory {
+        /**
+         * @param sort the sort the metavariable stands for
+         * @return a metavariable distinct from every other one of its trigger set
+         */
+        Metavariable fresh(Sort sort);
+    }
 
     /**
      * Checks whether the literal holds on its own, for cost prediction. The literal is passed

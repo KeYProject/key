@@ -17,8 +17,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -70,6 +72,21 @@ public class TriggersSet {
      * register unequal copies of the same triggers.
      */
     private final Set<JTerm> theoryTriggersProvidedFor = new HashSet<>();
+    /**
+     * Hands the supports their metavariables, counted within this set. The set is built from the
+     * quantified formula alone, so the same formula always yields the same names, and no two
+     * derived triggers share one. See {@link QuantifierTheorySupport.MetavariableFactory}.
+     */
+    private final QuantifierTheorySupport.MetavariableFactory metavariableFactory =
+        new QuantifierTheorySupport.MetavariableFactory() {
+            private int created;
+
+            @Override
+            public Metavariable fresh(Sort sort) {
+                return new Metavariable(new Name("unifier_derived_" + created++), sort);
+            }
+        };
+
     /** All universal variables of the formula. */
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -230,7 +247,7 @@ public class TriggersSet {
                     if (positive.op() == Junctor.NOT) {
                         positive = positive.sub(0);
                     }
-                    addMaximalUniTriggers(positive, services);
+                    addMaximalUniTriggers(positive, null, services);
                 }
             }
             buildCoveringMultiTriggers();
@@ -244,7 +261,7 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          * @return whether a trigger was found in the term or its subterms
          */
-        private boolean addMaximalUniTriggers(JTerm term, Services services) {
+        private boolean addMaximalUniTriggers(JTerm term, JTerm enclosing, Services services) {
             if (!mightContainTriggers(term)) {
                 return false;
             }
@@ -255,7 +272,7 @@ public class TriggersSet {
             boolean foundSubtriggers = false;
             for (int i = 0; i < term.arity(); i++) {
                 final JTerm subTerm = term.sub(i);
-                final boolean found = addMaximalUniTriggers(subTerm, services);
+                final boolean found = addMaximalUniTriggers(subTerm, term, services);
 
                 if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
                     foundSubtriggers = true;
@@ -266,7 +283,7 @@ public class TriggersSet {
             // whose candidates were all rejected (not acceptable as triggers) does not count,
             // so the next enclosing meaningful term gets its chance
             if (!foundSubtriggers) {
-                return addUniTrigger(term, services);
+                return addUniTrigger(term, enclosing, services);
             }
 
             return true;
@@ -336,7 +353,7 @@ public class TriggersSet {
 
         /**
          * A trigger candidate is acceptable unless some theory's {@link QuantifierTheorySupport}
-         * rejects it as coordinate or connective material.
+         * rejects it as an array index or connective material.
          */
         private boolean isAcceptableTrigger(JTerm term, Services services) {
             for (final QuantifierTheorySupport support : supports) {
@@ -347,13 +364,23 @@ public class TriggersSet {
             return true;
         }
 
+        /** Whether some theory would rather trigger on the term enclosing this one. */
+        private boolean prefersEnclosing(JTerm term, JTerm enclosing, Services services) {
+            for (final QuantifierTheorySupport support : supports) {
+                if (support.prefersEnclosingTrigger(term, enclosing, services)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /**
          * add a uni-trigger to triggers set or add an element of multi-triggers for this clause,
          * together with the derived triggers each theory's {@link QuantifierTheorySupport} provides
          *
          * @return whether a trigger was registered for {@code term}
          */
-        private boolean addUniTrigger(JTerm term, Services services) {
+        private boolean addUniTrigger(JTerm term, JTerm enclosing, Services services) {
             if (!isAcceptableTrigger(term, services)) {
                 return false;
             }
@@ -364,12 +391,14 @@ public class TriggersSet {
             if (theoryTriggersProvidedFor.add(term)) {
                 for (final QuantifierTheorySupport support : supports) {
                     for (final JTerm derived : support.provideTriggers(term, clauseVariables,
-                        services)) {
+                        services, metavariableFactory)) {
                         registerUniTrigger(derived, true);
                     }
                 }
             }
-            return true;
+            // An array index is registered like any other candidate, but does not stop the
+            // ascent: the read around it says which access is meant and becomes a trigger too.
+            return !prefersEnclosing(term, enclosing, services);
         }
 
         private void registerUniTrigger(JTerm term, boolean matchByUnification) {

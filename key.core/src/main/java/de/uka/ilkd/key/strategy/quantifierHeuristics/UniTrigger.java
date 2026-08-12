@@ -51,6 +51,16 @@ class UniTrigger implements Trigger {
     // run outside the lock); at worst two workers redundantly compute the same (pure) result.
     private final ConcurrentLruCache<Term, ImmutableSet<Substitution>> matchResults =
         new ConcurrentLruCache<>(1000);
+    /**
+     * The results of the same matching with basic matching allowed. That matching produces
+     * substitutions unification alone does not, so which of the two ran is part of what was
+     * computed and
+     * has to be part of the key: sharing one cache would hand the caller whichever mode happened
+     * to fill the entry first. Only a generalized trigger tells the two apart, see
+     * {@link #computeSubstitutionsForTerm}.
+     */
+    private final ConcurrentLruCache<Term, ImmutableSet<Substitution>> matchResultsByBasicMatching =
+        new ConcurrentLruCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> universalVariables,
             boolean onlyUnify,
@@ -67,33 +77,59 @@ class UniTrigger implements Trigger {
     @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
             Services services) {
+        return getSubstitutionsFromTerms(targetTerms, services, true);
+    }
+
+    @Override
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
+            Services services, boolean basicMatching) {
         ImmutableSet<Substitution> allSubs = DefaultImmutableSet.nil();
         for (Term target : targetTerms) {
-            allSubs = allSubs.union(cachedSubstitutionsForTerm(target, services));
+            allSubs = allSubs.union(cachedSubstitutionsForTerm(target, services, basicMatching));
         }
         return allSubs;
     }
 
-    private ImmutableSet<Substitution> cachedSubstitutionsForTerm(Term target, Services services) {
-        ImmutableSet<Substitution> subs = matchResults.get(target);
+    private ImmutableSet<Substitution> cachedSubstitutionsForTerm(Term target, Services services,
+            boolean basicMatching) {
+        // A plain trigger is matched basically whenever it is not unified, so the mode leaves its
+        // result untouched and both callers share the one cache.
+        final ConcurrentLruCache<Term, ImmutableSet<Substitution>> cache =
+            basicMatching && matchByUnification ? matchResultsByBasicMatching : matchResults;
+        ImmutableSet<Substitution> subs = cache.get(target);
         if (subs == null) {
-            subs = computeSubstitutionsForTerm(target, services);
-            matchResults.put(target, subs);
+            subs = computeSubstitutionsForTerm(target, services, basicMatching);
+            cache.put(target, subs);
         }
         return subs;
     }
 
-    private ImmutableSet<Substitution> computeSubstitutionsForTerm(Term target, Services services) {
+    private ImmutableSet<Substitution> computeSubstitutionsForTerm(Term target,
+            Services services, boolean basicMatching) {
         ImmutableSet<Substitution> subs = DefaultImmutableSet.nil();
-        if (target.freeVars().size() > 0 || target.op() instanceof Quantifier
-                || matchByUnification) {
+        final boolean groundTarget =
+            target.freeVars().isEmpty() && !(target.op() instanceof Quantifier);
+        if (!groundTarget || matchByUnification) {
             subs = Matching.twoSidedMatching(this, target, services);
-        } else if (!onlyUnify) {
-            subs = Matching.basicMatching(this, target);
+        }
+        // Against a ground target basic matching applies as well, and only it lets a
+        // theory solve an array index: unification decides a pair of terms as a whole and offers no
+        // point at which a failing array index could be solved.
+        if (groundTarget && !onlyUnify && (basicMatching || !matchByUnification)) {
+            final ImmutableSet<Substitution> basicSubs =
+                Matching.basicMatching(this, target, services);
+            if (!basicSubs.isEmpty()) {
+                subs = subs.union(basicSubs);
+            }
         }
         return subs;
     }
 
+
+    @Override
+    public boolean isTheoryProvided() {
+        return matchByUnification;
+    }
 
     @Override
     public Term getTriggerTerm() {
@@ -132,7 +168,7 @@ class UniTrigger implements Trigger {
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final ImmutableSet<Substitution> substitutions =
-            BasicMatching.getSubstitutions(candidate, searchTerm);
+            BasicMatching.getSyntacticSubstitutions(candidate, searchTerm);
 
         for (Substitution substitution : substitutions) {
             if (containsCycle(substitution)) {

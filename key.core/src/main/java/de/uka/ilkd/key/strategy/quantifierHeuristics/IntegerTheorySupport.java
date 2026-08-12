@@ -3,14 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -46,7 +53,8 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      */
     @Override
     public List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services) {
+            ImmutableSet<QuantifiableVariable> clauseVariables, Services services,
+            MetavariableFactory metavariableFactory) {
         return List.of();
     }
 
@@ -114,6 +122,82 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      * @param integerLDT the integer theory operators
      * @return whether the top operator carries polynomial structure
      */
+    /**
+     * Solves {@code pattern = instance} for the single variable the pattern is affine in.
+     *
+     * A trigger array index is typically written relative to an offset, as {@code base + t}, while
+     * the terms a proof produces are absolute. Decomposing both sides as polynomials turns the
+     * match into an equation: with the pattern {@code k*t + rest} and the instance {@code s}, the
+     * variable is {@code (s - rest) / k}. That division has to be exact, since a non-integer
+     * solution cannot reproduce the instance.
+     *
+     * Instantiating a universally quantified formula with any term is sound, so a solution that
+     * does not reproduce the instance costs one instantiation and nothing else.
+     *
+     * Declined when the pattern is affine in more than one variable, because the equation is then
+     * underdetermined; when a variable sits inside a product with another atom, because that is
+     * not linear; and when a variable of the pattern is already bound by this match, which would
+     * require substituting before solving.
+     */
+    @Override
+    public ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
+            ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Sort integerSort = integerLDT.targetSort();
+        // The decomposition below allocates, and matching asks after every failed comparison, so
+        // the cheap tests come first: only a term built by the polynomial operators can be affine.
+        if (pattern.sort() != integerSort || instance.sort() != integerSort
+                || !hasPolynomialStructure(pattern, integerLDT)
+                || !instance.freeVars().isEmpty() || pattern.freeVars().isEmpty()) {
+            return null;
+        }
+        for (final QuantifiableVariable free : pattern.freeVars()) {
+            if (varMap.get(free) != null) {
+                return null;
+            }
+        }
+
+        final Polynomial patternPoly = Polynomial.create(pattern, services);
+        Polynomial rest = Polynomial.ZERO.add(patternPoly.getConstantTerm());
+        Monomial linear = null;
+        QuantifiableVariable variable = null;
+        for (final Monomial part : patternPoly.getParts()) {
+            final ImmutableList<Term> atoms = part.getParts();
+            if (atoms.stream().allMatch(a -> a.freeVars().isEmpty())) {
+                rest = rest.add(part);
+                continue;
+            }
+            if (atoms.size() != 1 || linear != null
+                    || !(atoms.head().op() instanceof QuantifiableVariable qv)) {
+                return null;
+            }
+            linear = part;
+            variable = qv;
+        }
+        if (linear == null) {
+            return null;
+        }
+
+        final Polynomial solution = divideExactly(
+            Polynomial.create(instance, services).sub(rest), linear.getCoefficient());
+        return solution == null ? null : varMap.put(variable, solution.toTerm(services));
+    }
+
+    /** Divides every coefficient by the divisor, or returns null when a division is not exact. */
+    private static Polynomial divideExactly(Polynomial p, BigInteger divisor) {
+        if (divisor.signum() == 0 || p.getConstantTerm().remainder(divisor).signum() != 0) {
+            return null;
+        }
+        Polynomial result = Polynomial.ZERO.add(p.getConstantTerm().divide(divisor));
+        for (Monomial part : p.getParts()) {
+            if (part.getCoefficient().remainder(divisor).signum() != 0) {
+                return null;
+            }
+            result = result.add(part.setCoefficient(part.getCoefficient().divide(divisor)));
+        }
+        return result;
+    }
+
     private static boolean hasPolynomialStructure(JTerm t, IntegerLDT integerLDT) {
         final Operator op = t.op();
         return op == integerLDT.getAdd() || op == integerLDT.getMul()
