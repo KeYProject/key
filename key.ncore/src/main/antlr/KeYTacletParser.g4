@@ -110,10 +110,22 @@ triggers
    ;
 
 modifiers
-   : (rs = rulesets | NONINTERACTIVE | DISPLAYNAME dname = string_value | HELPTEXT htext = string_value | triggers)*
+   : (rs = rulesets | NONINTERACTIVE | DISPLAYNAME dname = string_value | HELPTEXT htext = string_value | triggers | generate)*
    ;
    //TODO Split
-   
+
+generate
+    : GENERATE LPAREN generator (COMMA generator)* RPAREN
+    ;
+
+generator
+    : eqGenerator
+    ;
+
+eqGenerator
+    : GENERATE_EQ LPAREN term (COLON (ruleset (COMMA ruleset)*))? RPAREN
+    ;
+
 one_schema_var_decl
    : MODALOPERATOR one_schema_modal_op_decl
    | PROGRAM (schema_modifiers)? id = simple_ident (LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET)? ids = simple_ident_comma_list

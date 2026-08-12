@@ -92,4 +92,34 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     public T getTaclet() {
         return getRewriteTaclet();
     }
+
+    @Override
+    public RewriteTacletBuilder<T> copy() {
+        var rb = new RewriteTacletBuilder<T>().setFind((JTerm) getFind());
+        rb.setSurviveSmbExec(surviveSmbExec);
+        rb.setAnnotations(tacletAnnotations);
+        rb.setApplicationRestriction(applicationRestriction);
+        rb.setAssumesSequent(assumesSeq);
+        rb.setChoices(choices);
+        rb.setDisplayName(attrs.displayName());
+        rb.setName(name);
+        rb.setTacletGoalTemplates(goals);
+        rb.setTrigger(attrs.trigger());
+        rb.setRuleSets(ruleSets);
+        for (var vc : variableConditions) {
+            rb.addVariableCondition(vc);
+        }
+        rb.addVarsNew(varsNew);
+        rb.addVarsNotFreeIn(varsNotFreeIn);
+        for (var vc : varsNewDependingOn) {
+            rb.addVarsNewDependingOn(vc.first(), vc.second());
+        }
+        rb.setFind((JTerm) find);
+        rb.setChoices(choices);
+        if (goal2Choices != null)
+            rb.goal2Choices =
+                (java.util.HashMap<TacletGoalTemplate, org.key_project.logic.ChoiceExpr>) goal2Choices
+                        .clone();
+        return rb;
+    }
 }

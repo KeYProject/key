@@ -94,4 +94,33 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
             choices, tacletAnnotations);
         return t;
     }
+
+    @Override
+    public AntecTacletBuilder copy() {
+        var rb = new AntecTacletBuilder().setFind((Sequent) getFind());
+        rb.setAnnotations(tacletAnnotations);
+        rb.setApplicationRestriction(applicationRestriction);
+        rb.setAssumesSequent(assumesSeq);
+        rb.setChoices(choices);
+        rb.setDisplayName(attrs.displayName());
+        rb.setName(name);
+        rb.setTacletGoalTemplates(goals);
+        rb.setTrigger(attrs.trigger());
+        rb.setRuleSets(ruleSets);
+        for (var vc : variableConditions) {
+            rb.addVariableCondition(vc);
+        }
+        rb.addVarsNew(varsNew);
+        rb.addVarsNotFreeIn(varsNotFreeIn);
+        for (var vc : varsNewDependingOn) {
+            rb.addVarsNewDependingOn(vc.first(), vc.second());
+        }
+        rb.setFind((Sequent) find);
+        rb.setChoices(choices);
+        if (goal2Choices != null)
+            rb.goal2Choices =
+                (java.util.HashMap<TacletGoalTemplate, org.key_project.logic.ChoiceExpr>) goal2Choices
+                        .clone();
+        return rb;
+    }
 }

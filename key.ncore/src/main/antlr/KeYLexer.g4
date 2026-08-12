@@ -321,6 +321,14 @@ SUCCEDENTPOLARITY
    : '\\succedentPolarity'
    ;
 
+GENERATE
+    : '\\generate'
+    ;
+
+GENERATE_EQ
+    : '\\EQ'
+    ;
+
 CLOSEGOAL
    : '\\closegoal'
    ;

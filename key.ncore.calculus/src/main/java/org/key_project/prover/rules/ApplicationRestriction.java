@@ -86,4 +86,23 @@ public record ApplicationRestriction(int value) {
         }
         return res;
     }
+
+    public String toString(boolean needsSameUpdateLevel) {
+        String res = "";
+        if (!needsSameUpdateLevel && matches(SAME_UPDATE_LEVEL)) {
+            res += "\\sameUpdateLevel";
+        } else if (needsSameUpdateLevel && !matches(SAME_UPDATE_LEVEL)) {
+            res += "\\ignoreUpdateLevel";
+        }
+        if (matches(IN_SEQUENT_STATE)) {
+            res += "\\inSequentState";
+        }
+        if (matches(ANTECEDENT_POLARITY)) {
+            res += "\\antecedentPolarity";
+        }
+        if (matches(SUCCEDENT_POLARITY)) {
+            res += "\\succedentPolarity";
+        }
+        return res;
+    }
 }

@@ -41,7 +41,7 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
      * exception otherwise
      */
     protected void checkBoundInIfAndFind() {
-        final BoundUniquenessChecker ch = new BoundUniquenessChecker(getFind(), ifSequent());
+        final BoundUniquenessChecker ch = new BoundUniquenessChecker(getFind(), assumesSequent());
         if (!ch.correct()) {
             throw new TacletBuilderException(this,
                 "A bound SchemaVariable variables occurs both " + "in assumes and find clauses.");

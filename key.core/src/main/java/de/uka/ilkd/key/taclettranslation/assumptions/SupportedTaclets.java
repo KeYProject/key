@@ -459,7 +459,7 @@ public final class SupportedTaclets {
             "reachAddOne2", "reachUniquePathSameObject", "reachDependenciesStoreSimple",
             "reachDoesNotDependOnCreatedness", "reachDependenciesStore", "reachDependenciesAnon",
             "reachDependenciesAnonCoarse", "only_created_objects_are_reachable",
-            "reach_does_not_depend_on_fresh_locs", "reach_does_not_depend_on_fresh_locs_EQ"
+            "reach_does_not_depend_on_fresh_locs", "reach_does_not_depend_on_fresh_locsEQ"
 
         );
 
