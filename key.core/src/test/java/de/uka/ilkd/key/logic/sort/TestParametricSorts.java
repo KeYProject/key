@@ -94,9 +94,9 @@ class TestParametricSorts {
         assertEquals(intSort, headInst.sort());
         assertEquals(listOfInt, headInst.argSort(0));
 
-        var term = io.parseExpression("head<[int]>(someConst<[List<[int]>]>) = someConst<[int]>");
-        assertEquals("List<[int]>", term.sub(0).sub(0).sort().toString());
-        assertEquals("List<[int]>", ((JFunction) term.sub(0).op()).argSorts().get(0).toString());
+        var term = io.parseExpression("head<int>(someConst<List<int> >) = someConst<int>");
+        assertEquals("List<int>", term.sub(0).sub(0).sort().toString());
+        assertEquals("List<int>", ((JFunction) term.sub(0).op()).argSorts().get(0).toString());
         assertEquals("int", term.sub(0).op().sort(new Sort[0]).toString());
         assertSame(term.sub(0).sort(), term.sub(1).sort());
     }

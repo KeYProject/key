@@ -109,7 +109,7 @@ final class Congruence {
      * The representative's sort must equal or specialise the rewritten side's sort: every operator
      * position accepting a term of {@code from}'s sort then accepts the representative, so the
      * rebuild in {@link #normalize} stays well sorted. A widening direction is ill sorted: a
-     * contract equality {@code cast<[int[]]>(dest) = dest} read left to right would put the
+     * contract equality {@code cast<int[]>(dest) = dest} read left to right would put the
      * {@code Object}-sorted variable into positions requiring {@code int[]}. The sort condition
      * holds transitively along the parent links, since every link narrows the sort. On top of the
      * sort condition every theory support must permit the rewrite.

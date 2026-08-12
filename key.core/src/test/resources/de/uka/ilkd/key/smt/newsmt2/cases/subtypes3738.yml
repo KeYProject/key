@@ -4,7 +4,7 @@ javaSrc: |
   interface X {}
   class Y extends Object implements X { }
 keySrc: |
-  \problem { !\exists Object o; (instance<[X]>(o) = TRUE & instance<[Y]>(o) = TRUE) }
+  \problem { !\exists Object o; (instance<X>(o) = TRUE & instance<Y>(o) = TRUE) }
 contains:
   - (assert (subtype sort_Y sort_X))
   - (assert (not (subtype sort_X sort_Y)))

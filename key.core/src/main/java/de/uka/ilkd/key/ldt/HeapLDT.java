@@ -179,7 +179,7 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         if (symbol instanceof ParametricFunctionInstance pfi) {
-            // e.g., $classErroneous<[A]>
+            // e.g., $classErroneous<A>
             return new SplitFieldName(pfi.getArgs().head().sort().toString(),
                 pfi.getBase().name().toString());
         }
@@ -269,7 +269,7 @@ public final class HeapLDT extends LDT {
      * Check if the given operator is an instance of the "final" function to access final fields.
      *
      * @param op the operator to check
-     * @return true if the operator is an instance of the {@code final<[X]>} parametric function
+     * @return true if the operator is an instance of the {@code final<X>} parametric function
      */
     public boolean isFinalOp(org.key_project.logic.op.Operator op) {
         return op instanceof ParametricFunctionInstance pfi

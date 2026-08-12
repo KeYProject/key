@@ -97,7 +97,7 @@ public class QueueRuleApplicationManagerWakeKeyTest {
     /**
      * The defect that motivated descriptors, pinned directly: the park key of
      * {@code referencedObjectIsCreatedRight} must use the base function of the
-     * {@code select<[deltaObject]>} instance, not the instance itself.
+     * {@code select<deltaObject>} instance, not the instance itself.
      */
     @Test
     void parametricAssumesFirstArgumentIsKeyedByItsBase() throws Exception {

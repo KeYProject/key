@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.WeakValueInterner;
@@ -62,8 +63,7 @@ public final class ParametricSortInstance extends AbstractSort {
 
     private static Name makeName(ParametricSortDecl base,
             ImmutableList<GenericArgument> parameters) {
-        // The [ ] are produced by the list's toString method.
-        return new Name(base.name() + "<" + parameters + ">");
+        return new Name(base.name() + Strings.formatAsList(parameters, "<", ",", ">"));
     }
 
     public ParametricSortDecl getBase() {

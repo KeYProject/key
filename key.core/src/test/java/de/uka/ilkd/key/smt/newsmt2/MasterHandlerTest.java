@@ -102,6 +102,7 @@ public class MasterHandlerTest {
                     data.add(testData);
 
                 } catch (Exception e) {
+                    System.err.println("Error while handling input file " + pFile);
                     e.printStackTrace();
                     throw e;
                 }

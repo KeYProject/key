@@ -46,7 +46,7 @@ equality_term
    ;
 
 comparison_term
-   : a = weak_arith_term ((LESS | LESSEQUAL | GREATER | GREATEREQUAL | UTF_PRECEDES | UTF_SUBSET_EQ | UTF_SUBSEQ | UTF_IN) b = weak_arith_term)?
+   : a = weak_arith_term ((LESS | LESSEQUAL | GREATER | GREATEREQUAL | GREATER_CONTD EQUALS | UTF_PRECEDES | UTF_SUBSET_EQ | UTF_SUBSEQ | UTF_IN) b = weak_arith_term)?
    ;
 
 weak_arith_term
