@@ -9682,7 +9682,7 @@ Choices: sequences:on}
 getOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
-\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha]>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq))))) 
+\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq)))))
 \heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -14046,8 +14046,8 @@ Choices: programRules:Java}
 == onlyCreatedObjectsAreReferenced (onlyCreatedObjectsAreReferenced) =========================================
 onlyCreatedObjectsAreReferenced {
 \assumes ([wellFormed(h)]==>[]) 
-\find(select<deltaObject]>(h,o,f))
-\add [or(equals(select<deltaObject]>(h,o,f),null),equals(select<boolean>(h,select<deltaObject>(h,o,f),java.lang.Object::#$created),TRUE))]==>[] 
+\find(select<deltaObject>(h,o,f))
+\add [or(equals(select<deltaObject>(h,o,f),null),equals(select<boolean>(h,select<deltaObject>(h,o,f),java.lang.Object::#$created),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
