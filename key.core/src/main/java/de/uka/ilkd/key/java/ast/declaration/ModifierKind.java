@@ -78,7 +78,11 @@ public enum ModifierKind {
         };
     }
 
-    public boolean allowsInheritance() {
-        return this == PUBLIC || this == PROTECTED || this == JML_PACKAGE;
+    // changed that to static as Visibility modifier for package private is encoded as null
+    // and caused NPE; is JML_PACKAGE something else than package private? Should it be included
+    // here?
+    // or do we need to handle package private differently and provide a proper modifer?
+    public static boolean allowsInheritance(ModifierKind kind) {
+        return kind == PUBLIC || kind == PROTECTED || kind == JML_PACKAGE;
     }
 }

@@ -483,17 +483,18 @@ public final class JavaInfo {
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
         final ModifierKind visibility = ax.getVisibility();
-        assert visibility != null && visibility.isVisibility();
+        // package private is modelled as null
+        assert visibility == null || visibility.isVisibility();
 
         if (PUBLIC == visibility) {
             return true;
         }
 
-        if (visibility.allowsInheritance()) {
+        if (ModifierKind.allowsInheritance(visibility)) {
             return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
         }
 
-        if (visibility == PROTECTED || visibility == JML_PACKAGE) {
+        if (visibility == null || visibility == JML_PACKAGE) {
             return visibleToPackage;
         } else {
             return kjt.equals(visibleTo);

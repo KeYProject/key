@@ -779,7 +779,7 @@ public class SpecificationRepository {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
         }
         // inherit non-private, non-static invariants
-        if (!inv.isStatic() && inv.getVisibility().allowsInheritance()) {
+        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
@@ -807,7 +807,7 @@ public class SpecificationRepository {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);
-                if (inv.getVisibility().allowsInheritance()) {
+                if (ModifierKind.allowsInheritance(inv.getVisibility())) {
                     final ImmutableList<KeYJavaType> subs =
                         services.getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
@@ -1089,7 +1089,7 @@ public class SpecificationRepository {
                 axioms.put(kjt, currentAxioms.add(ax));
             }
             // inherit represents clauses to subclasses and conjoin together
-            if (ax.getVisibility().allowsInheritance()) {
+            if (ModifierKind.allowsInheritance(ax.getVisibility())) {
                 final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);

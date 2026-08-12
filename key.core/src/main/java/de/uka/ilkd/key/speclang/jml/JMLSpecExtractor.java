@@ -187,8 +187,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (member instanceof FieldDeclaration) {
                 ModifierKind visibility = null;
                 for (Modifier mod : member.getModifiers()) {
-                    visibility = mod.getKind();
-                    if (visibility.isVisibility()) {
+                    final ModifierKind modKind = mod.getKind();
+                    if (modKind.isVisibility()) {
+                        visibility = modKind;
                         break;
                     }
                 }
