@@ -114,8 +114,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 }
                 if (genericParams == null) {
                     Function fn =
-                        new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
-                            false, false);
+                        new JFunction(new Name(argName), argSort, new Sort[] { sort }, null, false);
                     dtFnNamespace.add(fn);
                 } else {
                     var fn = new ParametricFunctionDecl(new Name(argName), genericParams,
@@ -124,7 +123,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 }
             }
             if (genericParams == null) {
-                var fn = new JFunction(name, sort, args, null, true, false);
+                var fn = new JFunction(name, sort, args, null, true);
                 functions().addSafely(fn);
                 docsSpace().setDocumentation(fn, doc);
             } else {

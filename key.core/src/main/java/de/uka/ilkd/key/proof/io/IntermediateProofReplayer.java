@@ -1075,7 +1075,7 @@ public class IntermediateProofReplayer {
             final ProgramElement pe = app.getProgramElement(value, psv, services);
             result = app.addCheckedInstantiation(sv, pe, services, true);
         } else if (sv instanceof SkolemTermSV skolemSv) {
-            result = app.createSkolemConstant(value, skolemSv, true, services);
+            result = app.createSkolemConstant(value, skolemSv, true, targetGoal);
         } else if (sv instanceof ModalOperatorSV msv) {
             result = app.addInstantiation(
                 app.instantiations().add(msv, JModality.JavaModalityKind.getKind(value), services),

@@ -34,6 +34,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * A proof obligation for a {@link FunctionalBlockContract}.
  *
@@ -85,7 +87,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         JTerm localAnonUpdate = null;
         for (LocationVariable pv : localOutVariables) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonFunc);
             final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (localAnonUpdate == null) {
@@ -112,7 +114,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
             final Function anonymisationFunction =
-                new JFunction(new Name(anonymisationName), heap.sort(), true);
+                new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonHeaps.put(heap, anonymisationFunction);
         }
@@ -136,7 +138,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), heap.sort(), true);
+                    new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
             }
