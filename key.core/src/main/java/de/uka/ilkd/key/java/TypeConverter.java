@@ -10,7 +10,6 @@ import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Abstract;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;

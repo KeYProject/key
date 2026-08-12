@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -18,17 +18,17 @@ import org.jspecify.annotations.Nullable;
  * matched afterward by their own instructions (a generic-sort match or an identity check per
  * argument).
  */
-public class SimilarParametricFunctionInstruction implements MatchInstruction {
-    private final ParametricFunctionInstance pfi;
+public class SimilarParametricSortInstruction implements MatchInstruction {
+    private final ParametricSortInstance psi;
 
-    public SimilarParametricFunctionInstruction(ParametricFunctionInstance pfi) {
-        this.pfi = pfi;
+    public SimilarParametricSortInstruction(ParametricSortInstance psi) {
+        this.psi = psi;
     }
 
     @Override
     public @Nullable MatchResultInfo match(SyntaxElement actualElement,
             MatchResultInfo matchConditions, LogicServices services) {
-        if (((ParametricFunctionInstance) actualElement).getBase() == pfi.getBase()) {
+        if (((ParametricSortInstance) actualElement).getBase() == psi.getBase()) {
             return matchConditions;
         }
         return null;

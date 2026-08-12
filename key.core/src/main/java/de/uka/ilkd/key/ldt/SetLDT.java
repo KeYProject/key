@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
@@ -8,10 +11,12 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 public final class SetLDT extends ParametricLDT {
     public static final Name NAME = new Name("Set");
@@ -28,27 +33,30 @@ public final class SetLDT extends ParametricLDT {
     public SetLDT(TermServices services) {
         super(NAME, services);
 
-        sEmpty = addParametricFunction(services,"sEmpty");
-        sSingleton = addParametricFunction(services,"sSingleton");
-        sUnion = addParametricFunction(services,"sUnion");
-        sIntersect = addParametricFunction(services,"sIntersect");
-        sSetMinus = addParametricFunction(services,"sSetMinus");
-        sInfiniteUnion = addParametricFunction(services,"sInfiniteUnion");
-        sCard = addParametricFunction(services,"sCard");
+        sEmpty = addParametricFunction(services, "sEmpty");
+        sSingleton = addParametricFunction(services, "sSingleton");
+        sUnion = addParametricFunction(services, "sUnion");
+        sIntersect = addParametricFunction(services, "sIntersect");
+        sSetMinus = addParametricFunction(services, "sSetMinus");
+        sInfiniteUnion = addParametricFunction(services, "sInfiniteUnion");
+        sCard = addParametricFunction(services, "sCard");
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
+            ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
+            ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub, TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+            ExecutionContext ec) {
         return false;
     }
 

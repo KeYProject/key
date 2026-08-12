@@ -15,14 +15,17 @@ import de.uka.ilkd.key.java.ast.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
 
 
 public final class LocSetLDT extends LDT {
@@ -49,25 +52,28 @@ public final class LocSetLDT extends LDT {
     private final Function createdInHeap;
 
 
-    public LocSetLDT(TermServices services) {
+    public LocSetLDT(Services services) {
         super(NAME, services);
-        empty = addFunction(services, "empty");
+        empty = getInstantiatedFunction("empty", services);
         allLocs = addFunction(services, "allLocs");
-        singleton = addFunction(services, "singleton");
-        union = addFunction(services, "union");
-        intersect = addFunction(services, "intersect");
-        setMinus = addFunction(services, "setMinus");
-        infiniteUnion = addFunction(services, "infiniteUnion");
+        singleton = getInstantiatedFunction("singleton", services);
+        union = getInstantiatedFunction("union", services);
+        intersect = getInstantiatedFunction("intersect", services);
+        setMinus = getInstantiatedFunction("setMinus", services);
+        infiniteUnion = getInstantiatedFunction("infiniteUnion", services);
         allFields = addFunction(services, "allFields");
         allObjects = addFunction(services, "allObjects");
         arrayRange = addFunction(services, "arrayRange");
         freshLocs = addFunction(services, "freshLocs");
-        elementOf = addFunction(services, "elementOf");
-        subset = addFunction(services, "subset");
-        disjoint = addFunction(services, "disjoint");
+        elementOf = getInstantiatedFunction("elementOf", services);
+        subset = getInstantiatedFunction("subset", services);
+        disjoint = getInstantiatedFunction("disjoint", services);
         createdInHeap = addFunction(services, "createdInHeap");
     }
 
+    private Function getInstantiatedFunction(String name, Services services) {
+        return ParametricFunctionInstance.get(addParametricFunction(services, name), ImmutableList.of(new GenericArgument(targetSort())), services);
+    }
 
     public Function getEmpty() {
         return empty;

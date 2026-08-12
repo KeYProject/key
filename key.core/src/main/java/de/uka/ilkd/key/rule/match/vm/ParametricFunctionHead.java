@@ -13,8 +13,8 @@ import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.MatchHead;
+import org.key_project.prover.rules.matcher.compiler.MatchPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
-import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 import org.jspecify.annotations.Nullable;
@@ -39,11 +39,11 @@ public final class ParametricFunctionHead implements MatchHead {
      * {@link #toString}.
      */
     private final ParametricFunctionInstance pfi;
-    private final MatchInstruction similar;
-    private final MatchInstruction[] argMatchers;
+    private final MatchPlan similar;
+    private final MatchPlan[] argMatchers;
 
-    private ParametricFunctionHead(ParametricFunctionInstance pfi, MatchInstruction similar,
-            MatchInstruction[] argMatchers) {
+    private ParametricFunctionHead(ParametricFunctionInstance pfi, MatchPlan similar,
+            MatchPlan[] argMatchers) {
         this.pfi = pfi;
         this.similar = similar;
         this.argMatchers = argMatchers;
@@ -56,13 +56,13 @@ public final class ParametricFunctionHead implements MatchHead {
      */
     public static @Nullable ParametricFunctionHead of(ParametricFunctionInstance pfi) {
         final int argCount = pfi.getChildCount();
-        final MatchInstruction[] argMatchers = new MatchInstruction[argCount];
+        final MatchPlan[] argMatchers = new MatchPlan[argCount];
         for (int i = 0; i < argCount; i++) {
             final GenericArgument arg = (GenericArgument) pfi.getChild(i);
             if (arg.sort() instanceof GenericSort gs) {
                 argMatchers[i] = getMatchGenericSortInstruction(gs);
-            } else if (arg.sort() instanceof ParametricSortInstance) {
-                return null;
+            } else if (arg.sort() instanceof ParametricSortInstance psi) {
+                argMatchers[i] = new ParametricSortMatchPlan(psi);
             } else {
                 // identity suffices: equal instances intern to one shared object, arguments
                 // included (pinned by ParametricFunctionInterningTest)
@@ -76,18 +76,21 @@ public final class ParametricFunctionHead implements MatchHead {
     @Override
     public void emit(List<VMInstruction> out) {
         out.add(getCheckNodeKindInstruction(ParametricFunctionInstance.class));
-        out.add(similar);
+        similar.emit(out);
         out.add(gotoNextInstruction());
-        for (MatchInstruction argMatcher : argMatchers) {
-            out.add(argMatcher);
+        for (MatchPlan argMatcher : argMatchers) {
+            argMatcher.emit(out);
             out.add(gotoNextInstruction());
         }
     }
 
     @Override
     public MatchProgram compileHeadCheck() {
-        final MatchInstruction sim = similar;
-        final MatchInstruction[] args = argMatchers;
+        final MatchProgram sim = similar.compile();
+        final MatchProgram[] args = new MatchProgram[argMatchers.length];
+        for (int i = 0; i < argMatchers.length; ++i) {
+            args[i] = argMatchers[i].compile();
+        }
         return (element, mc, services) -> {
             if (!(((Term) element).op() instanceof ParametricFunctionInstance actualPfi)) {
                 return null;

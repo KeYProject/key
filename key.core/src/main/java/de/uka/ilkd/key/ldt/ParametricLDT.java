@@ -1,18 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
-import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.op.Function;
-import org.key_project.logic.sort.Sort;
 
 import java.util.Map;
 import java.util.TreeMap;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
+
+import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// An "LDT" or "language data type" class corresponds to a standard rule file shipped with KeY.
 /// Usually, this rule file declares a sort (such as "int") and a number of operators. The LDT class
@@ -31,7 +32,7 @@ public abstract class ParametricLDT extends AbstractLDT {
         sort = services.getNamespaces().parametricSorts().lookup(name);
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
     }
 

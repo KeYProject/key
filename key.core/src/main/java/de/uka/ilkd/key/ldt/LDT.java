@@ -41,7 +41,7 @@ public abstract class LDT extends AbstractLDT {
             sort = services.getNamespaces().sortAliases().lookup(name).aliasedSort();
             if (sort == null) {
                 throw new RuntimeException("LDT " + name + " not found.\n"
-                        + "It seems that there are definitions missing from the .key files.");
+                    + "It seems that there are definitions missing from the .key files.");
             }
         }
         this.sort = sort;
