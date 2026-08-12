@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -28,7 +29,8 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Alexander Weigl
  * @version 1 (4/12/26)
  */
-public final class UnaryOperator extends Operator implements ExpressionStatement {
+public final class UnaryOperator extends Operator
+        implements ExpressionStatement, ProgramElementWithKind<UnaryOperatorKind> {
     public UnaryOperator(UnaryOperatorKind kind, Expression arg) {
         super(arg);
         this.kind = Objects.requireNonNull(kind);

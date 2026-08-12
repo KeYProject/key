@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  *
  */
 @NullMarked
-public class Modifier extends JavaProgramElement {
+public class Modifier extends JavaProgramElement implements ProgramElementWithKind<ModifierKind> {
     public static Modifier[] createModifierList(ModifierKind... modifierKind) {
         Modifier[] modifiers = new Modifier[modifierKind.length];
         for (int i = 0; i < modifierKind.length; i++) {

@@ -10,11 +10,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -32,7 +34,8 @@ import static de.uka.ilkd.key.pp.PrettyPrinter.*;
  * @author Alexander Weigl
  * @version 1 (4/12/26)
  */
-public class LogicFunctionalOperator extends Operator {
+public class LogicFunctionalOperator extends Operator
+        implements ProgramElementWithKind<LogicFunction> {
 
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> comments, LogicFunction function,
             Expression... args) {
@@ -90,6 +93,11 @@ public class LogicFunctionalOperator extends Operator {
     private final LogicFunction function;
 
     public LogicFunction getFunction() {
+        return function;
+    }
+
+    @Override
+    public LogicFunction getKind() {
         return function;
     }
 
