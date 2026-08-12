@@ -57,6 +57,7 @@ import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
@@ -721,7 +722,7 @@ public final class AuxiliaryContractBuilders {
             for (LocationVariable variable : vars) {
                 final String anonymisationName = newName(prefix + variable.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), variable.sort(), true);
+                    new JFunction(new Name(anonymisationName), variable.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final JTerm elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);
@@ -1458,7 +1459,7 @@ public final class AuxiliaryContractBuilders {
                 final String anonymisationName =
                     tb.newName("init_" + ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), heap.sort(), true);
+                    new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }

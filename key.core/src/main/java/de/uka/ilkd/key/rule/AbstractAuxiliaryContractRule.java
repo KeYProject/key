@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * <p>
  * Rule for the application of {@link AuxiliaryContract}s.
@@ -123,7 +125,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonFunc);
             final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {

@@ -45,6 +45,8 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 @NullMarked
 public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     private static final Name NAME = new Name("InfFlow Loop Invariant");
@@ -177,7 +179,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
         final Function heapAtPreFunc =
-            new JFunction(heapAtPreName, heapLDT.targetSort(), true);
+            new JFunction(heapAtPreName, heapLDT.targetSort(), SKOLEM);
         services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final JTerm heapAtPre = tb.func(heapAtPreFunc);
 

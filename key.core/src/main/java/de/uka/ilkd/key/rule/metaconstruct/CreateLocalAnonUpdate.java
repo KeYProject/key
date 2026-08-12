@@ -17,6 +17,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * Expects a loop body and creates the anonymizing update
  * <code>out_1:=anon_1||...||out_n:=anon_n</code>, where anon_1, ..., anon_n are the written
@@ -69,7 +71,8 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     private static Function anonConstForPV(ProgramVariable pv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-        final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+        final Function anonFunc =
+            new JFunction(anonFuncName, pv.sort(), SKOLEM);
         services.getNamespaces().functions().addSafely(anonFunc);
 
         return anonFunc;

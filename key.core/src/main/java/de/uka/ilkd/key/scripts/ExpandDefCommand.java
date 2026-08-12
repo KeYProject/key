@@ -65,7 +65,9 @@ public class ExpandDefCommand extends AbstractCommand {
 
         TacletApp app = completions.head();
         app = app.tryToInstantiate(g.proof().getServices().getOverlay(g.getLocalNamespaces()));
-        if (app == null || !app.complete()) {
+        // the skolem constants of an application are created when the goal applies it, so an
+        // instantiated application is complete except for them
+        if (app == null || !app.completeExceptSkolemConstants()) {
             throw new ScriptException("Cannot complete the rule app");
         }
 
