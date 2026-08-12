@@ -45,6 +45,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 @NullMarked
 public class WhileInvariantRule implements BuiltInRule {
@@ -447,7 +448,7 @@ public class WhileInvariantRule implements BuiltInRule {
             final TermBuilder tb = services.getTermBuilder();
             for (LocationVariable pv : localOuts) {
                 final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-                final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+                final Function anonFunc = new JFunction(anonFuncName, pv.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonFunc);
                 final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
                 if (anonUpdate == null) {
@@ -467,8 +468,7 @@ public class WhileInvariantRule implements BuiltInRule {
             final TermBuilder tb = services.getTermBuilder();
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-            final Function loopHeapFunc =
-                new JFunction(loopHeapName, heapLDT.targetSort(), true);
+            final Function loopHeapFunc = new JFunction(loopHeapName, heapLDT.targetSort(), SKOLEM);
             services.getNamespaces().functions().addSafely(loopHeapFunc);
 
             final JTerm loopHeap = tb.func(loopHeapFunc);

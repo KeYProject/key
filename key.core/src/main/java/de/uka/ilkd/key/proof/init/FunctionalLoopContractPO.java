@@ -34,6 +34,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * A proof obligation for a {@link FunctionalLoopContract}.
  *
@@ -322,7 +324,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
             final Function anonymisationFunction =
-                new JFunction(new Name(anonymisationName), heap.sort(), true);
+                new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonInHeaps.put(heap, anonymisationFunction);
         }
@@ -346,7 +348,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), heap.sort(), true);
+                    new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
             }

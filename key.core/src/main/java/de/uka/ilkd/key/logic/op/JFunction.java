@@ -16,26 +16,42 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
+
 
 /**
  * Objects of this class represent function and predicate symbols in JavaDL. Note that program
- * variables are a
- * separate syntactic category, and not a type of function.
+ * variables are a separate syntactic category, and not a type of function.
  * <br>
  * <strong>As soon as {@link AbstractTermTransformer#METASORT} is generalized, this class
  * may be deleted.</strong>
  */
 public class JFunction extends Function implements Sorted, Operator {
 
-
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * Creates a function symbol with the specified signature and kind
+     *
+     * @param name the Name of the function symbol
+     * @param sort the Sort of the function symbol
+     * @param argSorts the Sorts of its parameters
+     * @param whereToBind if it is a binder the position where the bound variable is in scope (can
+     *        be used)
+     * @param unique a boolean indicating whether the symbol is unique
+     * @param kind the kind of the function symbol
+     * @param isRigid a boolean specifying whether the symbol is state depending (i.e., can have
+     *        different values
+     *        in different states)
+     * @param introductionTime the introduction time of the symbol, or a
+     *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
+     */
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-            boolean isSkolemConstant) {
-        super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
+            FunctionKind kind, int introductionTime) {
+        super(name, argSorts, sort, whereToBind, isRigid, unique, kind, introductionTime);
 
         assert sort != JavaDLTheory.UPDATE;
         assert !(unique && sort == JavaDLTheory.FORMULA);
@@ -45,12 +61,26 @@ public class JFunction extends Function implements Sorted, Operator {
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique) {
-        this(name, sort, argSorts, whereToBind, unique, true, false);
+        this(name, sort, argSorts, whereToBind, unique, true, ORDINARY, UNRECORDED);
     }
 
+    /**
+     * Creates a function symbol with the specified signature and kind
+     *
+     * @param name the Name of the function symbol
+     * @param sort the Sort of the function symbol
+     * @param argSorts the Sorts of its parameters
+     * @param whereToBind if it is a binder the position where the bound variable is in scope (can
+     *        be used)
+     * @param unique a boolean indicating whether the symbol is unique
+     * @param kind the kind of the function symbol
+     * @param introductionTime the introduction time of the symbol, or a
+     *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
+     */
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
-        this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
+            ImmutableArray<Boolean> whereToBind, boolean unique, FunctionKind kind,
+            int introductionTime) {
+        this(name, sort, argSorts, whereToBind, unique, true, kind, introductionTime);
     }
 
     public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
@@ -59,16 +89,8 @@ public class JFunction extends Function implements Sorted, Operator {
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
-            boolean unique,
-            boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
-            isSkolemConstant);
-    }
-
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
-        this(name, sort, argSorts, null, false, isRigid, false);
+        this(name, sort, argSorts, null, false, isRigid, ORDINARY, UNRECORDED);
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
@@ -79,16 +101,19 @@ public class JFunction extends Function implements Sorted, Operator {
         this(name, sort, argSorts, null, false);
     }
 
-    public JFunction(Name name, Sort sort, boolean isSkolemConstant, Sort... argSorts) {
-        this(name, sort, argSorts, null, false, isSkolemConstant);
-    }
-
     public JFunction(Name name, Sort sort) {
         this(name, sort, new ImmutableArray<>(), null, false);
     }
 
-    public JFunction(Name name, Sort sort, boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant);
+    /**
+     * Creates a constant of the given kind
+     */
+    public JFunction(Name name, Sort sort, FunctionKind kind) {
+        this(name, sort, new ImmutableArray<>(), null, false, true, kind, UNRECORDED);
+    }
+
+    public JFunction(Name name, Sort sort, FunctionKind kind, int introductionTime) {
+        this(name, sort, new ImmutableArray<>(), null, false, true, kind, introductionTime);
     }
 
     /**

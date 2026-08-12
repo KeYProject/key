@@ -25,7 +25,6 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.SessionCaches;
 import org.key_project.prover.rules.Taclet;
@@ -80,11 +79,8 @@ import org.key_project.util.collection.Pair;
  * whose
  * value could be recomputed to something different, after an eviction, under a different access
  * order; for those, approximate or striped eviction was observed to change proofs. Caches whose
- * value does not depend on access order do not need this (for example
- * {@link #introductionTimeCache},
- * whose value is the depth at which an operator was introduced below the proof root and is the same
- * for every goal beneath that point). The weak-keyed caches instead stay wrapped in
- * {@link Collections#synchronizedMap}.
+ * value does not depend on access order do not need this. The weak-keyed caches instead stay
+ * wrapped in {@link Collections#synchronizedMap}.
  * </p>
  *
  * @author Martin Hentschel
@@ -110,13 +106,6 @@ public class ServiceCaches implements SessionCaches {
     private final Map<JTerm, TermInfo> betaCandidates =
         new ConcurrentLruCache<>(1000);
 
-
-    /**
-     * the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for Skolem
-     * constants
-     */
-    private final Map<Operator, Integer> introductionTimeCache =
-        new ConcurrentLruCache<>(10000);
 
     /**
      * Per-proof cache for {@code CostReuse}'s feature-locality classification (taclet -> its
@@ -233,14 +222,6 @@ public class ServiceCaches implements SessionCaches {
 
     public final Map<JTerm, TermInfo> getBetaCandidates() {
         return betaCandidates;
-    }
-
-    /**
-     * returns the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for
-     * Skolem constants
-     */
-    public final Map<Operator, Integer> getIntroductionTimeCache() {
-        return introductionTimeCache;
     }
 
     public final Map<Taclet, Object> getCostReuseClassificationCache() {

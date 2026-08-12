@@ -103,7 +103,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             // transformation; such symbols are smaller than other symbols (and
             // the smaller the later they were introduced)
 
-            final int v = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
+            final int v = introductionTime(t2.op()) - introductionTime(t1.op());
             if (v < 0) {
                 return true;
             }
@@ -141,7 +141,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             atoms1 = atoms1.tail();
             atoms2 = atoms2.tail();
 
-            final int c = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
+            final int c = introductionTime(t2.op()) - introductionTime(t1.op());
             if (c != 0) {
                 return c;
             }

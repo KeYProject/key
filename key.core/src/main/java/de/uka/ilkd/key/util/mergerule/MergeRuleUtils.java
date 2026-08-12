@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -417,7 +418,7 @@ public class MergeRuleUtils {
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new JFunction(new Name(newName), sort, true);
+            result = new JFunction(new Name(newName), sort, SKOLEM);
             services.getNamespaces().functions().add(result);
         } while (newName.equals(prefix));
 
@@ -1381,7 +1382,7 @@ public class MergeRuleUtils {
      */
     private static Function rename(Name newName, Function old) {
         return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
-            old.isUnique(), old.isSkolemConstant());
+            old.isUnique(), old.kind(), old.introductionTime());
     }
 
     /**

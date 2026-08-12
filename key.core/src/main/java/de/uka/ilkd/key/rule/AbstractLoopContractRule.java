@@ -30,6 +30,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * <p>
  * Rule for the application of {@link LoopContract}s.
@@ -135,8 +137,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
                     // but not in other branches, e.g., do-while loops might need to apply the same
-                    // contract
-                    // twice in its usage branch
+                    // contract twice in its usage branch
                     return true;
                 }
             }
@@ -213,7 +214,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), variable.sort(), true);
+                    new JFunction(new Name(anonymisationName), variable.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }

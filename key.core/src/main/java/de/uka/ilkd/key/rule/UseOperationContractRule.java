@@ -45,6 +45,8 @@ import org.key_project.util.collection.*;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
@@ -275,7 +277,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
         final Function methodHeapFunc =
-            new JFunction(methodHeapName, heapLDT.targetSort(), true);
+            new JFunction(methodHeapName, heapLDT.targetSort(), SKOLEM);
         services.getNamespaces().functions().addSafely(methodHeapFunc);
         final JTerm methodHeap = tb.func(methodHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));

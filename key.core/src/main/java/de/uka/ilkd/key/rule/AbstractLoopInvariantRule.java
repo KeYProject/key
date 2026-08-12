@@ -34,6 +34,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
@@ -219,7 +220,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         return localOuts.stream().map(pv -> {
             final Function anonFunc =
-                new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
+                new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonFunc);
 
             return tb.elementary(pv, tb.func(anonFunc));
@@ -432,7 +433,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
         final Function loopHeapFunc =
-            new JFunction(loopHeapName, heapLDT.targetSort(), true);
+            new JFunction(loopHeapName, heapLDT.targetSort(), SKOLEM);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final JTerm loopHeap = tb.func(loopHeapFunc);

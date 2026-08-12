@@ -24,11 +24,14 @@ public class Modifier implements Named {
     /// A rigid (non-flexible) function.
     public static final Modifier RIGID = create("rigid", 1);
 
-    /// A skolem function.
+    /// A skolem symbol.
     public static final Modifier SKOLEM = create("skolem", 1 << 1);
 
     /// A unique function.
     public static final Modifier UNIQUE = create("unique", 1 << 2);
+
+    /// A skolem symbol that abbreviates a term through a defining equation. Implies [#SKOLEM].
+    public static final Modifier DEFINITIONAL_SKOLEM = create("definitionalSkolem", 1 << 3);
 
     static Modifier create(String name, int bitMask) {
         var mod = MODIFIERS.get(bitMask);
