@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -320,7 +321,18 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnAssignment(final BinaryAssignment x) {
+    public void performActionOnUnaryAssignment(final UnaryAssignment x) {
+        DefaultAction def = new DefaultAction() {
+            @Override
+            ProgramElement createNewElement(final ExtList changeList) {
+                return new UnaryAssignment(x.getKind(), changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnBinaryAssignment(final BinaryAssignment x) {
         DefaultAction def = new DefaultAction() {
             @Override
             ProgramElement createNewElement(final ExtList changeList) {

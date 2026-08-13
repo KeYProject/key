@@ -44,6 +44,8 @@ import org.key_project.util.collection.*;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.*;
+
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
@@ -946,7 +948,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 resultAssign = new StatementBlock();
             } else {
                 final Assignment ca =
-                    new BinaryAssignment(BinaryAssignment.AssignmentKind.COPY, inst.actualResult,
+                    new BinaryAssignment(COPY, inst.actualResult,
                         resultVar);
                 resultAssign = new StatementBlock(ca);
             }

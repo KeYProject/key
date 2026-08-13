@@ -15,6 +15,7 @@ import org.key_project.logic.SyntaxElement;
  */
 public class JavaAstUtils {
     public static boolean isCopyAssignment(SyntaxElement a) {
-        return a instanceof Assignment b && b.getKind() == BinaryAssignment.AssignmentKind.COPY;
+        return a instanceof Assignment b
+                && b.getKind() == BinaryAssignment.BinaryAssignmentKind.COPY;
     }
 }

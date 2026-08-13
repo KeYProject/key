@@ -22,7 +22,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 

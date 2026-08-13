@@ -980,7 +980,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             callStatement = mr;
         } else {
             callStatement =
-                new BinaryAssignment(BinaryAssignment.AssignmentKind.COPY, originalResultVar, mr);
+                new BinaryAssignment(BinaryAssignment.BinaryAssignmentKind.COPY, originalResultVar,
+                    mr);
         }
         final CatchAllStatement cas = new CatchAllStatement(new StatementBlock(callStatement),
             originalExcVar);

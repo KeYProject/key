@@ -13,7 +13,10 @@ import de.uka.ilkd.key.java.ast.SourceElement;
  * Role interface to catch assignments via one type check.
  * An assignment is an operator with side-effects.
  */
-public interface Assignment<K extends Enum<K>>
+public interface Assignment<K extends Enum<K> & AssignmentKind>
         extends SourceElement, ProgramElement, NonTerminalProgramElement, Expression,
         ExpressionContainer, ExpressionStatement, ProgramElementWithKind<K> {
+
+    @Override
+    K getKind();
 }

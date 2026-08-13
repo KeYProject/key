@@ -996,7 +996,18 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnAssignment(BinaryAssignment x) {
+    public void performActionOnUnaryAssignment(UnaryAssignment x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new UnaryAssignment(x.getKind(), changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnBinaryAssignment(BinaryAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
@@ -1005,6 +1016,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+
 
     @Override
     public void performActionOnJmlAssert(JmlAssert x) {

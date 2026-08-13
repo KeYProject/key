@@ -42,7 +42,7 @@ import org.key_project.util.collection.ImmutableSet;
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 /**
  * <p>
