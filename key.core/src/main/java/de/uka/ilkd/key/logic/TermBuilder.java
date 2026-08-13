@@ -2176,6 +2176,16 @@ public class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
+    public JTerm msetEmpty(Sort instanceSort) {
+        return func(services.getTypeConverter().getMSetLDT().getMsetEmpty(instanceSort, services));
+    }
+
+    public JTerm msetRange(QuantifiableVariable qv, JTerm left, JTerm right, JTerm supplier, Sort instanceSort) {
+        return func(services.getTypeConverter().getMSetLDT().getMsetRange(instanceSort, services),
+                new JTerm[] { left, right, supplier },
+                new ImmutableArray<>(qv));
+    }
+
     // -------------------------------------------------------------------------
     // misc (moved from key.util.MiscTools)
     // -------------------------------------------------------------------------

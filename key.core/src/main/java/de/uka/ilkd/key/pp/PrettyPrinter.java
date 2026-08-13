@@ -7,6 +7,9 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.ccatch.*;
@@ -16,6 +19,7 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -407,6 +411,55 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnEmptyMSetLiteral(EmptyMSetLiteral x) {
+        layouter.print("\\mset_empty");
+    }
+
+
+
+    @Override
+    public void performActionOnMSetUnion(MSetUnion x) {
+        printDLFunctionOperator("\\mset_union", x);
+    }
+
+    @Override
+    public void performActionOnMSetIntersect(
+            MSetIntersect x) {
+        printDLFunctionOperator("\\mset_intersection", x);
+    }
+
+    @Override
+    public void performActionOnMSetSum(MSetSum x) {
+        printDLFunctionOperator("\\mset_sum", x);
+    }
+
+    @Override
+    public void performActionOnMSetDiff(MSetDiff x) {
+        printDLFunctionOperator("\\mset_diff", x);
+    }
+
+    @Override
+    public void performActionOnMSetSingle(
+            MSetSingle x) {
+        printDLFunctionOperator("\\mset_single", x);
+    }
+
+    @Override
+    public void performActionOnMSetMul(MSetMul x) {
+        x.getChildAt(0).visit(this);
+        layouter.print("[");
+        x.getChildAt(1).visit(this);
+        layouter.print("]");
+    }
+
+    @Override
+    public void performActionOnMSetCard(MSetCard x) {
+        x.getChildAt(0).visit(this);
+        layouter.print(".length");
+    }
+
+
+    @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         layouter.print("\\dl_" + x.getFunctionSymbol().name());
         layouter.print("(");
@@ -628,8 +681,10 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printTypeReference(ReferencePrefix prefix, @Nullable KeYJavaType type,
-            ProgramElementName name, boolean fullTypeNames) {
+    private void printTypeReference(ReferencePrefix prefix,
+            @Nullable KeYJavaType type,
+            ProgramElementName name,
+            boolean fullTypeNames) {
         printReferencePrefix(prefix);
         if (fullTypeNames && type != null) {
             layouter.print(type.getFullName());

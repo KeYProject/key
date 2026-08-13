@@ -1743,8 +1743,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     expr.getType());
             case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
                 declVars.second);
+
             case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
                 declVars.second);
+
             case JmlLexer.NUM_OF -> {
                 KeYJavaType kjtInt =
                     services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
@@ -1857,6 +1859,21 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression b = accept(ctx.expression(1));
         SLExpression t = accept(ctx.expression(2));
         SLExpression result = termFactory.createSeqDef(a, b, t, decls.first, decls.second);
+        resolverManager.popLocalVariablesNamespace();
+        return result;
+    }
+
+    @Override
+    public Object visitMsetrangeterm(JmlParser.MsetrangetermContext ctx) {
+        Pair<KeYJavaType, ImmutableList<LogicVariable>> decls = accept(ctx.quantifiedvardecls());
+        resolverManager.pushLocalVariablesNamespace();
+        assert decls != null;
+        resolverManager.putIntoTopLocalVariablesNamespace(decls.second, decls.first);
+        SLExpression left = accept(ctx.expression(0));
+        SLExpression right = accept(ctx.expression(1));
+        SLExpression supplier = accept(ctx.expression(2));
+        assert supplier != null;
+        SLExpression result = termFactory.createMsetRange(left, right, supplier, decls.first, decls.second);
         resolverManager.popLocalVariablesNamespace();
         return result;
     }
