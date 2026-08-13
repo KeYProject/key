@@ -143,11 +143,11 @@ public class LogicFunctionalOperator extends Operator
             return false;
         if (!super.equals(o))
             return false;
-        return function == that.function && Objects.equals(that.children, children);
+        return function == that.function;
     }
 
     @Override
     protected int computeHashCode() {
-        return Objects.hash(function, children);
+        return 0x01000193 * super.computeHashCode() + function.hashCode();
     }
 }
