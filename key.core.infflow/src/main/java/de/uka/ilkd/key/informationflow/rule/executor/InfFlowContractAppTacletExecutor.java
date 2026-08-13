@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
-import de.uka.ilkd.key.util.properties.Properties;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -19,6 +18,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.Properties;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;

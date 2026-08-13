@@ -76,10 +76,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return false;
     }
 
-    private static class AutoPilotStrategy implements Strategy<Goal> {
+    private static class AutoPilotStrategy implements JavaStrategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private final Strategy<@NonNull Goal> delegate;
+        private final org.key_project.prover.strategy.Strategy<@NonNull Goal> delegate;
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
@@ -144,7 +144,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio,
                 Goal goal,
-                RuleAppCostCollector collector) {
+                org.key_project.prover.strategy.RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
@@ -156,7 +156,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+    protected org.key_project.prover.strategy.Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }

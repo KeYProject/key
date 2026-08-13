@@ -5,11 +5,11 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -24,7 +24,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     private final Function add, mul, Z;
 
 
-    protected AbstractMonomialSmallerThanFeature(IntegerLDT numbers) {
+    protected AbstractMonomialSmallerThanFeature(IIntLdt numbers) {
         this.add = numbers.getAdd();
         this.mul = numbers.getMul();
         this.Z = numbers.getNumberSymbol();

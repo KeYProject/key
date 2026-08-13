@@ -11,13 +11,13 @@ import java.util.Optional;
 import de.uka.ilkd.key.macros.FilterStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -42,7 +42,8 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private final List<Pair<String, RuleAppCost>> additionalRules;
     private final boolean exclusive;
 
-    public AdditionalRulesStrategy(Strategy delegate, String additionalRules, boolean exclusive) {
+    public AdditionalRulesStrategy(Strategy<Goal> delegate, String additionalRules,
+            boolean exclusive) {
         super(delegate);
         this.additionalRules = parseAddRules(additionalRules);
         this.exclusive = exclusive;

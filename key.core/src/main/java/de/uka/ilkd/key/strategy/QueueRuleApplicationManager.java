@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  * {@link #next()}. This operation will remove the element from the queue. The priority of a given
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
- * {@link RuleApp} is computed according to a given {@link Strategy} (see
+ * {@link RuleApp} is computed according to a given {@link JavaStrategy} (see
  * {@link Feature#computeCost(RuleApp, PosInOccurrence, ProofGoal, MutableState)}).
  *
  * <h2>Why the set-aside state of this class belongs to one goal only</h2>

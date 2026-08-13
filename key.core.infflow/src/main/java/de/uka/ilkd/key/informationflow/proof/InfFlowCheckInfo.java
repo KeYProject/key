@@ -6,8 +6,9 @@ package de.uka.ilkd.key.informationflow.proof;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.properties.Properties;
-import de.uka.ilkd.key.util.properties.Properties.Property;
+
+import org.key_project.util.Properties;
+import org.key_project.util.Properties.Property;
 
 
 /// Helper class to access Information Flow information in the [StrategySettings]

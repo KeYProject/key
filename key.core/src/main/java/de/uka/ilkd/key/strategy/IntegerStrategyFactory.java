@@ -10,7 +10,7 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
-/// Factory for [IntegerStrategy]. Additionally, handles all strategy settings
+/// Factory for [JavaIntegerStrategy]. Additionally, handles all strategy settings
 /// relevant to integers.
 public class IntegerStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_ARITHMETIC_BASE = """
@@ -51,8 +51,10 @@ public class IntegerStrategyFactory implements StrategyFactory {
     }
 
     @Override
-    public IntegerStrategy create(Proof proof, StrategyProperties strategyProperties) {
-        return new IntegerStrategy(proof, strategyProperties);
+    public JavaIntegerStrategy create(Proof proof, StrategyProperties strategyProperties) {
+        var tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
+        var ff = new FormulaTermFeatures(tf);
+        return new JavaIntegerStrategy(tf, ff, proof, strategyProperties);
     }
 
     @Override
@@ -63,6 +65,6 @@ public class IntegerStrategyFactory implements StrategyFactory {
 
     @Override
     public Name name() {
-        return IntegerStrategy.NAME;
+        return JavaIntegerStrategy.NAME;
     }
 }

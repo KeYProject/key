@@ -15,6 +15,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 /**
  * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
  * matched to different members of the sequent. If a taclet has more than one formula in its
@@ -33,7 +35,8 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
     private DiffFindAndIfFeature() {}
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         ImmutableList<AssumesFormulaInstantiation> list = app.assumesFormulaInstantiations();

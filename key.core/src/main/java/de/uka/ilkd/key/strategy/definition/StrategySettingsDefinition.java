@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy.definition;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.settings.StrategySettings;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * Each {@link StrategyFactory} should provide an instance of this class to define the user
  * interface which the user can use to edit supported {@link StrategySettings} in created
- * {@link Strategy} instances. If a {@link StrategyFactory} provides no
+ * {@link JavaStrategy} instances. If a {@link StrategyFactory} provides no
  * {@link StrategySettingsDefinition} an empty user interface or even bedder an error message should
  * be shown to the user.
  * </p>

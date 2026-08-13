@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,22 +10,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -38,7 +37,7 @@ public class RuleSetDispatchFeature implements Feature {
 
     private static final Feature[] NO_FEATURES = new Feature[0];
 
-    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
+    private final Map<@NonNull RuleSet, @NonNull Feature> rulesetToFeature = new LinkedHashMap<>();
 
     /**
      * For each taclet the features bound to the rule sets the taclet belongs to, in rule
@@ -49,7 +48,7 @@ public class RuleSetDispatchFeature implements Feature {
      */
     private final Map<Taclet, Feature[]> featuresByTaclet = new ConcurrentHashMap<>();
 
-    public Set<RuleSet> ruleSets() {
+    public Set<@KeyFor("this.rulesetToFeature") RuleSet> ruleSets() {
         return rulesetToFeature.keySet();
     }
 
@@ -57,12 +56,12 @@ public class RuleSetDispatchFeature implements Feature {
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        if (!(app instanceof TacletApp)) {
+        if (!(app instanceof ITacletApp tapp)) {
             return NumberRuleAppCost.getZeroCost();
         }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        for (Feature partialF : featuresFor(((TacletApp) app).taclet())) {
+        for (Feature partialF : featuresFor(tapp.taclet())) {
             res = res.add(partialF.computeCost(app, pos, goal, mState));
             if (res instanceof TopRuleAppCost) {
                 break;
@@ -120,7 +119,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature get(RuleSet ruleSet) {
+    public @Nullable Feature get(@NonNull RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
     }
 
@@ -131,7 +130,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature remove(RuleSet ruleSet) {
+    public @Nullable Feature remove(@NonNull RuleSet ruleSet) {
         featuresByTaclet.clear();
         return rulesetToFeature.remove(ruleSet);
     }
