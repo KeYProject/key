@@ -798,11 +798,12 @@ public class LogicPrinter {
      * @param semiseq the semisequent to be printed
      */
     public void printSemisequent(Semisequent semiseq) {
-        for (int i = 0; i < semiseq.size(); i++) {
+        int idx = semiseq.size();
+        for (SequentFormula formula : semiseq) {
             layouter.markStartSub();
-            printConstrainedFormula(semiseq.get(i));
+            printConstrainedFormula(formula);
             layouter.markEndSub();
-            if (i != semiseq.size() - 1) {
+            if (--idx != 0) {
                 layouter.print(",").brk();
             }
         }

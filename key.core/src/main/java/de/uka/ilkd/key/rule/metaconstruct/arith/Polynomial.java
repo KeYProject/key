@@ -52,16 +52,11 @@ public class Polynomial {
         polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
             services);
 
-        Polynomial res;
-        synchronized (cache) {
-            res = cache.get(polyTerm);
-        }
+        Polynomial res = cache.get(polyTerm);
 
         if (res == null) {
             res = createHelp(polyTerm, services);
-            synchronized (cache) {
-                cache.put(polyTerm, res);
-            }
+            cache.put(polyTerm, res);
         }
         return res;
     }

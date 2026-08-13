@@ -207,7 +207,7 @@ public class TestDropEffectlessElementary {
             return term;
         }
 
-        return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
+        return mc.getInstantiations().getTermInstantiation(result, TacletForTests.services());
     }
 
 }

@@ -81,6 +81,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
         monomialEquation = opSub(eq, add(intF, nonNegMonomial), add(intF, monomial));
         intInEquation = add(or(leqF, geqF), sub(nonNegMonomial, polynomial));
         linearInEquation = add(or(leqF, geqF), sub(linearMonomial, polynomial));
+        intRelationOp = add(or(leqF, geqF, eqF), sub(intF, intF));
         intRelation = add(or(leqF, geqF, eqF), sub(add(intF, nonNegMonomial), polynomial));
 
         notContainsProduct = rec(any(), ifZero(mulF, not(sub(not(literal), not(literal)))));
@@ -147,6 +148,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
     final TermFeature monomialEquation;
     final TermFeature intInEquation;
     final TermFeature linearInEquation;
+    final TermFeature intRelationOp;
     final TermFeature intRelation;
 
     final TermFeature notContainsProduct;
