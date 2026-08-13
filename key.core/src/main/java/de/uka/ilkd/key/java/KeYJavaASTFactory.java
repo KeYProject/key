@@ -1140,7 +1140,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static IForUpdates postIncrementForUpdates(final ProgramVariable variable) {
         final Expression update =
-            new UnaryOperator(UnaryOperatorKind.POST_INCREMENT, variable);
+            new UnaryAssignment(UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT, variable);
         return forUpdates(update);
     }
 

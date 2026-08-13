@@ -14,13 +14,7 @@ public enum UnaryOperatorKind {
     LOGICAL_NOT("!", 1),
     NEGATIVE("-", 1),
     POSITIVE("+", 1),
-    BINARY_NOT("~", 1),
-
-    PRE_INCREMENT("++", 0),
-    PRE_DECREMENT("--", 0),
-    POST_INCREMENT("++", 0, Operator.POSTFIX),
-    POST_DECREMENT("--", 0, Operator.POSTFIX);
-
+    BINARY_NOT("~", 1);
 
     public final String symbol;
     public final int precedence;

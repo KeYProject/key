@@ -6,10 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.Assignment;
-import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.reference.*;
@@ -311,4 +308,6 @@ public interface Visitor {
     void performActionOnLogicFunctionalOperator(LogicFunctionalOperator op);
 
     void performActionOnAssignment(Assignment assignment);
+
+    void performActionOnAssignment(UnaryAssignment assignment);
 }
