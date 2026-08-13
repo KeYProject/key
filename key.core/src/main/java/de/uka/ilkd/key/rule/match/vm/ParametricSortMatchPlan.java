@@ -8,7 +8,6 @@ import java.util.List;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchGenericSortInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.SimilarParametricSortInstruction;
 
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -17,7 +16,7 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.*;
 
 public final class ParametricSortMatchPlan implements MatchPlan {
-    private final MatchPlan similar;
+    private final MatchInstruction similar;
     private final List<MatchPlan> children;
 
     public ParametricSortMatchPlan(ParametricSortInstance psi) {
@@ -25,14 +24,14 @@ public final class ParametricSortMatchPlan implements MatchPlan {
             if (a.sort() instanceof ParametricSortInstance s) {
                 return new ParametricSortMatchPlan(s);
             } else if (a.sort() instanceof GenericSort gs) {
-                return new MatchGenericSortInstruction(gs);
+                return new GenericSortPlan(gs);
             } else {
-                return new MatchIdentityInstruction(a);
+                return new IdentityMatchPlan(a);
             }
         }).toList());
     }
 
-    public ParametricSortMatchPlan(MatchPlan similar, List<MatchPlan> children) {
+    public ParametricSortMatchPlan(MatchInstruction similar, List<MatchPlan> children) {
         this.similar = similar;
         this.children = children;
     }
@@ -40,7 +39,7 @@ public final class ParametricSortMatchPlan implements MatchPlan {
     @Override
     public void emit(List<VMInstruction> out) {
         out.add(new CheckNodeKindInstruction(ParametricSortInstance.class));
-        similar.emit(out);
+        out.add(similar);
         out.add(GotoNextInstruction.INSTANCE);
         for (MatchPlan child : children) {
             child.emit(out);
@@ -49,7 +48,7 @@ public final class ParametricSortMatchPlan implements MatchPlan {
 
     @Override
     public MatchProgram compile() {
-        final MatchProgram headCheck = similar.compile();
+        final MatchProgram headCheck = similar::match;
         final int n = children.size();
         final MatchProgram[] childMatchers = new MatchProgram[n];
         for (int i = 0; i < n; i++) {
@@ -73,6 +72,5 @@ public final class ParametricSortMatchPlan implements MatchPlan {
             }
             return r;
         };
-
     }
 }

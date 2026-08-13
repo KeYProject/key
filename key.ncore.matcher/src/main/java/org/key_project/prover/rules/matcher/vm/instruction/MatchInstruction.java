@@ -3,14 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.matcher.vm.instruction;
 
-import java.util.List;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.prover.rules.matcher.compiler.MatchPlan;
-import org.key_project.prover.rules.matcher.vm.MatchProgram;
 
 import org.jspecify.annotations.Nullable;
 
@@ -30,7 +27,7 @@ import org.jspecify.annotations.Nullable;
  * @see SyntaxElement
  * @see PoolSyntaxElementCursor
  */
-public interface MatchInstruction extends VMInstruction, MatchPlan {
+public interface MatchInstruction extends VMInstruction {
 
     /**
      * Default implementation of the matching operation defined by {@link VMInstruction}.
@@ -64,14 +61,4 @@ public interface MatchInstruction extends VMInstruction, MatchPlan {
     @Nullable
     MatchResultInfo match(SyntaxElement actualElement,
             MatchResultInfo matchConditions, LogicServices services);
-
-    @Override
-    default void emit(List<VMInstruction> out) {
-        out.add(this);
-    }
-
-    @Override
-    default MatchProgram compile() {
-        return this::match;
-    }
 }
