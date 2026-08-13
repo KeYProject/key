@@ -307,7 +307,7 @@ public interface Visitor {
 
     void performActionOnLogicFunctionalOperator(LogicFunctionalOperator op);
 
-    void performActionOnAssignment(Assignment assignment);
+    void performActionOnAssignment(BinaryAssignment assignment);
 
     void performActionOnAssignment(UnaryAssignment assignment);
 }

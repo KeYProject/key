@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.logic.JTerm;
@@ -191,7 +192,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("Assignment");
+        contGoal.setBranchLabel("BinaryAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -201,7 +202,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "Assignment" cont branch
+        // ---- create "BinaryAssignment" cont branch
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
@@ -255,7 +256,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("Assignment");
+        contGoal.setBranchLabel("BinaryAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -264,7 +265,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "Assignment" cont branch
+        // ---- create "BinaryAssignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
         JModality modality = JModality.getModality(inst.modality().kind(), postJavaBlock);
@@ -356,7 +357,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
         if (!(activeStatement instanceof Assignment ca
-                && ca.getKind() == Assignment.AssignmentKind.COPY)) {
+                && ca.getKind() == BinaryAssignment.AssignmentKind.COPY)) {
             return null;
         }
 
