@@ -227,9 +227,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (!target.equals(ax.target) || !kjt.equals(ax.kjt)) {
             throw new RuntimeException("Tried to conjoin incompatible represents axioms.");
         }
-        ModifierKind minVisibility = visibility == null
-                ? (ModifierKind.PRIVATE == ax.visibility ? ax.visibility : null)
-                : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
+        ModifierKind minVisibility = ModifierKind.moreRestrictive(visibility, ax.visibility);
         JTerm newRep = tb.and(originalRep, ax.originalRep);
         JTerm newPre;
         if (originalPre == null) {
