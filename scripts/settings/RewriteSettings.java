@@ -101,8 +101,14 @@ public class RewriteSettings {
                     return;
                 }
 
+                System.out.println(token);
                 final var text = token.getText();
+
+                while (iterator.hasNext() && token.getType() == JavaKeYLexer.WS) {
+                    token = iterator.next();
+                }
                 token = iterator.next();
+                System.out.println(token);
 
                 if (token.getType() != JavaKeYLexer.RBRACE) {
                     return;
