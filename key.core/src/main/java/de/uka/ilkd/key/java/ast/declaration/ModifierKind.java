@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author Alexander Weigl
@@ -78,11 +80,36 @@ public enum ModifierKind {
         };
     }
 
-    // changed that to static as Visibility modifier for package private is encoded as null
-    // and caused NPE; is JML_PACKAGE something else than package private? Should it be included
-    // here?
-    // or do we need to handle package private differently and provide a proper modifer?
+    /** Visibility order: public < protected < package-private < private */
+    private static int visibilityLevel(@Nullable ModifierKind kind) {
+        if (kind == null || kind == JML_PACKAGE) { // Java's package private is null
+            return 2;
+        }
+        return switch (kind) {
+            case PUBLIC -> 0;
+            case PROTECTED -> 1;
+            case PRIVATE -> 3;
+            default -> throw new IllegalArgumentException("not a visibility: " + kind);
+        };
+    }
+
+    /**
+     * returns the more restrictive modifier: public < protected < package-private < private
+     * TODO: as package private is modelled as null or JML_PACKAGE the returned value
+     * depends on the order (a == null, b==JML_PACKAGE returns null, a and b swapped returns
+     * JML_PACKAGE)
+     * As long as we have the asymmetry with the modelling that cannot be solved cleanly
+     *
+     * @param a first modifier
+     * @param b second modifier
+     * @return the more restrictive modifier
+     */
+    public static @Nullable ModifierKind moreRestrictive(@Nullable ModifierKind a,
+            @Nullable ModifierKind b) {
+        return visibilityLevel(a) >= visibilityLevel(b) ? a : b;
+    }
+
     public static boolean allowsInheritance(ModifierKind kind) {
-        return kind == PUBLIC || kind == PROTECTED || kind == JML_PACKAGE;
+        return kind == PUBLIC || kind == PROTECTED;
     }
 }
