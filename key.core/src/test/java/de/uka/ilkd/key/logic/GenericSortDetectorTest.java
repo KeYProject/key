@@ -57,8 +57,8 @@ class GenericSortDetectorTest {
 
     /**
      * The case that a plain {@code instanceof GenericSort} check would miss: a sort that is not
-     * itself a generic sort but <em>contains</em> one, like {@code List<[G1]>} (the same situation
-     * arises for {@code select<[E]>(...)}). Detection must rely on
+     * itself a generic sort but <em>contains</em> one, like {@code List<G1>} (the same situation
+     * arises for {@code select<E>(...)}). Detection must rely on
      * {@link Sort#containsGenericSort()}.
      */
     @Test
@@ -80,7 +80,7 @@ class GenericSortDetectorTest {
 
         List<Sort> found = GenericSortDetector.findIn(t);
         assertEquals(List.of(listOfG1), found,
-            "a generic sort nested in a parametric sort (List<[G1]>) must be detected, even "
+            "a generic sort nested in a parametric sort (List<G1>) must be detected, even "
                 + "though the term's sort is not itself a GenericSort");
         assertTrue(found.get(0).containsGenericSort());
         assertFalse(found.get(0) instanceof GenericSort,

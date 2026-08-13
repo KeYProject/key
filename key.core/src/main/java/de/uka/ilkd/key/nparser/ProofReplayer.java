@@ -7,8 +7,8 @@ import java.net.URI;
 import java.util.*;
 
 import de.uka.ilkd.key.proof.io.IProofFileParser;
-import de.uka.ilkd.key.util.parsing.LocatableException;
 
+import org.key_project.util.parsing.LocatableException;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 

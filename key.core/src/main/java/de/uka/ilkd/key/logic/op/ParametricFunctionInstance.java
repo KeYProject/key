@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.WeakValueInterner;
@@ -67,8 +68,7 @@ public class ParametricFunctionInstance extends JFunction {
 
     private static Name makeName(ParametricFunctionDecl base,
             ImmutableList<GenericArgument> parameters) {
-        // The [ ] are produced by the list's toString method.
-        return new Name(base.name() + "<" + parameters + ">");
+        return new Name(base.name() + Strings.formatAsList(parameters, "<", ",", ">"));
     }
 
     /// Instantiates the arguments of `base` with the instantiations for the generic sorts in

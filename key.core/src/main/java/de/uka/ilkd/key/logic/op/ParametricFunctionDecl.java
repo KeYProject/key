@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/// The abstract declaration of a parametric function, e.g., `append<[E]>(List<[E]>, List<[E]>)`.
+/// The abstract declaration of a parametric function, e.g., `append<E>(List<E>, List<E>)`.
 ///
 /// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
 /// ImmutableList, de.uka.ilkd.key.java.Services)].

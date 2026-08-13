@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
@@ -271,7 +272,7 @@ class TermImpl implements JTerm {
         }
         if (nameHash == -1) {
             int h = 5;
-            h = h * 31 + op.name().toString().hashCode();
+            h = h * 31 + computeOperatorNameHash(op);
             h = h * 31 + arity();
             for (int i = 0; i < n; i++) {
                 h = h * 31 + subs.get(i).nameHash();
@@ -300,6 +301,36 @@ class TermImpl implements JTerm {
                 h = 0;
             }
             labelAgnosticHash = h;
+        }
+    }
+
+    private int computeOperatorNameHash(Operator op) {
+        if (op instanceof ParametricFunctionInstance pfi) {
+            // using just pfi's name would introduce a dependency on its
+            // concrete syntax impacting robustness
+            int h = 7;
+            h = h * 31 + pfi.getBase().name().toString().hashCode();
+            for (final GenericArgument arg : pfi.getArgs()) {
+                h = h * 31 + computeSortNameHash(arg.sort());
+            }
+            return h;
+        } else {
+            return op.name().toString().hashCode();
+        }
+    }
+
+    private int computeSortNameHash(Sort sort) {
+        if (sort instanceof ParametricSortInstance psi) {
+            // using just psi's name would introduce a dependency on its
+            // concrete syntax impacting robustness
+            int h = 11;
+            h = h * 31 + psi.getBase().name().toString().hashCode();
+            for (final GenericArgument arg : psi.getArgs()) {
+                h = h * 31 + computeSortNameHash(arg.sort());
+            }
+            return h;
+        } else {
+            return sort.name().toString().hashCode();
         }
     }
 

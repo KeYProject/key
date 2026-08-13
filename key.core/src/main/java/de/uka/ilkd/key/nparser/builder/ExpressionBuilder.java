@@ -354,7 +354,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.GREATER() != null) {
             op_name = "gt";
         }
-        if (ctx.GREATEREQUAL() != null) {
+        if (ctx.GREATEREQUAL() != null || ctx.GREATER_CONTD() != null) {
             op_name = "geq";
         }
         return binaryLDTSpecificTerm(ctx, ctx.b, op_name, termL, termR);
