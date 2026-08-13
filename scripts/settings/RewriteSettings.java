@@ -63,7 +63,11 @@ public class RewriteSettings {
                     .toList()
                     : Collections.singletonList(path);
             for (var file : files) {
-                rewrite(file);
+                try {
+                    rewrite(file);
+                } catch (java.util.zip.ZipException e) {
+                    LOGGER.error("", e);
+                }
             }
         }
         System.exit(ERROR ? 1 : 0);
@@ -127,7 +131,6 @@ public class RewriteSettings {
         }
 
         if (write || ALWAYS_WRITE) {
-
             if (!isGzip) {
                 Files.writeString(file, output.toString());
             } else {
