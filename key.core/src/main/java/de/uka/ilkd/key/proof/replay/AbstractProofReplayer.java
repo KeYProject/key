@@ -228,7 +228,6 @@ public abstract class AbstractProofReplayer {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
-                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
@@ -239,9 +238,36 @@ public abstract class AbstractProofReplayer {
                 ourApp = currGoal.indexOfTaclets().lookup(tacletName);
             }
             if (ourApp == null) {
-                throw new IllegalStateException(
-                    "proof replayer failed to find dynamically added taclet at original node "
-                        + originalStep.serialNr());
+                // problem with these taclets: they get dynamically added, and the name depends on
+                // how many more of these are already present in the proof on the current branch up
+                // to this point. If some of these earlier occurrences are sliced away (not needed),
+                // no taclet with this name exists. Try to find a matching one instead.
+                // TODO: can we instead give a more reliable name?
+                if (tacletName.startsWith("replaceKnownQuery")) {
+                    String tacletNameExt = tacletName.substring(0, tacletName.indexOf("_"));
+
+                    // the dynamically introduced taclet has a different name in the sliced proof,
+                    // try to find candidates
+                    List<NoPosTacletApp> candidates = currGoal.indexOfTaclets()
+                            .allNoPosTacletAppsStream()
+                            .filter(x -> x.rule().name().toString().startsWith(tacletNameExt))
+                            .toList();
+                    if (candidates.size() == 1) {
+                        // if there is only a single candidate, this has to be the one to use
+                        ourApp = candidates.getFirst();
+                    } else {
+                        // TODO: what if there are multiple candidates? Matching is difficult, not
+                        // implemented at the moment
+                        throw new IllegalStateException(
+                            "proof replayer failed to find dynamically added taclet at original node "
+                                + originalStep.serialNr());
+                    }
+
+                } else {
+                    throw new IllegalStateException(
+                        "proof replayer failed to find dynamically added taclet at original node "
+                            + originalStep.serialNr());
+                }
             }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
