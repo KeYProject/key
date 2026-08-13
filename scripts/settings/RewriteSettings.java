@@ -97,7 +97,7 @@ public class RewriteSettings {
                     token = iterator.next();
                 }
 
-                if (token.getType() != KeYLexer.STRING_LITERAL) {
+                if (token.getType() != JavaKeYLexer.STRING_LITERAL) {
                     return;
                 }
 
