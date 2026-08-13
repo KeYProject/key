@@ -37,7 +37,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqConcat;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqSingleton;
 

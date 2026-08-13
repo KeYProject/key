@@ -701,7 +701,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnAssignment(BinaryAssignment x) {
+    public void performActionOnBinaryAssignment(BinaryAssignment x) {
         doDefaultAction(x);
 
     }
@@ -724,7 +724,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnAssignment(UnaryAssignment assignment) {
+    public void performActionOnUnaryAssignment(UnaryAssignment assignment) {
         doDefaultAction(assignment);
     }
 }

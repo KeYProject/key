@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public final class UnaryAssignment extends Operator
         implements Assignment<UnaryAssignmentKind> {
-    public enum UnaryAssignmentKind {
+    public enum UnaryAssignmentKind implements AssignmentKind {
         PRE_INCREMENT("++", 0),
         PRE_DECREMENT("--", 0),
         POST_INCREMENT("++", 0, Operator.POSTFIX),
@@ -99,7 +99,7 @@ public final class UnaryAssignment extends Operator
 
     @Override
     public void visit(Visitor v) {
-        v.performActionOnAssignment(this);
+        v.performActionOnUnaryAssignment(this);
     }
 
 

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
@@ -34,7 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
@@ -52,7 +53,7 @@ public abstract class KeYJavaASTFactory {
      * creates an assignment <code> lhs:=rhs </code>
      */
     public static Assignment assign(Expression lhs, Expression rhs, PositionInfo posInfo) {
-        return assign(new ExtList(new Object[] { lhs, rhs, posInfo }));
+        return assign(COPY, new ExtList(new Object[] { lhs, rhs, posInfo }));
     }
 
     /**
@@ -62,8 +63,22 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
      */
     public static Assignment assign(final ExtList parameters) {
-
         return new BinaryAssignment(COPY, parameters);
+    }
+
+    /**
+     * Create an assignment.
+     *
+     * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
+     * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
+     */
+    public static Assignment assign(final Object assignOp, final ExtList parameters) {
+        if (assignOp instanceof UnaryAssignment.UnaryAssignmentKind kind) {
+            return new UnaryAssignment(kind, parameters);
+        } else if (assignOp instanceof BinaryAssignmentKind kind) {
+            return new BinaryAssignment(kind, parameters);
+        }
+        throw new IllegalArgumentException("Unsupported assignment kind: " + assignOp);
     }
 
     /**

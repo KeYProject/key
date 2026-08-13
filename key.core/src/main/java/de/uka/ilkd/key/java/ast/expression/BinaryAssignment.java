@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 
 /**
@@ -32,8 +32,8 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKin
  */
 @NullMarked
 public final class BinaryAssignment extends Operator
-        implements Assignment<AssignmentKind> {
-    public enum AssignmentKind {
+        implements Assignment<BinaryAssignmentKind> {
+    public enum BinaryAssignmentKind implements AssignmentKind {
         COPY(""),
         BINARY_OR("|"),
         DIVIDE("/"),
@@ -49,20 +49,20 @@ public final class BinaryAssignment extends Operator
 
         public final String symbol;
 
-        AssignmentKind(String symbol) {
+        BinaryAssignmentKind(String symbol) {
             this.symbol = symbol;
         }
     }
 
-    private final AssignmentKind kind;
+    private final BinaryAssignmentKind kind;
 
-    public BinaryAssignment(AssignmentKind kind, ExtList changeList) {
+    public BinaryAssignment(BinaryAssignmentKind kind, ExtList changeList) {
         super(changeList);
         this.kind = Objects.requireNonNull(kind);
     }
 
 
-    public BinaryAssignment(AssignmentKind kind, Expression lhs, Expression rhs) {
+    public BinaryAssignment(BinaryAssignmentKind kind, Expression lhs, Expression rhs) {
         super(lhs, rhs);
         this.kind = Objects.requireNonNull(kind);
     }
@@ -72,7 +72,7 @@ public final class BinaryAssignment extends Operator
     }
 
 
-    public BinaryAssignment(PositionInfo pi, List<Comment> c, AssignmentKind kind,
+    public BinaryAssignment(PositionInfo pi, List<Comment> c, BinaryAssignmentKind kind,
             Expression target,
             Expression expr) {
         super(pi, c, new ImmutableArray<>(target, expr));
@@ -110,7 +110,7 @@ public final class BinaryAssignment extends Operator
 
     @Override
     public void visit(Visitor v) {
-        v.performActionOnAssignment(this);
+        v.performActionOnBinaryAssignment(this);
     }
 
 
@@ -129,10 +129,9 @@ public final class BinaryAssignment extends Operator
         return INFIX;
     }
 
-    public AssignmentKind getKind() {
+    public BinaryAssignmentKind getKind() {
         return kind;
     }
-
 
     /**
      * overriden from Operator
