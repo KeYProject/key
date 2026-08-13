@@ -120,7 +120,7 @@ public class EvaluateArgs extends ProgramTransformer {
             resMR = null;
         }
 
-        if (pe instanceof Assignment && JavaAstUtils.isCopyAssignment(a)a && JavaAstUtils.isCopyAssignment(a)) {
+        if (pe instanceof Assignment a && JavaAstUtils.isCopyAssignment(a)) {
             res[res.length - 1] = KeYJavaASTFactory.assign(a.getExpressionAt(0),
                 (Expression) resMR);
         } else {

@@ -529,6 +529,11 @@ public class PrettyPrinter implements Visitor {
         printOperator(assignment, assignment.getKind().symbol + "=");
     }
 
+    @Override
+    public void performActionOnAssignment(UnaryAssignment op) {
+        printOperator(op, op.getKind().symbol);
+    }
+
     private void performActionOnType(@Nullable Type type) {
         if (type == null) {
             layouter.print("unknown");

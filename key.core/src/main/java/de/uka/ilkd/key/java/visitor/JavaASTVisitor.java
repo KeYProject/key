@@ -7,10 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.Assignment;
-import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.reference.*;
@@ -40,7 +37,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root the ProgramElement where to begin
+     * @param root     the ProgramElement where to begin
      * @param services the Services object
      */
     protected JavaASTVisitor(ProgramElement root, Services services) {
@@ -57,25 +54,25 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         }
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
-                services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
+                    services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
             if (li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
+                    services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
+                    services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
-                services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
+                    services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
             mcs.forEach(this::performActionOnMergeContract);
         }
     }
@@ -610,19 +607,19 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                             final StatementBlock newBlock) {
         // do nothing
     }
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                            final StatementBlock newBlock) {
         // do nothing
     }
 
     @Override
     public void performActionOnLoopContract(final LoopStatement oldLoop,
-            final LoopStatement newLoop) {
+                                            final LoopStatement newLoop) {
         // do nothing
     }
 
@@ -724,6 +721,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     public void performActionOnUnaryOperator(UnaryOperator x) {
         doDefaultAction(x);
+    }
 
+    @Override
+    public void performActionOnAssignment(UnaryAssignment assignment) {
+        doDefaultAction(assignment);
     }
 }

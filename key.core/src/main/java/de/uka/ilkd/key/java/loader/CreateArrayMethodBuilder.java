@@ -3,39 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.loader;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.LoopInitializer;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.Modifier;
-import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
-import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
-import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
-import de.uka.ilkd.key.java.ast.reference.ArrayReference;
-import de.uka.ilkd.key.java.ast.reference.FieldReference;
-import de.uka.ilkd.key.java.ast.reference.MethodReference;
-import de.uka.ilkd.key.java.ast.reference.ThisReference;
-import de.uka.ilkd.key.java.ast.reference.TypeRef;
-import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
@@ -44,13 +28,17 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LESS_THAN;
-import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.POST_INCREMENT;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
@@ -384,7 +372,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final For forLoop = new For(new LoopInitializer[] { forInit },
             new BinaryOperator(LESS_THAN, pv, new FieldReference(length, new ThisReference())),
-            new Expression[] { new UnaryOperator(POST_INCREMENT, pv) },
+            new Expression[] { new UnaryAssignment(POST_INCREMENT, pv) },
             assign(new ArrayReference(new ThisReference(), new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
