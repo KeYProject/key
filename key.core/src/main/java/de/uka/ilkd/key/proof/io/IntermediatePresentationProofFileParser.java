@@ -143,7 +143,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList.append(str);
             }
             case KeY_USER -> { // UserLog
-                if(proof != null) {
+                if (proof != null) {
                     if (proof.userLog == null) {
                         proof.userLog = new ArrayList<>();
                     }
@@ -151,7 +151,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 }
             }
             case KeY_VERSION -> { // Version log
-                if(proof != null) {
+                if (proof != null) {
                     if (proof.keyVersionLog == null) {
                         proof.keyVersionLog = new ArrayList<>();
                     }

@@ -441,11 +441,12 @@ public class IntermediateProofReplayer {
      *
      * @param proof the current proof to operate on
      * @param currInterm The intermediate taclet application to create a "real" application for.
-     * @param currGoal   The goal on which to apply the taclet app.
+     * @param currGoal The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate representation.
      * @throws TacletAppConstructionException In case of an error during construction.
      */
-    public static TacletApp constructTacletApp(Proof proof, TacletAppIntermediate currInterm, Goal currGoal)
+    public static TacletApp constructTacletApp(Proof proof, TacletAppIntermediate currInterm,
+            Goal currGoal)
             throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
