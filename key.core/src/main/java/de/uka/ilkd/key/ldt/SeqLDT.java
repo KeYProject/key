@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
@@ -135,8 +136,14 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
-        return op instanceof LogicFunctionalOperator lfo
-                && lfo.getFunction().returnType == PrimitiveType.JAVA_SEQ;
+        if (!(op instanceof LogicFunctionalOperator lfo)) {
+            return false;
+        }
+        final LogicFunction lf = lfo.getFunction();
+        return (lf.returnType == PrimitiveType.JAVA_SEQ
+                || lf == LogicFunction.SeqGet
+                || lf == LogicFunction.SeqIndexOf
+                || lf == LogicFunction.SeqLength);
     }
 
 

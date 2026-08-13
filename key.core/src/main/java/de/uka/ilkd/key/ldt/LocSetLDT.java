@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -159,7 +158,14 @@ public final class LocSetLDT extends LDT {
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (op instanceof LogicFunctionalOperator lfo) {
-            return lfo.getFunction().returnType == PrimitiveType.JAVA_LOCSET;
+            // getFunctionFor does not support all loc set functions, e.g. array range etc.
+            // return lfo.getFunction().returnType == PrimitiveType.JAVA_LOCSET;
+            return switch (lfo.getFunction()) {
+                case Singleton, SetUnion, Intersect,
+                        SetMinus, AllFields, AllObjects ->
+                    true;
+                default -> false;
+            };
         }
         return false;
     }
@@ -186,6 +192,7 @@ public final class LocSetLDT extends LDT {
             case Intersect -> intersect;
             case SetMinus -> setMinus;
             case AllFields -> allFields;
+            case AllObjects -> allObjects;
             default -> throw new IllegalStateException();
         };
     }
