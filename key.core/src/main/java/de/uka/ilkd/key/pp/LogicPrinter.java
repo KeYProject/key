@@ -1384,6 +1384,7 @@ public class LogicPrinter {
         layouter.markStartSub();
         printTerm(t.sub(1));
         layouter.markEndSub();
+        layouter.print(")");
     }
 
     public void printElementOf(JTerm t) {
