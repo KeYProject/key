@@ -101,9 +101,14 @@ public class RewriteSettings {
                     return;
                 }
 
-                hit = true;
-
                 final var text = token.getText();
+                token = iterator.next();
+
+                if (token.getType() != JavaKeYLexer.RBRACE) {
+                    return;
+                }
+
+                hit = true;
                 var settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.loadSettingsFromPropertyString(text.substring(1, text.length() - 1));
                 output.append(settings.settingsToString());
