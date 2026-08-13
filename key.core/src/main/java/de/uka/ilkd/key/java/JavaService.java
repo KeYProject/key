@@ -1005,7 +1005,7 @@ public class JavaService {
     }
 
     @NonNull
-    private JavaSymbolSolver getSymbolResolver() {
+    public JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }
 

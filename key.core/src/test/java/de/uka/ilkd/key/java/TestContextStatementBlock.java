@@ -17,7 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
+import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.POST_INCREMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,7 +52,7 @@ public class TestContextStatementBlock {
         PosInProgram suffixStart = PosInProgram.TOP.down(2);
         assertTrue(
             PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof UnaryAssignment uo
-                    && uo.getKind() == POST_INCREMENT,
+                    && uo.getKind() == UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT,
             "Suffix should start with an ++");
         for (int i = size - 2; i >= 1; i--) {
             statementList.add(stContainer.getChildAt(i));
