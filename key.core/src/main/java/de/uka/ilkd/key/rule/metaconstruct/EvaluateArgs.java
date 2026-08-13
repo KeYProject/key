@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.JavaAstUtils;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -77,7 +78,7 @@ public class EvaluateArgs extends ProgramTransformer {
         final ExecutionContext ec = svInst.getExecutionContext();
 
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
-        (pe instanceof Assignment a ? a.getChildAt(1) : pe);
+        (pe instanceof Assignment a && JavaAstUtils.isCopyAssignment(a) ? a.getChildAt(1) : pe);
 
         List<Statement> evalstat = new LinkedList<>();
 
@@ -119,7 +120,7 @@ public class EvaluateArgs extends ProgramTransformer {
             resMR = null;
         }
 
-        if (pe instanceof Assignment a) {
+        if (pe instanceof Assignment && JavaAstUtils.isCopyAssignment(a)a && JavaAstUtils.isCopyAssignment(a)) {
             res[res.length - 1] = KeYJavaASTFactory.assign(a.getExpressionAt(0),
                 (Expression) resMR);
         } else {
