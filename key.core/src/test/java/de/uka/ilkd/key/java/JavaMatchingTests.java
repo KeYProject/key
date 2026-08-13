@@ -1,8 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.JPContext;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
@@ -14,11 +14,16 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.op.sv.SchemaVariable;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -42,13 +47,14 @@ public class JavaMatchingTests {
         nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
                 .addSort("float");
 
-        @Nullable Namespace<SchemaVariable> nsSchema = new Namespace<>();
+        @Nullable
+        Namespace<SchemaVariable> nsSchema = new Namespace<>();
         nsSchema.add(SchemaVariableFactory.createProgramSV(
-                new ProgramElementName("#a"), ProgramSVSort.EXPRESSION, false));
+            new ProgramElementName("#a"), ProgramSVSort.EXPRESSION, false));
         nsSchema.add(SchemaVariableFactory.createProgramSV(
-                new ProgramElementName("#b"), ProgramSVSort.EXPRESSION, false));
+            new ProgramElementName("#b"), ProgramSVSort.EXPRESSION, false));
         nsSchema.add(SchemaVariableFactory.createProgramSV(
-                new ProgramElementName("#c"), ProgramSVSort.EXPRESSION, false));
+            new ProgramElementName("#c"), ProgramSVSort.EXPRESSION, false));
 
         services.activateJava(null);
 
@@ -78,8 +84,8 @@ public class JavaMatchingTests {
 
     private @Nullable MatchConditions match(ProgramElement scheme, ProgramElement concrete) {
         final MatchConditions result = scheme.match(
-                new SourceData(concrete, -1, services),
-                MatchConditions.EMPTY_MATCHCONDITIONS);
+            new SourceData(concrete, -1, services),
+            MatchConditions.EMPTY_MATCHCONDITIONS);
         return result;
     }
 

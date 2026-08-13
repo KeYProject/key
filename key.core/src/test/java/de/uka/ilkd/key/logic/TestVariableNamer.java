@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Collections;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
@@ -21,7 +23,7 @@ import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
@@ -31,7 +33,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static org.junit.jupiter.api.Assertions.*;
