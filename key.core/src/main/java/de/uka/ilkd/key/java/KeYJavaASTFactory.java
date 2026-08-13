@@ -72,7 +72,7 @@ public abstract class KeYJavaASTFactory {
      * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
      * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
      */
-    public static Assignment assign(final Object assignOp, final ExtList parameters) {
+    public static Assignment assign(final AssignmentKind assignOp, final ExtList parameters) {
         if (assignOp instanceof UnaryAssignment.UnaryAssignmentKind kind) {
             return new UnaryAssignment(kind, parameters);
         } else if (assignOp instanceof BinaryAssignmentKind kind) {

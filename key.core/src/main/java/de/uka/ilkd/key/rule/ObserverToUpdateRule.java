@@ -192,7 +192,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("BinaryAssignment");
+        contGoal.setBranchLabel("CopyAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -202,7 +202,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "BinaryAssignment" cont branch
+        // ---- create "CopyAssignment" cont branch
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
@@ -256,7 +256,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("BinaryAssignment");
+        contGoal.setBranchLabel("CopyAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -265,7 +265,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "BinaryAssignment" cont branch
+        // ---- create "CopyAssignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
         JModality modality = JModality.getModality(inst.modality().kind(), postJavaBlock);
