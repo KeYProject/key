@@ -20,15 +20,12 @@ public final class ParametricSortMatchPlan implements MatchPlan {
     private final List<MatchPlan> children;
 
     public ParametricSortMatchPlan(ParametricSortInstance psi) {
-        this(new SimilarParametricSortInstruction(psi), psi.getArgs().stream().map(a -> {
-            if (a.sort() instanceof ParametricSortInstance s) {
-                return new ParametricSortMatchPlan(s);
-            } else if (a.sort() instanceof GenericSort gs) {
-                return new GenericSortPlan(gs);
-            } else {
-                return new IdentityMatchPlan(a);
-            }
-        }).toList());
+        this(new SimilarParametricSortInstruction(psi),
+            psi.getArgs().stream().map(a -> switch (a.sort()) {
+                case ParametricSortInstance s -> new ParametricSortMatchPlan(s);
+                case GenericSort gs -> new GenericSortPlan(gs);
+                default -> new IdentityMatchPlan(a);
+            }).toList());
     }
 
     public ParametricSortMatchPlan(MatchInstruction similar, List<MatchPlan> children) {
