@@ -158,11 +158,11 @@ public final class BinaryAssignment extends Operator
             return false;
         if (!super.equals(o))
             return false;
-        return kind == that.kind && Objects.equals(that.children, children);
+        return kind == that.kind;
     }
 
     @Override
     protected int computeHashCode() {
-        return Objects.hash(kind, children);
+        return 0x01000193 * super.computeHashCode() + kind.hashCode();
     }
 }

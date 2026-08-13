@@ -99,15 +99,15 @@ public final class BinaryOperator extends Operator
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
         if (!(o instanceof BinaryOperator b))
             return false;
-        return Objects.equals(getKind(), b.getKind()) && Objects.equals(children, b.children);
+        if (!super.equals(o))
+            return false;
+        return kind == b.kind;
     }
 
     @Override
     protected int computeHashCode() {
-        return Objects.hash(kind, children);
+        return 0x01000193 * super.computeHashCode() + kind.hashCode();
     }
 }
