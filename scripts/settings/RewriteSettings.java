@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.JavaKeYLexer;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.ProofSettings;
 import org.antlr.v4.runtime.CharStreams;
@@ -72,7 +72,7 @@ public class RewriteSettings {
     private static void rewrite(Path file) throws IOException {
         boolean isGzip = file.getFileName().toString().endsWith(".gz");
         LOGGER.info("Rewriting: {} (isGzip:{})", file.getFileName(), isGzip);
-        KeYLexer lex;
+        JavaKeYLexer lex;
         if (isGzip) {
             var input = CharStreams.fromStream(new GZIPInputStream(Files.newInputStream(file)));
             lex = ParsingFacade.createLexer(input);
@@ -86,10 +86,10 @@ public class RewriteSettings {
         boolean hit = false;
         for (Iterator<? extends Token> iterator = ctx.iterator(); iterator.hasNext(); ) {
             var token = iterator.next();
-            if (token.getType() == KeYLexer.KEYSETTINGS) {
+            if (token.getType() == JavaKeYLexer.KEYSETTINGS) {
                 output.append(token.getText());
 
-                while (iterator.hasNext() && token.getType() != KeYLexer.STRING_LITERAL) {
+                while (iterator.hasNext() && token.getType() != JavaKeYLexer.STRING_LITERAL) {
                     token = iterator.next();
                 }
 
