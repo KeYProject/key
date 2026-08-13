@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 import javax.swing.*;
 import javax.swing.plaf.basic.ComboPopup;
 
@@ -33,7 +32,10 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.definition.*;
+import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
+import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
+import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -1001,41 +1003,42 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
 
+
     /**
      * A single entry of the preset combo box: either the built-in "Defaults", one of the profile's
      * further built-in presets, or a user-defined preset. User-defined entries can be deleted and
      * renamed; built-in entries cannot.
      */
     private static final class PresetEntry {
-        private final String name;
-        private final boolean userDefined;
-        private final int maxSteps;
-        private final Supplier<StrategyProperties> properties;
+        boolean userDefined;
+        private final StrategyPreset data;
 
         private PresetEntry(String name, boolean userDefined, int maxSteps,
-                Supplier<StrategyProperties> properties) {
-            this.name = name;
+                StrategyProperties properties) {
+            this(userDefined, new StrategyPreset(name, maxSteps, properties));
+        }
+
+        public PresetEntry(boolean userDefined, StrategyPreset preset) {
+            this.data = preset;
             this.userDefined = userDefined;
-            this.maxSteps = maxSteps;
-            this.properties = properties;
         }
 
         static PresetEntry defaults() {
             return new PresetEntry("Defaults", false, DEFINITION.getDefaultMaxRuleApplications(),
-                () -> DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties());
+                DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties());
         }
 
         static PresetEntry builtIn(StrategySettingsDefinition.StrategySettingEntry e) {
             return new PresetEntry(e.name(), false, e.order(),
-                () -> e.factory().createDefaultStrategyProperties());
+                e.factory().createDefaultStrategyProperties());
         }
 
         static PresetEntry user(StrategyPreset preset) {
-            return new PresetEntry(preset.name(), true, preset.maxSteps(), preset::properties);
+            return new PresetEntry(true, preset);
         }
 
         String name() {
-            return name;
+            return data.name();
         }
 
         boolean userDefined() {
@@ -1043,16 +1046,16 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         }
 
         int maxSteps() {
-            return maxSteps;
+            return data.maxSteps();
         }
 
         StrategyProperties properties() {
-            return properties.get();
+            return data.properties();
         }
 
         @Override
         public String toString() {
-            return name;
+            return data.name();
         }
     }
 
