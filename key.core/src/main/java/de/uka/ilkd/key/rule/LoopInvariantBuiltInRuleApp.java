@@ -133,7 +133,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         // get the second statement if possible
         Statement last =
             (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1);
-        skipValues = skipValues || !(last instanceof Assignment);
+        skipValues = skipValues || !JavaAstUtils.isCopyAssignment(last);
         Assignment assignment = skipValues ? null : ((Assignment) last);
         ProgramElement lhs = skipValues ? null : assignment.getChildAt(0);
         skipValues = skipValues || !(lhs instanceof ProgramVariable);

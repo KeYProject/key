@@ -598,7 +598,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                             app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs);
                         break;
-                    } else if (c.getStatementAt(1) instanceof Assignment p2) {
+                    } else if (c.getStatementAt(1) instanceof Assignment p2
+                            && JavaAstUtils.isCopyAssignment(p2)) {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {
                             SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);
