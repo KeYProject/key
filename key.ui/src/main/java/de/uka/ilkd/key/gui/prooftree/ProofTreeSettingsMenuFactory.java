@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.function.Supplier;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.docking.DynamicCMenu;
@@ -36,6 +37,7 @@ public final class ProofTreeSettingsMenuFactory {
             CMenu menu = new CMenu();
 
             menu.add(createSearch(view));
+            menu.add(createGotoNode(view));
             menu.addSeparator();
 
             menu.add(createExpandAll(view));
@@ -86,6 +88,14 @@ public final class ProofTreeSettingsMenuFactory {
         button.setIcon(IconFactory.search2(ICON_SIZE));
         button.setAccelerator(de.uka.ilkd.key.gui.prooftree.ProofTreeView.SEARCH_KEY_STROKE);
         button.addActionListener(e -> view.showSearchPanel());
+        return button;
+    }
+
+    private static CButton createGotoNode(ProofTreeView view) {
+        CButton button = new CButton();
+        button.setText("Go to Node...");
+        button.setIcon(IconFactory.GOTO_NODE.get(IconFactory.DEFAULT_SIZE));
+        button.addActionListener(e -> view.showGotoNodeDialog());
         return button;
     }
 

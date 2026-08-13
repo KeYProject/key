@@ -848,6 +848,25 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
+    public void showGotoNodeDialog() {
+        final String nodeStr = (String) JOptionPane.showInputDialog(this, null,
+            "Go to proof node", JOptionPane.PLAIN_MESSAGE,
+            IconFactory.GOTO_NODE.get(IconFactory.DEFAULT_SIZE), null, null);
+        if (nodeStr != null && !nodeStr.isEmpty()) {
+            try {
+                int serialNr = Integer.parseUnsignedInt(nodeStr);
+                if (!getMediator().getSelectionModel()
+                    .setSelectedNodeBySerialNr(serialNr)) {
+                    JOptionPane.showMessageDialog(this, "Node not found: " + nodeStr,
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid node number: " + nodeStr,
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     /**
      * Expands all currently visible nodes. Used by the collapsing search to reveal the (few)
      * surviving matching nodes after the tree has been filtered down to them.

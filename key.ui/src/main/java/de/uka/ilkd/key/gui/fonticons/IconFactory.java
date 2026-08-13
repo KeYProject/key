@@ -158,6 +158,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider ORIGIN_LABELS =
         new IconFontProvider(FontAwesomeSolid.ROUTE);
+    public static final IconFontProvider GOTO_NODE =
+        new IconFontProvider(FontAwesomeSolid.CROSSHAIRS);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
