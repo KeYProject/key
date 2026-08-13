@@ -996,11 +996,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnAssignment(Assignment x) {
+    public void performActionOnAssignment(BinaryAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                return new Assignment(x.getKind(), changeList);
+                return new BinaryAssignment(x.getKind(), changeList);
             }
         };
         def.doAction(x);

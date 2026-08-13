@@ -37,7 +37,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root     the ProgramElement where to begin
+     * @param root the ProgramElement where to begin
      * @param services the Services object
      */
     protected JavaASTVisitor(ProgramElement root, Services services) {
@@ -54,25 +54,25 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         }
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
-                    services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
+                services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
             if (li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                    services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
+                services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
+                services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
-                    services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
+                services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
             mcs.forEach(this::performActionOnMergeContract);
         }
     }
@@ -607,19 +607,19 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-                                             final StatementBlock newBlock) {
+            final StatementBlock newBlock) {
         // do nothing
     }
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-                                            final StatementBlock newBlock) {
+            final StatementBlock newBlock) {
         // do nothing
     }
 
     @Override
     public void performActionOnLoopContract(final LoopStatement oldLoop,
-                                            final LoopStatement newLoop) {
+            final LoopStatement newLoop) {
         // do nothing
     }
 
@@ -701,7 +701,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnAssignment(Assignment x) {
+    public void performActionOnAssignment(BinaryAssignment x) {
         doDefaultAction(x);
 
     }

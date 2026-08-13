@@ -37,7 +37,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqConcat;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqSingleton;
 
@@ -311,7 +311,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             new LogicFunctionalOperator(SeqSingleton, (ProgramVariable) element);
         final Expression seqConcat =
             new LogicFunctionalOperator(SeqConcat, valuesVar, seqSingleton);
-        return new Assignment(COPY, valuesVar, seqConcat);
+        return new BinaryAssignment(COPY, valuesVar, seqConcat);
     }
 
     /**

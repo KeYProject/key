@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.POST_INCREMENT;
+import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,8 +51,8 @@ public class TestContextStatementBlock {
             "Prefix should end with an assignment");
         PosInProgram suffixStart = PosInProgram.TOP.down(2);
         assertTrue(
-            PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof UnaryOperator uo
-                    && uo.kind == POST_INCREMENT,
+            PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof UnaryAssignment uo
+                    && uo.getKind() == POST_INCREMENT,
             "Suffix should start with an ++");
         for (int i = size - 2; i >= 1; i--) {
             statementList.add(stContainer.getChildAt(i));

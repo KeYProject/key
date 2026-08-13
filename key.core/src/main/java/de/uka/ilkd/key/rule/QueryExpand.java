@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -46,7 +47,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
 
 
 /**
@@ -210,7 +211,7 @@ public class QueryExpand implements BuiltInRule {
 
         stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
 
-        final Assignment assignment = new Assignment(COPY, result, mr);
+        final Assignment assignment = new BinaryAssignment(COPY, result, mr);
 
         stmnt.add(assignment);
 

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast;
 
 /**
- * Common interface for Assignment, UnaryOperator, BinaryOperator, LogicFunctinalOperator and
+ * Common interface for BinaryAssignment, UnaryOperator, BinaryOperator, LogicFunctinalOperator and
  * Modifier
  *
  * @param <K> specifies the concrete kind of the program element, e.g. whether it is a logical-and

@@ -525,7 +525,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnAssignment(Assignment assignment) {
+    public void performActionOnAssignment(BinaryAssignment assignment) {
         printOperator(assignment, assignment.getKind().symbol + "=");
     }
 

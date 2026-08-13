@@ -34,7 +34,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.java.ast.expression.Assignment.AssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
 
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
@@ -45,7 +45,7 @@ public abstract class KeYJavaASTFactory {
      * creates an assignment <code> lhs:=rhs </code>
      */
     public static Assignment assign(Expression lhs, Expression rhs) {
-        return new Assignment(COPY, lhs, rhs);
+        return new BinaryAssignment(COPY, lhs, rhs);
     }
 
     /**
@@ -59,11 +59,11 @@ public abstract class KeYJavaASTFactory {
      * Create an assignment.
      *
      * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
-     * @return a new {@link Assignment} as defined by <code>parameters</code>
+     * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
      */
     public static Assignment assign(final ExtList parameters) {
 
-        return new Assignment(COPY, parameters);
+        return new BinaryAssignment(COPY, parameters);
     }
 
     /**
@@ -1294,7 +1294,7 @@ public abstract class KeYJavaASTFactory {
      * @param variable the {@link ProgramVariable} to be assigned to
      * @param array the array {@link ReferencePrefix} to be accessed
      * @param index the array access index {@link Expression}
-     * @return a new {@link Assignment} of <code>array</code> element at <code>index</code> to
+     * @return a new {@link BinaryAssignment} of <code>array</code> element at <code>index</code> to
      *         <code>variable</code>
      */
     public static Assignment assignArrayField(final ProgramVariable variable,

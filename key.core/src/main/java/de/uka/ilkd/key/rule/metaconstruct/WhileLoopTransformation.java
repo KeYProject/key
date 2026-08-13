@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
@@ -750,7 +750,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
 
     @Override
-    public void performActionOnAssignment(Assignment x) {
+    public void performActionOnAssignment(BinaryAssignment x) {
         DefaultAction def = new DefaultAction() {
             @Override
             ProgramElement createNewElement(ExtList changeList) {

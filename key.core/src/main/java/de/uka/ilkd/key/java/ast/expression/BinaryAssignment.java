@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -21,50 +24,58 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.AssignmentKind.COPY;
+
 
 /**
- * An assignment is an operator with side-effects.
+ * An assignment operator of arity two.
  */
 @NullMarked
-public final class UnaryAssignment extends Operator
-        implements Assignment<UnaryAssignmentKind> {
-    public enum UnaryAssignmentKind {
-        PRE_INCREMENT("++", 0),
-        PRE_DECREMENT("--", 0),
-        POST_INCREMENT("++", 0, Operator.POSTFIX),
-        POST_DECREMENT("--", 0, Operator.POSTFIX);
+public final class BinaryAssignment extends Operator
+        implements Assignment<AssignmentKind> {
+    public enum AssignmentKind {
+        COPY(""),
+        BINARY_OR("|"),
+        DIVIDE("/"),
+        SHIFT_LEFT("<<"),
+        UNSIGNED_SHIFT_RIGHT(">>>"),
+        PLUS("+"),
+        SHIFT_RIGHT(">>"),
+        MINUS("-"),
+        MODULO("%"),
+        TIMES("*"),
+        BINARY_AND("&"),
+        BINARY_XOR("^");
 
         public final String symbol;
-        public final int precedence;
-        public final int notation;
 
-
-        UnaryAssignmentKind(String symbol, int precedence) {
-            this(symbol, precedence, Operator.PREFIX);
-        }
-
-        UnaryAssignmentKind(String symbol, int precedence, int notation) {
+        AssignmentKind(String symbol) {
             this.symbol = symbol;
-            this.notation = notation;
-            this.precedence = precedence;
         }
     }
 
-    private final UnaryAssignmentKind kind;
+    private final AssignmentKind kind;
 
-    public UnaryAssignment(UnaryAssignmentKind kind, ExtList changeList) {
+    public BinaryAssignment(AssignmentKind kind, ExtList changeList) {
         super(changeList);
         this.kind = Objects.requireNonNull(kind);
     }
 
-    public UnaryAssignment(UnaryAssignmentKind kind, Expression sub) {
-        super(sub);
+
+    public BinaryAssignment(AssignmentKind kind, Expression lhs, Expression rhs) {
+        super(lhs, rhs);
         this.kind = Objects.requireNonNull(kind);
     }
 
-    public UnaryAssignment(PositionInfo pi, List<Comment> c, UnaryAssignmentKind kind,
-            Expression sub) {
-        super(pi, c, new ImmutableArray<>(sub));
+    public BinaryAssignment(Expression lhs, Expression rhs) {
+        this(COPY, lhs, rhs);
+    }
+
+
+    public BinaryAssignment(PositionInfo pi, List<Comment> c, AssignmentKind kind,
+            Expression target,
+            Expression expr) {
+        super(pi, c, new ImmutableArray<>(target, expr));
         this.kind = Objects.requireNonNull(kind);
     }
 
@@ -77,7 +88,7 @@ public final class UnaryAssignment extends Operator
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if (src instanceof UnaryAssignment other) {
+        if (src instanceof Assignment other) {
             if (getKind().equals(other.getKind())) {
                 return super.match(source, matchCond);
             }
@@ -105,24 +116,27 @@ public final class UnaryAssignment extends Operator
 
     @Override
     public int getArity() {
-        return 1;
+        return 2;
     }
 
     @Override
     public int getPrecedence() {
-        return kind.precedence;
+        return 13;
     }
 
     @Override
     public int getNotation() {
-        return kind.notation;
+        return INFIX;
     }
 
-    public UnaryAssignmentKind getKind() {
+    public AssignmentKind getKind() {
         return kind;
     }
 
-    @Override
+
+    /**
+     * overriden from Operator
+     */
     public String reuseSignature(Services services, ExecutionContext ec) {
         String base = super.reuseSignature(services, ec);
         Expression rhs;
@@ -141,7 +155,7 @@ public final class UnaryAssignment extends Operator
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof UnaryAssignment that))
+        if (!(o instanceof BinaryAssignment that))
             return false;
         if (!super.equals(o))
             return false;
