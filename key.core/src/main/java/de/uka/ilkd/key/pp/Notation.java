@@ -465,6 +465,16 @@ public abstract class Notation {
         }
     }
 
+    public static final class PairNotation extends Notation {
+        public PairNotation() {
+            super(130);
+        }
+
+        public void print(JTerm t, LogicPrinter sp) {
+            sp.printPair(t);
+        }
+    }
+
     /**
      * The standard concrete syntax for conditional terms <code>if (phi) (t1) (t2)</code>.
      */

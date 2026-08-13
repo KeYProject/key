@@ -1353,31 +1353,14 @@ public class LogicPrinter {
 
     public void printSingleton(JTerm t) {
         assert t.arity() == 1;
-        if (t.sub(0).op() == services.getTypeConverter().getLocSetLDT().getPair()) {
-            layouter.startTerm(2);
-            layouter.print("{(").beginC(0);
+        layouter.startTerm(1);
+        layouter.print("{").beginC(0);
 
-            layouter.markStartSub();
-            printTerm(t.sub(0).sub(0));
-            layouter.markEndSub();
+        layouter.markStartSub();
+        printTerm(t.sub(0));
+        layouter.markEndSub();
 
-            layouter.print(",").brk(1, 0);
-
-            layouter.markStartSub();
-            printTerm(t.sub(0).sub(1));
-            layouter.markEndSub();
-
-            layouter.print(")}").end();
-        } else {
-            layouter.startTerm(1);
-            layouter.print("{").beginC(0);
-
-            layouter.markStartSub();
-            printTerm(t.sub(0));
-            layouter.markEndSub();
-
-            layouter.print("}").end();
-        }
+        layouter.print("}").end();
     }
 
     public void printSeqSingleton(JTerm t, String lDelimiter, String rDelimiter) {
@@ -1390,29 +1373,33 @@ public class LogicPrinter {
         layouter.print(rDelimiter).end();
     }
 
-    public void printElementOf(JTerm t) {
-        assert t.arity() == 3;
-        layouter.startTerm(3);
+    public void printPair(JTerm t) {
+        assert t.arity() == 2;
+        layouter.startTerm(2);
+        layouter.print("(");
+        layouter.markStartSub();
+        printTerm(t.sub(0));
+        layouter.markEndSub();
+        layouter.print(", ");
+        layouter.markStartSub();
+        printTerm(t.sub(1));
+        layouter.markEndSub();
+    }
 
-        layouter.print("(").beginC(0);
+    public void printElementOf(JTerm t) {
+        assert t.arity() == 2;
+        layouter.startTerm(2);
 
         layouter.markStartSub();
         printTerm(t.sub(0));
         layouter.markEndSub();
 
-        layouter.print(",").brk(1, 0);
-
-        layouter.markStartSub();
-        printTerm(t.sub(1));
-        layouter.markEndSub();
-
-        layouter.print(")").end();
         layouter.print(" ");
         layouter.keyWord("\\in");
         layouter.print(" ");
 
         layouter.markStartSub();
-        printTerm(t.sub(2));
+        printTerm(t.sub(1));
         layouter.markEndSub();
     }
 

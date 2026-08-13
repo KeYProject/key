@@ -5,11 +5,13 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.List;
 
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchGenericSortInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.SimilarParametricSortInstruction;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.MatchPlan;
@@ -56,13 +58,14 @@ public final class ParametricSortMatchPlan implements MatchPlan {
             childMatchers[i] = children.get(i).compile();
         }
         return (element, mc, services) -> {
+            if (element instanceof GenericArgument(org.key_project.logic.sort.Sort sort) && sort instanceof ParametricSortInstance psi) element = psi;
+            else if (!(element instanceof ParametricSortInstance)) return null;
             MatchResultInfo r = headCheck.match(element, mc, services);
             if (r == null) {
                 return null;
             }
-            final Term term = (Term) element;
             for (int i = 0; i < n; i++) {
-                r = childMatchers[i].match(term.sub(i), r, services);
+                r = childMatchers[i].match(element.getChild(i), r, services);
                 if (r == null) {
                     return null;
                 }
