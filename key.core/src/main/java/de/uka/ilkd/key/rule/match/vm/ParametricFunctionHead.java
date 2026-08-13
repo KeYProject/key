@@ -7,22 +7,15 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.MatchHead;
-import org.key_project.prover.rules.matcher.compiler.MatchPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
-import org.jspecify.annotations.Nullable;
-
-import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getCheckNodeKindInstruction;
-import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getSimilarParametricFunctionInstruction;
-import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.gotoNextInstruction;
+import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.*;
 
 /**
  * Match head for a {@link ParametricFunctionInstance} (a function symbol instantiated with sort
@@ -39,10 +32,10 @@ public final class ParametricFunctionHead implements MatchHead {
      */
     private final ParametricFunctionInstance pfi;
     private final MatchInstruction similar;
-    private final MatchPlan[] argMatchers;
+    private final MatchInstruction[] argMatchers;
 
     private ParametricFunctionHead(ParametricFunctionInstance pfi, MatchInstruction similar,
-            MatchPlan[] argMatchers) {
+            MatchInstruction[] argMatchers) {
         this.pfi = pfi;
         this.similar = similar;
         this.argMatchers = argMatchers;
@@ -50,23 +43,14 @@ public final class ParametricFunctionHead implements MatchHead {
 
     /**
      * @param pfi the parametric function instance pattern
-     * @return a head for {@code pfi}, or {@code null} if a generic argument uses a parametric sort
-     *         instance (which the matchers do not handle; then the caller falls back)
+     * @return a head for {@code pfi}
      */
-    public static @Nullable ParametricFunctionHead of(ParametricFunctionInstance pfi) {
+    public static ParametricFunctionHead of(ParametricFunctionInstance pfi) {
         final int argCount = pfi.getChildCount();
-        final MatchPlan[] argMatchers = new MatchPlan[argCount];
+        final MatchInstruction[] argMatchers = new MatchInstruction[argCount];
         for (int i = 0; i < argCount; i++) {
             final GenericArgument arg = (GenericArgument) pfi.getChild(i);
-            if (arg.sort() instanceof GenericSort gs) {
-                argMatchers[i] = new GenericSortPlan(gs);
-            } else if (arg.sort() instanceof ParametricSortInstance psi) {
-                argMatchers[i] = new ParametricSortMatchPlan(psi);
-            } else {
-                // identity suffices: equal instances intern to one shared object, arguments
-                // included (pinned by ParametricFunctionInterningTest)
-                argMatchers[i] = new IdentityMatchPlan(arg);
-            }
+            argMatchers[i] = getMatchInstructionForSortArgument(arg);
         }
         return new ParametricFunctionHead(pfi, getSimilarParametricFunctionInstruction(pfi),
             argMatchers);
@@ -77,8 +61,8 @@ public final class ParametricFunctionHead implements MatchHead {
         out.add(getCheckNodeKindInstruction(ParametricFunctionInstance.class));
         out.add(similar);
         out.add(gotoNextInstruction());
-        for (MatchPlan argMatcher : argMatchers) {
-            argMatcher.emit(out);
+        for (MatchInstruction argMatcher : argMatchers) {
+            out.add(argMatcher);
             out.add(gotoNextInstruction());
         }
     }
@@ -86,17 +70,13 @@ public final class ParametricFunctionHead implements MatchHead {
     @Override
     public MatchProgram compileHeadCheck() {
         final MatchProgram sim = similar::match;
-        final MatchProgram[] args = new MatchProgram[argMatchers.length];
-        for (int i = 0; i < argMatchers.length; ++i) {
-            args[i] = argMatchers[i].compile();
-        }
         return (element, mc, services) -> {
             if (!(((Term) element).op() instanceof ParametricFunctionInstance actualPfi)) {
                 return null;
             }
             MatchResultInfo r = sim.match(actualPfi, mc, services);
-            for (int i = 0; r != null && i < args.length; i++) {
-                r = args[i].match(actualPfi.getChild(i), r, services);
+            for (int i = 0; r != null && i < argMatchers.length; i++) {
+                r = argMatchers[i].match(actualPfi.getChild(i), r, services);
             }
             return r;
         };
