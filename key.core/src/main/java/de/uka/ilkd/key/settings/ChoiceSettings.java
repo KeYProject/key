@@ -159,7 +159,7 @@ public class ChoiceSettings extends AbstractSettings {
             while (st.hasMoreTokens()) {
                 StringTokenizer st2 = new StringTokenizer(st.nextToken().trim(), "-");
                 String category = st2.nextToken().trim();
-                String def = st2.nextToken().trim().replace("\\:","");
+                String def = st2.nextToken().trim().replace("\\:",":");
                 category2Default.put(category, def);
             }
         }
