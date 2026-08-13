@@ -29,10 +29,10 @@ import org.jspecify.annotations.Nullable;
 public final class UnaryAssignment extends Operator
         implements Assignment<UnaryAssignmentKind> {
     public enum UnaryAssignmentKind implements AssignmentKind {
-        PRE_INCREMENT("++", 0),
-        PRE_DECREMENT("--", 0),
-        POST_INCREMENT("++", 0, Operator.POSTFIX),
-        POST_DECREMENT("--", 0, Operator.POSTFIX);
+        PRE_INCREMENT("++", 1),
+        PRE_DECREMENT("--", 1),
+        POST_INCREMENT("++", 1, Operator.POSTFIX),
+        POST_DECREMENT("--", 1, Operator.POSTFIX);
 
         public final String symbol;
         public final int precedence;
