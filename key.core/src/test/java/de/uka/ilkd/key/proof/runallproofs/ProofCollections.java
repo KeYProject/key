@@ -1205,7 +1205,7 @@ public class ProofCollections {
 
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
-        g.loadable("standard_key/polymorphic/setExample.proof");
+        g.provable("standard_key/polymorphic/setExample.key");
 
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");

@@ -77,6 +77,11 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
             return cached;
         }
         if (sort instanceof GenericSort gs) {
+            Sort declared = services.getNamespaces().sorts().lookup(gs.name());
+            if (declared instanceof ProxySort declaredProxy) {
+                sortMap.put(gs, declaredProxy);
+                return declaredProxy;
+            }
             ImmutableSet<Sort> extSorts = replaceSorts(gs.extendsSorts(), services);
             ProxySort result = new ProxySort(gs.name(), extSorts);
             sortMap.put(gs, result);

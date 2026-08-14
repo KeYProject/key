@@ -7321,7 +7321,7 @@ equalityToElementOfRight {
 \find(==>equals(s,s2))
 \varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
 \replacewith([]==>[all{ov (variable)}(all{fv (variable)}(equiv(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
-\heuristics(setEqualityBlastingRight)
+\heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
 -----------------------------------------------------
 == equalityToSelect (equalityToSelect) =========================================
@@ -17227,7 +17227,7 @@ subsetToElementOfLocSetRight {
 \find(==>subset<Pair<java.lang.Object,Field>>(s,s2))
 \varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
 \replacewith([]==>[all{ov (variable)}(all{fv (variable)}(imp(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
-\heuristics(setEqualityBlastingRight)
+\heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
 -----------------------------------------------------
 == subsetUnionLeft (subsetUnionLeft) =========================================
