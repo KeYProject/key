@@ -1410,26 +1410,17 @@ public class LogicPrinter {
             return;
         }
 
-        assert t.arity() == 3;
-        layouter.startTerm(3);
-
-        layouter.print("(").beginC(0);
+        assert t.arity() == 2;
+        layouter.startTerm(2);
 
         layouter.markStartSub();
         printTerm(t.sub(0));
         layouter.markEndSub();
 
-        layouter.print(",").brk(1, 0);
-
-        layouter.markStartSub();
-        printTerm(t.sub(1));
-        layouter.markEndSub();
-
-        layouter.print(")").end();
         layouter.print(symbol);
 
         layouter.markStartSub();
-        printTerm(t.sub(2));
+        printTerm(t.sub(1));
         layouter.markEndSub();
     }
 
