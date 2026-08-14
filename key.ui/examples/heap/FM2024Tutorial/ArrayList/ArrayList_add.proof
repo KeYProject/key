@@ -1,37 +1,33 @@
 \profile "Java Profile";
 
-\settings {
+\settings{
     "Choice" : {
-        "JavaCard" : "JavaCard:off",
+        "JavaCard" : "JavaCard\:off",
         "Strings" : "Strings:on",
-        "assertions" : "assertions:safe",
+        "assertions" : "assertions\:on",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
-        "initialisation" : "initialisation:disableStaticInitialisation",
-        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "initialisation" : "initialisation\:disableStaticInitialisation",
+        "intRules" : "intRules\:arithmeticSemanticsIgnoringOF",
         "integerSimplificationRules" : "integerSimplificationRules:full",
         "javaLoopTreatment" : "javaLoopTreatment:efficient",
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
-        "modelFields" : "modelFields:treatAsAxiom",
-        "moreSeqRules" : "moreSeqRules:on",
+        "modelFields" : "modelFields\:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:off",
         "permissions" : "permissions:off",
-        "programRules" : "programRules:Java",
+        "programRules" : "programRules\:Java",
         "reach" : "reach:on",
-        "runtimeExceptions" : "runtimeExceptions:ban",
+        "runtimeExceptions" : "runtimeExceptions\:ban",
         "sequences" : "sequences:on",
-        "soundDefaultContracts" : "soundDefaultContracts:on",
-        "wdChecks" : "wdChecks:off",
-        "wdOperator" : "wdOperator:L"
+        "soundDefaultContracts" : "soundDefaultContracts:on"
     },
     "Labels" : {
         "UseOriginLabels" : true
     },
     "NewSMT" : {
-        "Axiomatisations" : "false",
-        "Presburger" : "false",
-        "sqrtSMTTranslation" : "SMT"
+        
     },
     "SMTSettings" : {
         "SelectedTaclets" : [
@@ -44,7 +40,7 @@
         "integersMinimum" : -2147483645,
         "invariantForall" : false,
         "maxGenericSorts" : 2,
-        "useConstantsForBigOrSmallIntegers" : true,
+        "useConstantsForBigOrSmallIntegers" : false,
         "useUninterpretedMultiplication" : true
     },
     "Strategy" : {
@@ -54,38 +50,26 @@
         "options" : {
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
-            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
-            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
+            "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
-            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
             "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
-            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
             "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
             "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
             "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "TRIGGERS_OPTIONS_KEY" : "TRIGGERS_BEST",
             "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
             "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
             "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
             "VBT_PHASE" : "VBT_SYM_EX"
         }
     }
-} 
-
-\javaSource "src";
-
-\proofObligation 
-// 
-{
-    "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
-    "contract" : "ArrayList[List::add(int)].JML normal_behavior operation contract.0",
-    "name" : "ArrayList[List::add(int)].JML normal_behavior operation contract.0"
-}
-
-\proofScript {
-  macro autopilot;
 }
