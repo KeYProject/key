@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Aug 14 11:41:42 CEST 2026
+# Date: Fri Aug 14 14:59:50 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -6336,18 +6336,18 @@ Choices: true}
 -----------------------------------------------------
 == elementOfInfiniteUnion2Vars (elementOfInfiniteUnion2Vars) =========================================
 elementOfInfiniteUnion2Vars {
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),infiniteUnion<Pair<java.lang.Object,Field>>{av (variable),bv (variable)}(s)))
-\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s)))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,infiniteUnion<Pair<java.lang.Object,Field>>{av (variable),bv (variable)}(s)))
+\varcond(\notFreeIn(bv (variable), l (Pair<java.lang.Object,Field> term)), \notFreeIn(av (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(l,s)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnion2VarsEQ (elementOfInfiniteUnion2VarsEQ) =========================================
 elementOfInfiniteUnion2VarsEQ {
 \assumes ([equals(infiniteUnion<Pair<java.lang.Object,Field>>{av (variable),bv (variable)}(s),EQ)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),EQ))
-\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s)))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
+\varcond(\notFreeIn(bv (variable), l (Pair<java.lang.Object,Field> term)), \notFreeIn(av (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(l,s)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7313,7 +7313,7 @@ equalityToElementOf {
 \find(equals(s,t))
 \varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
 \replacewith(all{av (variable)}(equiv(elementOf<T>(av,s),elementOf<T>(av,t)))) 
-\heuristics(simplify_enlarging)
+\heuristics(semantics_blasting)
 Choices: true}
 -----------------------------------------------------
 == equalityToElementOfRight (equalityToElementOfRight) =========================================
@@ -13989,32 +13989,32 @@ Choices: programRules:Java}
 == onlyCreatedObjectsAreInLocSets (onlyCreatedObjectsAreInLocSets) =========================================
 onlyCreatedObjectsAreInLocSets {
 \assumes ([wellFormed(h)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f2),select<Set<Pair<java.lang.Object,Field>>>(h,o,f))==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,select<Set<Pair<java.lang.Object,Field>>>(h,o,f))==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsEQ (onlyCreatedObjectsAreInLocSetsEQ) =========================================
 onlyCreatedObjectsAreInLocSetsEQ {
 \assumes ([wellFormed(h),equals(select<Set<Pair<java.lang.Object,Field>>>(h,o,f),EQ)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f2),EQ)==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinal (onlyCreatedObjectsAreInLocSetsFinal) =========================================
 onlyCreatedObjectsAreInLocSetsFinal {
 \assumes ([wellFormed(h)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f2),final<Set<Pair<java.lang.Object,Field>>>(o,f))==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,final<Set<Pair<java.lang.Object,Field>>>(o,f))==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinalEQ (onlyCreatedObjectsAreInLocSetsFinalEQ) =========================================
 onlyCreatedObjectsAreInLocSetsFinalEQ {
 \assumes ([wellFormed(h),equals(final<Set<Pair<java.lang.Object,Field>>>(o,f),EQ)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f2),EQ)==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14028,18 +14028,18 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreObservedInLocSets (onlyCreatedObjectsAreObservedInLocSets) =========================================
 onlyCreatedObjectsAreObservedInLocSets {
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),obs)==>)
+\find(elementOf<Pair<java.lang.Object,Field>>(l,obs)==>)
 \varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
-\add [or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))]==>[] 
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreObservedInLocSetsEQ (onlyCreatedObjectsAreObservedInLocSetsEQ) =========================================
 onlyCreatedObjectsAreObservedInLocSetsEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),EQ)==>)
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
 \varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
-\add [or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))]==>[] 
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14769,21 +14769,21 @@ Choices: true}
 -----------------------------------------------------
 == precOfIntPair (precOfIntPair) =========================================
 precOfIntPair {
-\find(prec(a,pair<int,any>(b,x)))
+\find(prec(a,pair<int,S>(b,x)))
 \replacewith(and(leq(Z(0(#)),a),leq(a,b))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == precOfPair (precOfPair) =========================================
 precOfPair {
-\find(prec(pair<any,any>(a1,b1),pair<any,any>(a2,b2)))
+\find(prec(pair<S1,S3>(a1,b1),pair<S2,S4>(a2,b2)))
 \replacewith(or(prec(a1,a2),and(equals(a1,a2),prec(b1,b2)))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == precOfPairInt (precOfPairInt) =========================================
 precOfPairInt {
-\find(prec(pair<int,any>(a,x),b))
+\find(prec(pair<int,S>(a,x),b))
 \replacewith(and(leq(Z(0(#)),a),lt(a,b))) 
 \heuristics(simplify)
 Choices: true}
@@ -17211,7 +17211,7 @@ subsetToElementOf {
 \find(subset<T>(s,t))
 \varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
 \replacewith(all{av (variable)}(imp(elementOf<T>(av,s),elementOf<T>(av,t)))) 
-\heuristics(simplify_enlarging)
+\heuristics(semantics_blasting)
 Choices: true}
 -----------------------------------------------------
 == subsetToElementOfLocSet (subsetToElementOfLocSet) =========================================
