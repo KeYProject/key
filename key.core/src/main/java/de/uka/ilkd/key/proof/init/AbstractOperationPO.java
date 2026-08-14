@@ -14,8 +14,9 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.statement.Try;
@@ -40,6 +41,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 /**
  * <p>
@@ -905,11 +908,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             sb2 = tryBlock;
         } else {
             // create try statement
-            final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
+            final Assignment nullStat = new BinaryAssignment(COPY, exceptionVar, NullLiteral.NULL);
             final VariableSpecification eSpec = new VariableSpecification(eVar);
             final ParameterDeclaration excDecl =
                 new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-            final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
+            final Assignment assignStat = new BinaryAssignment(COPY, exceptionVar, eVar);
             final Catch catchStat =
                 new Catch(excDecl, catchBlock == null ? new StatementBlock(assignStat)
                         : new StatementBlock(assignStat, catchBlock));

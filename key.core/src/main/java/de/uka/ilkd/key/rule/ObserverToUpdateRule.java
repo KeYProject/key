@@ -8,17 +8,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.*;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -193,7 +192,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("Assignment");
+        contGoal.setBranchLabel("CopyAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -203,7 +202,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "Assignment" cont branch
+        // ---- create "CopyAssignment" cont branch
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
@@ -257,7 +256,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             contGoal = result.head();
             nullGoal = null;
         }
-        contGoal.setBranchLabel("Assignment");
+        contGoal.setBranchLabel("CopyAssignment");
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
@@ -266,7 +265,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         }
 
-        // ---- create "Assignment" cont branch
+        // ---- create "CopyAssignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
         JModality modality = JModality.getModality(inst.modality().kind(), postJavaBlock);
@@ -357,7 +356,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment ca)) {
+        if (!(activeStatement instanceof Assignment ca
+                && ca.getKind() == BinaryAssignment.BinaryAssignmentKind.COPY)) {
             return null;
         }
 

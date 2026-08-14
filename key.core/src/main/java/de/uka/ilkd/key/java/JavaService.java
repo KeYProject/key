@@ -913,7 +913,7 @@ public class JavaService {
         }
         var f = JavaBlock
                 .createJavaBlock((StatementBlock) getConverter(allowSchemaJava).process(sb));
-        JavaLogger.print(block, f);
+        // JavaLogger.print(block, f);
         return f;
     }
 
@@ -1005,7 +1005,7 @@ public class JavaService {
     }
 
     @NonNull
-    private JavaSymbolSolver getSymbolResolver() {
+    public JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }
 

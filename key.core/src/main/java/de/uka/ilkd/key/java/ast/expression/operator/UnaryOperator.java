@@ -23,37 +23,37 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-public final class BinaryOperator extends Operator
-        implements ProgramElementWithKind<BinaryOperatorKind> {
-    private final BinaryOperatorKind kind;
-
-    public BinaryOperator(BinaryOperatorKind binaryOperatorKind, ExtList operands) {
-        super(operands);
-        kind = Objects.requireNonNull(binaryOperatorKind);
-        assert getChildCount() == 2;
-    }
-
-    public BinaryOperator(BinaryOperatorKind kind, Expression lhs, Expression rhs) {
-        super(lhs, rhs);
+/**
+ *
+ * @author Alexander Weigl
+ * @version 1 (4/12/26)
+ */
+public final class UnaryOperator extends Operator
+        implements ProgramElementWithKind<UnaryOperatorKind> {
+    public UnaryOperator(UnaryOperatorKind kind, Expression arg) {
+        super(arg);
         this.kind = Objects.requireNonNull(kind);
-        assert getChildCount() == 2;
     }
 
-    public BinaryOperator(PositionInfo pi, List<Comment> c,
-            BinaryOperatorKind kind, Expression lhs, Expression rhs) {
-        super(pi, c,
-            new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
+    public final UnaryOperatorKind kind;
+
+    public UnaryOperator(PositionInfo pi, List<Comment> c, UnaryOperatorKind op, Expression child) {
+        super(pi, c, new ImmutableArray<>(child));
+        this.kind = Objects.requireNonNull(op);
+    }
+
+    public UnaryOperator(UnaryOperatorKind kind, ExtList changeList) {
+        super(changeList);
         this.kind = Objects.requireNonNull(kind);
-        assert getChildCount() == 2;
     }
 
-
-    public BinaryOperatorKind getKind() {
+    public UnaryOperatorKind getKind() {
         return kind;
     }
 
+    @Override
     public int getArity() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -63,28 +63,13 @@ public final class BinaryOperator extends Operator
 
     @Override
     public int getNotation() {
-        return INFIX;
-    }
-
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        final TypeConverter tc = javaServ.getTypeConverter();
-        if (kind.isBoolean()) {
-            return javaServ.getTypeConverter().getBooleanType();
-        }
-
-        try {
-            return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec),
-                tc.getKeYJavaType((Expression) getChildAt(1), ec));
-        } catch (Exception e) {
-            throw new RuntimeException("Type promotion failed (see below). Operator was " + this,
-                e);
-        }
+        return kind.notation;
     }
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if (src instanceof BinaryOperator other) {
+        if (src instanceof UnaryOperator other) {
             if (this.kind.equals(other.getKind())) {
                 return super.match(source, matchCond);
             }
@@ -92,18 +77,34 @@ public final class BinaryOperator extends Operator
         return null;
     }
 
+
+    @Override
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+        final TypeConverter tc = javaServ.getTypeConverter();
+
+        try {
+            return switch (kind) {
+                case LOGICAL_NOT -> javaServ.getTypeConverter().getBooleanType();
+                default -> tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
+            };
+        } catch (Exception e) {
+            throw new RuntimeException("Type promotion failed (see below). Operator was " + this,
+                e);
+        }
+    }
+
     @Override
     public void visit(Visitor v) {
-        v.performActionOnBinaryOperator(this);
+        v.performActionOnUnaryOperator(this);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof BinaryOperator b))
+        if (!(o instanceof UnaryOperator that))
             return false;
         if (!super.equals(o))
             return false;
-        return kind == b.kind;
+        return kind == that.kind;
     }
 
     @Override
