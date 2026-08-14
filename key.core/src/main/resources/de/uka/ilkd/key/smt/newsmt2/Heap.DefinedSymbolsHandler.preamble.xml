@@ -13,8 +13,8 @@
 <entry key="anon.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Heap h2; \forall LocSet ls;
       select<any>(anon(h, ls, h2), o, f)<<Trigger>> =
-         \if(elementOf(o, f, ls) & f != java.lang.Object::#$created
-           | elementOf(o, f, freshLocs(h)))
+         \if(elementOf<Loc>(pair<Object,Field>(o, f), ls) & f != java.lang.Object::#$created
+           | elementOf<Loc>(pair<Object,Field>(o, f), freshLocs(h)))
          \then(select<any>(h2, o, f))
          \else(select<any>(h, o, f))
 ]]></entry>
@@ -22,7 +22,7 @@
 <entry key="memset.dl"><![CDATA[
     \forall Heap h; \forall LocSet s; \forall any x; \forall Object o; \forall Field f;
       select<any>(memset(h, s, x), o, f)<<Trigger>> =
-         \if(elementOf(o, f, s) & f != java.lang.Object::#$created)
+         \if(elementOf<Loc>(pair<Object,Field>(o, f), s) & f != java.lang.Object::#$created)
          \then(x)
          \else(select<any>(h, o, f))
 ]]></entry>
