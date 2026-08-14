@@ -68,7 +68,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     @Override
     public LiteralDecision decideStrippedSelf(JTerm strippedLiteral, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return QuantifierTheorySupport
+        return TheoryReasoning
                 .fromTruthTerm(HandleArith.provedByArith(strippedLiteral, integerLDT, services));
     }
 
@@ -84,7 +84,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     @Override
     public LiteralDecision decideFromAxiom(JTerm literal, JTerm axiom, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return QuantifierTheorySupport
+        return TheoryReasoning
                 .fromTruthTerm(HandleArith.provedByArith(literal, axiom, integerLDT, services));
     }
 

@@ -90,11 +90,8 @@ class Instantiation {
         congruence = new Congruence(assumedLiterals, services);
         assumedLiterals = normalizeAll(assumedLiterals);
         addInstances(sequentToTerms(seq), services);
-        // the theories' instance candidates are part of the theory-aware selection, dropped in
-        // classic
-        if (!treatment.isClassic()) {
-            addTheoryInstances((JTerm) matrix, TriggersSet.THEORY_SUPPORTS, services);
-        }
+        addTheoryInstances((JTerm) matrix,
+            services.getProfile().getTheorySupports(treatment.isClassic()), services);
     }
 
     /**
@@ -107,13 +104,16 @@ class Instantiation {
      * not, so every support is called on every subterm. A supplied candidate is costed like a
      * matched one.
      *
+     * The supports are the ones the trigger treatment selects, so the classic treatment, which
+     * has none for the heap, supplies no candidates.
+     *
      * @param term a subterm of the matrix
      * @param supports the theories to consult
      * @param services access to the theories
      */
-    private void addTheoryInstances(JTerm term, List<? extends QuantifierTheorySupport> supports,
+    private void addTheoryInstances(JTerm term, List<? extends TriggerSupport> supports,
             Services services) {
-        for (final QuantifierTheorySupport support : supports) {
+        for (final TriggerSupport support : supports) {
             for (final JTerm inst : support.provideInstances(term, firstVar, services)) {
                 final ImmutableMap<QuantifiableVariable, Term> varMap =
                     DefaultImmutableMap.<QuantifiableVariable, Term>nilMap().put(firstVar, inst);

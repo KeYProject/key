@@ -31,25 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class TriggersSet {
 
-    /**
-     * Per-theory support consulted for rejecting unsuitable trigger material, providing derived
-     * triggers, and (from {@link PredictCostProver}) deciding literals during cost prediction.
-     * Support for a further theory is added by extending this list. The order is significant for
-     * cost prediction: literals are decided by the first support that reaches a verdict, so
-     * equality
-     * is consulted before integer arithmetic, matching the original prover.
-     */
-    static final List<QuantifierTheorySupport> THEORY_SUPPORTS =
-        List.of(new HeapArrayTheorySupport(), new EqualityTheorySupport(),
-            new IntegerTheorySupport());
-
-    /**
-     * The classic trigger selection: equality and integer rejection only, without the
-     * symbolic-execution supports. The strategy option {@code TRIGGERS_CLASSIC} selects it.
-     */
-    private static final List<QuantifierTheorySupport> CLASSIC_SUPPORTS =
-        List.of(new EqualityTheorySupport(), new IntegerTheorySupport());
-
     /** The quantified formula in prenex CNF. */
     private final JTerm allTerm;
     /** Whether this set was built with the classic supports; part of the cache decision. */
@@ -75,10 +56,10 @@ public class TriggersSet {
     /**
      * Hands the supports their metavariables, counted within this set. The set is built from the
      * quantified formula alone, so the same formula always yields the same names, and no two
-     * derived triggers share one. See {@link QuantifierTheorySupport.MetavariableFactory}.
+     * derived triggers share one. See {@link TriggerSupport.MetavariableFactory}.
      */
-    private final QuantifierTheorySupport.MetavariableFactory metavariableFactory =
-        new QuantifierTheorySupport.MetavariableFactory() {
+    private final TriggerSupport.MetavariableFactory metavariableFactory =
+        new TriggerSupport.MetavariableFactory() {
             private int created;
 
             @Override
@@ -97,12 +78,12 @@ public class TriggersSet {
      * The theory supports consulted for trigger rejection and provision. Under the classic trigger
      * selection only the classic supports (equality and integer) are kept.
      */
-    private final List<QuantifierTheorySupport> supports;
+    private final List<? extends TriggerSupport> supports;
 
     private TriggersSet(JTerm allTerm, Services services, boolean classic) {
         this.allTerm = allTerm;
         this.classic = classic;
-        this.supports = classic ? CLASSIC_SUPPORTS : THEORY_SUPPORTS;
+        this.supports = services.getProfile().getTheorySupports(classic);
         replacementWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = collectUniversalVariables(allTerm);
@@ -352,11 +333,11 @@ public class TriggersSet {
         }
 
         /**
-         * A trigger candidate is acceptable unless some theory's {@link QuantifierTheorySupport}
+         * A trigger candidate is acceptable unless some theory's {@link TriggerSupport}
          * rejects it as an array index or connective material.
          */
         private boolean isAcceptableTrigger(JTerm term, Services services) {
-            for (final QuantifierTheorySupport support : supports) {
+            for (final TriggerSupport support : supports) {
                 if (support.rejectsAsTrigger(term, services)) {
                     return false;
                 }
@@ -366,7 +347,7 @@ public class TriggersSet {
 
         /** Whether some theory would rather trigger on the term enclosing this one. */
         private boolean prefersEnclosing(JTerm term, JTerm enclosing, Services services) {
-            for (final QuantifierTheorySupport support : supports) {
+            for (final TriggerSupport support : supports) {
                 if (support.prefersEnclosingTrigger(term, enclosing, services)) {
                     return true;
                 }
@@ -376,7 +357,7 @@ public class TriggersSet {
 
         /**
          * add a uni-trigger to triggers set or add an element of multi-triggers for this clause,
-         * together with the derived triggers each theory's {@link QuantifierTheorySupport} provides
+         * together with the derived triggers each theory's {@link TriggerSupport} provides
          *
          * @return whether a trigger was registered for {@code term}
          */
@@ -389,7 +370,7 @@ public class TriggersSet {
             // the original does not and fail to match where the original does. Both are therefore
             // registered, so an instantiation reachable through either one stays reachable.
             if (theoryTriggersProvidedFor.add(term)) {
-                for (final QuantifierTheorySupport support : supports) {
+                for (final TriggerSupport support : supports) {
                     for (final JTerm derived : support.provideTriggers(term, clauseVariables,
                         services, metavariableFactory)) {
                         registerUniTrigger(derived, true);

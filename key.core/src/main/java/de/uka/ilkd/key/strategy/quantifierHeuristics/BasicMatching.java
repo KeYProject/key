@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
  * pair of subterms defeated it. Basic matching descends position by position with the ground term
  * fixed, so a failing comparison stays located at the position where it failed and can be handed
  * to a theory there: where {@code arr(base + i)} meets {@code arr(x)} the integer theory solves
- * {@code base + i = x} for {@code i} (see {@link QuantifierTheorySupport#solveForVariable}) and
+ * {@code base + i = x} for {@code i} (see {@link TheoryReasoning#solveForVariable}) and
  * the match continues with {@code i = x - base}.
  */
 class BasicMatching {
@@ -181,7 +181,7 @@ class BasicMatching {
                 || !(instance instanceof JTerm instanceTerm)) {
             return null;
         }
-        for (QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
+        for (TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
             final ImmutableMap<QuantifiableVariable, Term> solved = support
                     .solveForVariable(patternTerm, instanceTerm, bindings.variables(), services);
             if (solved != null) {

@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.QuantifierTheorySupport;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.QuantifierTheorySupports;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.engine.GoalChooserFactory;
@@ -210,5 +212,14 @@ public interface Profile {
     default List<String> prepareInitConfig(InitConfig baseConfig,
             @Nullable Configuration additionalProfileOptions) {
         return Collections.emptyList();
+    }
+
+    /// The theories the quantifier heuristic consults for the terms of this profile, in the order
+    /// it consults them. A profile over other terms returns its own.
+    ///
+    /// @param classic whether the classic trigger selection is in effect
+    /// @return the theories, never empty
+    default List<QuantifierTheorySupport> getTheorySupports(boolean classic) {
+        return classic ? QuantifierTheorySupports.CLASSIC : QuantifierTheorySupports.JAVA_DL;
     }
 }
