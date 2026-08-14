@@ -854,14 +854,18 @@ public class TermBuilder {
     // ------------------------------
 
     public JTerm pair(JTerm first, JTerm second) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("pair"));
+        final Namespace<ParametricFunctionDecl> funcNS =
+            services.getNamespaces().parametricFunctions();
+        final ParametricFunctionDecl f = funcNS.lookup(new Name("pair"));
         if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
 
-        return func(f, first, second);
+        return func(ParametricFunctionInstance.get(f,
+            ImmutableList.fromList(
+                List.of(new GenericArgument(first.sort()), new GenericArgument(second.sort()))),
+            services), first, second);
 
     }
 
