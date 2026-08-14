@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -18,20 +19,20 @@ import org.key_project.util.collection.ImmutableList;
 public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
-    private final LocSetLDT locSetLDT;
+    private final SetLDT setLDT;
 
 
     private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            LocSetLDT locSetLDT) {
+            SetLDT setLDT) {
         this.left = left;
         this.right = right;
-        this.locSetLDT = locSetLDT;
+        this.setLDT = setLDT;
     }
 
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            LocSetLDT locSetLDT) {
-        return new SetsSmallerThanFeature(left, right, locSetLDT);
+            SetLDT setLDT) {
+        return new SetsSmallerThanFeature(left, right, setLDT);
     }
 
 
@@ -62,9 +63,9 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     private class LiteralCollector extends Collector {
 
         protected void collect(Term te) {
-            final var op = te.op();
-            if (op == locSetLDT.getUnion() || op == locSetLDT.getIntersect()
-                    || op == locSetLDT.getDisjoint()) {
+            if (te.op() instanceof ParametricFunctionInstance pfi
+                    && (pfi.getBase() == setLDT.getUnion() || pfi.getBase() == setLDT.getIntersect()
+                            || pfi.getBase() == setLDT.getDisjoint())) {
                 collect(te.sub(0));
                 collect(te.sub(1));
             } else {

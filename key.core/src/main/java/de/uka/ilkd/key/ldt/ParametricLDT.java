@@ -46,7 +46,7 @@ public abstract class ParametricLDT extends AbstractLDT {
         // TreeMap ensures the map is sorted according to the natural order of its keys.
         Map<Name, ParametricLDT> ret = new TreeMap<>();
 
-
+        ret.put(SetLDT.NAME, new SetLDT(s));
 
         return ret;
     }

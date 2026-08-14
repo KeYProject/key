@@ -21,25 +21,71 @@ import org.jspecify.annotations.Nullable;
 public final class SetLDT extends ParametricLDT {
     public static final Name NAME = new Name("Set");
 
-    private final ParametricFunctionDecl sEmpty;
-    private final ParametricFunctionDecl sSingleton;
-    private final ParametricFunctionDecl sUnion;
-    private final ParametricFunctionDecl sIntersect;
-    private final ParametricFunctionDecl sSetMinus;
-    private final ParametricFunctionDecl sInfiniteUnion;
-    private final ParametricFunctionDecl sCard;
+    private final ParametricFunctionDecl empty;
+    private final ParametricFunctionDecl singleton;
+    private final ParametricFunctionDecl union;
+    private final ParametricFunctionDecl intersect;
+    private final ParametricFunctionDecl setMinus;
+    private final ParametricFunctionDecl infiniteUnion;
+    private final ParametricFunctionDecl card;
+    private final ParametricFunctionDecl elementOf;
+    private final ParametricFunctionDecl subset;
+    private final ParametricFunctionDecl disjoint;
 
 
     public SetLDT(TermServices services) {
         super(NAME, services);
 
-        sEmpty = addParametricFunction(services, "sEmpty");
-        sSingleton = addParametricFunction(services, "sSingleton");
-        sUnion = addParametricFunction(services, "sUnion");
-        sIntersect = addParametricFunction(services, "sIntersect");
-        sSetMinus = addParametricFunction(services, "sSetMinus");
-        sInfiniteUnion = addParametricFunction(services, "sInfiniteUnion");
-        sCard = addParametricFunction(services, "sCard");
+        empty = addParametricFunction(services, "empty");
+        singleton = addParametricFunction(services, "singleton");
+        union = addParametricFunction(services, "union");
+        intersect = addParametricFunction(services, "intersect");
+        setMinus = addParametricFunction(services, "setMinus");
+        infiniteUnion = addParametricFunction(services, "infiniteUnion");
+        card = addParametricFunction(services, "sCard");
+        elementOf = addParametricFunction(services, "elementOf");
+        subset = addParametricFunction(services, "subset");
+        disjoint = addParametricFunction(services, "disjoint");
+    }
+
+    public ParametricFunctionDecl getEmpty() {
+        return empty;
+    }
+
+    public ParametricFunctionDecl getSingleton() {
+        return singleton;
+    }
+
+    public ParametricFunctionDecl getUnion() {
+        return union;
+    }
+
+    public ParametricFunctionDecl getIntersect() {
+        return intersect;
+    }
+
+    public ParametricFunctionDecl getSetMinus() {
+        return setMinus;
+    }
+
+    public ParametricFunctionDecl getInfiniteUnion() {
+        return infiniteUnion;
+    }
+
+    public ParametricFunctionDecl getCard() {
+        return card;
+    }
+
+    public ParametricFunctionDecl getElementOf() {
+        return elementOf;
+    }
+
+    public ParametricFunctionDecl getSubset() {
+        return subset;
+    }
+
+    public ParametricFunctionDecl getDisjoint() {
+        return disjoint;
     }
 
     @Override
