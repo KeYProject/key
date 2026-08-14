@@ -50,7 +50,6 @@ public class ProofObligationCreator {
      */
     public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,
             ImmutableSet<Taclet> axioms, Collection<LoaderListener> listeners) {
-
         ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 
         for (LoaderListener listener : listeners) {

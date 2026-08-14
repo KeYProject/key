@@ -177,7 +177,7 @@ public final class ParametricSortInstance extends AbstractSort implements Syntax
         return true;
     }
 
-    /// Get the sort if this parametric sort with all generics instantiated with `instMap`.
+    /// Get the sort of this parametric sort with all generics instantiated with `instMap`.
     public Sort resolveSort(SVInstantiations instMap, Services services) {
         ImmutableList<GenericArgument> newArgs = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
