@@ -144,9 +144,10 @@ public class ContractFactoryTest {
                 @  signals_only RuntimeException;
                 @*/""";
         JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
-        assertEquals("intersect<Pair<java.lang.Object,Field>>(if-then-else(equals(a,Z(5(#))),empty<Pair<java.lang.Object,Field>>,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(self,testPackage.TestClass::#l)),"
-            + "allLocs))",
+        assertEquals(
+            "intersect<Pair<java.lang.Object,Field>>(if-then-else(equals(a,Z(5(#))),empty<Pair<java.lang.Object,Field>>,allLocs),"
+                + "if-then-else(not(equals(a,Z(5(#)))),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(self,testPackage.TestClass::#l)),"
+                + "allLocs))",
             woLabels.toString());
     }
 

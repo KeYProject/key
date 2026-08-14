@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Aug 13 15:52:31 CEST 2026
+# Date: Fri Aug 14 11:41:42 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -5253,16 +5253,16 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSingleton (createdInHeapWithSingleton) =========================================
 createdInHeapWithSingleton {
-\find(createdInHeap(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),h))
-\replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
+\find(createdInHeap(singleton<Pair<java.lang.Object,Field>>(l),h))
+\replacewith(or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSingletonEQ (createdInHeapWithSingletonEQ) =========================================
 createdInHeapWithSingletonEQ {
-\assumes ([equals(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),EQ)]==>[]) 
+\assumes ([equals(singleton<Pair<java.lang.Object,Field>>(l),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
+\replacewith(or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5794,6 +5794,14 @@ disjointToElementOf {
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
+== disjointToElementOfLocSet (disjointToElementOfLocSet) =========================================
+disjointToElementOfLocSet {
+\find(disjoint<Pair<java.lang.Object,Field>>(s,s2))
+\varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith(all{ov (variable)}(all{fv (variable)}(or(not(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)),not(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2)))))) 
+\heuristics(semantics_blasting)
+Choices: programRules:Java}
+-----------------------------------------------------
 == disjointWithEmpty (disjointWithEmpty) =========================================
 disjointWithEmpty {
 \find(disjoint<T>(empty<T>,s))
@@ -6261,23 +6269,23 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfAllLocs (elementOfAllLocs) =========================================
 elementOfAllLocs {
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),allLocs))
+\find(elementOf<Pair<java.lang.Object,Field>>(l,allLocs))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfAllObjects (elementOfAllObjects) =========================================
 elementOfAllObjects {
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),allObjects(f2)))
-\replacewith(equals(f,f2)) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,allObjects(f2)))
+\replacewith(equals(second<java.lang.Object,Field>(l),f2)) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfArrayRange (elementOfArrayRange) =========================================
 elementOfArrayRange {
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),arrayRange(o2,lower,upper)))
-\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), f (Field term)))
-\replacewith(and(equals(o,o2),exists{iv (variable)}(and(and(equals(f,arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,arrayRange(o2,lower,upper)))
+\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(and(equals(first<java.lang.Object,Field>(l),o2),exists{iv (variable)}(and(and(equals(second<java.lang.Object,Field>(l),arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6291,9 +6299,9 @@ Choices: programRules:Java}
 == elementOfArrayRangeEQ (elementOfArrayRangeEQ) =========================================
 elementOfArrayRangeEQ {
 \assumes ([equals(arrayRange(o2,lower,upper),EQ)]==>[]) 
-\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),EQ))
-\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), f (Field term)))
-\replacewith(and(equals(o,o2),exists{iv (variable)}(and(and(equals(f,arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
+\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(and(equals(first<java.lang.Object,Field>(l),o2),exists{iv (variable)}(and(and(equals(second<java.lang.Object,Field>(l),arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11643,7 +11651,7 @@ Choices: true}
 -----------------------------------------------------
 == intro (intro) =========================================
 intro {
-\add [equals(t,sk)]==>[]
+\add [equals(t,sk)]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -18088,7 +18096,7 @@ tryCatchThrow {
   } catch (#t #v0) {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
