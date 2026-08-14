@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
@@ -189,7 +191,7 @@ public final class IconFactory {
      * Additional horizontal space in pixels reserved for the overlay letter in
      * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
      */
-    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 7;
     /**
      * Additional horizontal space in pixels for wider auto buttons.
      */
@@ -414,19 +416,21 @@ public final class IconFactory {
 
         // Draw letter overlay
         g2d.setColor(Color.BLACK);
-        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC,
+        Font font = new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC,
             (int) (baseIcon.getIconHeight() * 0.9f));
         g2d.setFont(font);
 
-        FontMetrics fm = g2d.getFontMetrics();
-        int textWidth = fm.stringWidth(letter);
-        int textHeight = fm.getAscent() - fm.getDescent();
+        GlyphVector glyphVector = font.createGlyphVector(g2d.getFontRenderContext(), letter);
+        Rectangle2D tightBounds = glyphVector.getVisualBounds();
 
-        // Position letter in bottom-right corner
-        int x = baseIcon.getIconWidth() - textWidth;
+        int overlayRight = TOOLBAR_EXTRA_WIDTH + TOOLBAR_INDICATOR_EXTRA_SPACE
+                + baseIcon.getIconWidth() - 1;
+        int overlayBottom = baseIcon.getIconHeight() - 1;
 
-        g2d.drawString(letter, x + TOOLBAR_INDICATOR_EXTRA_SPACE + TOOLBAR_EXTRA_WIDTH,
-            baseIcon.getIconHeight());
+        int baselineX = overlayRight - (int) Math.ceil(tightBounds.getMaxX());
+        int baselineY = overlayBottom - (int) Math.ceil(tightBounds.getMaxY());
+
+        g2d.drawString(letter, baselineX, baselineY);
         g2d.dispose();
 
         return new ImageIcon(image);

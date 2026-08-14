@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.Equals;
+import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.*;
@@ -73,7 +73,7 @@ public class SwitchToIf extends ProgramTransformer {
         }
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Case) {
-                Equals guard = KeYJavaASTFactory.equalsOperator(exV,
+                BinaryOperator guard = KeYJavaASTFactory.equalsOperator(exV,
                     ((Case) sw.getBranchAt(i)).getExpression());
                 StatementBlock caseBlock = collectStatements(sw, i);
                 // Avoid creating a Else(null) block

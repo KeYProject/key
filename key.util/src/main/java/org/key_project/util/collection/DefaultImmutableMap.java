@@ -4,6 +4,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.key_project.util.Strings;
@@ -24,6 +25,21 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     @SuppressWarnings("unchecked")
     public static <S, T> DefaultImmutableMap<S, T> nilMap() {
         return (DefaultImmutableMap<S, T>) EMPTY_MAP;
+    }
+
+    /**
+     * Creates an immutable map from the given map maintaining the order from the given {@code map}
+     * (if the given {@code map} supports stable ordering)
+     *
+     * @param map the map whose entries the result is to hold
+     * @return the persistent map holding exactly the entries of {@code map}
+     */
+    public static <S, T> ImmutableMap<S, T> fromMap(java.util.Map<S, T> map) {
+        DefaultImmutableMap<S, T> result = nilMap();
+        for (Entry<S, T> e : map.entrySet()) {
+            result = new DefaultImmutableMap<>(new MapEntry<>(e.getKey(), e.getValue()), result);
+        }
+        return result;
     }
 
     /**
@@ -71,6 +87,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public ImmutableMap<S, T> put(S key, T value) {
         return new DefaultImmutableMap<>(new MapEntry<>(key, value), this.remove(key));
     }
+
 
     /**
      * Retrieves the value mapped to key in this map.

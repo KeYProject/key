@@ -282,7 +282,7 @@ public class TestApplyUpdateOnRigidCondition {
         }
 
         return ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
-                .getTermInstantiation(result, null, TacletForTests.services());
+                .getTermInstantiation(result, TacletForTests.services());
     }
 
 }

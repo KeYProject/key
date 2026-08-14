@@ -10,9 +10,10 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -748,13 +749,23 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
-
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
+    public void performActionOnUnaryAssignment(UnaryAssignment x) {
         DefaultAction def = new DefaultAction() {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                return KeYJavaASTFactory.assign(changeList);
+                return KeYJavaASTFactory.assign(x.getKind(), changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnBinaryAssignment(BinaryAssignment x) {
+        DefaultAction def = new DefaultAction() {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return KeYJavaASTFactory.assign(x.getKind(), changeList);
             }
         };
         def.doAction(x);

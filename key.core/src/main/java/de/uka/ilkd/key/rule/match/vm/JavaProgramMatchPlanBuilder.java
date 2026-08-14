@@ -10,12 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.ContextStatementBlock;
-import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.ast.JavaProgramElement;
-import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.SourceData;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.CcatchReturnValParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
@@ -166,6 +161,12 @@ public final class JavaProgramMatchPlanBuilder {
         }
         if (progEl instanceof SchematicFieldReference fieldRef) {
             return FieldReferencePlan.of(fieldRef);
+        }
+        if (progEl instanceof ProgramElementWithKind<?> patternPE) {
+            return structuralPlan(patternPE,
+                (actual, mc,
+                        services) -> actual instanceof ProgramElementWithKind<?> peKind
+                                && peKind.getKind() == patternPE.getKind() ? mc : null);
         }
         if (!isGenericMatch(progEl)) {
             return null; // overrides match() with logic not described here

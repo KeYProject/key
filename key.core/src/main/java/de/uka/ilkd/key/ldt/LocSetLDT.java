@@ -11,11 +11,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.Intersect;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
@@ -187,8 +183,17 @@ public final class LocSetLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
-        return op instanceof Singleton || op instanceof SetUnion || op instanceof Intersect
-                || op instanceof SetMinus || op instanceof AllFields;
+        if (op instanceof LogicFunctionalOperator lfo) {
+            // getFunctionFor does not support all loc set functions, e.g. array range etc.
+            // return lfo.getFunction().returnType == PrimitiveType.JAVA_LOCSET;
+            return switch (lfo.getFunction()) {
+                case Singleton, SetUnion, Intersect,
+                        SetMinus, AllFields, AllObjects ->
+                    true;
+                default -> false;
+            };
+        }
+        return false;
     }
 
 
@@ -202,21 +207,21 @@ public final class LocSetLDT extends LDT {
     @Override
     public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
-        if (op instanceof Singleton) {
-            return singleton;
-        } else if (op instanceof SetUnion) {
-            return union;
-        } else if (op instanceof Intersect) {
-            return intersect;
-        } else if (op instanceof SetMinus) {
-            return setMinus;
-        } else if (op instanceof AllFields) {
-            return allFields;
+        if (!(op instanceof LogicFunctionalOperator lfo)) {
+            assert false;
+            return null;
         }
-        assert false;
-        return null;
-    }
 
+        return switch (lfo.getFunction()) {
+            case Singleton -> singleton;
+            case SetUnion -> union;
+            case Intersect -> intersect;
+            case SetMinus -> setMinus;
+            case AllFields -> allFields;
+            case AllObjects -> allObjects;
+            default -> throw new IllegalStateException();
+        };
+    }
 
     @Override
     public boolean hasLiteralFunction(Function f) {

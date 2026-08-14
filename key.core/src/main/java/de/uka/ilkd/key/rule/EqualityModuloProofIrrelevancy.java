@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -239,6 +240,13 @@ public class EqualityModuloProofIrrelevancy {
         if (_this.getClass() != that.getClass()) {
             return false;
         }
+
+        if (_this instanceof ProgramElementWithKind<?> _thisWithKind &&
+                that instanceof ProgramElementWithKind<?> thatWithKind &&
+                _thisWithKind.getKind() != thatWithKind.getKind()) {
+            return false;
+        }
+
         if (_this instanceof TypeRef thisRef) {
             final TypeRef thatRef = (TypeRef) that;
             return thisRef.getDimensions() == thatRef.getDimensions() &&

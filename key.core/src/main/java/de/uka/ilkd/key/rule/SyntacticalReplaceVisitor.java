@@ -334,7 +334,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
             final JTerm newTerm = toTerm(
-                svInst.getTermInstantiation(visitedSV, svInst.getExecutionContext(), services));
+                svInst.getTermInstantiation(visitedSV, services));
             final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);

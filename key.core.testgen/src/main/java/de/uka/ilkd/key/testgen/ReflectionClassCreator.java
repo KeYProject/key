@@ -190,7 +190,8 @@ public class ReflectionClassCreator {
     /**
      * Takes a string representing a type e.g. "java.lang.Object[]" and returns a new name without
      * "." and "[]", e.g. "java_lang_Object_ARRAY_". It is used to create correct setter and getter
-     * method names. This method is also used in Assignment.toString(boolean rfl) to generate the
+     * method names. This method is also used in BinaryAssignment.toString(boolean rfl) to generate
+     * the
      * correct method names.
      */
     public static String cleanTypeName(TypeName s) {

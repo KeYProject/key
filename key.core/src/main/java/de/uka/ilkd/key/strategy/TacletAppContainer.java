@@ -13,11 +13,11 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.indexing.FormulaTagManager;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -348,7 +348,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         final Iterator<AssumesFormulaInstantiation> it =
             getTacletApp().assumesFormulaInstantiations().iterator();
-        final Sequent seq = p_goal.sequent();
+        final FormulaTagManager tags = p_goal.getFormulaTagManager();
 
         while (it.hasNext()) {
             final AssumesFormulaInstantiation assumesInstantiations2 = it.next();
@@ -359,8 +359,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     assumesInstantiations2);
                 throw new IllegalStateException(
                     "Unexpected assume-instantiation" + assumesInstantiations2);
-            } else if (!(assumesInst.inAntecedent() ? seq.antecedent() : seq.succedent())
-                    .contains(assumesInst.getSequentFormula())) {
+            } else if (tags.getTagForPos(assumesInst.toPosInOccurrence()) == null) {
+                // checks whether assumesInst still occurs in sequent,
+                // replaces linear lookup via Sequent#contains by
+                // hashmap lookup using the tag manager
                 return false;
             }
         }

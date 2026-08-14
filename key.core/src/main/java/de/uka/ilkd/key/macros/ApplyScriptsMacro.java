@@ -176,7 +176,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         Term appliedOn = ruleApp.posInOccurrence().subTerm();
         if (appliedOn.op() instanceof UpdateApplication) {
             var update = UpdateApplication.getUpdate((JTerm) appliedOn);
-            Map<JTerm, JTerm> updates = new HashMap<>();
+            Map<JTerm, JTerm> updates = new LinkedHashMap<>();
             Services services = goal.proof().getServices();
             collectUpdates(update, updates, services);
             return new OpReplacer(updates, services.getTermFactory());
@@ -311,7 +311,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private Map<LocationVariable, JFunction> makeObtainVarMap(
             ImmutableList<LocationVariable> locationVariables) {
-        HashMap<LocationVariable, JFunction> result = new HashMap<>();
+        HashMap<LocationVariable, JFunction> result = new LinkedHashMap<>();
         for (LocationVariable lv : locationVariables) {
             result.put(lv, null);
         }

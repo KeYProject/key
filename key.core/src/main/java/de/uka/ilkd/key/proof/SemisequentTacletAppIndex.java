@@ -5,7 +5,9 @@ package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
@@ -48,6 +50,26 @@ public class SemisequentTacletAppIndex {
             cfmas = cfmas.tail();
             addTermIndex(cfma, services, tacletIndex, listener);
         }
+    }
+
+    /**
+     * Create the map <code>termIndices</code> with an index for every formula of the given
+     * semisequent.
+     *
+     * @return map with an index for each formula in the semisequent
+     */
+    private ImmutableMap<SequentFormula, TermTacletAppIndex> createTermIndices(
+            ImmutableList<SequentFormula> cfmas,
+            Services services,
+            TacletIndex tacletIndex, NewRuleListener listener) {
+        final Map<SequentFormula, TermTacletAppIndex> indices = new LinkedHashMap<>();
+        for (final SequentFormula cfma : cfmas) {
+            final PosInOccurrence pos =
+                new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+            indices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex,
+                listener, ruleFilter, indexCaches));
+        }
+        return DefaultImmutableMap.fromMap(indices);
     }
 
     /**
@@ -179,7 +201,8 @@ public class SemisequentTacletAppIndex {
         this.antec = antec;
         this.ruleFilter = ruleFilter;
         this.indexCaches = indexCaches;
-        addTermIndices((antec ? s.antecedent() : s.succedent()).asList(), services, tacletIndex,
+        this.termIndices = createTermIndices((antec ? s.antecedent() : s.succedent()).asList(),
+            services, tacletIndex,
             listener);
     }
 
