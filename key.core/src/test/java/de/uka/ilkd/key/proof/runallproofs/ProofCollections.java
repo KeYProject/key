@@ -415,6 +415,10 @@ public class ProofCollections {
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute_opt.key");
+        g.provable("heap/verifyThis26_01_hIndex/lemma1.key");
+        g.provable("heap/verifyThis26_01_hIndex/update.key");
 
         g = c.group("funOfIF");
         g.provable("heap/information_flow/ArrayList_contains.key");

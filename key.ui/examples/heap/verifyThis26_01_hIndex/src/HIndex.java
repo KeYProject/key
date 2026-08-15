@@ -55,13 +55,13 @@ class HIndex {
       @  ensures (\num_of int i; 0 <= i < a.length; a[i] >= \result + 1) < \result + 1;
       @  ensures 0 <= \result <= a.length;
       @  ensures \result == a.length || a[\result] <= \result;
-      @  ensures \result == 0 || a[\result-1] > \result;
+      @  ensures \result == 0 || a[\result-1] >= \result;
       @  assignable \strictly_nothing;
       @*/
     static int compute(int a[]) {
         int h = 0;
         /*@ loop_invariant 0 <= h <= a.length;
-          @ // loop_invariant (\forall int x; 0 <= x < h; a[x] > x);
+          @ loop_invariant h == 0 || a[h-1] >= h;
           @ loop_invariant (\forall int x; 0 <= x < h; a[x] >= h);
           @ loop_invariant (\num_of int i; 0 <= i < h; a[i] >= h) == h;
           @ assignable \strictly_nothing;
@@ -74,7 +74,7 @@ class HIndex {
 
         /*@ assert (\num_of int i; 0 <= i < h; a[i] >= h + 1) <= h \by {
           @   oss;
-          @   rule "bsum_num_of_bounds" occ: "1";
+          @   rule "bsum_num_of_bounds" occ: 1;
           @   auto;
           @ };
           @*/
@@ -91,7 +91,7 @@ class HIndex {
         
         /*@ assert (\num_of int i; 0 <= i < a.length; a[i] >= h) >= h \by {
           @  oss;
-          @  rule "bsum_positive1" occ: "0" on: (\num_of int i; h <= i < a.length; a[i] >= h);
+          @  rule "bsum_positive1" occ: 0 on: (\num_of int i; h <= i < a.length; a[i] >= h);
           @  auto;
           @ };
           @*/
@@ -108,12 +108,14 @@ class HIndex {
       @  ensures (\num_of int i; 0 <= i < a.length; a[i] >= \result) >= \result;
       @  ensures (\num_of int i; 0 <= i < a.length; a[i] >= \result + 1) < \result + 1;
       @  ensures \result == a.length || a[\result] <= \result;
+      @  ensures \result == 0 || a[\result-1] >= \result;
       @  assignable \strictly_nothing;
       @*/
     static int compute_opt(int a[]) {
         int lo = 0, hi = a.length;
 
         /*@ loop_invariant 0 <= lo <= hi <= a.length;
+          @ loop_invariant lo == 0 || a[lo-1] >= lo;
           @ loop_invariant (\forall int x; 0 <= x < lo; a[x] >= lo);
           @ loop_invariant (\forall int x; hi <= x < a.length; a[x] <= hi);
           @ assignable \strictly_nothing;
@@ -131,7 +133,7 @@ class HIndex {
         
         /*@ assert (\num_of int i; 0 <= i < lo; a[i] >= lo + 1) <= lo \by {
           @   oss;
-          @   rule "bsum_num_of_bounds" occ: "1";
+          @   rule "bsum_num_of_bounds" occ: 1;
           @   auto;
           @ };
           @*/
@@ -148,7 +150,7 @@ class HIndex {
         
         /*@ assert (\num_of int i; 0 <= i < a.length; a[i] >= lo) >= lo  \by {
           @  oss;
-          @  rule "bsum_positive1" occ: "0" on: (\num_of int i; lo <= i < a.length; a[i] >= lo);
+          @  rule "bsum_positive1" occ: 0 on: (\num_of int i; lo <= i < a.length; a[i] >= lo);
           @  auto;
           @ };
           @*/
