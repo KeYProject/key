@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Aug 14 14:59:50 CEST 2026
+# Date: Sat Aug 15 09:31:01 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -11593,6 +11593,36 @@ intersectAllFieldsFreshLocs {
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
+== intersectUnionEqualsEmpty (intersectUnionEqualsEmpty) =========================================
+intersectUnionEqualsEmpty {
+\find(equals(intersect<T>(union<T>(s,s2),t),empty<T>))
+\replacewith(and(equals(intersect<T>(s,t),empty<T>),equals(intersect<T>(s2,t),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmpty2 (intersectUnionEqualsEmpty2) =========================================
+intersectUnionEqualsEmpty2 {
+\find(equals(intersect<T>(t,union<T>(s,s2)),empty<T>))
+\replacewith(and(equals(intersect<T>(t,s),empty<T>),equals(intersect<T>(t,s2),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmpty2EQ (intersectUnionEqualsEmpty2EQ) =========================================
+intersectUnionEqualsEmpty2EQ {
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(equals(intersect<T>(t,EQ),empty<T>))
+\replacewith(and(equals(intersect<T>(t,s),empty<T>),equals(intersect<T>(t,s2),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmptyEQ (intersectUnionEqualsEmptyEQ) =========================================
+intersectUnionEqualsEmptyEQ {
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(equals(intersect<T>(EQ,t),empty<T>))
+\replacewith(and(equals(intersect<T>(s,t),empty<T>),equals(intersect<T>(s2,t),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
 == intersectWithAllLocs (intersectWithAllLocs) =========================================
 intersectWithAllLocs {
 \find(intersect<Pair<java.lang.Object,Field>>(allLocs,s))
@@ -16167,6 +16197,14 @@ sequentialToParallel3 {
 \find(update-application(u,update-application(u2,u3)))
 \replacewith(update-application(parallel-upd(u,update-application(u,u2)),u3)) 
 \heuristics(update_join)
+Choices: true}
+-----------------------------------------------------
+== setEqualityToElementOfRight (setEqualityToElementOfRight) =========================================
+setEqualityToElementOfRight {
+\find(==>equals(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith([]==>[all{av (variable)}(equiv(elementOf<T>(av,s),elementOf<T>(av,t)))]) 
+\heuristics(setEqualityBlastingRight)
 Choices: true}
 -----------------------------------------------------
 == setIntersectUnfoldLeft (setIntersectUnfold) =========================================
