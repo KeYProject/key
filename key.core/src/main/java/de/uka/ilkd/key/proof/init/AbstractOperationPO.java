@@ -39,7 +39,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import com.github.javaparser.ast.key.KeyTransactionStatement;
+import com.github.javaparser.ast.key.KeyTransactionStmt;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
@@ -923,19 +923,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.BEGIN),
+                                KeyTransactionStmt.TransactionType.BEGIN),
                             nullStat, tryStat,
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.FINISH) }
+                                KeyTransactionStmt.TransactionType.FINISH) }
                         : new Statement[] { nullStat, tryStat });
             } else {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.BEGIN),
+                                KeyTransactionStmt.TransactionType.BEGIN),
                             nullStat, beforeTry, tryStat,
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.FINISH) }
+                                KeyTransactionStmt.TransactionType.FINISH) }
                         : new Statement[] { nullStat, beforeTry, tryStat });
             }
         }
