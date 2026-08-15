@@ -260,6 +260,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 oat -> new TermWithHoles(oat.resolve(obtainMap, goal.proof().getServices())));
             pse.getStateMap().getValueInjector().addConverter(boolean.class, ObtainAwareTerm.class,
                 oat -> Boolean.parseBoolean(oat.term.toString()));
+            pse.getStateMap().getValueInjector().addConverter(String.class, ObtainAwareTerm.class,
+                oat -> oat.term.toString());
             LOGGER.debug("---- Script");
             LOGGER.debug(renderedProof.stream()
                     .map(ScriptCommandAst::asCommandLine)

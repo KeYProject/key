@@ -185,7 +185,7 @@ public class ProofCollections {
          * pervar g = c.group("- one subprocess is created for each group
          * perFile-one subprocess is created for each file
          */
-        settings.setForkMode(ForkMode.PERGROUP);
+        settings.setForkMode(ForkMode.NOFORK);
 
         /*
          * Enable or disable proof reloading.
@@ -240,7 +240,7 @@ public class ProofCollections {
          * test can be restricted to these groups (for debugging).
          */
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
-        // settings.setRunOnlyOn("performance, performancePOConstruction");
+        settings.setRunOnlyOn("example-algos");
 
         settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 

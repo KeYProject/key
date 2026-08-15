@@ -87,7 +87,7 @@ public class AutoCommand extends AbstractCommand {
             OriginalValue ov = orgValues.get(entry.getKey());
             if (ov != null) {
                 ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
-                String key = entry.getValue().toString();
+                String key = state.getValueInjector().convert(entry.getValue(), String.class);
                 String value = ov.stringMap.get(key);
                 if (value == null) {
                     throw new ScriptException("Invalid value for " + entry.getKey() + ": " + key);
