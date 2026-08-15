@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import java.awt.event.ActionEvent;
 
 /// Menu option for selecting the proof node with the given node number.
 ///
