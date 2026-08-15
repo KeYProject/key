@@ -321,6 +321,9 @@ public class KeYFile implements EnvInput {
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
                 Path parent = file.file().getParent();
+                if (parent == null) {
+                    parent = Path.of(".");
+                }
                 absFile = parent.resolve(javaPath).normalize();
             }
             if (!Files.exists(absFile)) {
