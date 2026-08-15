@@ -98,6 +98,8 @@ heap/vacid0_01_SparseArray/README.txt
 ## WeideEtAl
 heap/WeideEtAl_01_AddAndMultiply/README.txt
 heap/WeideEtAl_02_BinarySearch/README.txt
+## VerifyThis 2026
+heap/verifyThis26_01_hIndex/README.txt
 
 # Information Flow
 heap/information_flow/README-ArrayList.txt
