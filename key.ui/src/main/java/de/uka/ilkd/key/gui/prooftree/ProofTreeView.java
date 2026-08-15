@@ -849,14 +849,140 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
     public void showGotoNodeDialog() {
-        final String nodeStr = (String) JOptionPane.showInputDialog(this, null,
-            "Go to proof node", JOptionPane.PLAIN_MESSAGE,
-            IconFactory.GOTO_NODE.get(IconFactory.DEFAULT_SIZE), null, null);
+        // Build a combined dialog that allows direct input of a node number and shows all nodes
+        // annotated with notes in a JList. If there are no notes, show the explanatory message.
+
+        final var currentProof = mediator != null ? mediator.getSelectedProof() : null;
+
+        // Top: input panel for direct node number entry (keeps existing functionality)
+        final var inputLabel = new JLabel("Node number:");
+        final var inputField = new JTextField();
+        inputField.setColumns(10);
+        final var inputPanel = new JPanel(new BorderLayout(8, 0));
+        inputPanel.add(inputLabel, BorderLayout.WEST);
+        inputPanel.add(inputField, BorderLayout.CENTER);
+
+        // Center: either noted-nodes list or explanatory message
+        final JComponent centerComponent;
+        final JList<Node> notedList;
+        // Collect nodes with notes (global)
+        final java.util.List<Node> notedNodes = new ArrayList<>();
+        for (Iterator<Node> it = currentProof.root().subtreeIterator(); it.hasNext();) {
+            final Node n = it.next();
+            final String notes = n.getNodeInfo().getNotes();
+            if (notes != null) {
+                notedNodes.add(n);
+            }
+        }
+        notedNodes.sort(Comparator.comparingInt(Node::serialNr));
+
+        if (!notedNodes.isEmpty()) {
+            notedList = new JList<>(notedNodes.toArray(new Node[0]));
+            notedList.setVisibleRowCount(Math.min(8, notedNodes.size()));
+            notedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            // Custom renderer: "<serial>: <ruleName>" on first line, first line of note below
+            notedList.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                        int index, boolean isSelected, boolean cellHasFocus) {
+                    final Component c = super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+                    if (value instanceof Node n) {
+                        final var app = n.getAppliedRuleApp();
+                        final String ruleName = app != null
+                                ? app.rule().name().toString()
+                                : "Root";
+                        String note = n.getNodeInfo().getNotes();
+                        if (note == null)
+                            note = "";
+                        int nl = note.indexOf('\n');
+                        final String firstLine = nl >= 0 ? note.substring(0, nl) : note;
+                        // Limit overly long lines for display
+                        final String firstLineShort = firstLine.length() > 40
+                                ? firstLine.substring(0, 40) + " …"
+                                : firstLine;
+                        // Use simple HTML for two-line display
+                        final String html = "<html><b>" + n.serialNr() + ": "
+                            + LogicPrinter.escapeHTML(ruleName, true)
+                            + "</b><br>" + LogicPrinter.escapeHTML(firstLineShort, true);
+                        ((JLabel) c).setText(html);
+                        c.setFont(UIManager.getFont("TextArea.font"));
+                        ((JLabel) c).setIcon(IconFactory.editFile(16));
+                    }
+                    return c;
+                }
+            });
+            centerComponent = new JScrollPane(notedList);
+        } else {
+            notedList = null;
+            final var info = new JLabel(
+                "<html>Nodes that have been bookmarked using<br>" +
+                    "the node context menu will be listed here.</html>");
+            info.setFont(UIManager.getFont("TextArea.font"));
+            centerComponent = info;
+            centerComponent.setBorder(
+                BorderFactory.createEmptyBorder(6, 0, 0, 0));
+        }
+
+
+        final var panel = new JPanel(new BorderLayout(0, 8));
+        panel.add(inputPanel, BorderLayout.NORTH);
+        panel.add(centerComponent, BorderLayout.CENTER);
+
+        final var optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.OK_CANCEL_OPTION, IconFactory.GOTO_NODE.get(IconFactory.DEFAULT_SIZE));
+        final var dialog = optionPane.createDialog(this, "Go to proof node");
+
+        // Ensure the input field has focus once the dialog is shown
+        dialog.addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                inputField.requestFocusInWindow();
+            }
+        });
+
+        // Allow double-click on a list entry to immediately jump and close the dialog
+        if (notedList != null) {
+            notedList.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    final Node sel = notedList.getSelectedValue();
+                    if (sel != null) {
+                        if (e.getClickCount() == 2) {
+                            mediator.getSelectionModel().setSelectedNode(sel);
+                            dialog.dispose();
+                        }
+                        if (e.getClickCount() == 1) {
+                            inputField.setText(Integer.toString(sel.serialNr()));
+                        }
+                    }
+                }
+            });
+        }
+
+        inputField.requestFocus();
+        dialog.setVisible(true);
+
+        final Object chosen = optionPane.getValue();
+        if (!(chosen instanceof Integer) || ((Integer) chosen) != JOptionPane.OK_OPTION) {
+            return; // cancelled or closed
+        }
+
+        // OK pressed: prefer list selection; otherwise parse number field
+        if (notedList != null) {
+            final Node sel = notedList.getSelectedValue();
+            if (sel != null) {
+                mediator.getSelectionModel().setSelectedNode(sel);
+                return;
+            }
+        }
+
+        inputField.requestFocus();
+        final String nodeStr = inputField.getText();
         if (nodeStr != null && !nodeStr.isEmpty()) {
             try {
                 int serialNr = Integer.parseUnsignedInt(nodeStr);
-                if (!getMediator().getSelectionModel()
-                    .setSelectedNodeBySerialNr(serialNr)) {
+                if (!getMediator().getSelectionModel().setSelectedNodeBySerialNr(serialNr)) {
                     JOptionPane.showMessageDialog(this, "Node not found: " + nodeStr,
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
