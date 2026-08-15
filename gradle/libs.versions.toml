@@ -23,7 +23,7 @@ stringtemplate = "4.3.4"
 
 # Java parsing and analysis
 javapoet = "1.13.0"
-javaparser = "3.28.0-K13.6"
+javaparser = "3.28.2-J8.0-K13.5-SNAPSHOT"
 truth = "1.4.5"
 
 # UI and CLI
@@ -67,9 +67,9 @@ stringtemplate = { module = "org.antlr:ST4", version.ref = "stringtemplate" }
 
 # Java source code processing
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
-javaparser-core = { module = "org.key-project.proofjava:javaparser-core", version.ref = "javaparser" }
-javaparser-core-serialization = { module = "org.key-project.proofjava:javaparser-core-serialization", version.ref = "javaparser" }
-javaparser-symbol-solver-core = { module = "org.key-project.proofjava:javaparser-symbol-solver-core", version.ref = "javaparser" }
+javaparser-core = { module = "io.github.jmltoolkit:jmlparser-core", version.ref = "javaparser" }
+javaparser-core-serialization = { module = "io.github.jmltoolkit:jmlparser-core-serialization", version.ref = "javaparser" }
+javaparser-symbol-solver-core = { module = "io.github.jmltoolkit:jmlparser-symbol-solver-core", version.ref = "javaparser" }
 
 # Testing utilities
 truth = { module = "com.google.truth:truth", version.ref = "truth" }

@@ -60,6 +60,8 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
@@ -278,6 +280,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case MULTIPLY -> BinaryOperatorKind.TIMES;
             case DIVIDE -> BinaryOperatorKind.DIVIDE;
             case REMAINDER -> BinaryOperatorKind.MODULO;
+            default ->
+                throw new IllegalStateException("JML operators not allowed: " + n.getOperator());
         };
         return new BinaryOperator(pi, c, op, lhs, rhs);
     }
@@ -760,31 +764,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeYMarkerStatement n, Void arg) {
+    public Object visit(JmlExpressionStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         return switch (n.getKind()) {
-            case MarkerStatementHelper.KIND_ASSERT -> {
+            case JmlStmtKind.ASSERT -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
                 yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
             }
-            case MarkerStatementHelper.KIND_ASSUME -> {
+            case JmlStmtKind.ASSUME -> {
                 TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
                 yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
             }
-            case MarkerStatementHelper.KIND_SET -> {
+            case JmlStmtKind.SET -> {
                 KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
                 yield new SetStatement(context, pi);
-            }
-
-
-            case MarkerStatementHelper.KIND_MERGE_POINT -> {
-                var loc = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal("x"),
-                    services.getNamespaces().sorts().lookup("boolean"));
-                List<Comment> c = createComments(n);
-
-                TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
-                yield new MergePointStatement(pi, c, a, loc);
             }
             default -> throw new IllegalStateException("Unexpected value: " + n.getKind());
         };
@@ -1696,7 +1689,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyCatchAllStatement n, Void arg) {
+    public Object visit(KeyCatchAllStmt n, Void arg) {
         // TODO
         return reportUnsupportedElement(n);
     }
@@ -1801,7 +1794,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyExecStatement n, Void arg) {
+    public Object visit(KeyExecStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         var c = createComments(n);
         StatementBlock body = accept(n.getExecBlock());
@@ -1825,7 +1818,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyLoopScopeBlock n, Void arg) {
+    public Object visit(KeyLoopScopeBlockStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
         StatementBlock body = accept(n.getBlock());
@@ -1834,11 +1827,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMergePointStatement n, Void arg) {
+    public Object visit(KeyMergePointStmt n, Void arg) {
         var pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        IProgramVariable expr = accept(n.getExpr());
-        return new MergePointStatement(pi, c, null, expr);
+        // IProgramVariable expr = accept(n.getExpr());
+        var loc = new LocationVariable(
+            services.getVariableNamer().getTemporaryNameProposal("x"),
+            services.getNamespaces().sorts().lookup("boolean"));
+        TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
+        return new MergePointStatement(pi, c, a, loc);
     }
 
     @Override
@@ -1861,7 +1858,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMethodCallStatement n, Void arg) {
+    public Object visit(KeyMethodCallStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
         IProgramVariable resultVar = accepto(n.getName());
@@ -1885,7 +1882,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyTransactionStatement n, Void arg) {
+    public Object visit(KeyTransactionStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
         return new TransactionStatement(pi, c, n.getType());
@@ -2188,11 +2185,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(CompactConstructorDeclaration n, Void arg) {
-        return reportUnsupportedElement(n);
-    }
-
-    @Override
-    public Object visit(KeyRangeExpression n, Void arg) {
         return reportUnsupportedElement(n);
     }
     // endregion
