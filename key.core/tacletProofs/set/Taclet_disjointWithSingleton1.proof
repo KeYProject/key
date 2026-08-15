@@ -42,6 +42,10 @@
 "
 }
 
+\sorts {
+    \proxy T;
+}
+
 \proofObligation {
 	"name": "disjointWithSingleton1",
 	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",

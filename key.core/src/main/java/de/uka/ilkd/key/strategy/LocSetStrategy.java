@@ -9,6 +9,8 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
+import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
 
@@ -56,6 +58,40 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
         bindRuleSet(d, "locSetEqualityBlastingRight",
             ifZero(applyTF(FocusFormulaProjection.INSTANCE, lsf.requireLocationDecomposition),
                 longConst(-100), longConst(-80)));
+
+        bindRuleSet(d, "locSetArrayRangeMerge",
+            add(ifZero(MatchedAssumesFeature.INSTANCE,
+                add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("upper")),
+                    PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
+                    PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("upper2"))),
+                longConst(0)),
+                longConst(-4000)));
+
+        bindRuleSet(d, "locSetArrayRangeInterNested",
+            add(ifZero(MatchedAssumesFeature.INSTANCE,
+                add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("lower2")),
+                    PolynomialValuesCmpFeature.leq(instOf("upper2"), instOf("upper"))),
+                longConst(0)),
+                longConst(-4000)));
+
+        bindRuleSet(d, "locSetArrayRangeInterNested2",
+            add(ifZero(MatchedAssumesFeature.INSTANCE,
+                add(PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("lower")),
+                    PolynomialValuesCmpFeature.leq(instOf("upper"), instOf("upper2"))),
+                longConst(0)),
+                longConst(-4000)));
+
+        bindRuleSet(d, "locSetArrayRangeInterDisjoint",
+            add(ifZero(MatchedAssumesFeature.INSTANCE,
+                PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
+                longConst(0)),
+                longConst(-4000)));
+
+        bindRuleSet(d, "locSetArrayRangeInterDisjoint2",
+            add(ifZero(MatchedAssumesFeature.INSTANCE,
+                PolynomialValuesCmpFeature.lt(instOf("upper2"), instOf("lower")),
+                longConst(0)),
+                longConst(-4000)));
         return d;
     }
 

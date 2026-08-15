@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /// Term features for the theory of sets.
-class SetTermFeatures extends StaticFeatureCollection {
+public class SetTermFeatures extends StaticFeatureCollection {
 
     SetTermFeatures(SetLDT sets) {
         empty = sets.getEmpty();
@@ -35,16 +35,16 @@ class SetTermFeatures extends StaticFeatureCollection {
         disjointF = opBase(disjoint);
     }
 
-    final ParametricFunctionDecl empty;
-    final ParametricFunctionDecl singleton;
-    final ParametricFunctionDecl union;
-    final ParametricFunctionDecl intersect;
-    final ParametricFunctionDecl setMinus;
-    final ParametricFunctionDecl infiniteUnion;
-    final ParametricFunctionDecl card;
-    final ParametricFunctionDecl elementOf;
-    final ParametricFunctionDecl subset;
-    final ParametricFunctionDecl disjoint;
+    public final ParametricFunctionDecl empty;
+    public final ParametricFunctionDecl singleton;
+    public final ParametricFunctionDecl union;
+    public final ParametricFunctionDecl intersect;
+    public final ParametricFunctionDecl setMinus;
+    public final ParametricFunctionDecl infiniteUnion;
+    public final ParametricFunctionDecl card;
+    public final ParametricFunctionDecl elementOf;
+    public final ParametricFunctionDecl subset;
+    public final ParametricFunctionDecl disjoint;
 
     final TermFeature emptyF;
     final TermFeature singletonF;

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
+import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 
@@ -21,6 +21,8 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -33,9 +35,11 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
     private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
+    private final SetTermFeatures stf;
 
     public SetStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
+        stf = new SetTermFeatures(getServices().getTypeConverter().getLDT(SetLDT.class));
         costComputationDispatcher = setupCostComputationF();
 
         stopAtFirstNonCloseableGoal =
@@ -47,13 +51,24 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-90));
 
-        // Changed to always on (concerned to previous versions).
-        // Reason: e.g. union(l, s) = union(s, l) can now alsways be closed after one swap
-        // even if quantifier treatment is switched off, otherwise it would require a longer proof
-        final SetLDT setLDT = getServices().getTypeConverter().getLDT(SetLDT.class);
-        bindRuleSet(d, "cnf_setComm",
-            add(SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), setLDT),
-                NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+        // Distribution duplicates the distributed set, so it is allowed only
+        // where a resulting set is known to collapse.
+        final TermFeature collapses = or(stf.emptyF, stf.singletonF);
+        final Feature operandCollapses = or(applyTF("distributedSet", collapses),
+            applyTF("unionLeft", collapses), applyTF("unionRight", collapses));
+        bindRuleSet(d, "setDist",
+            add(ifZero(MatchedAssumesFeature.INSTANCE, operandCollapses, longConst(0)),
+                longConst(-2000)));
+
+        bindRuleSet(d, "setAssoc", longConst(-850));
+
+        // Always on, independent of the quantifier treatment: e.g. union(l, s) = union(s, l)
+        // closes after one swap where it would otherwise need blasting the sets.
+        bindRuleSet(d, "setComm",
+            add(applyTF("commLeft", not(or(stf.unionF, stf.intersectF))),
+                applyTF("commRight", not(or(stf.unionF, stf.intersectF))),
+                SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf),
+                longConst(-800)));
         return d;
     }
 

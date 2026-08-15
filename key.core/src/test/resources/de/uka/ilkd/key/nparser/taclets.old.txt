@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Aug 15 09:31:01 CEST 2026
+# Date: Sat Aug 15 11:53:32 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1132,6 +1132,14 @@ arrayLengthNotNegative {
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
+== arrayRangeEmpty (arrayRangeEmpty) =========================================
+arrayRangeEmpty {
+\assumes ([]==>[equals(o,o2)]) 
+\find(equals(arrayRange(o,lower,upper),empty<Pair<java.lang.Object,Field>>))
+\replacewith(lt(upper,lower)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == array_post_declaration (array_post_declaration) =========================================
 array_post_declaration {
 \find(#allmodal ((modal operator))|{{ ..
@@ -2037,14 +2045,14 @@ Choices: programRules:Java}
 associativeLawIntersect {
 \find(intersect<T>(s1,intersect<T>(s2,s3)))
 \replacewith(intersect<T>(intersect<T>(s1,s2),s3)) 
-\heuristics(conjNormalForm)
+\heuristics(setAssoc)
 Choices: true}
 -----------------------------------------------------
 == associativeLawUnion (associativeLawUnion) =========================================
 associativeLawUnion {
 \find(union<T>(s1,union<T>(s2,s3)))
 \replacewith(union<T>(union<T>(s1,s2),s3)) 
-\heuristics(conjNormalForm)
+\heuristics(setAssoc)
 Choices: true}
 -----------------------------------------------------
 == atan2IsNaN (atan2IsNaN) =========================================
@@ -3650,35 +3658,35 @@ Choices: (programRules:Java & JavaCard:on)}
 commuteDisjoint {
 \find(disjoint<T>(commLeft,commRight))
 \replacewith(disjoint<T>(commRight,commLeft)) 
-\heuristics(cnf_setComm)
+\heuristics(setComm)
 Choices: true}
 -----------------------------------------------------
 == commuteIntersection (commuteIntersection) =========================================
 commuteIntersection {
 \find(intersect<T>(commLeft,commRight))
 \replacewith(intersect<T>(commRight,commLeft)) 
-\heuristics(cnf_setComm)
+\heuristics(setComm)
 Choices: true}
 -----------------------------------------------------
 == commuteIntersection_2 (commuteIntersection_2) =========================================
 commuteIntersection_2 {
 \find(intersect<T>(intersect<T>(s,commLeft),commRight))
 \replacewith(intersect<T>(intersect<T>(s,commRight),commLeft)) 
-\heuristics(cnf_setComm)
+\heuristics(setComm)
 Choices: true}
 -----------------------------------------------------
 == commuteUnion (commuteUnion) =========================================
 commuteUnion {
 \find(union<T>(commLeft,commRight))
 \replacewith(union<T>(commRight,commLeft)) 
-\heuristics(cnf_setComm)
+\heuristics(setComm)
 Choices: true}
 -----------------------------------------------------
 == commuteUnion_2 (commuteUnion_2) =========================================
 commuteUnion_2 {
 \find(union<T>(union<T>(s,commLeft),commRight))
 \replacewith(union<T>(union<T>(s,commRight),commLeft)) 
-\heuristics(cnf_setComm)
+\heuristics(setComm)
 Choices: true}
 -----------------------------------------------------
 == commute_and (commute_and) =========================================
@@ -5663,6 +5671,20 @@ disjointAllFields {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== disjointAllFieldsSingleton (disjointAllFieldsSingleton) =========================================
+disjointAllFieldsSingleton {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f))),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(o,o2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllFieldsSingleton2 (disjointAllFieldsSingleton) =========================================
+disjointAllFieldsSingleton2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f)),allFields(o)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(o,o2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == disjointAllFields_2 (disjointAllFields_2) =========================================
 disjointAllFields_2 {
 \find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),allFields(o2)),empty<Pair<java.lang.Object,Field>>))
@@ -5675,6 +5697,27 @@ disjointAllObjects {
 \assumes ([equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f),s),empty<Pair<java.lang.Object,Field>>)]==>[]) 
 \find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s))
 \replacewith(false) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjects2 (disjointAllObjects) =========================================
+disjointAllObjects2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f1),allObjects(f2)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f1,f2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjectsSingleton (disjointAllObjectsSingleton) =========================================
+disjointAllObjectsSingleton {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2))),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f,f2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjectsSingleton2 (disjointAllObjectsSingleton) =========================================
+disjointAllObjectsSingleton2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2)),allObjects(f)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f,f2))) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5791,7 +5834,7 @@ disjointToElementOf {
 \find(disjoint<T>(s,t))
 \varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
 \replacewith(all{av (variable)}(or(not(elementOf<T>(av,s)),not(elementOf<T>(av,t))))) 
-\heuristics(simplify_enlarging)
+\heuristics(semantics_blasting)
 Choices: true}
 -----------------------------------------------------
 == disjointToElementOfLocSet (disjointToElementOfLocSet) =========================================
@@ -5888,16 +5931,32 @@ Choices: true}
 -----------------------------------------------------
 == distributeIntersection (distributeIntersection) =========================================
 distributeIntersection {
-\find(intersect<T>(s1,union<T>(s2,s3)))
-\replacewith(union<T>(intersect<T>(s1,s2),intersect<T>(s1,s3))) 
-\heuristics(simplify_enlarging)
+\find(intersect<T>(distributedSet,union<T>(unionLeft,unionRight)))
+\replacewith(union<T>(intersect<T>(distributedSet,unionLeft),intersect<T>(distributedSet,unionRight))) 
+\heuristics(setDist)
 Choices: true}
 -----------------------------------------------------
-== distributeIntersection_2 (distributeIntersection_2) =========================================
-distributeIntersection_2 {
-\find(intersect<T>(union<T>(s2,s3),s1))
-\replacewith(union<T>(intersect<T>(s2,s1),intersect<T>(s3,s1))) 
-\heuristics(simplify_enlarging)
+== distributeIntersection2 (distributeIntersection2) =========================================
+distributeIntersection2 {
+\find(intersect<T>(union<T>(unionLeft,unionRight),distributedSet))
+\replacewith(union<T>(intersect<T>(unionLeft,distributedSet),intersect<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
+-----------------------------------------------------
+== distributeIntersection2EQ (distributeIntersection2EQ) =========================================
+distributeIntersection2EQ {
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(intersect<T>(EQ,distributedSet))
+\replacewith(union<T>(intersect<T>(unionLeft,distributedSet),intersect<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
+-----------------------------------------------------
+== distributeIntersectionEQ (distributeIntersectionEQ) =========================================
+distributeIntersectionEQ {
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(intersect<T>(distributedSet,EQ))
+\replacewith(union<T>(intersect<T>(distributedSet,unionLeft),intersect<T>(distributedSet,unionRight))) 
+\heuristics(setDist)
 Choices: true}
 -----------------------------------------------------
 == divAddMultDenom (divAddMultDenom) =========================================
@@ -6277,6 +6336,14 @@ Choices: programRules:Java}
 == elementOfAllObjects (elementOfAllObjects) =========================================
 elementOfAllObjects {
 \find(elementOf<Pair<java.lang.Object,Field>>(l,allObjects(f2)))
+\replacewith(equals(second<java.lang.Object,Field>(l),f2)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== elementOfAllObjectsEQ (elementOfAllObjectsEQ) =========================================
+elementOfAllObjectsEQ {
+\assumes ([equals(allObjects(f2),EQ)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
 \replacewith(equals(second<java.lang.Object,Field>(l),f2)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -11586,11 +11653,191 @@ int_induction {
 
 Choices: true}
 -----------------------------------------------------
+== intersectAllFieldsAllObjects (intersectAllFieldsAllObjects) =========================================
+intersectAllFieldsAllObjects {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjects2 (intersectAllFieldsAllObjects) =========================================
+intersectAllFieldsAllObjects2 {
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjects2EQ (intersectAllFieldsAllObjectsEQ) =========================================
+intersectAllFieldsAllObjects2EQ {
+\assumes ([equals(allObjects(f),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjectsEQ (intersectAllFieldsAllObjectsEQ) =========================================
+intersectAllFieldsAllObjectsEQ {
+\assumes ([equals(allFields(o),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == intersectAllFieldsFreshLocs (intersectAllFieldsFreshLocs) =========================================
 intersectAllFieldsFreshLocs {
 \find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),freshLocs(h)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonDiff (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonDiff {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f))))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonDiff2 (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonDiff2 {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f)),allFields(o)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonSame (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonSame {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonSame2 (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonDiff (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonDiff {
+\assumes ([]==>[equals(f,f2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2))))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonDiff2 (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonDiff2 {
+\assumes ([]==>[equals(f,f2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2)),allObjects(f)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonSame (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonSame {
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonSame2 (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsDiff (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsDiff {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),allFields(o2)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsDiff2 (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsDiff2 {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o2),arrayRange(o,lower,upper)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsSame (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsSame {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),allFields(o)))
+\replacewith(arrayRange(o,lower,upper)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsSame2 (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),arrayRange(o,lower,upper)))
+\replacewith(arrayRange(o,lower,upper)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint (intersectArrayRangesDisjoint) =========================================
+intersectArrayRangesDisjoint {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper,lower2),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint2 (intersectArrayRangesDisjoint) =========================================
+intersectArrayRangesDisjoint2 {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper2,lower),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint2EQ (intersectArrayRangesDisjointEQ) =========================================
+intersectArrayRangesDisjoint2EQ {
+\assumes ([equals(arrayRange(o,lower2,upper2),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),EQ))
+\replacewith(if-then-else(lt(upper2,lower),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjointEQ (intersectArrayRangesDisjointEQ) =========================================
+intersectArrayRangesDisjointEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper,lower2),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested (intersectArrayRangesNested) =========================================
+intersectArrayRangesNested {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower,lower2),leq(upper2,upper)),arrayRange(o,lower2,upper2),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested2 (intersectArrayRangesNested) =========================================
+intersectArrayRangesNested2 {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower2,lower),leq(upper,upper2)),arrayRange(o,lower,upper),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested2EQ (intersectArrayRangesNestedEQ) =========================================
+intersectArrayRangesNested2EQ {
+\assumes ([equals(arrayRange(o,lower2,upper2),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),EQ))
+\replacewith(if-then-else(and(leq(lower2,lower),leq(upper,upper2)),arrayRange(o,lower,upper),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNestedEQ (intersectArrayRangesNestedEQ) =========================================
+intersectArrayRangesNestedEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower,lower2),leq(upper2,upper)),arrayRange(o,lower2,upper2),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested)
 Choices: programRules:Java}
 -----------------------------------------------------
 == intersectUnionEqualsEmpty (intersectUnionEqualsEmpty) =========================================
@@ -11621,6 +11868,66 @@ intersectUnionEqualsEmptyEQ {
 \find(equals(intersect<T>(EQ,t),empty<T>))
 \replacewith(and(equals(intersect<T>(s,t),empty<T>),equals(intersect<T>(s2,t),empty<T>))) 
 \heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself (intersectUnionItself) =========================================
+intersectUnionItself {
+\find(intersect<T>(union<T>(s1,s2),s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself2 (intersectUnionItself) =========================================
+intersectUnionItself2 {
+\find(intersect<T>(union<T>(s2,s1),s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself2EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself2EQ {
+\assumes ([equals(union<T>(s2,s1),EQ)]==>[]) 
+\find(intersect<T>(EQ,s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself3 (intersectUnionItself) =========================================
+intersectUnionItself3 {
+\find(intersect<T>(s1,union<T>(s1,s2)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself3EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself3EQ {
+\assumes ([equals(union<T>(s1,s2),EQ)]==>[]) 
+\find(intersect<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself4 (intersectUnionItself) =========================================
+intersectUnionItself4 {
+\find(intersect<T>(s1,union<T>(s2,s1)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself4EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself4EQ {
+\assumes ([equals(union<T>(s2,s1),EQ)]==>[]) 
+\find(intersect<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItselfEQ (intersectUnionItselfEQ) =========================================
+intersectUnionItselfEQ {
+\assumes ([equals(union<T>(s1,s2),EQ)]==>[]) 
+\find(intersect<T>(EQ,s1))
+\replacewith(s1) 
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == intersectWithAllLocs (intersectWithAllLocs) =========================================
@@ -16243,6 +16550,21 @@ setJavaCardTransient {
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
+== setMinusEqualsEmpty (setMinusEqualsEmpty) =========================================
+setMinusEqualsEmpty {
+\find(equals(setMinus<T>(s1,s2),empty<T>))
+\replacewith(subset<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== setMinusEqualsEmptyEQ (setMinusEqualsEmptyEQ) =========================================
+setMinusEqualsEmptyEQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(equals(EQ,empty<T>))
+\replacewith(subset<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == setMinusItself (setMinusItself) =========================================
 setMinusItself {
 \find(setMinus<T>(s,s))
@@ -16252,17 +16574,17 @@ Choices: true}
 -----------------------------------------------------
 == setMinusOfUnion (setMinusOfUnion) =========================================
 setMinusOfUnion {
-\find(setMinus<T>(union<T>(s,s2),s3))
-\replacewith(union<T>(setMinus<T>(s,s3),setMinus<T>(s2,s3))) 
-\heuristics(simplify_enlarging)
+\find(setMinus<T>(union<T>(unionLeft,unionRight),distributedSet))
+\replacewith(union<T>(setMinus<T>(unionLeft,distributedSet),setMinus<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
 Choices: true}
 -----------------------------------------------------
 == setMinusOfUnionEQ (setMinusOfUnionEQ) =========================================
 setMinusOfUnionEQ {
-\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
-\find(setMinus<T>(EQ,s3))
-\replacewith(union<T>(setMinus<T>(s,s3),setMinus<T>(s2,s3))) 
-\heuristics(simplify_enlarging)
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(setMinus<T>(EQ,distributedSet))
+\replacewith(union<T>(setMinus<T>(unionLeft,distributedSet),setMinus<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
 Choices: true}
 -----------------------------------------------------
 == setMinusSingleton (setMinusSingleton) =========================================
@@ -16318,6 +16640,13 @@ setMinusWithEmpty2 {
 \find(setMinus<T>(empty<T>,s))
 \replacewith(empty<T>) 
 \heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== setMinusWithSingleton (setMinusWithSingleton) =========================================
+setMinusWithSingleton {
+\find(setMinus<T>(singleton<T>(e),s))
+\replacewith(if-then-else(elementOf<T>(e,s),empty<T>,singleton<T>(e))) 
+\heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == setUnionUnfoldLeft (setUnionUnfold) =========================================
@@ -17140,6 +17469,36 @@ sub_zero_2 {
 \heuristics(simplify_int)
 Choices: true}
 -----------------------------------------------------
+== subsetIntersectLeft (subsetIntersectLeft) =========================================
+subsetIntersectLeft {
+\find(subset<T>(intersect<T>(s1,s2),s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeft2 (subsetIntersectLeft) =========================================
+subsetIntersectLeft2 {
+\find(subset<T>(intersect<T>(s2,s1),s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeft2EQ (subsetIntersectLeftEQ) =========================================
+subsetIntersectLeft2EQ {
+\assumes ([equals(intersect<T>(s2,s1),EQ)]==>[]) 
+\find(subset<T>(EQ,s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeftEQ (subsetIntersectLeftEQ) =========================================
+subsetIntersectLeftEQ {
+\assumes ([equals(intersect<T>(s1,s2),EQ)]==>[]) 
+\find(subset<T>(EQ,s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
 == subsetOfEmpty (subsetOfEmpty) =========================================
 subsetOfEmpty {
 \find(subset<T>(s,empty<T>))
@@ -17267,6 +17626,14 @@ subsetToElementOfLocSetRight {
 \replacewith([]==>[all{ov (variable)}(all{fv (variable)}(imp(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
 \heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
+-----------------------------------------------------
+== subsetToElementOfRight (subsetToElementOfRight) =========================================
+subsetToElementOfRight {
+\find(==>subset<T>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith([]==>[all{av (variable)}(imp(elementOf<T>(av,s),elementOf<T>(av,t)))]) 
+\heuristics(setEqualityBlastingRight)
+Choices: true}
 -----------------------------------------------------
 == subsetUnionLeft (subsetUnionLeft) =========================================
 subsetUnionLeft {
@@ -18473,6 +18840,21 @@ unaryMinusLong {
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
+== unionArrayRangeAdjacent (unionArrayRangeAdjacent) =========================================
+unionArrayRangeAdjacent {
+\find(union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(and(leq(lower,upper),equals(lower2,add(upper,Z(1(#))))),lt(upper,upper2)),arrayRange(o,lower,upper2),union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeMerge)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unionArrayRangeAdjacentEQ (unionArrayRangeAdjacentEQ) =========================================
+unionArrayRangeAdjacentEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(union<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(and(leq(lower,upper),equals(lower2,add(upper,Z(1(#))))),lt(upper,upper2)),arrayRange(o,lower,upper2),union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeMerge)
+Choices: programRules:Java}
+-----------------------------------------------------
 == unionEqualsEmpty (unionEqualsEmpty) =========================================
 unionEqualsEmpty {
 \find(equals(union<T>(s,s2),empty<T>))
@@ -18491,6 +18873,36 @@ Choices: true}
 == unionIntersectItself (unionIntersectItself) =========================================
 unionIntersectItself {
 \find(union<T>(intersect<T>(s1,s2),s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself5 (unionIntersectItself) =========================================
+unionIntersectItself5 {
+\find(union<T>(s1,intersect<T>(s1,s2)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself5EQ (unionIntersectItselfEQ) =========================================
+unionIntersectItself5EQ {
+\assumes ([equals(intersect<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself6 (unionIntersectItself) =========================================
+unionIntersectItself6 {
+\find(union<T>(s1,intersect<T>(s2,s1)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself6EQ (unionIntersectItselfEQ) =========================================
+unionIntersectItself6EQ {
+\assumes ([equals(intersect<T>(s2,s1),EQ)]==>[]) 
+\find(union<T>(s1,EQ))
 \replacewith(s1) 
 \heuristics(simplify)
 Choices: true}
@@ -18527,6 +18939,36 @@ Choices: true}
 unionIntersectItself_6 {
 \find(union<T>(union<T>(intersect<T>(s2,s1),s),s1))
 \replacewith(union<T>(s,s1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself (unionSetMinusItself) =========================================
+unionSetMinusItself {
+\find(union<T>(setMinus<T>(s1,s2),s2))
+\replacewith(union<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself2 (unionSetMinusItself) =========================================
+unionSetMinusItself2 {
+\find(union<T>(s2,setMinus<T>(s1,s2)))
+\replacewith(union<T>(s2,s1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself2EQ (unionSetMinusItselfEQ) =========================================
+unionSetMinusItself2EQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(s2,EQ))
+\replacewith(union<T>(s2,s1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItselfEQ (unionSetMinusItselfEQ) =========================================
+unionSetMinusItselfEQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(EQ,s2))
+\replacewith(union<T>(s1,s2)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
