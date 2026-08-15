@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.sort.SortAlias;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
@@ -38,7 +39,8 @@ public abstract class LDT extends AbstractLDT {
         super(name);
         var sort = services.getNamespaces().sorts().lookup(name);
         if (sort == null) {
-            sort = services.getNamespaces().sortAliases().lookup(name).aliasedSort();
+            SortAlias alias = services.getNamespaces().sortAliases().lookup(name);
+            sort = alias == null ? null : alias.aliasedSort();
             if (sort == null) {
                 throw new RuntimeException("LDT " + name + " not found.\n"
                     + "It seems that there are definitions missing from the .key files.");
