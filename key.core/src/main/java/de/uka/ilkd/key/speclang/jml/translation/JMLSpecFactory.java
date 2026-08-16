@@ -1608,9 +1608,10 @@ public class JMLSpecFactory {
                 .atBefore(pv.atBefores);
         JTerm lemmaCall = io.translateTerm(context);
 
-        if(lemmaCall.op() instanceof ProgramMethod lpm && !lpm.isLemma()) {
+        if (lemmaCall.op() instanceof ProgramMethod lpm && !lpm.isLemma()) {
             throw new SLTranslationException(
-                "Invalid lemma call for use_lemma statement (only lemma invocations allowed): " + lemmaCall,
+                "Invalid lemma call for use_lemma statement (only lemma invocations allowed): "
+                    + lemmaCall,
                 Location.fromToken(context.getStart()));
         }
 
