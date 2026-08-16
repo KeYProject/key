@@ -1830,12 +1830,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMergePointStmt n, Void arg) {
         var pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        // IProgramVariable expr = accept(n.getExpr());
-        var loc = new LocationVariable(
-            services.getVariableNamer().getTemporaryNameProposal("x"),
-            services.getNamespaces().sorts().lookup("boolean"));
-        TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
-        return new MergePointStatement(pi, c, a, loc);
+
+        if(n.containsData(MarkerStatementHelper.KEY_MERGE_POINT)) {
+            // IProgramVariable expr = accept(n.getExpr());
+            var loc = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal("x"),
+                    services.getNamespaces().sorts().lookup("boolean"));
+            TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
+            return new MergePointStatement(pi, c, a, loc);
+        }else {
+            IProgramVariable expr = accept(n.getExpr());
+            return new MergePointStatement(pi, c, null, expr);
+        }
     }
 
     @Override
