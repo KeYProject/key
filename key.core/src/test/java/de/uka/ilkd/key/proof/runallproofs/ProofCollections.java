@@ -533,8 +533,9 @@ public class ProofCollections {
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
+        g.provable("sort-jmlscript.key");
+        g.provable("split-jmlscript.key");
         g.provable("split.key");
-
 
         /*
          * These are simpler regression tests that show a certain feature works
