@@ -55,6 +55,7 @@ public enum ModifierKind {
     JML_CODE("code"),
     JML_OT_PEER("peer"),
     JML_OT_REP("rep"),
+    JML_LEMMA("lemma"),
     JML_OT_READ_ONLY("read_only");
 
     private final String codeRepresentation;

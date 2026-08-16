@@ -608,6 +608,19 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnUseLemmaStatement(UseLemmaStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                // there are no AST elements below the use lemma statement, so we can use the copy
+                // constructor.
+                return new UseLemmaStatement(x);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnReturn(Return x) {
         DefaultAction def = new DefaultAction(x) {
             @Override

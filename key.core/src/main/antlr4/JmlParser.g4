@@ -22,6 +22,7 @@ classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
   : class_invariant     | accessible_clause  | method_specification
   | method_declaration  | field_declaration  | represents_clause
+  | lemma_declaration
   | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
@@ -33,7 +34,7 @@ methodlevel_element
   : field_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement
+  | assert_statement | assume_statement | use_lemma_statement
  ;
 
 modifiers: modifier+;
@@ -157,12 +158,14 @@ name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 
 field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
 method_declaration: typespec IDENT param_list (method_body=mbody_block | SEMI_TOPLEVEL);
-mbody_block: LBRACE mbody_var* mbody_statement RBRACE;
+mbody_block: LBRACE (mbody_var | assert_statement)* mbody_statement RBRACE;
 mbody_statement:
     RETURN expression SEMI_TOPLEVEL #mbody_return
   | IF LPAREN expression RPAREN (mbody_statement | mbody_block) ELSE (mbody_statement | mbody_block) #mbody_if
   ;
 mbody_var: VAR? IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
+
+lemma_declaration: LEMMA IDENT param_list assertionProof SEMI_TOPLEVEL;
 
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
@@ -176,6 +179,7 @@ maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
 set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
+use_lemma_statement: USE_LEMMA postfixexpr SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?

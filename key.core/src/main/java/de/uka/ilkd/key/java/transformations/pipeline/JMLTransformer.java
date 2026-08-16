@@ -191,7 +191,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * @return the new method declaration
      * @throws SLTranslationException
      */
-    private @NonNull MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
+    private @NonNull MethodDeclaration transformMethodDecl(TextualJMLMethodOrLemmaDecl decl,
             @Nullable TextualJMLModifierList jmlModifiers)
             throws SLTranslationException {
         // prepend Java modifiers
@@ -248,6 +248,13 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         return stmt;
     }
 
+
+    private Statement transformUseLemmaStatement(TextualJMLUseLemmaStatement stat) {
+        KeYMarkerStatement stmt = new KeYMarkerStatement(KIND_USE_LEMMA);
+        stmt.setData(KEY_USE_LEMMA, stat);
+        return stmt;
+    }
+
     private KeYMarkerStatement transformMergePointDecl(TextualJMLMergePointDecl stat) {
         KeYMarkerStatement mps = new KeYMarkerStatement(KIND_MERGE_POINT);
         mps.setData(KEY_MERGE_POINT, stat);
@@ -294,7 +301,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                     if (c instanceof TextualJMLFieldDecl fd) {
                         // ghost/model field decl.: transform into "real" field decl.
                         td.addMember(transformClassFieldDecl(fd));
-                    } else if (c instanceof TextualJMLMethodDecl md) {
+                    } else if (c instanceof TextualJMLMethodOrLemmaDecl md) {
                         // model method decl.:
                         final MethodDeclaration decl = transformMethodDecl(md, jmlModifiers);
                         jmlModifiers = null; // these are used now
@@ -325,6 +332,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                         String errorMessage = switch (c) {
                             case TextualJMLSetStatement a ->
                                 "A set assignment only allowed inside of a method body";
+                            case TextualJMLUseLemmaStatement a ->
+                                "A use_lemma statement is only allowed inside of a method body";
                             case TextualJMLMergePointDecl a ->
                                 "Merge points are only allowed inside of a method body";
                             case TextualJMLLoopSpec a ->
@@ -442,6 +451,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                         // local ghost variable declaration!
                         case TextualJMLFieldDecl field -> statement = transformVariableDecl(field);
                         case TextualJMLSetStatement set -> statement = transformSetStatement(set);
+                        case TextualJMLUseLemmaStatement ulema ->
+                            statement = transformUseLemmaStatement(ulema);
                         case TextualJMLMergePointDecl mergePointDecl ->
                             statement = transformMergePointDecl(mergePointDecl);
                         case TextualJMLAssertStatement assertStatement ->

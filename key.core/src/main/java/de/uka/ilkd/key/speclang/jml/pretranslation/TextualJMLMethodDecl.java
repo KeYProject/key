@@ -4,22 +4,18 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * A JML model method declaration in textual form.
  */
-public final class TextualJMLMethodDecl extends TextualJMLConstruct {
+public final class TextualJMLMethodDecl extends TextualJMLMethodOrLemmaDecl {
     private final JmlParser.Method_declarationContext methodDefinition;
-
 
     public TextualJMLMethodDecl(ImmutableList<JMLModifier> modifiers,
             JmlParser.Method_declarationContext methodDefinition) {
@@ -28,38 +24,16 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         setPosition(methodDefinition);
     }
 
-    public String getParsableDeclaration() {
-        String m = modifiers.stream().map(it -> {
-            if (JMLTransformer.JAVA_MODS.contains(it)) {
-                return it.toString();
-            } else {
-                JMLModifier jmlModifier = JMLModifier.valueOf(it.name());
-                if (jmlModifier == JMLModifier.NON_NULL || jmlModifier == JMLModifier.NULLABLE) {
-                    return "/*@ " + jmlModifier + " @*/";
-                } else {
-                    return StringUtil.repeat(" ", it.toString().length());
-                }
-            }
-        }).collect(Collectors.joining(" "));
+    // public JmlParser.Method_declarationContext getDecl() {
+    // return methodDefinition;
+    // }
 
-        String paramsString = methodDefinition.param_list().param_decl().stream()
-                .map(it -> (it.NULLABLE() != null ? "/*@ nullable @*/"
-                        : it.NON_NULL() != null ? "/*@ non_null @*/" : "")
-                    + " " + it.typespec().getText() + " " + it.p.getText()
-                    + StringUtil.repeat("[]", it.LBRACKET().size()))
-                .collect(Collectors.joining(","));
-        return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
-            getMethodName(), paramsString);
-    }
-
-    public JmlParser.Method_declarationContext getDecl() {
-        return methodDefinition;
-    }
-
+    @Override
     public String getMethodName() {
         return methodDefinition.IDENT().getText();
     }
 
+    @Override
     public ParserRuleContext getMethodDefinition() {
         return methodDefinition;
     }
@@ -86,14 +60,13 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         return Objects.hash(methodDefinition);
     }
 
-    public int getStateCount() {
-        if (modifiers.contains(JMLModifier.TWO_STATE)) {
-            return 2;
-        }
-        if (modifiers.contains(JMLModifier.NO_STATE)) {
-            return 0;
-        }
-        return 1;
+    @Override
+    protected JmlParser.Param_listContext getParamListContext() {
+        return methodDefinition.param_list();
     }
 
+    @Override
+    protected String getTypespecText() {
+        return methodDefinition.typespec().getText();
+    }
 }
