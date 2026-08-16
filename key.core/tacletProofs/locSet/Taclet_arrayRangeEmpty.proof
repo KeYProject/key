@@ -3,7 +3,7 @@
 \settings {
     "Choice" : {
         "JavaCard" : "JavaCard:off",
-        "Strings" : "Strings:off",
+        "Strings" : "Strings:on",
         "assertions" : "assertions:safe",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
@@ -15,15 +15,13 @@
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
         "modelFields" : "modelFields:treatAsAxiom",
-        "moreSeqRules" : "moreSeqRules:on",
+        "moreSeqRules" : "moreSeqRules:off",
         "permissions" : "permissions:off",
         "programRules" : "programRules:Java",
         "reach" : "reach:on",
         "runtimeExceptions" : "runtimeExceptions:ban",
         "sequences" : "sequences:on",
-        "soundDefaultContracts" : "soundDefaultContracts:on",
-        "wdChecks" : "wdChecks:off",
-        "wdOperator" : "wdOperator:L"
+        "soundDefaultContracts" : "soundDefaultContracts:on"
     },
     "Labels" : {
         "UseOriginLabels" : true
@@ -47,19 +45,19 @@
     },
     "Strategy" : {
         "ActiveStrategy" : "Modular JavaDL Strategy",
-        "MaximumNumberOfAutomaticApplications" : 4000,
+        "MaximumNumberOfAutomaticApplications" : 10000,
         "Timeout" : -1,
         "options" : {
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
-            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
-            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_EXPAND",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
             "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
-            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
+            "LOOP_OPTIONS_KEY" : "LOOP_NONE",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
-            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
-            "OSS_OPTIONS_KEY" : "OSS_OFF",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
             "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
             "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
@@ -86,14 +84,11 @@
 }
 
 \proof {
-(keyLog "0" (keyUser "bubel" ) (keyVersion "055adf452b2e09a0d2fc410c66c8849e10340622"))
+(keyLog "0" (keyUser "daniel" ) (keyVersion "3e5e375a5961f774f564a01b1e406905665f8f19"))
 
-(autoModeTime "318")
+(autoModeTime "685")
 
 (branch "dummy ID"
-(rule "impRight" (formula "1"))
-(rule "notLeft" (formula "1"))
-(rule "eqSymm" (formula "2"))
 (rule "inEqSimp_ltToLeq" (formula "1") (term "1"))
 (rule "polySimp_mulComm0" (formula "1") (term "1,0,0,1"))
 (rule "inEqSimp_sepPosMonomial0" (formula "1") (term "1"))
@@ -114,8 +109,7 @@
    (rule "polySimp_mulLiterals" (formula "1") (term "1"))
    (rule "polySimp_elimOne" (formula "1") (term "1"))
    (rule "equalityToElementOf" (formula "2") (inst "av=av:Pair<java.lang.Object,Field>") (userinteraction))
-   (rule "elementOfEmpty" (formula "2") (term "1,0"))
-   (rule "concrete_eq_4" (formula "2") (term "0"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "elementOfArrayRange" (formula "2") (term "0,0") (inst "iv=iv"))
    (rule "inEqSimp_commuteLeq" (formula "2") (term "1,0,0,1,0,0"))
    (rule "nnf_notAnd" (formula "2") (term "0"))
@@ -142,21 +136,19 @@
    (rule "shift_paren_or" (formula "2") (term "0,0"))
    (rule "shift_paren_or" (formula "2") (term "0,0,0"))
    (rule "allLeft" (formula "2") (inst "t=pair<java.lang.Object, Field>(null, arr(f_upper)):Pair<java.lang.Object,Field>") (userinteraction))
-   (rule "firstOfPair" (formula "2") (term "0,0,0,0,0,0"))
-   (rule "secondOfPair" (formula "2") (term "0,0,1,0,0,0"))
-   (rule "equalUnique" (formula "2") (term "0,1,0,0,0"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "eqSymm" (formula "2") (term "0,0,0,0,0"))
    (rule "eqSymm" (formula "2") (term "0,1,0,0,0"))
    (rule "commute_or_2" (formula "2") (term "0,0"))
    (rule "commute_or_2" (formula "2") (term "0"))
-   (rule "elim_forall4" (formula "2"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "inEqSimp_homoInEq1" (formula "2") (term "1"))
    (rule "polySimp_pullOutFactor1b" (formula "2") (term "0,1"))
    (rule "add_literals" (formula "2") (term "1,1,0,1"))
    (rule "times_zero_1" (formula "2") (term "1,0,1"))
    (rule "add_literals" (formula "2") (term "0,1"))
    (rule "leq_literals" (formula "2") (term "1"))
-   (rule "concrete_or_4" (formula "2"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "inEqSimp_contradInEq1" (formula "2") (term "1") (ifseqformula "1"))
    (rule "inEqSimp_homoInEq1" (formula "2") (term "0,1"))
    (rule "polySimp_mulComm0" (formula "2") (term "1,0,0,1"))
@@ -169,12 +161,11 @@
    (rule "times_zero_1" (formula "2") (term "1,0,0,1"))
    (rule "add_literals" (formula "2") (term "0,0,1"))
    (rule "leq_literals" (formula "2") (term "0,1"))
-   (rule "concrete_and_2" (formula "2") (term "1"))
-   (rule "concrete_or_4" (formula "2"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "notLeft" (formula "2"))
    (rule "geq_to_lt_alt" (formula "1") (userinteraction))
    (rule "orLeft" (formula "1") (userinteraction))
-   (branch "f_upper > f_lower"
+   (branch "gt(f_upper, f_lower)"
       (rule "inEqSimp_gtToGeq" (formula "1"))
       (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
       (rule "inEqSimp_sepPosMonomial1" (formula "1"))
@@ -184,23 +175,18 @@
       (rule "polySimp_mulLiterals" (formula "1") (term "1,1"))
       (rule "polySimp_elimOne" (formula "1") (term "1,1"))
       (rule "allLeft" (formula "2") (inst "t=pair<java.lang.Object, Field>(f_o, arr(f_lower)):Pair<java.lang.Object,Field>") (userinteraction))
-      (rule "firstOfPair" (formula "2") (term "0,0,0,0,0,0"))
-      (rule "eqClose" (formula "2") (term "0,0,0,0,0"))
-      (rule "concrete_not_1" (formula "2") (term "0,0,0,0"))
-      (rule "concrete_or_2" (formula "2") (term "0,0,0"))
-      (rule "secondOfPair" (formula "2") (term "0,0,0,0,0"))
-      (rule "equalUnique" (formula "2") (term "0,0,0,0"))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "eqSymm" (formula "2") (term "0,0,0,0"))
       (rule "commute_or" (formula "2") (term "0,0"))
       (rule "commute_or_2" (formula "2") (term "0"))
-      (rule "elim_forall4" (formula "2"))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "inEqSimp_homoInEq0" (formula "2") (term "0"))
       (rule "polySimp_pullOutFactor1b" (formula "2") (term "0,0"))
       (rule "add_literals" (formula "2") (term "1,1,0,0"))
       (rule "times_zero_1" (formula "2") (term "1,0,0"))
       (rule "add_literals" (formula "2") (term "0,0"))
       (rule "qeq_literals" (formula "2") (term "0"))
-      (rule "concrete_or_2" (formula "2"))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "inEqSimp_homoInEq1" (formula "2"))
       (rule "polySimp_addComm1" (formula "2") (term "0"))
       (rule "inEqSimp_sepPosMonomial0" (formula "2"))
@@ -247,30 +233,20 @@
       (rule "polySimp_pullOutFactor1" (formula "2") (term "0,0,1,0,0"))
       (rule "add_literals" (formula "2") (term "1,0,0,1,0,0"))
       (rule "times_zero_1" (formula "2") (term "0,0,1,0,0"))
-      (rule "eqClose" (formula "2") (term "0,1,0,0"))
-      (rule "ifthenelse_true_for" (formula "2") (term "1,0,0"))
-      (rule "elim_forall4" (formula "2") (term "0"))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "allLeft" (formula "2") (inst "t=pair<java.lang.Object, Field>(f_o, arr(f_lower)):Pair<java.lang.Object,Field>") (userinteraction))
-      (rule "firstOfPair" (formula "2") (term "0,0,0"))
-      (rule "eqClose" (formula "2") (term "0,0"))
-      (rule "concrete_not_1" (formula "2") (term "0"))
-      (rule "concrete_or_2" (formula "2"))
-      (rule "secondOfPair" (formula "2") (term "0,0"))
-      (rule "eqClose" (formula "2") (term "0"))
-      (rule "concrete_not_1" (formula "2"))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "closeFalse" (formula "2"))
    )
 )
 (branch "Case '<-'"
    (rule "equalityToElementOfRight" (formula "2") (inst "fv=fv") (inst "ov=ov"))
-   (rule "elementOfEmpty" (formula "2") (term "1,0,0"))
-   (rule "concrete_eq_4" (formula "2") (term "0,0"))
+    (builtin "One Step Simplification" (formula "2"))
    (rule "allRight" (formula "2") (inst "sk=ov_0:java.lang.Object"))
    (rule "allRight" (formula "2") (inst "sk=fv_0:Field"))
    (rule "notRight" (formula "2"))
    (rule "elementOfArrayRange" (formula "1") (inst "iv=iv"))
-   (rule "firstOfPair" (formula "1") (term "0,0"))
-   (rule "secondOfPair" (formula "1") (term "0,0,0,0,1"))
+    (builtin "One Step Simplification" (formula "1"))
    (rule "andLeft" (formula "1"))
    (rule "exLeft" (formula "2") (inst "sk=iv_0:int"))
    (rule "andLeft" (formula "2"))

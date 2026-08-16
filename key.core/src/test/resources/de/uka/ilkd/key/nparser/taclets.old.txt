@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Aug 15 11:53:32 CEST 2026
+# Date: Sun Aug 16 12:25:27 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1134,7 +1134,6 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == arrayRangeEmpty (arrayRangeEmpty) =========================================
 arrayRangeEmpty {
-\assumes ([]==>[equals(o,o2)]) 
 \find(equals(arrayRange(o,lower,upper),empty<Pair<java.lang.Object,Field>>))
 \replacewith(lt(upper,lower)) 
 \heuristics(simplify)
