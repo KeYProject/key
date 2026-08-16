@@ -5,7 +5,7 @@
 # Plugins
 spotless = "8.9.0"
 checkerframework-gradle = "0.6.61"
-maven-publish = "0.37.0"
+maven-publish = "0.36.0"
 shadow = "9.6.1"
 
 # Core dependencies
