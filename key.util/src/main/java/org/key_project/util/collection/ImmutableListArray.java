@@ -22,7 +22,14 @@ import org.jspecify.annotations.Nullable;
 final class ImmutableListArray<T extends @Nullable Object> implements ImmutableList<T> {
     private final T[] data;
 
-    public ImmutableListArray(T[] data) {
+    /**
+     * Caution: This constructor does *not* the argument array but refers to it directly.
+     * Do not call it but from contexts where you know that data remains unmodified.
+     *
+     * @see ImmutableList#fromArray(Object[])
+     * @param data the array data
+     */
+    ImmutableListArray(T[] data) {
         this.data = data;
     }
 
