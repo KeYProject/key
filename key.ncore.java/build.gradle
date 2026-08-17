@@ -1,3 +1,4 @@
+description = "Java AST and AST generation for KeY"
 sourceSets {
     generator {
         java {
