@@ -247,7 +247,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     ProgramElementName name = new ProgramElementName(ctx.var.getText());
                     collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
                 }
-                return null;
+                return super.visitProofCmd(ctx);
             }
         }
 

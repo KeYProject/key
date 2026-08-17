@@ -89,8 +89,17 @@ public class ObtainCommand extends AbstractCommand {
     private JTerm executeFromGoal(LocationVariable var) throws ScriptException {
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        // This works under the assumption that the last succedent formula is the "goal" formula.
-        SequentFormula sequentFormula = goal.node().sequent().succedent().getLast();
+        // Pick the most recently changed succedent formula as the goal formula.
+        var sci = goal.node().getNodeInfo().getSequentChangeInfo().getSemisequentChangeInfo(false);
+        SequentFormula sequentFormula;
+        if (!sci.addedFormulas().isEmpty()) {
+            sequentFormula = sci.addedFormulas().get(0);
+        } else if (!sci.modifiedFormulas().isEmpty()) {
+            sequentFormula = sci.modifiedFormulas().get(0).newFormula();
+        } else {
+            // Fallback to last succedent if no change info is available
+            sequentFormula = goal.node().sequent().succedent().getLast();
+        }
         JTerm formula = (JTerm) sequentFormula.formula();
         while (formula.op() instanceof UpdateApplication) {
             formula = formula.sub(1);
@@ -124,26 +133,79 @@ public class ObtainCommand extends AbstractCommand {
         return app.instantiations().getInstantiation(sk);
     }
 
-    private SequentFormula identifySequentFormula(Node node) {
-        SemisequentChangeInfo changes =
-            node.getNodeInfo().getSequentChangeInfo().getSemisequentChangeInfo(false);
-        ImmutableList<SequentFormula> added = changes.addedFormulas();
-        if (!added.isEmpty()) {
-            if (added.size() == 1) {
-                return added.get(0);
-            }
-        } else {
-            ImmutableList<FormulaChangeInfo> modified = changes.modifiedFormulas();
-            if (modified.size() == 1) {
-                return modified.get(0).newFormula();
-            }
+    private JTerm executeSuchThat(LocationVariable var, @Nullable JTerm suchThat)
+            throws ScriptException {
+        if (suchThat == null) {
+            throw new ScriptException("'such_that' must not be null");
         }
-        throw new IllegalStateException(
-            "Multiple or no formulas modified or added in last step, cannot identify sequent formula to skolemize.");
-    }
 
-    private JTerm executeSuchThat(LocationVariable var, @Nullable JTerm suchThat) {
-        throw new UnsupportedOperationException("such_that not yet supported in obtain.");
+        Services services = state().getProof().getServices();
+        var tb = services.getTermBuilder();
+
+        // 1) Replace program variable by a fresh logical variable in the condition.
+        String base = var.name().toString();
+        String lvName = VariableNameProposer.DEFAULT.getNameProposal(base, services, null);
+        LogicVariable lv = new LogicVariable(new Name(lvName), var.sort());
+
+        JTerm progVarTerm = tb.var(var);
+        JTerm lvTerm = tb.var(lv);
+        JTerm condWithLv = OpReplacer.replace(progVarTerm, lvTerm, suchThat,
+            services.getTermFactory(), state().getProof());
+
+        // 2) Ensure it is a formula
+        JTerm asFormula = tb.convertToFormula(condWithLv);
+
+        // 3) Existentially quantify and cut on it
+        JTerm exFormula = tb.ex(lv, asFormula);
+
+        Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("cut"));
+        TacletApp cutApp = NoPosTacletApp.createNoPosTacletApp(cut);
+        SchemaVariable cutSv = cutApp.uninstantiatedVars().iterator().next();
+        cutApp = cutApp.addCheckedInstantiation(cutSv, exFormula, services, true);
+        ImmutableList<Goal> goals = state.getFirstOpenAutomaticGoal().apply(cutApp);
+
+        // 4) On the antecedent branch, apply exLeft to introduce a Skolem constant
+        TermComparisonWithHoles cmp = new TermComparisonWithHoles(exFormula);
+        Goal antecedentGoal = null;
+        SequentFormula targetSf = null;
+        for (Goal g : goals) {
+            var matches = cmp.findTopLevelMatchesInSequent(g.node().sequent());
+            for (var m : matches) {
+                if (Boolean.TRUE.equals(m.first)) {
+                    antecedentGoal = g;
+                    targetSf = m.second;
+                    break;
+                }
+            }
+            if (antecedentGoal != null) break;
+        }
+        if (antecedentGoal == null || targetSf == null) {
+            throw new ScriptException("Could not locate antecedent \\exists-formula after cut.");
+        }
+
+        FindTaclet exLeft = (FindTaclet) state.getProof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("exLeft"));
+        PosInOccurrence pio = new PosInOccurrence(targetSf, PosInTerm.getTopLevel(), true);
+        MatchConditions mc = new MatchConditions();
+        TacletApp exApp = PosTacletApp.createPosTacletApp(exLeft, mc, pio, services);
+
+        var schemaVars = ImmutableSet.from(exLeft.collectSchemaVars());
+        SchemaVariable u = getSV(schemaVars, "u");
+        SchemaVariable b = getSV(schemaVars, "b");
+        SchemaVariable sk = getSV(schemaVars, "sk");
+
+        exApp = exApp.addInstantiation(u,
+            services.getTermBuilder().tf().createTerm(targetSf.formula().boundVars().get(0)),
+            true, services);
+        exApp = exApp.addInstantiation(b, targetSf.formula().sub(0), true, services);
+
+        String skName = VariableNameProposer.DEFAULT.getNameProposal(base, services, null);
+        exApp = exApp.createSkolemConstant(skName, sk,
+            targetSf.formula().boundVars().get(0).sort(), true, services);
+
+        antecedentGoal.apply(exApp);
+        return exApp.instantiations().getInstantiation(sk);
     }
 
     private JTerm executeEquals(LocationVariable var, @Nullable JTerm equals)

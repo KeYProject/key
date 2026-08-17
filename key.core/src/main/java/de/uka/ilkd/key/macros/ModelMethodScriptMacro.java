@@ -6,7 +6,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.statement.JmlAssert;
-import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
@@ -47,17 +47,17 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.proof.OpReplacer;
 import org.key_project.util.collection.Pair;
 
-public class LemmaAndModelMethodScriptMacro  extends AbstractProofMacro {
+public class ModelMethodScriptMacro extends AbstractProofMacro {
 
     private static final String ID = "[A-Za-z_$0-9.]+";
     private static final Pattern NAME_PATTERN =
             Pattern.compile(ID+ "\\[(" + ID + "::" + ID + ")\\(.*\\)\\].JML model_behavior operation contract.\\d+");
 
-    public LemmaAndModelMethodScriptMacro() { }
+    public ModelMethodScriptMacro() { }
 
     @Override
     public String getName() {
-        return "lemma-script-auto-macro";
+        return "model-method-script-auto-macro";
     }
 
     @Override
@@ -68,6 +68,48 @@ public class LemmaAndModelMethodScriptMacro  extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Apply scripts in lemmas and model methods";
+    }
+
+    @Override
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+       return canApplyTo(proof, goals, posInOcc, false);
+    }
+
+    /**
+     * shared code with {@link LemmaMethodScriptMacro} to determine if the macro
+     * can be applied to the given proof and goals.
+     */
+    static boolean canApplyTo(Proof proof,  ImmutableList<Goal> goals, PosInOccurrence posInOcc, boolean expectLemma) {
+        // only applicable on the root of the proof
+        // todo change this to allow for subproofs of lemmas and model methods
+        if (!goals.stream().allMatch(g -> g.node() == proof.root()))
+            return false;
+
+        ProgramMethod pm = extractModelMethod(proof);
+        if (pm != null) {
+            return pm.isLemma() == expectLemma;
+        }
+        return false;
+    }
+
+    /**
+     * shared code with {@link LemmaMethodScriptMacro} to extract the model method from the proof name
+     * @param proof proof object whose name is to be parsed
+     * @return null or the model method behind the proof obligation
+     */
+    static @Nullable ProgramMethod extractModelMethod(Proof proof) {
+        String name = proof.name().toString();
+        Matcher m = NAME_PATTERN.matcher(name);
+        if(!m.matches()) {
+            return null;
+        }
+        Services services = proof.getServices();
+        String lemmaName = m.group(1);
+        Function function = services.getNamespaces().functions().lookup(lemmaName);
+        if (function instanceof ProgramMethod pm && pm.isModel()) {
+            return pm;
+        }
+        return null;
     }
 
     record CutTree(List<ParseTree> localHistory, JmlParser.ExpressionContext cond, CutTree thenTree, CutTree elseTree) {
@@ -129,17 +171,7 @@ public class LemmaAndModelMethodScriptMacro  extends AbstractProofMacro {
 
 
 
-    @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        // only applicable on the root of the proof
-        // todo change this to allow for subproofs of lemmas and model methods
-        if(!goals.stream().allMatch(g -> g.node() == proof.root()))
-            return false;
 
-        String name = proof.name().toString();
-        Matcher m = NAME_PATTERN.matcher(name);
-        return m.matches();
-    }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) throws Exception {
