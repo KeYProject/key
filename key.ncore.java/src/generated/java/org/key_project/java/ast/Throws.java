@@ -87,9 +87,11 @@ public final class Throws extends JavaSourceElement implements JavaProgramElemen
         }
 
         public Builder exceptions(TypeReference exceptions) {
-            if (this.exceptions == null)
-                this.exceptions = new ArrayList<>();
-            this.exceptions.add(exceptions);
+            if (this.exceptions == null) {
+                this.exceptions = ImmutableList.of(exceptions);
+                return this;
+            }
+            this.exceptions = this.exceptions.append(exceptions);
             return this;
         }
     }

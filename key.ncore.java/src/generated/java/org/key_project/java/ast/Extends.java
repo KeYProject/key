@@ -88,9 +88,11 @@ public final class Extends extends JavaSourceElement implements InheritanceSpeci
         }
 
         public Builder supertypes(TypeReference supertypes) {
-            if (this.supertypes == null)
-                this.supertypes = new ArrayList<>();
-            this.supertypes.add(supertypes);
+            if (this.supertypes == null) {
+                this.supertypes = ImmutableList.of(supertypes);
+                return this;
+            }
+            this.supertypes = this.supertypes.append(supertypes);
             return this;
         }
     }

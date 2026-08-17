@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
-import java.util.stream.Collectors;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
@@ -23,6 +21,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.stream.Collectors;
+
 import static com.github.javaparser.StaticJavaParser.*;
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -38,23 +38,23 @@ public class NodeSteps {
                 .filter(NodeSteps::fieldIsWritable)
                 .flatMap(it -> it.getVariables().stream()).forEach(it -> {
                     var args =
-                        target.getFields().stream()
-                                .flatMap(f -> f.getVariables().stream())
-                                .map(v -> {
-                                    if (v == it) {
-                                        return (Expression) v.getNameAsExpression();
-                                    } else {
-                                        return new MethodCallExpr(null, v.getNameAsString());
-                                    }
-                                }).toList();
+                            target.getFields().stream()
+                                    .flatMap(f -> f.getVariables().stream())
+                                    .map(v -> {
+                                        if (v == it) {
+                                            return (Expression) v.getNameAsExpression();
+                                        } else {
+                                            return new MethodCallExpr(null, v.getNameAsString());
+                                        }
+                                    }).toList();
 
                     var m = target.addMethod("with" + upperStart(it.getNameAsString()), PUBLIC);
                     m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, target.getNameAsString()));
                     m.getBody().get().addStatement(new ReturnStmt(
-                        new ObjectCreationExpr(null,
-                            new ClassOrInterfaceType(null, target.getNameAsString()),
-                            new NodeList<>(args))));
+                            new ObjectCreationExpr(null,
+                                    new ClassOrInterfaceType(null, target.getNameAsString()),
+                                    new NodeList<>(args))));
                 });
     }
 
@@ -80,20 +80,21 @@ public class NodeSteps {
         if (target.isAbstract() || target.isInterface()) {
             return;
         }
-        MethodDeclaration equals = target.addMethod("match", PUBLIC);
-        // equals.addModifier(FINAL);
-        equals.addAnnotation(Override.class);
-        equals.addAnnotation(Nullable.class);
-        equals.setType("MatchConditions");
+        MethodDeclaration match = target.addMethod("match", PUBLIC);
+        // match.addModifier(FINAL);
+        match.addAnnotation(Override.class);
+        match.addAnnotation(Nullable.class);
+        match.setType("MatchConditions");
         final var o = getNullableObject();
-        equals.getParameters().add(o);
-        equals.addParameter("MatchConditions", "cond");
+        match.getParameters().add(o);
+        match.addParameter("MatchConditions", "cond");
 
-        BlockStmt body = equals.getBody().get();
+        BlockStmt body = match.getBody().get();
         body.addStatement(parseStatement(
-            "if(!(o instanceof %s other)) return null;".formatted(target.getNameAsString())));
+                "if(!(o instanceof %s other)) return null;".formatted(target.getNameAsString())));
         var fields = target.getFields().stream()
                 .filter(it -> it.getAnnotationByName("EqEx").isEmpty())
+                .filter(it -> it.getAnnotationByName("NoMatch").isEmpty())
                 .flatMap(it -> it.getVariables().stream())
                 .toList();
         for (var field : fields) {
@@ -117,12 +118,12 @@ public class NodeSteps {
         BlockStmt body = equals.getBody().get();
         body.addStatement(parseStatement("if(this == o) return true;"));
         body.addStatement(parseStatement(
-            "if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
+                "if(!(o instanceof %s that)) return false;".formatted(target.getNameAsString())));
         Expression equalFields = target.getFields().stream()
                 .filter(it -> it.getAnnotationByName("EqEx").isEmpty())
                 .flatMap(it -> it.getVariables().stream())
                 .map(it -> callObjects("equals", it.getNameAsExpression(),
-                    new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
+                        new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
                 .reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND))
                 .orElse(new BooleanLiteralExpr(true));
         body.addStatement(new ReturnStmt(equalFields));
@@ -156,12 +157,12 @@ public class NodeSteps {
         else {
             final Expression compute = callObjects("hash", args);
             final Expression hashCodeIsNull = new BinaryExpr(variable.getNameAsExpression(),
-                new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
+                    new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
             final var setHashCode =
-                new ExpressionStmt(new AssignExpr(variable.getNameAsExpression(), compute,
-                    AssignExpr.Operator.ASSIGN));
+                    new ExpressionStmt(new AssignExpr(variable.getNameAsExpression(), compute,
+                            AssignExpr.Operator.ASSIGN));
             hashCode.getBody().get().addStatement(
-                new IfStmt(hashCodeIsNull, setHashCode, null));
+                    new IfStmt(hashCodeIsNull, setHashCode, null));
             hashCode.getBody().get().addStatement(new ReturnStmt(variable.getNameAsExpression()));
         }
     }
@@ -175,16 +176,16 @@ public class NodeSteps {
         toString.addAnnotation(Override.class);
         toString.setType(String.class);
         var parameters =
-            clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
+                clazz.getFields().stream().flatMap(it -> it.getVariables().stream()).toList();
         var sb = (clazz.getNameAsString() + "[")
-            + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
-                    .collect(Collectors.joining(", "))
-            + "]";
+                + parameters.stream().map(NodeWithSimpleName::getNameAsString).map(it -> it + "=%s")
+                .collect(Collectors.joining(", "))
+                + "]";
 
         var args = parameters.stream().map(NodeWithSimpleName::getNameAsExpression)
                 .map(it -> (Expression) it).toList();
         toString.getBody().get().addStatement(new ReturnStmt(
-            new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
+                new MethodCallExpr(new StringLiteralExpr(sb), "formatted", new NodeList<>(args))));
     }
 
     static void handleRoot(ClassOrInterfaceDeclaration clazz) {
@@ -245,12 +246,12 @@ public class NodeSteps {
                 params.add(p);
                 if (isOptional) {
                     body.addStatement(
-                        "this.%s = %s;".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = %s;".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 } else {
                     body.addStatement(
-                        "this.%s = Objects.requireNonNull(%s);".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 }
             }
         }
@@ -288,16 +289,16 @@ public class NodeSteps {
 
                 if (isOptional) {
                     body.addStatement(
-                        "this.%s = null;".formatted(variable.getNameAsString()));
+                            "this.%s = null;".formatted(variable.getNameAsString()));
                 } else {
                     final var p =
-                        new Parameter(variable.getType().clone(), variable.getNameAsString());
+                            new Parameter(variable.getType().clone(), variable.getNameAsString());
                     field.getAnnotations().stream().map(AnnotationExpr::clone)
                             .forEach(p::addAnnotation);
                     params.add(p);
                     body.addStatement(
-                        "this.%s = Objects.requireNonNull(%s);".formatted(
-                            variable.getNameAsString(), variable.getNameAsString()));
+                            "this.%s = Objects.requireNonNull(%s);".formatted(
+                                    variable.getNameAsString(), variable.getNameAsString()));
                 }
             }
         }
@@ -315,7 +316,7 @@ public class NodeSteps {
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
         params.add(
-            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+                new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         params.add(new Parameter(parseType("Properties"), "map"));
 
@@ -324,7 +325,7 @@ public class NodeSteps {
                 .flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
                 .map(it -> (Expression) parseExpression(
-                    "map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
+                        "map.get(PROPERTY_%s, other.%s)".formatted(it.toUpperCase(), it)))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -345,7 +346,7 @@ public class NodeSteps {
                 .flatMap(it -> it.getVariables().stream())
                 .map(NodeWithSimpleName::getNameAsString)
                 .map(it -> (Expression) parseExpression(
-                    "map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
+                        "map.get(PROPERTY_%s)".formatted(it.toUpperCase())))
                 .toList();
         body.addStatement(new MethodCallExpr(null, "this", new NodeList<>(args)));
     }
@@ -364,7 +365,7 @@ public class NodeSteps {
         target.getFields().stream()
                 .flatMap(it -> it.getVariables().stream())
                 .forEach(variable -> body.addStatement("p.set(PROPERTY_%s, %s());".formatted(
-                    variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
+                        variable.getNameAsString().toUpperCase(), variable.getNameAsString())));
         body.addStatement("return p;");
     }
 
@@ -378,7 +379,7 @@ public class NodeSteps {
         var params = constr.getParameters();
         constr.setName(target.getNameAsString());
         params.add(
-            new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
+                new Parameter(new ClassOrInterfaceType(null, target.getNameAsString()), "other"));
 
         /*
          * for (var field : target.getFields()) {
@@ -428,11 +429,6 @@ public class NodeSteps {
             target.setInterface(true);
             target.addModifier(SEALED);
             target.removeModifier(ABSTRACT);
-            var permittedTypes =
-                Generator.INSTANCE.getStep(PreSteps.PreComputation.class).permittedTypes;
-            for (var s : permittedTypes.get(target.getNameAsString())) {
-                target.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
-            }
 
             target.addExtendedType("Matchable");
             target.addExtendedType("Visitable");
@@ -455,12 +451,12 @@ public class NodeSteps {
         for (var field : target.getFields()) {
             for (var variable : field.getVariables()) {
                 final var dataKey = new ClassOrInterfaceType(null, new SimpleName("Property"),
-                    new NodeList<>(toBoxType(variable.getType().clone())));
+                        new NodeList<>(toBoxType(variable.getType().clone())));
                 var f = target.addField(
-                    dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC,
-                    FINAL);
+                        dataKey, "PROPERTY_" + variable.getNameAsString().toUpperCase(), PUBLIC, STATIC,
+                        FINAL);
                 f.getVariables().getFirst().setInitializer(
-                    "new Property<>(\"%s\")".formatted(variable.getNameAsString()));
+                        "new Property<>(\"%s\")".formatted(variable.getNameAsString()));
             }
         }
     }
@@ -525,9 +521,13 @@ public class NodeSteps {
         for (var field : target.getFields()) {
             for (var variable : field.variables()) {
                 if (variable.getInitializer().isEmpty()) {
-                    var f =
-                        builder.addField(variable.getType().clone(), variable.getNameAsString(),
-                            PUBLIC);
+                    FieldDeclaration f;
+                    //if(isList(variable)) {
+                    //var old = variable.getType().asClassOrInterfaceType().clone();
+                    //old.setName("List");
+                    //f = builder.addField(old, variable.getNameAsString(), PUBLIC);
+                    //}
+                    f = builder.addField(variable.getType().clone(), variable.getNameAsString(), PUBLIC);
                     f.addAnnotation(Nullable.class);
                 }
             }
@@ -542,9 +542,9 @@ public class NodeSteps {
                 .map(it -> (Expression) it.getNameAsExpression())
                 .toList();
         build.getBody().get().addStatement(new ReturnStmt(
-            new ObjectCreationExpr(null,
-                new ClassOrInterfaceType(null, target.getNameAsString()),
-                new NodeList<>(args))));
+                new ObjectCreationExpr(null,
+                        new ClassOrInterfaceType(null, target.getNameAsString()),
+                        new NodeList<>(args))));
 
         builder.getFields().stream()
                 .flatMap(it -> it.variables().stream())
@@ -554,7 +554,7 @@ public class NodeSteps {
                     m.addParameter(new Parameter(it.getType().clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, "Builder"));
                     m.getBody().get().addStatement(
-                        "this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
+                            "this.%s=%s;".formatted(it.getNameAsString(), it.getNameAsString()));
                     m.getBody().get().addStatement("return this;");
                 });
 
@@ -566,13 +566,15 @@ public class NodeSteps {
                 .forEach(it -> {
                     var m = builder.addMethod(it.getNameAsString(), PUBLIC);
                     var t =
-                        it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
+                            it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
                     m.addParameter(new Parameter(t.clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, "Builder"));
-                    m.getBody().get().addStatement("if(this.%s==null) this.%s = new ArrayList<>();"
-                            .formatted(it.getNameAsString(), it.getNameAsString()));
+                    m.getBody().get().addStatement("if(this.%s==null) { this.%s = ImmutableList.of(%s); return this;}"
+                            .formatted(it.getNameAsString(), it.getNameAsString(), it.getNameAsString()));
                     m.getBody().get().addStatement(
-                        "this.%s.add(%s);".formatted(it.getNameAsString(), it.getNameAsString()));
+                            "this.%s= this.%s.append(%s);".formatted(it.getNameAsString(),
+                                    it.getNameAsString(),
+                                    it.getNameAsString()));
                     m.getBody().get().addStatement("return this;");
                 });
 
@@ -586,7 +588,7 @@ public class NodeSteps {
                 .flatMap(it -> it.variables().stream())
                 .filter(NodeSteps::fieldIsWritable)
                 .forEach(it -> b.addStatement(
-                    "b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
+                        "b.%s = %s;".formatted(it.getNameAsString(), it.getNameAsString())));
         b.addStatement("return b;");
     }
 

@@ -87,9 +87,11 @@ public final class ForUpdates extends JavaSourceElement implements JavaProgramEl
         }
 
         public Builder updates(Expression updates) {
-            if (this.updates == null)
-                this.updates = new ArrayList<>();
-            this.updates.add(updates);
+            if (this.updates == null) {
+                this.updates = ImmutableList.of(updates);
+                return this;
+            }
+            this.updates = this.updates.append(updates);
             return this;
         }
     }

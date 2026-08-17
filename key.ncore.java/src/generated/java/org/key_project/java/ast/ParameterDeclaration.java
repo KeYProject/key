@@ -137,9 +137,11 @@ public final class ParameterDeclaration extends JavaSourceElement implements Var
         }
 
         public Builder varSpec(VariableSpecification varSpec) {
-            if (this.varSpec == null)
-                this.varSpec = new ArrayList<>();
-            this.varSpec.add(varSpec);
+            if (this.varSpec == null) {
+                this.varSpec = ImmutableList.of(varSpec);
+                return this;
+            }
+            this.varSpec = this.varSpec.append(varSpec);
             return this;
         }
     }

@@ -255,9 +255,11 @@ public final class MethodDeclaration extends JavaSourceElement implements JavaDe
         }
 
         public Builder parameters(ParameterDeclaration parameters) {
-            if (this.parameters == null)
-                this.parameters = new ArrayList<>();
-            this.parameters.add(parameters);
+            if (this.parameters == null) {
+                this.parameters = ImmutableList.of(parameters);
+                return this;
+            }
+            this.parameters = this.parameters.append(parameters);
             return this;
         }
     }
