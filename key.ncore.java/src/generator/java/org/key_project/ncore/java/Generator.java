@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import com.github.javaparser.ParseProblemException;
 import org.key_project.ncore.java.NodeSteps.NodeStep;
 import org.key_project.ncore.java.PostSteps.PostStep;
 import org.key_project.ncore.java.PreSteps.PreStep;
 
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -41,8 +41,9 @@ public class Generator implements Callable<Integer> {
     public static void main(String[] args) throws Exception {
         try {
             INSTANCE.call();
-        }catch (ParseProblemException ppe){
-            ppe.getProblems().forEach((it) -> System.err.format("%s: %s\n", it.getLocation(), it.getVerboseMessage()));
+        } catch (ParseProblemException ppe) {
+            ppe.getProblems().forEach(
+                (it) -> System.err.format("%s: %s\n", it.getLocation(), it.getVerboseMessage()));
             throw ppe;
         }
     }
@@ -62,10 +63,10 @@ public class Generator implements Callable<Integer> {
 
         // weigl: this block adds the processing of
         // PROPERTY_* accessors and Node -> Map construction
-        //addStep(NodeSteps::addOverrideConstructor);
-        //addStep(NodeSteps::addOverrideConstructor2);
-        //addStep(NodeSteps::addGetProperties);
-        //addStep(NodeSteps::processFieldsAccessor);
+        // addStep(NodeSteps::addOverrideConstructor);
+        // addStep(NodeSteps::addOverrideConstructor2);
+        // addStep(NodeSteps::addGetProperties);
+        // addStep(NodeSteps::processFieldsAccessor);
 
         addStep(NodeSteps::addEquals);
         addStep(NodeSteps::ToString);
