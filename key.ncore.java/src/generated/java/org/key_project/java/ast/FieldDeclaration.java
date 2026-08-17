@@ -137,9 +137,11 @@ public final class FieldDeclaration extends JavaSourceElement implements Variabl
         }
 
         public Builder fieldSpecs(FieldSpecification fieldSpecs) {
-            if (this.fieldSpecs == null)
-                this.fieldSpecs = new ArrayList<>();
-            this.fieldSpecs.add(fieldSpecs);
+            if (this.fieldSpecs == null) {
+                this.fieldSpecs = ImmutableList.of(fieldSpecs);
+                return this;
+            }
+            this.fieldSpecs = this.fieldSpecs.append(fieldSpecs);
             return this;
         }
     }

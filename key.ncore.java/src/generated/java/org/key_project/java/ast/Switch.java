@@ -111,9 +111,11 @@ public final class Switch extends JavaSourceElement implements BranchStatement {
         }
 
         public Builder branches(Branch branches) {
-            if (this.branches == null)
-                this.branches = new ArrayList<>();
-            this.branches.add(branches);
+            if (this.branches == null) {
+                this.branches = ImmutableList.of(branches);
+                return this;
+            }
+            this.branches = this.branches.append(branches);
             return this;
         }
     }

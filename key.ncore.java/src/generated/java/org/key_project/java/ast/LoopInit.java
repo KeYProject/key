@@ -87,9 +87,11 @@ public final class LoopInit extends JavaSourceElement implements JavaProgramElem
         }
 
         public Builder inits(LoopInitializer inits) {
-            if (this.inits == null)
-                this.inits = new ArrayList<>();
-            this.inits.add(inits);
+            if (this.inits == null) {
+                this.inits = ImmutableList.of(inits);
+                return this;
+            }
+            this.inits = this.inits.append(inits);
             return this;
         }
     }

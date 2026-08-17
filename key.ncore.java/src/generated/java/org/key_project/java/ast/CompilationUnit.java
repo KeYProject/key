@@ -137,16 +137,20 @@ public final class CompilationUnit extends JavaSourceElement implements JavaProg
         }
 
         public Builder imports(Import imports) {
-            if (this.imports == null)
-                this.imports = new ArrayList<>();
-            this.imports.add(imports);
+            if (this.imports == null) {
+                this.imports = ImmutableList.of(imports);
+                return this;
+            }
+            this.imports = this.imports.append(imports);
             return this;
         }
 
         public Builder typeDeclarations(TypeDeclaration typeDeclarations) {
-            if (this.typeDeclarations == null)
-                this.typeDeclarations = new ArrayList<>();
-            this.typeDeclarations.add(typeDeclarations);
+            if (this.typeDeclarations == null) {
+                this.typeDeclarations = ImmutableList.of(typeDeclarations);
+                return this;
+            }
+            this.typeDeclarations = this.typeDeclarations.append(typeDeclarations);
             return this;
         }
     }

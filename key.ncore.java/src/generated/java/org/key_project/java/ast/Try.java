@@ -137,9 +137,11 @@ public final class Try extends JavaSourceElement implements BranchStatement {
         }
 
         public Builder catches(Catch catches) {
-            if (this.catches == null)
-                this.catches = new ArrayList<>();
-            this.catches.add(catches);
+            if (this.catches == null) {
+                this.catches = ImmutableList.of(catches);
+                return this;
+            }
+            this.catches = this.catches.append(catches);
             return this;
         }
     }

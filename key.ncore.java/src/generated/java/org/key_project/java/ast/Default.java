@@ -87,9 +87,11 @@ public final class Default extends JavaSourceElement {
         }
 
         public Builder body(Statement body) {
-            if (this.body == null)
-                this.body = new ArrayList<>();
-            this.body.add(body);
+            if (this.body == null) {
+                this.body = ImmutableList.of(body);
+                return this;
+            }
+            this.body = this.body.append(body);
             return this;
         }
     }

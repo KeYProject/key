@@ -14,6 +14,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked()
 public final class While extends JavaSourceElement implements LoopStatement {
 
+    @EqEx
     private final ImmutableList<TextualJMLConstruct> attachedJml;
 
     private final Statement body;
@@ -59,7 +60,7 @@ public final class While extends JavaSourceElement implements LoopStatement {
         return updates;
     }
 
-    public While(ImmutableList<TextualJMLConstruct> attachedJml, Statement body, IGuard guard, ILoopInit inits, @EqEx @Nullable PositionInfo positionInfo, IForUpdates updates) {
+    public While(@EqEx ImmutableList<TextualJMLConstruct> attachedJml, Statement body, IGuard guard, ILoopInit inits, @EqEx @Nullable PositionInfo positionInfo, IForUpdates updates) {
         this.attachedJml = Objects.requireNonNull(attachedJml);
         this.body = Objects.requireNonNull(body);
         this.guard = Objects.requireNonNull(guard);
@@ -68,7 +69,7 @@ public final class While extends JavaSourceElement implements LoopStatement {
         this.updates = Objects.requireNonNull(updates);
     }
 
-    public While(ImmutableList<TextualJMLConstruct> attachedJml, Statement body, IGuard guard, ILoopInit inits, IForUpdates updates) {
+    public While(@EqEx ImmutableList<TextualJMLConstruct> attachedJml, Statement body, IGuard guard, ILoopInit inits, IForUpdates updates) {
         this.attachedJml = Objects.requireNonNull(attachedJml);
         this.body = Objects.requireNonNull(body);
         this.guard = Objects.requireNonNull(guard);
@@ -86,10 +87,6 @@ public final class While extends JavaSourceElement implements LoopStatement {
     public MatchConditions match(java.lang.Object o, MatchConditions cond) {
         if (!(o instanceof While other))
             return null;
-        cond = MatchHelper.match(attachedJml, other.attachedJml, cond);
-        if (cond == null) {
-            return null;
-        }
         cond = MatchHelper.match(body, other.body, cond);
         if (cond == null) {
             return null;
@@ -188,9 +185,11 @@ public final class While extends JavaSourceElement implements LoopStatement {
         }
 
         public Builder attachedJml(TextualJMLConstruct attachedJml) {
-            if (this.attachedJml == null)
-                this.attachedJml = new ArrayList<>();
-            this.attachedJml.add(attachedJml);
+            if (this.attachedJml == null) {
+                this.attachedJml = ImmutableList.of(attachedJml);
+                return this;
+            }
+            this.attachedJml = this.attachedJml.append(attachedJml);
             return this;
         }
     }
@@ -212,7 +211,7 @@ public final class While extends JavaSourceElement implements LoopStatement {
             return true;
         if (!(o instanceof While that))
             return false;
-        return Objects.equals(attachedJml, that.attachedJml) && Objects.equals(body, that.body) && Objects.equals(guard, that.guard) && Objects.equals(inits, that.inits) && Objects.equals(updates, that.updates);
+        return Objects.equals(body, that.body) && Objects.equals(guard, that.guard) && Objects.equals(inits, that.inits) && Objects.equals(updates, that.updates);
     }
 
     @Override()
@@ -228,7 +227,7 @@ public final class While extends JavaSourceElement implements LoopStatement {
     @Override()
     public int hashCode() {
         if (hashCode == null)
-            hashCode = Objects.hash(attachedJml, body, guard, inits, updates);
+            hashCode = Objects.hash(body, guard, inits, updates);
         return hashCode;
     }
 
