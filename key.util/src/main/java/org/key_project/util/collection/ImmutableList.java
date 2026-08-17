@@ -111,7 +111,7 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param list the list to wrap
     /// @return an ImmutableList containing the elements of the input list
     static <T extends @Nullable Object> ImmutableList<T> fromList(List<T> list) {
-        return new ImmutableListList<>(list);
+        return new ImmutableListList<>(new ArrayList<>(list));
     }
 
     /// Creates an [ImmutableList] from an array.
@@ -123,9 +123,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param array the array to wrap
     /// @return an ImmutableList containing the elements of the input array
     static <T extends @Nullable Object> ImmutableList<T> fromArray(T[] array) {
-        return new ImmutableListArray<>(array);
+        return new ImmutableListArray<>(array.clone());
     }
-
 
     /// Return an empty immutable list.
     ///
@@ -246,7 +245,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param array the array to prepend
     /// @return a new list with the array's elements at the beginning
     default ImmutableList<T> prepend(T... array) {
-        return new ImmutableListConcat<>(ImmutableList.fromArray(array), this);
+        // weigl: here we can use the leaky version
+        return new ImmutableListConcat<>(new ImmutableListArray<>(array), this);
     }
 
     /// Appends a single element to this list.

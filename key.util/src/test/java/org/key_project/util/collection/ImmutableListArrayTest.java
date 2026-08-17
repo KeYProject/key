@@ -29,6 +29,24 @@ class ImmutableListArrayTest {
         return IntStream.range(1, i + 1).boxed().toArray(Integer[]::new);
     }
 
+    @Test
+    void immutability1() {
+        Integer[] array = { 0, 1, 4 };
+        // constructor does not copy the array, so changes to the array are reflected in the list
+        // While this seems dangerous, the constructor is package-private and thus considered safe.
+        ImmutableListArray<Integer> list = new ImmutableListArray<>(array);
+        assertThat(list.get(2)).isEqualTo(4);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(2);
+    }
+
+    @Test
+    void immutability2() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.fromArray(array);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
 
     @Test
     void size() {
