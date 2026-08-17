@@ -345,9 +345,11 @@ public final class EnumClassDeclaration extends JavaSourceElement implements Cla
         }
 
         public Builder members(MemberDeclaration members) {
-            if (this.members == null)
-                this.members = new ArrayList<>();
-            this.members.add(members);
+            if (this.members == null) {
+                this.members = ImmutableList.of(members);
+                return this;
+            }
+            this.members = this.members.append(members);
             return this;
         }
     }

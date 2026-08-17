@@ -13,6 +13,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
 public sealed interface Expression extends Matchable, Visitable permits Literal, ParenthesizedExpression, PassiveExpression {
+
     public default KeYJavaType getType(Services services) {
         return accept(new FindReturnType());
     }

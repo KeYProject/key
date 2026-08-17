@@ -74,6 +74,7 @@ public class Generator implements Callable<Integer> {
 
         addStep(NodeSteps::handleRoot);
 
+        postSteps.add(PostSteps::sealing);
         postSteps.add(PostSteps::createVisitor);
         postSteps.add(PostSteps::createArgVisitor);
         postSteps.add(PostSteps::createVoidVisitor);

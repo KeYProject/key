@@ -111,9 +111,11 @@ public final class LogicalFunctionOperator extends JavaSourceElement implements 
         }
 
         public Builder arguments(Expression arguments) {
-            if (this.arguments == null)
-                this.arguments = new ArrayList<>();
-            this.arguments.add(arguments);
+            if (this.arguments == null) {
+                this.arguments = ImmutableList.of(arguments);
+                return this;
+            }
+            this.arguments = this.arguments.append(arguments);
             return this;
         }
     }

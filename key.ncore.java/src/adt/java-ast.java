@@ -480,6 +480,8 @@ abstract class LoopStatement extends JavaStatement {
     IForUpdates updates;
     IGuard guard;
     Statement body;
+
+    @EqEx
     ImmutableList<TextualJMLConstruct> attachedJml;
 }
 

@@ -111,9 +111,11 @@ public final class ArrayReference extends JavaSourceElement implements JavaProgr
         }
 
         public Builder inits(Expression inits) {
-            if (this.inits == null)
-                this.inits = new ArrayList<>();
-            this.inits.add(inits);
+            if (this.inits == null) {
+                this.inits = ImmutableList.of(inits);
+                return this;
+            }
+            this.inits = this.inits.append(inits);
             return this;
         }
     }

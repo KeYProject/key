@@ -22,8 +22,6 @@ public class PreSteps {
         Multimap<String, String> inheritanceMap =
             MultimapBuilder.treeKeys().treeSetValues().build();
 
-        Multimap<String, String> permittedTypes =
-            MultimapBuilder.treeKeys().treeSetValues().build();
 
         ClassOrInterfaceDeclaration root;
 
@@ -46,13 +44,6 @@ public class PreSteps {
                         clazz.getExtendedTypes().getOFirst()
                                 .map(NodeWithSimpleName::getNameAsString);
                     zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
-
-                    zuper.ifPresent(s ->
-                            permittedTypes.put(s, decl.getNameAsString()));
-
-                    clazz.getImplementedTypes().forEach(s ->
-                            permittedTypes.put(s.getNameAsString(), decl.getNameAsString()));
-
                 }
             }
 
