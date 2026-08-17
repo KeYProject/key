@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.java;
 
+import java.util.ArrayList;
+import java.util.TreeMap;
+
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -11,18 +14,16 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
-import java.util.ArrayList;
-import java.util.TreeMap;
-
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT;
 import static org.key_project.ncore.java.NodeSteps.isRoot;
 
 public class PreSteps {
     final static class PreComputation implements PreStep {
         Multimap<String, String> inheritanceMap =
-                MultimapBuilder.treeKeys().treeSetValues().build();
+            MultimapBuilder.treeKeys().treeSetValues().build();
+
         Multimap<String, String> permittedTypes =
-                MultimapBuilder.treeKeys().treeSetValues().build();
+            MultimapBuilder.treeKeys().treeSetValues().build();
 
         ClassOrInterfaceDeclaration root;
 
@@ -40,11 +41,18 @@ public class PreSteps {
                         this.root = clazz;
                     }
                     fields.put(decl.getNameAsString(), clazz);
-
                     inheritanceMap.put(decl.getNameAsString(), this.root.getNameAsString());
                     var zuper =
-                            clazz.getExtendedTypes().getOFirst().map(NodeWithSimpleName::getNameAsString);
+                        clazz.getExtendedTypes().getOFirst()
+                                .map(NodeWithSimpleName::getNameAsString);
                     zuper.ifPresent(s -> inheritanceMap.put(decl.getNameAsString(), s));
+
+                    zuper.ifPresent(s ->
+                            permittedTypes.put(s, decl.getNameAsString()));
+
+                    clazz.getImplementedTypes().forEach(s ->
+                            permittedTypes.put(s.getNameAsString(), decl.getNameAsString()));
+
                 }
             }
 
@@ -56,7 +64,7 @@ public class PreSteps {
                     final var strings = new ArrayList<>(inheritanceMap.get(clazz));
                     for (var zuper : strings) {
                         changed =
-                                changed || inheritanceMap.putAll(clazz, inheritanceMap.get(zuper));
+                            changed || inheritanceMap.putAll(clazz, inheritanceMap.get(zuper));
                     }
                 }
             }
@@ -94,15 +102,15 @@ public class PreSteps {
                     }
                 });
             }
-
-            fillPermittedTypes();
         }
 
+        /*
         private void fillPermittedTypes() {
             for (var entry : inheritanceMap.entries()) {
                 permittedTypes.put(entry.getValue(), entry.getKey());
             }
         }
+         */
     }
 
     interface PreStep {

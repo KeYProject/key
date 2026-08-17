@@ -24,7 +24,6 @@ import com.github.javaparser.utils.SourceRoot;
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static org.key_project.ncore.java.Generator.ROOT;
 import static org.key_project.ncore.java.NodeSteps.isNonTerminal;
-import static org.key_project.ncore.java.NodeSteps.isRoot;
 
 public class PostSteps {
     public static void createVisitor(List<CompilationUnit> nodeUnits, SourceRoot sourceRoot) {
@@ -215,7 +214,7 @@ public class PostSteps {
     private static boolean isAstNode(Type type) {
         if (type.isClassOrInterfaceType()) {
             var c = type.asClassOrInterfaceType();
-            if (c.getNameAsString().equals("RoList")) {
+            if (c.getNameAsString().equals("ImmutableList")) {
                 return isAstNode(c.getTypeArguments().get().getFirst());
             }
 
@@ -258,8 +257,8 @@ public class PostSteps {
         {
             var acceptList = type.addMethod("accept", PROTECTED);
             acceptList.addTypeParameter(t.clone());
-            acceptList.addParameter(StaticJavaParser.parseType("RoList<T>"), "n");
-            acceptList.setType("RoList<T>");
+            acceptList.addParameter(StaticJavaParser.parseType("ImmutableList<T>"), "n");
+            acceptList.setType("ImmutableList<T>");
             acceptList.getBody().get().addStatement(
                 "return n != null ? n.stream().map(it -> (T) it.accept(this)).collect(RoList.collector()) : null;");
         }

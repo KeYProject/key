@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.java.ast;
 
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.pp.PrettyPrinter;
+
+import static de.uka.ilkd.key.pp.PrettyPrinter.*;
+
 public enum LogicFunction {
     Intersect(2, 1, PrimitiveType.JAVA_LOCSET, AsFunction("\\intersect")),
     SetUnion(2, 1, PrimitiveType.JAVA_LOCSET, AsFunction("\\set_union")),
@@ -31,4 +36,5 @@ public enum LogicFunction {
         this.returnType = returnType;
         this.format = format;
     }
+
 }

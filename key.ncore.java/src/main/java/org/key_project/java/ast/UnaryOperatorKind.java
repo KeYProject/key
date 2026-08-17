@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.java.ast;
 
+import static de.uka.ilkd.key.java.ast.expression.Operator.*;
+
 public enum UnaryOperatorKind {
     LOGICAL_NOT("!", 1),
     NEGATIVE("-", 1),
