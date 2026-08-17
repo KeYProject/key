@@ -10,11 +10,11 @@ shadow = "9.6.1"
 
 # Core dependencies
 slf4j = "2.0.18"
-logback = "1.6.1"
-jspecify = "1.0.0"
+logback = "1.6.2"
+jspecify = "1.0.1"
 eisop = "3.49.5-eisop1"
 assertj = "3.27.7"
-junit = "6.1.2"
+junit = "6.1.3"
 jackson = "2.21.5"
 
 # ANTLR
