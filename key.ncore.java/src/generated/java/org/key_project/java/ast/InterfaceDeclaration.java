@@ -237,16 +237,20 @@ public final class InterfaceDeclaration extends JavaSourceElement implements Typ
         }
 
         public Builder extending(TypeReference extending) {
-            if (this.extending == null)
-                this.extending = new ArrayList<>();
-            this.extending.add(extending);
+            if (this.extending == null) {
+                this.extending = ImmutableList.of(extending);
+                return this;
+            }
+            this.extending = this.extending.append(extending);
             return this;
         }
 
         public Builder members(MemberDeclaration members) {
-            if (this.members == null)
-                this.members = new ArrayList<>();
-            this.members.add(members);
+            if (this.members == null) {
+                this.members = ImmutableList.of(members);
+                return this;
+            }
+            this.members = this.members.append(members);
             return this;
         }
     }

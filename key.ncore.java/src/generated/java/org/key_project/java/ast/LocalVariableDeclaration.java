@@ -137,9 +137,11 @@ public final class LocalVariableDeclaration extends JavaSourceElement implements
         }
 
         public Builder varSpecs(VariableSpecification varSpecs) {
-            if (this.varSpecs == null)
-                this.varSpecs = new ArrayList<>();
-            this.varSpecs.add(varSpecs);
+            if (this.varSpecs == null) {
+                this.varSpecs = ImmutableList.of(varSpecs);
+                return this;
+            }
+            this.varSpecs = this.varSpecs.append(varSpecs);
             return this;
         }
     }

@@ -112,16 +112,20 @@ public final class Implements extends JavaSourceElement implements InheritanceSp
         }
 
         public Builder typeRefs(TypeReference typeRefs) {
-            if (this.typeRefs == null)
-                this.typeRefs = new ArrayList<>();
-            this.typeRefs.add(typeRefs);
+            if (this.typeRefs == null) {
+                this.typeRefs = ImmutableList.of(typeRefs);
+                return this;
+            }
+            this.typeRefs = this.typeRefs.append(typeRefs);
             return this;
         }
 
         public Builder supertypes(TypeReference supertypes) {
-            if (this.supertypes == null)
-                this.supertypes = new ArrayList<>();
-            this.supertypes.add(supertypes);
+            if (this.supertypes == null) {
+                this.supertypes = ImmutableList.of(supertypes);
+                return this;
+            }
+            this.supertypes = this.supertypes.append(supertypes);
             return this;
         }
     }

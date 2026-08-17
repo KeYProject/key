@@ -139,9 +139,11 @@ public final class ContextStatementBlock extends JavaSourceElement implements St
         }
 
         public Builder statement(Statement statement) {
-            if (this.statement == null)
-                this.statement = new ArrayList<>();
-            this.statement.add(statement);
+            if (this.statement == null) {
+                this.statement = ImmutableList.of(statement);
+                return this;
+            }
+            this.statement = this.statement.append(statement);
             return this;
         }
     }
