@@ -34,9 +34,6 @@ final class JavaCardDLCost {
      */
     static final long JAVA_INTEGER_SEMANTICS = -5000;
 
-    /** Loc-set CNF commutation ({@code cnf_setComm}). */
-    static final long LOCSET_CNF_COMMUTE = -800;
-
     /** Apply a class axiom ({@code classAxiom}). */
     static final long CLASS_AXIOM = -250;
 
