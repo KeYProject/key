@@ -163,7 +163,7 @@ public final class JmlTermFactory {
             final JTerm sub1 = getFields(t.sub(1));
             return tb.union(sub0, sub1);
         } else if (t.op().equals(locSetLDT.getSingleton())) {
-            return tb.allObjects(t.sub(1));
+            return tb.allObjects(t.sub(0).sub(1));
         } else {
             throw exc.createException0("Inacceptable field expression: " + t);
         }

@@ -86,15 +86,15 @@ class EndToEndTests {
                 .resolve("reverseArray.proof");
         Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             directory,
-            5270, 4183, true, true, true);
+            5308, 4218, true, true, true);
         var iteration2 =
-            sliceProofFullFilename(iteration1.second, 4183, 4181, true, true, true);
+            sliceProofFullFilename(iteration1.second, 4218, 4216, true, true, true);
         var iteration3 =
-            sliceProofFullFilename(iteration2.second, 4181, 4179, true, true, true);
+            sliceProofFullFilename(iteration2.second, 4216, 4214, true, true, true);
         var iteration4 =
-            sliceProofFullFilename(iteration3.second, 4179, 4177, true, true, true);
+            sliceProofFullFilename(iteration3.second, 4214, 4212, true, true, true);
         var iteration5 =
-            sliceProofFullFilename(iteration4.second, 4177, 4175, true, true, true);
+            sliceProofFullFilename(iteration4.second, 4212, 4210, true, true, true);
         iteration5.first.dispose();
         iteration4.first.dispose();
         iteration3.first.dispose();

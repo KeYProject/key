@@ -66,7 +66,7 @@ public class JavaDLTheory extends LDT {
     // private final TermServices services;
 
     protected JavaDLTheory(TermServices services) {
-        super(NAME, FORMULA, services);
+        super(NAME, FORMULA);
         // this.services = services;
     }
 

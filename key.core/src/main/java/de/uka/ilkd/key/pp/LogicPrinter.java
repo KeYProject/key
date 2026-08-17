@@ -798,11 +798,12 @@ public class LogicPrinter {
      * @param semiseq the semisequent to be printed
      */
     public void printSemisequent(Semisequent semiseq) {
-        for (int i = 0; i < semiseq.size(); i++) {
+        int idx = semiseq.size();
+        for (SequentFormula formula : semiseq) {
             layouter.markStartSub();
-            printConstrainedFormula(semiseq.get(i));
+            printConstrainedFormula(formula);
             layouter.markEndSub();
-            if (i != semiseq.size() - 1) {
+            if (--idx != 0) {
                 layouter.print(",").brk();
             }
         }
@@ -1352,21 +1353,15 @@ public class LogicPrinter {
     }
 
     public void printSingleton(JTerm t) {
-        assert t.arity() == 2;
-        layouter.startTerm(2);
-        layouter.print("{(").beginC(0);
+        assert t.arity() == 1;
+        layouter.startTerm(1);
+        layouter.print("{").beginC(0);
 
         layouter.markStartSub();
         printTerm(t.sub(0));
         layouter.markEndSub();
 
-        layouter.print(",").brk(1, 0);
-
-        layouter.markStartSub();
-        printTerm(t.sub(1));
-        layouter.markEndSub();
-
-        layouter.print(")}").end();
+        layouter.print("}").end();
     }
 
     public void printSeqSingleton(JTerm t, String lDelimiter, String rDelimiter) {
@@ -1379,29 +1374,34 @@ public class LogicPrinter {
         layouter.print(rDelimiter).end();
     }
 
-    public void printElementOf(JTerm t) {
-        assert t.arity() == 3;
-        layouter.startTerm(3);
+    public void printPair(JTerm t) {
+        assert t.arity() == 2;
+        layouter.startTerm(2);
+        layouter.print("(");
+        layouter.markStartSub();
+        printTerm(t.sub(0));
+        layouter.markEndSub();
+        layouter.print(", ");
+        layouter.markStartSub();
+        printTerm(t.sub(1));
+        layouter.markEndSub();
+        layouter.print(")");
+    }
 
-        layouter.print("(").beginC(0);
+    public void printElementOf(JTerm t) {
+        assert t.arity() == 2;
+        layouter.startTerm(2);
 
         layouter.markStartSub();
         printTerm(t.sub(0));
         layouter.markEndSub();
 
-        layouter.print(",").brk(1, 0);
-
-        layouter.markStartSub();
-        printTerm(t.sub(1));
-        layouter.markEndSub();
-
-        layouter.print(")").end();
         layouter.print(" ");
         layouter.keyWord("\\in");
         layouter.print(" ");
 
         layouter.markStartSub();
-        printTerm(t.sub(2));
+        printTerm(t.sub(1));
         layouter.markEndSub();
     }
 
@@ -1411,26 +1411,17 @@ public class LogicPrinter {
             return;
         }
 
-        assert t.arity() == 3;
-        layouter.startTerm(3);
-
-        layouter.print("(").beginC(0);
+        assert t.arity() == 2;
+        layouter.startTerm(2);
 
         layouter.markStartSub();
         printTerm(t.sub(0));
         layouter.markEndSub();
 
-        layouter.print(",").brk(1, 0);
-
-        layouter.markStartSub();
-        printTerm(t.sub(1));
-        layouter.markEndSub();
-
-        layouter.print(")").end();
         layouter.print(symbol);
 
         layouter.markStartSub();
-        printTerm(t.sub(2));
+        printTerm(t.sub(1));
         layouter.markEndSub();
     }
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.CostReuse;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
@@ -126,7 +127,8 @@ public class ServiceCaches implements SessionCaches {
      * this class (a {@code CostReuse.Eligibility}, or its ineligible sentinel) to keep this package
      * independent of the strategy package.
      */
-    private final Map<Taclet, Object> costReuseClassificationCache = new ConcurrentHashMap<>();
+    private final Map<Taclet, CostReuse.ConditionalEligibility> costReuseClassificationCache =
+        new ConcurrentHashMap<>();
 
     private final Map<org.key_project.logic.Term, Monomial> monomialCache =
         new ConcurrentLruCache<>(2000);
@@ -243,7 +245,7 @@ public class ServiceCaches implements SessionCaches {
         return introductionTimeCache;
     }
 
-    public final Map<Taclet, Object> getCostReuseClassificationCache() {
+    public final Map<Taclet, CostReuse.ConditionalEligibility> getCostReuseClassificationCache() {
         return costReuseClassificationCache;
     }
 

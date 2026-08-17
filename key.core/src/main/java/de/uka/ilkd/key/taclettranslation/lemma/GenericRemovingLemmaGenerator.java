@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
 import org.key_project.logic.op.Operator;
@@ -30,27 +30,34 @@ import org.key_project.util.collection.ImmutableSet;
  * For every generic sort, precisely one proxy sort is introduced.
  */
 public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
-
     /**
      * The map from generic sorts to proxy sorts.
      */
     private final Map<Sort, Sort> sortMap = new HashMap<>();
 
-
     /**
      * {@inheritDoc}
      * <p>
-     * The generic removing implementation replaces sort depending functions if their sort argument
+     * The generic removing implementation replaces parametric functions if their sort argument
      * is a generic sort.
      */
     @Override
     protected Operator replaceOp(Operator op, TermServices services) {
-        if (op instanceof ParametricFunctionInstance pfi && pfi.getArgs().size() == 1) {
-            Sort sort = pfi.getArgs().head().sort();
-            Sort repSort = replaceSort(sort, services);
-            if (sort != repSort) {
+        if (op instanceof ParametricFunctionInstance pfi) {
+            List<GenericArgument> newArgs = new LinkedList<>();
+            boolean changed = false;
+            for (var arg : pfi.getArgs()) {
+                final var sort = arg.sort();
+                if (sort.containsGenericSort()) {
+                    newArgs.add(new GenericArgument(replaceSort(sort, services)));
+                    changed = true;
+                } else {
+                    newArgs.add(arg);
+                }
+            }
+            if (changed) {
                 op = ParametricFunctionInstance.get(pfi.getBase(),
-                    ImmutableList.of(new GenericArgument(repSort)), (Services) services);
+                    ImmutableList.fromList(newArgs), (Services) services);
             }
         }
 
@@ -65,18 +72,29 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      */
     @Override
     protected Sort replaceSort(Sort sort, TermServices services) {
-        if (sort instanceof GenericSort) {
-
-            Sort cached = sortMap.get(sort);
-            if (cached != null) {
-                return cached;
+        Sort cached = sortMap.get(sort);
+        if (cached != null) {
+            return cached;
+        }
+        if (sort instanceof GenericSort gs) {
+            Sort declared = services.getNamespaces().sorts().lookup(gs.name());
+            if (declared instanceof ProxySort declaredProxy) {
+                sortMap.put(gs, declaredProxy);
+                return declaredProxy;
             }
-
-            ImmutableSet<Sort> extSorts = replaceSorts(sort.extendsSorts(), services);
-            ProxySort result = new ProxySort(sort.name(), extSorts);
-            sortMap.put(sort, result);
+            ImmutableSet<Sort> extSorts = replaceSorts(gs.extendsSorts(), services);
+            ProxySort result = new ProxySort(gs.name(), extSorts);
+            sortMap.put(gs, result);
             return result;
-
+        } else if (sort instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
+            List<GenericArgument> newArgs = new ArrayList<>(psi.getArgs().size());
+            for (var arg : psi.getArgs()) {
+                newArgs.add(new GenericArgument(replaceSort(arg.sort(), services)));
+            }
+            ParametricSortInstance newSort = ParametricSortInstance.get(psi.getBase(),
+                ImmutableList.fromList(newArgs), (Services) services);
+            sortMap.put(sort, newSort);
+            return newSort;
         } else {
             return sort;
         }

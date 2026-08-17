@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.matcher.vm.instruction;
 
+
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;

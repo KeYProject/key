@@ -73,7 +73,7 @@ class LogicPrinterTest {
                                  \\programVariables { Object o; }
 
                                  \\problem {
-                                      anon(store(h1, o, fld, null), union(union(allFields(o), singleton(o,fld)), allObjects(fld)), h2) = h3
+                                      anon(store(h1, o, fld, null), union<Loc>(union<Loc>(allFields(o), singleton<Loc>(pair<Object, Field>(o,fld))), allObjects(fld)), h2) = h3
                                  }
                                 """)
                     .loadCompleteProblem().getProblem().succedent().getFirst().formula();

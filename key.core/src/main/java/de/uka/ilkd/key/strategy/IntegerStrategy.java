@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.RelevantSequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
@@ -343,9 +344,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 applyTF("distSummand1", tf.polynomial),
                 ifZero(applyTF("distCoeff", tf.monomial), longConst(PolynomialCost.DISTRIBUTE + 20),
                     applyTF("distCoeff", tf.polynomial)),
-                applyTF("distSummand0", tf.polynomial),
-
-                applyTF("distSummand1", tf.polynomial), longConst(PolynomialCost.DISTRIBUTE)));
+                longConst(PolynomialCost.DISTRIBUTE)));
 
         // category "direct equations"
 
@@ -762,13 +761,16 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
          * instOf ( "multLeft" ), instOf ( "multFacLeft" ), sub ( intRel, 0 ) ) ) ) ) );
          */
 
-        final Feature totallyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
-            not(add(applyTF(intRel, tf.intRelation), InEquationMultFeature
-                    .totallyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0))))));
+        final Feature intRelation = applyTF(intRel, tf.intRelation);
+        final var relevantSequentFormulas =
+            RelevantSequentFormulasGenerator.sequent(tf.intRelationOp);
 
-        final Feature exactlyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
-            not(add(applyTF(intRel, tf.intRelation), InEquationMultFeature
-                    .exactlyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0))))));
+        final Feature totallyBounded = not(sum(intRel, relevantSequentFormulas,
+            not(add(InEquationMultFeature
+                    .totallyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0)),
+                intRelation))));
+        final Feature exactlyBounded = new IsBoundedByInequationFeature(
+            instOf("multLeft"), instOf("multFacLeft"), tf.intRelation);
 
         // this is a bit hackish
         //
@@ -984,7 +986,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     private Feature succIntEquationExists() {
         final TermBuffer succFor = new TermBuffer();
 
-        return not(sum(succFor, SequentFormulasGenerator.succedent(),
+        return not(sum(succFor, RelevantSequentFormulasGenerator.succedent(tf.intEquation),
             not(applyTF(succFor, tf.intEquation))));
     }
 

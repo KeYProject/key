@@ -610,8 +610,8 @@ public final class MiscTools {
 
         @Override
         protected void doDefaultAction(SourceElement node) {
-            if (node instanceof Assignment) {
-                ProgramElement lhs = ((Assignment) node).getChildAt(0);
+            if (node instanceof Assignment<?>) {
+                ProgramElement lhs = ((Assignment<?>) node).getChildAt(0);
                 if (lhs instanceof LocationVariable pv) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         writtenPVs = writtenPVs.add(pv);

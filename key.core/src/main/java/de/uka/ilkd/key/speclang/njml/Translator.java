@@ -2429,7 +2429,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     return new Error("Unreachable");
                 });
                 if (!term.sort().extendsTrans(logVar.sort())) {
-                    raiseError("Assignment to variable " + name + " with incompatible type.",
+                    raiseError("BinaryAssignment to variable " + name + " with incompatible type.",
                         varCtx);
                 }
             }

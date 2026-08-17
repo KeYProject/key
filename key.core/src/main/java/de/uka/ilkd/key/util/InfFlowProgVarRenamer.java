@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
@@ -54,7 +53,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
         if (preInitialisedReplaceMap == null) {
-            this.replaceMap = new HashMap<>();
+            this.replaceMap = new LinkedHashMap<>();
         } else {
             this.replaceMap = preInitialisedReplaceMap;
         }
@@ -241,7 +240,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Map<LocationVariable, LocationVariable> restrictToProgramVariables(
             Map<JTerm, JTerm> replaceMap) {
         Map<LocationVariable, LocationVariable> progVarReplaceMap =
-            new HashMap<>();
+            new LinkedHashMap<>();
         for (final JTerm t : replaceMap.keySet()) {
             if (t.op() instanceof LocationVariable lv) {
                 progVarReplaceMap.put(lv,

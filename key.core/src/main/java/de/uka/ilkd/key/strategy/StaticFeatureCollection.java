@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ParametricFunctionBaseTermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -329,8 +331,16 @@ public abstract class StaticFeatureCollection {
         return OperatorTF.create(op);
     }
 
+    protected static TermFeature opBase(ParametricFunctionDecl base) {
+        return ParametricFunctionBaseTermFeature.create(base);
+    }
+
     protected static TermFeature rec(TermFeature cond, TermFeature summand) {
         return RecSubTermFeature.create(cond, summand);
+    }
+
+    protected static TermFeature some(TermFeature f) {
+        return not(rec(any(), not(f)));
     }
 
     protected static TermFeature sub(TermFeature sub0) {

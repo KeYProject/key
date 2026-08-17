@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.SetTermFeatures;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -18,20 +19,20 @@ import org.key_project.util.collection.ImmutableList;
 public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
-    private final LocSetLDT locSetLDT;
+    private final SetTermFeatures setFeatures;
 
 
     private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            LocSetLDT locSetLDT) {
+            SetTermFeatures setFeatures) {
         this.left = left;
         this.right = right;
-        this.locSetLDT = locSetLDT;
+        this.setFeatures = setFeatures;
     }
 
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            LocSetLDT locSetLDT) {
-        return new SetsSmallerThanFeature(left, right, locSetLDT);
+            SetTermFeatures setFeatures) {
+        return new SetsSmallerThanFeature(left, right, setFeatures);
     }
 
 
@@ -62,9 +63,10 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     private class LiteralCollector extends Collector {
 
         protected void collect(Term te) {
-            final var op = te.op();
-            if (op == locSetLDT.getUnion() || op == locSetLDT.getIntersect()
-                    || op == locSetLDT.getDisjoint()) {
+            if (te.op() instanceof ParametricFunctionInstance pfi
+                    && (pfi.getBase() == setFeatures.union
+                            || pfi.getBase() == setFeatures.intersect
+                            || pfi.getBase() == setFeatures.disjoint)) {
                 collect(te.sub(0));
                 collect(te.sub(1));
             } else {

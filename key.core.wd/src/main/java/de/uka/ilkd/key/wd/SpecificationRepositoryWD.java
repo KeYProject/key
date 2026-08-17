@@ -10,7 +10,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -363,7 +363,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
         }
 
         // inherit non-private, non-static invariants
-        if (!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
+        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
