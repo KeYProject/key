@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Aug 11 14:35:00 CEST 2026
+# Date: Sun Aug 16 12:25:27 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -33,8 +33,8 @@ Choices: (programRules:Java & JavaCard:on)}
 == accDefinition (accDefinition) =========================================
 accDefinition {
 \find(acc(h,s,o,o2))
-\varcond(\notFreeIn(fv (variable), o2 (deltaObject term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(fv (variable), h (Heap term)))
-\replacewith(and(and(not(equals(o,null)),not(equals(o2,null))),exists{fv (variable)}(and(elementOf(o,fv,s),equals(select<deltaObject>(h,o,fv),o2))))) 
+\varcond(\notFreeIn(fv (variable), o2 (deltaObject term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h (Heap term)))
+\replacewith(and(and(not(equals(o,null)),not(equals(o2,null))),exists{fv (variable)}(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,fv),s),equals(select<deltaObject>(h,o,fv),o2))))) 
 \heuristics(simplify)
 Choices: reach:on}
 -----------------------------------------------------
@@ -566,8 +566,8 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == allFieldsSubsetOf (allFieldsSubsetOf) =========================================
 allFieldsSubsetOf {
-\assumes ([subset(allFields(o),s)]==>[]) 
-\find(elementOf(o,f,s))
+\assumes ([subset<Pair<java.lang.Object,Field>>(allFields(o),s)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -1132,6 +1132,13 @@ arrayLengthNotNegative {
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
+== arrayRangeEmpty (arrayRangeEmpty) =========================================
+arrayRangeEmpty {
+\find(equals(arrayRange(o,lower,upper),empty<Pair<java.lang.Object,Field>>))
+\replacewith(lt(upper,lower)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == array_post_declaration (array_post_declaration) =========================================
 array_post_declaration {
 \find(#allmodal ((modal operator))|{{ ..
@@ -1234,8 +1241,8 @@ Choices: (programRules:Java & assertions:safe)}
 == assignableDefinition (assignableDefinition) =========================================
 assignableDefinition {
 \find(assignable(heapNew,heapOld,locs))
-\varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
-\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(select<boolean>(heapOld,o,java.lang.Object::#$created),TRUE)))),equals(select<any>(heapNew,o,f),select<any>(heapOld,o,f)))))) 
+\varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),locs),and(not(equals(o,null)),not(equals(select<boolean>(heapOld,o,java.lang.Object::#$created),TRUE)))),equals(select<any>(heapNew,o,f),select<any>(heapOld,o,f)))))) 
 \heuristics(delayedExpansion)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2035,17 +2042,17 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == associativeLawIntersect (associativeLawIntersect) =========================================
 associativeLawIntersect {
-\find(intersect(s1,intersect(s2,s3)))
-\replacewith(intersect(intersect(s1,s2),s3)) 
-\heuristics(conjNormalForm)
-Choices: programRules:Java}
+\find(intersect<T>(s1,intersect<T>(s2,s3)))
+\replacewith(intersect<T>(intersect<T>(s1,s2),s3)) 
+\heuristics(setAssoc)
+Choices: true}
 -----------------------------------------------------
 == associativeLawUnion (associativeLawUnion) =========================================
 associativeLawUnion {
-\find(union(s1,union(s2,s3)))
-\replacewith(union(union(s1,s2),s3)) 
-\heuristics(conjNormalForm)
-Choices: programRules:Java}
+\find(union<T>(s1,union<T>(s2,s3)))
+\replacewith(union<T>(union<T>(s1,s2),s3)) 
+\heuristics(setAssoc)
+Choices: true}
 -----------------------------------------------------
 == atan2IsNaN (atan2IsNaN) =========================================
 atan2IsNaN {
@@ -3648,38 +3655,38 @@ Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
 == commuteDisjoint (commuteDisjoint) =========================================
 commuteDisjoint {
-\find(disjoint(commLeft,commRight))
-\replacewith(disjoint(commRight,commLeft)) 
-\heuristics(cnf_setComm)
-Choices: programRules:Java}
+\find(disjoint<T>(commLeft,commRight))
+\replacewith(disjoint<T>(commRight,commLeft)) 
+\heuristics(setComm)
+Choices: true}
 -----------------------------------------------------
 == commuteIntersection (commuteIntersection) =========================================
 commuteIntersection {
-\find(intersect(commLeft,commRight))
-\replacewith(intersect(commRight,commLeft)) 
-\heuristics(cnf_setComm)
-Choices: programRules:Java}
+\find(intersect<T>(commLeft,commRight))
+\replacewith(intersect<T>(commRight,commLeft)) 
+\heuristics(setComm)
+Choices: true}
 -----------------------------------------------------
 == commuteIntersection_2 (commuteIntersection_2) =========================================
 commuteIntersection_2 {
-\find(intersect(intersect(s,commLeft),commRight))
-\replacewith(intersect(intersect(s,commRight),commLeft)) 
-\heuristics(cnf_setComm)
-Choices: programRules:Java}
+\find(intersect<T>(intersect<T>(s,commLeft),commRight))
+\replacewith(intersect<T>(intersect<T>(s,commRight),commLeft)) 
+\heuristics(setComm)
+Choices: true}
 -----------------------------------------------------
 == commuteUnion (commuteUnion) =========================================
 commuteUnion {
-\find(union(commLeft,commRight))
-\replacewith(union(commRight,commLeft)) 
-\heuristics(cnf_setComm)
-Choices: programRules:Java}
+\find(union<T>(commLeft,commRight))
+\replacewith(union<T>(commRight,commLeft)) 
+\heuristics(setComm)
+Choices: true}
 -----------------------------------------------------
 == commuteUnion_2 (commuteUnion_2) =========================================
 commuteUnion_2 {
-\find(union(union(s,commLeft),commRight))
-\replacewith(union(union(s,commRight),commLeft)) 
-\heuristics(cnf_setComm)
-Choices: programRules:Java}
+\find(union<T>(union<T>(s,commLeft),commRight))
+\replacewith(union<T>(union<T>(s,commRight),commLeft)) 
+\heuristics(setComm)
+Choices: true}
 -----------------------------------------------------
 == commute_and (commute_and) =========================================
 commute_and {
@@ -5162,8 +5169,8 @@ Choices: true}
 == createdInHeapToElementOf (createdInHeapToElementOf) =========================================
 createdInHeapToElementOf {
 \find(createdInHeap(s,h))
-\varcond(\notFreeIn(fv (variable), h (Heap term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),or(equals(ov,null),equals(select<boolean>(h,ov,java.lang.Object::#$created),TRUE)))))) 
+\varcond(\notFreeIn(fv (variable), h (Heap term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),or(equals(ov,null),equals(select<boolean>(h,ov,java.lang.Object::#$created),TRUE)))))) 
 \heuristics(classAxiom)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5199,7 +5206,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithEmpty (createdInHeapWithEmpty) =========================================
 createdInHeapWithEmpty {
-\find(createdInHeap(empty,h))
+\find(createdInHeap(empty<Pair<java.lang.Object,Field>>,h))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -5207,7 +5214,7 @@ Choices: programRules:Java}
 == createdInHeapWithObserver (createdInHeapWithObserver) =========================================
 createdInHeapWithObserver {
 \find(==>createdInHeap(obs,h))
-\varcond(\isObserver (obs (LocSet term), h (Heap term)))
+\varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -5216,21 +5223,21 @@ Choices: programRules:Java}
 createdInHeapWithObserverEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
 \find(==>createdInHeap(EQ,h))
-\varcond(\isObserver (obs (LocSet term), h (Heap term)))
+\varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSelect (createdInHeapWithSelect) =========================================
 createdInHeapWithSelect {
-\find(==>createdInHeap(select<LocSet>(h,o,f),h))
+\find(==>createdInHeap(select<Set<Pair<java.lang.Object,Field>>>(h,o,f),h))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSelectEQ (createdInHeapWithSelectEQ) =========================================
 createdInHeapWithSelectEQ {
-\assumes ([equals(select<LocSet>(h,o,f),EQ)]==>[]) 
+\assumes ([equals(select<Set<Pair<java.lang.Object,Field>>>(h,o,f),EQ)]==>[]) 
 \find(==>createdInHeap(EQ,h))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
@@ -5238,14 +5245,14 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSetMinusFreshLocs (createdInHeapWithSetMinusFreshLocs) =========================================
 createdInHeapWithSetMinusFreshLocs {
-\find(createdInHeap(setMinus(s,freshLocs(h)),h))
+\find(createdInHeap(setMinus<Pair<java.lang.Object,Field>>(s,freshLocs(h)),h))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSetMinusFreshLocsEQ (createdInHeapWithSetMinusFreshLocsEQ) =========================================
 createdInHeapWithSetMinusFreshLocsEQ {
-\assumes ([equals(setMinus(s,freshLocs(h)),EQ)]==>[]) 
+\assumes ([equals(setMinus<Pair<java.lang.Object,Field>>(s,freshLocs(h)),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
 \replacewith(true) 
 \heuristics(concrete)
@@ -5253,22 +5260,22 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSingleton (createdInHeapWithSingleton) =========================================
 createdInHeapWithSingleton {
-\find(createdInHeap(singleton(o,f),h))
-\replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
+\find(createdInHeap(singleton<Pair<java.lang.Object,Field>>(l),h))
+\replacewith(or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSingletonEQ (createdInHeapWithSingletonEQ) =========================================
 createdInHeapWithSingletonEQ {
-\assumes ([equals(singleton(o,f),EQ)]==>[]) 
+\assumes ([equals(singleton<Pair<java.lang.Object,Field>>(l),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
+\replacewith(or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithUnion (createdInHeapWithUnion) =========================================
 createdInHeapWithUnion {
-\find(==>createdInHeap(union(s,s2),h))
+\find(==>createdInHeap(union<Pair<java.lang.Object,Field>>(s,s2),h))
 \replacewith([]==>[createdInHeap(s2,h)]) ;
 \replacewith([]==>[createdInHeap(s,h)]) 
 \heuristics(simplify_enlarging)
@@ -5276,7 +5283,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithUnionEQ (createdInHeapWithUnionEQ) =========================================
 createdInHeapWithUnionEQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
+\assumes ([equals(union<Pair<java.lang.Object,Field>>(s,s2),EQ)]==>[]) 
 \find(==>createdInHeap(EQ,h))
 \replacewith([]==>[createdInHeap(s2,h)]) ;
 \replacewith([]==>[createdInHeap(s,h)]) 
@@ -5459,9 +5466,9 @@ Choices: true}
 -----------------------------------------------------
 == definitionAllElementsOfArray (definitionAllElementsOfArray) =========================================
 definitionAllElementsOfArray {
-\find(allElementsOfArray(h,array,singleton(o,f)))
+\find(allElementsOfArray(h,array,singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
 \varcond(\notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), o (java.lang.Object term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),singleton(select<java.lang.Object>(h,array,arr(j)),f),empty))) 
+\replacewith(infiniteUnion<Pair<java.lang.Object,Field>>{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(select<java.lang.Object>(h,array,arr(j)),f)),empty<Pair<java.lang.Object,Field>>))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5469,15 +5476,15 @@ Choices: programRules:Java}
 definitionAllElementsOfArray2 {
 \find(allElementsOfArray(h,array,allFields(o)))
 \varcond(\notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),allFields(select<java.lang.Object>(h,array,arr(j))),empty))) 
+\replacewith(infiniteUnion<Pair<java.lang.Object,Field>>{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),allFields(select<java.lang.Object>(h,array,arr(j))),empty<Pair<java.lang.Object,Field>>))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == definitionAllElementsOfArrayLocsets (definitionAllElementsOfArrayLocsets) =========================================
 definitionAllElementsOfArrayLocsets {
-\find(allElementsOfArrayLocsets(h,array,singleton(o,f)))
+\find(allElementsOfArrayLocsets(h,array,singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
 \varcond(\notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), o (java.lang.Object term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),select<LocSet>(h,select<java.lang.Object>(h,array,arr(j)),f),empty))) 
+\replacewith(infiniteUnion<Pair<java.lang.Object,Field>>{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),select<Set<Pair<java.lang.Object,Field>>>(h,select<java.lang.Object>(h,array,arr(j)),f),empty<Pair<java.lang.Object,Field>>))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5533,7 +5540,7 @@ Choices: sequences:on}
 -----------------------------------------------------
 == definitionSeqdefWorkaround2 (definitionSeqdefWorkaround2) =========================================
 definitionSeqdefWorkaround2 {
-\find(seq_def_workaround2(h,lower,upper,array,singleton(o,f)))
+\find(seq_def_workaround2(h,lower,upper,array,singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
 \varcond(\notFreeIn(j (variable), upper (int term)), \notFreeIn(j (variable), lower (int term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), h (Heap term)))
 \replacewith(seqDef{j (variable)}(lower,upper,select<any>(h,select<java.lang.Object>(h,array,arr(j)),f))) 
 \heuristics(concrete)
@@ -5657,163 +5664,206 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == disjointAllFields (disjointAllFields) =========================================
 disjointAllFields {
-\assumes ([equals(intersect(allFields(o),s),empty)]==>[]) 
-\find(elementOf(o,f,s))
+\assumes ([equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),s),empty<Pair<java.lang.Object,Field>>)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s))
 \replacewith(false) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllFieldsSingleton (disjointAllFieldsSingleton) =========================================
+disjointAllFieldsSingleton {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f))),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(o,o2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllFieldsSingleton2 (disjointAllFieldsSingleton) =========================================
+disjointAllFieldsSingleton2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f)),allFields(o)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(o,o2))) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointAllFields_2 (disjointAllFields_2) =========================================
 disjointAllFields_2 {
-\find(equals(intersect(allFields(o),allFields(o2)),empty))
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),allFields(o2)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(not(equals(o,o2))) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointAllObjects (disjointAllObjects) =========================================
 disjointAllObjects {
-\assumes ([equals(intersect(allObjects(f),s),empty)]==>[]) 
-\find(elementOf(o,f,s))
+\assumes ([equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f),s),empty<Pair<java.lang.Object,Field>>)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s))
 \replacewith(false) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjects2 (disjointAllObjects) =========================================
+disjointAllObjects2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f1),allObjects(f2)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f1,f2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjectsSingleton (disjointAllObjectsSingleton) =========================================
+disjointAllObjectsSingleton {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2))),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f,f2))) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointAllObjectsSingleton2 (disjointAllObjectsSingleton) =========================================
+disjointAllObjectsSingleton2 {
+\find(equals(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2)),allObjects(f)),empty<Pair<java.lang.Object,Field>>))
+\replacewith(not(equals(f,f2))) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointAndSubset1 (disjointAndSubset1) =========================================
 disjointAndSubset1 {
-\assumes ([equals(intersect(s2,s3),empty)]==>[]) 
-\find(subset(s,s2)==>)
-\add [equals(intersect(s,s3),empty)]==>[] 
+\assumes ([equals(intersect<T>(s2,s3),empty<T>)]==>[]) 
+\find(subset<T>(s,s2)==>)
+\add [equals(intersect<T>(s,s3),empty<T>)]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointAndSubset2 (disjointAndSubset2) =========================================
 disjointAndSubset2 {
-\assumes ([equals(intersect(s2,s3),empty)]==>[]) 
-\find(subset(s,s3)==>)
-\add [equals(intersect(s,s2),empty)]==>[] 
+\assumes ([equals(intersect<T>(s2,s3),empty<T>)]==>[]) 
+\find(subset<T>(s,s3)==>)
+\add [equals(intersect<T>(s,s2),empty<T>)]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointAndSubset_3 (disjointAndSubset_3) =========================================
 disjointAndSubset_3 {
-\assumes ([equals(intersect(s1,s2),empty)]==>[]) 
-\find(subset(s4,union(s2,s3))==>)
-\add [imp(equals(intersect(s1,s3),empty),equals(intersect(s1,s4),empty))]==>[] 
+\assumes ([equals(intersect<T>(s1,s2),empty<T>)]==>[]) 
+\find(subset<T>(s4,union<T>(s2,s3))==>)
+\add [imp(equals(intersect<T>(s1,s3),empty<T>),equals(intersect<T>(s1,s4),empty<T>))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointAndSubset_4 (disjointAndSubset_4) =========================================
 disjointAndSubset_4 {
-\assumes ([equals(intersect(s1,s2),empty)]==>[]) 
-\find(subset(s4,union(s3,s2))==>)
-\add [imp(equals(intersect(s1,s3),empty),equals(intersect(s1,s4),empty))]==>[] 
+\assumes ([equals(intersect<T>(s1,s2),empty<T>)]==>[]) 
+\find(subset<T>(s4,union<T>(s3,s2))==>)
+\add [imp(equals(intersect<T>(s1,s3),empty<T>),equals(intersect<T>(s1,s4),empty<T>))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointAndSubset_5 (disjointAndSubset_5) =========================================
 disjointAndSubset_5 {
-\assumes ([equals(intersect(s2,s1),empty)]==>[]) 
-\find(subset(s4,union(s2,s3))==>)
-\add [imp(equals(intersect(s1,s3),empty),equals(intersect(s1,s4),empty))]==>[] 
+\assumes ([equals(intersect<T>(s2,s1),empty<T>)]==>[]) 
+\find(subset<T>(s4,union<T>(s2,s3))==>)
+\add [imp(equals(intersect<T>(s1,s3),empty<T>),equals(intersect<T>(s1,s4),empty<T>))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointAndSubset_6 (disjointAndSubset_6) =========================================
 disjointAndSubset_6 {
-\assumes ([equals(intersect(s2,s1),empty)]==>[]) 
-\find(subset(s4,union(s3,s2))==>)
-\add [imp(equals(intersect(s1,s3),empty),equals(intersect(s1,s4),empty))]==>[] 
+\assumes ([equals(intersect<T>(s2,s1),empty<T>)]==>[]) 
+\find(subset<T>(s4,union<T>(s3,s2))==>)
+\add [imp(equals(intersect<T>(s1,s3),empty<T>),equals(intersect<T>(s1,s4),empty<T>))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointArrayRangeAllFields1 (disjointArrayRangeAllFields) =========================================
 disjointArrayRangeAllFields1 {
-\find(equals(intersect(allFields(o1),arrayRange(o2,lower2,upper2)),empty))
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o1),arrayRange(o2,lower2,upper2)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(not(and(equals(o1,o2),leq(lower2,upper2)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointArrayRangeAllFields2 (disjointArrayRangeAllFields) =========================================
 disjointArrayRangeAllFields2 {
-\find(equals(intersect(arrayRange(o1,lower1,upper1),allFields(o2)),empty))
+\find(equals(intersect<Pair<java.lang.Object,Field>>(arrayRange(o1,lower1,upper1),allFields(o2)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(not(and(equals(o1,o2),leq(lower1,upper1)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointArrayRanges (disjointArrayRanges) =========================================
 disjointArrayRanges {
-\find(equals(intersect(arrayRange(o1,lower1,upper1),arrayRange(o2,lower2,upper2)),empty))
+\find(equals(intersect<Pair<java.lang.Object,Field>>(arrayRange(o1,lower1,upper1),arrayRange(o2,lower2,upper2)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(not(and(and(and(equals(o1,o2),leq(lower1,upper1)),leq(lower2,upper2)),or(and(leq(lower1,lower2),leq(lower2,upper1)),and(leq(lower2,lower1),leq(lower1,upper2)))))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointDefinition (disjointDefinition) =========================================
 disjointDefinition {
-\find(disjoint(s,s2))
-\replacewith(equals(intersect(s,s2),empty)) 
+\find(disjoint<T>(s,s2))
+\replacewith(equals(intersect<T>(s,s2),empty<T>)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointInfiniteUnion (disjointInfiniteUnion) =========================================
 disjointInfiniteUnion {
-\find(equals(intersect(infiniteUnion{iv (variable)}(s2),s),empty))
-\varcond(\notFreeIn(iv (variable), s (LocSet term)))
-\replacewith(all{iv (variable)}(equals(intersect(s2,s),empty))) 
+\find(equals(intersect<T>(infiniteUnion<T>{iv (variable)}(s2),s),empty<T>))
+\varcond(\notFreeIn(iv (variable), s (Set<T> term)))
+\replacewith(all{iv (variable)}(equals(intersect<T>(s2,s),empty<T>))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointInfiniteUnion_2 (disjointInfiniteUnion_2) =========================================
 disjointInfiniteUnion_2 {
-\find(equals(intersect(s,infiniteUnion{iv (variable)}(s2)),empty))
-\varcond(\notFreeIn(iv (variable), s (LocSet term)))
-\replacewith(all{iv (variable)}(equals(intersect(s,s2),empty))) 
+\find(equals(intersect<T>(s,infiniteUnion<T>{iv (variable)}(s2)),empty<T>))
+\varcond(\notFreeIn(iv (variable), s (Set<T> term)))
+\replacewith(all{iv (variable)}(equals(intersect<T>(s,s2),empty<T>))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
-== disjointNotInOtherLocset1 (disjointNotInOtherLocset1) =========================================
-disjointNotInOtherLocset1 {
-\assumes ([equals(intersect(s,s2),empty)]==>[]) 
-\find(elementOf(o,f,s)==>)
-\add []==>[elementOf(o,f,s2)] 
+== disjointNotInOtherSet1 (disjointNotInOtherSet1) =========================================
+disjointNotInOtherSet1 {
+\assumes ([equals(intersect<T>(s,s2),empty<T>)]==>[]) 
+\find(elementOf<T>(e,s)==>)
+\add []==>[elementOf<T>(e,s2)] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
-== disjointNotInOtherLocset2 (disjointNotInOtherLocset2) =========================================
-disjointNotInOtherLocset2 {
-\assumes ([equals(intersect(s,s2),empty)]==>[]) 
-\find(elementOf(o,f,s2)==>)
-\add []==>[elementOf(o,f,s)] 
+== disjointNotInOtherSet2 (disjointNotInOtherSet2) =========================================
+disjointNotInOtherSet2 {
+\assumes ([equals(intersect<T>(s,s2),empty<T>)]==>[]) 
+\find(elementOf<T>(e,s2)==>)
+\add []==>[elementOf<T>(e,s)] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointToElementOf (disjointToElementOf) =========================================
 disjointToElementOf {
-\find(disjoint(s,s2))
-\varcond(\notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(or(not(elementOf(ov,fv,s)),not(elementOf(ov,fv,s2)))))) 
+\find(disjoint<T>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith(all{av (variable)}(or(not(elementOf<T>(av,s)),not(elementOf<T>(av,t))))) 
+\heuristics(semantics_blasting)
+Choices: true}
+-----------------------------------------------------
+== disjointToElementOfLocSet (disjointToElementOfLocSet) =========================================
+disjointToElementOfLocSet {
+\find(disjoint<Pair<java.lang.Object,Field>>(s,s2))
+\varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith(all{ov (variable)}(all{fv (variable)}(or(not(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)),not(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2)))))) 
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointWithEmpty (disjointWithEmpty) =========================================
 disjointWithEmpty {
-\find(disjoint(empty,s))
+\find(disjoint<T>(empty<T>,s))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointWithSingleton1 (disjointWithSingleton) =========================================
 disjointWithSingleton1 {
-\find(equals(intersect(s,singleton(o,f)),empty))
-\replacewith(not(elementOf(o,f,s))) 
+\find(equals(intersect<T>(s,singleton<T>(e)),empty<T>))
+\replacewith(not(elementOf<T>(e,s))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == disjointWithSingleton2 (disjointWithSingleton) =========================================
 disjointWithSingleton2 {
-\find(equals(intersect(singleton(o,f),s),empty))
-\replacewith(not(elementOf(o,f,s))) 
+\find(equals(intersect<T>(singleton<T>(e),s),empty<T>))
+\replacewith(not(elementOf<T>(e,s))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == dismissNonSelectedField (dismissNonSelectedField) =========================================
 dismissNonSelectedField {
@@ -5880,17 +5930,33 @@ Choices: true}
 -----------------------------------------------------
 == distributeIntersection (distributeIntersection) =========================================
 distributeIntersection {
-\find(intersect(s1,union(s2,s3)))
-\replacewith(union(intersect(s1,s2),intersect(s1,s3))) 
-\heuristics(simplify_enlarging)
-Choices: programRules:Java}
+\find(intersect<T>(distributedSet,union<T>(unionLeft,unionRight)))
+\replacewith(union<T>(intersect<T>(distributedSet,unionLeft),intersect<T>(distributedSet,unionRight))) 
+\heuristics(setDist)
+Choices: true}
 -----------------------------------------------------
-== distributeIntersection_2 (distributeIntersection_2) =========================================
-distributeIntersection_2 {
-\find(intersect(union(s2,s3),s1))
-\replacewith(union(intersect(s2,s1),intersect(s3,s1))) 
-\heuristics(simplify_enlarging)
-Choices: programRules:Java}
+== distributeIntersection2 (distributeIntersection2) =========================================
+distributeIntersection2 {
+\find(intersect<T>(union<T>(unionLeft,unionRight),distributedSet))
+\replacewith(union<T>(intersect<T>(unionLeft,distributedSet),intersect<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
+-----------------------------------------------------
+== distributeIntersection2EQ (distributeIntersection2EQ) =========================================
+distributeIntersection2EQ {
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(intersect<T>(EQ,distributedSet))
+\replacewith(union<T>(intersect<T>(unionLeft,distributedSet),intersect<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
+-----------------------------------------------------
+== distributeIntersectionEQ (distributeIntersectionEQ) =========================================
+distributeIntersectionEQ {
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(intersect<T>(distributedSet,EQ))
+\replacewith(union<T>(intersect<T>(distributedSet,unionLeft),intersect<T>(distributedSet,unionRight))) 
+\heuristics(setDist)
+Choices: true}
 -----------------------------------------------------
 == divAddMultDenom (divAddMultDenom) =========================================
 divAddMultDenom {
@@ -6254,36 +6320,44 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfAllFields (elementOfAllFields) =========================================
 elementOfAllFields {
-\find(elementOf(o,f,allFields(o2)))
-\replacewith(equals(o,o2)) 
+\find(elementOf<Pair<java.lang.Object,Field>>(p,allFields(o2)))
+\replacewith(equals(first<java.lang.Object,Field>(p),o2)) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfAllLocs (elementOfAllLocs) =========================================
 elementOfAllLocs {
-\find(elementOf(o,f,allLocs))
+\find(elementOf<Pair<java.lang.Object,Field>>(l,allLocs))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfAllObjects (elementOfAllObjects) =========================================
 elementOfAllObjects {
-\find(elementOf(o,f,allObjects(f2)))
-\replacewith(equals(f,f2)) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,allObjects(f2)))
+\replacewith(equals(second<java.lang.Object,Field>(l),f2)) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== elementOfAllObjectsEQ (elementOfAllObjectsEQ) =========================================
+elementOfAllObjectsEQ {
+\assumes ([equals(allObjects(f2),EQ)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
+\replacewith(equals(second<java.lang.Object,Field>(l),f2)) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfArrayRange (elementOfArrayRange) =========================================
 elementOfArrayRange {
-\find(elementOf(o,f,arrayRange(o2,lower,upper)))
-\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), f (Field term)))
-\replacewith(and(equals(o,o2),exists{iv (variable)}(and(and(equals(f,arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,arrayRange(o2,lower,upper)))
+\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(and(equals(first<java.lang.Object,Field>(l),o2),exists{iv (variable)}(and(and(equals(second<java.lang.Object,Field>(l),arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfArrayRangeConcrete (elementOfArrayRangeConcrete) =========================================
 elementOfArrayRangeConcrete {
-\find(elementOf(o,arr(idx),arrayRange(o2,lower,upper)))
+\find(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,arr(idx)),arrayRange(o2,lower,upper)))
 \replacewith(and(and(equals(o,o2),leq(lower,idx)),leq(idx,upper))) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -6291,142 +6365,142 @@ Choices: programRules:Java}
 == elementOfArrayRangeEQ (elementOfArrayRangeEQ) =========================================
 elementOfArrayRangeEQ {
 \assumes ([equals(arrayRange(o2,lower,upper),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), f (Field term)))
-\replacewith(and(equals(o,o2),exists{iv (variable)}(and(and(equals(f,arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
+\varcond(\notFreeIn(iv (variable), upper (int term)), \notFreeIn(iv (variable), lower (int term)), \notFreeIn(iv (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(and(equals(first<java.lang.Object,Field>(l),o2),exists{iv (variable)}(and(and(equals(second<java.lang.Object,Field>(l),arr(iv)),leq(lower,iv)),leq(iv,upper))))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfEmpty (elementOfEmpty) =========================================
 elementOfEmpty {
-\find(elementOf(o,f,empty))
+\find(elementOf<T>(a,empty<T>))
 \replacewith(false) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfFreshLocs (elementOfFreshLocs) =========================================
 elementOfFreshLocs {
-\find(elementOf(o,f,freshLocs(h)))
-\replacewith(and(not(equals(o,null)),not(equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE)))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(p,freshLocs(h)))
+\replacewith(and(not(equals(first<java.lang.Object,Field>(p),null)),not(equals(select<boolean>(h,first<java.lang.Object,Field>(p),java.lang.Object::#$created),TRUE)))) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfGuardedSet (elementOfGuardedSet) =========================================
 elementOfGuardedSet {
-\find(elementOf(o,f,if-then-else(phi,s,empty)))
-\replacewith(and(phi,elementOf(o,f,s))) 
+\find(elementOf<T>(e,if-then-else(phi,s,empty<T>)))
+\replacewith(and(phi,elementOf<T>(e,s))) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfInfiniteUnion (elementOfInfiniteUnion) =========================================
 elementOfInfiniteUnion {
-\find(elementOf(o,f,infiniteUnion{av (variable)}(s)))
-\varcond(\notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(elementOf(o,f,s))) 
+\find(elementOf<T>(a,infiniteUnion<T>{av (variable)}(s)))
+\varcond(\notFreeIn(av (variable), a (T term)))
+\replacewith(exists{av (variable)}(elementOf<T>(a,s))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfInfiniteUnion2Vars (elementOfInfiniteUnion2Vars) =========================================
 elementOfInfiniteUnion2Vars {
-\find(elementOf(o,f,infiniteUnion{av (variable),bv (variable)}(s)))
-\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf(o,f,s)))) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,infiniteUnion<Pair<java.lang.Object,Field>>{av (variable),bv (variable)}(s)))
+\varcond(\notFreeIn(bv (variable), l (Pair<java.lang.Object,Field> term)), \notFreeIn(av (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(l,s)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnion2VarsEQ (elementOfInfiniteUnion2VarsEQ) =========================================
 elementOfInfiniteUnion2VarsEQ {
-\assumes ([equals(infiniteUnion{av (variable),bv (variable)}(s),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf(o,f,s)))) 
+\assumes ([equals(infiniteUnion<Pair<java.lang.Object,Field>>{av (variable),bv (variable)}(s),EQ)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ))
+\varcond(\notFreeIn(bv (variable), l (Pair<java.lang.Object,Field> term)), \notFreeIn(av (variable), l (Pair<java.lang.Object,Field> term)))
+\replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf<Pair<java.lang.Object,Field>>(l,s)))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnionEQ (elementOfInfiniteUnionEQ) =========================================
 elementOfInfiniteUnionEQ {
-\assumes ([equals(infiniteUnion{av (variable)}(s),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\varcond(\notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
-\replacewith(exists{av (variable)}(elementOf(o,f,s))) 
+\assumes ([equals(infiniteUnion<T>{av (variable)}(s),EQ)]==>[]) 
+\find(elementOf<T>(a,EQ))
+\varcond(\notFreeIn(av (variable), a (T term)))
+\replacewith(exists{av (variable)}(elementOf<T>(a,s))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfIntersect (elementOfIntersect) =========================================
 elementOfIntersect {
-\find(elementOf(o,f,intersect(s,s2)))
-\replacewith(and(elementOf(o,f,s),elementOf(o,f,s2))) 
+\find(elementOf<T>(a,intersect<T>(s,t)))
+\replacewith(and(elementOf<T>(a,s),elementOf<T>(a,t))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfIntersectEQ (elementOfIntersectEQ) =========================================
 elementOfIntersectEQ {
-\assumes ([equals(intersect(s,s2),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\replacewith(and(elementOf(o,f,s),elementOf(o,f,s2))) 
+\assumes ([equals(intersect<T>(s,t),EQ)]==>[]) 
+\find(elementOf<T>(a,EQ))
+\replacewith(and(elementOf<T>(a,s),elementOf<T>(a,t))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSetMinus (elementOfSetMinus) =========================================
 elementOfSetMinus {
-\find(elementOf(o,f,setMinus(s,s2)))
-\replacewith(and(elementOf(o,f,s),not(elementOf(o,f,s2)))) 
+\find(elementOf<T>(a,setMinus<T>(s,t)))
+\replacewith(and(elementOf<T>(a,s),not(elementOf<T>(a,t)))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSetMinusEQ (elementOfSetMinusEQ) =========================================
 elementOfSetMinusEQ {
-\assumes ([equals(setMinus(s,s2),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\replacewith(and(elementOf(o,f,s),not(elementOf(o,f,s2)))) 
+\assumes ([equals(setMinus<T>(s,t),EQ)]==>[]) 
+\find(elementOf<T>(a,EQ))
+\replacewith(and(elementOf<T>(a,s),not(elementOf<T>(a,t)))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSingleton (elementOfSingleton) =========================================
 elementOfSingleton {
-\find(elementOf(o,f,singleton(o2,f2)))
-\replacewith(and(equals(o,o2),equals(f,f2))) 
+\find(elementOf<T>(a,singleton<T>(b)))
+\replacewith(equals(a,b)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSubsetImpliesElementOfSuperset (elementOfSubsetImpliesElementOfSuperset) =========================================
 elementOfSubsetImpliesElementOfSuperset {
-\assumes ([subset(s,s2)]==>[]) 
-\find(elementOf(o,f,s)==>)
-\add [elementOf(o,f,s2)]==>[] 
+\assumes ([subset<T>(s,s2)]==>[]) 
+\find(elementOf<T>(e,s)==>)
+\add [elementOf<T>(e,s2)]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSubsetOfUnion1 (elementOfSubsetOfUnion1) =========================================
 elementOfSubsetOfUnion1 {
-\assumes ([subset(s,union(s2,s3))]==>[elementOf(o,f,s2)]) 
-\find(elementOf(o,f,s))
-\add [equiv(elementOf(o,f,s),elementOf(o,f,intersect(s,s3)))]==>[] 
+\assumes ([subset<T>(s,union<T>(s2,s3))]==>[elementOf<T>(e,s2)]) 
+\find(elementOf<T>(e,s))
+\add [equiv(elementOf<T>(e,s),elementOf<T>(e,intersect<T>(s,s3)))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfSubsetOfUnion2 (elementOfSubsetOfUnion2) =========================================
 elementOfSubsetOfUnion2 {
-\assumes ([subset(s,union(s2,s3))]==>[elementOf(o,f,s3)]) 
-\find(elementOf(o,f,s))
-\add [equiv(elementOf(o,f,s),elementOf(o,f,intersect(s,s2)))]==>[] 
+\assumes ([subset<T>(s,union<T>(s2,s3))]==>[elementOf<T>(e,s3)]) 
+\find(elementOf<T>(e,s))
+\add [equiv(elementOf<T>(e,s),elementOf<T>(e,intersect<T>(s,s2)))]==>[] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfUnion (elementOfUnion) =========================================
 elementOfUnion {
-\find(elementOf(o,f,union(s,s2)))
-\replacewith(or(elementOf(o,f,s),elementOf(o,f,s2))) 
+\find(elementOf<T>(a,union<T>(s,t)))
+\replacewith(or(elementOf<T>(a,s),elementOf<T>(a,t))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elementOfUnionEQ (elementOfUnionEQ) =========================================
 elementOfUnionEQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(elementOf(o,f,EQ))
-\replacewith(or(elementOf(o,f,s),elementOf(o,f,s2))) 
+\assumes ([equals(union<T>(s,t),EQ)]==>[]) 
+\find(elementOf<T>(a,EQ))
+\replacewith(or(elementOf<T>(a,s),elementOf<T>(a,t))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == elimGcdEq (elimGcdEq) =========================================
 elimGcdEq {
@@ -6718,25 +6792,25 @@ Choices: true}
 -----------------------------------------------------
 == elim_exists_sub_1 (elim_exists_sub_1) =========================================
 elim_exists_sub_1 {
-\find(exists{locVar (variable)}(and(subset(locVar,locSetTermRight),subset(locSetTermLeft,locVar))))
-\varcond(\notFreeIn(locVar (variable), locSetTermRight (LocSet term)), \notFreeIn(locVar (variable), locSetTermLeft (LocSet term)))
-\replacewith(subset(locSetTermLeft,locSetTermRight)) 
+\find(exists{locVar (variable)}(and(subset<G>(locVar,locSetTermRight),subset<G>(locSetTermLeft,locVar))))
+\varcond(\notFreeIn(locVar (variable), locSetTermRight (Set<G> term)), \notFreeIn(locVar (variable), locSetTermLeft (Set<G> term)))
+\replacewith(subset<G>(locSetTermLeft,locSetTermRight)) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == elim_exists_sub_1_and_phi (elim_exists_sub_1_and_phi) =========================================
 elim_exists_sub_1_and_phi {
-\find(exists{locVar (variable)}(and(and(subset(locVar,locSetTerm),subset(locSetTerm,locVar)),phi)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
+\find(exists{locVar (variable)}(and(and(subset<G>(locVar,locSetTerm),subset<G>(locSetTerm,locVar)),phi)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<G> term)))
 \replacewith(exists{locVar (variable)}(and(equals(locVar,locSetTerm),phi))) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == elim_exists_sub_1_or_phi (elim_exists_sub_1_or_phi) =========================================
 elim_exists_sub_1_or_phi {
-\find(exists{locVar (variable)}(or(and(subset(locVar,locSetTermRight),subset(locSetTermLeft,locVar)),phi)))
-\varcond(\notFreeIn(locVar (variable), locSetTermRight (LocSet term)), \notFreeIn(locVar (variable), locSetTermLeft (LocSet term)))
-\replacewith(or(subset(locSetTermLeft,locSetTermRight),exists{locVar (variable)}(phi))) 
+\find(exists{locVar (variable)}(or(and(subset<G>(locVar,locSetTermRight),subset<G>(locSetTermLeft,locVar)),phi)))
+\varcond(\notFreeIn(locVar (variable), locSetTermRight (Set<G> term)), \notFreeIn(locVar (variable), locSetTermLeft (Set<G> term)))
+\replacewith(or(subset<G>(locSetTermLeft,locSetTermRight),exists{locVar (variable)}(phi))) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6902,8 +6976,8 @@ Choices: true}
 -----------------------------------------------------
 == elim_forall_eqSet_imp_phi (elim_forall_eqSet_imp_phi) =========================================
 elim_forall_eqSet_imp_phi {
-\find(all{locVar (variable)}(imp(and(subset(locVar,locSetTerm),subset(locSetTerm,locVar)),phi)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
+\find(all{locVar (variable)}(imp(and(subset<G>(locVar,locSetTerm),subset<G>(locSetTerm,locVar)),phi)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<G> term)))
 \replacewith(all{locVar (variable)}(imp(equals(locSetTerm,locVar),phi))) 
 \heuristics(elimQuantifier)
 Choices: true}
@@ -6966,42 +7040,42 @@ Choices: true}
 -----------------------------------------------------
 == elim_forall_subOfAll (elim_forall_subOfAll) =========================================
 elim_forall_subOfAll {
-\find(all{locVar (variable)}(subset(locSetTerm,locVar)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
-\replacewith(equals(locSetTerm,empty)) 
+\find(all{locVar (variable)}(subset<G>(locSetTerm,locVar)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<G> term)))
+\replacewith(equals(locSetTerm,empty<G>)) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == elim_forall_subOfAll_and_phi (elim_forall_subOfAll_and_phi) =========================================
 elim_forall_subOfAll_and_phi {
-\find(all{locVar (variable)}(and(subset(locSetTerm,locVar),phi)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
-\replacewith(and(equals(locSetTerm,empty),all{locVar (variable)}(phi))) 
+\find(all{locVar (variable)}(and(subset<G>(locSetTerm,locVar),phi)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<G> term)))
+\replacewith(and(equals(locSetTerm,empty<G>),all{locVar (variable)}(phi))) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == elim_forall_superOfAll (elim_forall_superOfAll) =========================================
 elim_forall_superOfAll {
-\find(all{locVar (variable)}(subset(locVar,locSetTerm)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
+\find(all{locVar (variable)}(subset<Pair<java.lang.Object,Field>>(locVar,locSetTerm)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<Pair<java.lang.Object,Field>> term)))
 \replacewith(equals(locSetTerm,allLocs)) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == elim_forall_superOfAll_and_phi (elim_forall_superOfAll_and_phi) =========================================
 elim_forall_superOfAll_and_phi {
-\find(all{locVar (variable)}(and(subset(locVar,locSetTerm),phi)))
-\varcond(\notFreeIn(locVar (variable), locSetTerm (LocSet term)))
+\find(all{locVar (variable)}(and(subset<Pair<java.lang.Object,Field>>(locVar,locSetTerm),phi)))
+\varcond(\notFreeIn(locVar (variable), locSetTerm (Set<Pair<java.lang.Object,Field>> term)))
 \replacewith(and(equals(locSetTerm,allLocs),all{locVar (variable)}(phi))) 
 \heuristics(elimQuantifier)
 Choices: true}
 -----------------------------------------------------
 == emptyEqualsSingleton (emptyEqualsSingleton) =========================================
 emptyEqualsSingleton {
-\find(equals(empty,singleton(o,f)))
+\find(equals(empty<T>,singleton<T>(a)))
 \replacewith(false) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == emptyModality (emptyModality) =========================================
 emptyModality {
@@ -7295,34 +7369,26 @@ Choices: true}
 -----------------------------------------------------
 == equalityOfSingleton (equalityOfSingleton) =========================================
 equalityOfSingleton {
-\find(equals(singleton(o1,f1),singleton(o2,f2)))
-\replacewith(and(equals(o1,o2),equals(f1,f2))) 
+\find(equals(singleton<T>(e1),singleton<T>(e2)))
+\replacewith(equals(e1,e2)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == equalityToElementOf (equalityToElementOf) =========================================
 equalityToElementOf {
-\find(equals(s,s2))
-\varcond(\notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(equiv(elementOf(ov,fv,s),elementOf(ov,fv,s2))))) 
+\find(equals(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith(all{av (variable)}(equiv(elementOf<T>(av,s),elementOf<T>(av,t)))) 
 \heuristics(semantics_blasting)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == equalityToElementOfRight (equalityToElementOfRight) =========================================
 equalityToElementOfRight {
 \find(==>equals(s,s2))
-\varcond(\notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith([]==>[all{ov (variable)}(all{fv (variable)}(equiv(elementOf(ov,fv,s),elementOf(ov,fv,s2))))]) 
-\heuristics(setEqualityBlastingRight)
+\varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith([]==>[all{ov (variable)}(all{fv (variable)}(equiv(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
+\heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
------------------------------------------------------
-== equalityToSElementOf (equalityToSElementOf) =========================================
-equalityToSElementOf {
-\find(equals(s,t))
-\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
-\replacewith(all{av (variable)}(equiv(sElementOf<T>(av,s),sElementOf<T>(av,t)))) 
-\heuristics(simplify_enlarging)
-Choices: true}
 -----------------------------------------------------
 == equalityToSelect (equalityToSelect) =========================================
 equalityToSelect {
@@ -9520,7 +9586,7 @@ Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
 == firstOfPair (firstOfPair) =========================================
 firstOfPair {
-\find(first(pair(t,t1)))
+\find(first<G,H>(pair<G,H>(t,t1)))
 \replacewith(t) 
 \heuristics(concrete)
 Choices: true}
@@ -9682,7 +9748,7 @@ Choices: sequences:on}
 getOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
-\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq)))))
+\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq))))) 
 \heuristics(no_self_application, simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -11305,11 +11371,11 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == infiniteUnionUnused (infiniteUnionUnused) =========================================
 infiniteUnionUnused {
-\find(infiniteUnion{av (variable)}(s))
-\varcond(\notFreeIn(av (variable), s (LocSet term)))
+\find(infiniteUnion<T>{av (variable)}(s))
+\varcond(\notFreeIn(av (variable), s (Set<T> term)))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == insert_constant_string_value (insert_constant_string_value) =========================================
 insert_constant_string_value {
@@ -11586,72 +11652,342 @@ int_induction {
 
 Choices: true}
 -----------------------------------------------------
+== intersectAllFieldsAllObjects (intersectAllFieldsAllObjects) =========================================
+intersectAllFieldsAllObjects {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjects2 (intersectAllFieldsAllObjects) =========================================
+intersectAllFieldsAllObjects2 {
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjects2EQ (intersectAllFieldsAllObjectsEQ) =========================================
+intersectAllFieldsAllObjects2EQ {
+\assumes ([equals(allObjects(f),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsAllObjectsEQ (intersectAllFieldsAllObjectsEQ) =========================================
+intersectAllFieldsAllObjectsEQ {
+\assumes ([equals(allFields(o),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == intersectAllFieldsFreshLocs (intersectAllFieldsFreshLocs) =========================================
 intersectAllFieldsFreshLocs {
-\find(equals(intersect(allFields(o),freshLocs(h)),empty))
+\find(equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),freshLocs(h)),empty<Pair<java.lang.Object,Field>>))
 \replacewith(or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
+== intersectAllFieldsSingletonDiff (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonDiff {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f))))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonDiff2 (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonDiff2 {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o2,f)),allFields(o)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonSame (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonSame {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllFieldsSingletonSame2 (intersectAllFieldsSingleton) =========================================
+intersectAllFieldsSingletonSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),allFields(o)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonDiff (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonDiff {
+\assumes ([]==>[equals(f,f2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2))))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonDiff2 (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonDiff2 {
+\assumes ([]==>[equals(f,f2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f2)),allObjects(f)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonSame (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonSame {
+\find(intersect<Pair<java.lang.Object,Field>>(allObjects(f),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectAllObjectsSingletonSame2 (intersectAllObjectsSingleton) =========================================
+intersectAllObjectsSingletonSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f)),allObjects(f)))
+\replacewith(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsDiff (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsDiff {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),allFields(o2)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsDiff2 (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsDiff2 {
+\assumes ([]==>[equals(o,o2)]) 
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o2),arrayRange(o,lower,upper)))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsSame (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsSame {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),allFields(o)))
+\replacewith(arrayRange(o,lower,upper)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangeAllFieldsSame2 (intersectArrayRangeAllFields) =========================================
+intersectArrayRangeAllFieldsSame2 {
+\find(intersect<Pair<java.lang.Object,Field>>(allFields(o),arrayRange(o,lower,upper)))
+\replacewith(arrayRange(o,lower,upper)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint (intersectArrayRangesDisjoint) =========================================
+intersectArrayRangesDisjoint {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper,lower2),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint2 (intersectArrayRangesDisjoint) =========================================
+intersectArrayRangesDisjoint2 {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper2,lower),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjoint2EQ (intersectArrayRangesDisjointEQ) =========================================
+intersectArrayRangesDisjoint2EQ {
+\assumes ([equals(arrayRange(o,lower2,upper2),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),EQ))
+\replacewith(if-then-else(lt(upper2,lower),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesDisjointEQ (intersectArrayRangesDisjointEQ) =========================================
+intersectArrayRangesDisjointEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(lt(upper,lower2),empty<Pair<java.lang.Object,Field>>,intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterDisjoint)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested (intersectArrayRangesNested) =========================================
+intersectArrayRangesNested {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower,lower2),leq(upper2,upper)),arrayRange(o,lower2,upper2),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested2 (intersectArrayRangesNested) =========================================
+intersectArrayRangesNested2 {
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower2,lower),leq(upper,upper2)),arrayRange(o,lower,upper),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNested2EQ (intersectArrayRangesNestedEQ) =========================================
+intersectArrayRangesNested2EQ {
+\assumes ([equals(arrayRange(o,lower2,upper2),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),EQ))
+\replacewith(if-then-else(and(leq(lower2,lower),leq(upper,upper2)),arrayRange(o,lower,upper),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested2)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectArrayRangesNestedEQ (intersectArrayRangesNestedEQ) =========================================
+intersectArrayRangesNestedEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(intersect<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(leq(lower,lower2),leq(upper2,upper)),arrayRange(o,lower2,upper2),intersect<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeInterNested)
+Choices: programRules:Java}
+-----------------------------------------------------
+== intersectUnionEqualsEmpty (intersectUnionEqualsEmpty) =========================================
+intersectUnionEqualsEmpty {
+\find(equals(intersect<T>(union<T>(s,s2),t),empty<T>))
+\replacewith(and(equals(intersect<T>(s,t),empty<T>),equals(intersect<T>(s2,t),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmpty2 (intersectUnionEqualsEmpty2) =========================================
+intersectUnionEqualsEmpty2 {
+\find(equals(intersect<T>(t,union<T>(s,s2)),empty<T>))
+\replacewith(and(equals(intersect<T>(t,s),empty<T>),equals(intersect<T>(t,s2),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmpty2EQ (intersectUnionEqualsEmpty2EQ) =========================================
+intersectUnionEqualsEmpty2EQ {
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(equals(intersect<T>(t,EQ),empty<T>))
+\replacewith(and(equals(intersect<T>(t,s),empty<T>),equals(intersect<T>(t,s2),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionEqualsEmptyEQ (intersectUnionEqualsEmptyEQ) =========================================
+intersectUnionEqualsEmptyEQ {
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(equals(intersect<T>(EQ,t),empty<T>))
+\replacewith(and(equals(intersect<T>(s,t),empty<T>),equals(intersect<T>(s2,t),empty<T>))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself (intersectUnionItself) =========================================
+intersectUnionItself {
+\find(intersect<T>(union<T>(s1,s2),s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself2 (intersectUnionItself) =========================================
+intersectUnionItself2 {
+\find(intersect<T>(union<T>(s2,s1),s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself2EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself2EQ {
+\assumes ([equals(union<T>(s2,s1),EQ)]==>[]) 
+\find(intersect<T>(EQ,s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself3 (intersectUnionItself) =========================================
+intersectUnionItself3 {
+\find(intersect<T>(s1,union<T>(s1,s2)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself3EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself3EQ {
+\assumes ([equals(union<T>(s1,s2),EQ)]==>[]) 
+\find(intersect<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself4 (intersectUnionItself) =========================================
+intersectUnionItself4 {
+\find(intersect<T>(s1,union<T>(s2,s1)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItself4EQ (intersectUnionItselfEQ) =========================================
+intersectUnionItself4EQ {
+\assumes ([equals(union<T>(s2,s1),EQ)]==>[]) 
+\find(intersect<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== intersectUnionItselfEQ (intersectUnionItselfEQ) =========================================
+intersectUnionItselfEQ {
+\assumes ([equals(union<T>(s1,s2),EQ)]==>[]) 
+\find(intersect<T>(EQ,s1))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == intersectWithAllLocs (intersectWithAllLocs) =========================================
 intersectWithAllLocs {
-\find(intersect(allLocs,s))
+\find(intersect<Pair<java.lang.Object,Field>>(allLocs,s))
 \replacewith(s) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == intersectWithAllLocsRight (intersectWithAllLocs) =========================================
 intersectWithAllLocsRight {
-\find(intersect(s,allLocs))
+\find(intersect<Pair<java.lang.Object,Field>>(s,allLocs))
 \replacewith(s) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == intersectWithEmpty (intersectWithEmpty) =========================================
 intersectWithEmpty {
-\find(intersect(empty,s))
-\replacewith(empty) 
+\find(intersect<T>(empty<T>,s))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intersectWithEmptyRight (intersectWithEmpty) =========================================
 intersectWithEmptyRight {
-\find(intersect(s,empty))
-\replacewith(empty) 
+\find(intersect<T>(s,empty<T>))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intersectWithItself (intersectWithItself) =========================================
 intersectWithItself {
-\find(intersect(s,s))
+\find(intersect<T>(s,s))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intersectWithSingleton (intersectWithSingleton) =========================================
 intersectWithSingleton {
-\find(intersect(singleton(o,f),s))
-\replacewith(if-then-else(elementOf(o,f,s),singleton(o,f),empty)) 
+\find(intersect<T>(singleton<T>(e),s))
+\replacewith(if-then-else(elementOf<T>(e,s),singleton<T>(e),empty<T>)) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intersectionSetMinusItself (intersectionSetMinusItself) =========================================
 intersectionSetMinusItself {
-\find(intersect(setMinus(s1,s2),s2))
-\replacewith(empty) 
+\find(intersect<T>(setMinus<T>(s1,s2),s2))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intersectionSetMinusItself_2 (intersectionSetMinusItself_2) =========================================
 intersectionSetMinusItself_2 {
-\find(intersect(s2,setMinus(s1,s2)))
-\replacewith(empty) 
+\find(intersect<T>(s2,setMinus<T>(s1,s2)))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == intro (intro) =========================================
 intro {
-\add [equals(t,sk)]==>[]
+\add [equals(t,sk)]==>[] 
 
 Choices: true}
 -----------------------------------------------------
@@ -12969,7 +13305,7 @@ Choices: true}
 -----------------------------------------------------
 == memsetEmpty (memsetEmpty) =========================================
 memsetEmpty {
-\find(memset(h,empty,x))
+\find(memset(h,empty<Pair<java.lang.Object,Field>>,x))
 \replacewith(h) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -13879,11 +14215,11 @@ Choices: true}
 -----------------------------------------------------
 == noElementOfSupersetImpliesNoElementOfSubset (noElementOfSupersetImpliesNoElementOfSubset) =========================================
 noElementOfSupersetImpliesNoElementOfSubset {
-\assumes ([subset(s,s2)]==>[]) 
-\find(==>elementOf(o,f,s2))
-\add []==>[elementOf(o,f,s)] 
+\assumes ([subset<T>(s,s2)]==>[]) 
+\find(==>elementOf<T>(e,s2))
+\add []==>[elementOf<T>(e,s)] 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == nonNull (nonNull) =========================================
 nonNull {
@@ -13989,32 +14325,32 @@ Choices: programRules:Java}
 == onlyCreatedObjectsAreInLocSets (onlyCreatedObjectsAreInLocSets) =========================================
 onlyCreatedObjectsAreInLocSets {
 \assumes ([wellFormed(h)]==>[]) 
-\find(elementOf(o2,f2,select<LocSet>(h,o,f))==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,select<Set<Pair<java.lang.Object,Field>>>(h,o,f))==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsEQ (onlyCreatedObjectsAreInLocSetsEQ) =========================================
 onlyCreatedObjectsAreInLocSetsEQ {
-\assumes ([wellFormed(h),equals(select<LocSet>(h,o,f),EQ)]==>[]) 
-\find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\assumes ([wellFormed(h),equals(select<Set<Pair<java.lang.Object,Field>>>(h,o,f),EQ)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinal (onlyCreatedObjectsAreInLocSetsFinal) =========================================
 onlyCreatedObjectsAreInLocSetsFinal {
 \assumes ([wellFormed(h)]==>[]) 
-\find(elementOf(o2,f2,final<LocSet>(o,f))==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,final<Set<Pair<java.lang.Object,Field>>>(o,f))==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinalEQ (onlyCreatedObjectsAreInLocSetsFinalEQ) =========================================
 onlyCreatedObjectsAreInLocSetsFinalEQ {
-\assumes ([wellFormed(h),equals(final<LocSet>(o,f),EQ)]==>[]) 
-\find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(select<boolean>(h,o2,java.lang.Object::#$created),TRUE))]==>[] 
+\assumes ([wellFormed(h),equals(final<Set<Pair<java.lang.Object,Field>>>(o,f),EQ)]==>[]) 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14028,18 +14364,18 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreObservedInLocSets (onlyCreatedObjectsAreObservedInLocSets) =========================================
 onlyCreatedObjectsAreObservedInLocSets {
-\find(elementOf(o,f,obs)==>)
-\varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,obs)==>)
+\varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreObservedInLocSetsEQ (onlyCreatedObjectsAreObservedInLocSetsEQ) =========================================
 onlyCreatedObjectsAreObservedInLocSetsEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
-\find(elementOf(o,f,EQ)==>)
-\varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))]==>[] 
+\find(elementOf<Pair<java.lang.Object,Field>>(l,EQ)==>)
+\varcond(\isObserver (obs (Set<Pair<java.lang.Object,Field>> term), h (Heap term)))
+\add [or(equals(first<java.lang.Object,Field>(l),null),equals(select<boolean>(h,first<java.lang.Object,Field>(l),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14047,7 +14383,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreReferenced {
 \assumes ([wellFormed(h)]==>[]) 
 \find(select<deltaObject>(h,o,f))
-\add [or(equals(select<deltaObject>(h,o,f),null),equals(select<boolean>(h,select<deltaObject>(h,o,f),java.lang.Object::#$created),TRUE))]==>[]
+\add [or(equals(select<deltaObject>(h,o,f),null),equals(select<boolean>(h,select<deltaObject>(h,o,f),java.lang.Object::#$created),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14115,6 +14451,14 @@ orRight {
 \find(==>or(b,c))
 \replacewith([]==>[b,c]) 
 \heuristics(alpha)
+Choices: true}
+-----------------------------------------------------
+== pairAxiom (pairAxiom) =========================================
+pairAxiom {
+\find(p)
+\varcond(\notFreeIn(e2 (variable), p (Pair<E1,E2> term)), \notFreeIn(e1 (variable), p (Pair<E1,E2> term)))
+\add [exists{e1 (variable)}(exists{e2 (variable)}(equals(pair<E1,E2>(e1,e2),p)))]==>[] 
+
 Choices: true}
 -----------------------------------------------------
 == parallelWithSkip1 (parallelWithSkip1) =========================================
@@ -14761,21 +15105,21 @@ Choices: true}
 -----------------------------------------------------
 == precOfIntPair (precOfIntPair) =========================================
 precOfIntPair {
-\find(prec(a,pair(b,x)))
+\find(prec(a,pair<int,S>(b,x)))
 \replacewith(and(leq(Z(0(#)),a),leq(a,b))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == precOfPair (precOfPair) =========================================
 precOfPair {
-\find(prec(pair(a1,b1),pair(a2,b2)))
+\find(prec(pair<S1,S3>(a1,b1),pair<S2,S4>(a2,b2)))
 \replacewith(or(prec(a1,a2),and(equals(a1,a2),prec(b1,b2)))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == precOfPairInt (precOfPairInt) =========================================
 precOfPairInt {
-\find(prec(pair(a,x),b))
+\find(prec(pair<int,S>(a,x),b))
 \replacewith(and(leq(Z(0(#)),a),lt(a,b))) 
 \heuristics(simplify)
 Choices: true}
@@ -15016,7 +15360,7 @@ Choices: true}
 == reachAddOne (reachAddOne) =========================================
 reachAddOne {
 \find(reach(h,s,o,o2,add(Z(1(#)),n)))
-\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)))
+\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
 \replacewith(and(and(and(geq(n,Z(neglit(1(#)))),not(equals(o,null))),not(equals(o2,null))),or(and(equals(n,Z(neglit(1(#)))),equals(o,o2)),exists{ov (variable)}(and(reach(h,s,o,ov,n),acc(h,s,ov,o2)))))) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15024,7 +15368,7 @@ Choices: reach:on}
 == reachAddOne2 (reachAddOne2) =========================================
 reachAddOne2 {
 \find(reach(h,s,o,o2,add(n,Z(1(#)))))
-\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)))
+\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
 \replacewith(and(and(and(geq(n,Z(neglit(1(#)))),not(equals(o,null))),not(equals(o2,null))),or(and(equals(n,Z(neglit(1(#)))),equals(o,o2)),exists{ov (variable)}(and(reach(h,s,o,ov,n),acc(h,s,ov,o2)))))) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -15032,7 +15376,7 @@ Choices: reach:on}
 == reachDefinition (reachDefinition) =========================================
 reachDefinition {
 \find(reach(h,s,o,o2,n))
-\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)))
+\varcond(\notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
 \replacewith(and(and(and(geq(n,Z(0(#))),not(equals(o,null))),not(equals(o2,null))),or(and(equals(n,Z(0(#))),equals(o,o2)),exists{ov (variable)}(and(reach(h,s,o,ov,sub(n,Z(1(#)))),acc(h,s,ov,o2)))))) 
 
 Choices: reach:on}
@@ -15040,27 +15384,27 @@ Choices: reach:on}
 == reachDependenciesAnon (reachDependenciesAnon) =========================================
 reachDependenciesAnon {
 \find(reach(anon(h,s2,h2),s,o,o2,n))
-\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (LocSet term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (LocSet term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (LocSet term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), h (Heap term)))
-\add [all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf(ov,fv,s2),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf(ov,fv,s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf(ov,fv,s2),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf(ov,fv,s)))))] 
+\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
+\add [all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
+\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))] 
 
 Choices: reach:on}
 -----------------------------------------------------
 == reachDependenciesAnonCoarse (reachDependenciesAnonCoarse) =========================================
 reachDependenciesAnonCoarse {
 \find(reach(anon(h,s2,h2),s,o,o2,n))
-\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (LocSet term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (LocSet term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (LocSet term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), h (Heap term)))
-\add [all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf(ov,fv,s2),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf(ov,fv,s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf(ov,fv,s2),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf(ov,fv,s)))))] 
+\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
+\add [all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
+\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))] 
 
 Choices: reach:on}
 -----------------------------------------------------
 == reachDependenciesStore (reachDependenciesStore) =========================================
 reachDependenciesStore {
 \find(reach(store(h,o3,f,x),s,o,o2,n))
-\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (LocSet term)), \notFreeIn(nv (variable), x (any term)), \notFreeIn(nv (variable), f (Field term)), \notFreeIn(nv (variable), o3 (java.lang.Object term)), \notFreeIn(nv (variable), h (Heap term)))
-\add [not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))] 
+\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), x (any term)), \notFreeIn(nv (variable), f (Field term)), \notFreeIn(nv (variable), o3 (java.lang.Object term)), \notFreeIn(nv (variable), h (Heap term)))
+\add [not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o3,f),s)))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
+\add []==>[not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o3,f),s)))] 
 
 Choices: reach:on}
 -----------------------------------------------------
@@ -15068,9 +15412,9 @@ Choices: reach:on}
 reachDependenciesStoreEQ {
 \assumes ([equals(store(h,o3,f,x),EQ)]==>[]) 
 \find(reach(EQ,s,o,o2,n))
-\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (LocSet term)), \notFreeIn(nv (variable), x (any term)), \notFreeIn(nv (variable), f (Field term)), \notFreeIn(nv (variable), o3 (java.lang.Object term)), \notFreeIn(nv (variable), h (Heap term)))
-\add [not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf(o3,f,s)))] 
+\varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), x (any term)), \notFreeIn(nv (variable), f (Field term)), \notFreeIn(nv (variable), o3 (java.lang.Object term)), \notFreeIn(nv (variable), h (Heap term)))
+\add [not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o3,f),s)))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
+\add []==>[not(and(exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,o3,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o3,f),s)))] 
 
 Choices: reach:on}
 -----------------------------------------------------
@@ -15156,7 +15500,7 @@ Choices: reach:on}
 == reach_does_not_depend_on_fresh_locs (reach_does_not_depend_on_fresh_locs) =========================================
 reach_does_not_depend_on_fresh_locs {
 \assumes ([]==>[equals(o,null)]) 
-\find(reach(anon(h,empty,h2),s,o,o2,n))
+\find(reach(anon(h,empty<Pair<java.lang.Object,Field>>,h2),s,o,o2,n))
 \add []==>[and(wellFormed(h),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
 \heuristics(simplify)
@@ -15164,7 +15508,7 @@ Choices: reach:on}
 -----------------------------------------------------
 == reach_does_not_depend_on_fresh_locsEQ (reach_does_not_depend_on_fresh_locsEQ) =========================================
 reach_does_not_depend_on_fresh_locsEQ {
-\assumes ([equals(anon(h,empty,h2),EQ)]==>[equals(o,null)]) 
+\assumes ([equals(anon(h,empty<Pair<java.lang.Object,Field>>,h2),EQ)]==>[equals(o,null)]) 
 \find(reach(EQ,s,o,o2,n))
 \add []==>[and(wellFormed(h),equals(select<boolean>(h,o,java.lang.Object::#$created),TRUE))] ;
 \replacewith(reach(h,s,o,o2,n)) 
@@ -15345,7 +15689,7 @@ Choices: programRules:Java}
 repeatAxiom {
 \find(match(repeat(rexp,nTimes),string))
 \varcond(\notFreeIn(endIdx (variable), string (Seq term)), \notFreeIn(endIdx (variable), nTimes (int term)), \notFreeIn(endIdx (variable), rexp (RegEx term)))
-\replacewith(if-then-else(lt(nTimes,Z(0(#))),false,if-then-else(equals(nTimes,Z(0(#))),equals(string,empty),exists{endIdx (variable)}(and(and(and(geq(endIdx,Z(0(#))),leq(endIdx,seqLen(string))),match(rexp,seqSub(string,Z(0(#)),endIdx))),match(repeat(rexp,sub(nTimes,Z(1(#)))),seqSub(string,endIdx,seqLen(string)))))))) 
+\replacewith(if-then-else(lt(nTimes,Z(0(#))),false,if-then-else(equals(nTimes,Z(0(#))),equals(string,empty<any>),exists{endIdx (variable)}(and(and(and(geq(endIdx,Z(0(#))),leq(endIdx,seqLen(string))),match(rexp,seqSub(string,Z(0(#)),endIdx))),match(repeat(rexp,sub(nTimes,Z(1(#)))),seqSub(string,endIdx,seqLen(string)))))))) 
 
 Choices: Strings:on}
 -----------------------------------------------------
@@ -15620,137 +15964,17 @@ sCardNonNegative {
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
-== sCardSEmpty (sCardSEmpty) =========================================
-sCardSEmpty {
-\find(sCard<T>(sEmpty<T>))
+== sCardempty (sCardempty) =========================================
+sCardempty {
+\find(sCard<T>(empty<T>))
 \replacewith(Z(0(#))) 
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
-== sCardSSingleton (sCardSSingleton) =========================================
-sCardSSingleton {
-\find(sCard<T>(sSingleton<T>(b)))
+== sCardsingleton (sCardsingleton) =========================================
+sCardsingleton {
+\find(sCard<T>(singleton<T>(b)))
 \replacewith(Z(1(#))) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== sDisjointToSElementOf (sDisjointToSElementOf) =========================================
-sDisjointToSElementOf {
-\find(sDisjoint<T>(s,t))
-\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
-\replacewith(all{av (variable)}(or(not(sElementOf<T>(av,s)),not(sElementOf<T>(av,t))))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSEmpty (sElementOfSEmpty) =========================================
-sElementOfSEmpty {
-\find(sElementOf<T>(a,sEmpty<T>))
-\replacewith(false) 
-\heuristics(concrete)
-Choices: true}
------------------------------------------------------
-== sElementOfSInfiniteUnion (sElementOfSInfiniteUnion) =========================================
-sElementOfSInfiniteUnion {
-\find(sElementOf<T>(a,sInfiniteUnion<T>{av (variable)}(s)))
-\varcond(\notFreeIn(av (variable), a (T term)))
-\replacewith(exists{av (variable)}(sElementOf<T>(a,s))) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== sElementOfSInfiniteUnionEQ (sElementOfSInfiniteUnionEQ) =========================================
-sElementOfSInfiniteUnionEQ {
-\assumes ([equals(sInfiniteUnion<T>{av (variable)}(s),EQ)]==>[]) 
-\find(sElementOf<T>(a,EQ))
-\varcond(\notFreeIn(av (variable), a (T term)))
-\replacewith(exists{av (variable)}(sElementOf<T>(a,s))) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== sElementOfSIntersect (sElementOfSIntersect) =========================================
-sElementOfSIntersect {
-\find(sElementOf<T>(a,sIntersect<T>(s,t)))
-\replacewith(and(sElementOf<T>(a,s),sElementOf<T>(a,t))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSIntersectEQ (sElementOfSIntersectEQ) =========================================
-sElementOfSIntersectEQ {
-\assumes ([equals(sIntersect<T>(s,t),EQ)]==>[]) 
-\find(sElementOf<T>(a,EQ))
-\replacewith(and(sElementOf<T>(a,s),sElementOf<T>(a,t))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSSetMinus (sElementOfSSetMinus) =========================================
-sElementOfSSetMinus {
-\find(sElementOf<T>(a,sSetMinus<T>(s,t)))
-\replacewith(and(sElementOf<T>(a,s),not(sElementOf<T>(a,t)))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSSetMinusEQ (sElementOfSSetMinusEQ) =========================================
-sElementOfSSetMinusEQ {
-\assumes ([equals(sSetMinus<T>(s,t),EQ)]==>[]) 
-\find(sElementOf<T>(a,EQ))
-\replacewith(and(sElementOf<T>(a,s),not(sElementOf<T>(a,t)))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSSingleton (sElementOfSSingleton) =========================================
-sElementOfSSingleton {
-\find(sElementOf<T>(a,sSingleton<T>(b)))
-\replacewith(equals(a,b)) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== sElementOfSUnion (sElementOfSUnion) =========================================
-sElementOfSUnion {
-\find(sElementOf<T>(a,sUnion<T>(s,t)))
-\replacewith(or(sElementOf<T>(a,s),sElementOf<T>(a,t))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sElementOfSUnionEQ (sElementOfSUnionEQ) =========================================
-sElementOfSUnionEQ {
-\assumes ([equals(sUnion<T>(s,t),EQ)]==>[]) 
-\find(sElementOf<T>(a,EQ))
-\replacewith(or(sElementOf<T>(a,s),sElementOf<T>(a,t))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sEmptyEqualsSSingleton (sEmptyEqualsSSingleton) =========================================
-sEmptyEqualsSSingleton {
-\find(equals(sEmpty<T>,sSingleton<T>(a)))
-\replacewith(false) 
-\heuristics(concrete)
-Choices: true}
------------------------------------------------------
-== sSingletonEqualsSEmpty (sSingletonEqualsSEmpty) =========================================
-sSingletonEqualsSEmpty {
-\find(equals(sSingleton<T>(a),sEmpty<T>))
-\replacewith(false) 
-\heuristics(concrete)
-Choices: true}
------------------------------------------------------
-== sSubsetToSElementOf (sSubsetToSElementOf) =========================================
-sSubsetToSElementOf {
-\find(sSubset<T>(s,t))
-\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
-\replacewith(all{av (variable)}(imp(sElementOf<T>(av,s),sElementOf<T>(av,t)))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
-== sUnionWithSSingletonEqualsSUnionWithSSingleton (sUnionWithSSingletonEqualsSUnionWithSSingleton) =========================================
-sUnionWithSSingletonEqualsSUnionWithSSingleton {
-\find(equals(sUnion<T>(s,sSingleton<T>(a)),sUnion<T>(t,sSingleton<T>(a))))
-\replacewith(equals(sSetMinus<T>(s,sSingleton<T>(a)),sSetMinus<T>(t,sSingleton<T>(a)))) 
-\heuristics(simplify)
-Choices: true}
------------------------------------------------------
-== sUnionWithSSingletonEqualsSUnionWithSSingleton_2 (sUnionWithSSingletonEqualsSUnionWithSSingleton_2) =========================================
-sUnionWithSSingletonEqualsSUnionWithSSingleton_2 {
-\find(equals(sUnion<T>(sSingleton<T>(a),s),sUnion<T>(sSingleton<T>(a),t)))
-\replacewith(equals(sSetMinus<T>(s,sSingleton<T>(a)),sSetMinus<T>(t,sSingleton<T>(a)))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -15845,7 +16069,7 @@ Choices: true}
 -----------------------------------------------------
 == secondOfPair (secondOfPair) =========================================
 secondOfPair {
-\find(second(pair(t,t1)))
+\find(second<G,H>(pair<G,H>(t,t1)))
 \replacewith(t1) 
 \heuristics(concrete)
 Choices: true}
@@ -15883,7 +16107,7 @@ Choices: programRules:Java}
 == selectOfAnon (selectOfAnon) =========================================
 selectOfAnon {
 \find(select<beta>(anon(h,s,h2),o,f))
-\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f))) 
+\replacewith(if-then-else(or(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f))) 
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15891,7 +16115,7 @@ Choices: programRules:Java}
 selectOfAnonEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(select<beta>(EQ,o,f))
-\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f))) 
+\replacewith(if-then-else(or(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f))) 
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15929,7 +16153,7 @@ Choices: programRules:Java}
 == selectOfMemset (selectOfMemset) =========================================
 selectOfMemset {
 \find(select<beta>(memset(h,s,x),o,f))
-\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f))) 
+\replacewith(if-then-else(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f))) 
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15937,7 +16161,7 @@ Choices: programRules:Java}
 selectOfMemsetEQ {
 \assumes ([equals(memset(h,s,x),EQ)]==>[]) 
 \find(select<beta>(EQ,o,f))
-\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f))) 
+\replacewith(if-then-else(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f))) 
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16281,6 +16505,14 @@ sequentialToParallel3 {
 \heuristics(update_join)
 Choices: true}
 -----------------------------------------------------
+== setEqualityToElementOfRight (setEqualityToElementOfRight) =========================================
+setEqualityToElementOfRight {
+\find(==>equals(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith([]==>[all{av (variable)}(equiv(elementOf<T>(av,s),elementOf<T>(av,t)))]) 
+\heuristics(setEqualityBlastingRight)
+Choices: true}
+-----------------------------------------------------
 == setIntersectUnfoldLeft (setIntersectUnfold) =========================================
 setIntersectUnfoldLeft {
 \find(#allmodal ((modal operator))|{{ ..
@@ -16317,35 +16549,50 @@ setJavaCardTransient {
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
+== setMinusEqualsEmpty (setMinusEqualsEmpty) =========================================
+setMinusEqualsEmpty {
+\find(equals(setMinus<T>(s1,s2),empty<T>))
+\replacewith(subset<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== setMinusEqualsEmptyEQ (setMinusEqualsEmptyEQ) =========================================
+setMinusEqualsEmptyEQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(equals(EQ,empty<T>))
+\replacewith(subset<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == setMinusItself (setMinusItself) =========================================
 setMinusItself {
-\find(setMinus(s,s))
-\replacewith(empty) 
+\find(setMinus<T>(s,s))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == setMinusOfUnion (setMinusOfUnion) =========================================
 setMinusOfUnion {
-\find(setMinus(union(s,s2),s3))
-\replacewith(union(setMinus(s,s3),setMinus(s2,s3))) 
-\heuristics(simplify_enlarging)
-Choices: programRules:Java}
+\find(setMinus<T>(union<T>(unionLeft,unionRight),distributedSet))
+\replacewith(union<T>(setMinus<T>(unionLeft,distributedSet),setMinus<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
 -----------------------------------------------------
 == setMinusOfUnionEQ (setMinusOfUnionEQ) =========================================
 setMinusOfUnionEQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(setMinus(EQ,s3))
-\replacewith(union(setMinus(s,s3),setMinus(s2,s3))) 
-\heuristics(simplify_enlarging)
-Choices: programRules:Java}
+\assumes ([equals(union<T>(unionLeft,unionRight),EQ)]==>[]) 
+\find(setMinus<T>(EQ,distributedSet))
+\replacewith(union<T>(setMinus<T>(unionLeft,distributedSet),setMinus<T>(unionRight,distributedSet))) 
+\heuristics(setDist)
+Choices: true}
 -----------------------------------------------------
 == setMinusSingleton (setMinusSingleton) =========================================
 setMinusSingleton {
-\assumes ([]==>[elementOf(o,f,s)]) 
-\find(setMinus(s,singleton(o,f)))
+\assumes ([]==>[elementOf<T>(e,s)]) 
+\find(setMinus<T>(s,singleton<T>(e)))
 \replacewith(s) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == setMinusUnfoldLeft (setMinusUnfold) =========================================
 setMinusUnfoldLeft {
@@ -16375,24 +16622,31 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == setMinusWithAllLocs (setMinusWithAllLocs) =========================================
 setMinusWithAllLocs {
-\find(setMinus(s,allLocs))
-\replacewith(empty) 
+\find(setMinus<Pair<java.lang.Object,Field>>(s,allLocs))
+\replacewith(empty<Pair<java.lang.Object,Field>>) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == setMinusWithEmpty1 (setMinusWithEmpty) =========================================
 setMinusWithEmpty1 {
-\find(setMinus(s,empty))
+\find(setMinus<T>(s,empty<T>))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == setMinusWithEmpty2 (setMinusWithEmpty) =========================================
 setMinusWithEmpty2 {
-\find(setMinus(empty,s))
-\replacewith(empty) 
+\find(setMinus<T>(empty<T>,s))
+\replacewith(empty<T>) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
+-----------------------------------------------------
+== setMinusWithSingleton (setMinusWithSingleton) =========================================
+setMinusWithSingleton {
+\find(setMinus<T>(singleton<T>(e),s))
+\replacewith(if-then-else(elementOf<T>(e,s),empty<T>,singleton<T>(e))) 
+\heuristics(simplify_enlarging)
+Choices: true}
 -----------------------------------------------------
 == setUnionUnfoldLeft (setUnionUnfold) =========================================
 setUnionUnfoldLeft {
@@ -16523,7 +16777,7 @@ simplifySelectOfAnon {
 \find(select<beta>(anon(h,s,h2),o,f))
 \sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16535,7 +16789,7 @@ simplifySelectOfAnonEQ {
 \find(select<beta>(EQ,o,f))
 \sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),elementOf(o,f,freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),freshLocs(h))),select<beta>(h2,o,f),select<beta>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16569,7 +16823,7 @@ simplifySelectOfMemset {
 \find(select<beta>(memset(h,s,x),o,f))
 \sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16581,7 +16835,7 @@ simplifySelectOfMemsetEQ {
 \find(select<beta>(EQ,o,f))
 \sameUpdateLevel\inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f),s),not(equals(f,java.lang.Object::#$created))),cast<beta>(x),select<beta>(h,o,f)),sk)]==>[]) 
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16709,16 +16963,16 @@ singletonAssignment {
 \find(#allmodal ((modal operator))|{{ ..
   #v = \singleton(#seObj.#a);
 ... }}| (post))
-\replacewith(update-application(elem-update(#v (program Variable))(singleton(#seObj,#memberPVToField(#a))),#allmodal(post))) 
+\replacewith(update-application(elem-update(#v (program Variable))(singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(#seObj,#memberPVToField(#a)))),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
 == singletonEqualsEmpty (singletonEqualsEmpty) =========================================
 singletonEqualsEmpty {
-\find(equals(singleton(o,f),empty))
+\find(equals(singleton<T>(a),empty<T>))
 \replacewith(false) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == singletonUnfold (singletonUnfold) =========================================
 singletonUnfold {
@@ -17214,176 +17468,222 @@ sub_zero_2 {
 \heuristics(simplify_int)
 Choices: true}
 -----------------------------------------------------
+== subsetIntersectLeft (subsetIntersectLeft) =========================================
+subsetIntersectLeft {
+\find(subset<T>(intersect<T>(s1,s2),s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeft2 (subsetIntersectLeft) =========================================
+subsetIntersectLeft2 {
+\find(subset<T>(intersect<T>(s2,s1),s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeft2EQ (subsetIntersectLeftEQ) =========================================
+subsetIntersectLeft2EQ {
+\assumes ([equals(intersect<T>(s2,s1),EQ)]==>[]) 
+\find(subset<T>(EQ,s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== subsetIntersectLeftEQ (subsetIntersectLeftEQ) =========================================
+subsetIntersectLeftEQ {
+\assumes ([equals(intersect<T>(s1,s2),EQ)]==>[]) 
+\find(subset<T>(EQ,s1))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
 == subsetOfEmpty (subsetOfEmpty) =========================================
 subsetOfEmpty {
-\find(subset(s,empty))
-\replacewith(equals(s,empty)) 
+\find(subset<T>(s,empty<T>))
+\replacewith(equals(s,empty<T>)) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfIntersectWithItSelf1 (subsetOfIntersectWithItSelf1) =========================================
 subsetOfIntersectWithItSelf1 {
-\find(subset(s,intersect(s,s2)))
-\replacewith(subset(s,s2)) 
+\find(subset<T>(s,intersect<T>(s,s2)))
+\replacewith(subset<T>(s,s2)) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfIntersectWithItSelf1EQ (subsetOfIntersectWithItSelf1EQ) =========================================
 subsetOfIntersectWithItSelf1EQ {
-\assumes ([equals(intersect(s,s2),EQ)]==>[]) 
-\find(subset(s,EQ))
-\replacewith(subset(s,s2)) 
+\assumes ([equals(intersect<T>(s,s2),EQ)]==>[]) 
+\find(subset<T>(s,EQ))
+\replacewith(subset<T>(s,s2)) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfIntersectWithItSelf2 (subsetOfIntersectWithItSelf2) =========================================
 subsetOfIntersectWithItSelf2 {
-\find(subset(s,intersect(s2,s)))
-\replacewith(subset(s,s2)) 
+\find(subset<T>(s,intersect<T>(s2,s)))
+\replacewith(subset<T>(s,s2)) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfIntersectWithItSelf2EQ (subsetOfIntersectWithItSelf2EQ) =========================================
 subsetOfIntersectWithItSelf2EQ {
-\assumes ([equals(intersect(s2,s),EQ)]==>[]) 
-\find(subset(s,EQ))
-\replacewith(subset(s,s2)) 
+\assumes ([equals(intersect<T>(s2,s),EQ)]==>[]) 
+\find(subset<T>(s,EQ))
+\replacewith(subset<T>(s,s2)) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfItself (subsetOfItself) =========================================
 subsetOfItself {
-\find(subset(s,s))
+\find(subset<T>(s,s))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfUnionWithItSelf1 (subsetOfUnionWithItSelf1) =========================================
 subsetOfUnionWithItSelf1 {
-\find(subset(s,union(s,s2)))
+\find(subset<T>(s,union<T>(s,s2)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfUnionWithItSelf1EQ (subsetOfUnionWithItSelf1EQ) =========================================
 subsetOfUnionWithItSelf1EQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(subset(s,EQ))
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(subset<T>(s,EQ))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfUnionWithItSelf2 (subsetOfUnionWithItSelf2) =========================================
 subsetOfUnionWithItSelf2 {
-\find(subset(s,union(s2,s)))
+\find(subset<T>(s,union<T>(s2,s)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetOfUnionWithItSelf2EQ (subsetOfUnionWithItSelf2EQ) =========================================
 subsetOfUnionWithItSelf2EQ {
-\assumes ([equals(union(s2,s),EQ)]==>[]) 
-\find(subset(s,EQ))
+\assumes ([equals(union<T>(s2,s),EQ)]==>[]) 
+\find(subset<T>(s,EQ))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetSingletonLeft (subsetSingletonLeft) =========================================
 subsetSingletonLeft {
-\find(subset(singleton(o,f),s))
-\replacewith(elementOf(o,f,s)) 
+\find(subset<T>(singleton<T>(e),s))
+\replacewith(elementOf<T>(e,s)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetSingletonLeftEQ (subsetSingletonLeftEQ) =========================================
 subsetSingletonLeftEQ {
-\assumes ([equals(singleton(o,f),EQ)]==>[]) 
-\find(subset(EQ,s))
-\replacewith(elementOf(o,f,s)) 
+\assumes ([equals(singleton<T>(e),EQ)]==>[]) 
+\find(subset<T>(EQ,s))
+\replacewith(elementOf<T>(e,s)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetSingletonRight (subsetSingletonRight) =========================================
 subsetSingletonRight {
-\find(subset(s,singleton(o,f)))
-\replacewith(or(equals(s,empty),equals(s,singleton(o,f)))) 
+\find(subset<T>(s,singleton<T>(e)))
+\replacewith(or(equals(s,empty<T>),equals(s,singleton<T>(e)))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetSingletonRightEQ (subsetSingletonRightEQ) =========================================
 subsetSingletonRightEQ {
-\assumes ([equals(singleton(o,f),EQ)]==>[]) 
-\find(subset(s,EQ))
-\replacewith(or(equals(s,empty),equals(s,singleton(o,f)))) 
+\assumes ([equals(singleton<T>(e),EQ)]==>[]) 
+\find(subset<T>(s,EQ))
+\replacewith(or(equals(s,empty<T>),equals(s,singleton<T>(e)))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetToElementOf (subsetToElementOf) =========================================
 subsetToElementOf {
-\find(subset(s,s2))
-\varcond(\notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),elementOf(ov,fv,s2))))) 
+\find(subset<T>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith(all{av (variable)}(imp(elementOf<T>(av,s),elementOf<T>(av,t)))) 
 \heuristics(semantics_blasting)
+Choices: true}
+-----------------------------------------------------
+== subsetToElementOfLocSet (subsetToElementOfLocSet) =========================================
+subsetToElementOfLocSet {
+\find(subset<Pair<java.lang.Object,Field>>(s,s2))
+\varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))) 
+\heuristics(semantics_blasting)
+Choices: programRules:Java}
+-----------------------------------------------------
+== subsetToElementOfLocSetRight (subsetToElementOfLocSetRight) =========================================
+subsetToElementOfLocSetRight {
+\find(==>subset<Pair<java.lang.Object,Field>>(s,s2))
+\varcond(\notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)))
+\replacewith([]==>[all{ov (variable)}(all{fv (variable)}(imp(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
+\heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
 -----------------------------------------------------
 == subsetToElementOfRight (subsetToElementOfRight) =========================================
 subsetToElementOfRight {
-\find(==>subset(s,s2))
-\varcond(\notFreeIn(fv (variable), s2 (LocSet term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), s2 (LocSet term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith([]==>[all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),elementOf(ov,fv,s2))))]) 
+\find(==>subset<T>(s,t))
+\varcond(\notFreeIn(av (variable), t (Set<T> term)), \notFreeIn(av (variable), s (Set<T> term)))
+\replacewith([]==>[all{av (variable)}(imp(elementOf<T>(av,s),elementOf<T>(av,t)))]) 
 \heuristics(setEqualityBlastingRight)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetUnionLeft (subsetUnionLeft) =========================================
 subsetUnionLeft {
-\find(subset(union(s,s2),s3))
-\replacewith(and(subset(s,s3),subset(s2,s3))) 
+\find(subset<T>(union<T>(s,s2),s3))
+\replacewith(and(subset<T>(s,s3),subset<T>(s2,s3))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetUnionLeftEQ (subsetUnionLeftEQ) =========================================
 subsetUnionLeftEQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(subset(EQ,s3))
-\replacewith(and(subset(s,s3),subset(s2,s3))) 
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(subset<T>(EQ,s3))
+\replacewith(and(subset<T>(s,s3),subset<T>(s2,s3))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetWithAllLocs (subsetOfAllLocs) =========================================
 subsetWithAllLocs {
-\find(subset(s,allLocs))
+\find(subset<Pair<java.lang.Object,Field>>(s,allLocs))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == subsetWithAllLocs2 (subsetWithAllLocs) =========================================
 subsetWithAllLocs2 {
-\find(subset(allLocs,s))
+\find(subset<Pair<java.lang.Object,Field>>(allLocs,s))
 \replacewith(equals(s,allLocs)) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == subsetWithEmpty (subsetWithEmpty) =========================================
 subsetWithEmpty {
-\find(subset(empty,s))
+\find(subset<T>(empty<T>,s))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetWithSetMinusLeft (subsetWithSetMinusLeft) =========================================
 subsetWithSetMinusLeft {
-\find(subset(setMinus(s,s2),s3))
-\replacewith(subset(s,union(s2,s3))) 
+\find(subset<T>(setMinus<T>(s,s2),s3))
+\replacewith(subset<T>(s,union<T>(s2,s3))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsetWithSetMinusLeftEQ (subsetWithSetMinusLeftEQ) =========================================
 subsetWithSetMinusLeftEQ {
-\assumes ([equals(setMinus(s,s2),EQ)]==>[]) 
-\find(subset(EQ,s3))
-\replacewith(subset(s,union(s2,s3))) 
+\assumes ([equals(setMinus<T>(s,s2),EQ)]==>[]) 
+\find(subset<T>(EQ,s3))
+\replacewith(subset<T>(s,union<T>(s2,s3))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == subsortTrans (subsortTrans) =========================================
 subsortTrans {
@@ -18200,7 +18500,7 @@ tryCatchThrow {
   } catch (#t #v0) {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18539,111 +18839,186 @@ unaryMinusLong {
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
+== unionArrayRangeAdjacent (unionArrayRangeAdjacent) =========================================
+unionArrayRangeAdjacent {
+\find(union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(and(leq(lower,upper),equals(lower2,add(upper,Z(1(#))))),lt(upper,upper2)),arrayRange(o,lower,upper2),union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeMerge)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unionArrayRangeAdjacentEQ (unionArrayRangeAdjacentEQ) =========================================
+unionArrayRangeAdjacentEQ {
+\assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
+\find(union<Pair<java.lang.Object,Field>>(EQ,arrayRange(o,lower2,upper2)))
+\replacewith(if-then-else(and(and(leq(lower,upper),equals(lower2,add(upper,Z(1(#))))),lt(upper,upper2)),arrayRange(o,lower,upper2),union<Pair<java.lang.Object,Field>>(arrayRange(o,lower,upper),arrayRange(o,lower2,upper2)))) 
+\heuristics(locSetArrayRangeMerge)
+Choices: programRules:Java}
+-----------------------------------------------------
 == unionEqualsEmpty (unionEqualsEmpty) =========================================
 unionEqualsEmpty {
-\find(equals(union(s,s2),empty))
-\replacewith(and(equals(s,empty),equals(s2,empty))) 
+\find(equals(union<T>(s,s2),empty<T>))
+\replacewith(and(equals(s,empty<T>),equals(s2,empty<T>))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionEqualsEmptyEQ (unionEqualsEmptyEQ) =========================================
 unionEqualsEmptyEQ {
-\assumes ([equals(union(s,s2),EQ)]==>[]) 
-\find(equals(EQ,empty))
-\replacewith(and(equals(s,empty),equals(s2,empty))) 
+\assumes ([equals(union<T>(s,s2),EQ)]==>[]) 
+\find(equals(EQ,empty<T>))
+\replacewith(and(equals(s,empty<T>),equals(s2,empty<T>))) 
 \heuristics(simplify_enlarging)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself (unionIntersectItself) =========================================
 unionIntersectItself {
-\find(union(intersect(s1,s2),s1))
+\find(union<T>(intersect<T>(s1,s2),s1))
 \replacewith(s1) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself5 (unionIntersectItself) =========================================
+unionIntersectItself5 {
+\find(union<T>(s1,intersect<T>(s1,s2)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself5EQ (unionIntersectItselfEQ) =========================================
+unionIntersectItself5EQ {
+\assumes ([equals(intersect<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself6 (unionIntersectItself) =========================================
+unionIntersectItself6 {
+\find(union<T>(s1,intersect<T>(s2,s1)))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionIntersectItself6EQ (unionIntersectItselfEQ) =========================================
+unionIntersectItself6EQ {
+\assumes ([equals(intersect<T>(s2,s1),EQ)]==>[]) 
+\find(union<T>(s1,EQ))
+\replacewith(s1) 
+\heuristics(simplify)
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself_2 (unionIntersectItself_2) =========================================
 unionIntersectItself_2 {
-\find(union(intersect(s2,s1),s1))
+\find(union<T>(intersect<T>(s2,s1),s1))
 \replacewith(s1) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself_3 (unionIntersectItself_3) =========================================
 unionIntersectItself_3 {
-\find(union(union(s,intersect(s1,s2)),s1))
-\replacewith(union(s,s1)) 
+\find(union<T>(union<T>(s,intersect<T>(s1,s2)),s1))
+\replacewith(union<T>(s,s1)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself_4 (unionIntersectItself_4) =========================================
 unionIntersectItself_4 {
-\find(union(union(s,intersect(s2,s1)),s1))
-\replacewith(union(s,s1)) 
+\find(union<T>(union<T>(s,intersect<T>(s2,s1)),s1))
+\replacewith(union<T>(s,s1)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself_5 (unionIntersectItself_5) =========================================
 unionIntersectItself_5 {
-\find(union(union(intersect(s1,s2),s),s1))
-\replacewith(union(s,s1)) 
+\find(union<T>(union<T>(intersect<T>(s1,s2),s),s1))
+\replacewith(union<T>(s,s1)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionIntersectItself_6 (unionIntersectItself_6) =========================================
 unionIntersectItself_6 {
-\find(union(union(intersect(s2,s1),s),s1))
-\replacewith(union(s,s1)) 
+\find(union<T>(union<T>(intersect<T>(s2,s1),s),s1))
+\replacewith(union<T>(s,s1)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself (unionSetMinusItself) =========================================
+unionSetMinusItself {
+\find(union<T>(setMinus<T>(s1,s2),s2))
+\replacewith(union<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself2 (unionSetMinusItself) =========================================
+unionSetMinusItself2 {
+\find(union<T>(s2,setMinus<T>(s1,s2)))
+\replacewith(union<T>(s2,s1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItself2EQ (unionSetMinusItselfEQ) =========================================
+unionSetMinusItself2EQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(s2,EQ))
+\replacewith(union<T>(s2,s1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== unionSetMinusItselfEQ (unionSetMinusItselfEQ) =========================================
+unionSetMinusItselfEQ {
+\assumes ([equals(setMinus<T>(s1,s2),EQ)]==>[]) 
+\find(union<T>(EQ,s2))
+\replacewith(union<T>(s1,s2)) 
+\heuristics(simplify)
+Choices: true}
 -----------------------------------------------------
 == unionWithAllLocs (unionWithAllLocs) =========================================
 unionWithAllLocs {
-\find(union(allLocs,s))
+\find(union<Pair<java.lang.Object,Field>>(allLocs,s))
 \replacewith(allLocs) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == unionWithAllLocsRight (unionWithAllLocs) =========================================
 unionWithAllLocsRight {
-\find(union(s,allLocs))
+\find(union<Pair<java.lang.Object,Field>>(s,allLocs))
 \replacewith(allLocs) 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == unionWithEmpty (unionWithEmpty) =========================================
 unionWithEmpty {
-\find(union(empty,s))
+\find(union<T>(empty<T>,s))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionWithEmptyRight (unionWithEmpty) =========================================
 unionWithEmptyRight {
-\find(union(s,empty))
+\find(union<T>(s,empty<T>))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionWithItself (unionWithItself) =========================================
 unionWithItself {
-\find(union(s,s))
+\find(union<T>(s,s))
 \replacewith(s) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionWithSingletonEqualsUnionWithSingleton (unionWithSingletonEqualsUnionWithSingleton) =========================================
 unionWithSingletonEqualsUnionWithSingleton {
-\find(equals(union(s1,singleton(o,f)),union(s2,singleton(o,f))))
-\replacewith(equals(setMinus(s1,singleton(o,f)),setMinus(s2,singleton(o,f)))) 
+\find(equals(union<T>(s,singleton<T>(a)),union<T>(t,singleton<T>(a))))
+\replacewith(equals(setMinus<T>(s,singleton<T>(a)),setMinus<T>(t,singleton<T>(a)))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unionWithSingletonEqualsUnionWithSingleton_2 (unionWithSingletonEqualsUnionWithSingleton_2) =========================================
 unionWithSingletonEqualsUnionWithSingleton_2 {
-\find(equals(union(singleton(o,f),s1),union(singleton(o,f),s2)))
-\replacewith(equals(setMinus(s1,singleton(o,f)),setMinus(s2,singleton(o,f)))) 
+\find(equals(union<T>(singleton<T>(a),s),union<T>(singleton<T>(a),t)))
+\replacewith(equals(setMinus<T>(s,singleton<T>(a)),setMinus<T>(t,singleton<T>(a)))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == unsignedShiftRightJintDef (unsignedShiftRightJintDef) =========================================
 unsignedShiftRightJintDef {
@@ -18809,7 +19184,7 @@ Choices: programRules:Java}
 == wellFormedMemsetArrayPrimitive (wellFormedMemsetArrayPrimitive) =========================================
 wellFormedMemsetArrayPrimitive {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, Set<Pair<java.lang.Object,Field>>), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18834,7 +19209,7 @@ Choices: programRules:Java}
 == wellFormedStoreLocSet (wellFormedStoreLocSet) =========================================
 wellFormedStoreLocSet {
 \find(wellFormed(store(h,o,f,x)))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha))
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(Set<Pair<java.lang.Object,Field>>, alpha))
 \replacewith(and(wellFormed(h),createdInHeap(x,h))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18843,7 +19218,7 @@ Choices: programRules:Java}
 wellFormedStoreLocSetEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha))
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(Set<Pair<java.lang.Object,Field>>, alpha))
 \replacewith(and(wellFormed(h),createdInHeap(x,h))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18868,7 +19243,7 @@ Choices: programRules:Java}
 == wellFormedStorePrimitive (wellFormedStorePrimitive) =========================================
 wellFormedStorePrimitive {
 \find(wellFormed(store(h,o,f,x)))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, Set<Pair<java.lang.Object,Field>>), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -18876,7 +19251,7 @@ Choices: programRules:Java}
 == wellFormedStorePrimitiveArray (wellFormedStorePrimitiveArray) =========================================
 wellFormedStorePrimitiveArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, Set<Pair<java.lang.Object,Field>>), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -18885,7 +19260,7 @@ Choices: programRules:Java}
 wellFormedStorePrimitiveArrayEQ {
 \assumes ([equals(store(h,o,arr(idx),x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, Set<Pair<java.lang.Object,Field>>), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -18894,7 +19269,7 @@ Choices: programRules:Java}
 wellFormedStorePrimitiveEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, Set<Pair<java.lang.Object,Field>>), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}

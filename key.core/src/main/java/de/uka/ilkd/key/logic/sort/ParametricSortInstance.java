@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
@@ -22,7 +23,7 @@ import org.key_project.util.collection.WeakValueInterner;
 import org.jspecify.annotations.NonNull;
 
 /// Concrete sort of a parametric sort.
-public final class ParametricSortInstance extends AbstractSort {
+public final class ParametricSortInstance extends AbstractSort implements SyntaxElement {
     /**
      * Thread-safe Interning of parametric sort instances so that equal instances are the same
      * object.
@@ -176,7 +177,7 @@ public final class ParametricSortInstance extends AbstractSort {
         return true;
     }
 
-    /// Get the sort if this parametric sort with all generics instantiated with `instMap`.
+    /// Get the sort of this parametric sort with all generics instantiated with `instMap`.
     public Sort resolveSort(SVInstantiations instMap, Services services) {
         ImmutableList<GenericArgument> newArgs = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
@@ -209,5 +210,15 @@ public final class ParametricSortInstance extends AbstractSort {
             }
         }
         return false;
+    }
+
+    @Override
+    public int getChildCount() {
+        return args.size();
+    }
+
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        return Objects.requireNonNull(args.get(n));
     }
 }

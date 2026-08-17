@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Matches a parametric function instance "up to generic arguments": the source operator must be an
  * instance of the same base function as the pattern's. The generic arguments themselves are
- * matched afterwards by their own instructions (a generic-sort match or an identity check per
+ * matched afterward by their own instructions (a generic-sort match or an identity check per
  * argument).
  */
 public class SimilarParametricFunctionInstruction implements MatchInstruction {

@@ -159,6 +159,19 @@ final class ImmutableListArray<T extends @Nullable Object> implements ImmutableL
     }
 
     @Override
+    public String toString() {
+        var sb = new StringBuilder().append('[');
+        for (int i = 0; i < size(); ++i) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append(get(i));
+        }
+        sb.append(']');
+        return sb.toString();
+    }
+
+    @Override
     public boolean equals(@Nullable Object o) {
         if (o instanceof ImmutableListArray<?> that) {
             return Arrays.equals(data, that.data);

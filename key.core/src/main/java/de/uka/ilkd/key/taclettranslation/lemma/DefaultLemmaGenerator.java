@@ -85,7 +85,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                     if (!assumptions.isEmpty()
                             && Objects.equals(appRestr, ApplicationRestriction.NONE)) {
                         // any restriction is fine. The polarity switches are equiv
-                        // to"inSequentState" in this respect.
+                        // to "inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
                             + " has \\ignoreUpdateLevel set or is not set to \\inSequentState.");
                     }
@@ -140,8 +140,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         if (instantiation == null) {
             instantiation = createInstantiation(owner, var, services);
             mapping.put(var, instantiation);
-
-
         }
         return instantiation;
     }

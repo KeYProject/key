@@ -322,6 +322,8 @@ public final class NotationInfo {
 
         // set operators
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        tbl.put(((ParametricFunctionInstance) setLDT.getPair()).getBase(),
+            new Notation.PairNotation());
         tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
         tbl.put(setLDT.getUnion(),
             new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));

@@ -854,14 +854,18 @@ public class TermBuilder {
     // ------------------------------
 
     public JTerm pair(JTerm first, JTerm second) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("pair"));
+        final Namespace<ParametricFunctionDecl> funcNS =
+            services.getNamespaces().parametricFunctions();
+        final ParametricFunctionDecl f = funcNS.lookup(new Name("pair"));
         if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
 
-        return func(f, first, second);
+        return func(ParametricFunctionInstance.get(f,
+            ImmutableList.fromList(
+                List.of(new GenericArgument(first.sort()), new GenericArgument(second.sort()))),
+            services), first, second);
 
     }
 
@@ -1387,7 +1391,13 @@ public class TermBuilder {
     }
 
     public JTerm singleton(JTerm o, JTerm f) {
-        return func(services.getTypeConverter().getLocSetLDT().getSingleton(), o, f);
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getSingleton(), locSetPair(o, f));
+    }
+
+    public JTerm locSetPair(JTerm o, JTerm f) {
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getPair(), o, f);
     }
 
     public JTerm union(JTerm s1, JTerm s2) {
@@ -1494,7 +1504,7 @@ public class TermBuilder {
         if (s.op() == ldt.getEmpty()) {
             return ff();
         } else {
-            return func(ldt.getElementOf(), o, f, s);
+            return func(ldt.getElementOf(), locSetPair(o, f), s);
         }
     }
 

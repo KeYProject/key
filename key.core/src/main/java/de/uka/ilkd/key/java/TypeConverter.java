@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,13 +46,14 @@ public final class TypeConverter {
     // Maps LDT names to LDT instances. The map stays sorted by name so that getLDTFor visits
     // the theories in a fixed order, independent of the run.
     private final Map<Name, LDT> LDTs = new TreeMap<>();
+    private final Map<Name, ParametricLDT> PLDTs = new TreeMap<>();
 
     // The typed accessors below are called at high frequency from the proof-search strategy
     // (for example by the arithmetic heuristics for every candidate weighing), so lookups go
     // through this class-keyed map: a class hashes by identity, so a lookup costs no name
     // comparison. The map is filled generically when the theories are created; adding a new
     // theory needs no change in this class.
-    private final Map<Class<? extends LDT>, LDT> ldtsByClass = new HashMap<>();
+    private final Map<Class<? extends AbstractLDT>, AbstractLDT> ldtsByClass = new HashMap<>();
 
     /** the heap theory, kept directly because this class itself uses it throughout */
     private HeapLDT heapLDT = null;
@@ -64,15 +64,19 @@ public final class TypeConverter {
     }
 
     public void init() {
-        init(LDT.getNewLDTInstances(services));
+        init(LDT.getNewLDTInstances(services), ParametricLDT.getNewLDTInstances(services));
     }
 
-    private void init(Map<Name, LDT> map) {
+    private void init(Map<Name, LDT> map, Map<Name, ParametricLDT> pMap) {
         LDTs.putAll(map);
         for (LDT ldt : map.values()) {
             ldtsByClass.put(ldt.getClass(), ldt);
         }
         heapLDT = getLDT(HeapLDT.class);
+        PLDTs.putAll(pMap);
+        for (ParametricLDT ldt : pMap.values()) {
+            ldtsByClass.put(ldt.getClass(), ldt);
+        }
     }
 
     /**
@@ -83,7 +87,7 @@ public final class TypeConverter {
      * @return the theory instance of that class
      * @param <T> the type of the theory
      */
-    public <T extends LDT> T getLDT(Class<T> ldtClass) {
+    public <T extends AbstractLDT> T getLDT(Class<T> ldtClass) {
         return ldtClass.cast(ldtsByClass.get(ldtClass));
     }
 
@@ -96,10 +100,6 @@ public final class TypeConverter {
         }
         LOGGER.debug("No LDT found for {}", s);
         return null;
-    }
-
-    private LDT getLDT(Name ldtName) {
-        return LDTs.get(ldtName);
     }
 
     public JavaDLTheory getJavaDLTheory() {
@@ -156,12 +156,7 @@ public final class TypeConverter {
         return getLDT(CharListLDT.class);
     }
 
-    public Collection<LDT> getLDTs() {
-        return LDTs.values();
-    }
-
     private JTerm translateOperator(Operator op, ExecutionContext ec) {
-
         final JTerm[] subs = new JTerm[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
             subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
@@ -176,7 +171,7 @@ public final class TypeConverter {
             }
         }
 
-        LDT responsibleLDT = getResponsibleLDT(op, subs, services, ec);
+        AbstractLDT responsibleLDT = getResponsibleLDT(op, subs, services, ec);
         if (responsibleLDT != null) {
             return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
         } else if (op instanceof BinaryOperator bo
@@ -393,8 +388,10 @@ public final class TypeConverter {
         if (lit instanceof NullLiteral) {
             return tb.NULL();
         } else {
-            LDT ldt = LDTs.get(lit.getLDTName());
+            AbstractLDT ldt = LDTs.get(lit.getLDTName());
             if (ldt != null) {
+                return ldt.translateLiteral(lit, services);
+            } else if ((ldt = PLDTs.get(lit.getLDTName())) != null) {
                 return ldt.translateLiteral(lit, services);
             } else {
                 Debug.fail("Unknown literal type", lit);
@@ -563,6 +560,11 @@ public final class TypeConverter {
                     return model.translateTerm(term, null, services);
                 }
             }
+            for (ParametricLDT model : PLDTs.values()) {
+                if (model.hasLiteralFunction(function)) {
+                    return model.translateTerm(term, null, services);
+                }
+            }
         }
 
         final ExtList children = new ExtList();
@@ -574,6 +576,11 @@ public final class TypeConverter {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
         } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
+                if (model.containsFunction(function)) {
+                    return model.translateTerm(term, children, services);
+                }
+            }
+            for (ParametricLDT model : PLDTs.values()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
                 }
@@ -982,13 +989,18 @@ public final class TypeConverter {
 
     public TypeConverter copy(Services services) {
         TypeConverter TC = new TypeConverter(services);
-        TC.init(LDTs);
+        TC.init(LDTs, PLDTs);
         return TC;
     }
 
-    private LDT getResponsibleLDT(Operator op, JTerm[] subs,
+    private AbstractLDT getResponsibleLDT(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
+            if (ldt.isResponsible(op, subs, services, ec)) {
+                return ldt;
+            }
+        }
+        for (ParametricLDT ldt : PLDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {
                 return ldt;
             }

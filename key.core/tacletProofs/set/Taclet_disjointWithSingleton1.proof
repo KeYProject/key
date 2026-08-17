@@ -42,6 +42,10 @@
 "
 }
 
+\sorts {
+    \proxy T;
+}
+
 \proofObligation {
 	"name": "disjointWithSingleton1",
 	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
@@ -56,25 +60,22 @@
 (rule "equiv_right" (formula "1") (newnames "f_s,f_o,f_f"))
 (branch "Case '->'"
    (rule "notRight" (formula "2"))
-   (rule "disjointNotInOtherLocset1" (formula "1") (ifseqformula "2"))
+   (rule "disjointNotInOtherSet1" (formula "1") (ifseqformula "2"))
    (rule "elementOfSingleton" (formula "3"))
     (builtin "One Step Simplification" (formula "3"))
    (rule "closeTrue" (formula "3"))
 )
 (branch "Case '<-'"
    (rule "notLeft" (formula "1"))
-   (rule "equalityToElementOfRight" (formula "2") (inst "ov=ov") (inst "fv=fv"))
+   (rule "equalityToElementOf" (formula "2") (inst "ov=ov") (inst "fv=fv"))
     (builtin "One Step Simplification" (formula "2"))
-   (rule "allRight" (formula "2") (inst "sk=ov_0"))
-   (rule "allRight" (formula "2") (inst "sk=fv_0"))
+   (rule "allRight" (formula "2") (inst "sk=pv_0"))
    (rule "notRight" (formula "2"))
    (rule "elementOfIntersect" (formula "1"))
    (rule "andLeft" (formula "1"))
    (rule "elementOfSingleton" (formula "2"))
-   (rule "andLeft" (formula "2"))
    (rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
-   (rule "applyEq" (formula "1") (term "1") (ifseqformula "3"))
-   (rule "close" (formula "4") (ifseqformula "1"))
+   (rule "close" (formula "3") (ifseqformula "1"))
 )
 )
 }

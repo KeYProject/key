@@ -1,0 +1,14 @@
+<entry key="empty.dl">
+  \forall any e; ( elementOf&lt;any&gt;(e,empty&lt;any&gt;)&lt;&lt;Trigger&gt;&gt; &lt;-&gt; false )
+</entry>
+
+<entry key="union.dl">
+  \forall any e; \forall Set&lt;any&gt; s1; \forall Set&lt;any&gt; s2;
+     ( elementOf&lt;any&gt;(e, union&lt;any&gt;(s1, s2))&lt;&lt;Trigger&gt;&gt; &lt;-&gt; elementOf&lt;any&gt;(e,s1) | elementOf&lt;any&gt;(e,s2) )
+</entry>
+
+<entry key="singleton.dl">
+  \forall any e1; \forall any e2;
+    ( elementOf&lt;any&gt;(e1, singleton&lt;any&gt;(e2))&lt;&lt;Trigger&gt;&gt; &lt;-&gt;
+      e1 = e2 )
+</entry>

@@ -55,7 +55,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME));
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");

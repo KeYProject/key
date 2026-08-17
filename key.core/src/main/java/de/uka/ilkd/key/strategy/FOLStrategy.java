@@ -66,7 +66,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     public FOLStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
 
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        this.strategyProperties = strategyProperties.clone();
 
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
@@ -295,10 +295,6 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                 add(longConst(-150),
                     ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
                 inftyConst()));
-
-        bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
-
-
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
