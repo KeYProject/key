@@ -108,7 +108,7 @@ public class ObtainCommand extends AbstractCommand {
         SchemaVariable sk = getSV(app.uninstantiatedVars(), "sk");
         String name =
             VariableNameProposer.DEFAULT.getNameProposal(var.name().toString(), services, null);
-        app = app.createSkolemConstant(name, sk, var.sort(), true, services);
+        app = app.createSkolemConstant(name, sk, var.sort(), true, goal);
 
         SchemaVariable b = getSV(app.uninstantiatedVars(), "b");
         app = app.addCheckedInstantiation(b, formula.sub(0), services, true);
@@ -156,7 +156,8 @@ public class ObtainCommand extends AbstractCommand {
         SchemaVariable t = getSV(app.uninstantiatedVars(), "t");
         String name =
             VariableNameProposer.DEFAULT.getNameProposal(var.name().toString(), services, null);
-        app = app.createSkolemConstant(name, sk, var.sort(), true, services);
+        app = app.createSkolemConstant(name, sk, var.sort(), true,
+            state.getFirstOpenAutomaticGoal());
         app = app.addCheckedInstantiation(t, equals, services, true);
         state.getFirstOpenAutomaticGoal().apply(app);
         return app.instantiations().getInstantiation(sk);

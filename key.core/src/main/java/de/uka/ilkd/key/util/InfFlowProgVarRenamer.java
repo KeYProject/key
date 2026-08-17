@@ -161,7 +161,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Name newName =
             VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
         final Function renamedF = new JFunction(newName, f.sort(), f.argSorts(),
-            f.whereToBind(), f.isUnique(), f.isSkolemConstant());
+            f.whereToBind(), f.isUnique(), f.kind(), f.introductionTime());
         services.getNamespaces().functions().addSafely(renamedF);
         final JTerm fTerm = label(func(renamedF), term.getLabels());
         replaceMap.put(term, fTerm);

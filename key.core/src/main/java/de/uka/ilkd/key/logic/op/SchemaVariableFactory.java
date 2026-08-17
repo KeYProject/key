@@ -96,7 +96,14 @@ public class SchemaVariableFactory {
      * creates a SchemaVariable representing a skolem term
      */
     public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
-        return new SkolemTermSV(name, s);
+        return new SkolemTermSV(name, s, false);
+    }
+
+    /**
+     * @param definitional whether the created constants are definitional symbols
+     */
+    public static SkolemTermSV createSkolemTermSV(Name name, Sort s, boolean definitional) {
+        return new SkolemTermSV(name, s, definitional);
     }
 
     /**

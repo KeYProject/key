@@ -6054,7 +6054,7 @@ Choices: true}
 div_axiom {
 \find(div(divNum,divDenom))
 \add [or(equals(divDenom,Z(0(#))),and(and(equals(div(divNum,divDenom),quotient),leq(mul(quotient,divDenom),divNum)),if-then-else(geq(divDenom,Z(0(#))),geq(mul(quotient,divDenom),add(add(Z(1(#)),divNum),mul(Z(neglit(1(#))),divDenom))),geq(mul(quotient,divDenom),add(add(Z(1(#)),divNum),divDenom)))))]==>[] 
-\heuristics(notHumanReadable, polySimp_newSmallSym, defOps_div)
+\heuristics(notHumanReadable, defOps_div)
 Choices: true}
 -----------------------------------------------------
 == div_cancel1 (div_cancel1) =========================================
@@ -14147,7 +14147,7 @@ Choices: true}
 newSym_eq {
 \find(equals(mul(newSymLeft,newSymLeftCoeff),newSymRight)==>)
 \add [equals(newSymLeft,add(l,newSymDef))]==>[] 
-\heuristics(polySimp_newSmallSym, polySimp_newSym, polySimp_leftNonUnit)
+\heuristics(polySimp_newSym, polySimp_leftNonUnit)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == niceDouble (niceDouble) =========================================

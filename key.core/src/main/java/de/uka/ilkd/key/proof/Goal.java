@@ -702,7 +702,10 @@ public final class Goal implements ProofGoal<Goal> {
      * @param ruleApp the rule application to perform
      * @return the pending application to be committed, or {@code null} if the rule aborted
      */
-    public @Nullable PendingRuleApp computeRuleApp(final RuleApp ruleApp) {
+    public @Nullable PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {
+        final RuleApp ruleApp = p_ruleApp instanceof TacletApp tacletApp
+                ? tacletApp.createSkolemConstants(this)
+                : p_ruleApp;
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);

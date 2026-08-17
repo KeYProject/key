@@ -101,10 +101,9 @@ public class WitnessCommand extends AbstractCommand {
             true, services);
         app = app.addInstantiation(getSV(schemaVars, "b"), match.second.formula().sub(0), true,
             services);
-        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"),
-            match.second.formula().boundVars().get(0).sort(), true, services);
-
         Goal g = state.getFirstOpenAutomaticGoal();
+        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"),
+            match.second.formula().boundVars().get(0).sort(), true, g);
         g.apply(app);
     }
 

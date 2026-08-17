@@ -22,6 +22,9 @@ import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NonNull;
 
+import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
+
 /// A concrete instance of a [ParametricFunctionDecl].
 public class ParametricFunctionInstance extends JFunction {
     /**
@@ -52,8 +55,8 @@ public class ParametricFunctionInstance extends JFunction {
     private ParametricFunctionInstance(ParametricFunctionDecl base,
             ImmutableList<GenericArgument> args, ImmutableArray<Sort> argSorts, Sort sort) {
         super(makeName(base, args), sort, argSorts, base.getWhereToBind(), base.isUnique(),
-            base.isRigid(),
-            base.isSkolemConstant());
+            base.isRigid(), base.isSkolemConstant() ? SKOLEM : ORDINARY,
+            UNRECORDED);
         this.base = base;
         this.args = args;
     }

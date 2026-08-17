@@ -383,8 +383,7 @@ public class TacletFindModel extends AbstractTableModel {
                         // sv instanceof SkolemTermSV
                         final Named n = namespaces().lookupLogicSymbol(new Name(idd.name()));
                         if (n == null) {
-                            result = result.createSkolemConstant(idd.name(), sv, sort, true,
-                                services);
+                            result = result.createSkolemConstant(idd.name(), sv, sort, true, goal);
                         } else {
                             throw new SVInstantiationParserException(idd.name(),
                                 createPosition(irow),
