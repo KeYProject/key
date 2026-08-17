@@ -19,6 +19,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
@@ -26,6 +27,9 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.strategy.SetCosts.COMMUTE;
+import static de.uka.ilkd.key.strategy.SetCosts.DIST;
 
 /// Strategy for the sort generic theory of sets.
 /// Do not create directly; use [SetStrategyFactory] instead.
@@ -49,7 +53,7 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        bindRuleSet(d, "setEqualityBlastingRight", longConst(-90));
+        bindRuleSet(d, "setEqualityBlastingRight", CostBand.DEFAULT.at(-90));
 
         // Distribution duplicates the distributed set, so it is allowed only
         // where a resulting set is known to collapse.
@@ -57,8 +61,8 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
         final Feature operandCollapses = or(applyTF("distributedSet", collapses),
             applyTF("unionLeft", collapses), applyTF("unionRight", collapses));
         bindRuleSet(d, "setDist",
-            add(ifZero(MatchedAssumesFeature.INSTANCE, operandCollapses, longConst(0)),
-                longConst(-2000)));
+            add(ifZero(MatchedAssumesFeature.INSTANCE, operandCollapses, CostBand.DEFAULT.cost()),
+                longConst(DIST)));
 
         bindRuleSet(d, "setAssoc", longConst(-850));
 
@@ -68,7 +72,7 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
             add(applyTF("commLeft", not(or(stf.unionF, stf.intersectF))),
                 applyTF("commRight", not(or(stf.unionF, stf.intersectF))),
                 SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf),
-                longConst(-800)));
+                longConst(COMMUTE)));
         return d;
     }
 
