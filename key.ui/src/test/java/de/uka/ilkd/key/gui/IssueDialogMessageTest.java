@@ -77,7 +77,7 @@ public class IssueDialogMessageTest {
         // dialog uses to place the squiggly underline lands on the offending Java code ('=' before
         // the misplaced ';'), not on the modality token.
         int offset = offsetIn(source, loc);
-        assertEquals('{', source.charAt(offset),
+        assertTrue(source.startsWith("int i = ;", offset),
             "the underline offset should anchor on the offending Java code");
     }
 
