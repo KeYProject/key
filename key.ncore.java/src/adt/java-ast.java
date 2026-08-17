@@ -6,6 +6,7 @@ import org.key_project.util.collection.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
+import de.uka.ilkd.key.java.Services;
 
 @Root
 abstract class JavaSourceElement implements Visitable, Matchable {
