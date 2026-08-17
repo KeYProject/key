@@ -1,11 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.java.ast;
+
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.rule.MatchConditions;
-import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.RoList;
 
-import java.util.Objects;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -29,7 +34,8 @@ public class MatchHelper {
         return Objects.equals(s1, s2) ? cond : null;
     }
 
-    public static @Nullable <T extends Matchable> MatchConditions match(RoList<T> seq1, RoList<T> seq2, MatchConditions cond) {
+    public static @Nullable <T extends Matchable> MatchConditions match(ImmutableList<T> seq1,
+            ImmutableList<T> seq2, MatchConditions cond) {
         if (seq1.size() != seq2.size()) {
             return null;
         }
@@ -44,7 +50,8 @@ public class MatchHelper {
         return cond;
     }
 
-    public static @Nullable MatchConditions match(JavaSourceElement e1, JavaSourceElement e2, MatchConditions cond) {
+    public static @Nullable MatchConditions match(Matchable e1, Matchable e2,
+            MatchConditions cond) {
         return e1.match(e2, cond);
     }
 
