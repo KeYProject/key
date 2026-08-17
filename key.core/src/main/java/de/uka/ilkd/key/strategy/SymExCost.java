@@ -21,6 +21,23 @@ final class SymExCost {
     private SymExCost() {}
 
     /**
+     * Apply a block/loop contract instead of executing the block. MUST stay more eager (smaller)
+     * than {@link org.key_project.prover.strategy.costbased.CostBand#REWRITE} and every
+     * symbolic-execution program rule, otherwise the block starts
+     * to execute instead of being contracted. Value is the current sentinel; step 3 normalizes it
+     * to a modest value between {@link org.key_project.prover.strategy.costbased.CostBand#CLOSE}
+     * and {@link org.key_project.prover.strategy.costbased.CostBand#REWRITE}.
+     */
+    static final long BLOCK_CONTRACT = Long.MIN_VALUE;
+    /**
+     * Apply a loop invariant instead of unrolling. Only needs to beat loop-unrolling / method
+     * expansion when enabled. (Currently above
+     * {@link org.key_project.prover.strategy.costbased.CostBand#CLOSE}; step 3 flips it below
+     * CLOSE.)
+     */
+    static final long LOOP_INVARIANT = -20_000;
+
+    /**
      * A cheap concrete program step: {@code simplify_expression}, {@code execute*Assignment} and
      * the ordinary {@code simplify_prog} case — "advance the program by one small step".
      */

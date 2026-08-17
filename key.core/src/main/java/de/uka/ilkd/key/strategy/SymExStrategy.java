@@ -117,20 +117,20 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final String blockProperty =
             strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
-            blockFeature = blockContractInternalFeature(CostBand.BLOCK_CONTRACT.cost());
+            blockFeature = blockContractInternalFeature(longConst(BLOCK_CONTRACT));
             loopBlockFeature =
-                loopContractInternalFeature(CostBand.BLOCK_CONTRACT.cost());
+                loopContractInternalFeature(longConst(BLOCK_CONTRACT));
             loopBlockApplyHeadFeature =
-                loopContractApplyHead(CostBand.BLOCK_CONTRACT.cost());
+                loopContractApplyHead(longConst(BLOCK_CONTRACT));
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
-            blockFeature = blockContractExternalFeature(CostBand.BLOCK_CONTRACT.cost());
+            blockFeature = blockContractExternalFeature(longConst(BLOCK_CONTRACT));
             loopBlockFeature =
                 SumFeature.createSum(
-                    loopContractExternalFeature(CostBand.BLOCK_CONTRACT.cost()),
+                    loopContractExternalFeature(longConst(BLOCK_CONTRACT)),
                     loopContractInternalFeature(
                         longConst(LOOP_CONTRACT_INTERNAL_TIEBREAK)));
             loopBlockApplyHeadFeature =
-                loopContractApplyHead(CostBand.BLOCK_CONTRACT.cost());
+                loopContractApplyHead(longConst(BLOCK_CONTRACT));
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
             loopBlockFeature = loopContractExternalFeature(inftyConst());
@@ -180,7 +180,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
                 ScaleFeature.createScaled(findDepthFeature, 10.0)));
 
         // taclets for special invariant handling
-        bindRuleSet(d, "loopInvariant", CostBand.LOOP_INVARIANT.cost());
+        bindRuleSet(d, "loopInvariant", longConst(LOOP_INVARIANT));
 
         boolean useLoopExpand = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
                 .equals(StrategyProperties.LOOP_EXPAND);

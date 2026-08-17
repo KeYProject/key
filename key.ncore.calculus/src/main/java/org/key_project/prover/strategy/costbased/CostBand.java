@@ -26,22 +26,10 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * <b>Care when changing:</b> altering a band's value, or its order relative to other bands,
  * shifts the cross-theory search of <em>all</em> proofs — always re-verify with a full
  * runAllProofs and a Model-Search node-for-node comparison. Respect the hard ordering
- * constraints noted on individual bands (notably {@link #BLOCK_CONTRACT}).
+ * constraints noted on individual bands.
  * </p>
  */
 public enum CostBand {
-    /**
-     * Apply a block/loop contract instead of executing the block. MUST stay more eager (smaller)
-     * than {@link #REWRITE} and every symbolic-execution program rule, otherwise the block starts
-     * to execute instead of being contracted. Value is the current sentinel; step 3 normalizes it
-     * to a modest value between {@link #CLOSE} and {@link #REWRITE}.
-     */
-    BLOCK_CONTRACT(Long.MIN_VALUE),
-    /**
-     * Apply a loop invariant instead of unrolling. Only needs to beat loop-unrolling / method
-     * expansion when enabled. (Currently above {@link #CLOSE}; step 3 flips it below CLOSE.)
-     */
-    LOOP_INVARIANT(-20_000),
     /**
      * Close the goal. Most eager of the ordinary bands: eager closure is completeness-neutral
      * (no free-variable calculus), so closing may always take precedence.

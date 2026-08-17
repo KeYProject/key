@@ -413,7 +413,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
                     forEach(varInst, HeuristicInstantiation.forOption(classicTriggers()),
                         add(instantiate("t", varInst),
                             add(branchPrediction,
-                            CostBand.DEFAULT.at(10),
+                                CostBand.DEFAULT.at(10),
                                 // orders candidates of one predicted-cost band by their
                                 // connection to the sequent instead of formula position
                                 InstantiationTieBreakFeature.create(varInst,

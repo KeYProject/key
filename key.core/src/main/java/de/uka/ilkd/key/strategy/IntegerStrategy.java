@@ -615,8 +615,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // category "handling of non-linear inequations"
 
         if (arith == ArithTreatment.MODEL_SEARCH) {
-            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(CostBand.DEFAULT.at(100),
-                AT_COST));
+            setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST),
+                CostBand.DEFAULT.at(100),
+                AT_COST);
 
             bindRuleSet(d, "inEqSimp_split_eq",
                 add(TopLevelFindFeature.SUCC, longConst(NonlinearArithmeticCost.SPLIT_EQ)));
