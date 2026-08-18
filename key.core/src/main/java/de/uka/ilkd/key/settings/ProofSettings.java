@@ -313,4 +313,14 @@ public class ProofSettings {
         for (Settings setting : settings)
             setting.readSettings(c);
     }
+
+    /// Returns the current proof settings as a configuration object
+    public Configuration asConfiguration() {
+        Configuration result = new Configuration();
+        for (Settings s : settings) {
+            s.writeSettings(result);
+        }
+        return result;
+    }
+
 }
