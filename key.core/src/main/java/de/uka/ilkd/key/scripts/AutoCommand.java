@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
@@ -111,12 +112,17 @@ public class AutoCommand extends AbstractCommand {
         // start actual autoprove
         try {
             final Proof proof = state().getProof();
+            final ProofSearchInformation<Proof, Goal> result;
             if (arguments.onAllOpenGoals) {
                 final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
-                applyStrategy.startEach(proof, goals, strategySettings.getMaxSteps(),
+                result = applyStrategy.startEach(proof, goals, strategySettings.getMaxSteps(),
                     strategySettings.getTimeout());
             } else {
-                applyStrategy.start(proof, goals);
+                result = applyStrategy.start(proof, goals);
+            }
+            if (result.isError()) {
+                throw new ScriptException("Proof search failed: " + result.getException(),
+                    result.getException());
             }
             if (applyStrategy.hasBeenInterrupted()) {
                 throw new InterruptedException();

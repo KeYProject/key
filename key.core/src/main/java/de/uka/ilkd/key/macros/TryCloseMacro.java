@@ -71,6 +71,11 @@ public class TryCloseMacro extends AbstractProofMacro {
     private final int numberSteps;
 
     /**
+     * Number of goals per parallel batch (bound due to memory reasons with too many open goals)
+     */
+    private static final int GOALS_PER_RUN = 100;
+
+    /**
      * Instantiates a new try close macro. No changes to the max number of steps.
      */
     public TryCloseMacro() {
@@ -172,34 +177,28 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // start actual autoprove
         try {
-            final List<Node> initialGoalNodes = goals.map(g -> g.node()).toList();
-            final ProofSearchInformation<Proof, Goal> result =
-                applyStrategy.startEach(proof, goals, maxSteps, -1);
-            // final Goal closedGoal;
-            for (final Node node : initialGoalNodes) {
-                // retreat if not closed
-                if (!node.isClosed()) {
-                    proof.pruneProof(node);
-                    pml.incrementNotClosedGoals();
-                    // closedGoal = null;
-                } else {
-                    // closedGoal = goal;
+            for (ImmutableList<Goal> batch = goals; !batch.isEmpty();) {
+                final int size = Math.min(GOALS_PER_RUN, batch.size());
+                final ImmutableList<Goal> current = batch.take(size);
+                batch = batch.skip(size);
+                final List<Node> initialGoalNodes = current.map(g -> g.node()).toList();
+                final ProofSearchInformation<Proof, Goal> result =
+                    applyStrategy.startEach(proof, current, maxSteps, -1);
+                if (result.isError()) {
+                    throw new RuntimeException("Proof search failed: " + result.getException(),
+                        result.getException());
                 }
-            }
-            synchronized (applyStrategy) { // wait for applyStrategy to finish its last rule
-                // application
-                // update statistics
-                /*
-                 * if (closedGoal == null) { TODO: This incremental approach would be nicer, but
-                 * therefore the comparison of Goal needs to be fixed. info = new
-                 * ProofMacroFinishedInfo(info, result); } else { info = new
-                 * ProofMacroFinishedInfo(info, result,
-                 * info.getGoals().removeFirst(closedGoal)); }
-                 */
-                info = new ProofMacroFinishedInfo(info, result);
-                if (applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption
-                    // exception
-                    throw new InterruptedException();
+                for (final Node node : initialGoalNodes) {
+                    if (!node.isClosed()) {
+                        proof.pruneProof(node);
+                        pml.incrementNotClosedGoals();
+                    }
+                }
+                synchronized (applyStrategy) {
+                    info = new ProofMacroFinishedInfo(info, result);
+                    if (applyStrategy.hasBeenInterrupted()) {
+                        throw new InterruptedException();
+                    }
                 }
             }
         } finally {

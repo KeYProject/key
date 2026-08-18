@@ -350,10 +350,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     public synchronized ApplyStrategyInfo<Proof, Goal> startEach(Proof proof,
             ImmutableList<Goal> goals, int maxSteps, long timeout) {
         // Tasks never stop the run: a task that runs out of budget or of rules leaves its goals
-        // open for the caller to deal with, and the other tasks keep going.
-        return run(proof, goals,
-            (int) Math.min(Integer.MAX_VALUE, (long) goals.size() * maxSteps),
-            timeout, false, maxSteps);
+        return run(proof, goals, Integer.MAX_VALUE, timeout, false, maxSteps);
     }
 
     /**

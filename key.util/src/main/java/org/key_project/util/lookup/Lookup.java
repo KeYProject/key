@@ -105,6 +105,24 @@ public class Lookup {
     }
 
     /**
+     * The first implementation registered for {@code service}, here or in a parent lookup, or
+     * {@code null} if there is none. Unlike {@link #get(Class)} this does not throw in case of
+     * a miss.
+     *
+     * @param service the requested service class
+     * @param <T> the service type
+     * @return the first registered implementation, or {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends @Nullable Object> @Nullable T getOrNull(Class<T> service) {
+        LinkedList<?> t = serviceMap.get(service);
+        if (t != null && !t.isEmpty()) {
+            return (T) t.getFirst();
+        }
+        return parent != null ? parent.getOrNull(service) : null;
+    }
+
+    /**
      * Register
      *
      * @param obj
