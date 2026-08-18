@@ -1,4 +1,6 @@
 
+// TODO: Add a .key file that runs auto; and then z3 on all remaining open goals.
+
 class MinExcludant0 {
 
     /*@ requires (\forall int n; 0 <= n < s.length; (\exists int m; 0 <= m < s.length; (\bigint)s[m] == n));
@@ -64,8 +66,8 @@ class MinExcludant0 {
             if (i == n)
                 return v;
 
-            //@ use_lemma nospace(\array2seq(a));
         }
+        //@ use_lemma nospace(\array2seq(a));
         return n;
     }
 }
