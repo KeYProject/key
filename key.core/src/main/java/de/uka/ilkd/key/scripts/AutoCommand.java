@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.scripts.meta.*;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -109,14 +110,16 @@ public class AutoCommand extends AbstractCommand {
 
         // start actual autoprove
         try {
-            for (Goal goal : goals) {
-                applyStrategy.start(state().getProof(), ImmutableList.<Goal>singleton(goal));
-
-                // only now reraise the interruption exception
-                if (applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
-                }
-
+            final Proof proof = state().getProof();
+            if (arguments.onAllOpenGoals) {
+                final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+                applyStrategy.startEach(proof, goals, strategySettings.getMaxSteps(),
+                    strategySettings.getTimeout());
+            } else {
+                applyStrategy.start(proof, goals);
+            }
+            if (applyStrategy.hasBeenInterrupted()) {
+                throw new InterruptedException();
             }
         } finally {
             state().setMaxAutomaticSteps(oldNumberOfSteps);

@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.macros;
 
 
+import java.util.List;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -170,12 +172,11 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // start actual autoprove
         try {
-            for (final Goal goal : goals) {
-                Node node = goal.node();
-                final ProofSearchInformation<Proof, Goal> result = applyStrategy.start(proof,
-                    ImmutableList.singleton(goal), maxSteps, -1, false);
-                // final Goal closedGoal;
-
+            final List<Node> initialGoalNodes = goals.map(g -> g.node()).toList();
+            final ProofSearchInformation<Proof, Goal> result =
+                applyStrategy.startEach(proof, goals, maxSteps, -1);
+            // final Goal closedGoal;
+            for (final Node node : initialGoalNodes) {
                 // retreat if not closed
                 if (!node.isClosed()) {
                     proof.pruneProof(node);
@@ -184,22 +185,21 @@ public class TryCloseMacro extends AbstractProofMacro {
                 } else {
                     // closedGoal = goal;
                 }
-
-                synchronized (applyStrategy) { // wait for applyStrategy to finish its last rule
-                                               // application
-                    // update statistics
-                    /*
-                     * if (closedGoal == null) { TODO: This incremental approach would be nicer, but
-                     * therefore the comparison of Goal needs to be fixed. info = new
-                     * ProofMacroFinishedInfo(info, result); } else { info = new
-                     * ProofMacroFinishedInfo(info, result,
-                     * info.getGoals().removeFirst(closedGoal)); }
-                     */
-                    info = new ProofMacroFinishedInfo(info, result);
-                    if (applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption
-                                                              // exception
-                        throw new InterruptedException();
-                    }
+            }
+            synchronized (applyStrategy) { // wait for applyStrategy to finish its last rule
+                // application
+                // update statistics
+                /*
+                 * if (closedGoal == null) { TODO: This incremental approach would be nicer, but
+                 * therefore the comparison of Goal needs to be fixed. info = new
+                 * ProofMacroFinishedInfo(info, result); } else { info = new
+                 * ProofMacroFinishedInfo(info, result,
+                 * info.getGoals().removeFirst(closedGoal)); }
+                 */
+                info = new ProofMacroFinishedInfo(info, result);
+                if (applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption
+                    // exception
+                    throw new InterruptedException();
                 }
             }
         } finally {

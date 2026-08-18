@@ -67,6 +67,43 @@ public interface ProverCore<P extends ProofObject<G>, G extends @Nullable ProofG
     ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal);
 
+    /// Starts a proof search for a list of goals, each goal is treated as its own task with its own
+    /// step count, timeout is global for all tasks
+    ///
+    ///
+    /// @param proof The [ProofObject] representing the proof instance.
+    /// @param goals An [ImmutableList] of [ProofGoal] objects to prove.
+    /// @param maxSteps The maximum number of rule applications to perform per goal task.
+    /// @param timeout The maximum duration (in milliseconds) to perform the proof search (global
+    /// over all tasks).
+    /// @return An [ProofSearchInformation] object containing information about the performed
+    /// work, such as the number of rules applied.
+    default ProofSearchInformation<P, G> startEach(P proof, ImmutableList<G> goals, int maxSteps,
+            long timeout) {
+
+        ProofSearchInformation<P, G> aggregatedResult = null;
+        long deadline = timeout >= 0 ? System.currentTimeMillis() + timeout : -1;
+
+        for (G goal : goals) {
+            final ProofSearchInformation<P, G> result;
+            long remainingTime = deadline;
+            if (deadline >= 0 &&
+                    (remainingTime -= System.currentTimeMillis()) <= 0) {
+                break;
+            }
+            result = start(proof, ImmutableList.singleton(goal), maxSteps, remainingTime, false);
+
+            aggregatedResult = aggregatedResult == null ? result : aggregatedResult.join(result);
+
+            if (hasBeenInterrupted()) {
+                break;
+            }
+        }
+        return aggregatedResult != null ? aggregatedResult
+                : // stupid hack to get an info object without having to create one here explicitly
+                start(proof, ImmutableList.nil(), maxSteps, timeout, false);
+    }
+
     /// Adds a listener to monitor proof task events.
     ///
     /// @param observer The [ProverTaskListener] to add.

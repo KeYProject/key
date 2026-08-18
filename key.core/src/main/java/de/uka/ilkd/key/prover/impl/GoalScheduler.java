@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.key_project.prover.proof.ProofGoal;
@@ -45,6 +46,23 @@ import org.jspecify.annotations.Nullable;
  * @param <T> the goal type
  */
 public final class GoalScheduler<T extends ProofGoal<T>> {
+
+    /** Remaining work for one task */
+    private static final class Budget {
+        int remaining;
+        boolean progressMade;
+
+        Budget(int remaining) {
+            this.remaining = remaining;
+        }
+
+        boolean isSpent() {
+            return remaining <= 0;
+        }
+    }
+
+    /** Task budget per goal, or {@code null} for a run without budgets */
+    private @Nullable Map<T, Budget> taskBudget;
 
     private final Deque<T> available = new ArrayDeque<>();
     /**
@@ -113,6 +131,25 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
         }
     }
 
+    public synchronized void offerAllAsTasks(Iterable<? extends T> goals, int maxSteps) {
+        taskBudget = new IdentityHashMap<>();
+        for (T goal : goals) {
+            taskBudget.put(goal, new Budget(maxSteps));
+            offer(goal);
+        }
+    }
+
+    /**
+     * retrieves the budget for the given goal
+     *
+     * @param goal the Goal
+     * @return the Budget or null if running with unlimited budget
+     */
+    private @Nullable Budget getBudgetFor(T goal) {
+        assert Thread.holdsLock(this);
+        return taskBudget == null ? null : taskBudget.get(goal);
+    }
+
     /**
      * Atomically claims the next available goal, moving it to the in-flight set.
      *
@@ -129,12 +166,27 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      * @return the claimed goal, or {@code null} if none is currently available
      */
     public synchronized @Nullable T claimNext() {
-        T goal = available.pollLast();
-        if (goal != null) {
+        T goal;
+        while ((goal = available.pollLast()) != null) {
             availableSet.remove(goal);
+            final Budget budget = getBudgetFor(goal);
+            if (budget != null) {
+                if (budget.isSpent()) {
+                    continue;
+                }
+                budget.remaining -= 1;
+            }
             inFlight.add(goal);
+            return goal;
         }
-        return goal;
+        return null;
+    }
+
+    private void refund(T goal) {
+        final Budget budget = getBudgetFor(goal);
+        if (budget != null) {
+            budget.remaining += 1;
+        }
     }
 
     /**
@@ -173,7 +225,17 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      * Moves all stalled goals back to the available queue for another attempt (caller holds lock).
      */
     private void reactivateStalled() {
+        final Deque<T> stillStalled = new ArrayDeque<>();
+        final Set<Budget> progressedTasks = Collections.newSetFromMap(new IdentityHashMap<>());
         for (T g : stalledOrder) {
+            final Budget budget = getBudgetFor(g);
+            if (budget == null ? !progressMade : !budget.progressMade) {
+                stillStalled.addLast(g);
+                continue;
+            }
+            if (budget != null) {
+                progressedTasks.add(budget);
+            }
             // The inFlight guard is a defensive backstop: stall() keeps stalled disjoint from
             // inFlight, so a stalled goal is never also owned by a worker; skipping any that were
             // makes it impossible to re-queue an in-flight goal (a double-schedule).
@@ -183,6 +245,13 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
         }
         stalled.clear();
         stalledOrder.clear();
+        for (T g : stillStalled) {
+            stalled.add(g);
+            stalledOrder.addLast(g);
+        }
+        for (Budget budget : progressedTasks) {
+            budget.progressMade = false;
+        }
         progressMade = false;
     }
 
@@ -195,6 +264,7 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      */
     public synchronized void stall(T goal) {
         inFlight.remove(goal);
+        refund(goal);
         if (stalled.add(goal)) {
             stalledOrder.addLast(goal);
         }
@@ -203,8 +273,8 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
 
     /**
      * Returns an in-flight goal to the available queue for immediate re-processing. Used when a
-     * rule
-     * application aborted but the goal still has further candidate rules to try: dropping it (via
+     * rule application aborted but the goal still has further candidate rules to try: dropping it
+     * (via
      * {@link #complete}) would lose the goal and leave the proof open, while {@link #stall}ing
      * would defer it to a progress-gated retry. Re-offering makes it available again right away,
      * mirroring the single-threaded prover, which simply retries the goal after an aborted
@@ -214,6 +284,7 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      */
     public synchronized void reoffer(T goal) {
         inFlight.remove(goal);
+        refund(goal);
         if (!stalled.contains(goal) && availableSet.add(goal)) {
             available.addLast(goal);
         }
@@ -223,6 +294,7 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
     /** Marks an in-flight goal as done and wakes any threads waiting in {@link #claimOrAwait}. */
     public synchronized void complete(T goal) {
         inFlight.remove(goal);
+        refund(goal);
         notifyAll();
     }
 
@@ -246,8 +318,15 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      */
     public synchronized void completeAndOffer(T goal, @Nullable Iterable<? extends T> successors) {
         inFlight.remove(goal);
+        final Budget budget = getBudgetFor(goal);
+        if (budget != null) {
+            budget.progressMade = true;
+        }
         if (successors != null) {
             for (T s : successors) {
+                if (budget != null) {
+                    taskBudget.put(s, budget);
+                }
                 makeAvailable(s);
             }
         }
