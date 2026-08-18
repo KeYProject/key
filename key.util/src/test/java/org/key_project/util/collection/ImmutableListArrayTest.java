@@ -51,7 +51,7 @@ class ImmutableListArrayTest {
     @Test
     void immutability3() {
         Integer[] array = { 0, 1, 4 };
-        ImmutableList<Integer> list = ImmutableList.fromItems(array);
+        ImmutableList<Integer> list = ImmutableList.of(array);
         array[2] = 2;
         assertThat(list.get(2)).isEqualTo(4);
     }
@@ -59,7 +59,7 @@ class ImmutableListArrayTest {
     @Test
     void immutability4() {
         Integer[] array = { 0, 1, 4 };
-        ImmutableList<Integer> list = ImmutableList.fromItems(-1).prepend(array);
+        ImmutableList<Integer> list = ImmutableList.of(-1, -2, -3).prepend(array);
         assertThat(list.get(2)).isEqualTo(4);
         array[2] = 2;
         assertThat(list.get(2)).isEqualTo(4);
