@@ -14,14 +14,13 @@ import javax.swing.tree.TreePath;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * for debugging - opens a window with the settings from current Proof and the default settings
  */
 public class ShowActiveSettingsAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -3038735283059371442L;
-
     public ShowActiveSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Show All Active Settings");
@@ -34,7 +33,11 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     }
 
     private ViewSettingsDialog showDialog() {
-        SettingsTreeModel model = new SettingsTreeModel(getMediator().getSelectedProof());
+        ProofSettings settings =
+            (getMediator().getSelectedProof() == null) ? null
+                    : getMediator().getSelectedProof().getSettings();
+        SettingsTreeModel model =
+            new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
         dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(mainWindow);
@@ -45,24 +48,24 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     public void showAndFocusTacletOptions() {
         ViewSettingsDialog dialog = showDialog();
         SettingsTreeModel model = (SettingsTreeModel) dialog.optionTree.getModel();
-        OptionContentNode item = model.getTacletOptionsItem();
-        dialog.getOptionTree().setSelectionPath(new TreePath(item.getPath()));
+        var item = model.getTacletOptionsItem();
+        dialog.optionTree.setSelectionPath(new TreePath(item.getPath()));
     }
 
     /**
      * The old (cleaned up) SettingsDialog.
      */
     private class ViewSettingsDialog extends JDialog {
-        private static final long serialVersionUID = -3780496399924182275L;
-        private JTree optionTree;
-        private JSplitPane splitPane;
-        private JPanel optionPanel;
+        private final JTree optionTree = new JTree();
 
         public ViewSettingsDialog(TreeModel model, JComponent startComponent) {
             super(mainWindow);
+
+            optionTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
             Container cp = this.getContentPane();
             cp.setLayout(new BorderLayout());
-            cp.add(getSplitPane(), BorderLayout.CENTER);
+            cp.add(new JScrollPane(optionTree), BorderLayout.CENTER);
 
             JButton okButton = new JButton("OK");
             okButton.addActionListener(e -> dispose());
@@ -71,17 +74,18 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             buttons.add(okButton);
             cp.add(buttons, BorderLayout.SOUTH);
 
+            final var selectedProof = mainWindow.getMediator().getSelectedProof();
+            var name = selectedProof != null ? selectedProof.name() : "<b>no proof selected</b>";
+
             JLabel announce =
-                new JLabel("<html>This shows the active settings for the current proof.<br>" +
+                new JLabel("<html>This shows the active settings for the proof: " + name + ".<br>" +
                     "To change settings for future proofs, use Options > Show Settings.");
             announce.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             cp.add(announce, BorderLayout.NORTH);
+            optionTree.setModel(model);
 
-            this.getOptionTree().setModel(model);
-            getSplitPane().setRightComponent(startComponent);
-
-            this.getOptionTree().getParent().setMinimumSize(getOptionTree().getPreferredSize());
-            cp.setPreferredSize(computePreferredSize(model));
+            optionTree.getParent().setMinimumSize(optionTree.getPreferredSize());
+            cp.setPreferredSize(computePreferredSize(model, optionTree));
             this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setIconImage(IconFactory.keyLogo());
             this.pack();
@@ -92,15 +96,15 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             getRootPane().setDefaultButton(okButton);
         }
 
-        private Dimension computePreferredSize(TreeModel model) {
+        private static Dimension computePreferredSize(TreeModel model, JComponent comp) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) model.getRoot();
             Dimension dim = computePreferredSize(node);
-            dim.width = dim.width + getOptionTree().getPreferredSize().width + 100;
+            dim.width = dim.width + comp.getPreferredSize().width + 100;
             dim.height = Math.min(dim.height, 400);
             return dim;
         }
 
-        private Dimension computePreferredSize(DefaultMutableTreeNode node) {
+        private static Dimension computePreferredSize(DefaultMutableTreeNode node) {
 
             Dimension dim = node instanceof OptionContentNode
                     ? new Dimension(((OptionContentNode) node).getComponent().getPreferredSize())
@@ -114,45 +118,6 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
             }
             return dim;
-        }
-
-
-        private JTree getOptionTree() {
-            if (optionTree == null) {
-                optionTree = new JTree();
-                optionTree.addTreeSelectionListener(e -> {
-                    TreePath path = e.getNewLeadSelectionPath();
-
-                    if (path != null) {
-                        Object node = path.getLastPathComponent();
-                        if (node instanceof OptionContentNode) {
-                            getSplitPane()
-                                    .setRightComponent(((OptionContentNode) node).getComponent());
-
-                        }
-                    }
-                });
-                optionTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            }
-            return optionTree;
-        }
-
-        private JSplitPane getSplitPane() {
-            if (splitPane == null) {
-                splitPane = new JSplitPane();
-                splitPane.setLeftComponent(new JScrollPane(getOptionTree()));
-                splitPane.setRightComponent(getOptionPanel());
-                // splitPane.setResizeWeight(0.2);
-            }
-            return splitPane;
-
-        }
-
-        private JPanel getOptionPanel() {
-            if (optionPanel == null) {
-                optionPanel = new JPanel();
-            }
-            return optionPanel;
         }
     }
 }

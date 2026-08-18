@@ -7,10 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
@@ -217,5 +214,14 @@ public class ProofIndependentSettings {
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
+    }
+
+    /// Returns the current proof settings as a configuration object
+    public Configuration asConfiguration() {
+        Configuration result = new Configuration();
+        for (Settings s : settings) {
+            s.writeSettings(result);
+        }
+        return result;
     }
 }
