@@ -160,7 +160,10 @@ public interface ImmutableList<T extends @Nullable Object>
             return of(es[0]);
         }
 
-        return new ImmutableListArray<>(es);
+        // we need to make a copy here since es can be an array that can be modified from the
+        // outside
+        // see ImmutableListArrayTest#immutability3
+        return new ImmutableListArray<>(es.clone());
     }
 
     /// the empty list
@@ -246,7 +249,9 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @return a new list with the array's elements at the beginning
     default ImmutableList<T> prepend(T... array) {
         // weigl: here we can use the leaky version
-        return new ImmutableListConcat<>(new ImmutableListArray<>(array), this);
+        // ulbrich: no, we cannot. See TestIm
+        // see ImmutableListArrayTest#immutability4
+        return new ImmutableListConcat<>(new ImmutableListArray<>(array.clone()), this);
     }
 
     /// Appends a single element to this list.

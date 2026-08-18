@@ -49,6 +49,23 @@ class ImmutableListArrayTest {
     }
 
     @Test
+    void immutability3() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.of(array);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
+
+    @Test
+    void immutability4() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.of(-1, -2, -3).prepend(array);
+        assertThat(list.get(2)).isEqualTo(4);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
+
+    @Test
     void size() {
         assertThat(list123.size()).isEqualTo(3);
         assertThat(listEmpty.size()).isEqualTo(0);
