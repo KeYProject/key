@@ -322,7 +322,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals) {
         final long startTime = System.currentTimeMillis();
         final GoalScheduler<Goal> scheduler = new GoalScheduler<>();
-        scheduler.offerAll(goals);
+        // pass only enabled goals to scheduler (works only as long as goals cannot be disabled
+        // during an automatic prover run, otherwise claimNext needs to be changed)
+        scheduler.offerAll(goals.filter(Goal::isAutomatic));
         final Object commitLock = new Object();
 
         // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed

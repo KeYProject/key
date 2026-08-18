@@ -9,6 +9,8 @@ import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+import org.key_project.prover.proof.ProofGoal;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,9 +42,9 @@ import org.jspecify.annotations.Nullable;
  * This is the natural termination condition for a worker loop, and is <em>weaker</em> than
  * {@link #isQuiescent()}: a worker may terminate with stalled goals still held.
  *
- * @param <T> the goal type (the prover uses {@code GoalScheduler<Goal>}; tests use tokens)
+ * @param <T> the goal type
  */
-public final class GoalScheduler<T> {
+public final class GoalScheduler<T extends ProofGoal<T>> {
 
     private final Deque<T> available = new ArrayDeque<>();
     /**
@@ -83,11 +85,25 @@ public final class GoalScheduler<T> {
      * brings it back once progress is made.
      */
     public synchronized void offer(T goal) {
+        if (makeAvailable(goal)) {
+            notifyAll();
+        }
+    }
+
+    /**
+     * Queues {@code goal} unless it is already available, in flight or stalled (by identity).
+     * <p>
+     * Caller holds monitor and is responsible for calling {@code notifyAll}.
+     *
+     * @param goal the goal to queue
+     * @return whether the goal became available
+     */
+    private boolean makeAvailable(T goal) {
         if (inFlight.contains(goal) || stalled.contains(goal) || !availableSet.add(goal)) {
-            return;
+            return false;
         }
         available.addLast(goal);
-        notifyAll();
+        return true;
     }
 
     /** Offers each goal in {@code goals} (see {@link #offer}). */
@@ -232,9 +248,7 @@ public final class GoalScheduler<T> {
         inFlight.remove(goal);
         if (successors != null) {
             for (T s : successors) {
-                if (!inFlight.contains(s) && !stalled.contains(s) && availableSet.add(s)) {
-                    available.addLast(s);
-                }
+                makeAvailable(s);
             }
         }
         // A rule was applied, which may have made the stalled goals applicable again.
