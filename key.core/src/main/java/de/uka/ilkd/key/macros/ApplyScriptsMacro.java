@@ -261,14 +261,14 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         }
         listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
             "Running fallback macro on the remaining goals", 0));
-        for (Goal goal : laterGoals) {
-            if (Thread.interrupted()) {
-                throw new InterruptedException();
-            }
-            if (fallBackMacro != null) {
-                fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
-            }
 
+        if (Thread.interrupted()) {
+            throw new InterruptedException();
+        }
+
+        if (fallBackMacro != null && !laterGoals.isEmpty()) {
+            fallBackMacro.applyTo(uic, proof, ImmutableList.fromList(laterGoals), posInOcc,
+                listener);
         }
 
         return new ProofMacroFinishedInfo(this, proof);
