@@ -60,6 +60,8 @@ ADD_ANNOTATION : '\\addAnnotation';
 REMOVE_ANNOTATION : '\\removeAnnotation';
 // label occurs again for character `!'
 NOTFREEIN : '\\notFreeIn';
+ISBINDINGEXPR : '\\isBindingExpr';
+ALWAYS_ABNORMALLY_TERMINATES: '\\alwaysAbnormallyTerminates';
 STATIC : '\\static';
 STATICMETHODREFERENCE : '\\staticMethodReference';
 MAXEXPANDMETHOD : '\\mayExpandMethod';

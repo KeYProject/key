@@ -251,6 +251,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnInstanceofPattern(InstanceofPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnExecutionContext(ExecutionContext x) {
         doDefaultAction(x);
     }
