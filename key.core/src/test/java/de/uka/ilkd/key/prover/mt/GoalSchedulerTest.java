@@ -14,6 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.prover.impl.GoalScheduler;
 
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,21 +37,73 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class GoalSchedulerTest {
 
+    private static final class TestGoal implements ProofGoal<TestGoal> {
+        private final String name;
+        private final int splitsLeft;
+        private final boolean automatic;
+
+        private TestGoal(String name, int splitsLeft, boolean automatic) {
+            this.name = name;
+            this.splitsLeft = splitsLeft;
+            this.automatic = automatic;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        @Override
+        public @Nullable ProofObject<TestGoal> proof() {
+            return null;
+        }
+
+        @Override
+        public @Nullable Sequent sequent() {
+            return null;
+        }
+
+        @Override
+        public @Nullable ImmutableList<TestGoal> apply(RuleApp ruleApp) {
+            return null;
+        }
+
+        @Override
+        public @Nullable RuleApplicationManager<TestGoal> getRuleAppManager() {
+            return null;
+        }
+
+        @Override
+        public long getTime() {
+            return 0;
+        }
+    }
+
+    /** An automatic goal that never splits. */
+    private static TestGoal goal(String name) {
+        return new TestGoal(name, 0, true);
+    }
+
+    /** An automatic goal that still splits {@code splitsLeft} times. */
+    private static TestGoal splitting(int splitsLeft) {
+        return new TestGoal("d" + splitsLeft, splitsLeft, true);
+    }
+
     @Test
     void basicLifecycleAndQuiescence() {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
         assertTrue(scheduler.isQuiescent());
 
-        scheduler.offer("a");
-        scheduler.offer("b");
+        scheduler.offer(goal("a"));
+        scheduler.offer(goal("b"));
         assertEquals(2, scheduler.availableCount());
         assertFalse(scheduler.isQuiescent());
 
-        String first = scheduler.claimNext();
+        TestGoal first = scheduler.claimNext();
         assertEquals(1, scheduler.inFlightCount());
         assertFalse(scheduler.isQuiescent(), "in-flight work means not quiescent");
 
-        String second = scheduler.claimNext(); // claim the other (order is an impl detail)
+        TestGoal second = scheduler.claimNext(); // claim the other (order is an impl detail)
         assertNull(scheduler.claimNext(), "nothing left to claim");
 
         scheduler.complete(first);
@@ -54,13 +114,13 @@ public class GoalSchedulerTest {
 
     @Test
     void deduplicatesByIdentity() {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String g = "goal";
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal g = goal("goal");
         scheduler.offer(g);
         scheduler.offer(g); // same identity, ignored
         assertEquals(1, scheduler.availableCount());
 
-        String claimed = scheduler.claimNext();
+        TestGoal claimed = scheduler.claimNext();
         scheduler.offer(claimed); // in flight, must not be re-queued
         assertEquals(0, scheduler.availableCount());
     }
@@ -71,15 +131,15 @@ public class GoalSchedulerTest {
         final int initialGoals = 500;
         // Each goal, when processed, "splits" into children a bounded number of times, modelling
         // proof-tree growth. Total processed count is deterministic regardless of scheduling.
-        final GoalScheduler<int[]> scheduler = new GoalScheduler<>();
+        final GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
 
-        final Set<int[]> claimedOnce = ConcurrentHashMap.newKeySet();
-        final List<int[]> claimedTwice = new CopyOnWriteArrayList<>();
+        final Set<TestGoal> claimedOnce = ConcurrentHashMap.newKeySet();
+        final List<TestGoal> claimedTwice = new CopyOnWriteArrayList<>();
         final AtomicInteger processed = new AtomicInteger();
         final List<Throwable> failures = new CopyOnWriteArrayList<>();
 
         for (int i = 0; i < initialGoals; i++) {
-            scheduler.offer(new int[] { 3 }); // depth budget 3
+            scheduler.offer(splitting(3)); // depth budget 3
         }
 
         final CountDownLatch ready = new CountDownLatch(workers);
@@ -90,16 +150,16 @@ public class GoalSchedulerTest {
                 try {
                     ready.countDown();
                     go.await();
-                    int[] goal;
+                    TestGoal goal;
                     while ((goal = scheduler.claimOrAwait()) != null) {
                         if (!claimedOnce.add(goal)) {
                             claimedTwice.add(goal);
                         }
                         processed.incrementAndGet();
                         // "Splitting": produce two children with a smaller depth budget.
-                        if (goal[0] > 0) {
-                            scheduler.offer(new int[] { goal[0] - 1 });
-                            scheduler.offer(new int[] { goal[0] - 1 });
+                        if (goal.splitsLeft > 0) {
+                            scheduler.offer(splitting(goal.splitsLeft - 1));
+                            scheduler.offer(splitting(goal.splitsLeft - 1));
                         }
                         scheduler.complete(goal);
                     }
@@ -139,10 +199,10 @@ public class GoalSchedulerTest {
         final int depth = 13; // full binary tree: 2^(depth+1) - 1 nodes
         final int expected = (1 << (depth + 1)) - 1;
         for (int rep = 0; rep < 5; rep++) {
-            final GoalScheduler<int[]> scheduler = new GoalScheduler<>();
+            final GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
             final AtomicInteger processed = new AtomicInteger();
             final List<Throwable> failures = new CopyOnWriteArrayList<>();
-            scheduler.offer(new int[] { depth }); // single root -> small frontier
+            scheduler.offer(splitting(depth)); // single root -> small frontier
 
             final CountDownLatch go = new CountDownLatch(1);
             List<Thread> threads = new ArrayList<>();
@@ -150,11 +210,12 @@ public class GoalSchedulerTest {
                 Thread t = new Thread(() -> {
                     try {
                         go.await();
-                        int[] goal;
+                        TestGoal goal;
                         while ((goal = scheduler.claimOrAwait()) != null) {
                             processed.incrementAndGet();
-                            List<int[]> kids = goal[0] > 0
-                                    ? List.of(new int[] { goal[0] - 1 }, new int[] { goal[0] - 1 })
+                            List<TestGoal> kids = goal.splitsLeft > 0
+                                    ? List.of(splitting(goal.splitsLeft - 1),
+                                        splitting(goal.splitsLeft - 1))
                                     : null;
                             scheduler.completeAndOffer(goal, kids);
                         }
@@ -184,9 +245,9 @@ public class GoalSchedulerTest {
      */
     @Test
     void offeringAStalledGoalDoesNotDoubleScheduleIt() throws Exception {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String g = "g";
-        String driver = "driver"; // a second goal whose completion signals progress
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal g = goal("g");
+        TestGoal driver = goal("driver"); // a second goal whose completion signals progress
         // offer driver first so g is on top of the LIFO stack and is claimed first
         scheduler.offer(driver);
         scheduler.offer(g);
@@ -216,15 +277,15 @@ public class GoalSchedulerTest {
      */
     @Test
     void stalledGoalsReactivateOnlyAfterProgressInDeterministicOrder() throws Exception {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String driver = "driver";
-        String g1 = "g1";
-        String g2 = "g2";
-        String g3 = "g3";
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal driver = goal("driver");
+        TestGoal g1 = goal("g1");
+        TestGoal g2 = goal("g2");
+        TestGoal g3 = goal("g3");
         scheduler.offer(driver);
 
         // Stall g1, g2, g3 in that order (each is the LIFO top when claimed).
-        for (String g : new String[] { g1, g2, g3 }) {
+        for (TestGoal g : new TestGoal[] { g1, g2, g3 }) {
             scheduler.offer(g);
             assertEquals(g, scheduler.claimNext());
             scheduler.stall(g);
@@ -236,8 +297,8 @@ public class GoalSchedulerTest {
         scheduler.completeAndOffer(driver, null);
 
         // Reactivation appends g1,g2,g3 (insertion order); LIFO hand-out then claims g3,g2,g1.
-        List<String> claimOrder = new ArrayList<>();
-        String claimed;
+        List<TestGoal> claimOrder = new ArrayList<>();
+        TestGoal claimed;
         while ((claimed = scheduler.claimOrAwait()) != null) {
             claimOrder.add(claimed);
             scheduler.completeAndOffer(claimed, null);
@@ -252,8 +313,8 @@ public class GoalSchedulerTest {
      */
     @Test
     void reofferMakesGoalImmediatelyClaimable() {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String g = "g";
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal g = goal("g");
         scheduler.offer(g);
         assertEquals(g, scheduler.claimNext());
         assertEquals(0, scheduler.availableCount());
@@ -275,14 +336,14 @@ public class GoalSchedulerTest {
      */
     @Test
     void offerAllMakesEachGoalAvailableAndDeduplicates() {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String a = "a";
-        String b = "b";
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal a = goal("a");
+        TestGoal b = goal("b");
         scheduler.offerAll(List.of(a, b, a)); // duplicate a collapses
         assertEquals(2, scheduler.availableCount());
 
-        String claimed = scheduler.claimNext();
-        scheduler.offerAll(List.of(claimed, "c")); // in-flight claimed ignored, c added
+        TestGoal claimed = scheduler.claimNext();
+        scheduler.offerAll(List.of(claimed, goal("c"))); // in-flight claimed ignored, c added
         assertEquals(2, scheduler.availableCount(), "in-flight goal not re-queued; new goal added");
     }
 
@@ -295,8 +356,8 @@ public class GoalSchedulerTest {
      */
     @Test
     void searchTerminatesButIsQuiescentStaysFalseWhenGoalsEndStalled() throws Exception {
-        GoalScheduler<String> scheduler = new GoalScheduler<>();
-        String g = "g";
+        GoalScheduler<TestGoal> scheduler = new GoalScheduler<>();
+        TestGoal g = goal("g");
         scheduler.offer(g);
         assertEquals(g, scheduler.claimNext());
         scheduler.stall(g); // no progress was made this pass

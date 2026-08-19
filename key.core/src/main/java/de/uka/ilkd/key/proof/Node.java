@@ -796,14 +796,7 @@ public class Node implements Iterable<Node> {
      * @see #register(Object, Class)
      */
     public <T> @Nullable T lookup(Class<T> service) {
-        try {
-            if (userData == null) {
-                return null;
-            }
-            return userData.get(service);
-        } catch (IllegalStateException ignored) {
-            return null;
-        }
+        return userData == null ? null : userData.getOrNull(service);
     }
 
     /**

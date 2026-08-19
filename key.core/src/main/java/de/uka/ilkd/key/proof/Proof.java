@@ -1074,9 +1074,9 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     private static ImmutableList<Goal> getGoalsBelow(Node node, ImmutableList<Goal> fromGoals) {
         ImmutableList<Goal> result = ImmutableList.nil();
-        List<Node> leaves = node.getLeaves();
+        final Set<Node> leaves = Collections.newSetFromMap(new IdentityHashMap<>());
+        leaves.addAll(node.getLeaves());
         for (final Goal goal : fromGoals) {
-            // if list contains node, remove it to make the list faster later
             if (leaves.remove(goal.node())) {
                 result = result.prepend(goal);
             }

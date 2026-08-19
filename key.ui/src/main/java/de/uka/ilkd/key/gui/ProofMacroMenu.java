@@ -12,10 +12,12 @@ import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
@@ -82,8 +84,10 @@ public class ProofMacroMenu extends JMenu {
 
         int count = 0;
         Node node = mediator.getSelectedNode();
+        final ImmutableList<Goal> goals =
+            node == null ? null : node.proof().getSubtreeEnabledGoals(node);
         for (ProofMacro macro : REGISTERED_MACROS) {
-            boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
+            boolean applicable = goals != null && macro.canApplyTo(node.proof(), goals, posInOcc);
 
             if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);

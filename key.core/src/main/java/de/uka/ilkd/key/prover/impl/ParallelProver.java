@@ -288,7 +288,37 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
             int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
+        return run(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
+    }
+
+    /**
+     * Runs the workers over {@code goals} and reports the outcome
+     *
+     * @param proof the Proof the goals belong too
+     * @param goals the goals to
+     * @param maxSteps the run-wide limit on rule applications
+     * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
+     *        step budget applies to all as a whole
+     */
+    private ApplyStrategyInfo<Proof, Goal> run(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout, boolean stopAtFirstNonCloseableGoal, int perTaskSteps) {
         assert proof != null;
+        initializeProverRun(proof, maxSteps, timeout, stopAtFirstNonCloseableGoal);
+
+        fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
+            PROCESSING_STRATEGY, -1));
+
+        final ApplyStrategyInfo<Proof, Goal> result = runParallel(goals, perTaskSteps);
+
+        proof.addAutoModeTime(result.getTime());
+        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+            result.getNumberOfAppliedRuleApps(), result.getNumberOfClosedGoals()));
+
+        return result;
+    }
+
+    private void initializeProverRun(Proof proof, int maxSteps, long timeout,
+            boolean stopAtFirstNonCloseableGoal) {
         this.proof = proof;
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
         this.stopCondition =
@@ -304,25 +334,45 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         this.stopMessage = null;
         this.nonCloseableGoal = null;
         this.firstError.set(null);
-
-        // the status line shows an indeterminate ("busy") bar (<code>size == -1</code>):
-        // the parallel prover does not report a meaningful per-step progress value (workers
-        // commit concurrently)
-        fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
-            PROCESSING_STRATEGY, -1));
-
-        ApplyStrategyInfo<Proof, Goal> result = runParallel(goals);
-
-        proof.addAutoModeTime(result.getTime());
-        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
-            result.getNumberOfAppliedRuleApps(), result.getNumberOfClosedGoals()));
-        return result;
     }
 
-    private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals) {
+    /// Starts a proof search for a list of goals, each goal is treated as its own task with its own
+    /// step count, timeout is global for all tasks
+    ///
+    /// @param proof The [ProofObject] representing the proof instance.
+    /// @param goals An [ImmutableList] of [ProofGoal] objects to prove.
+    /// @param maxSteps The maximum number of rule applications to perform per goal task.
+    /// @param timeout The maximum duration (in milliseconds) to perform the proof search (global
+    /// over all tasks).
+    /// @return An [ProofSearchInformation] object containing information about the performed
+    /// work, such as the number of rules applied.
+    @Override
+    public synchronized ApplyStrategyInfo<Proof, Goal> startEach(Proof proof,
+            ImmutableList<Goal> goals, int maxSteps, long timeout) {
+        // Tasks never stop the run: a task that runs out of budget or of rules leaves its goals
+        return run(proof, goals, Integer.MAX_VALUE, timeout, false, maxSteps);
+    }
+
+    /**
+     * runs the parallel prover on the given goals; per task steps decides whether
+     * {@link #maxApplications} limits the rule apps per goal or for all goals together
+     *
+     * @param goals the Goal objects to prove in parallel
+     * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
+     *        step budget applies to all as a whole
+     */
+    private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals,
+            int perTaskSteps) {
         final long startTime = System.currentTimeMillis();
         final GoalScheduler<Goal> scheduler = new GoalScheduler<>();
-        scheduler.offerAll(goals);
+        // pass only enabled goals to scheduler (works only as long as goals cannot be disabled
+        // during an automatic prover run, otherwise claimNext needs to be changed)
+        final ImmutableList<Goal> enabledGoals = goals.filter(Goal::isAutomatic);
+        if (perTaskSteps > 0) {
+            scheduler.offerAllAsTasks(enabledGoals, perTaskSteps);
+        } else {
+            scheduler.offerAll(enabledGoals);
+        }
         final Object commitLock = new Object();
 
         // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed

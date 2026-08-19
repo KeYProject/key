@@ -123,6 +123,22 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends @Nu
         return appliedRuleAppsCount;
     }
 
+    @Override
+    public ApplyStrategyInfo<Proof, Goal> join(ProofSearchInformation<Proof, Goal> other) {
+        if (other.getProof() != proof) {
+            throw new IllegalArgumentException("Tried to combine ProofSearchInformations from" +
+                "different proof objects");
+        }
+
+        return new ApplyStrategyInfo<>("Aggregated Information (batched)",
+            proof,
+            error != null ? error : other.getException(),
+            nonCloseableGoal != null ? nonCloseableGoal : other.nonCloseableGoal(),
+            timeInMillis + other.getTime(),
+            appliedRuleAppsCount + other.getNumberOfAppliedRuleApps(),
+            nrClosedGoals + other.getNumberOfClosedGoals());
+    }
+
     /// {@inheritDoc}
     @Override
     public Proof getProof() {

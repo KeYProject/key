@@ -116,4 +116,11 @@ public interface ProofSearchInformation<P extends ProofObject<G>, G extends @Nul
     /// @return the number of rule applications performed
     int getNumberOfAppliedRuleApps();
 
+    /// join several ProofSearchInformation into an aggregate
+    /// needed for batch runs (messages becomes a generic message)
+    /// counters are summed and in case of error and non-closeable goal
+    /// the first current one is kept
+    /// @param other the ProofSearchInformation<P,G> to combine with
+    /// @return the aggregated ProofSearchInformation<P,G>
+    ProofSearchInformation<P, G> join(ProofSearchInformation<P, G> other);
 }

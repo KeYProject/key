@@ -94,6 +94,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
     /**
+     * Number of modified subtrees changed by one automatic run {@link GUIProofTreeProofListener}
+     * which if exceeded cause the whole tree to be updated (not just the affected subtrees).
+     */
+    private static final int MAX_PARTIAL_TREE_UPDATES = 16;
+
+    /**
      * Whether to expand oss nodes when using expand all
      */
     private boolean expandOSSNodes = false;
@@ -1094,11 +1100,21 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateView.removeTreeSelectionListener(treeSelectionListener);
             setProof(mediator.getSelectedProof());
             if (modifiedSubtrees != null) {
+                final List<Node> changed = new ArrayList<>();
                 for (final Node n : modifiedSubtrees) {
                     // skip nodes of other proofs: the displayed proof may have changed since the
                     // subtrees were recorded in autoModeStarted (see #3713)
                     if (n.proof() == proof
                             && proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                        changed.add(n);
+                    }
+                }
+                if (changed.size() > MAX_PARTIAL_TREE_UPDATES) {
+                    // update whole tree
+                    delegateModel.updateTree(null);
+                } else {
+                    // update only affected subtrees
+                    for (final Node n : changed) {
                         delegateModel.updateTree(n);
                     }
                 }
