@@ -57,6 +57,8 @@ NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
 // label occurs again for character `!'
 NOTFREEIN : '\\notFreeIn';
+ISBINDINGEXPR : '\\isBindingExpr';
+ALWAYS_ABNORMALLY_TERMINATES: '\\alwaysAbnormallyTerminates';
 STATIC : '\\static';
 STATICMETHODREFERENCE : '\\staticMethodReference';
 MAXEXPANDMETHOD : '\\mayExpandMethod';
