@@ -1311,6 +1311,28 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnInstanceofPattern(InstanceofPattern x) {
+        boolean addParentheses = x.isToBeParenthesized();
+        if (addParentheses) {
+            layouter.print("(");
+        }
+        if (x.getArguments() != null) {
+            x.getExpressionAt(0).visit(this);
+        }
+        layouter.print(" instanceof ");
+        if (x.getTypeReference() != null) {
+            x.getTypeReference().visit(this);
+        }
+        if (x.getPatternVariable() != null) {
+            layouter.print(" ");
+            x.getPatternVariable().visit(this);
+        }
+        if (addParentheses) {
+            layouter.print(")");
+        }
+    }
+
+    @Override
     public void performActionOnNew(New x) {
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
