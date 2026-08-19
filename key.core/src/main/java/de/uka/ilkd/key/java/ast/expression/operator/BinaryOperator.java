@@ -8,11 +8,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.ast.Comment;
-import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
-import de.uka.ilkd.key.java.ast.SourceData;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -109,5 +105,13 @@ public final class BinaryOperator extends Operator
     @Override
     protected int computeHashCode() {
         return 0x01000193 * super.computeHashCode() + kind.hashCode();
+    }
+
+    public Expression getLeft() {
+        return this.getExpressionAt(0);
+    }
+
+    public Expression getRight() {
+        return this.getExpressionAt(1);
     }
 }

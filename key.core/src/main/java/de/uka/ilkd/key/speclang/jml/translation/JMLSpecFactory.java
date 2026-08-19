@@ -15,7 +15,9 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.visitor.BindingVariableVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -1697,6 +1699,34 @@ public class JMLSpecFactory {
                     result = result.prepend(visibleLocalVariables);
                     return result;
                 }
+            } else if (s instanceof If ifStmt) {
+                final int branchCount = ifStmt.getBranchCount();
+                final var condition = ifStmt.getExpression();
+                if (branchCount == 1) {
+                    var thenBranch = ifStmt.getBranchAt(0);
+                    final ImmutableList<LocationVariable> visibleLocalVariables =
+                        collectLocalVariablesVisibleTo(statement, thenBranch);
+                    if (visibleLocalVariables != null) {
+                        result = result.prepend(visibleLocalVariables);
+                        ImmutableList<LocationVariable> pattern =
+                            collectPatternVariables(true, condition);
+                        result = result.prepend(pattern);
+                        return result;
+                    }
+                }
+
+                if (branchCount == 2) { // also consider else-branch
+                    var elseBranch = ifStmt.getBranchAt(1);
+                    final ImmutableList<LocationVariable> visibleLocalVariables =
+                        collectLocalVariablesVisibleTo(statement, elseBranch);
+                    if (visibleLocalVariables != null) {
+                        result = result.prepend(visibleLocalVariables);
+                        ImmutableList<LocationVariable> pattern =
+                            collectPatternVariables(false, condition);
+                        result = result.prepend(pattern);
+                        return result;
+                    }
+                }
             } else if (s instanceof BranchStatement branch) {
                 final int branchCount = branch.getBranchCount();
                 for (int j = 0; j < branchCount; j++) {
@@ -1874,7 +1904,7 @@ public class JMLSpecFactory {
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini,
             IProgramMethod pm) throws SLTranslationException {
         final ImmutableList<JMLModifier> modifiers =
-            ImmutableList.<JMLModifier>singleton(JMLModifier.PRIVATE);
+            ImmutableList.singleton(JMLModifier.PRIVATE);
         final TextualJMLSpecCase specCase = new TextualJMLSpecCase(modifiers, Behavior.NONE);
         specCase.addName(ini.getName());
         for (LabeledParserRuleContext context : createPrecond(pm, ini.getOriginalSpec())) {
@@ -1917,4 +1947,12 @@ public class JMLSpecFactory {
         }
         return res;
     }
+
+
+    private ImmutableList<LocationVariable> collectPatternVariables(boolean b,
+            Expression condition) {
+        var v = BindingVariableVisitor.analyze(condition);
+        return ImmutableList.fromList(b ? v.whenTrue().keySet() : v.whenFalse().keySet());
+    }
+
 }
