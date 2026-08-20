@@ -801,7 +801,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         if (!applied) {
             LOGGER.warn("Found name-matching conditions with following type signature:");
-            suitableManipulators.forEach(it -> LOGGER.warn(Arrays.toString(it.getArgumentTypes())));
+            suitableManipulators.forEach(it -> LOGGER.warn(it.getArgumentTypes().toString()));
             LOGGER.warn("But you gave {} arguments.\n", arguments.size());
             semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
         }
