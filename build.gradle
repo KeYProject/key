@@ -84,6 +84,9 @@ subprojects {
         testImplementation(libs.logback.classic)
 
 
+        // Therapi runtime javadoc
+        annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
+        implementation 'com.github.therapi:therapi-runtime-javadoc:0.13.0'
         compileOnly(libs.jspecify)
         testCompileOnly(libs.jspecify)
         compileOnly(libs.checkerframework.qual)
@@ -316,7 +319,6 @@ subprojects {
             afterEvaluate {
                 description = project.description
                 assert (project.description != null && project.description != "") : "Description of modules are required at maven-central"
-                print(project.description)
             }
             url = 'https://key-project.org/'
 

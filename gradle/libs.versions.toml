@@ -25,6 +25,7 @@ stringtemplate = "4.3.4"
 javapoet = "1.13.0"
 javaparser = "3.28.0-K13.6"
 truth = "1.4.5"
+therapi = "0.13.0"
 
 # UI and CLI
 flatlaf = "3.7.2"
@@ -35,6 +36,7 @@ docking-frames = "1.1.3p1"
 # External tools
 scala-isabelle = "0.4.5"
 
+
 [libraries]
 # SLF4J and logging
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -42,6 +44,10 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 
 # JSpecify (nullability annotations)
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+#Extracting Javadoc
+therapi-processor = { module = "com.github.therapi:therapi-runtime-javadoc-scribe", version.ref = "therapi" }
+therapi-runtime = { module = "com.github.therapi:therapi-runtime-javadoc", version.ref = "therapi" }
 
 # EISOP Checker Framework
 checkerframework-qual = { module = "io.github.eisop:checker-qual", version.ref = "eisop" }
