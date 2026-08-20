@@ -8,6 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.
@@ -50,4 +51,12 @@ public interface TacletBuilderCommand {
      */
     void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters,
             boolean negated);
+
+
+    String getTriggerName();
+
+    boolean isNegationSupported();
+
+    @Nullable
+    Class<?> getRelevantClazz();
 }
