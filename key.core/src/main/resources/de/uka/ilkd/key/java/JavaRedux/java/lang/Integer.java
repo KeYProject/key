@@ -26,6 +26,10 @@ public final class Integer implements java.lang.Comparable
      @ assignable \nothing;
      @*/
    public static java.lang.Integer valueOf(int arg0);
+
+   /*@ public normal_behavior
+     @ ensures value == arg0;
+     @*/
    public Integer(int arg0);
    public Integer(java.lang.String arg0) throws java.lang.NumberFormatException;
    public byte byteValue();
@@ -35,6 +39,11 @@ public final class Integer implements java.lang.Comparable
       @ assignable \strictly_nothing;
       @*/
    public int intValue();
+
+   /*@ public normal_behavior
+     @ ensures \result == (long) value;
+     @ assignable \strictly_nothing;
+     @*/
    public long longValue();
 //   public float floatValue();
 //   public double doubleValue();
