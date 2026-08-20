@@ -27,7 +27,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;

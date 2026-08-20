@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;

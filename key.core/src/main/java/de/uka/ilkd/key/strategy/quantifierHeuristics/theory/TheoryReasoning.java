@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -29,7 +29,7 @@ public interface TheoryReasoning {
         /**
          * @return the decision for the negation of the judged literal
          */
-        LiteralDecision negate() {
+        public LiteralDecision negate() {
             return switch (this) {
                 case PROVED -> REFUTED;
                 case REFUTED -> PROVED;
@@ -107,7 +107,7 @@ public interface TheoryReasoning {
     }
 
     /**
-     * Whether the equality-based normalisation of the cost prediction (see {@link Congruence}) may
+     * Whether the equality-based normalisation of the cost prediction (see {@code Congruence}) may
      * rewrite occurrences of {@code from} to {@code to}, justified by an assumed equality between
      * the two. The proof search keeps the terms of a theory in a normal form of the theory's own
      * rules, integer terms in polynomial form for example. A theory vetoes here when the rewrite

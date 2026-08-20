@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;

@@ -14,7 +14,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-class TriggerUtils {
+public class TriggerUtils {
 
     /**
      * remove all the quantifiable variable bounded in the top level of a given formula.

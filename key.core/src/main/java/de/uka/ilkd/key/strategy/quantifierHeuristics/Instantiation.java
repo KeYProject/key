@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;

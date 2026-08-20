@@ -23,8 +23,8 @@ import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.SessionCaches;

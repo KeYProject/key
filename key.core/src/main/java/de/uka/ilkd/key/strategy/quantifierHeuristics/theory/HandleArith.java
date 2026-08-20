@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * knowing that {@code c>=d} or {@code c<=d;}
  *
  */
-public class HandleArith {
+class HandleArith {
 
     private HandleArith() {}
 

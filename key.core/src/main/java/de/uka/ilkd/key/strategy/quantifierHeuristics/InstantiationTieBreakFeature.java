@@ -6,6 +6,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.GenPolTieBreak;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.PolarityTieBreak;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;

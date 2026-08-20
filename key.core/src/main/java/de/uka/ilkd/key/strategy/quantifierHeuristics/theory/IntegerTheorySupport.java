@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -95,7 +95,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      * place in both directions: rewriting it away collapses the structure that
      * {@link de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial} decomposes, and rewriting other
      * terms into it makes it a class representative, which the one-pass normalisation of
-     * {@link Congruence} does not rewrite further. Rewriting an atom to a number literal or to
+     * {@code Congruence} does not rewrite further. Rewriting an atom to a number literal or to
      * another atom stays permitted: that only identifies atoms, which the assumed equality
      * justifies, and can only add arithmetic decisions.
      *

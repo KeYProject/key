@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.util.collection.ImmutableSet;
 

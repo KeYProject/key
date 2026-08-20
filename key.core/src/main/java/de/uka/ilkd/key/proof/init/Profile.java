@@ -17,8 +17,8 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.QuantifierTheorySupport;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.QuantifierTheorySupports;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupport;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupports;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.engine.GoalChooserFactory;

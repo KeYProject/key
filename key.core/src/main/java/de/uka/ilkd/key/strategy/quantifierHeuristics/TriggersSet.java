@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;

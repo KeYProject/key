@@ -1,12 +1,14 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;

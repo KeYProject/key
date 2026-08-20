@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;

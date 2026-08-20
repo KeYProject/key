@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -20,9 +20,9 @@ import org.key_project.logic.op.Function;
  * instance's newest skolem constant was introduced on the branch, and breaks a same-generation
  * tie by the proving-polarity occurrence connection of {@link PolarityOccurrenceTieBreak}.
  */
-final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
+public final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
 
-    static final GenPolTieBreak INSTANCE = new GenPolTieBreak();
+    public static final GenPolTieBreak INSTANCE = new GenPolTieBreak();
 
     private GenPolTieBreak() {
     }
