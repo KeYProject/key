@@ -24,6 +24,9 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(project(":key.core"))
 
+    annotationProcessor(libs.therapi.processor)
+    api(libs.therapi.runtime)
+
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
     testImplementation(libs.jackson.dataformat.yaml)
 
@@ -32,7 +35,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
+    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts,de.uka.ilkd.key.rule.conditions"
 }
 
 // The target directory for JavaCC (parser generation)
