@@ -13,39 +13,26 @@ import org.key_project.prover.rules.VariableCondition;
 
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
-    private final boolean negationSupported;
 
     public ConstructorBasedBuilder(String name, Class<? extends VariableCondition> clazz,
             ArgumentType... types) {
-        this(name, lastArgumentOfFirstContructorIsBoolean(clazz), clazz, types);
+        this(TacletBuilderCommandInfo.createVarcondInfo(name, clazz, types), clazz);
     }
 
-    private static boolean lastArgumentOfFirstContructorIsBoolean(
+    public ConstructorBasedBuilder(TacletBuilderCommandInfo info,
             Class<? extends VariableCondition> clazz) {
-        try {
-            Class<?>[] types = clazz.getConstructors()[0].getParameterTypes();
-            return types[types.length - 1] == Boolean.class
-                    || types[types.length - 1] == Boolean.TYPE;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return false;
-        }
-    }
-
-    public ConstructorBasedBuilder(String name, boolean negationSupported,
-            Class<? extends VariableCondition> clazz, ArgumentType... types) {
-        super(name, types);
+        super(info);
         this.clazz = clazz;
-        this.negationSupported = negationSupported;
     }
 
     @Override
     public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
-        if (negated && !negationSupported) {
+        if (negated && !info.isNegationSupported()) {
             throw new RuntimeException(clazz.getName() + " does not support negation.");
         }
 
         Object[] args = arguments;
-        if (negationSupported) {
+        if (info.isNegationSupported()) {
             args = Arrays.copyOf(arguments, arguments.length + 1);
             args[args.length - 1] = negated;
         }
@@ -58,5 +45,10 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
             }
         }
         throw new RuntimeException();
+    }
+
+    @Override
+    public TacletBuilderCommandInfoImpl getInformation() {
+        return (TacletBuilderCommandInfoImpl) super.getInformation();
     }
 }
