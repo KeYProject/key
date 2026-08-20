@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -14,13 +15,24 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
+import org.key_project.util.collection.Pair;
 
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.github.javaparser.javadoc.JavadocBlockTag;
+import com.google.common.collect.Streams;
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
@@ -63,7 +75,7 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder SAME =
-        new AbstractConditionBuilder("same", TR, TR) {
+        new AbstractConditionBuilder("same", TypeComparisonCondition.class, true, TR, TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -77,7 +89,7 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder IS_SUBTYPE =
-        new AbstractConditionBuilder("sub", TR, TR) {
+        new AbstractConditionBuilder("sub", TypeComparisonCondition.class, true, TR, TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -91,7 +103,7 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder STRICT =
-        new AbstractConditionBuilder("scrictSub", TR, TR) {
+        new AbstractConditionBuilder("scrictSub", TypeComparisonCondition.class, false, TR, TR) {
             @Override
             public boolean isSuitableFor(@NonNull String name) {
                 if (super.isSuitableFor(name)) {
@@ -116,7 +128,8 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder DISJOINT_MODULO_NULL =
-        new AbstractConditionBuilder("disjointModuloNull", TR, TR) {
+        new AbstractConditionBuilder("disjointModuloNull", TypeComparisonCondition.class, false, TR,
+            TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -138,7 +151,7 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractTacletBuilderCommand NEW_JAVATYPE =
-        new AbstractTacletBuilderCommand("new", SV, KJT) {
+        new AbstractTacletBuilderCommand("new", NewVarcond.class, false, SV, KJT) {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
@@ -151,7 +164,7 @@ public class TacletBuilderManipulators {
         };
 
     public static final AbstractTacletBuilderCommand NEW_VAR =
-        new AbstractTacletBuilderCommand("new", SV, SORT) {
+        new AbstractTacletBuilderCommand("new", NewVarcond.class, false, SV, SORT) {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
@@ -169,7 +182,7 @@ public class TacletBuilderManipulators {
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
-            super("notFreeIn", argumentsTypes);
+            super("notFreeIn", NotFreeIn.class, true, argumentsTypes);
         }
 
         @Override
@@ -195,7 +208,7 @@ public class TacletBuilderManipulators {
 
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(32);
     public static final AbstractTacletBuilderCommand NEW_TYPE_OF =
-        new AbstractTacletBuilderCommand("newTypeOf", SV, SV) {
+        new AbstractTacletBuilderCommand("newTypeOf", NewVarcond.class, false, SV, SV) {
 
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
@@ -209,7 +222,7 @@ public class TacletBuilderManipulators {
             }
         };
     public static final AbstractTacletBuilderCommand NEW_DEPENDING_ON =
-        new AbstractTacletBuilderCommand("newDependingOn", SV, SV) {
+        new AbstractTacletBuilderCommand("newDependingOn", NewDependingOn.class, false, SV, SV) {
             @Override
             public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -236,7 +249,8 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder ARRAY =
         new ConstructorBasedBuilder("isArray", ArrayTypeCondition.class, SV);
     public static final AbstractConditionBuilder REFERENCE_ARRAY =
-        new AbstractConditionBuilder("isReferenceArray", SV) {
+        new AbstractConditionBuilder("isReferenceArray", ArrayComponentTypeCondition.class, true,
+            SV) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -252,7 +266,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder THIS_REFERENCE =
         new ConstructorBasedBuilder("isThisReference", IsThisReference.class, SV);
     public static final AbstractConditionBuilder REFERENCE =
-        new AbstractConditionBuilder("isReference", TR) {
+        new AbstractConditionBuilder("isReference", TypeCondition.class, true, TR) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -303,7 +317,7 @@ public class TacletBuilderManipulators {
         private final boolean elmen;
 
         public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
-            super(triggerName, SV, SORT);
+            super(triggerName, JavaTypeToSortCondition.class, false, SV, SORT);
             this.elmen = forceElmentary;
         }
 
@@ -332,7 +346,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
     // endregion
     public static final AbstractConditionBuilder STORE_TERM_IN =
-        new AbstractConditionBuilder("storeTermIn", SV, T) {
+        new AbstractConditionBuilder("storeTermIn", StoreTermInCondition.class, false, SV, T) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -350,7 +364,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder GET_FREE_INVARIANT = new ConstructorBasedBuilder(
         "\\getFreeInvariant", LoopFreeInvariantCondition.class, PV, SV, SV);
     public static final AbstractConditionBuilder GET_VARIANT =
-        new AbstractConditionBuilder("\\getVariant", PV, SV) {
+        new AbstractConditionBuilder("\\getVariant", LoopVariantCondition.class, false, PV, SV) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -359,7 +373,7 @@ public class TacletBuilderManipulators {
             }
         };
     public static final AbstractConditionBuilder IS_LABELED =
-        new AbstractConditionBuilder("isLabeled", PV) {
+        new AbstractConditionBuilder("isLabeled", IsLabeledCondition.class, true, PV) {
             @Override
             public IsLabeledCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -431,6 +445,142 @@ public class TacletBuilderManipulators {
     public static List<TacletBuilderCommand> getConditionBuildersFor(String name) {
         return tacletBuilderCommands.stream().filter(it -> it.isSuitableFor(name))
                 .collect(Collectors.toList());
+    }
+    // endregion
+
+
+    // region
+    public static void main(String[] args) {
+        var config = new ParserConfiguration();
+        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
+        StaticJavaParser.setConfiguration(config);
+
+        Function<String, String> normalizeCmdName =
+            (String it) -> it.startsWith("\\") ? it.replace("\\\\", "\\") : "\\" + it;
+        Function<TacletBuilderCommand, String> getTriggerName =
+            TacletBuilderCommand::getTriggerName;
+
+        var g = getConditionBuilders().stream()
+                .collect(Collectors.groupingBy(getTriggerName.andThen(normalizeCmdName)));
+        Comparator<TacletBuilderCommand> reversed =
+            Comparator.comparing((TacletBuilderCommand it) -> it.getArgumentTypes().length)
+                    .reversed();
+
+        var conds = g.keySet().stream().sorted().toList();
+
+        for (var name : conds) {
+            var cmds = g.get(name);
+            System.out.println();
+            System.out.println();
+            System.out.format("### `%s`\n\n", name);
+            cmds.sort(reversed);
+
+            Class<?> clazz = cmds.getFirst().getRelevantClazz();
+            final var sourceCode = getSourceCode(clazz.getName());
+
+            System.out.println(clazzDoc(sourceCode));
+
+            System.out.format("\n**Signatures**\n\n", name);
+            for (TacletBuilderCommand cmd : cmds) {
+                final var x = constructorJavadoc(sourceCode, cmd.getArgumentTypes(),
+                    cmd.isNegationSupported());
+
+                final var arguments = Streams.zip(x.first.stream(),
+                    Arrays.stream(cmd.getArgumentTypes()).map(Enum::toString), "%s%s"::formatted)
+                        .collect(Collectors.joining(", "));
+                System.out.printf("* `%s(%s)`\n", name, arguments);
+
+                if (cmd.isNegationSupported()) {
+                    System.out.printf("* `\\not%s(%s)`\n", name, arguments);
+                }
+
+                System.out.println();
+                System.out.println(x.second);
+            }
+        }
+    }
+
+
+    private static Pair<List<String>, String> constructorJavadoc(CompilationUnit sourceCode,
+            ArgumentType[] types, boolean supportNegation) {
+        List<String> javadoc = new ArrayList<>();
+        for (ArgumentType type : types) {
+            javadoc.add(type.clazz.getSimpleName());
+        }
+        if (supportNegation)
+            javadoc.add("boolean");
+
+        final var constructorDeclaration = sourceCode.getPrimaryType()
+                .flatMap(it -> it.getConstructorByParameterTypes(javadoc.toArray(new String[0])));
+
+        var names = constructorDeclaration.map(
+            it -> it.getParameters().stream().map(NodeWithSimpleName::getNameAsString)
+                    .map(s -> s + ": ")
+                    .toList())
+                .orElse(Arrays.stream(types).map(it -> "").toList());
+
+        var jd = constructorDeclaration
+                .flatMap(NodeWithJavadoc::getJavadoc)
+                .map(it -> it.getDescription().toText() + "\n" +
+                    it.getBlockTags().stream()
+                            .filter(tag -> tag.getType() == JavadocBlockTag.Type.PARAM)
+                            .map(tag -> "* `%s` %s".formatted(tag.getName().orElse(""),
+                                tag.toText()))
+                            .collect(Collectors.joining("\n")))
+                .map(it -> it.replace("<tt>", "`")
+                        .replace("<ul>", "\n")
+                        .replace("</ul>", "\n")
+                        .replace("<ul>", "\n")
+                        .replace("<li>", "* ")
+                        .replace("</li>", "")
+                        .replace("{@link", "`")
+                        .replace("}", "`")
+                        .replace("<code>", "`")
+                        .replace("</tt>", "`")
+                        .replace("</code>", "`")
+                        .replace("<b>", "**")
+                        .replace("</b>", "**"))
+                .map(it -> "   " + it.replace("\n", "\n   ")).orElse("");
+        return new Pair<>(names, jd);
+    }
+
+    private static String clazzDoc(CompilationUnit sourceCode) {
+        return sourceCode.getPrimaryType().flatMap(NodeWithJavadoc::getJavadoc)
+                .map(it -> it.getDescription().toText())
+                .map(it -> it.replace("<tt>", "`")
+                        .replace("<ul>", "\n")
+                        .replace("</ul>", "\n")
+                        .replace("<ul>", "\n")
+                        .replace("<li>", "* ")
+                        .replace("</li>", "")
+                        .replace("{@link", "`")
+                        .replace("}", "`")
+                        .replace("<code>", "`")
+                        .replace("</tt>", "`")
+                        .replace("</code>", "`")
+                        .replace("</h4>", "")
+                        .replace("<h4>", "#### ")
+                        .replace("<b>", "**")
+                        .replace("</b>", "**"))
+                .orElse("");
+    }
+
+    private static CompilationUnit getSourceCode(String name) {
+        var bases = List.of(
+            Paths.get("key.core/src/main/java/"),
+            Paths.get("key.ncore/src/main/java/"));
+        var rel = name.replace('.', '/') + ".java";
+        for (var basis : bases) {
+            var x = basis.resolve(rel);
+            if (Files.exists(x)) {
+                try {
+                    return StaticJavaParser.parse(x);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return new CompilationUnit();
     }
     // endregion
 }
