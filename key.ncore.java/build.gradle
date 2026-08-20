@@ -1,3 +1,5 @@
+description = "xxx"
+
 sourceSets {
     generator {
         java {
