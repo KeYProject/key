@@ -3,15 +3,29 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Constraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.EqualityConstraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -102,5 +116,67 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
             return negated ? LiteralDecision.REFUTED : LiteralDecision.PROVED;
         }
         return LiteralDecision.UNKNOWN;
+    }
+
+    @Override
+    public List<JTerm> fallbackTriggers(ClauseTriggers selection, Services services,
+            MetavariableFactory metavariableFactory) {
+        List<JTerm> fallbackTriggers = new ArrayList<>();
+        final ClauseAnalysis clauseInfo = selection.clause();
+
+        final TermBuilder tb = services.getTermBuilder();
+        final Map<QuantifiableVariable, Term> qv2mv = new LinkedHashMap<>();
+        final Map<Metavariable, QuantifiableVariable> mv2qv = new LinkedHashMap<>();
+        for (QuantifiableVariable var : clauseInfo.clause().freeVars()) {
+            final Metavariable mv = metavariableFactory.fresh(var.sort());
+            qv2mv.put(var, tb.var(mv));
+            if (clauseInfo.universalVariables().contains(var)) {
+                mv2qv.put(mv, var);
+            }
+        }
+        final Substitution qv2mvSubst = new Substitution(DefaultImmutableMap.fromMap(qv2mv));
+        final OpReplacer mv2qvReplacer =
+            new OpReplacer(mv2qv, services.getTermFactory());
+        for (JTerm lit : clauseInfo.literals()) {
+            if (lit.op() == Equality.EQUALS) {
+                fallbackTriggers.addAll(
+                    solveEquation(mv2qv.keySet(), qv2mvSubst, mv2qvReplacer, lit, services));
+            }
+        }
+        return fallbackTriggers;
+    }
+
+    /// solves equation f(u) = f(g(v)) to u = g(MV_V)
+    /// @param mvs set of Metavariables used to replace **universal** bound variables
+    /// @param qv2mv substitution of the free variables of lit by their meta variables
+    /// @param mv2qv OpReplacer to restore universal (not existential) bound variables
+    /// @param lit the JTerm representing an uncovered literal
+    /// @param services the Services class provides access to term construction and other services
+    /// @return list of solved equations that describe triggers
+    private List<JTerm> solveEquation(Set<Metavariable> mvs, Substitution qv2mv,
+            OpReplacer mv2qv, JTerm lit,
+            Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final JTerm litWithMV = (JTerm) qv2mv.applyWithoutCasts(lit, services);
+        final Constraint c =
+            EqualityConstraint.BOTTOM.unify(litWithMV.sub(0), litWithMV.sub(1), services);
+        List<JTerm> solvedEquations = new ArrayList<>();
+        if (c.isSatisfiable()) {
+            for (final Metavariable mv : mvs) {
+                final JTerm solution = c.getInstantiation(mv, services);
+                final Operator instOp = solution.op();
+                if (instOp instanceof LogicVariable ||
+                        instOp instanceof Metavariable) {
+                    // solutions that are a variable
+                    // and contain no function symbol do not
+                    // make useful triggers
+                    continue;
+                }
+                final JTerm solvedEquation = mv2qv.replace(tb.equals(tb.var(mv), solution));
+                solvedEquations.add(solvedEquation);
+                solvedEquations.add(tb.equals(solvedEquation.sub(1), solvedEquation.sub(0)));
+            }
+        }
+        return solvedEquations;
     }
 }

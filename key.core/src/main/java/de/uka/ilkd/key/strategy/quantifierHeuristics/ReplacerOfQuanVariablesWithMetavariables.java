@@ -20,8 +20,7 @@ import org.key_project.util.collection.ImmutableMap;
  * <code>allTerm</code> and create constant functions for all existential variables. The variables
  * with new created metavariables or constant functions are store to a map <code>mapQM</code>.
  */
-@Deprecated
-class ReplacerOfQuanVariablesWithMetavariables {
+public class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables() {}
 

@@ -38,7 +38,6 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * constraint would not be satisfiable (cycles, unification failed) the Constraint TOP of interface
  * Constraint is returned.
  */
-@Deprecated
 public class EqualityConstraint implements Constraint {
 
     /**
