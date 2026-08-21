@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 /**
- * A theory that contributes to quantifier instantiation on both counts: it says which of its
+ * A theory that contributes to quantifier instantiation on both counts: it selects which of its
  * subterms make a trigger, and it answers the questions the heuristic asks about terms.
  *
  * The two halves are separate interfaces because they travel differently. A front end registers

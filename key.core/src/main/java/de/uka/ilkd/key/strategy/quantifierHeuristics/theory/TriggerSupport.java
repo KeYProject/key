@@ -18,7 +18,8 @@ import org.key_project.util.collection.ImmutableSet;
  * A theory's contribution to the choice of what a quantified formula is instantiated with.
  *
  * Which subterms make a usable trigger depends on the theory a term belongs to: an array index or
- * an integer comparison matches everywhere and says nothing, a read says which access is meant.
+ * an integer comparison matches everywhere and discriminates nothing, while a read determines
+ * which location is accessed.
  * A theory also derives further triggers from an accepted one, for example a read generalized so
  * it matches over the many heaps of a proof, and it names instances that no trigger reaches at
  * all.
@@ -37,7 +38,8 @@ public interface TriggerSupport {
         ACCEPTABLE,
         /**
          * The candidate is never a trigger, because for this theory it discriminates nothing:
-         * a connective, or a wrapper whose content and enclosing term say everything it could.
+         * a connective, or a wrapper that adds no information to its content and its enclosing
+         * term.
          * It does not block the term enclosing it: where every subterm of a term is forbidden,
          * the term itself is the candidate.
          */
@@ -45,7 +47,7 @@ public interface TriggerSupport {
         /**
          * The candidate is a trigger, but the search for triggers continues into the term
          * enclosing it. An array access's index expression is the case at hand: it is a usable
-         * trigger, yet only the read around it names the accessed array, so the read must
+         * trigger, yet only the read around it determines the accessed array, so the read must
          * become a trigger too.
          */
         PREFER_ENCLOSING
@@ -89,7 +91,8 @@ public interface TriggerSupport {
      *
      * A returned trigger is registered as theory-provided: it is unified, and under the most
      * informed treatment also matched structurally, so a metavariable in it can bind a term the
-     * formula never named and a theory can solve an index below it. Instances it yields carry
+     * that does not occur in the formula, and a theory can solve an index below it. Instances it
+     * yields carry
      * the {@code FALLBACK} origin, which only the most informed treatment admits. A fallback
      * that covers only part of the clause's variables joins no multi-trigger cover; the covers
      * are built before the fallbacks are asked for.

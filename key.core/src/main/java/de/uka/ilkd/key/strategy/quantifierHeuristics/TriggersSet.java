@@ -312,8 +312,8 @@ public class TriggersSet {
                 return Search.SATISFIED;
             }
             // A term becomes a trigger only if no subterm satisfies it. A subterm whose
-            // candidates were all forbidden does not, so the next enclosing meaningful term
-            // gets its chance.
+            // candidates were all forbidden does not, so the search continues with the
+            // enclosing term.
             return registerCandidate(term, enclosing, services);
         }
 
@@ -428,8 +428,8 @@ public class TriggersSet {
                 }
             }
             // A preferred-enclosing candidate is registered like any other, but leaves the
-            // search open: the read around an array index says which access is meant and
-            // becomes a trigger too.
+            // search open: the read around an array index determines the accessed array and
+            // must become a trigger too.
             return verdict == TriggerSupport.CandidateVerdict.PREFER_ENCLOSING ? Search.OPEN
                     : Search.SATISFIED;
         }

@@ -49,7 +49,7 @@ class UniTrigger implements Trigger {
      * substitutions unification alone does not, so which of the two ran is part of what was
      * computed and
      * has to be part of the key: sharing one cache would hand the caller whichever mode happened
-     * to fill the entry first. Only a generalized trigger tells the two apart, see
+     * to fill the entry first. Only a generalized trigger distinguishes the two modes, see
      * {@link #computeSubstitutionsForTerm}.
      */
     private final ConcurrentLruCache<Term, ImmutableSet<Substitution>> matchResultsByBasicMatching =

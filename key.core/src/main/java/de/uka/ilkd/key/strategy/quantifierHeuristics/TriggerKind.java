@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
  * variable is unified instead, which treats that variable as an unknown rather than binding it.
  * A theory-derived trigger carries metavariables in place of ground subterms; unification binds
  * them on any target, and structural matching is allowed in addition under the most informed
- * treatment, since it instantiates from a term the formula never named.
+ * treatment, since it instantiates from a term that does not occur in the formula.
  *
  * The kind is decided once, when the trigger is registered, and the matching stage chooses the
  * matcher by the kind alone.

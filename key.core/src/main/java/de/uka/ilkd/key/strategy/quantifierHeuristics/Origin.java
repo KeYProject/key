@@ -28,7 +28,7 @@ enum Origin {
 
     /**
      * A theory's generalized trigger matched a sequent term structurally, binding a
-     * metavariable to a term the formula never named.
+     * metavariable to a term that does not occur in the formula.
      */
     THEORY_MATCHED,
 

@@ -36,7 +36,7 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * nothing of its own, so it is never a trigger. The index expression below it can be one:
      * only compound expressions reach a verdict, a bare variable is no candidate to begin
      * with, and a compound expression matches only terms of its own shape. The read above
-     * names the accessed array, which the index expression alone does not, so its verdict
+     * determines the accessed array, which the index expression alone does not, so its verdict
      * keeps the search going up to the select.
      *
      * @param candidate a trigger candidate that contains the quantified variables
@@ -54,13 +54,13 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
         }
         if (candidate.op() == heapLDT.getArr()) {
             // arr only packs the index expression into a Field. With a bare index it matches
-            // the packaging of every access on the sequent; with a compound index everything
-            // it could say is said by its argument, which gets its own verdict below.
+            // the packaging of every access on the sequent; with a compound index it adds
+            // no information to its argument, which receives its own verdict below.
             return CandidateVerdict.FORBIDDEN;
         }
         if (enclosing != null && enclosing.op() == heapLDT.getArr()) {
             // a compound index expression is a trigger of its own, but only the read above
-            // names the accessed array, so the select must become a trigger too
+            // determines the accessed array, so the select must become a trigger too
             return CandidateVerdict.PREFER_ENCLOSING;
         }
         return CandidateVerdict.ACCEPTABLE;

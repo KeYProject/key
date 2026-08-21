@@ -154,7 +154,8 @@ class BasicMatching {
 
         if (patternOp != instance.op()) {
             // Only below a read that has matched so far. Solving a bare array index against an
-            // arbitrary integer says nothing until the read around it is known to be the same.
+            // arbitrary integer establishes nothing until the read around it is known to be the
+            // same.
             return nested ? solveByTheory(bindings, pattern, instance, services) : null;
         }
         for (int i = 0; i < pattern.arity(); i++) {

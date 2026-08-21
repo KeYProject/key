@@ -101,7 +101,8 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
     /**
      * The occurrence value of an instance with the proving-polarity boost: a formula where the
      * instance occurs at proving polarity counts twice, so of two equally frequent instances the
-     * one the proof still has to say something about comes first. A weakly connected instance gets
+     * one occurring in a formula that remains to be proved comes first. A weakly connected instance
+     * gets
      * a
      * large value, a strongly connected one a small value, bounded by {@link #CAP}.
      *
