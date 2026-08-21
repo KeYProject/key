@@ -15,12 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -112,13 +110,8 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
      * @return the boosted occurrence value, between 0 and {@link #CAP}
      */
     protected static long polarityValue(OccData d, Term inst) {
-        Integer occ = d.occ().get(inst);
-        Integer pos = d.goalOcc().get(inst);
-        if (occ == null && (inst.op() instanceof ParametricFunctionInstance pfi
-                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
-            occ = d.occ().get(inst.sub(0));
-            pos = d.goalOcc().get(inst.sub(0));
-        }
+        final Integer occ = d.occ().get(inst);
+        final Integer pos = d.goalOcc().get(inst);
         if (occ == null) {
             return CAP;
         }

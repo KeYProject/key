@@ -9,9 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
-
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 
@@ -43,11 +40,7 @@ public final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
      * @return the generation rank
      */
     private static long generationValue(Map<Term, Integer> ranks, Term inst) {
-        Integer rank = ranks.get(inst);
-        if (rank == null && (inst.op() instanceof ParametricFunctionInstance pfi
-                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
-            rank = ranks.get(inst.sub(0));
-        }
+        final Integer rank = ranks.get(inst);
         return rank == null ? CAP : rank;
     }
 

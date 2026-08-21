@@ -3,22 +3,41 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
  * How much the quantifier instantiation heuristic is told about the theories, as the strategy's
  * trigger option selects it.
+ *
+ * A treatment is a set of admitted instance {@link Origin}s and a choice of theory supports.
+ * Which theories select the triggers follows {@link #isClassic()}; whether an instance found by
+ * some mechanism is offered at all follows {@link #admits(Origin)}. A new mechanism is one new
+ * origin, admitted here per treatment.
+ *
+ * The solved-position origin is admitted everywhere: solving happens inside the structural
+ * matching of the formula's own triggers, which every treatment runs (see
+ * {@code BasicMatching}).
  */
 public enum TriggerTreatment {
 
     /** Everything the heuristic knows. */
-    BEST,
+    BEST(EnumSet.allOf(Origin.class)),
 
     /** The theories' trigger selection, with theory-provided triggers unified only. */
-    GOOD,
+    GOOD(EnumSet.of(Origin.OWN_PATTERN, Origin.SOLVED_POSITION, Origin.THEORY_UNIFIED,
+        Origin.THEORY_DIRECT)),
 
     /** Equality and integer rejection only, and no ordering of the candidates. */
-    CLASSIC;
+    CLASSIC(EnumSet.of(Origin.OWN_PATTERN, Origin.SOLVED_POSITION));
+
+    private final Set<Origin> admittedOrigins;
+
+    TriggerTreatment(Set<Origin> admittedOrigins) {
+        this.admittedOrigins = admittedOrigins;
+    }
 
     public static TriggerTreatment forOption(String option) {
         if (StrategyProperties.TRIGGERS_CLASSIC.equals(option)) {
@@ -32,16 +51,8 @@ public enum TriggerTreatment {
         return this == CLASSIC;
     }
 
-    /**
-     * Whether a theory-provided trigger may also be matched by {@link BasicMatching}, and not only
-     * unified.
-     *
-     * Basic matching binds the trigger's metavariable to a term the trigger never read, so a
-     * trigger written for one heap matches a read over another, and a theory can solve an array
-     * index along the way. It is the one part of the heuristic that instantiates from a term the
-     * formula does not name, so it is left to the most informed treatment.
-     */
-    public boolean allowsBasicMatchingOfTheoryTriggers() {
-        return this == BEST;
+    /** Whether an instance of the given origin is offered under this treatment. */
+    boolean admits(Origin origin) {
+        return admittedOrigins.contains(origin);
     }
 }

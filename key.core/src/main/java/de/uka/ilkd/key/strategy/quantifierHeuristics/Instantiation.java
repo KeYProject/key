@@ -3,17 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,7 +27,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 class Instantiation {
 
@@ -48,15 +41,8 @@ class Instantiation {
      */
     private ImmutableSet<JTerm> assumedLiterals = DefaultImmutableSet.nil();
 
-    /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
-    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<>();
-    /**
-     * The recorded instances bucketed by {@link Term#nameHash()}. Two terms equal up to term
-     * labels share that hash, so the label-insensitive duplicate check in
-     * {@link #addInstance(Substitution, long)} compares only within one bucket instead of
-     * scanning every recorded instance.
-     */
-    private final Map<Integer, List<Term>> instancesByNameHash = new HashMap<>();
+    /** The candidate instances found on the sequent, with their costs and origins. */
+    private final InstanceTable instances = new InstanceTable();
 
     /** The tie-break scorer, prepared lazily on the first tie-break request and reused. */
     private QuantifierInstantiationTieBreak.Scorer scorer;
@@ -92,8 +78,10 @@ class Instantiation {
         congruence = new Congruence(assumedLiterals, services);
         assumedLiterals = normalizeAll(assumedLiterals);
         addInstances(sequentToTerms(seq), services);
-        addTheoryInstances((JTerm) matrix,
-            services.getProfile().getTheorySupports(treatment.isClassic()), services);
+        if (treatment.admits(Origin.THEORY_DIRECT)) {
+            addTheoryInstances((JTerm) matrix,
+                services.getProfile().getTheorySupports(treatment.isClassic()), services);
+        }
     }
 
     /**
@@ -106,8 +94,8 @@ class Instantiation {
      * not, so every support is called on every subterm. A supplied candidate is costed like a
      * matched one.
      *
-     * The supports are the ones the trigger treatment selects, so the classic treatment, which
-     * has none for the heap, supplies no candidates.
+     * The caller asks the treatment for {@link Origin#THEORY_DIRECT} before the walk starts,
+     * so a treatment that admits no direct instances does not pay for the descent.
      *
      * @param term a subterm of the matrix
      * @param supports the theories to consult
@@ -119,7 +107,7 @@ class Instantiation {
             for (final JTerm inst : support.provideInstances(term, firstVar, services)) {
                 final ImmutableMap<QuantifiableVariable, Term> varMap =
                     DefaultImmutableMap.<QuantifiableVariable, Term>nilMap().put(firstVar, inst);
-                addInstance(new Substitution(varMap), services, 0);
+                record(new Substitution(varMap), Origin.THEORY_DIRECT, false, services);
             }
         }
         for (int i = 0; i < term.arity(); i++) {
@@ -134,7 +122,7 @@ class Instantiation {
     /**
      * Per-thread single-entry cache for {@link #create}. The parallel prover computes quantifier
      * cost concurrently, so a shared cache would hand the same {@link Instantiation}, with its
-     * mutable {@code instancesWithCosts}, to several workers at once. Confining it to one worker
+     * mutable instance table, to several workers at once. Confining it to one worker
      * also drops the cross-proof lock the class used to take.
      */
     private static final ThreadLocal<Cached> lastCreate = new ThreadLocal<>();
@@ -167,7 +155,7 @@ class Instantiation {
 
     /**
      * For each trigger, match it against the sequent terms and store every resulting instantiation
-     * together with its predicted cost in {@code instancesWithCosts}.
+     * together with its predicted cost in the instance table.
      *
      * @param terms the sequent terms the triggers are matched against
      */
@@ -178,16 +166,12 @@ class Instantiation {
                 continue;
             }
             for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) {
-                addInstance(sub, services,
-                    sub.isSolvedByTheory() ? SOLVED_POSITION_SURCHARGE : 0);
+                record(sub,
+                    sub.isSolvedByTheory() ? Origin.SOLVED_POSITION : Origin.OWN_PATTERN,
+                    false, services);
                 matchedByOwnTerms = true;
             }
         }
-        // Basic matching binds the trigger's metavariable to a term the trigger never read, so
-        // the instance speaks about a state the formula does not name. Where none of the formula's
-        // own terms match the sequent it is all there is, and costs what it predicts. Where they
-        // do match, it is offered behind them, so the search takes it only if nothing cheaper
-        // closes the goal. Only the cheapest offer for an instance is recorded.
         for (final Trigger t : triggersSet.getAllTriggers()) {
             if (!t.isTheoryProvided()) {
                 continue;
@@ -195,13 +179,14 @@ class Instantiation {
             final ImmutableSet<Substitution> unified =
                 t.getSubstitutionsFromTerms(terms, services, false);
             for (final Substitution sub : unified) {
-                addInstance(sub, services, 0);
+                record(sub, Origin.THEORY_UNIFIED, matchedByOwnTerms, services);
             }
-            if (treatment.allowsBasicMatchingOfTheoryTriggers()) {
-                final long surcharge = matchedByOwnTerms ? THEORY_TRIGGER_SURCHARGE : 0;
+            // The treatment is asked before the matching runs, not in record: computing matches
+            // no treatment admits would be wasted work.
+            if (treatment.admits(Origin.THEORY_MATCHED)) {
                 for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services, true)) {
                     if (!unified.contains(sub)) {
-                        addInstance(sub, services, surcharge);
+                        record(sub, Origin.THEORY_MATCHED, matchedByOwnTerms, services);
                     }
                 }
             }
@@ -209,38 +194,62 @@ class Instantiation {
     }
 
     /**
-     * What an instance costs on top of its prediction when only basic matching of a
-     * theory-provided trigger produces it, and the formula's own terms do match the sequent.
+     * Records one instance candidate: drops it if the treatment does not admit its origin or
+     * its cost cannot be predicted, otherwise costs it with the origin's surcharge on top of its
+     * prediction. Only the cheapest
+     * offer for an instance is kept.
      *
-     * A predicted cost is a product of clause sizes (see {@link PredictCostProver}), so any
-     * surcharge above that range puts such instances behind the supported ones; the exact value
-     * does not matter.
-     */
-    private static final long THEORY_TRIGGER_SURCHARGE = 10000L;
-
-    /**
-     * What an instance costs on top of its prediction when a theory solved a disagreeing position
-     * to obtain it. The instance is then a term the matched term does not contain, so it is
-     * offered behind those the two terms produced by agreeing throughout.
-     */
-    private static final long SOLVED_POSITION_SURCHARGE = 10000L;
-
-
-    /**
      * @param sub the instantiation found
+     * @param origin why the instance is offered
+     * @param matchedByOwnTerms whether some term of the formula matched the sequent
      * @param services access to the theories
-     * @param surcharge what the instance costs on top of its prediction, zero where one of the
-     *        formula's own terms produced it
      */
-    private void addInstance(Substitution sub, Services services, long surcharge) {
-        long cost =
-            PredictCostProver.computerInstanceCost(sub, (JTerm) getMatrix(),
-                assumedLiterals, congruence, services);
+    private void record(Substitution sub, Origin origin, boolean matchedByOwnTerms,
+            Services services) {
+        if (!treatment.admits(origin)) {
+            return;
+        }
+        final long cost = PredictCostProver.computerInstanceCost(sub, (JTerm) getMatrix(),
+            assumedLiterals, congruence, services);
         if (cost == -1) {
             return;
         }
-        addInstance(sub, cost + surcharge);
+        instances.record(sub.getSubstitutedTerm(firstVar),
+            cost + surcharge(origin, matchedByOwnTerms), origin);
     }
+
+    /**
+     * What an instance costs on top of its predicted cost, by its origin.
+     *
+     * A predicted cost is a product of clause sizes (see {@link PredictCostProver}), so any
+     * surcharge above that range puts the instance behind every unsurcharged one; the exact
+     * values do not matter.
+     *
+     * A solved position always costs extra: the instance is a term the matched term does not
+     * contain, so it is offered behind those the two terms produced by agreeing throughout. A
+     * theory trigger's structural match costs extra only when some term of the formula matched
+     * the sequent: such a match binds the trigger's metavariable to a term the trigger never
+     * read, so where the formula's own terms match, their instances come first, and where they
+     * do not, it is all there is and costs what it predicts.
+     *
+     * @param origin why the instance is offered
+     * @param matchedByOwnTerms whether some term of the formula matched the sequent
+     * @return the surcharge
+     */
+    private static long surcharge(Origin origin, boolean matchedByOwnTerms) {
+        return switch (origin) {
+            case SOLVED_POSITION -> SOLVED_POSITION_SURCHARGE;
+            case THEORY_MATCHED -> matchedByOwnTerms ? THEORY_TRIGGER_SURCHARGE : 0;
+            default -> 0;
+        };
+    }
+
+    /** Surcharge of {@link Origin#THEORY_MATCHED} instances, see {@link #surcharge}. */
+    private static final long THEORY_TRIGGER_SURCHARGE = 10000L;
+
+    /** Surcharge of {@link Origin#SOLVED_POSITION} instances, see {@link #surcharge}. */
+    private static final long SOLVED_POSITION_SURCHARGE = 10000L;
+
 
     /** Normalizes every literal by the congruence, so equal atoms coincide. */
     private ImmutableSet<JTerm> normalizeAll(ImmutableSet<JTerm> lits) {
@@ -252,33 +261,6 @@ class Instantiation {
             res = res.add(congruence.normalize(l));
         }
         return res;
-    }
-
-    private void addInstance(Substitution sub, long cost) {
-        final Term inst =
-            sub.getSubstitutedTerm(firstVar);
-        Term key = inst;
-        Long oldCost = instancesWithCosts.get(inst);
-        if (oldCost == null) {
-            final List<Term> bucket = instancesByNameHash.get(inst.nameHash());
-            if (bucket != null) {
-                for (final Term existing : bucket) {
-                    if (((JTerm) existing).equalsModProperty(inst,
-                        IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                        key = existing;
-                        oldCost = instancesWithCosts.get(existing);
-                        break;
-                    }
-                }
-            }
-            if (oldCost == null) {
-                instancesByNameHash.computeIfAbsent(inst.nameHash(), h -> new ArrayList<>(2))
-                        .add(inst);
-            }
-        }
-        if (oldCost == null || oldCost >= cost) {
-            instancesWithCosts.put(key, cost);
-        }
     }
 
     /**
@@ -316,21 +298,11 @@ class Instantiation {
     }
 
     private RuleAppCost computeCostHelp(Term inst) {
-        Long cost = instancesWithCosts.get(inst);
-        if (cost == null && (inst.op() instanceof ParametricFunctionInstance pfi
-                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
-            cost = instancesWithCosts.get(inst.sub(0));
-        }
-
-        if (cost == null) {
-            // if (triggersSet)
+        final InstanceTable.Entry entry = instances.entryOf(inst, services);
+        if (entry == null) {
             return TopRuleAppCost.INSTANCE;
         }
-        if (cost == -1) {
-            return TopRuleAppCost.INSTANCE;
-        }
-
-        return NumberRuleAppCost.create(cost);
+        return NumberRuleAppCost.create(entry.cost());
     }
 
     /**
@@ -362,16 +334,16 @@ class Instantiation {
             QuantifierInstantiationTieBreak strategy) {
         if (scorer == null || scorerStrategy != strategy) {
             scorer = strategy.prepare(new QuantifierInstantiationTieBreak.View(
-                instancesWithCosts.keySet(), sequent, goal, services));
+                instances.instances(), sequent, goal, services));
             scorerStrategy = strategy;
         }
-        return NumberRuleAppCost.create(scorer.tieBreak(inst));
+        return NumberRuleAppCost.create(scorer.tieBreak(instances.normalize(inst, services)));
     }
 
     /** get all instances from instancesCostCache subsCache */
     ImmutableSet<Term> getSubstitution() {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
-        for (final Term inst : instancesWithCosts.keySet()) {
+        for (final Term inst : instances.instances()) {
             res = res.add(inst);
         }
         return res;
