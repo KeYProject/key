@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,10 +25,10 @@ import org.key_project.util.collection.Pair;
 
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
-import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
-import com.github.javaparser.javadoc.JavadocBlockTag;
+import com.github.therapi.runtimejavadoc.ClassJavadoc;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
+import com.github.therapi.runtimejavadoc.ParamJavadoc;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import com.google.common.collect.Streams;
 import org.jspecify.annotations.NonNull;
 
@@ -476,13 +473,14 @@ public class TacletBuilderManipulators {
             cmds.sort(reversed);
 
             Class<?> clazz = cmds.getFirst().getRelevantClazz();
-            final var sourceCode = getSourceCode(clazz.getName());
 
-            System.out.println(clazzDoc(sourceCode));
+            ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(clazz.getName());
+
+            System.out.println(clazzDoc(classDoc));
 
             System.out.format("\n**Signatures**\n\n", name);
             for (TacletBuilderCommand cmd : cmds) {
-                final var x = constructorJavadoc(sourceCode, cmd.getArgumentTypes(),
+                final var x = constructorJavadoc(classDoc, clazz, cmd.getArgumentTypes(),
                     cmd.isNegationSupported());
 
                 final var arguments = Streams.zip(x.first.stream(),
@@ -501,86 +499,63 @@ public class TacletBuilderManipulators {
     }
 
 
-    private static Pair<List<String>, String> constructorJavadoc(CompilationUnit sourceCode,
+    private static Pair<List<String>, String> constructorJavadoc(ClassJavadoc sourceCode,
+            Class<?> clazz,
             ArgumentType[] types, boolean supportNegation) {
-        List<String> javadoc = new ArrayList<>();
+        List<Class<?>> javadoc = new ArrayList<>();
         for (ArgumentType type : types) {
-            javadoc.add(type.clazz.getSimpleName());
+            javadoc.add(type.clazz);
         }
         if (supportNegation)
-            javadoc.add("boolean");
+            javadoc.add(Boolean.TYPE);
 
-        final var constructorDeclaration = sourceCode.getPrimaryType()
-                .flatMap(it -> it.getConstructorByParameterTypes(javadoc.toArray(new String[0])));
+        try {
+            var constr = clazz.getConstructor(javadoc.toArray(new Class<?>[0]));
 
-        var names = constructorDeclaration.map(
-            it -> it.getParameters().stream().map(NodeWithSimpleName::getNameAsString)
-                    .map(s -> s + ": ")
-                    .toList())
-                .orElse(Arrays.stream(types).map(it -> "").toList());
+            final var constructorDeclaration = sourceCode.getConstructors().stream()
+                    .filter(it -> it.matches(constr))
+                    .findAny();
 
-        var jd = constructorDeclaration
-                .flatMap(NodeWithJavadoc::getJavadoc)
-                .map(it -> it.getDescription().toText() + "\n" +
-                    it.getBlockTags().stream()
-                            .filter(tag -> tag.getType() == JavadocBlockTag.Type.PARAM)
-                            .map(tag -> "* `%s` %s".formatted(tag.getName().orElse(""),
-                                tag.toText()))
-                            .collect(Collectors.joining("\n")))
-                .map(it -> it.replace("<tt>", "`")
-                        .replace("<ul>", "\n")
-                        .replace("</ul>", "\n")
-                        .replace("<ul>", "\n")
-                        .replace("<li>", "* ")
-                        .replace("</li>", "")
-                        .replace("{@link", "`")
-                        .replace("}", "`")
-                        .replace("<code>", "`")
-                        .replace("</tt>", "`")
-                        .replace("</code>", "`")
-                        .replace("<b>", "**")
-                        .replace("</b>", "**"))
-                .map(it -> "   " + it.replace("\n", "\n   ")).orElse("");
-        return new Pair<>(names, jd);
-    }
+            var names = constructorDeclaration.map(
+                it -> it.getParams().stream().map(ParamJavadoc::getName)
+                        .map(s -> s + ": ")
+                        .toList())
+                    .orElse(Arrays.stream(types).map(it -> "").toList());
 
-    private static String clazzDoc(CompilationUnit sourceCode) {
-        return sourceCode.getPrimaryType().flatMap(NodeWithJavadoc::getJavadoc)
-                .map(it -> it.getDescription().toText())
-                .map(it -> it.replace("<tt>", "`")
-                        .replace("<ul>", "\n")
-                        .replace("</ul>", "\n")
-                        .replace("<ul>", "\n")
-                        .replace("<li>", "* ")
-                        .replace("</li>", "")
-                        .replace("{@link", "`")
-                        .replace("}", "`")
-                        .replace("<code>", "`")
-                        .replace("</tt>", "`")
-                        .replace("</code>", "`")
-                        .replace("</h4>", "")
-                        .replace("<h4>", "#### ")
-                        .replace("<b>", "**")
-                        .replace("</b>", "**"))
-                .orElse("");
-    }
-
-    private static CompilationUnit getSourceCode(String name) {
-        var bases = List.of(
-            Paths.get("key.core/src/main/java/"),
-            Paths.get("key.ncore/src/main/java/"));
-        var rel = name.replace('.', '/') + ".java";
-        for (var basis : bases) {
-            var x = basis.resolve(rel);
-            if (Files.exists(x)) {
-                try {
-                    return StaticJavaParser.parse(x);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            var jd = constructorDeclaration
+                    .map(it -> it.getComment() + "\n" +
+                        it.getParams().stream()
+                                .map(tag -> "* `%s` %s".formatted(tag.getName(), tag.getComment()))
+                                .collect(Collectors.joining("\n")))
+                    .map(it -> it.replace("<tt>", "`")
+                            .replace("<ul>", "\n")
+                            .replace("</ul>", "\n")
+                            .replace("<ul>", "\n")
+                            .replace("<li>", "* ")
+                            .replace("</li>", "")
+                            .replace("{@link", "`")
+                            .replace("}", "`")
+                            .replace("<code>", "`")
+                            .replace("</tt>", "`")
+                            .replace("</code>", "`")
+                            .replace("<b>", "**")
+                            .replace("</b>", "**"))
+                    .map(it -> "   " + it.replace("\n", "\n   ")).orElse("");
+            return new Pair<>(names, jd);
+        } catch (NoSuchMethodException e) {
+            return new Pair<>(List.of(), "");
         }
-        return new CompilationUnit();
+    }
+
+    private static String clazzDoc(ClassJavadoc clazz) {
+        CommentFormatter formatter = new CommentFormatter();
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(clazz.getName());
+
+        if (classDoc.isEmpty()) { // optionally skip absent documentation
+            return "";
+        }
+
+        return formatter.format(classDoc.getComment());
     }
     // endregion
 }
