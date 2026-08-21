@@ -13,7 +13,8 @@ import de.uka.ilkd.key.logic.JTerm;
  * elements of several literals combined into a covering multi-trigger.
  *
  * A clause is covered if some literal has a covering trigger or a covering multi-trigger was
- * built. An uncovered clause is never instantiated through its own terms; it is the case
+ * built. Every covering trigger binds the formula's first variable, so the formula is
+ * instantiated exactly if some clause is covered; a formula with no covered clause is the case
  * {@link TriggerSupport#fallbackTriggers} exists for.
  *
  * @param clause the clause as trigger selection read it

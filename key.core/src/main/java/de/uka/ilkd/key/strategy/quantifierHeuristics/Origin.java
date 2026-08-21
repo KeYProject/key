@@ -36,9 +36,8 @@ enum Origin {
     THEORY_DIRECT,
 
     /**
-     * A fallback trigger of a clause without a covering trigger matched or unified. The clause
-     * would never be instantiated without it, see
-     * {@code TriggerSupport#fallbackTriggers}.
+     * A fallback trigger matched or unified. Fallback triggers exist only for a formula that no
+     * trigger of its own instantiates, see {@code TriggerSupport#fallbackTriggers}.
      */
     FALLBACK
 }

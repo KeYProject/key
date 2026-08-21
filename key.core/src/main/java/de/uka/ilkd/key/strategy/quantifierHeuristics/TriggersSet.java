@@ -142,19 +142,50 @@ public class TriggersSet {
         return DefaultImmutableSet.nil();
     }
 
-    /** Finds the triggers in every clause of the matrix. */
+    /**
+     * Finds the triggers in every clause of the matrix that holds the first quantified variable,
+     * and asks the theories for fallback triggers if none of these clauses is covered.
+     *
+     * The instantiation binds the first variable, so the formula is instantiated exactly if some
+     * clause holding that variable has a covering trigger. A clause without one is no gap while
+     * another clause covers, since every covering trigger binds the first variable. Only a
+     * formula where no clause covers would never be instantiated, and only for it are the
+     * fallbacks asked, clause by clause. The cover search runs once more per clause afterwards,
+     * so fallbacks that bind only some variables combine into covering multi-triggers.
+     */
     private void initTriggers(Services services) {
         final QuantifiableVariable firstVariable = allTerm.varsBoundHere(0).get(0);
+        final List<ClauseTriggerFinder> finders = new ArrayList<>();
+        final List<ClauseTriggers> selections = new ArrayList<>();
         final var clauses =
             TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND);
         while (clauses.hasNext()) {
             final var clause = (JTerm) clauses.next();
             // a trigger must contain the first variable of the quantified formula
             if (clause.freeVars().contains(firstVariable)) {
-                ClauseTriggerFinder finder = new ClauseTriggerFinder(clause);
-                finder.createTriggers(services);
+                final ClauseTriggerFinder finder = new ClauseTriggerFinder(clause);
+                finders.add(finder);
+                selections.add(finder.createTriggers(services));
             }
         }
+        if (!anyCovered(selections)) {
+            for (int i = 0; i < finders.size(); i++) {
+                final ClauseTriggerFinder finder = finders.get(i);
+                finder.addFallbackTriggers(selections.get(i), services);
+                // A fallback binding only some of the clause's variables is an element. No clause
+                // had a cover before, so the search finds only covers that use a fallback.
+                finder.buildCoveringMultiTriggers();
+            }
+        }
+    }
+
+    private static boolean anyCovered(List<ClauseTriggers> selections) {
+        for (final ClauseTriggers selection : selections) {
+            if (selection.covered()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -234,8 +265,7 @@ public class TriggersSet {
 
         /**
          * Finds the uni-triggers and multi-trigger elements in each literal of the clause,
-         * registers the uni-triggers, builds the covering multi-triggers, and asks the theories
-         * for fallback triggers if the clause ends up without a covering trigger.
+         * registers the uni-triggers and builds the covering multi-triggers.
          *
          * @param services access to the theory operators and term construction
          * @return what the selection found, per literal
@@ -249,19 +279,15 @@ public class TriggersSet {
                 perLiteral.add(found.forLiteral(literal));
             }
             final boolean multiCovered = buildCoveringMultiTriggers();
-            final ClauseTriggers selection =
-                new ClauseTriggers(analysis, List.copyOf(perLiteral), multiCovered);
-            if (!selection.covered()) {
-                addFallbackTriggers(selection, services);
-            }
-            return selection;
+            return new ClauseTriggers(analysis, List.copyOf(perLiteral), multiCovered);
         }
 
         /**
-         * Registers the theories' fallback triggers for a clause without a covering trigger.
-         * Which treatments act on their instances is decided where the instances are recorded,
-         * not here: the set is cached per formula and shared by the non-classic treatments.
-         * Fallback triggers are not part of the selection value they are asked for.
+         * Registers the theories' fallback triggers for this clause. Called only when no clause
+         * of the formula is covered, see {@link TriggersSet#initTriggers}. Which treatments act
+         * on the instances is decided where the instances are recorded, not here: the set is
+         * cached per formula and shared by the non-classic treatments. Fallback triggers are not
+         * part of the selection value they are asked for.
          */
         private void addFallbackTriggers(ClauseTriggers selection, Services services) {
             final Collected discarded = new Collected();

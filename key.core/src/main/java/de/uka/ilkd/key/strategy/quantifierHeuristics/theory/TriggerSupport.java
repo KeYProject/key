@@ -82,24 +82,27 @@ public interface TriggerSupport {
             Services services, MetavariableFactory metavariableFactory);
 
     /**
-     * The fallback triggers this theory offers for a clause that has no covering trigger.
+     * The fallback triggers this theory offers for a clause of a formula that no trigger
+     * instantiates.
      *
-     * Some clauses yield no covering trigger: every literal holding the quantified variable is
-     * forbidden, and what remains binds no universal variable. Such a clause is never
-     * instantiated through its own terms. This method is the last resort, asked only for such a
-     * clause, so an implementation does not compete with the ordinary selection and cannot lose
-     * an instantiation that exists anyway. It receives what the selection did find, per literal,
-     * so it can address the literals that yielded nothing.
+     * Some formulas yield no covering trigger in any clause: every literal holding the
+     * quantified variable is forbidden, and what remains binds no universal variable. Such a
+     * formula is never instantiated through its own terms. This method is the last resort, asked
+     * for each clause of such a formula and for no other, so an implementation does not compete
+     * with the ordinary selection and cannot lose an instantiation that exists anyway. The
+     * given clause is therefore uncovered itself; the value also tells, per literal, what the
+     * selection did find. Instances a theory reads off the formula directly, without a trigger,
+     * are not part of this condition: they are found later, per sequent.
      *
      * A returned trigger is registered as theory-provided: it is unified, and under the most
-     * informed treatment also matched structurally, so a metavariable in it can bind a term the
-     * that does not occur in the formula, and a theory can solve an index below it. Instances it
-     * yields carry
-     * the {@code FALLBACK} origin, which only the most informed treatment admits. A fallback
-     * that covers only part of the clause's variables joins no multi-trigger cover; the covers
-     * are built before the fallbacks are asked for.
+     * informed treatment also matched structurally, so a metavariable in it can bind a term that
+     * does not occur in the formula, and a theory can solve an index below it. Instances it
+     * yields carry the {@code FALLBACK} origin, which only the most informed treatment admits. A
+     * fallback that binds only some of the clause's variables is an element, and may combine
+     * with other elements, the formula's own included, into a covering multi-trigger: the cover
+     * search runs again after the fallbacks are registered.
      *
-     * @param selection the clause and the triggers its literals yielded
+     * @param selection one clause of the formula, with the triggers its literals yielded
      * @param services access to the theory operators
      * @param metavariableFactory supplies the metavariables a fallback trigger needs
      * @return the fallback triggers, possibly empty
