@@ -84,10 +84,12 @@ public interface TriggerSupport {
     /**
      * The fallback triggers this theory offers for a clause that has no covering trigger.
      *
-     * Some clauses yield no trigger at all: every literal holding the quantified variable is
-     * forbidden, and what remains covers no variable. Such a clause is never instantiated. This
-     * method is the last resort, asked only for such a clause, so an implementation does not
-     * compete with the ordinary selection and cannot lose an instantiation that exists anyway.
+     * Some clauses yield no covering trigger: every literal holding the quantified variable is
+     * forbidden, and what remains binds no universal variable. Such a clause is never
+     * instantiated through its own terms. This method is the last resort, asked only for such a
+     * clause, so an implementation does not compete with the ordinary selection and cannot lose
+     * an instantiation that exists anyway. It receives what the selection did find, per literal,
+     * so it can address the literals that yielded nothing.
      *
      * A returned trigger is registered as theory-provided: it is unified, and under the most
      * informed treatment also matched structurally, so a metavariable in it can bind a term the
@@ -97,12 +99,12 @@ public interface TriggerSupport {
      * that covers only part of the clause's variables joins no multi-trigger cover; the covers
      * are built before the fallbacks are asked for.
      *
-     * @param clause the clause without a covering trigger
+     * @param selection the clause and the triggers its literals yielded
      * @param services access to the theory operators
      * @param metavariableFactory supplies the metavariables a fallback trigger needs
      * @return the fallback triggers, possibly empty
      */
-    default List<JTerm> fallbackTriggers(ClauseAnalysis clause, Services services,
+    default List<JTerm> fallbackTriggers(ClauseTriggers selection, Services services,
             MetavariableFactory metavariableFactory) {
         return List.of();
     }
