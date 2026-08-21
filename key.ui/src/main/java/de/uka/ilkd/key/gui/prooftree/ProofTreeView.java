@@ -212,7 +212,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
                     Style style = renderer.initStyleForNode(node);
                     if (style.tooltip != null) {
-                        return renderTooltip(style.tooltip);
+                        return renderTooltip(style.tooltip,
+                            node.getNode().proof().getServices());
                     }
                 }
 
@@ -1197,7 +1198,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
     }
 
-    private static String renderTooltip(Style.Tooltip tooltip) {
+    private static String renderTooltip(Style.Tooltip tooltip, Services services) {
         String title = tooltip.getTitle();
         List<Style.Tooltip.Fragment> fragments = tooltip.getAdditionalInfos();
         boolean titleEmpty = title == null || title.isEmpty();
@@ -1226,7 +1227,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
             } else {
                 result.append(" ");
             }
-            result.append(fragment.value);
+            if (fragment.value instanceof final PosInOccurrence pio) {
+                if (pio != null) {
+                    String on = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
+                    result.append(LogicPrinter.escapeHTML(cutIfTooLong(on), true));
+                } else {
+                    result.append("sequent");
+                }
+            } else {
+                result.append(fragment.value);
+            }
         }
         result.append("</html>");
         return result.toString();
@@ -1278,11 +1288,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private void renderBranch(Style style, GUIBranchNode node) {
             style.icon = getIcon();
 
-            var text = style.text;
+            var text = style.text();
             // Elide text and move it to additional info
             // This does not influence the search since it does not use the text
             if (text.length() > 60) {
-                style.text = text.substring(0, 60) + "...";
+                style.setText(text.substring(0, 60) + "...");
                 style.tooltip.setTitle(text);
             }
 
@@ -1382,9 +1392,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
-                String on = LogicPrinter.quickPrintTerm(
-                    (JTerm) pio.subTerm(), node.proof().getServices());
-                style.tooltip.addAppliedOn(cutIfTooLong(on));
+                style.tooltip.addPosInOccurrence(pio);
             }
 
             final String notes = node.getNodeInfo().getNotes();
@@ -1412,7 +1420,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (!(treeNode instanceof GUIOneStepChildTreeNode) && child.size() == 1
                     && child.get(0).getNodeInfo().getBranchLabel() != null) {
                 isBranch = true;
-                style.text = style.text + ": " + child.get(0).getNodeInfo().getBranchLabel();
+                style.setText(style.text() + ": " + child.get(0).getNodeInfo().getBranchLabel());
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();
@@ -1420,11 +1428,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             style.icon = defaultIcon;
 
-            var text = style.text;
+            var text = style.text();
             // Elide text and move it to additional info
             // This does not influence the search since it does not use the text
             if (text.length() > 60 && treeNode instanceof GUIProofTreeNode) {
-                style.text = text.substring(0, 60) + "...";
+                style.setText(text.substring(0, 60) + "...");
                 // This should only happen if node.name() uses the active statement
                 // Pretty print it to make it readable
                 style.tooltip.setTitle(node.getAppliedRuleApp().rule().name().toString());
@@ -1459,12 +1467,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.foreground = GRAY_COLOR.get();
             style.icon = IconFactory.oneStepSimplifier(16);
             RuleApp app = node.getRuleApp();
-            style.text = app.rule().name().toString();
-            Services services = node.getNode().proof().getServices();
-            String on =
-                LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
-            style.tooltip.addRule(style.text);
-            style.tooltip.addAppliedOn(cutIfTooLong(on));
+            style.setText(app.rule().name().toString());
+            style.tooltip.addRule(style.text());
+            style.tooltip.addPosInOccurrence(app.posInOccurrence());
         }
 
         @Override
@@ -1495,7 +1500,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // For performance reasons, we render the tooltips now lazily ...
             // String tooltip = renderTooltip(style.tooltip);
             // setToolTipText(tooltip);
-            setText(style.text);
+            setText(style.text());
             setIcon(style.icon);
 
             return this;
@@ -1512,7 +1517,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.foreground = UIManager.getColor("Label.foreground");
             style.background = UIManager.getColor("Label.background");
             // Normalize whitespace
-            style.text = node.toString().replaceAll("\\s+", " ");
+            style.setText(node.toString().replaceAll("\\s+", " "));
             style.border = null;
             style.tooltip = new Style.Tooltip();
             style.icon = null;
