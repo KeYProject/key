@@ -907,6 +907,8 @@ public class ProofCollections {
         g.provable("standard_key/quantifiers/normalisation12.key");
         g.provable("standard_key/quantifiers/normalisation13.key");
         g.provable("standard_key/quantifiers/triggers0.key");
+        g.provable("standard_key/quantifiers/affineArrayIndices.key");
+        g.provable("standard_key/quantifiers/issue3972MVE.key");
 
 
         g = c.group("strings");
