@@ -14,11 +14,33 @@
  *   }
  */
 public class InstanceOfPatternExample {
-    
+
     /**
-     * Basic instanceof pattern matching example.
-     * The variable 's' is bound in the true branch of the instanceof check.
+     *
      */
+
+    /*@ normal_behavior
+      @ requires obj != null;
+      @ ensures \result instanceof String;
+      @*/
+    public static Object getString(Object obj) {
+        return "ha";
+    }
+
+    /*@ normal_behavior
+      @ requires obj != null;
+      @ ensures \result;
+      @*/
+    public static boolean isString(Object obj) {
+        boolean result = getString(obj) instanceof String id;
+        return result;
+    }
+
+
+        /**
+         * Basic instanceof pattern matching example.
+         * The variable 's' is bound in the true branch of the instanceof check.
+         */
     /*@ normal_behavior
       @ requires obj != null;
       @ ensures \result >= 0;
