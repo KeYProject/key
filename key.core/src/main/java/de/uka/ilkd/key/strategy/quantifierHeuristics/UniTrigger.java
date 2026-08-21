@@ -32,6 +32,8 @@ class UniTrigger implements Trigger {
     /** How this trigger is matched, see {@link TriggerKind}. */
     private final TriggerKind kind;
     private final boolean isElementOfMultitrigger;
+    /** Whether this trigger is a theory's fallback for a clause without a covering trigger. */
+    private final boolean fallback;
 
     // A TriggersSet is cached per proof (ServiceCaches.triggerSetCache) and thus shared across the
     // parallel-prover workers, so this match-result cache is hit concurrently on the cost path. The
@@ -54,12 +56,13 @@ class UniTrigger implements Trigger {
         new ConcurrentLruCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> universalVariables,
-            TriggerKind kind, boolean isElementOfMultitrigger,
+            TriggerKind kind, boolean isElementOfMultitrigger, boolean fallback,
             TriggersSet owningTriggerSet) {
         this.trigger = trigger;
         this.universalVariables = universalVariables;
         this.kind = kind;
         this.isElementOfMultitrigger = isElementOfMultitrigger;
+        this.fallback = fallback;
         this.owningTriggerSet = owningTriggerSet;
     }
 
@@ -130,6 +133,11 @@ class UniTrigger implements Trigger {
     @Override
     public boolean isTheoryProvided() {
         return kind.isTheoryProvided();
+    }
+
+    @Override
+    public boolean isFallback() {
+        return fallback;
     }
 
     @Override

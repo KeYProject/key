@@ -166,10 +166,10 @@ public class TriggersSet {
      */
     private Trigger createUniTrigger(JTerm trigger,
             ImmutableSet<QuantifiableVariable> universalVariables, TriggerKind kind,
-            boolean isElement) {
+            boolean isElement, boolean fallback) {
         Trigger cached = termToTrigger.get(trigger);
         if (cached == null) {
-            cached = new UniTrigger(trigger, universalVariables, kind, isElement, this);
+            cached = new UniTrigger(trigger, universalVariables, kind, isElement, fallback, this);
             termToTrigger.put(trigger, cached);
         }
         return cached;
@@ -221,10 +221,30 @@ public class TriggersSet {
          */
         public void createTriggers(Services services) {
             final ClauseAnalysis analysis = analyse(services);
+            final int coveringBefore = collectedTriggers.size();
             for (final JTerm literal : analysis.literals()) {
                 searchTriggers(literal, null, services);
             }
             buildCoveringMultiTriggers();
+            // Standalone triggers and covering multi-triggers both land in collectedTriggers,
+            // so the clause has a covering trigger exactly if the collection grew.
+            if (collectedTriggers.size() == coveringBefore) {
+                addFallbackTriggers(analysis, services);
+            }
+        }
+
+        /**
+         * Registers the theories' fallback triggers for a clause without a covering trigger.
+         * Which treatments act on their instances is decided where the instances are recorded,
+         * not here: the set is cached per formula and shared by the non-classic treatments.
+         */
+        private void addFallbackTriggers(ClauseAnalysis analysis, Services services) {
+            for (final TriggerSupport support : supports) {
+                for (final JTerm fallback : support.fallbackTriggers(analysis, services,
+                    metavariableFactory)) {
+                    registerUniTrigger(fallback, true, true);
+                }
+            }
         }
 
         /**
@@ -415,6 +435,10 @@ public class TriggersSet {
         }
 
         private void registerUniTrigger(JTerm term, boolean theoryProvided) {
+            registerUniTrigger(term, theoryProvided, false);
+        }
+
+        private void registerUniTrigger(JTerm term, boolean theoryProvided, boolean fallback) {
             final boolean carriesExistential = !term.freeVars().subset(clauseVariables);
             final boolean isElement = !clauseVariables.subset(term.freeVars());
             final TriggerKind kind = theoryProvided
@@ -423,7 +447,7 @@ public class TriggersSet {
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), clauseVariables);
             Trigger trigger =
-                createUniTrigger(term, uniVarsInTerm, kind, isElement);
+                createUniTrigger(term, uniVarsInTerm, kind, isElement, fallback);
             if (isElement) {
                 elementsOfMultiTrigger = elementsOfMultiTrigger.add(trigger);
             } else {

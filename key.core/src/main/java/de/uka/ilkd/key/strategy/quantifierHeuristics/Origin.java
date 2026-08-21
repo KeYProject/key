@@ -33,5 +33,12 @@ enum Origin {
     THEORY_MATCHED,
 
     /** A theory read the instance off the formula directly, without a trigger. */
-    THEORY_DIRECT
+    THEORY_DIRECT,
+
+    /**
+     * A fallback trigger of a clause without a covering trigger matched or unified. The clause
+     * would never be instantiated without it, see
+     * {@code TriggerSupport#fallbackTriggers}.
+     */
+    FALLBACK
 }

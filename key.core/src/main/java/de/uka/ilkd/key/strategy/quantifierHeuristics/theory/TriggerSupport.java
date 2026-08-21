@@ -80,6 +80,31 @@ public interface TriggerSupport {
             Services services, MetavariableFactory metavariableFactory);
 
     /**
+     * The fallback triggers this theory offers for a clause that has no covering trigger.
+     *
+     * Some clauses yield no trigger at all: every literal holding the quantified variable is
+     * forbidden, and what remains covers no variable. Such a clause is never instantiated. This
+     * method is the last resort, asked only for such a clause, so an implementation does not
+     * compete with the ordinary selection and cannot lose an instantiation that exists anyway.
+     *
+     * A returned trigger is registered as theory-provided: it is unified, and under the most
+     * informed treatment also matched structurally, so a metavariable in it can bind a term the
+     * formula never named and a theory can solve an index below it. Instances it yields carry
+     * the {@code FALLBACK} origin, which only the most informed treatment admits. A fallback
+     * that covers only part of the clause's variables joins no multi-trigger cover; the covers
+     * are built before the fallbacks are asked for.
+     *
+     * @param clause the clause without a covering trigger
+     * @param services access to the theory operators
+     * @param metavariableFactory supplies the metavariables a fallback trigger needs
+     * @return the fallback triggers, possibly empty
+     */
+    default List<JTerm> fallbackTriggers(ClauseAnalysis clause, Services services,
+            MetavariableFactory metavariableFactory) {
+        return List.of();
+    }
+
+    /**
      * The instance candidates this theory supplies for a subterm of the quantified formula. They
      * are used for the quantified variable directly, not through a trigger.
      *

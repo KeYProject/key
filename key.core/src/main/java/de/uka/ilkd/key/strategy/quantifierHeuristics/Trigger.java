@@ -44,4 +44,14 @@ public interface Trigger {
     default boolean isTheoryProvided() {
         return false;
     }
+
+    /**
+     * Whether this trigger is a theory's fallback for a clause without a covering trigger.
+     * Instances it yields carry the {@code FALLBACK} origin.
+     *
+     * @return whether the trigger is a fallback
+     */
+    default boolean isFallback() {
+        return false;
+    }
 }

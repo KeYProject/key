@@ -148,6 +148,18 @@ class MultiTrigger implements Trigger {
         return false;
     }
 
+    /** A multi-trigger is a fallback if one of its elements is. */
+    @Override
+    public boolean isFallback() {
+        for (Trigger element : elements) {
+            if (element.isFallback()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     @Override
     public Term getTriggerTerm() {
         return clause;

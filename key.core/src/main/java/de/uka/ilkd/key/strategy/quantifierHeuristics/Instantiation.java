@@ -176,17 +176,20 @@ class Instantiation {
             if (!t.isTheoryProvided()) {
                 continue;
             }
+            final boolean fallback = t.isFallback();
             final ImmutableSet<Substitution> unified =
                 t.getSubstitutionsFromTerms(terms, services, false);
             for (final Substitution sub : unified) {
-                record(sub, Origin.THEORY_UNIFIED, matchedByOwnTerms, services);
+                record(sub, fallback ? Origin.FALLBACK : Origin.THEORY_UNIFIED,
+                    matchedByOwnTerms, services);
             }
             // The treatment is asked before the matching runs, not in record: computing matches
             // no treatment admits would be wasted work.
             if (treatment.admits(Origin.THEORY_MATCHED)) {
                 for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services, true)) {
                     if (!unified.contains(sub)) {
-                        record(sub, Origin.THEORY_MATCHED, matchedByOwnTerms, services);
+                        record(sub, fallback ? Origin.FALLBACK : Origin.THEORY_MATCHED,
+                            matchedByOwnTerms, services);
                     }
                 }
             }
@@ -230,7 +233,8 @@ class Instantiation {
      * theory trigger's structural match costs extra only when some term of the formula matched
      * the sequent: such a match binds the trigger's metavariable to a term the trigger never
      * read, so where the formula's own terms match, their instances come first, and where they
-     * do not, it is all there is and costs what it predicts.
+     * do not, it is all there is and costs what it predicts. A fallback instance follows the
+     * same rule: its clause had no trigger, but another clause of the formula may have matched.
      *
      * @param origin why the instance is offered
      * @param matchedByOwnTerms whether some term of the formula matched the sequent
@@ -239,7 +243,7 @@ class Instantiation {
     private static long surcharge(Origin origin, boolean matchedByOwnTerms) {
         return switch (origin) {
             case SOLVED_POSITION -> SOLVED_POSITION_SURCHARGE;
-            case THEORY_MATCHED -> matchedByOwnTerms ? THEORY_TRIGGER_SURCHARGE : 0;
+            case THEORY_MATCHED, FALLBACK -> matchedByOwnTerms ? THEORY_TRIGGER_SURCHARGE : 0;
             default -> 0;
         };
     }
