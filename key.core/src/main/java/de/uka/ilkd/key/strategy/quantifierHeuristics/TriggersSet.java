@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,9 +16,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.ClauseAnalysis;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
@@ -54,7 +55,7 @@ public class TriggersSet {
      * metavariables, so a second occurrence of the same subterm in another clause would
      * register unequal copies of the same triggers.
      */
-    private final Set<JTerm> theoryTriggersProvidedFor = new HashSet<>();
+    private final Set<JTerm> theoryTriggersProvidedFor = new LinkedHashSet<>();
     /**
      * Hands the supports their metavariables, counted within this set. The set is built from the
      * quantified formula alone, so the same formula always yields the same names, and no two
@@ -102,7 +103,7 @@ public class TriggersSet {
     }
 
     static TriggersSet create(JTerm allTerm, Services services, boolean classic) {
-        final Map<org.key_project.logic.Term, TriggersSet> triggerSetCache =
+        final Map<Term, TriggersSet> triggerSetCache =
             services.getCaches().getTriggerSetCache();
         allTerm = TermLabelManager.removeIrrelevantLabels(allTerm, services);
         TriggersSet trs;
@@ -159,19 +160,16 @@ public class TriggersSet {
      *
      * @param trigger the trigger term
      * @param universalVariables the universal variables the trigger binds
-     * @param isUnify whether the trigger carries an existential variable and needs unification
+     * @param kind how the trigger is matched
      * @param isElement whether the trigger is an element of a multi-trigger
-     * @param matchByUnification whether the trigger is matched by unification even against ground
-     *        terms
      * @return the uni-trigger for the term
      */
     private Trigger createUniTrigger(JTerm trigger,
-            ImmutableSet<QuantifiableVariable> universalVariables, boolean isUnify,
-            boolean isElement, boolean matchByUnification) {
+            ImmutableSet<QuantifiableVariable> universalVariables, TriggerKind kind,
+            boolean isElement) {
         Trigger cached = termToTrigger.get(trigger);
         if (cached == null) {
-            cached = new UniTrigger(trigger, universalVariables, isUnify, isElement,
-                matchByUnification, this);
+            cached = new UniTrigger(trigger, universalVariables, kind, isElement, this);
             termToTrigger.put(trigger, cached);
         }
         return cached;
@@ -222,54 +220,81 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          */
         public void createTriggers(Services services) {
-            final var literals = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
-            while (literals.hasNext()) {
-                final JTerm literal = (JTerm) literals.next();
-                for (JTerm term : expandIfThenElse(literal, services)) {
-                    JTerm positive = term;
-                    if (positive.op() == Junctor.NOT) {
-                        positive = positive.sub(0);
-                    }
-                    addMaximalUniTriggers(positive, null, services);
-                }
+            final ClauseAnalysis analysis = analyse(services);
+            for (final JTerm literal : analysis.literals()) {
+                searchTriggers(literal, null, services);
             }
             buildCoveringMultiTriggers();
         }
 
         /**
-         * Registers the maximal uni-triggers in the term: the triggers of its subterms if any of
-         * them yields one, otherwise the term itself.
+         * Reads the clause into the value trigger selection works on: its literals, negations
+         * stripped and if-then-else expanded, and its universal variables.
+         */
+        private ClauseAnalysis analyse(Services services) {
+            final List<JTerm> literals = new ArrayList<>();
+            final var disjuncts = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
+            while (disjuncts.hasNext()) {
+                final JTerm disjunct = (JTerm) disjuncts.next();
+                for (JTerm term : expandIfThenElse(disjunct, services)) {
+                    literals.add(term.op() == Junctor.NOT ? term.sub(0) : term);
+                }
+            }
+            return new ClauseAnalysis(clause, clauseVariables, literals);
+        }
+
+        /**
+         * What the search below one term produced, as the term enclosing it reads it.
+         */
+        private enum Search {
+            /**
+             * A registered trigger below the term covers the term's universal variables. No
+             * enclosing term needs to become a trigger for them.
+             */
+            SATISFIED,
+            /**
+             * No registered trigger below the term covers its universal variables. The
+             * enclosing term is the next candidate.
+             */
+            OPEN
+        }
+
+        /**
+         * Registers the maximal uni-triggers in the term: the triggers of its subterms if they
+         * cover the term's universal variables, otherwise the term itself.
+         *
+         * A subterm's SATISFIED counts only if the subterm carries every universal variable of
+         * this term. Each level checks this against its own variables, so a deep trigger
+         * satisfies every term above it exactly as far as the variables reach.
          *
          * @param term a subterm of a literal
+         * @param enclosing the term {@code term} is an argument of, null at the top of a literal
          * @param services access to the theory operators and term construction
-         * @return whether a trigger was found in the term or its subterms
+         * @return what the search below {@code term} produced
          */
-        private boolean addMaximalUniTriggers(JTerm term, JTerm enclosing, Services services) {
+        private Search searchTriggers(JTerm term, JTerm enclosing, Services services) {
             if (!mightContainTriggers(term)) {
-                return false;
+                return Search.OPEN;
             }
 
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), clauseVariables);
 
-            boolean foundSubtriggers = false;
+            boolean satisfied = false;
             for (int i = 0; i < term.arity(); i++) {
                 final JTerm subTerm = term.sub(i);
-                final boolean found = addMaximalUniTriggers(subTerm, term, services);
-
-                if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
-                    foundSubtriggers = true;
+                final Search below = searchTriggers(subTerm, term, services);
+                if (below == Search.SATISFIED && uniVarsInTerm.subset(subTerm.freeVars())) {
+                    satisfied = true;
                 }
             }
-
-            // a term becomes a trigger only if none of its subterms yielded one; a subterm
-            // whose candidates were all rejected (not acceptable as triggers) does not count,
-            // so the next enclosing meaningful term gets its chance
-            if (!foundSubtriggers) {
-                return addUniTrigger(term, enclosing, services);
+            if (satisfied) {
+                return Search.SATISFIED;
             }
-
-            return true;
+            // A term becomes a trigger only if no subterm satisfies it. A subterm whose
+            // candidates were all forbidden does not, so the next enclosing meaningful term
+            // gets its chance.
+            return registerCandidate(term, enclosing, services);
         }
 
         @SuppressWarnings("unchecked")
@@ -322,7 +347,7 @@ public class TriggersSet {
         /**
          * Check whether a given term (or a subterm of the term) might be a trigger candidate
          */
-        private boolean mightContainTriggers(JTerm term) {
+        private boolean mightContainTriggers(Term term) {
             if (term.freeVars().isEmpty()) {
                 return false;
             }
@@ -335,37 +360,40 @@ public class TriggersSet {
         }
 
         /**
-         * A trigger candidate is acceptable unless some theory's {@link TriggerSupport}
-         * rejects it as an array index or connective material.
+         * The theories' combined verdict on a trigger candidate. A single {@code FORBIDDEN}
+         * discards the candidate; otherwise a single {@code PREFER_ENCLOSING} keeps the search
+         * going past it.
          */
-        private boolean isAcceptableTrigger(JTerm term, Services services) {
+        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, JTerm enclosing,
+                Services services) {
+            TriggerSupport.CandidateVerdict combined = TriggerSupport.CandidateVerdict.ACCEPTABLE;
             for (final TriggerSupport support : supports) {
-                if (support.rejectsAsTrigger(term, services)) {
-                    return false;
+                switch (support.verdictOn(term, enclosing, services)) {
+                    case FORBIDDEN:
+                        return TriggerSupport.CandidateVerdict.FORBIDDEN;
+                    case PREFER_ENCLOSING:
+                        combined = TriggerSupport.CandidateVerdict.PREFER_ENCLOSING;
+                        break;
+                    default:
+                        break;
                 }
             }
-            return true;
-        }
-
-        /** Whether some theory would rather trigger on the term enclosing this one. */
-        private boolean prefersEnclosing(JTerm term, JTerm enclosing, Services services) {
-            for (final TriggerSupport support : supports) {
-                if (support.prefersEnclosingTrigger(term, enclosing, services)) {
-                    return true;
-                }
-            }
-            return false;
+            return combined;
         }
 
         /**
-         * add a uni-trigger to triggers set or add an element of multi-triggers for this clause,
-         * together with the derived triggers each theory's {@link TriggerSupport} provides
+         * Offers one candidate to the theories and registers it as their verdict directs,
+         * together with the derived triggers each theory provides for an accepted one.
          *
-         * @return whether a trigger was registered for {@code term}
+         * @param term the candidate
+         * @param enclosing the term {@code term} is an argument of, null at the top of a literal
+         * @param services access to the theory operators and term construction
+         * @return what the registration produced for the enclosing term
          */
-        private boolean addUniTrigger(JTerm term, JTerm enclosing, Services services) {
-            if (!isAcceptableTrigger(term, services)) {
-                return false;
+        private Search registerCandidate(JTerm term, JTerm enclosing, Services services) {
+            final TriggerSupport.CandidateVerdict verdict = verdictOn(term, enclosing, services);
+            if (verdict == TriggerSupport.CandidateVerdict.FORBIDDEN) {
+                return Search.OPEN;
             }
             registerUniTrigger(term, false);
             // A theory's generalisation is a different term, not a weaker one: it can match where
@@ -379,18 +407,23 @@ public class TriggersSet {
                     }
                 }
             }
-            // An array index is registered like any other candidate, but does not stop the
-            // ascent: the read around it says which access is meant and becomes a trigger too.
-            return !prefersEnclosing(term, enclosing, services);
+            // A preferred-enclosing candidate is registered like any other, but leaves the
+            // search open: the read around an array index says which access is meant and
+            // becomes a trigger too.
+            return verdict == TriggerSupport.CandidateVerdict.PREFER_ENCLOSING ? Search.OPEN
+                    : Search.SATISFIED;
         }
 
-        private void registerUniTrigger(JTerm term, boolean matchByUnification) {
-            final boolean isUnify = !term.freeVars().subset(clauseVariables);
+        private void registerUniTrigger(JTerm term, boolean theoryProvided) {
+            final boolean carriesExistential = !term.freeVars().subset(clauseVariables);
             final boolean isElement = !clauseVariables.subset(term.freeVars());
+            final TriggerKind kind = theoryProvided
+                    ? (carriesExistential ? TriggerKind.GENERALIZED_UNIFY : TriggerKind.GENERALIZED)
+                    : (carriesExistential ? TriggerKind.NEEDS_UNIFY : TriggerKind.PATTERN);
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), clauseVariables);
             Trigger trigger =
-                createUniTrigger(term, uniVarsInTerm, isUnify, isElement, matchByUnification);
+                createUniTrigger(term, uniVarsInTerm, kind, isElement);
             if (isElement) {
                 elementsOfMultiTrigger = elementsOfMultiTrigger.add(trigger);
             } else {

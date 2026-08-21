@@ -30,31 +30,40 @@ import org.key_project.util.collection.ImmutableSet;
 public interface TriggerSupport {
 
     /**
-     * Whether {@code candidate} must not be used as a standalone trigger, because for this theory
-     * it is an array index or a connective rather than a read.
-     *
-     * @param candidate a subterm that contains the quantified variables and is a trigger candidate
-     * @param services access to the theory operators
+     * A theory's verdict on one trigger candidate, see {@link #verdictOn}.
      */
-    boolean rejectsAsTrigger(JTerm candidate, Services services);
+    enum CandidateVerdict {
+        /** The candidate may become a trigger. */
+        ACCEPTABLE,
+        /**
+         * The candidate is never a trigger, because for this theory it discriminates nothing:
+         * a connective, or a wrapper whose content and enclosing term say everything it could.
+         * It does not block the term enclosing it: where every subterm of a term is forbidden,
+         * the term itself is the candidate.
+         */
+        FORBIDDEN,
+        /**
+         * The candidate is a trigger, but the search for triggers continues into the term
+         * enclosing it. An array access's index expression is the case at hand: it is a usable
+         * trigger, yet only the read around it names the accessed array, so the read must
+         * become a trigger too.
+         */
+        PREFER_ENCLOSING
+    }
 
     /**
-     * Whether a candidate should give way to the term enclosing it, when that term yields a
-     * trigger of its own.
+     * This theory's verdict on a trigger candidate at its position.
      *
-     * Unlike {@link #rejectsAsTrigger}, this is a preference and not a veto. An array index
-     * matches every integer term on the sequent, while the read around it says which access is
-     * meant. Where no enclosing term yields a trigger the candidate is used anyway, since a
-     * clause without a trigger is never instantiated.
+     * The selection walks the formula and asks every theory at every candidate. A single
+     * {@code FORBIDDEN} discards the candidate; otherwise a single {@code PREFER_ENCLOSING}
+     * keeps the search going past it.
      *
-     * @param candidate a trigger candidate
+     * @param candidate a subterm that contains the quantified variables and is a trigger candidate
      * @param enclosing the term the candidate is an argument of, null at the top of a literal
-     * @param services access to the theory's operators
-     * @return whether an enclosing trigger is preferable to this candidate
+     * @param services access to the theory operators
+     * @return the verdict
      */
-    default boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
-        return false;
-    }
+    CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services);
 
     /**
      * Additional triggers derived from the accepted trigger {@code term}, for example a read

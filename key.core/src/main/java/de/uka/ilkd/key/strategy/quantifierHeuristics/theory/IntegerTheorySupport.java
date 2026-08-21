@@ -23,24 +23,27 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Support for the integer theory.
  *
- * Rejects the (non-strict) comparisons as triggers (matching on them has not been observed to help
+ * Forbids the (non-strict) comparisons as triggers (matching on them has not been observed to help
  * instantiation) and provides no derived triggers. For cost prediction it decides an arithmetic
  * comparison from itself or from an assumed comparison, through {@link HandleArith}.
  */
 final class IntegerTheorySupport implements QuantifierTheorySupport {
 
     /**
-     * Rejects the non-strict comparisons {@code <=} and {@code >=} as triggers.
+     * Forbids the non-strict comparisons {@code <=} and {@code >=} as triggers.
      *
      * @param candidate a trigger candidate that contains the quantified variables
+     * @param enclosing the term the candidate is an argument of, null at the top of a literal
      * @param services access to the integer theory operators
-     * @return whether the candidate is rejected
+     * @return the verdict
      */
     @Override
-    public boolean rejectsAsTrigger(JTerm candidate, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
         final Operator op = candidate.op();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return op == integerLDT.getLessOrEquals() || op == integerLDT.getGreaterOrEquals();
+        return op == integerLDT.getLessOrEquals() || op == integerLDT.getGreaterOrEquals()
+                ? CandidateVerdict.FORBIDDEN
+                : CandidateVerdict.ACCEPTABLE;
     }
 
     /**

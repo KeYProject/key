@@ -29,17 +29,8 @@ class UniTrigger implements Trigger {
 
     private final TriggersSet owningTriggerSet;
 
-    /**
-     * If {@code true} the trigger carries a non-universal (existential) variable and may therefore
-     * only be matched by (two-sided) unification, not by basic matching.
-     */
-    private final boolean onlyUnify;
-    /**
-     * If {@code true} the trigger contains a metavariable in place of a ground subterm (a
-     * heap-generalized array read) and is matched by unification even against ground terms, so the
-     * metavariable can bind to any heap. Plain triggers use syntactic matching on ground terms.
-     */
-    private final boolean matchByUnification;
+    /** How this trigger is matched, see {@link TriggerKind}. */
+    private final TriggerKind kind;
     private final boolean isElementOfMultitrigger;
 
     // A TriggersSet is cached per proof (ServiceCaches.triggerSetCache) and thus shared across the
@@ -63,14 +54,12 @@ class UniTrigger implements Trigger {
         new ConcurrentLruCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> universalVariables,
-            boolean onlyUnify,
-            boolean isElementOfMultitrigger, boolean matchByUnification,
+            TriggerKind kind, boolean isElementOfMultitrigger,
             TriggersSet owningTriggerSet) {
         this.trigger = trigger;
         this.universalVariables = universalVariables;
-        this.onlyUnify = onlyUnify;
+        this.kind = kind;
         this.isElementOfMultitrigger = isElementOfMultitrigger;
-        this.matchByUnification = matchByUnification;
         this.owningTriggerSet = owningTriggerSet;
     }
 
@@ -95,7 +84,7 @@ class UniTrigger implements Trigger {
         // A plain trigger is matched basically whenever it is not unified, so the mode leaves its
         // result untouched and both callers share the one cache.
         final ConcurrentLruCache<Term, ImmutableSet<Substitution>> cache =
-            basicMatching && matchByUnification ? matchResultsByBasicMatching : matchResults;
+            basicMatching && kind.isTheoryProvided() ? matchResultsByBasicMatching : matchResults;
         ImmutableSet<Substitution> subs = cache.get(target);
         if (subs == null) {
             subs = computeSubstitutionsForTerm(target, services, basicMatching);
@@ -106,29 +95,41 @@ class UniTrigger implements Trigger {
 
     private ImmutableSet<Substitution> computeSubstitutionsForTerm(Term target,
             Services services, boolean basicMatching) {
-        ImmutableSet<Substitution> subs = DefaultImmutableSet.nil();
         final boolean groundTarget =
             target.freeVars().isEmpty() && !(target.op() instanceof Quantifier);
-        if (!groundTarget || matchByUnification) {
-            subs = Matching.twoSidedMatching(this, target, services);
+        // A quantified target is unified whatever the kind: its own variables are unknowns
+        // that structural matching cannot handle.
+        if (!groundTarget) {
+            return Matching.twoSidedMatching(this, target, services);
         }
-        // Against a ground target basic matching applies as well, and only it lets a
-        // theory solve an array index: unification decides a pair of terms as a whole and offers no
-        // point at which a failing array index could be solved.
-        if (groundTarget && !onlyUnify && (basicMatching || !matchByUnification)) {
-            final ImmutableSet<Substitution> basicSubs =
-                Matching.basicMatching(this, target, services);
-            if (!basicSubs.isEmpty()) {
-                subs = subs.union(basicSubs);
-            }
+        // Against a ground target the kind decides. Only structural matching lets a theory
+        // solve an array index: unification decides a pair of terms as a whole and offers no
+        // point at which a failing index could be solved.
+        switch (kind) {
+            case PATTERN:
+                return Matching.basicMatching(this, target, services);
+            case GENERALIZED:
+                ImmutableSet<Substitution> subs = Matching.twoSidedMatching(this, target, services);
+                if (basicMatching) {
+                    final ImmutableSet<Substitution> basicSubs =
+                        Matching.basicMatching(this, target, services);
+                    if (!basicSubs.isEmpty()) {
+                        subs = subs.union(basicSubs);
+                    }
+                }
+                return subs;
+            case GENERALIZED_UNIFY:
+                return Matching.twoSidedMatching(this, target, services);
+            case NEEDS_UNIFY:
+            default:
+                return DefaultImmutableSet.nil();
         }
-        return subs;
     }
 
 
     @Override
     public boolean isTheoryProvided() {
-        return matchByUnification;
+        return kind.isTheoryProvided();
     }
 
     @Override

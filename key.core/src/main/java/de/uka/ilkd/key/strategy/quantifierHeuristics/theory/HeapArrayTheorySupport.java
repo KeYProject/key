@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -21,45 +20,50 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Support for the heap theory and array reads.
  *
- * Rejects the bare array-index constructor {@code arr(i)} (an index, not a read) and reads of
- * the implicit {@code $created} field, provides array-read triggers generalized over the heap
- * so that a read written for one heap in a quantified formula matches the reads a proof produces
- * over its many other heaps, and supplies the indices a formula writes as candidate instances
- * for the index it reads.
+ * Forbids the index packaging {@code arr(...)} and reads of the implicit {@code $created}
+ * field as triggers, provides array-read triggers generalized over the heap so that a read
+ * written for one heap in a quantified formula matches the reads a proof produces over its many
+ * other heaps, and supplies the indices a formula writes as candidate instances for the index
+ * it reads.
  */
 final class HeapArrayTheorySupport implements QuantifierTheorySupport {
 
     /**
-     * Rejects the bare array index {@code arr(i)} and reads of the implicit created field, both of
-     * which flood the instantiation when matched on their own.
+     * The trigger for an array access is the read.
+     *
+     * Around an access, three terms could trigger, and the verdicts keep them apart. The
+     * packaging {@code arr(...)} wraps the index expression into a Field; it discriminates
+     * nothing of its own, so it is never a trigger. The index expression below it can be one:
+     * only compound expressions reach a verdict, a bare variable is no candidate to begin
+     * with, and a compound expression matches only terms of its own shape. The read above
+     * names the accessed array, which the index expression alone does not, so its verdict
+     * keeps the search going up to the select.
      *
      * @param candidate a trigger candidate that contains the quantified variables
+     * @param enclosing the term the candidate is an argument of, null at the top of a literal
      * @param services access to the heap theory operators
-     * @return whether the candidate is rejected
+     * @return the verdict
      */
     @Override
-    public boolean rejectsAsTrigger(JTerm candidate, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        // we do not want to match on expressions a.$created
-        if (heapLDT.isSelectOp(candidate.op()) && candidate.sub(2).op().name().toString()
-                .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
-            return true;
+        if (heapLDT.isSelectOp(candidate.op())
+                && candidate.sub(2).op() == heapLDT.getCreated()) {
+            // a created read holds of every allocated object alike, so it selects nothing
+            return CandidateVerdict.FORBIDDEN;
         }
-        // the array-index constructor arr(i) alone is an index, not a read: matching on it
-        // instantiates with every index literal of any array on any heap. The enclosing select is
-        // the meaningful trigger (see the generalized variants provided below).
-        return candidate.op() == heapLDT.getArr();
-    }
-
-    /**
-     * An array index gives way to the read around it: alone it matches every integer term on the
-     * sequent, while the read says which access is meant. Both are registered, so no instantiation
-     * is lost.
-     */
-    @Override
-    public boolean prefersEnclosingTrigger(JTerm candidate, JTerm enclosing, Services services) {
-        return enclosing != null
-                && enclosing.op() == services.getTypeConverter().getHeapLDT().getArr();
+        if (candidate.op() == heapLDT.getArr()) {
+            // arr only packs the index expression into a Field. With a bare index it matches
+            // the packaging of every access on the sequent; with a compound index everything
+            // it could say is said by its argument, which gets its own verdict below.
+            return CandidateVerdict.FORBIDDEN;
+        }
+        if (enclosing != null && enclosing.op() == heapLDT.getArr()) {
+            // a compound index expression is a trigger of its own, but only the read above
+            // names the accessed array, so the select must become a trigger too
+            return CandidateVerdict.PREFER_ENCLOSING;
+        }
+        return CandidateVerdict.ACCEPTABLE;
     }
 
     /**

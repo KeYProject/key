@@ -19,7 +19,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 /**
  * Support for the equality theory.
  *
- * Rejects the equality {@code =} as a trigger (matching on it has not been observed to help
+ * Forbids the equality {@code =} as a trigger (matching on it has not been observed to help
  * instantiation) and provides no derived triggers. For cost prediction it decides a literal that is
  * an equality or equivalence whose two sides are equal up to renaming, and decides an arbitrary
  * literal that equals an assumed one up to renaming (or contradicts it under a negation).
@@ -27,15 +27,17 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 final class EqualityTheorySupport implements QuantifierTheorySupport {
 
     /**
-     * Rejects the equality {@code =} as a trigger.
+     * Forbids the equality {@code =} as a trigger.
      *
      * @param candidate a trigger candidate that contains the quantified variables
+     * @param enclosing the term the candidate is an argument of, null at the top of a literal
      * @param services access to the theory operators
-     * @return whether the candidate is rejected
+     * @return the verdict
      */
     @Override
-    public boolean rejectsAsTrigger(JTerm candidate, Services services) {
-        return candidate.op() == Equality.EQUALS;
+    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
+        return candidate.op() == Equality.EQUALS ? CandidateVerdict.FORBIDDEN
+                : CandidateVerdict.ACCEPTABLE;
     }
 
     /**
