@@ -69,6 +69,11 @@ public class KeYProgModelInfo {
     /** Size of the type model {@link #subtypeCache} was computed from. */
     private int subtypeCachedSize = -1;
 
+    /**
+     * Caches locally declared fields; does not need to be invalidated as
+     * an existing class declaration is immutable
+     */
+    private final Map<KeYJavaType, List<Field>> localDeclaredFields = new LinkedHashMap<>();
 
 
     public KeYProgModelInfo(JavaService service) {
@@ -460,9 +465,20 @@ public class KeYProgModelInfo {
         if (ct.getJavaType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
-        return getReferenceType(ct)
+        List<Field> fields;
+        synchronized (localDeclaredFields) {
+            fields = localDeclaredFields.get(ct);
+            if (fields != null) {
+                return fields;
+            }
+        }
+        fields = Collections.unmodifiableList(getReferenceType(ct)
                 .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
-                .orElseGet(ArrayList::new);
+                .orElseGet(ArrayList::new));
+        synchronized (localDeclaredFields) {
+            localDeclaredFields.put(ct, fields);
+        }
+        return fields;
     }
 
 
