@@ -65,7 +65,7 @@ final class Point3d extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
+    public final /*@ non_null */ String toString() {
         return "Point3d[" + "x=" + x + "," + "y=" + y + "," + "z=" + z + "]";
     }
 }

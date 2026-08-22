@@ -3729,7 +3729,7 @@ Statement Statement() :
 | result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
-| result = KeYCatchAllStatement()
+| result = KeyCatchAllStmt()
 | result = ExecStatement()
 )
   {
@@ -3739,7 +3739,7 @@ Statement Statement() :
   }
 }
 
-Statement KeYCatchAllStatement() :
+Statement KeyCatchAllStmt() :
 {
   Statement result;
   UncollatedReferenceQualifier qn;
