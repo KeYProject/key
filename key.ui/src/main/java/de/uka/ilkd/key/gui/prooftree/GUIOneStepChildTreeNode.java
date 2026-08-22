@@ -53,13 +53,14 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         return true;
     }
 
+    /**
+     * The node's label without the applied on information.
+     * The term is shown in the tooltip and can still be
+     * searched through {@link #getSearchString()}.
+     */
     @Override
     public String toString() {
-        // For prettyprinting
-        Services services = parent.getNode().proof().getServices();
-        String prettySubTerm =
-            LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
-        return app.rule().name() + " ON " + prettySubTerm;
+        return app.rule().name().toString();
     }
 
     public RuleApp getRuleApp() {
@@ -77,6 +78,9 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     @Override
     public @NonNull String getSearchString() {
-        return toString();
+        Services services = parent.getNode().proof().getServices();
+        String prettySubTerm =
+            LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
+        return app.rule().name() + " ON " + prettySubTerm;
     }
 }
