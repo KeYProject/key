@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import org.jspecify.annotations.NullMarked;
@@ -58,7 +57,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
             List<EnumConstantDeclaration> enumConstantDeclarations) {
         super(children, fullName, isLibrary);
 
-        ImmutableList<EnumEntry> seq = ImmutableSLList.nil();
+        ImmutableList<EnumEntry> seq = ImmutableList.nil();
         int ordinal = 0;
         for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
             String constName = ecd.getNameAsString();
