@@ -276,7 +276,8 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public int hashCode() {
         int hashCode = 1;
         for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
-            hashCode += 7 * stImmutableMapEntry.hashCode();
+            hashCode += (Objects.hashCode(stImmutableMapEntry.key()) ^
+                    Objects.hashCode(stImmutableMapEntry.value()));
         }
         return hashCode;
     }
