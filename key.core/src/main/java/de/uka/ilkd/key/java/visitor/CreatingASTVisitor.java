@@ -470,6 +470,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnInstanceofPattern(InstanceofPattern x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new InstanceofPattern(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnBreak(Break x) {
         DefaultAction def = new DefaultAction(x) {
             @Override

@@ -924,6 +924,31 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Expression lhs = accept(n.getExpression());
         TypeReference type = requireTypeReference(n.getType());
+
+        if (n.getName().isPresent()) {
+            final SimpleName nName = n.getName().get();
+            var name = nName.getIdentifier();
+
+            PositionInfo piVar = createPositionInfo(nName);
+            List<Comment> cVar = createComments(nName);
+
+            IProgramVariable pvar;
+            if (!name.startsWith("#")) {
+                pvar = new LocationVariable(
+                    new ProgramElementName(name), type.getKeYJavaType());
+            } else {
+                pvar = (ProgramSV) lookupSchemaVariable(nName);
+            }
+
+            final var vs =
+                new VariableSpecification(piVar, cVar, null, pvar, 0, type.getKeYJavaType());
+            return new InstanceofPattern(pi, c, lhs, type, vs);
+        }
+
+        if (n.getPattern().isPresent()) {
+            reportUnsupportedElement(n);
+        }
+
         return new Instanceof(pi, c, lhs, type);
     }
 
@@ -2178,7 +2203,25 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(TypePatternExpr n, Void arg) {
-        return reportUnsupportedElement(n);
+        // weigl: This is somehow crude and called by a type resolution in NameExpr, expecting a
+        // VariableDeclaration
+        var nName = n.getName();
+        TypeRef type = accept(n.getType());
+        var name = nName.getIdentifier();
+
+        PositionInfo piVar = createPositionInfo(nName);
+        List<Comment> cVar = createComments(nName);
+
+        IProgramVariable pvar;
+        if (!name.startsWith("#")) {
+            pvar = new LocationVariable(
+                new ProgramElementName(name), type.getKeYJavaType());
+        } else {
+            pvar = (ProgramSV) lookupSchemaVariable(nName);
+        }
+
+        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> mods = map(n.getModifiers());
+        return new LocalVariableDeclaration(mods, type, new VariableSpecification(pvar));
     }
 
     @Override

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -109,9 +110,21 @@ public class VMTacletMatcher implements TacletMatcher {
     private final JTerm findExp;
 
     /**
+     * optional sink for human readable explanations of the matching decisions taken by this
+     * matcher; {@code null} disables logging entirely, in which case {@link #logDecision} is a
+     * no-op.
+     */
+    private final @Nullable PrintWriter out;
+
+    /**
      * @param taclet the Taclet matched by this matcher
      */
     public VMTacletMatcher(Taclet taclet) {
+        this(taclet, null);
+    }
+
+    public VMTacletMatcher(Taclet taclet, @Nullable PrintWriter out) {
+        this.out = out;
         varconditions = taclet.getVariableConditions();
         assumesSequent = taclet.assumesSequent();
         boundVars = taclet.getBoundVariables();
@@ -122,25 +135,46 @@ public class VMTacletMatcher implements TacletMatcher {
         // interpreter is used only when explicitly selected (property) or as the automatic
         // fallback for a pattern the compiler does not handle
         final boolean useInterpreter = Boolean.getBoolean(INTERPRETER_MATCHER_PROPERTY);
+        logDecision(
+            "Building matcher for taclet '%s' using the %s back-end (system property %s=%s).",
+            taclet.name(), useInterpreter ? "interpreter" : "compiled",
+            INTERPRETER_MATCHER_PROPERTY, useInterpreter);
 
         if (taclet instanceof final FindTaclet findTaclet) {
             findExp = findTaclet.find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             findMatchProgram = matchProgramFor(findExp, useInterpreter);
+            logDecision(
+                "Taclet '%s' is a find taclet with find expression '%s'; top-level updates %s ignored.",
+                taclet.name(), findExp, ignoreTopLevelUpdates ? "will be" : "will not be");
         } else {
             ignoreTopLevelUpdates = false;
             findExp = null;
             findMatchProgram = null;
+            logDecision("Taclet '%s' has no \\find expression; no find matcher is built.",
+                taclet.name());
         }
 
         // The taclet's \assumes formulas use the same back-end as the find, chosen by the one
         // switch above: with the compiled matcher they are compiled too (cursor-free, including
         // the Java program of a modality), with the interpreter they are interpreted.
+        int assumesCount = 0;
         for (final SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(),
                 matchProgramFor((JTerm) sf.formula(), useInterpreter));
-            assumesKeySources.put(sf.formula(), keySourceFor((JTerm) sf.formula()));
+            final PatternKeySource keySource = keySourceFor((JTerm) sf.formula());
+            assumesKeySources.put(sf.formula(), keySource);
+            logDecision("Built \\assumes matcher #%d for formula '%s' with key source %s.",
+                ++assumesCount, sf.formula(), keySource);
+        }
+    }
+
+    private void logDecision(String message, Object... args) {
+        if (out != null) {
+            out.format(message, args);
+            out.println();
+            out.flush();
         }
     }
 
@@ -204,6 +238,9 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull LogicServices p_services) {
         final MatchProgram program = assumesMatchPrograms.get(p_template);
         if (program == null) {
+            logDecision(
+                "Failed to match \\assumes template '%s': it is not an assumes formula of this taclet.",
+                p_template);
             throw new IllegalArgumentException(
                 "template is not an assumes formula of this taclet: " + p_template);
         }
@@ -218,6 +255,10 @@ public class VMTacletMatcher implements TacletMatcher {
 
         if (updateContextPresent) {
             context = mc.getInstantiations().getUpdateContext();
+            logDecision(
+                "Matching \\assumes template '%s' against candidates with a non-empty update context; "
+                    + "each candidate's own update prefix must match the context first.",
+                p_template);
         }
 
         for (var cf : p_toMatch) {
@@ -231,11 +272,26 @@ public class VMTacletMatcher implements TacletMatcher {
                     checkConditions(program.match(formula, mc, p_services), p_services);
 
                 if (newMC != null) {
+                    logDecision(
+                        "Candidate formula '%s' matches \\assumes template '%s' (variable conditions satisfied).",
+                        cf.getSequentFormula().formula(), p_template);
                     resFormulas = resFormulas.prepend(cf);
                     resMC = resMC.prepend(newMC);
+                } else {
+                    logDecision(
+                        "Candidate formula '%s' rejected for \\assumes template '%s': "
+                            + "term match or variable conditions failed.",
+                        cf.getSequentFormula().formula(), p_template);
                 }
+            } else {
+                logDecision(
+                    "Candidate formula '%s' rejected for \\assumes template '%s': "
+                        + "its update prefix does not match the current update context.",
+                    cf.getSequentFormula().formula(), p_template);
             }
         }
+        logDecision("\\assumes matching for template '%s' found %d matching candidate(s).",
+            p_template, resFormulas.size());
         return new AssumesMatchResult(resFormulas, resMC);
     }
 
@@ -264,8 +320,15 @@ public class VMTacletMatcher implements TacletMatcher {
                 }
             }
             // update context does not match update prefix of formula
+            logDecision(
+                "Update context mismatch at position %d/%d: expected update '%s', "
+                    + "but candidate's update prefix does not agree (or candidate has none left).",
+                i + 1, size, curContext.head().update());
             return null;
         }
+        logDecision(
+            "Update context of %d update(s) fully matched; continuing with the stripped formula '%s'.",
+            context.size(), formula);
         return formula;
     }
 
@@ -301,11 +364,17 @@ public class VMTacletMatcher implements TacletMatcher {
 
             assert assumesSequentIterator.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
+            logDecision(
+                "Matching candidate instantiation '%s' against the next %s \\assumes template.",
+                candidateInst, candidateInAntec ? "antecedent" : "succedent");
             newMC = matchAssumes(
                 ImmutableList.singleton(candidateInst),
                 assumesSequentIterator.next().formula(), p_matchCond, p_services).matchConditions();
 
             if (newMC.isEmpty()) {
+                logDecision(
+                    "Sequential \\assumes matching aborted: candidate '%s' did not match its template.",
+                    candidateInst);
                 return null;
             }
 
@@ -314,6 +383,7 @@ public class VMTacletMatcher implements TacletMatcher {
         assert !anteIterator.hasNext() && !succIterator.hasNext()
                 : "p_toMatch and assumes sequent must have same number of elements";
 
+        logDecision("Sequential \\assumes matching succeeded for all candidates.");
         return p_matchCond;
     }
 
@@ -332,6 +402,9 @@ public class VMTacletMatcher implements TacletMatcher {
                 // for example SimplifyIfThenElseUpdateCondition
                 // rewrite these conditions and avoid null; conditions that do not involve matched
                 // variables
+                logDecision(
+                    "No schema variables are instantiated yet; delegating directly to the "
+                        + "taclet's variable conditions (e.g. conditions not tied to a matched variable).");
                 return checkVariableConditions(null, null, cond, services);// XXX
             }
 
@@ -342,8 +415,11 @@ public class VMTacletMatcher implements TacletMatcher {
                     result = (MatchConditions) checkVariableConditions(sv, se, result, services);
                 }
             }
+        } else {
+            logDecision("Skipping variable condition checks: the term match already failed.");
         }
 
+        logDecision("checkConditions %s.", result != null ? "succeeded" : "failed");
         return result;
     }
 
@@ -381,24 +457,38 @@ public class VMTacletMatcher implements TacletMatcher {
             @Nullable SyntaxElement instantiationCandidate,
             @Nullable MatchResultInfo matchCond,
             @NonNull LogicServices services) {
+        logDecision("check variable conditions for %s, %s, %s", var, instantiationCandidate,
+            matchCond);
         if (matchCond != null) {
             if (instantiationCandidate instanceof JTerm term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is
                         // bound or declared non free (so it has to be matched to a variable)
+                        logDecision(
+                            "check variable conditions failed: schema variable %s is bound/declared "
+                                + "not-free but was instantiated with the non-variable term '%s'.",
+                            var, term);
                         return null; // FAILED
                     }
                 }
             }
             // check generic conditions
             for (final VariableCondition vc : varconditions) {
+                final MatchResultInfo before = matchCond;
                 matchCond = vc.check(var, instantiationCandidate, matchCond, services);
                 if (matchCond == null) {
+                    logDecision(
+                        "check variable conditions failed: generic variable condition '%s' rejected "
+                            + "instantiation of %s with '%s'.",
+                        vc, var, instantiationCandidate);
                     return null; // FAILED
                 }
+                logDecision("generic variable condition '%s' accepted the instantiation (was: %s).",
+                    vc, before);
             }
         }
+        logDecision("check variable conditions succeeded for %s.", var);
         return matchCond;
     }
 
@@ -413,14 +503,21 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     private Pair<JTerm, MatchResultInfo> matchAndIgnoreUpdatePrefix(
             JTerm source, final MatchResultInfo matchResult) {
+        logDecision("Try to match w/o update-prefix.");
         final MatchConditions matchCond = (MatchConditions) matchResult;
         final var instantiations = matchCond.getInstantiations();
         ImmutableList<UpdateLabelPair> updateLabel = instantiations.getUpdateContext();
+        int strippedUpdates = 0;
         while (source.op() instanceof UpdateApplication) {
             final JTerm update = UpdateApplication.getUpdate(source);
             updateLabel = updateLabel.append(new UpdateLabelPair(update, source.getLabels()));
             source = UpdateApplication.getTarget(source);
+            strippedUpdates++;
         }
+        logDecision(
+            "Stripped %d leading update(s) from the term to be matched; remaining term is '%s' "
+                + "and the stripped updates were pushed onto the update context.",
+            strippedUpdates, source);
         return new Pair<>(source,
             matchCond.setInstantiations(instantiations.addUpdateList(updateLabel)));
     }
@@ -434,6 +531,7 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull MatchResultInfo p_matchCond,
             @NonNull LogicServices services) {
         if (findMatchProgram == null) {
+            logDecision("No matching program for \\find was found.");
             return null;
         }
         JTerm source = (JTerm) term;
@@ -444,7 +542,15 @@ public class VMTacletMatcher implements TacletMatcher {
             p_matchCond = resultUpdateMatch.second;
         }
         final MatchResultInfo matchResult = findMatchProgram.match(source, p_matchCond, services);
-        return matchResult == null ? null : checkConditions(matchResult, services);
+        if (matchResult == null) {
+            logDecision("\\find matching failed: term '%s' does not match the find pattern '%s'.",
+                source, findExp);
+            return null;
+        }
+        final MatchResultInfo checked = checkConditions(matchResult, services);
+        logDecision("\\find matching of term '%s' against pattern '%s' %s.",
+            source, findExp, checked != null ? "succeeded" : "failed its variable conditions");
+        return checked;
     }
 
 
@@ -460,13 +566,23 @@ public class VMTacletMatcher implements TacletMatcher {
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
+        logDecision("Matching schema variable %s against '%s' using instruction '%s'.",
+            sv, syntaxElement, instr);
+
         // the instruction routes the candidate by kind (term or program element) itself
         matchCond = instr.match(syntaxElement, matchCond, services);
+        if (matchCond == null) {
+            logDecision("Matching schema variable %s against '%s' failed at the instruction level.",
+                sv, syntaxElement);
+            return null;
+        }
         if (syntaxElement instanceof JTerm) {
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
         } else if (syntaxElement instanceof ProgramElement) {
             matchCond = checkConditions(matchCond, services);
         }
+        logDecision("Matching schema variable %s against '%s' %s.",
+            sv, syntaxElement, matchCond != null ? "succeeded" : "failed");
         return matchCond;
     }
 
