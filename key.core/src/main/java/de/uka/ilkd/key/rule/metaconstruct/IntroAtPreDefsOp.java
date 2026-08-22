@@ -192,6 +192,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             handleJmlStatement(x);
         }
 
+        public void performActionOnUseLemmaStatement(UseLemmaStatement x) {
+            handleJmlStatement(x);
+        }
+
         private void handleJmlStatement(Statement x) {
             var spec =
                 Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));

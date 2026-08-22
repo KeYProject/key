@@ -1743,6 +1743,31 @@ public class PrettyPrinter implements Visitor {
         layouter.end();
     }
 
+    public void performActionOnUseLemmaStatement(UseLemmaStatement x) {
+        layouter.print("//@ ");
+        layouter.keyWord("use_lemma");
+
+        layouter.beginRelativeC();
+        layouter.brk();
+
+        if (services != null) {
+            var spec =
+                Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+            JTerm lemma = spec.term(0);
+            layouter.print(printInLogicPrinter(lemma));
+        } else {
+            var context = x.getParserContext();
+            if (context != null) {
+                // remove all whitespaces (\n\f\t...) with an empty space
+                var text = context.getText();
+                // text = text.substring(11, text.length() - 1);
+                layouter.print(text);
+            }
+        }
+        layouter.end();
+    }
+
+
     public String printInLogicPrinter(JTerm t) {
         var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols,
             hidePackagePrefix);

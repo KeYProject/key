@@ -376,11 +376,18 @@ public class JmlIO {
     }
 
     /**
-     * Sets the current list of known parameter. Can also be used to give additionally variables.
+     * Sets the current list of known parameter. Can also be used to give additional variables.
      */
     public JmlIO parameters(ImmutableList<LocationVariable> params) {
         this.paramVars = params;
         return this;
+    }
+
+    /**
+     * Gets the list of known parameters (and additional variables).
+     */
+    public @Nullable ImmutableList<LocationVariable> getParamVars() {
+        return paramVars;
     }
 
     /**

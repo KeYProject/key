@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.util.List;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
@@ -219,6 +220,11 @@ public class InstantiateCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "instantiate";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("inst");
     }
 
     @Documentation(category = "Fundamental",

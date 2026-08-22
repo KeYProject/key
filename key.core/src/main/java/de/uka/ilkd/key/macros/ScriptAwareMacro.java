@@ -40,6 +40,8 @@ package de.uka.ilkd.key.macros;
 public class ScriptAwareMacro extends SequentialProofMacro {
 
     private final ProofMacro autoMacro = new SymbolicExecutionOnlyMacro();
+    private final ProofMacro lemmaScriptMacro = new LemmaMethodScriptMacro();
+    private final ProofMacro modelMethodScriptMacro = new ModelMethodScriptMacro();
     private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(new TryCloseMacro());
 
     @Override
@@ -64,6 +66,6 @@ public class ScriptAwareMacro extends SequentialProofMacro {
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] { autoMacro, applyMacro };
+        return new ProofMacro[] { autoMacro, lemmaScriptMacro, modelMethodScriptMacro, applyMacro };
     }
 }

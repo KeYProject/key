@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -16,6 +17,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
@@ -55,7 +57,8 @@ public class CutCommand extends AbstractCommand {
             state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
 
         app = app.addCheckedInstantiation(sv, formula, state.getProof().getServices(), true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        ImmutableList<Goal> goals = state.getFirstOpenAutomaticGoal().apply(app);
+        state.labelGoals(goals, "false", "true");
     }
 
     @Documentation(category = "Fundamental", value = """

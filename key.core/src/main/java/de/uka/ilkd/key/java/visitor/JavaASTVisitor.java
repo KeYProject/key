@@ -217,6 +217,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnUseLemmaStatement(UseLemmaStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnDefault(Default x) {
         doDefaultAction(x);
     }

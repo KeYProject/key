@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.*;
 
 import org.key_project.util.collection.ImmutableList;
@@ -15,6 +13,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -268,5 +267,28 @@ public class TestJMLPreTranslator {
                     /*@ behaviour
                       @  requires (;((;;);();();(();;;(;)));
                       @*/"""));
+    }
+
+    @Test
+    public void testLemmaDefinition() {
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("""
+                /*@ requires n >= 2;
+                  @ ensures 3*n*n >= 7;
+                  @ static lemma someLemma(int n) \\by {
+                  @   assert n >= 3 ==> 3*(n-1)*(n-1) >= 7 \\by { use_lemma someLemma(n-1); auto; }
+                  @   auto;
+                  @ };
+                  @*/""");
+
+        assertThat(constructs.get(0)).isInstanceOf(TextualJMLSpecCase.class);
+        TextualJMLSpecCase contract = (TextualJMLSpecCase) constructs.get(0);
+        assertThat(contract.getClauses()).hasSize(2);
+
+        assertThat(constructs.get(1)).isInstanceOf(TextualJMLLemmaDecl.class);
+        TextualJMLLemmaDecl lemma = (TextualJMLLemmaDecl) constructs.get(1);
+        assertThat(lemma.getMethodName()).isEqualTo("someLemma");
+        assertThat(lemma.getStateCount()).isEqualTo(1);
+        assertThat(lemma.getModifiers()).contains(JMLModifier.MODEL);
+        assertThat(lemma.getModifiers()).contains(JMLModifier.STATIC);
     }
 }
