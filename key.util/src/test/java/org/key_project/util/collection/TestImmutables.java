@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -234,4 +235,22 @@ public class TestImmutables {
             "Set size should be one less than list size as list contains one duplicate");
     }
 
+    @Test
+    public void testListNotLeaked() {
+        // ensures that optimisation with less copying does not lead to a leak
+        List<Integer> original = List.of(1, 2, 3, 4);
+        List<Integer> mutableCopyOfOriginal = new ArrayList<>(original);
+        int size = mutableCopyOfOriginal.size();
+        ImmutableList<Integer> immList = ImmutableList.fromList(mutableCopyOfOriginal);
+        assertEquals(immList.toList(), original,
+            "ImmutableList size should be equal to original list");
+        mutableCopyOfOriginal.add(10);
+        assertEquals(mutableCopyOfOriginal.size(), size + 1, "List size should have increased");
+        assertEquals(immList.toList(), original, "ImmutableList should be equal to original list");
+        mutableCopyOfOriginal.removeLast();
+        mutableCopyOfOriginal.removeFirst();
+        assertEquals(mutableCopyOfOriginal.size(), size - 1,
+            "List size should be one less than original list");
+        assertEquals(immList.toList(), original, "ImmutableList should be equal to original list");
+    }
 }

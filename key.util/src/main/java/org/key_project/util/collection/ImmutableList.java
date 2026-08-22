@@ -111,7 +111,9 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param list the list to wrap
     /// @return an ImmutableList containing the elements of the input list
     static <T extends @Nullable Object> ImmutableList<T> fromList(List<T> list) {
-        return new ImmutableListList<>(new ArrayList<>(list));
+        // Used constructor is public one which copies list into an ArrayList, so
+        // no copy needed here
+        return new ImmutableListList<>(list);
     }
 
     /// Creates an [ImmutableList] from an array.
