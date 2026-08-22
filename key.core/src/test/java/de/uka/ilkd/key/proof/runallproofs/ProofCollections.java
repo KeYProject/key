@@ -185,7 +185,7 @@ public class ProofCollections {
          * pervar g = c.group("- one subprocess is created for each group
          * perFile-one subprocess is created for each file
          */
-        settings.setForkMode(ForkMode.PERGROUP);
+        settings.setForkMode(ForkMode.NOFORK);
 
         /*
          * Enable or disable proof reloading.
@@ -240,7 +240,7 @@ public class ProofCollections {
          * test can be restricted to these groups (for debugging).
          */
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
-        // settings.setRunOnlyOn("performance, performancePOConstruction");
+        settings.setRunOnlyOn("example-algos");
 
         settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
@@ -415,6 +415,10 @@ public class ProofCollections {
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute_opt.key");
+        g.provable("heap/verifyThis26_01_hIndex/lemma1.key");
+        g.provable("heap/verifyThis26_01_hIndex/update.key");
 
         g = c.group("funOfIF");
         g.provable("heap/information_flow/ArrayList_contains.key");
@@ -529,8 +533,9 @@ public class ProofCollections {
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
+        g.provable("sort-jmlscript.key");
+        g.provable("split-jmlscript.key");
         g.provable("split.key");
-
 
         /*
          * These are simpler regression tests that show a certain feature works

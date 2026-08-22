@@ -89,8 +89,12 @@ public class AutoCommand extends AbstractCommand {
             OriginalValue ov = orgValues.get(entry.getKey());
             if (ov != null) {
                 ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
-                activeStrategyProperties.setProperty(ov.settingName,
-                    "true".equals(entry.getValue()) ? ov.trueValue : ov.falseValue);
+                String key = state.getValueInjector().convert(entry.getValue(), String.class);
+                String value = ov.stringMap.get(key);
+                if (value == null) {
+                    throw new ScriptException("Invalid value for " + entry.getKey() + ": " + key);
+                }
+                activeStrategyProperties.setProperty(ov.settingName, value);
             }
         }
 
@@ -141,9 +145,14 @@ public class AutoCommand extends AbstractCommand {
 
     private Map<String, OriginalValue> prepareOriginalValues() {
         var res = new HashMap<String, OriginalValue>();
+        // Deprecated: Will be removed soon
         res.put("modelSearch",
             new OriginalValue(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_COMPLETION,
                 NON_LIN_ARITH_DEF_OPS));
+        res.put("arithmetic",
+            new OriginalValue(NON_LIN_ARITH_OPTIONS_KEY,
+                Map.of("basic", NON_LIN_ARITH_NONE, "defOps",
+                    NON_LIN_ARITH_DEF_OPS, "modelsearch", NON_LIN_ARITH_COMPLETION)));
         res.put("expandQueries",
             new OriginalValue(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF));
         res.put("classAxioms",
@@ -219,8 +228,27 @@ public class AutoCommand extends AbstractCommand {
         public @Nullable String breakpoint = null;
 
         @Flag(value = "modelsearch")
-        @Documentation("Enable model search. Better for some (types of) arithmetic problems. Sometimes a lot worse.")
+        @Deprecated
+        @Documentation("Deprecated. Use arithmetic=modelsearch instead.")
         public boolean modelSearch;
+
+        @Option(value = "arithmetic")
+        @Documentation("""
+                Specify the arithmetic strategy to handle division and modulo operations:
+                - *`basic`*: Basic arithmetic support:
+                  - Simplification of polynomial expressions
+                  - Computation of Gröbner Bases for polynomials in the antecedent
+                  - (Partial) Omega procedure for handling linear inequations</li>" + "</ul>"
+                - *`defOps`*: Automatically expand defined symbols like: `/`, `%`, `jdiv`, `jmod` ..., `int_RANGE`, ...
+                In addition, inequations are multiplied with each other where the product is bounded by an existing
+                inequation (restricted such that termination is guaranteed).
+                - *`modelsearch`*: Support for non-linear inequations and model search. In addition, this performs
+                (a) multiplication of inequations with each other and (b) systematic case distinctions (cuts).
+                This method is guaranteed to find counterexamples for invalid goals that only contain polynomial
+                (in)equations. Such counterexamples turn up as trivially unprovable goals. It is also able to prove many
+                more valid goals involving (in)equations, but will in general not terminate on such goals.
+                """)
+        public @Nullable String arithmetic;
 
         @Flag(value = "expandQueries")
         @Documentation("Automatically expand occurrences of query symbols using additional modalities on the sequent.")
@@ -268,23 +296,23 @@ public class AutoCommand extends AbstractCommand {
 
     private static final class OriginalValue {
         private final String settingName;
-        private final String trueValue;
-        private final String falseValue;
+        private final Map<String, String> stringMap;
         private @Nullable String oldValue;
 
         private OriginalValue(String settingName, String trueValue, String falseValue) {
-            this.settingName = settingName;
-            this.trueValue = trueValue;
+            this(settingName, Map.of("true", trueValue, "false", falseValue));
+        }
 
-            this.falseValue = falseValue;
+        private OriginalValue(String settingName, Map<String, String> stringMap) {
+            this.settingName = settingName;
+            this.stringMap = stringMap;
         }
 
         @Override
         public String toString() {
             return "OriginalValue{" +
                 "settingName='" + settingName + '\'' +
-                ", trueValue='" + trueValue + '\'' +
-                ", falseValue='" + falseValue + '\'' +
+                ", stringMap=" + stringMap +
                 ", oldValue='" + oldValue + '\'' +
                 '}';
         }

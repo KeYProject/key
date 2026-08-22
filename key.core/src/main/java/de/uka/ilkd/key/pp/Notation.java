@@ -630,7 +630,7 @@ public abstract class Notation {
      * The standard concrete syntax for the number literal indicator `Z'. This is only used in the
      * `Pretty&amp;Untrue' syntax.
      */
-    static final class NumLiteral extends Notation {
+    public static final class NumLiteral extends Notation {
         public NumLiteral() {
             super(120);
         }
