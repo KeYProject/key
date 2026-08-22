@@ -1,5 +1,8 @@
 public final class SimpleEnum extends Enum {
-    //@ static invariant A == null && B == null && C == null;
+    //@ static invariant A != null && B != null && C != null;
+    //@ static invariant A != B;
+    //@ static invariant A != C;
+    //@ static invariant B != C;
     //@ static invariant (\forall SimpleEnum x; A == x || B == x || C == x);
 
     public static final SimpleEnum A = new SimpleEnum();
