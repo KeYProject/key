@@ -41,7 +41,11 @@ public class BindingVariableVisitor {
             // it can't be determined at compile time that the match failed
             // in a way that still binds anything.
             var name = (LocationVariable) io.getPatternVariable().getProgramVariable();
-            var expr = io.getExpressionAt(0);
+            Expression expr = io.getExpressionAt(0);
+
+            // add a cast
+            expr = new TypeCast(expr, io.getTypeReference());
+
             return new Bindings(Map.of(name, expr), Map.of());
         } else if (e instanceof BinaryOperator bo) {
             if (bo.getKind() == BinaryOperatorKind.LOGICAL_AND) {
