@@ -524,6 +524,8 @@ public class ProofCollections {
         g.provable("heap/BoyerMoore/BM.count.accessible.key");
         g.provable("heap/BoyerMoore/BM.count.key");
         g.provable("heap/BoyerMoore/BM.monoLemma.key");
+        g.provable("heap/Adjacency/project.key");
+        g.provable("heap/Adjacency/distinct.key");
 
         g = c.group("quicksort");
         g.setDirectory("heap/quicksort");
@@ -905,6 +907,8 @@ public class ProofCollections {
         g.provable("standard_key/quantifiers/normalisation12.key");
         g.provable("standard_key/quantifiers/normalisation13.key");
         g.provable("standard_key/quantifiers/triggers0.key");
+        g.provable("standard_key/quantifiers/affineArrayIndices.key");
+        g.provable("standard_key/quantifiers/issue3972MVE.key");
 
 
         g = c.group("strings");

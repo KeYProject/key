@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -15,12 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -103,7 +101,8 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
     /**
      * The occurrence value of an instance with the proving-polarity boost: a formula where the
      * instance occurs at proving polarity counts twice, so of two equally frequent instances the
-     * one the proof still has to say something about comes first. A weakly connected instance gets
+     * one occurring in a formula that remains to be proved comes first. A weakly connected instance
+     * gets
      * a
      * large value, a strongly connected one a small value, bounded by {@link #CAP}.
      *
@@ -112,13 +111,8 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
      * @return the boosted occurrence value, between 0 and {@link #CAP}
      */
     protected static long polarityValue(OccData d, Term inst) {
-        Integer occ = d.occ().get(inst);
-        Integer pos = d.goalOcc().get(inst);
-        if (occ == null && (inst.op() instanceof ParametricFunctionInstance pfi
-                && pfi.getBase().name().equals(JavaDLTheory.CAST_NAME))) {
-            occ = d.occ().get(inst.sub(0));
-            pos = d.goalOcc().get(inst.sub(0));
-        }
+        final Integer occ = d.occ().get(inst);
+        final Integer pos = d.goalOcc().get(inst);
         if (occ == null) {
             return CAP;
         }

@@ -348,7 +348,7 @@ public class OpReplacer {
         for (int i = 0, n = vars.size(); i < n; i++) {
             QuantifiableVariable qv = vars.get(i);
             QuantifiableVariable newQv = (QuantifiableVariable) replace(qv);
-            result[i++] = newQv;
+            result[i] = newQv;
             if (newQv != qv) {
                 changed = true;
             }

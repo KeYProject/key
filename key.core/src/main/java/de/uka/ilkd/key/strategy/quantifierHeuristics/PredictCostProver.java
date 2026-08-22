@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -195,14 +196,14 @@ public class PredictCostProver {
             negated = !negated;
             pro = pro.sub(0);
         }
-        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
-            QuantifierTheorySupport.LiteralDecision decision =
+        for (final TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
+            TheoryReasoning.LiteralDecision decision =
                 support.decideStrippedSelf(pro, services);
-            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
+            if (decision != TheoryReasoning.LiteralDecision.UNKNOWN) {
                 if (negated) {
                     decision = decision.negate();
                 }
-                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+                return decision == TheoryReasoning.LiteralDecision.PROVED ? trueT : falseT;
             }
         }
         return problem;
@@ -218,11 +219,11 @@ public class PredictCostProver {
      *         the problem's negation, and <code>problem</code> if undecided
      */
     private JTerm provedByAnother(JTerm problem, JTerm axiom) {
-        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
-            final QuantifierTheorySupport.LiteralDecision decision =
+        for (final TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
+            final TheoryReasoning.LiteralDecision decision =
                 support.decideFromAxiom(problem, axiom, services);
-            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
-                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+            if (decision != TheoryReasoning.LiteralDecision.UNKNOWN) {
+                return decision == TheoryReasoning.LiteralDecision.PROVED ? trueT : falseT;
             }
         }
         return problem;

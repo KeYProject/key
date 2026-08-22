@@ -18,8 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
- * same existential quantifiable variable, we say they are connected. And this property is
- * transitive.
+ * same existential quantifiable variable, they are connected. Connectedness is transitive.
  */
 public class ClausesGraph {
     private final ImmutableSet<QuantifiableVariable> exVars;

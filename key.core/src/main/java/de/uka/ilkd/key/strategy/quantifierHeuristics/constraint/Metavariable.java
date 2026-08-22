@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.constraint;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,7 +13,6 @@ import org.key_project.logic.Named;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
-@Deprecated
 public final class Metavariable extends JAbstractSortedOperator
         implements Comparable<Metavariable>, TerminalSyntaxElement, Named {
 

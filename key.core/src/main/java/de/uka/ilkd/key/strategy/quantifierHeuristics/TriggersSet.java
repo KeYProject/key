@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,9 +15,17 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.ClauseAnalysis;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.ClauseTriggers;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.LiteralTriggers;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -28,25 +35,6 @@ import org.key_project.util.collection.ImmutableSet;
  * Selects and stores the triggers for a quantified formula in prenex conjunctive normal form.
  */
 public class TriggersSet {
-
-    /**
-     * Per-theory support consulted for rejecting unsuitable trigger material, providing derived
-     * triggers, and (from {@link PredictCostProver}) deciding literals during cost prediction.
-     * Support for a further theory is added by extending this list. The order is significant for
-     * cost prediction: literals are decided by the first support that reaches a verdict, so
-     * equality
-     * is consulted before integer arithmetic, matching the original prover.
-     */
-    static final List<QuantifierTheorySupport> THEORY_SUPPORTS =
-        List.of(new HeapArrayTheorySupport(), new EqualityTheorySupport(),
-            new IntegerTheorySupport());
-
-    /**
-     * The classic trigger selection: equality and integer rejection only, without the
-     * symbolic-execution supports. The strategy option {@code TRIGGERS_CLASSIC} selects it.
-     */
-    private static final List<QuantifierTheorySupport> CLASSIC_SUPPORTS =
-        List.of(new EqualityTheorySupport(), new IntegerTheorySupport());
 
     /** The quantified formula in prenex CNF. */
     private final JTerm allTerm;
@@ -62,14 +50,29 @@ public class TriggersSet {
     /** All triggers for the formula, built from the collected ones by the constructor. */
     private final ImmutableSet<Trigger> allTriggers;
     /** Maps each trigger subterm of the formula to its trigger. */
-    private final Map<JTerm, Trigger> termToTrigger = new LinkedHashMap<>();
+    private final Map<JTerm, UniTrigger> termToTrigger = new LinkedHashMap<>();
     /**
-     * The subterms whose theory triggers were already provided. The derived triggers depend
-     * only on the subterm and its variables, but each provision builds them around fresh
-     * metavariables, so a second occurrence of the same subterm in another clause would
-     * register unequal copies of the same triggers.
+     * The derived triggers each subterm received from the theories, by subterm. The derived
+     * triggers depend only on the subterm and its variables, but each provision builds them
+     * around fresh metavariables, so a second occurrence of the same subterm in another clause
+     * reuses the first occurrence's triggers instead of registering unequal copies.
      */
-    private final Set<JTerm> theoryTriggersProvidedFor = new HashSet<>();
+    private final Map<JTerm, List<JTerm>> derivedTriggersFor = new LinkedHashMap<>();
+    /**
+     * Hands the supports their metavariables, counted within this set. The set is built from the
+     * quantified formula alone, so the same formula always yields the same names, and no two
+     * derived triggers share one. See {@link TriggerSupport.MetavariableFactory}.
+     */
+    private final TriggerSupport.MetavariableFactory metavariableFactory =
+        new TriggerSupport.MetavariableFactory() {
+            private int created;
+
+            @Override
+            public Metavariable fresh(Sort sort) {
+                return new Metavariable(new Name("unifier_derived_" + created++), sort);
+            }
+        };
+
     /** All universal variables of the formula. */
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -80,12 +83,12 @@ public class TriggersSet {
      * The theory supports consulted for trigger rejection and provision. Under the classic trigger
      * selection only the classic supports (equality and integer) are kept.
      */
-    private final List<QuantifierTheorySupport> supports;
+    private final List<? extends TriggerSupport> supports;
 
     private TriggersSet(JTerm allTerm, Services services, boolean classic) {
         this.allTerm = allTerm;
         this.classic = classic;
-        this.supports = classic ? CLASSIC_SUPPORTS : THEORY_SUPPORTS;
+        this.supports = services.getProfile().getTheorySupports(classic);
         replacementWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = collectUniversalVariables(allTerm);
@@ -102,7 +105,7 @@ public class TriggersSet {
     }
 
     static TriggersSet create(JTerm allTerm, Services services, boolean classic) {
-        final Map<org.key_project.logic.Term, TriggersSet> triggerSetCache =
+        final Map<Term, TriggersSet> triggerSetCache =
             services.getCaches().getTriggerSetCache();
         allTerm = TermLabelManager.removeIrrelevantLabels(allTerm, services);
         TriggersSet trs;
@@ -139,19 +142,50 @@ public class TriggersSet {
         return DefaultImmutableSet.nil();
     }
 
-    /** Finds the triggers in every clause of the matrix. */
+    /**
+     * Finds the triggers in every clause of the matrix that holds the first quantified variable,
+     * and asks the theories for fallback triggers if none of these clauses is covered.
+     *
+     * The instantiation binds the first variable, so the formula is instantiated exactly if some
+     * clause holding that variable has a covering trigger. A clause without one is no gap while
+     * another clause covers, since every covering trigger binds the first variable. Only a
+     * formula where no clause covers would never be instantiated, and only for it are the
+     * fallbacks asked, clause by clause. The cover search runs once more per clause afterwards,
+     * so fallbacks that bind only some variables combine into covering multi-triggers.
+     */
     private void initTriggers(Services services) {
         final QuantifiableVariable firstVariable = allTerm.varsBoundHere(0).get(0);
+        final List<ClauseTriggerFinder> finders = new ArrayList<>();
+        final List<ClauseTriggers> selections = new ArrayList<>();
         final var clauses =
             TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND);
         while (clauses.hasNext()) {
             final var clause = (JTerm) clauses.next();
             // a trigger must contain the first variable of the quantified formula
             if (clause.freeVars().contains(firstVariable)) {
-                ClauseTriggerFinder finder = new ClauseTriggerFinder(clause);
-                finder.createTriggers(services);
+                final ClauseTriggerFinder finder = new ClauseTriggerFinder(clause);
+                finders.add(finder);
+                selections.add(finder.createTriggers(services));
             }
         }
+        if (!anyCovered(selections)) {
+            for (int i = 0; i < finders.size(); i++) {
+                final ClauseTriggerFinder finder = finders.get(i);
+                finder.addFallbackTriggers(selections.get(i), services);
+                // A fallback binding only some of the clause's variables is an element. No clause
+                // had a cover before, so the search finds only covers that use a fallback.
+                finder.buildCoveringMultiTriggers();
+            }
+        }
+    }
+
+    private static boolean anyCovered(List<ClauseTriggers> selections) {
+        for (final ClauseTriggers selection : selections) {
+            if (selection.covered()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -159,19 +193,16 @@ public class TriggersSet {
      *
      * @param trigger the trigger term
      * @param universalVariables the universal variables the trigger binds
-     * @param isUnify whether the trigger carries an existential variable and needs unification
+     * @param kind how the trigger is matched
      * @param isElement whether the trigger is an element of a multi-trigger
-     * @param matchByUnification whether the trigger is matched by unification even against ground
-     *        terms
      * @return the uni-trigger for the term
      */
-    private Trigger createUniTrigger(JTerm trigger,
-            ImmutableSet<QuantifiableVariable> universalVariables, boolean isUnify,
-            boolean isElement, boolean matchByUnification) {
-        Trigger cached = termToTrigger.get(trigger);
+    private UniTrigger createUniTrigger(JTerm trigger,
+            ImmutableSet<QuantifiableVariable> universalVariables, TriggerKind kind,
+            boolean isElement, boolean fallback) {
+        UniTrigger cached = termToTrigger.get(trigger);
         if (cached == null) {
-            cached = new UniTrigger(trigger, universalVariables, isUnify, isElement,
-                matchByUnification, this);
+            cached = new UniTrigger(trigger, universalVariables, kind, isElement, fallback, this);
             termToTrigger.put(trigger, cached);
         }
         return cached;
@@ -216,60 +247,128 @@ public class TriggersSet {
         }
 
         /**
-         * Finds the uni-triggers and multi-trigger elements in each literal of the clause,
-         * registers the uni-triggers, and then builds the covering multi-triggers.
-         *
-         * @param services access to the theory operators and term construction
+         * The triggers collected for the literal under search, covering ones and elements
+         * apart. Filled by registration and read into the literal's {@link LiteralTriggers}.
          */
-        public void createTriggers(Services services) {
-            final var literals = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
-            while (literals.hasNext()) {
-                final JTerm literal = (JTerm) literals.next();
-                for (JTerm term : expandIfThenElse(literal, services)) {
-                    JTerm positive = term;
-                    if (positive.op() == Junctor.NOT) {
-                        positive = positive.sub(0);
-                    }
-                    addMaximalUniTriggers(positive, services);
-                }
+        private static final class Collected {
+            final List<Trigger> covering = new ArrayList<>();
+            final List<Trigger> elements = new ArrayList<>();
+
+            void add(Trigger trigger, boolean isElement) {
+                (isElement ? elements : covering).add(trigger);
             }
-            buildCoveringMultiTriggers();
+
+            LiteralTriggers forLiteral(JTerm literal) {
+                return new LiteralTriggers(literal, List.copyOf(covering), List.copyOf(elements));
+            }
         }
 
         /**
-         * Registers the maximal uni-triggers in the term: the triggers of its subterms if any of
-         * them yields one, otherwise the term itself.
+         * Finds the uni-triggers and multi-trigger elements in each literal of the clause,
+         * registers the uni-triggers and builds the covering multi-triggers.
+         *
+         * @param services access to the theory operators and term construction
+         * @return what the selection found, per literal
+         */
+        public ClauseTriggers createTriggers(Services services) {
+            final ClauseAnalysis analysis = analyse(services);
+            final List<LiteralTriggers> perLiteral = new ArrayList<>();
+            for (final JTerm literal : analysis.literals()) {
+                final Collected found = new Collected();
+                searchTriggers(literal, null, found, services);
+                perLiteral.add(found.forLiteral(literal));
+            }
+            final boolean multiCovered = buildCoveringMultiTriggers();
+            return new ClauseTriggers(analysis, List.copyOf(perLiteral), multiCovered);
+        }
+
+        /**
+         * Registers the theories' fallback triggers for this clause. Called only when no clause
+         * of the formula is covered, see {@link TriggersSet#initTriggers}. Which treatments act
+         * on the instances is decided where the instances are recorded, not here: the set is
+         * cached per formula and shared by the non-classic treatments. Fallback triggers are not
+         * part of the selection value they are asked for.
+         */
+        private void addFallbackTriggers(ClauseTriggers selection, Services services) {
+            final Collected discarded = new Collected();
+            for (final TriggerSupport support : supports) {
+                for (final JTerm fallback : support.fallbackTriggers(selection, services,
+                    metavariableFactory)) {
+                    registerUniTrigger(fallback, true, true, discarded);
+                }
+            }
+        }
+
+        /**
+         * Reads the clause into the value trigger selection works on: its literals, negations
+         * stripped and if-then-else expanded, and its universal variables.
+         */
+        private ClauseAnalysis analyse(Services services) {
+            final List<JTerm> literals = new ArrayList<>();
+            final var disjuncts = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
+            while (disjuncts.hasNext()) {
+                final JTerm disjunct = (JTerm) disjuncts.next();
+                for (JTerm term : expandIfThenElse(disjunct, services)) {
+                    literals.add(term.op() == Junctor.NOT ? term.sub(0) : term);
+                }
+            }
+            return new ClauseAnalysis(clause, clauseVariables, literals);
+        }
+
+        /**
+         * What the search below one term produced, as the term enclosing it reads it.
+         */
+        private enum Search {
+            /**
+             * A registered trigger below the term covers the term's universal variables. No
+             * enclosing term needs to become a trigger for them.
+             */
+            SATISFIED,
+            /**
+             * No registered trigger below the term covers its universal variables. The
+             * enclosing term is the next candidate.
+             */
+            OPEN
+        }
+
+        /**
+         * Registers the maximal uni-triggers in the term: the triggers of its subterms if they
+         * cover the term's universal variables, otherwise the term itself.
+         *
+         * A subterm's SATISFIED counts only if the subterm carries every universal variable of
+         * this term. Each level checks this against its own variables, so a deep trigger
+         * satisfies every term above it exactly as far as the variables reach.
          *
          * @param term a subterm of a literal
+         * @param enclosing the term {@code term} is an argument of, null at the top of a literal
+         * @param found receives the triggers registered for the literal under search
          * @param services access to the theory operators and term construction
-         * @return whether a trigger was found in the term or its subterms
+         * @return what the search below {@code term} produced
          */
-        private boolean addMaximalUniTriggers(JTerm term, Services services) {
+        private Search searchTriggers(JTerm term, JTerm enclosing, Collected found,
+                Services services) {
             if (!mightContainTriggers(term)) {
-                return false;
+                return Search.OPEN;
             }
 
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), clauseVariables);
 
-            boolean foundSubtriggers = false;
+            boolean satisfied = false;
             for (int i = 0; i < term.arity(); i++) {
                 final JTerm subTerm = term.sub(i);
-                final boolean found = addMaximalUniTriggers(subTerm, services);
-
-                if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
-                    foundSubtriggers = true;
+                final Search below = searchTriggers(subTerm, term, found, services);
+                if (below == Search.SATISFIED && uniVarsInTerm.subset(subTerm.freeVars())) {
+                    satisfied = true;
                 }
             }
-
-            // a term becomes a trigger only if none of its subterms yielded one; a subterm
-            // whose candidates were all rejected (not acceptable as triggers) does not count,
-            // so the next enclosing meaningful term gets its chance
-            if (!foundSubtriggers) {
-                return addUniTrigger(term, services);
+            if (satisfied) {
+                return Search.SATISFIED;
             }
-
-            return true;
+            // A term becomes a trigger only if no subterm satisfies it. A subterm whose
+            // candidates were all forbidden does not, so the search continues with the
+            // enclosing term.
+            return registerCandidate(term, enclosing, found, services);
         }
 
         @SuppressWarnings("unchecked")
@@ -322,7 +421,7 @@ public class TriggersSet {
         /**
          * Check whether a given term (or a subterm of the term) might be a trigger candidate
          */
-        private boolean mightContainTriggers(JTerm term) {
+        private boolean mightContainTriggers(Term term) {
             if (term.freeVars().isEmpty()) {
                 return false;
             }
@@ -335,55 +434,94 @@ public class TriggersSet {
         }
 
         /**
-         * A trigger candidate is acceptable unless some theory's {@link QuantifierTheorySupport}
-         * rejects it as coordinate or connective material.
+         * The theories' combined verdict on a trigger candidate. A single {@code FORBIDDEN}
+         * discards the candidate; otherwise a single {@code PREFER_ENCLOSING} keeps the search
+         * going past it.
          */
-        private boolean isAcceptableTrigger(JTerm term, Services services) {
-            for (final QuantifierTheorySupport support : supports) {
-                if (support.rejectsAsTrigger(term, services)) {
-                    return false;
+        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, JTerm enclosing,
+                Services services) {
+            TriggerSupport.CandidateVerdict combined = TriggerSupport.CandidateVerdict.ACCEPTABLE;
+            for (final TriggerSupport support : supports) {
+                switch (support.verdictOn(term, enclosing, services)) {
+                    case FORBIDDEN:
+                        return TriggerSupport.CandidateVerdict.FORBIDDEN;
+                    case PREFER_ENCLOSING:
+                        combined = TriggerSupport.CandidateVerdict.PREFER_ENCLOSING;
+                        break;
+                    default:
+                        break;
                 }
             }
-            return true;
+            return combined;
         }
 
         /**
-         * add a uni-trigger to triggers set or add an element of multi-triggers for this clause,
-         * together with the derived triggers each theory's {@link QuantifierTheorySupport} provides
+         * Offers one candidate to the theories and registers it as their verdict directs,
+         * together with the derived triggers each theory provides for an accepted one.
          *
-         * @return whether a trigger was registered for {@code term}
+         * @param term the candidate
+         * @param enclosing the term {@code term} is an argument of, null at the top of a literal
+         * @param found receives the triggers registered for the literal under search
+         * @param services access to the theory operators and term construction
+         * @return what the registration produced for the enclosing term
          */
-        private boolean addUniTrigger(JTerm term, Services services) {
-            if (!isAcceptableTrigger(term, services)) {
-                return false;
+        private Search registerCandidate(JTerm term, JTerm enclosing, Collected found,
+                Services services) {
+            final TriggerSupport.CandidateVerdict verdict = verdictOn(term, enclosing, services);
+            if (verdict == TriggerSupport.CandidateVerdict.FORBIDDEN) {
+                return Search.OPEN;
             }
-            registerUniTrigger(term, false);
+            registerUniTrigger(term, false, false, found);
             // A theory's generalisation is a different term, not a weaker one: it can match where
             // the original does not and fail to match where the original does. Both are therefore
             // registered, so an instantiation reachable through either one stays reachable.
-            if (theoryTriggersProvidedFor.add(term)) {
-                for (final QuantifierTheorySupport support : supports) {
-                    for (final JTerm derived : support.provideTriggers(term, clauseVariables,
-                        services)) {
-                        registerUniTrigger(derived, true);
-                    }
+            List<JTerm> derived = derivedTriggersFor.get(term);
+            if (derived == null) {
+                derived = new ArrayList<>();
+                for (final TriggerSupport support : supports) {
+                    derived.addAll(support.provideTriggers(term, clauseVariables, services,
+                        metavariableFactory));
+                }
+                derivedTriggersFor.put(term, derived);
+                for (final JTerm derivedTerm : derived) {
+                    registerUniTrigger(derivedTerm, true, false, found);
+                }
+            } else {
+                // The derived triggers of an earlier occurrence are registered once; this
+                // literal counts them as its own, classified against this clause's variables.
+                for (final JTerm derivedTerm : derived) {
+                    found.add(termToTrigger.get(derivedTerm), isElement(derivedTerm));
                 }
             }
-            return true;
+            // A preferred-enclosing candidate is registered like any other, but leaves the
+            // search open: the read around an array index determines the accessed array and
+            // must become a trigger too.
+            return verdict == TriggerSupport.CandidateVerdict.PREFER_ENCLOSING ? Search.OPEN
+                    : Search.SATISFIED;
         }
 
-        private void registerUniTrigger(JTerm term, boolean matchByUnification) {
-            final boolean isUnify = !term.freeVars().subset(clauseVariables);
-            final boolean isElement = !clauseVariables.subset(term.freeVars());
+        /** Whether a trigger term binds only some of the clause's universal variables. */
+        private boolean isElement(JTerm term) {
+            return !clauseVariables.subset(term.freeVars());
+        }
+
+        private void registerUniTrigger(JTerm term, boolean theoryProvided, boolean fallback,
+                Collected found) {
+            final boolean carriesExistential = !term.freeVars().subset(clauseVariables);
+            final boolean isElement = isElement(term);
+            final TriggerKind kind = theoryProvided
+                    ? (carriesExistential ? TriggerKind.GENERALIZED_UNIFY : TriggerKind.GENERALIZED)
+                    : (carriesExistential ? TriggerKind.NEEDS_UNIFY : TriggerKind.PATTERN);
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), clauseVariables);
-            Trigger trigger =
-                createUniTrigger(term, uniVarsInTerm, isUnify, isElement, matchByUnification);
+            final UniTrigger trigger =
+                createUniTrigger(term, uniVarsInTerm, kind, isElement, fallback);
             if (isElement) {
                 elementsOfMultiTrigger = elementsOfMultiTrigger.add(trigger);
             } else {
                 collectedTriggers.add(trigger);
             }
+            found.add(trigger, isElement);
         }
 
 
@@ -398,8 +536,11 @@ public class TriggersSet {
          * nothing (see {@link #keepOwnedVariables}). Building all combinations of the elements
          * instead and keeping the covering ones yields the same instantiations, but visits 2^n
          * combinations, which is out of reach once a clause offers a few dozen elements.
+         *
+         * @return whether a covering multi-trigger was built
          */
-        private void buildCoveringMultiTriggers() {
+        private boolean buildCoveringMultiTriggers() {
+            final int before = collectedTriggers.size();
             final List<Trigger> elements = new ArrayList<>();
             final List<ImmutableSet<QuantifiableVariable>> coveredBy = new ArrayList<>();
             for (final Trigger element : elementsOfMultiTrigger) {
@@ -409,6 +550,8 @@ public class TriggersSet {
             }
             coverRemainingVariables(clauseVariables, DefaultImmutableSet.nil(), new ArrayList<>(),
                 elements, coveredBy);
+            // every multi-trigger is new to the set, so the set grew exactly if one was built
+            return collectedTriggers.size() > before;
         }
 
         /**

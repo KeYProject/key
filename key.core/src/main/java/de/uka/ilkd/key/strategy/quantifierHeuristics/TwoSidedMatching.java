@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Constraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
