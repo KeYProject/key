@@ -40,6 +40,7 @@ ISARRAY:'\\isArray';
 ISARRAYLENGTH:'\\isArrayLength';
 ISCONSTANT: '\\isConstant';
 ISENUMTYPE:'\\isEnumType';
+ISENUMCONST:'\\isEnumConst';
 ISINDUCTVAR:'\\isInductVar';
 ISLOCALVARIABLE : '\\isLocalVariable';
 ISOBSERVER : '\\isObserver';

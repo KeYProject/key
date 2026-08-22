@@ -25,6 +25,7 @@ heap/FM2024Tutorial/BinarySearch/README.txt
 heap/FM2024Tutorial/ArrayList/README.txt
 
 # Java Features
+Java/Enums/README.txt
 Java/MultiCatch/README.txt
 Java/Records/README.txt
 Java/Records+CompactConstructor/README.txt

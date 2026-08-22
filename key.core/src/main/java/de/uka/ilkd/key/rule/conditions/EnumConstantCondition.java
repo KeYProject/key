@@ -5,34 +5,41 @@ package de.uka.ilkd.key.rule.conditions;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration;
-import de.uka.ilkd.key.java.ast.reference.FieldReference;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 
 
 /**
- * ensures that the given instantiation for the schemavariable denotes a constant of an enum type.
+ * ensures that the given instantiation for the schema-variable denotes a constant of an enum type.
  *
  * @author mulbrich
  * @since 2006-12-04
  * @version 2006-12-11
+ * @version 2025-10-24 Refactored for the "new" heap model.
  */
 public final class EnumConstantCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;
+    private final GenericSort typeReference;
 
     /**
      * the static reference condition checks if a suggested instantiation for a schema variable
      * denotes a reference to an enum constant.
      */
-    public EnumConstantCondition(SchemaVariable reference) {
+    public EnumConstantCondition(GenericSort typeReference, SchemaVariable reference) {
         this.reference = reference;
+        this.typeReference = typeReference;
     }
 
 
@@ -41,27 +48,50 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
             Services services) {
 
         if (var == reference) {
-            // new ObjectInspector(var).setVisible(true);
-            // new ObjectInspector(subst).setVisible(true);
-            ProgramVariable progvar;
-
-            if (subst instanceof FieldReference) {
-                progvar = ((FieldReference) subst).getProgramVariable();
-            } else if (subst instanceof JTerm && ((JTerm) subst).op() instanceof ProgramVariable) {
-                progvar = (ProgramVariable) ((JTerm) subst).op();
-            } else {
+            // try to find the enum constant field
+            EnumClassDeclaration.EnumEntry field = resolveEnumFieldConstant(subst, services);
+            if (field == null)
                 return false;
-            }
 
-            return EnumClassDeclaration.isEnumConstant(progvar);
-
+            // if there is such a field, check that its type is the right enum type
+            KeYJavaType containerType = ((ProgramVariable) field.variable()).getContainerType();
+            Sort typeInst = svInst.getGenericSortInstantiations().getInstantiation(typeReference);
+            return containerType.getSort() == typeInst;
         }
+
         return true;
     }
+
+    // also used in EnumConstantValue
+    public static EnumClassDeclaration.EnumEntry resolveEnumFieldConstant(Object obj,
+            Services services) {
+        if (obj instanceof Term term) {
+            Operator op = term.op();
+            if (op instanceof Function func && func.isUnique()
+                    && func.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
+                    && func.name().toString().contains("::")) {
+                String funcName = func.name().toString();
+                int colon = funcName.indexOf("::$");
+                if (colon == -1) {
+                    return null;
+                }
+                String sortName = funcName.substring(0, colon);
+                String fieldName = funcName.substring(colon + 3);
+                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sortName);
+                if (kjt == null || !(kjt.getJavaType() instanceof EnumClassDeclaration ecd)) {
+                    return null;
+                }
+
+                return ecd.getConstant(fieldName);
+            }
+        }
+        return null;
+    }
+
 
 
     @Override
     public String toString() {
-        return "\\enumConstant(" + reference + ")";
+        return "\\isEnumConst(" + typeReference + ", " + reference + ")";
     }
 }
