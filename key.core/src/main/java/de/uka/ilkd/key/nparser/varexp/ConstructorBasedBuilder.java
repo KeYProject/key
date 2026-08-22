@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.key_project.prover.rules.VariableCondition;
 
+import org.jspecify.annotations.Nullable;
+
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
     private final boolean negationSupported;
@@ -32,7 +34,7 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
 
     public ConstructorBasedBuilder(String name, boolean negationSupported,
             Class<? extends VariableCondition> clazz, ArgumentType... types) {
-        super(name, types);
+        super(name, clazz, negationSupported, types);
         this.clazz = clazz;
         this.negationSupported = negationSupported;
     }
@@ -57,5 +59,15 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
             }
         }
         throw new RuntimeException();
+    }
+
+    @Override
+    public boolean isNegationSupported() {
+        return negationSupported;
+    }
+
+    @Override
+    public @Nullable Class<?> getRelevantClazz() {
+        return clazz;
     }
 }
