@@ -1228,12 +1228,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 result.append(" ");
             }
             if (fragment.value instanceof final PosInOccurrence pio) {
-                if (pio != null) {
-                    String on = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
-                    result.append(LogicPrinter.escapeHTML(cutIfTooLong(on), true));
-                } else {
-                    result.append("sequent");
-                }
+                String on = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
+                result.append(LogicPrinter.escapeHTML(cutIfTooLong(on), true));
             } else {
                 result.append(fragment.value);
             }

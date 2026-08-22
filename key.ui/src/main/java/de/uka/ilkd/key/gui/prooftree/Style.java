@@ -76,8 +76,8 @@ public class Style {
          * @param value the value
          * @param block whether this should be rendered as a block
          */
-        public <T> void addAdditionalInfo(@NonNull String key, @NonNull T value, boolean block) {
-            additionalInfo.add(new Fragment<>(key, value, block));
+        public void addAdditionalInfo(@NonNull String key, @NonNull Object value, boolean block) {
+            additionalInfo.add(new Fragment(key, value, block));
         }
 
         /**
@@ -110,15 +110,15 @@ public class Style {
         }
 
         /** wrapper class for additional infos */
-        public static final class Fragment<T> {
+        public static final class Fragment {
             /** key */
             public final String key;
             /** value */
-            public final T value;
+            public final Object value;
             /** whether this is a block */
             public final boolean block;
 
-            public Fragment(String key, T value, boolean block) {
+            public Fragment(String key, Object value, boolean block) {
                 this.key = key;
                 this.value = value;
                 this.block = block;
