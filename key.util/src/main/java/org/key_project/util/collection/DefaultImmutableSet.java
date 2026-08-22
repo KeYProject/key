@@ -63,7 +63,14 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     }
 
     public static <T> ImmutableSet<T> fromCollection(Collection<T> seq) {
-        return new DefaultImmutableSet<>(ImmutableList.fromList(seq));
+        // ensure set property, each element only once and order of collection maintained
+        // to avoid regression with previous behavior
+        return seq.isEmpty() ? nil() : fromSet(new LinkedHashSet<>(seq));
+    }
+
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        // we can rely on the set property here
+        return set.isEmpty() ? nil() : new DefaultImmutableSet<>(ImmutableList.fromList(set));
     }
 
     // private static HashSet<String> previousComplains = new HashSet<>();

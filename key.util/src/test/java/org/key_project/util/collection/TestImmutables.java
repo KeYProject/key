@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
@@ -222,6 +224,14 @@ public class TestImmutables {
         assertTrue(result);
         result = l.exists(x -> x == 1_999_998);
         assertFalse(result);
+    }
+
+    @Test
+    public void testSetFromCollectionHasNoDuplicates() {
+        List<Integer> l = List.of(1, 2, 3, 2);
+        ImmutableSet<Integer> s = DefaultImmutableSet.fromCollection(l);
+        assertEquals(s.size(), l.size() - 1,
+            "Set size should be one less than list size as list contains one duplicate");
     }
 
 }
