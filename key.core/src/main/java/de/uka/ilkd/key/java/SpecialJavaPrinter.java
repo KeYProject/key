@@ -184,7 +184,7 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
 class ToStringVisitor extends JmlParserBaseVisitor<String> {
     @Override
     public String visitTerminal(TerminalNode node) {
-        return node.getText();
+        return node.getSymbol().getText();
     }
 
     public String accept(@Nullable ParseTree ctx) {
@@ -216,7 +216,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     @Override
     public String visitAdditiveexpr(JmlParser.AdditiveexprContext ctx) {
-        return accept(ctx.multexpr(), ctx.op);
+        return acceptt(ctx.multexpr(), ctx.op);
     }
 
     @Override
@@ -259,7 +259,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     private String accept(TerminalNode terminalNode) {
         if (terminalNode != null)
-            return terminalNode.getText();
+            return terminalNode.getSymbol().getText();
         return "";
     }
 
@@ -415,12 +415,45 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     @Override
     public String visitEqualityexpr(JmlParser.EqualityexprContext ctx) {
-        return accept(ctx.relationalexpr(), " == "); // TODO
+        return accept(ctx.relationalexpr(), ctx.EQ_NEQ());
     }
 
     @Override
     public String visitEquivalenceexpr(JmlParser.EquivalenceexprContext ctx) {
-        return accept(ctx.impliesexpr(), "<==>"); // TODO
+        return accept(ctx.impliesexpr(), ctx.EQV_ANTIV());
+    }
+
+    private String acceptt(List<? extends ParserRuleContext> children, List<Token> separators) {
+        StringBuilder sb = new StringBuilder();
+        var siter = separators.iterator();
+        var citer = children.iterator();
+
+        while (citer.hasNext()) {
+            sb.append(accept(citer.next()));
+            if (citer.hasNext() && siter.hasNext()) {
+                sb.append(" ");
+                sb.append(siter.next().getText());
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+    private String accept(List<? extends ParserRuleContext> children,
+            List<TerminalNode> separators) {
+        StringBuilder sb = new StringBuilder();
+        var siter = separators.iterator();
+        var citer = children.iterator();
+
+        while (citer.hasNext()) {
+            sb.append(accept(citer.next()));
+            if (citer.hasNext() && siter.hasNext()) {
+                sb.append(" ");
+                sb.append(accept(siter.next()));
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     @Override
@@ -690,7 +723,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     @Override
     public String visitMultexpr(JmlParser.MultexprContext ctx) {
-        return accept(ctx.unaryexpr(), ctx.op);
+        return acceptt(ctx.unaryexpr(), ctx.op);
     }
 
     @Override
@@ -1094,7 +1127,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     @Override
     public String visitRelational_chain(JmlParser.Relational_chainContext ctx) {
-        return accept(ctx.shiftexpr(), ctx.op);
+        return acceptt(ctx.shiftexpr(), ctx.op);
     }
 
     @Override
@@ -1202,15 +1235,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
 
     @Override
     public String visitShiftexpr(JmlParser.ShiftexprContext ctx) {
-        return accept(ctx.additiveexpr(), ctx.op);
-    }
-
-    private String accept(List<? extends ParserRuleContext> expr, List<Token> op) {
-        StringBuilder s = new StringBuilder(accept(expr.getFirst()));
-        for (var i = 1; i < expr.size(); i++) {
-            s.append(" ").append(op.get(i - 1)).append(" ").append(accept(expr.get(i)));
-        }
-        return s.toString();
+        return acceptt(ctx.additiveexpr(), ctx.op);
     }
 
     @Override

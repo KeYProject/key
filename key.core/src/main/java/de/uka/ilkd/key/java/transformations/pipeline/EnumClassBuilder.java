@@ -103,11 +103,11 @@ public class EnumClassBuilder extends JavaTransformerAbstract {
 
     private void addDisjointInvariant(ClassOrInterfaceDeclaration cu, EnumDeclaration declaration) {
         var consts = declaration.getEntries().stream()
-                .map(NodeWithSimpleName::getNameAsString).toList();
-        for (var a : consts) {
-            for (var b : consts) {
-                if (a == b)
-                    continue;
+                .map(NodeWithSimpleName::getNameAsString).sorted().toList();
+        for (int i = 0; i < consts.size(); i++) {
+            var a = consts.get(i);
+            for (int j = i + 1; j < consts.size(); j++) {
+                var b = consts.get(j);
                 services.attachTypeSpec(cu, "static invariant %s != %s;".formatted(a, b));
             }
         }
