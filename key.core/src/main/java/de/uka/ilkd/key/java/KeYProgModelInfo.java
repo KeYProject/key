@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -73,7 +74,8 @@ public class KeYProgModelInfo {
      * Caches locally declared fields; does not need to be invalidated as
      * an existing class declaration is immutable
      */
-    private final Map<KeYJavaType, List<Field>> localDeclaredFields = new LinkedHashMap<>();
+    private final Map<KeYJavaType, ImmutableList<Field>> localDeclaredFields =
+        new ConcurrentHashMap<>();
 
 
     public KeYProgModelInfo(JavaService service) {
@@ -461,21 +463,16 @@ public class KeYProgModelInfo {
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getVisibleArrayFields(ct);
-        }
-        List<Field> fields;
-        synchronized (localDeclaredFields) {
-            fields = localDeclaredFields.get(ct);
-            if (fields != null) {
-                return fields;
+    public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
+        ImmutableList<Field> fields = localDeclaredFields.get(ct);
+        if (fields == null) {
+            if (ct.getJavaType() instanceof ArrayType) {
+                fields = ImmutableList.fromList(getVisibleArrayFields(ct));
+            } else {
+                fields = ImmutableList.fromList(getReferenceType(ct)
+                        .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
+                        .orElseGet(ArrayList::new));
             }
-        }
-        fields = Collections.unmodifiableList(getReferenceType(ct)
-                .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
-                .orElseGet(ArrayList::new));
-        synchronized (localDeclaredFields) {
             localDeclaredFields.put(ct, fields);
         }
         return fields;
