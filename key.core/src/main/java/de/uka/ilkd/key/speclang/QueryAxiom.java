@@ -174,6 +174,13 @@ public final class QueryAxiom extends ClassAxiom {
         // get real implementation of program method
         final IProgramMethod targetImpl =
             services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
+
+        if (targetImpl.getMethodDeclaration().getBody() == null) {
+            // no method implementation available so using a query axiom
+            // that requires inlining of the body is not sensible.
+            return DefaultImmutableSet.nil();
+        }
+
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
             resultProgSV, new ImmutableArray<>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
