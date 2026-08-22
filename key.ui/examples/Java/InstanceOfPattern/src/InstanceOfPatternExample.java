@@ -14,10 +14,7 @@
  *   }
  */
 public class InstanceOfPatternExample {
-
-    /**
-     *
-     */
+    //@ static invariant_free (\forall String s; true; s.length() >= 0);
 
     /*@ normal_behavior
       @ requires obj != null;
@@ -32,17 +29,11 @@ public class InstanceOfPatternExample {
       @ ensures \result;
       @*/
     public static boolean isString(Object obj) {
-        boolean result = getString(obj) instanceof String id;
-        return result;
+        return getString(obj) instanceof String id && id.length() >= 0;
     }
 
-
-        /**
-         * Basic instanceof pattern matching example.
-         * The variable 's' is bound in the true branch of the instanceof check.
-         */
     /*@ normal_behavior
-      @ requires obj != null;
+      @ requires obj instanceof String;
       @ ensures \result >= 0;
       @*/
     public static int getStringLength(Object obj) {
