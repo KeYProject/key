@@ -490,22 +490,29 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
+        if (_this instanceof FindTaclet _thisFind) {
+            final FindTaclet thatFind = (FindTaclet) that;
+            if (!_thisFind.find().equalsModProperty(thatFind.find(), PROOF_IRRELEVANCY_PROPERTY)) {
+                return false;
+            }
+        }
+
         if ((_this.assumesSequent() == null && that.assumesSequent() != null)
                 || (_this.assumesSequent() != null && that.assumesSequent() == null)) {
-                return false;
+            return false;
         } else {
             ImmutableList<SequentFormula> if1 =
                 _this.assumesSequent().asList();
             ImmutableList<SequentFormula> if2 =
                 that.assumesSequent().asList();
-        while (!if1.isEmpty() && !if2.isEmpty()
-                && equalsModProofIrrelevancy(if1.head(), if2.head())) {
-            if1 = if1.tail();
-            if2 = if2.tail();
-        }
-        if (!if1.isEmpty() || !if2.isEmpty()) {
-            return false;
-        }
+            while (!if1.isEmpty() && !if2.isEmpty()
+                    && equalsModProofIrrelevancy(if1.head(), if2.head())) {
+                if1 = if1.tail();
+                if2 = if2.tail();
+            }
+            if (!if1.isEmpty() || !if2.isEmpty()) {
+                return false;
+            }
         }
 
         if (!_this.getChoices().equals(that.getChoices())) {

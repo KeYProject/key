@@ -207,7 +207,7 @@ public abstract class AbstractProofReplayer {
         for (Node n = goal.node(); n != null; n = n.parent()) {
             for (NoPosTacletApp introduced : n.getLocalIntroducedRules()) {
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(introduced,
-                        app)) {
+                    app)) {
                     return introduced;
                 }
             }
