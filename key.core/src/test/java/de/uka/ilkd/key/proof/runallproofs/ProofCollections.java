@@ -1213,6 +1213,14 @@ public class ProofCollections {
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
 
+        g = c.group("StipuLa");
+        g.provable("case-studies/stipula/behavior_run_bet.key");
+        g.provable("case-studies/stipula/behavior_run_bike.key");
+        g.provable("case-studies/stipula/behavior_run_donation.key");
+        g.provable("case-studies/stipula/behavior_run_license.key");
+        g.provable("case-studies/stipula/behavior_run_loanForUse.key");
+
+
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
