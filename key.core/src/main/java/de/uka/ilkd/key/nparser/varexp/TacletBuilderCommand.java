@@ -8,7 +8,6 @@ import java.util.List;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.
@@ -28,6 +27,9 @@ public interface TacletBuilderCommand {
      */
     boolean isSuitableFor(@NonNull String name);
 
+    /// Returns information about this command.
+    TacletBuilderCommandInfo getInformation();
+
     /**
      * Defines the amount and type of expected arguments. For example, if you want describe a
      * sub-type test (instanceOf) you would need two sorts {@code new ArgumentType[]{SORT,SORT} } as
@@ -39,7 +41,9 @@ public interface TacletBuilderCommand {
      *
      * @see ArgumentType
      */
-    ArgumentType[] getArgumentTypes();
+    default ArgumentType[] getArgumentTypes() {
+        return getInformation().argumentTypes();
+    }
 
     /**
      * Applying this command on the given taclet builder.
@@ -51,12 +55,4 @@ public interface TacletBuilderCommand {
      */
     void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters,
             boolean negated);
-
-
-    String getTriggerName();
-
-    boolean isNegationSupported();
-
-    @Nullable
-    Class<?> getRelevantClazz();
 }

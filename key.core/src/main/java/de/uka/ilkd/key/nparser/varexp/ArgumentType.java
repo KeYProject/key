@@ -12,14 +12,19 @@ import org.key_project.logic.sort.Sort;
 
 /**
  * Argument types for {@link TacletBuilderCommand}s.
+ * Each {@link ArgumentType} has an expected class for the type of the argument.
  *
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  * @see TacletBuilderCommand
  */
 public enum ArgumentType {
-    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(JTerm.class),
-    JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
+    TYPE_RESOLVER(TypeResolver.class),
+    SORT(Sort.class),
+    TERM(JTerm.class),
+    JAVA_TYPE(KeYJavaType.class),
+    VARIABLE(ParsableVariable.class),
+    STRING(String.class);
 
     public final Class<?> clazz;
 

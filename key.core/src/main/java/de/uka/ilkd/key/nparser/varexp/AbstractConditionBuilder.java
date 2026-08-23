@@ -3,22 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import org.jspecify.annotations.NullMarked;
+import org.key_project.prover.rules.VariableCondition;
 
 /**
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
-@NullMarked
 public abstract class AbstractConditionBuilder extends AbstractTacletBuilderCommand
         implements ConditionBuilder {
-    protected AbstractConditionBuilder(String triggerName, ArgumentType... argumentsTypes) {
-        super(triggerName, null, false, argumentsTypes);
+    protected AbstractConditionBuilder(TacletBuilderCommandInfo info) {
+        super(info);
     }
 
-    protected AbstractConditionBuilder(
-            String triggerName, Class<?> clazz, boolean isNegationSupported,
-            ArgumentType... argumentsTypes) {
-        super(triggerName, clazz, isNegationSupported, argumentsTypes);
+    public AbstractConditionBuilder(String name, Class<? extends VariableCondition> clazz,
+            boolean negationSupported, ArgumentType... types) {
+        super(TacletBuilderCommandInfo.createVarcondInfo(name, clazz, negationSupported, types));
     }
 }
