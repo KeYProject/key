@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
@@ -188,7 +189,7 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     ///
     /// @return the array of expected constructor parameter types
     Class<?>[] getConstructorClasses() {
-        return getConstructorClasses(argTypes, isNegationSupported == Boolean.TRUE);
+        return getConstructorClasses(argTypes, isNegationSupported());
     }
 
     /// Resolves and caches [#argNames], [#generalDocumentation], and
@@ -202,32 +203,33 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
         ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(clazz.getName());
         generalDocumentation = classDoc;
 
-        try {
-            var constr = clazz.getConstructor(getConstructorClasses());
-            final var constructorDeclaration = classDoc.getConstructors()
-                    .stream().filter(it -> it.matches(constr)).findAny();
-
-            final var parameters = constr.getParameters();
-            argNames = new String[argTypes.length];
-            for (int i = 0; i < argTypes.length; i++) {
-                argNames[i] = parameters[i].getName();
-            }
-
-            constructorDeclaration.ifPresent(it -> {
-                List<ParamJavadoc> params = it.getParams();
-                for (int i = 0; i < params.size(); i++) {
-                    argNames[i] = params.get(i).getName();
-                }
-            });
-
-            argumentDocumentation = constructorDeclaration
-                    .orElse(new MethodJavadoc(constr.getName(), null, null, null, null, null, null,
-                        null));
-        } catch (NoSuchMethodException e) {
+        final var constr = findConstructor(clazz, getConstructorClasses());
+        if (constr == null) {
             argNames = new String[argTypes.length];
             Arrays.fill(argNames, "");
-            argumentDocumentation = new MethodJavadoc("", null, null, null, null, null, null, null);
+            argumentDocumentation =
+                MethodJavadoc.createEmpty((Constructor<?>) null);
+            return;
         }
+
+        final var constructorDeclaration = classDoc.getConstructors()
+                .stream().filter(it -> it.matches(constr)).findAny();
+
+        final var parameters = constr.getParameters();
+        argNames = new String[argTypes.length];
+        for (int i = 0; i < argTypes.length; i++) {
+            argNames[i] = parameters[i].getName();
+        }
+
+        constructorDeclaration.ifPresent(it -> {
+            List<ParamJavadoc> params = it.getParams();
+            for (int i = 0; i < argNames.length; i++) {
+                argNames[i] = params.get(i).getName();
+            }
+        });
+
+        argumentDocumentation = constructorDeclaration
+                .orElse(MethodJavadoc.createEmpty((Constructor<?>) null));
         // endregion
     }
 
@@ -239,31 +241,33 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     /// @param clazz the implementation class to inspect
     /// @param argTypes the expected leading argument types
     /// @return `true` if such a constructor exists, `false` otherwise
+    /// @throws IllegalStateException if no suitable constructor exists in `clazz`
     private static boolean lastArgumentOfFirstConstructorIsBoolean(
             Class<?> clazz, ArgumentType[] argTypes) {
-        if (findConstructor(clazz, getConstructorClasses(argTypes, true))) {
+        if (findConstructor(clazz, getConstructorClasses(argTypes, true)) != null) {
             return true;
         }
-        if (findConstructor(clazz, getConstructorClasses(argTypes, false))) {
+        if (findConstructor(clazz, getConstructorClasses(argTypes, false)) != null) {
             return false;
         }
         throw new IllegalStateException();
     }
 
-    private static boolean findConstructor(Class<?> clazz, Class<?>[] constructorClasses) {
+    private static @Nullable Constructor<?> findConstructor(Class<?> clazz,
+            Class<?>[] constructorClasses) {
         final var constructors = clazz.getConstructors();
         c: for (var constructor : constructors) {
             if (constructor.getParameterCount() != constructorClasses.length)
-                continue c;
+                continue;
             final var parameterTypes = constructor.getParameterTypes();
             for (var i = 0; i < parameterTypes.length; i++) {
                 if (!constructorClasses[i].isAssignableFrom(parameterTypes[i])) {
                     continue c;
                 }
             }
-            return true;
+            return constructor;
         }
-        return false;
+        return null;
     }
 
     /// Builds the array of constructor parameter types corresponding to `argTypes`,
