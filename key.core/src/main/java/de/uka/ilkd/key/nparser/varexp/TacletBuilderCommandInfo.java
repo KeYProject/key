@@ -241,12 +241,29 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     /// @return `true` if such a constructor exists, `false` otherwise
     private static boolean lastArgumentOfFirstConstructorIsBoolean(
             Class<?> clazz, ArgumentType[] argTypes) {
-        try {
-            clazz.getConstructor(getConstructorClasses(argTypes, true));
+        if (findConstructor(clazz, getConstructorClasses(argTypes, true))) {
             return true;
-        } catch (NoSuchMethodException e) {
+        }
+        if (findConstructor(clazz, getConstructorClasses(argTypes, false))) {
             return false;
         }
+        throw new IllegalStateException();
+    }
+
+    private static boolean findConstructor(Class<?> clazz, Class<?>[] constructorClasses) {
+        final var constructors = clazz.getConstructors();
+        c: for (var constructor : constructors) {
+            if (constructor.getParameterCount() != constructorClasses.length)
+                continue c;
+            final var parameterTypes = constructor.getParameterTypes();
+            for (var i = 0; i < parameterTypes.length; i++) {
+                if (!constructorClasses[i].isAssignableFrom(parameterTypes[i])) {
+                    continue c;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /// Builds the array of constructor parameter types corresponding to `argTypes`,
