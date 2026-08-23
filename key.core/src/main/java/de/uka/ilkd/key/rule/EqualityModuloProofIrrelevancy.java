@@ -492,20 +492,20 @@ public class EqualityModuloProofIrrelevancy {
 
         if ((_this.assumesSequent() == null && that.assumesSequent() != null)
                 || (_this.assumesSequent() != null && that.assumesSequent() == null)) {
-            return false;
+                return false;
         } else {
             ImmutableList<SequentFormula> if1 =
                 _this.assumesSequent().asList();
             ImmutableList<SequentFormula> if2 =
                 that.assumesSequent().asList();
-            while (!if1.isEmpty() && !if2.isEmpty()
-                    && equalsModProofIrrelevancy(if1.head(), if2.head())) {
-                if1 = if1.tail();
-                if2 = if2.tail();
-            }
-            if (!if1.isEmpty() || !if2.isEmpty()) {
-                return false;
-            }
+        while (!if1.isEmpty() && !if2.isEmpty()
+                && equalsModProofIrrelevancy(if1.head(), if2.head())) {
+            if1 = if1.tail();
+            if2 = if2.tail();
+        }
+        if (!if1.isEmpty() || !if2.isEmpty()) {
+            return false;
+        }
         }
 
         if (!_this.getChoices().equals(that.getChoices())) {
@@ -523,8 +523,16 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(org.key_project.prover.rules.Taclet taclet) {
-        Sequent sequentFormulas = taclet.assumesSequent();
-        return hashCodeModProofIrrelevancy(sequentFormulas.getFormulaByNr(1));
+        int hashCode = 17;
+        hashCode += 17 * (taclet.getChoices().hashCode() + 17 * taclet.goalTemplates().size());
+        if (taclet instanceof final FindTaclet find) {
+            hashCode += 17 * PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty(find.find());
+        }
+        final Sequent assumesSequent = taclet.assumesSequent();
+        if (assumesSequent != null && !assumesSequent.isEmpty()) {
+            hashCode += 17 * hashCodeModProofIrrelevancy(assumesSequent.getFormulaByNr(1));
+        }
+        return hashCode;
     }
 
 
