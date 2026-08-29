@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.settings;
 
+import java.io.File;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -44,20 +45,30 @@ public class GeneralSettings extends AbstractSettings {
     public static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
     public static final String AUTO_SAVE = "AutoSavePeriod";
 
+    public static final String LAST_USED_PATH = "LastUsedPath";
+
     /**
      * The key for storing the ensureSourceConsistency flag in settings
      */
     private static final String ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
 
-    /** Whether automatic proof search uses the multi-core (parallel) prover. */
+    /**
+     * Whether automatic proof search uses the multi-core (parallel) prover.
+     */
     public static final String PARALLEL_PROVER_ENABLED = "ParallelProverEnabled";
-    /** The number of worker threads the multi-core prover uses. */
+    /**
+     * The number of worker threads the multi-core prover uses.
+     */
     public static final String PARALLEL_PROVER_THREADS = "ParallelProverThreadCount";
 
-    /** Default worker count when the multi-core prover is first enabled. */
+    /**
+     * Default worker count when the multi-core prover is first enabled.
+     */
     public static final int PARALLEL_PROVER_THREADS_DEFAULT = 4;
 
-    /** Default value for {@link #getJmlEnabledKeys()} */
+    /**
+     * Default value for {@link #getJmlEnabledKeys()}
+     */
     public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
 
     private Set<String> jmlEnabledKeys = new TreeSet<>(JML_ENABLED_KEYS_DEFAULT);
@@ -86,6 +97,11 @@ public class GeneralSettings extends AbstractSettings {
      * auto save is disabled by default. Positive values indicate save period.
      */
     private int autoSave = 0;
+
+    /**
+     *
+     */
+    private String lastUsedPath;
 
     /**
      * If enabled, source files are cached at first use to ensure consistency between proof and
@@ -219,6 +235,30 @@ public class GeneralSettings extends AbstractSettings {
         firePropertyChange(PARALLEL_PROVER_THREADS, old, parallelProverThreadCount);
     }
 
+    public void setLastUsedPath(File f) {
+        setLastUsedPath(f.getAbsolutePath());
+    }
+
+    public void setLastUsedPath(String absolutePath) {
+        var old = lastUsedPath;
+        lastUsedPath = absolutePath;
+        firePropertyChange(LAST_USED_PATH, old, lastUsedPath);
+    }
+
+    public File getLastUsedPath() {
+        if (lastUsedPath == null) {
+            setLastUsedPath(new File("."));
+        }
+        return new File(lastUsedPath);
+    }
+
+    public File getLastUsedPathEnsureFolder() {
+        if (getLastUsedPath().isFile())
+            return getLastUsedPath().getParentFile();
+        else
+            return getLastUsedPath();
+    }
+
     /**
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
@@ -341,6 +381,8 @@ public class GeneralSettings extends AbstractSettings {
         } else {
             setJmlEnabledKeys(new TreeSet<>(props.getStringList(KEY_JML_ENABLED_KEYS)));
         }
+
+        setLastUsedPath(props.getString(LAST_USED_PATH, new File(".").getAbsolutePath()));
     }
 
     @Override
@@ -355,4 +397,6 @@ public class GeneralSettings extends AbstractSettings {
         props.set(PARALLEL_PROVER_THREADS, parallelProverThreadCount);
         props.set(KEY_JML_ENABLED_KEYS, jmlEnabledKeys.stream().toList());
     }
+
+
 }
