@@ -12,7 +12,6 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
@@ -212,7 +212,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         if (proof.getProofFile() != null) {
             proofFolder = proof.getProofFile().getParent();
         } else { // happens when a Java file is loaded
-            proofFolder = Main.getWorkingDir();
+            proofFolder = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .getLastUsedPathEnsureFolder().toPath();
         }
         final Path toSave = proofFolder.resolve(filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
