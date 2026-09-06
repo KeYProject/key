@@ -57,6 +57,13 @@ jobs:
       - run: hermes process
       - run: hermes curate
 
+      - name: Upload Log
+        uses: actions/upload-artifact@v7
+        with:
+          name: hermes-log
+          path: "hermes.log"
+          retention-days: 1
+
       - run: |
           # Cache current branch for PR close job
           git branch --show-current > .hermes/curate/target_branch
@@ -143,7 +150,6 @@ jobs:
             git push origin --delete "$BRANCH"
           done
       # TODO: if: failure() --- delete the curation branches when the deposition failed
-
 
   hermes-cleanup:
     name: Cleanup aborted curation branches
