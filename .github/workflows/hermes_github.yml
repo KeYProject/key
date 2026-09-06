@@ -12,6 +12,7 @@
 name: Software Publication
 
 on:
+  workflow_dispatch:
   # ADAPT
   # See the events you can react to at https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
   push:
@@ -50,7 +51,7 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install hermes
-      #- run: pip install git+https://github.com/softwarepub/hermes-plugin-git
+      - run: pip install git+https://github.com/softwarepub/hermes-plugin-git
 
       - run: hermes harvest
       - run: hermes process
