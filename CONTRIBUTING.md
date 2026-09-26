@@ -21,4 +21,4 @@ More detailed information is available in the [KeY Developer Documentation](http
 
 ### Licensing
 
-KeY is published under the [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html.en) (no later versions). By opening a PR, you are licensing your contribution under the GPLv2 for inclusion in KeY.
+KeY is published under the [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html.en), or (at your option) any later version. By opening a PR, you are licensing your contribution under the GPLv2 (or later) for inclusion in KeY.

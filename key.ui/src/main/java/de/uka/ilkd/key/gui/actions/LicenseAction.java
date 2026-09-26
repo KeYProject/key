@@ -1,6 +1,6 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -24,7 +24,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  */
 public class LicenseAction extends MainWindowAction {
     public static final String KEY_FALLBACK =
-        (KeYConstants.COPYRIGHT + "\nKeY is protected by the " + "GNU General Public License v2");
+        (KeYConstants.COPYRIGHT + "\nKeY is protected by the "
+            + "GNU General Public License v2, or (at your option) any later version");
 
     private static final long serialVersionUID = 5606343347731759150L;
 
