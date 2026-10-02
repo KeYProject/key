@@ -75,6 +75,12 @@ Assuming you are in the directory of this README file, you can create a runnable
    ./gradlew :key.ui:shadowJar
    ```
    The file is generated in `key.ui/build/libs/key-*-exe.jar`.
+   A slim variant without the optional keyext extensions and the bundled examples is created with
+   ```sh
+   ./gradlew :key.ui:slimJar
+   ```
+   The file is generated in `key.ui/build/libs/key-*-slim-exe.jar`.
+   Both jars are also built as part of `./gradlew assemble`.
 
 5. A distribution is build with
    ```sh
