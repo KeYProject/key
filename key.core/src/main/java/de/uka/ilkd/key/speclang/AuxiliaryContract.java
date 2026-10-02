@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.ast.LoopInitializer;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.Break;
 import de.uka.ilkd.key.java.ast.statement.Continue;
 import de.uka.ilkd.key.java.ast.statement.For;
@@ -1020,7 +1022,8 @@ public interface AuxiliaryContract extends SpecificationElement {
         public Variables create() {
             createAndStoreFlags();
 
-            return new Variables(selfVar(method, method.getContainerType(), false), breakFlags,
+            return new Variables(selfVar(method, new TypeRef(method.getContainerType()), false),
+                breakFlags,
                 continueFlags, returnFlag,
                 // We don't need to (and shouldn't) make the variable names unique here.
                 // That is done in AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
@@ -1090,7 +1093,8 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @return a boolean variable with the specified name.
          */
         private LocationVariable createFlag(final String name) {
-            return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
+            return createVariable(name,
+                new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")));
         }
 
         /**
@@ -1159,7 +1163,7 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
-                    createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                    createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getTypeReference()));
             }
             return result;
         }
@@ -1213,7 +1217,7 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (LocationVariable var : localInVariables) {
                 result.put(var,
-                    createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                    createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getTypeReference()));
             }
             return result;
         }
@@ -1221,12 +1225,12 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          *
          * @param name a base name.
-         * @param type a type.
+         * @param typeRef a {@link TypeReference}.
          * @return a variable with a name based on the specified base name of the specified type.
          */
-        private LocationVariable createVariable(final String name, final KeYJavaType type) {
+        private LocationVariable createVariable(final String name, final TypeReference typeRef) {
             return new LocationVariable(services.getVariableNamer().getTemporaryNameProposal(name),
-                type);
+                typeRef);
         }
     }
 

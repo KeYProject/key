@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -133,7 +134,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         // prepare variables
         final LocationVariable selfVar =
-            !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
+            !contract.getTarget().isStatic() ? tb.selfVar(new TypeRef(contract.getKJT()), true)
+                    : null;
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);

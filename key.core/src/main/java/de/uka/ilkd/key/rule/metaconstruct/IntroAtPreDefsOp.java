@@ -271,7 +271,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     continue;
                 }
                 final LocationVariable l = tb.locationVariable(var.name() + "Before_" + methodName,
-                    var.getKeYJavaType(), true);
+                    var.getTypeReference(), true);
                 services.getNamespaces().programVariables().addSafely(l);
 
                 final JTerm u = tb.elementary(l, tb.var(var));

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 
 /**

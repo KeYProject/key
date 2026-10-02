@@ -60,7 +60,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /**
      * keeps the currently used integer type
      */
-    private final KeYJavaType integerType;
+    private final TypeReference integerType;
 
     /**
      * stores the currently used object type
@@ -76,7 +76,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /** create the method builder for array implict creation methods */
     public CreateArrayMethodBuilder(KeYJavaType integerType, KeYJavaType objectType, Sort heapSort,
             int heapCount) {
-        this.integerType = integerType;
+        this.integerType = new TypeRef(integerType);
         this.objectType = objectType;
         this.heapSort = heapSort;
         this.heapCount = heapCount;
@@ -208,7 +208,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             new LocationVariable(new ProgramElementName("length"), integerType, true);
 
         final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
-            new TypeRef(integerType), new VariableSpecification(paramLength), false);
+            integerType, new VariableSpecification(paramLength), false);
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
             new ProgramElementName(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE),
@@ -332,7 +332,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             new LocationVariable(new ProgramElementName("length"), integerType);
 
         final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
-            new TypeRef(integerType), new VariableSpecification(paramLength), false);
+            integerType, new VariableSpecification(paramLength), false);
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
             new ProgramElementName(IMPLICIT_ARRAY_CREATE), new ParameterDeclaration[] { param },
