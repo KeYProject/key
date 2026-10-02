@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -91,19 +92,19 @@ public final class ForToWhile extends JavaSourceElement implements ProgramTransf
     }
 
     public ForToWhile withInnerLabel(SchemaVariable innerLabel) {
-        return new ForToWhile(innerLabel, outerLabel(), body(), name(), positionInfo());
+        return new ForToWhile(innerLabel, outerLabel(), body(), positionInfo());
     }
 
     public ForToWhile withOuterLabel(SchemaVariable outerLabel) {
-        return new ForToWhile(innerLabel(), outerLabel, body(), name(), positionInfo());
+        return new ForToWhile(innerLabel(), outerLabel, body(), positionInfo());
     }
 
     public ForToWhile withBody(Statement body) {
-        return new ForToWhile(innerLabel(), outerLabel(), body, name(), positionInfo());
+        return new ForToWhile(innerLabel(), outerLabel(), body, positionInfo());
     }
 
     public ForToWhile withPositionInfo(PositionInfo positionInfo) {
-        return new ForToWhile(innerLabel(), outerLabel(), body(), name(), positionInfo);
+        return new ForToWhile(innerLabel(), outerLabel(), body(), positionInfo);
     }
 
     public final static class Builder {

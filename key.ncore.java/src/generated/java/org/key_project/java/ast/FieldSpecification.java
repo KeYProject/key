@@ -8,20 +8,14 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
 public final class FieldSpecification extends JavaSourceElement implements VariableSpecification {
 
-    private final Type type;
-
     private final int dimensions;
-
-    private final ProgramVariable var;
-
-    @Nullable
-    private final Expression init;
 
     private final Expression initializer;
 
@@ -31,21 +25,11 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
 
     private final IProgramVariable programVariable;
 
-    public Type type() {
-        return type;
-    }
+    private final Type type;
 
+    @java.lang.Override()
     public int dimensions() {
         return dimensions;
-    }
-
-    public ProgramVariable var() {
-        return var;
-    }
-
-    @Nullable()
-    public Expression init() {
-        return init;
     }
 
     @java.lang.Override()
@@ -64,28 +48,29 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
         return programVariable;
     }
 
-    public FieldSpecification(Type type, int dimensions, ProgramVariable var, @Nullable Expression init, Expression initializer, @EqEx @Nullable PositionInfo positionInfo, IProgramVariable programVariable) {
-        this.type = Objects.requireNonNull(type);
+    @java.lang.Override()
+    public Type type() {
+        return type;
+    }
+
+    public FieldSpecification(int dimensions, Expression initializer, @EqEx @Nullable PositionInfo positionInfo, IProgramVariable programVariable, Type type) {
         this.dimensions = Objects.requireNonNull(dimensions);
-        this.var = Objects.requireNonNull(var);
-        this.init = init;
         this.initializer = Objects.requireNonNull(initializer);
         this.positionInfo = positionInfo;
         this.programVariable = Objects.requireNonNull(programVariable);
+        this.type = Objects.requireNonNull(type);
     }
 
-    public FieldSpecification(Type type, int dimensions, ProgramVariable var, Expression initializer, IProgramVariable programVariable) {
-        this.type = Objects.requireNonNull(type);
+    public FieldSpecification(int dimensions, Expression initializer, IProgramVariable programVariable, Type type) {
         this.dimensions = Objects.requireNonNull(dimensions);
-        this.var = Objects.requireNonNull(var);
-        this.init = null;
         this.initializer = Objects.requireNonNull(initializer);
         this.positionInfo = null;
         this.programVariable = Objects.requireNonNull(programVariable);
+        this.type = Objects.requireNonNull(type);
     }
 
     public FieldSpecification(FieldSpecification other) {
-        this(other.type, other.dimensions, other.var, other.init, other.initializer, other.positionInfo, other.programVariable);
+        this(other.dimensions, other.initializer, other.positionInfo, other.programVariable, other.type);
     }
 
     @Override()
@@ -93,19 +78,7 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
     public MatchConditions match(java.lang.Object o, MatchConditions cond) {
         if (!(o instanceof FieldSpecification other))
             return null;
-        cond = MatchHelper.match(type, other.type, cond);
-        if (cond == null) {
-            return null;
-        }
         cond = MatchHelper.match(dimensions, other.dimensions, cond);
-        if (cond == null) {
-            return null;
-        }
-        cond = MatchHelper.match(var, other.var, cond);
-        if (cond == null) {
-            return null;
-        }
-        cond = MatchHelper.match(init, other.init, cond);
         if (cond == null) {
             return null;
         }
@@ -117,50 +90,37 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
         if (cond == null) {
             return null;
         }
+        cond = MatchHelper.match(type, other.type, cond);
+        if (cond == null) {
+            return null;
+        }
         return cond;
     }
 
-    public FieldSpecification withType(Type type) {
-        return new FieldSpecification(type, dimensions(), var(), init(), initializer(), positionInfo(), programVariable());
-    }
-
     public FieldSpecification withDimensions(int dimensions) {
-        return new FieldSpecification(type(), dimensions, var(), init(), initializer(), positionInfo(), programVariable());
-    }
-
-    public FieldSpecification withVar(ProgramVariable var) {
-        return new FieldSpecification(type(), dimensions(), var, init(), initializer(), positionInfo(), programVariable());
-    }
-
-    public FieldSpecification withInit(Expression init) {
-        return new FieldSpecification(type(), dimensions(), var(), init, initializer(), positionInfo(), programVariable());
+        return new FieldSpecification(dimensions, initializer(), positionInfo(), programVariable(), type());
     }
 
     public FieldSpecification withInitializer(Expression initializer) {
-        return new FieldSpecification(type(), dimensions(), var(), init(), initializer, positionInfo(), programVariable());
+        return new FieldSpecification(dimensions(), initializer, positionInfo(), programVariable(), type());
     }
 
     public FieldSpecification withPositionInfo(PositionInfo positionInfo) {
-        return new FieldSpecification(type(), dimensions(), var(), init(), initializer(), positionInfo, programVariable());
+        return new FieldSpecification(dimensions(), initializer(), positionInfo, programVariable(), type());
     }
 
     public FieldSpecification withProgramVariable(IProgramVariable programVariable) {
-        return new FieldSpecification(type(), dimensions(), var(), init(), initializer(), positionInfo(), programVariable);
+        return new FieldSpecification(dimensions(), initializer(), positionInfo(), programVariable, type());
+    }
+
+    public FieldSpecification withType(Type type) {
+        return new FieldSpecification(dimensions(), initializer(), positionInfo(), programVariable(), type);
     }
 
     public final static class Builder {
 
         @Nullable()
-        public Type type;
-
-        @Nullable()
         public int dimensions;
-
-        @Nullable()
-        public ProgramVariable var;
-
-        @Nullable()
-        public Expression init;
 
         @Nullable()
         public Expression initializer;
@@ -171,27 +131,15 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
         @Nullable()
         public IProgramVariable programVariable;
 
-        public FieldSpecification build() {
-            return new FieldSpecification(type, dimensions, var, init, initializer, positionInfo, programVariable);
-        }
+        @Nullable()
+        public Type type;
 
-        public Builder type(Type type) {
-            this.type = type;
-            return this;
+        public FieldSpecification build() {
+            return new FieldSpecification(dimensions, initializer, positionInfo, programVariable, type);
         }
 
         public Builder dimensions(int dimensions) {
             this.dimensions = dimensions;
-            return this;
-        }
-
-        public Builder var(ProgramVariable var) {
-            this.var = var;
-            return this;
-        }
-
-        public Builder init(Expression init) {
-            this.init = init;
             return this;
         }
 
@@ -209,17 +157,20 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
             this.programVariable = programVariable;
             return this;
         }
+
+        public Builder type(Type type) {
+            this.type = type;
+            return this;
+        }
     }
 
     public Builder builder() {
         Builder b = new Builder();
-        b.type = type;
         b.dimensions = dimensions;
-        b.var = var;
-        b.init = init;
         b.initializer = initializer;
         b.positionInfo = positionInfo;
         b.programVariable = programVariable;
+        b.type = type;
         return b;
     }
 
@@ -229,12 +180,12 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
             return true;
         if (!(o instanceof FieldSpecification that))
             return false;
-        return Objects.equals(type, that.type) && Objects.equals(dimensions, that.dimensions) && Objects.equals(var, that.var) && Objects.equals(init, that.init) && Objects.equals(initializer, that.initializer) && Objects.equals(programVariable, that.programVariable);
+        return Objects.equals(dimensions, that.dimensions) && Objects.equals(initializer, that.initializer) && Objects.equals(programVariable, that.programVariable) && Objects.equals(type, that.type);
     }
 
     @Override()
     public String toString() {
-        return "FieldSpecification[type=%s, dimensions=%s, var=%s, init=%s, initializer=%s, positionInfo=%s, programVariable=%s]".formatted(type, dimensions, var, init, initializer, positionInfo, programVariable);
+        return "FieldSpecification[dimensions=%s, initializer=%s, positionInfo=%s, programVariable=%s, type=%s]".formatted(dimensions, initializer, positionInfo, programVariable, type);
     }
 
     @EqEx()
@@ -245,7 +196,7 @@ public final class FieldSpecification extends JavaSourceElement implements Varia
     @Override()
     public int hashCode() {
         if (hashCode == null)
-            hashCode = Objects.hash(type, dimensions, var, init, initializer, programVariable);
+            hashCode = Objects.hash(dimensions, initializer, programVariable, type);
         return hashCode;
     }
 

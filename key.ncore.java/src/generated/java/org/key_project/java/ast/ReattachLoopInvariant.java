@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -16,7 +17,7 @@ public final class ReattachLoopInvariant extends JavaSourceElement implements Pr
 
     private final String name = "#reattachLoopInvariant";
 
-    private final LoopStatment body;
+    private final ProgramElement body;
 
     @EqEx
     @Nullable
@@ -26,7 +27,7 @@ public final class ReattachLoopInvariant extends JavaSourceElement implements Pr
         return name;
     }
 
-    public LoopStatment body() {
+    public ProgramElement body() {
         return body;
     }
 
@@ -36,12 +37,12 @@ public final class ReattachLoopInvariant extends JavaSourceElement implements Pr
         return positionInfo;
     }
 
-    public ReattachLoopInvariant(LoopStatment body, @EqEx @Nullable PositionInfo positionInfo) {
+    public ReattachLoopInvariant(ProgramElement body, @EqEx @Nullable PositionInfo positionInfo) {
         this.body = Objects.requireNonNull(body);
         this.positionInfo = positionInfo;
     }
 
-    public ReattachLoopInvariant(LoopStatment body) {
+    public ReattachLoopInvariant(ProgramElement body) {
         this.body = Objects.requireNonNull(body);
         this.positionInfo = null;
     }
@@ -66,18 +67,18 @@ public final class ReattachLoopInvariant extends JavaSourceElement implements Pr
         return cond;
     }
 
-    public ReattachLoopInvariant withBody(LoopStatment body) {
-        return new ReattachLoopInvariant(name(), body, positionInfo());
+    public ReattachLoopInvariant withBody(ProgramElement body) {
+        return new ReattachLoopInvariant(body, positionInfo());
     }
 
     public ReattachLoopInvariant withPositionInfo(PositionInfo positionInfo) {
-        return new ReattachLoopInvariant(name(), body(), positionInfo);
+        return new ReattachLoopInvariant(body(), positionInfo);
     }
 
     public final static class Builder {
 
         @Nullable()
-        public LoopStatment body;
+        public ProgramElement body;
 
         @Nullable()
         public PositionInfo positionInfo;
@@ -86,7 +87,7 @@ public final class ReattachLoopInvariant extends JavaSourceElement implements Pr
             return new ReattachLoopInvariant(body, positionInfo);
         }
 
-        public Builder body(LoopStatment body) {
+        public Builder body(ProgramElement body) {
             this.body = body;
             return this;
         }

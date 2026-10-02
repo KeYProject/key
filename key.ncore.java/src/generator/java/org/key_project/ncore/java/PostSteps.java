@@ -21,6 +21,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
@@ -46,8 +48,16 @@ public class PostSteps {
         for (var cu : compilationUnits) {
             for (var type : cu.getTypes()) {
                 if (type instanceof ClassOrInterfaceDeclaration clazz && clazz.hasModifier(SEALED)) {
-                    for (var s : permittedTypes.get(clazz.getNameAsString())) {
-                        clazz.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
+                    var subtypes = permittedTypes.get(clazz.getNameAsString());
+                    if (subtypes.isEmpty()) {
+                        // Java forbids a sealed type without direct subclasses. Marker types
+                        // without metamodel subtypes (e.g. IGuard, LoopInitializer) fall back to
+                        // plain (non-sealed) interfaces.
+                        clazz.removeModifier(SEALED);
+                    } else {
+                        for (var s : subtypes) {
+                            clazz.getPermittedTypes().add(new ClassOrInterfaceType(null, s));
+                        }
                     }
                 }
             }
@@ -149,6 +159,8 @@ public class PostSteps {
                 (ClassOrInterfaceType) StaticJavaParser.parseType("Visitor<JavaSourceElement>"));
         addAcceptMethods(type);
 
+        Set<String> astTypes = collectAstTypes(nodeUnits);
+
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
@@ -163,13 +175,16 @@ public class PostSteps {
                 m.addAnnotation(Override.class);
                 BlockStmt body = m.getBody().get();
                 body.addStatement("var b = n.builder();");
-                t.getFields()
-                        .stream().filter(NodeWithPrivateModifier::isPrivate)
-                        .forEach(f -> body.addStatement(
-                                "b.%s = (%s) accept(n.%s());"
-                                        .formatted(f.getVariable(0).getNameAsExpression(),
-                                                f.getVariable(0).getTypeAsString(),
-                                                f.getVariable(0).getNameAsExpression())));
+                for (var field : builderFields(c, astTypes)) {
+                    var v = field.getVariable(0);
+                    if (isAstType(v.getType(), astTypes)) {
+                        body.addStatement("b.%s = (%s) accept(n.%s());".formatted(
+                                v.getNameAsString(), v.getTypeAsString(), v.getNameAsString()));
+                    } else {
+                        body.addStatement("b.%s = n.%s();".formatted(
+                                v.getNameAsString(), v.getNameAsString()));
+                    }
+                }
                 body.addStatement("return b.build();");
                 m.setType(new ClassOrInterfaceType(null, t.getFullyQualifiedName().get()));
             } catch (Exception e) {
@@ -189,6 +204,8 @@ public class PostSteps {
         addAcceptMethods(type);
 
 
+        Set<String> astTypes = collectAstTypes(nodeUnits);
+
         for (CompilationUnit clazz : nodeUnits) {
             try {
                 var t = clazz.getPrimaryType().get();
@@ -198,24 +215,24 @@ public class PostSteps {
                 if (isNonTerminal(c))
                     continue;
 
+                var fields = builderFields(c, astTypes);
                 var m = type.addMethod("visit", PUBLIC);
                 m.addParameter(new ClassOrInterfaceType(null, t.getNameAsString()), "n");
                 m.addAnnotation(Override.class);
                 BlockStmt body = m.getBody().get();
                 body.addStatement("var b = n.builder();");
-                t.getFields()
-                        .stream()
-                        .filter(NodeWithPrivateModifier::isPrivate)
-                        .filter(PostSteps::isAstNode)
-                        .forEach(f -> body.addStatement(
-                                "b.%s = (%s) accept(n.%s());"
-                                        .formatted(f.getVariable(0).getNameAsExpression(),
-                                                f.getVariable(0).getTypeAsString(),
-                                                f.getVariable(0).getNameAsExpression())));
-                final var formatted = "boolean clean = %s;".formatted(
-                        t.getFields().isEmpty() ? "false"
-                                : t.getFields()
-                                .stream().filter(NodeWithPrivateModifier::isPrivate)
+                for (var f : fields) {
+                    var v = f.getVariable(0);
+                    if (isAstType(v.getType(), astTypes)) {
+                        body.addStatement("b.%s = (%s) accept(n.%s());".formatted(
+                                v.getNameAsString(), v.getTypeAsString(), v.getNameAsString()));
+                    } else {
+                        body.addStatement("b.%s = n.%s();".formatted(
+                                v.getNameAsString(), v.getNameAsString()));
+                    }
+                }
+                final var formatted = "boolean clean = %s;".formatted(fields.isEmpty() ? "false"
+                        : fields.stream()
                                 .map(it -> {
                                     final var n = it.getVariable(0).getNameAsString();
                                     return "(n.%s() == b.%s)".formatted(n, n);
@@ -271,33 +288,64 @@ public class PostSteps {
     /// }
     /// ```
     private static void addAcceptMethods(ClassOrInterfaceDeclaration type) {
-        var t = StaticJavaParser.parseTypeParameter("T extends Visitable");
-        var typeT = StaticJavaParser.parseType("T");
-
         {
+            var t = StaticJavaParser.parseTypeParameter("T extends Visitable");
             var accept = type.addMethod("accept", PROTECTED);
             accept.addTypeParameter(t);
-            accept.addParameter(typeT, "n");
-            accept.setType(typeT.clone());
-            accept.getBody().get().addStatement("return n!=null?n.accept(this):null;");
+            accept.addParameter(StaticJavaParser.parseType("T"), "n");
+            accept.setType("T");
+            accept.getBody().get().addStatement("return n != null ? (T) n.accept(this) : null;");
         }
 
         {
+            var t = StaticJavaParser.parseTypeParameter("T extends Visitable");
             var acceptList = type.addMethod("accept", PROTECTED);
-            acceptList.addTypeParameter(t.clone());
+            acceptList.addTypeParameter(t);
             acceptList.addParameter(StaticJavaParser.parseType("ImmutableList<T>"), "n");
             acceptList.setType("ImmutableList<T>");
             acceptList.getBody().get().addStatement(
-                    "return n != null ? n.stream().map(it -> (T) it.accept(this)).collect(RoList.collector()) : null;");
+                    "return n != null ? n.stream().map(it -> (T) it.accept(this)).collect(ImmutableList.collector()) : null;");
         }
+    }
 
-        {
-            var acceptList = type.addMethod("accept", PROTECTED);
-            acceptList.addTypeParameter("T");
-            acceptList.addParameter("T", "n");
-            acceptList.setType("T");
-            acceptList.getBody().get().addStatement("return n;");
+    /// Generates the set of {@code org.key_project.java.ast} types, i.e. the metamodel types that
+    /// participate in the sealed AST hierarchy (plus the {@code Visitable}/{@code Matchable}
+    /// support interfaces). Everything else (primitives, String, enums, imported KeY types) is a
+    /// leaf that the traversal visitors copy by reference.
+    private static Set<String> collectAstTypes(List<CompilationUnit> nodeUnits) {
+        Set<String> types = new TreeSet<>();
+        for (var cu : nodeUnits) {
+            if (cu.getPrimaryType().isPresent()
+                    && cu.getPrimaryType().get() instanceof ClassOrInterfaceDeclaration c) {
+                types.add(c.getNameAsString());
+            }
         }
+        types.add("Visitable");
+        types.add("Matchable");
+        return types;
+    }
+
+    private static boolean isAstType(Type type, Set<String> astTypes) {
+        if (type.isClassOrInterfaceType()) {
+            var c = type.asClassOrInterfaceType();
+            if (c.getNameAsString().equals("ImmutableList") && c.getTypeArguments().isPresent()) {
+                return isAstType(c.getTypeArguments().get().getFirst(), astTypes);
+            }
+            return astTypes.contains(c.getNameAsString());
+        }
+        return false;
+    }
+
+    /// The fields that end up on the generated {@code Builder}: private, non-constant (no
+    /// initializer) fields, excluding the lazily computed {@code hashCode} slot which is only
+    /// added to the class itself.
+    private static List<FieldDeclaration> builderFields(ClassOrInterfaceDeclaration type,
+            Set<String> astTypes) {
+        return type.getFields().stream()
+                .filter(NodeWithPrivateModifier::isPrivate)
+                .filter(f -> f.getVariable(0).getInitializer().isEmpty())
+                .filter(f -> !f.getVariable(0).getNameAsString().equals("hashCode"))
+                .toList();
     }
 
     private static ClassOrInterfaceDeclaration createTypeAndSetDefaults(CompilationUnit cu,

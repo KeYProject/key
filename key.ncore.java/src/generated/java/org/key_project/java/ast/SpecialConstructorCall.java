@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -68,11 +69,11 @@ public final class SpecialConstructorCall extends JavaSourceElement implements P
     }
 
     public SpecialConstructorCall withBody(ProgramElement body) {
-        return new SpecialConstructorCall(name(), body, positionInfo());
+        return new SpecialConstructorCall(body, positionInfo());
     }
 
     public SpecialConstructorCall withPositionInfo(PositionInfo positionInfo) {
-        return new SpecialConstructorCall(name(), body(), positionInfo);
+        return new SpecialConstructorCall(body(), positionInfo);
     }
 
     public final static class Builder {

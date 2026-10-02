@@ -12,11 +12,9 @@ public interface Visitor<R> {
 
     R visit(Import n);
 
-    R visit(StatementBlock n);
+    R visit(CcatchNonstandardParameterDeclaration n);
 
     R visit(ArrayDeclaration n);
-
-    R visit(ClassDeclaration n);
 
     R visit(ClassInitializer n);
 
@@ -36,15 +34,15 @@ public interface Visitor<R> {
 
     R visit(LocalVariableDeclaration n);
 
-    R visit(MethodDeclaration n);
+    R visit(JMLModifiers n);
+
+    R visit(Comment n);
 
     R visit(ParameterDeclaration n);
 
     R visit(SuperArrayDeclaration n);
 
     R visit(Throws n);
-
-    R visit(VariableSpecification n);
 
     R visit(AnnotationUseSpecification n);
 
@@ -98,8 +96,6 @@ public interface Visitor<R> {
 
     R visit(ExecutionContext n);
 
-    R visit(FieldReference n);
-
     R visit(MetaClassReference n);
 
     R visit(MethodReference n);
@@ -120,8 +116,6 @@ public interface Visitor<R> {
 
     R visit(TypeRef n);
 
-    R visit(VariableReference n);
-
     R visit(Assert n);
 
     R visit(Break n);
@@ -129,6 +123,8 @@ public interface Visitor<R> {
     R visit(Case n);
 
     R visit(Default n);
+
+    R visit(Catch n);
 
     R visit(SingleCatch n);
 
@@ -183,8 +179,6 @@ public interface Visitor<R> {
     R visit(Try n);
 
     R visit(While n);
-
-    R visit(ProgramElementName n);
 
     R visit(PermIndProgramElementName n);
 

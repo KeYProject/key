@@ -8,11 +8,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
-public sealed interface TypeDeclaration extends JavaDeclaration, Matchable, Visitable permits ArrayDeclaration, ClassDeclaration, InterfaceDeclaration, SuperArrayDeclaration {
+public sealed interface TypeDeclaration extends JavaDeclaration, MemberDeclaration, NamedProgramElement, TypeDeclarationContainer, Matchable, Visitable permits ArrayDeclaration, ClassDeclaration, InterfaceDeclaration, SuperArrayDeclaration {
 
     ProgramElementName name();
 

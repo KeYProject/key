@@ -8,9 +8,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
-public sealed interface JavaStatement extends JavaProgramElement, Matchable, Visitable permits Assert, BranchStatement, JmlAssert, JumpStatement, LabeledStatement, LoopScopeBlock, LoopStatement, MergePointStatement, MethodFrame, SetStatement, StatementBlock, SynchronizedBlock, TransactionStatement {
+public sealed interface JavaStatement extends JavaProgramElement, Statement, Matchable, Visitable permits Assert, BranchStatement, Catch, JmlAssert, JumpStatement, LabeledStatement, LoopScopeBlock, LoopStatement, MergePointStatement, MethodFrame, SetStatement, StatementBlock, SynchronizedBlock, TransactionStatement {
 }
