@@ -116,6 +116,27 @@ public class KeYSelectionModel {
         fireSelectedNodeChanged(previousSelectedNode);
     }
 
+    /// Selects the node with the given serial number, if it exists in the current proof.
+    /// @param serialNr the serial number of the node to select
+    /// @return true if the node was found and selected, false otherwise
+    public synchronized boolean setSelectedNodeBySerialNr(int serialNr) {
+        final Node previousSelectedNode = selectedNode;
+        if (proof == null) {
+            return false;
+        }
+        Node node = proof.findAny(n -> n.serialNr() == serialNr);
+        if (node == null) {
+            return false;
+        }
+        goalIsValid = false;
+        selectedNode = node;
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        setSelectedNode(node);
+        fireSelectedNodeChanged(previousSelectedNode);
+        return true;
+    }
+
     /**
      * Sets the node and sequent focused by the user.
      *

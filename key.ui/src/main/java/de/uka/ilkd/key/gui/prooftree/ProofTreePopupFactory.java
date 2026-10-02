@@ -347,7 +347,7 @@ public final class ProofTreePopupFactory {
     static class Notes extends ProofTreeAction {
         public Notes(ProofTreeContext context) {
             super(context);
-            setName("Edit Notes...");
+            setName("Set bookmark/Annotate ...");
             setIcon(IconFactory.editFile(ICON_SIZE));
         }
 
@@ -355,7 +355,10 @@ public final class ProofTreePopupFactory {
         public void actionPerformed(ActionEvent e) {
             // display a dialog to attach text to the node
             final Icon editIcon = IconFactory.editFile(20);
-            final String origNotes = context.invokedNode.getNodeInfo().getNotes();
+            String origNotes = context.invokedNode.getNodeInfo().getNotes();
+            if (origNotes == null || origNotes.isBlank()) {
+                origNotes = "Bookmark %d".formatted(context.invokedNode.serialNr());
+            }
             final String newNotes = (String) JOptionPane.showInputDialog(context.proofTreeView,
                 null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
                 origNotes);

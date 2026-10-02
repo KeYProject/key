@@ -99,6 +99,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
         defineDefault(OpenFileAction.class, KeyEvent.VK_O, SHORTCUT_KEY_MASK);
         defineDefault(SearchInSequentAction.class, KeyEvent.VK_F, SHORTCUT_KEY_MASK);
+        defineDefault(GotoNodeAction.class, KeyEvent.VK_G, SHORTCUT_KEY_MASK);
 
         // "special" keystrokes
         defineDefault(SearchNextAction.class, KeyEvent.VK_F3, 0);

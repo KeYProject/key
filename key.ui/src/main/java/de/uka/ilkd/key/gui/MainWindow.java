@@ -1118,6 +1118,7 @@ public final class MainWindow extends JFrame {
         if (selected == null) {
             proof.addSeparator();
             proof.add(new SearchInProofTreeAction(this));
+            proof.add(new GotoNodeAction(this));
             proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
             proof.add(new SearchNextAction(this, sequentViewSearchBar));
             proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
