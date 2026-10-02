@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -90,6 +91,7 @@ public final class CatchAllStatement extends JavaSourceElement implements CatchC
 
     @Override()
     public int hashCode() {
+        return 0;
     }
 
     public <R> R accept(org.key_project.java.ast.visitor.Visitor<R> visitor) {

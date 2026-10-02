@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -18,12 +19,10 @@ public final class SchematicFieldReference extends JavaSourceElement implements 
 
     @EqEx
     @Nullable
-    @java.lang.Override()
     private final PositionInfo positionInfo;
 
     private final ReferencePrefix prefix;
 
-    @java.lang.Override()
     private final ProgramVariable variable;
 
     public SchemaVariable schemaVariable() {
@@ -46,14 +45,14 @@ public final class SchematicFieldReference extends JavaSourceElement implements 
         return variable;
     }
 
-    public SchematicFieldReference(SchemaVariable schemaVariable, @EqEx @Nullable @java.lang.Override() PositionInfo positionInfo, ReferencePrefix prefix, @java.lang.Override() ProgramVariable variable) {
+    public SchematicFieldReference(SchemaVariable schemaVariable, @EqEx @Nullable PositionInfo positionInfo, ReferencePrefix prefix, ProgramVariable variable) {
         this.schemaVariable = Objects.requireNonNull(schemaVariable);
         this.positionInfo = positionInfo;
         this.prefix = Objects.requireNonNull(prefix);
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public SchematicFieldReference(SchemaVariable schemaVariable, ReferencePrefix prefix, @java.lang.Override() ProgramVariable variable) {
+    public SchematicFieldReference(SchemaVariable schemaVariable, ReferencePrefix prefix, ProgramVariable variable) {
         this.schemaVariable = Objects.requireNonNull(schemaVariable);
         this.positionInfo = null;
         this.prefix = Objects.requireNonNull(prefix);

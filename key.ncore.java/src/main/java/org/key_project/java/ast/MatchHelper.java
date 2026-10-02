@@ -62,4 +62,12 @@ public class MatchHelper {
     public static MatchConditions match(KeYJavaType a, KeYJavaType b, MatchConditions cond) {
         return Objects.equals(a, b) ? cond : null;
     }
+
+    // Generic fallback for fields whose type is an external class (e.g. Type, SchemaVariable,
+    // JMLModifiers, IProgramVariable). All overloads declared above are more specific and take
+    // precedence in overload resolution.
+    public static @Nullable MatchConditions match(@Nullable Object a, @Nullable Object b,
+            MatchConditions cond) {
+        return Objects.equals(a, b) ? cond : null;
+    }
 }

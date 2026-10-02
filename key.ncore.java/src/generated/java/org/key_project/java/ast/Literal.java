@@ -8,11 +8,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
-public sealed interface Literal extends Expression, Matchable, Visitable permits BooleanLiteral, DoubleLiteral, FloatLiteral, FreeLiteral, RealLiteral, StringLiteral {
+public sealed interface Literal extends Expression, Matchable, Visitable permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, FloatLiteral, FreeLiteral, RealLiteral, StringLiteral {
 
     String value();
 }

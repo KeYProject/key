@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -32,7 +33,7 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
 
     private final TypeReference returnType;
 
-    private final Comment[] voidComments;
+    private final ImmutableList<Comment> voidComments;
 
     @java.lang.Override()
     public StatementBlock body() {
@@ -76,11 +77,11 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
     }
 
     @java.lang.Override()
-    public Comment[] voidComments() {
+    public ImmutableList<Comment> voidComments() {
         return voidComments;
     }
 
-    public ConstructorDeclaration(StatementBlock body, Throws exceptions, JMLModifiers jmlModifiers, ProgramElementName name, ImmutableList<ParameterDeclaration> parameters, boolean parentIsInterfaceDeclaration, @EqEx @Nullable PositionInfo positionInfo, TypeReference returnType, Comment[] voidComments) {
+    public ConstructorDeclaration(StatementBlock body, Throws exceptions, JMLModifiers jmlModifiers, ProgramElementName name, ImmutableList<ParameterDeclaration> parameters, boolean parentIsInterfaceDeclaration, @EqEx @Nullable PositionInfo positionInfo, TypeReference returnType, ImmutableList<Comment> voidComments) {
         this.body = Objects.requireNonNull(body);
         this.exceptions = Objects.requireNonNull(exceptions);
         this.jmlModifiers = Objects.requireNonNull(jmlModifiers);
@@ -92,7 +93,7 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
         this.voidComments = Objects.requireNonNull(voidComments);
     }
 
-    public ConstructorDeclaration(StatementBlock body, Throws exceptions, JMLModifiers jmlModifiers, ProgramElementName name, ImmutableList<ParameterDeclaration> parameters, boolean parentIsInterfaceDeclaration, TypeReference returnType, Comment[] voidComments) {
+    public ConstructorDeclaration(StatementBlock body, Throws exceptions, JMLModifiers jmlModifiers, ProgramElementName name, ImmutableList<ParameterDeclaration> parameters, boolean parentIsInterfaceDeclaration, TypeReference returnType, ImmutableList<Comment> voidComments) {
         this.body = Objects.requireNonNull(body);
         this.exceptions = Objects.requireNonNull(exceptions);
         this.jmlModifiers = Objects.requireNonNull(jmlModifiers);
@@ -180,7 +181,7 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
         return new ConstructorDeclaration(body(), exceptions(), jmlModifiers(), name(), parameters(), parentIsInterfaceDeclaration(), positionInfo(), returnType, voidComments());
     }
 
-    public ConstructorDeclaration withVoidComments(Comment[] voidComments) {
+    public ConstructorDeclaration withVoidComments(ImmutableList<Comment> voidComments) {
         return new ConstructorDeclaration(body(), exceptions(), jmlModifiers(), name(), parameters(), parentIsInterfaceDeclaration(), positionInfo(), returnType(), voidComments);
     }
 
@@ -211,7 +212,7 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
         public TypeReference returnType;
 
         @Nullable()
-        public Comment[] voidComments;
+        public ImmutableList<Comment> voidComments;
 
         public ConstructorDeclaration build() {
             return new ConstructorDeclaration(body, exceptions, jmlModifiers, name, parameters, parentIsInterfaceDeclaration, positionInfo, returnType, voidComments);
@@ -257,7 +258,7 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
             return this;
         }
 
-        public Builder voidComments(Comment[] voidComments) {
+        public Builder voidComments(ImmutableList<Comment> voidComments) {
             this.voidComments = voidComments;
             return this;
         }
@@ -268,6 +269,15 @@ public final class ConstructorDeclaration extends JavaSourceElement implements M
                 return this;
             }
             this.parameters = this.parameters.append(parameters);
+            return this;
+        }
+
+        public Builder voidComments(Comment voidComments) {
+            if (this.voidComments == null) {
+                this.voidComments = ImmutableList.of(voidComments);
+                return this;
+            }
+            this.voidComments = this.voidComments.append(voidComments);
             return this;
         }
     }

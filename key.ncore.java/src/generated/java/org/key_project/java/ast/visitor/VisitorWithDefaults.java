@@ -18,15 +18,11 @@ public interface VisitorWithDefaults<R> {
         return defaultVisit(n);
     }
 
-    default R visit(StatementBlock n) {
+    default R visit(CcatchNonstandardParameterDeclaration n) {
         return defaultVisit(n);
     }
 
     default R visit(ArrayDeclaration n) {
-        return defaultVisit(n);
-    }
-
-    default R visit(ClassDeclaration n) {
         return defaultVisit(n);
     }
 
@@ -66,7 +62,11 @@ public interface VisitorWithDefaults<R> {
         return defaultVisit(n);
     }
 
-    default R visit(MethodDeclaration n) {
+    default R visit(JMLModifiers n) {
+        return defaultVisit(n);
+    }
+
+    default R visit(Comment n) {
         return defaultVisit(n);
     }
 
@@ -79,10 +79,6 @@ public interface VisitorWithDefaults<R> {
     }
 
     default R visit(Throws n) {
-        return defaultVisit(n);
-    }
-
-    default R visit(VariableSpecification n) {
         return defaultVisit(n);
     }
 
@@ -190,10 +186,6 @@ public interface VisitorWithDefaults<R> {
         return defaultVisit(n);
     }
 
-    default R visit(FieldReference n) {
-        return defaultVisit(n);
-    }
-
     default R visit(MetaClassReference n) {
         return defaultVisit(n);
     }
@@ -234,10 +226,6 @@ public interface VisitorWithDefaults<R> {
         return defaultVisit(n);
     }
 
-    default R visit(VariableReference n) {
-        return defaultVisit(n);
-    }
-
     default R visit(Assert n) {
         return defaultVisit(n);
     }
@@ -251,6 +239,10 @@ public interface VisitorWithDefaults<R> {
     }
 
     default R visit(Default n) {
+        return defaultVisit(n);
+    }
+
+    default R visit(Catch n) {
         return defaultVisit(n);
     }
 
@@ -359,10 +351,6 @@ public interface VisitorWithDefaults<R> {
     }
 
     default R visit(While n) {
-        return defaultVisit(n);
-    }
-
-    default R visit(ProgramElementName n) {
         return defaultVisit(n);
     }
 

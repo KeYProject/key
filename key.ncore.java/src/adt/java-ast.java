@@ -7,6 +7,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 
 @Root
 abstract class JavaSourceElement implements Visitable, Matchable {
@@ -23,9 +24,7 @@ class ContextStatementBlock extends StatementBlock {
     IExecutionContext executionContext;
 }
 
-abstract class Declaration {
-    List<Modifier> getModifiers();
-}
+abstract class Declaration {}
 
 abstract class ExpressionContainer {}
 
@@ -45,20 +44,19 @@ abstract class ParameterContainer {}
 
 abstract class ProgramElement {}
 
-abstract class ProgramVariableName {}
+abstract class JavaProgramElement implements ProgramElement {}
 
 abstract class Reference {}
 
-abstract class ScopeDefiningElement {}
+abstract class Statement extends ProgramElement {}
 
-abstract class Statement {}
-
-class StatementBlock extends JavaStatement {
+abstract class StatementBlock extends JavaStatement
+        implements ProgramPrefix, TypeDeclarationContainer {
     List<Statement> statement;
     @Nullable MethodFrame innerMostMethodFrame;
 }
 
-abstract class CcatchNonstandardParameterDeclaration extends JavaProgramElement {
+class CcatchNonstandardParameterDeclaration extends JavaProgramElement {
     ParameterDeclaration delegate;
     boolean isWildcard;
     boolean isBreak;
@@ -68,7 +66,7 @@ abstract class CcatchNonstandardParameterDeclaration extends JavaProgramElement 
 
 class ArrayDeclaration extends TypeDeclaration {}
 
-class ClassDeclaration extends TypeDeclaration {
+abstract class ClassDeclaration extends TypeDeclaration {
 
     Extends extending;
 
@@ -97,12 +95,7 @@ class FieldDeclaration extends VariableDeclaration {
     List<FieldSpecification> fieldSpecs;
 }
 
-class FieldSpecification extends VariableSpecification {
-    Type type;
-    int dimensions;
-    ProgramVariable var;
-    @Nullable Expression init;
-}
+class FieldSpecification extends VariableSpecification {}
 
 class Implements extends InheritanceSpecification {
     List<TypeReference> typeRefs;
@@ -124,9 +117,21 @@ class LocalVariableDeclaration extends VariableDeclaration {
 
 abstract class MemberDeclaration {}
 
-class MethodDeclaration extends JavaDeclaration {
+class JMLModifiers extends JavaProgramElement {
+    boolean strictlyPure;
+    boolean pure;
+    boolean nullableByDefault;
+    boolean helper;
+}
+
+class Comment extends JavaProgramElement {
+    String text;
+}
+
+abstract class MethodDeclaration extends JavaDeclaration
+        implements MemberDeclaration, ParameterContainer, NamedProgramElement, TypeReferenceContainer {
     TypeReference returnType;
-    Comment[] voidComments;
+    List<Comment> voidComments;
     ProgramElementName name;
     List<ParameterDeclaration> parameters;
     Throws exceptions;
@@ -150,7 +155,8 @@ class Throws extends JavaProgramElement {
     List<TypeReference> exceptions;
 }
 
-abstract class TypeDeclaration extends JavaDeclaration {
+abstract class TypeDeclaration extends JavaDeclaration
+        implements MemberDeclaration, NamedProgramElement, TypeDeclarationContainer {
     ProgramElementName name;
     ProgramElementName fullName;
     List<MemberDeclaration> members;
@@ -166,7 +172,8 @@ abstract class VariableDeclaration extends JavaDeclaration {
     boolean parentIsInterfaceDeclaration;
 }
 
-class VariableSpecification extends JavaProgramElement {
+abstract class VariableSpecification extends JavaProgramElement
+        implements NamedProgramElement, ExpressionContainer {
     Expression initializer;
     int dimensions;
     Type type;
@@ -182,14 +189,8 @@ class ArrayInitializer extends JavaProgramElement {
     KeYJavaType kjt;
 }
 
-abstract class ExpressionStatement {}
-
 //region expressions
-abstract class Expression {
-    public KeYJavaType getType(Services services) {
-        return accept(new FindReturnType());
-    }
-}
+abstract class Expression extends ProgramElement {}
 
 class ParenthesizedExpression extends Expression{
     Expression child;
@@ -213,6 +214,8 @@ class FloatLiteral extends Literal {
 
 class FreeLiteral extends Literal {}
 
+abstract class AbstractIntegerLiteral extends Literal {}
+
 class IntLiteral extends AbstractIntegerLiteral {}
 
 class LongLiteral extends AbstractIntegerLiteral {}
@@ -220,6 +223,8 @@ class LongLiteral extends AbstractIntegerLiteral {}
 class RealLiteral extends Literal {}
 
 class StringLiteral extends Literal {}
+
+abstract class Operator extends Expression implements ExpressionContainer {}
 
 class Assignment extends Operator {
     AssignmentKind kind;
@@ -234,7 +239,7 @@ class BinaryOperator extends Operator {
     Expression right;
 }
 
-class UnaryOperator implements Operator {
+class UnaryOperator extends Operator {
     UnaryOperatorKind kind;
     Expression child;
 
@@ -273,7 +278,7 @@ class NewArray extends TypeOperator {
 
 class TypeCast extends TypeOperator {}
 
-abstract class TypeOperator extends Operator {
+abstract class TypeOperator extends Operator implements TypeReferenceContainer {
 
     TypeReference typeReference;
 }
@@ -291,7 +296,7 @@ class ArrayReference extends JavaProgramElement {
     List<Expression> inits;
 }
 
-abstract class ConstructorReference {}
+abstract class ConstructorReference implements MethodOrConstructorReference {}
 
 class ExecutionContext extends JavaProgramElement {
 
@@ -300,14 +305,14 @@ class ExecutionContext extends JavaProgramElement {
     ReferencePrefix runtimeInstance;
 }
 
-class FieldReference extends VariableReference {
+abstract class FieldReference extends VariableReference implements ReferenceSuffix, MemberReference {
 
     ReferencePrefix prefix;
 }
 
 abstract class IExecutionContext {}
 
-abstract class MemberReference {}
+abstract class MemberReference implements Reference {}
 
 class MetaClassReference extends JavaProgramElement {
 
@@ -316,7 +321,7 @@ class MetaClassReference extends JavaProgramElement {
 
 abstract class MethodName {}
 
-abstract class MethodOrConstructorReference {}
+abstract class MethodOrConstructorReference implements MemberReference, ReferencePrefix {}
 
 class MethodReference extends JavaProgramElement {
 
@@ -324,7 +329,7 @@ class MethodReference extends JavaProgramElement {
 
     MethodName name;
 
-    List<? extends Expression> arguments;
+    List<Expression> arguments;
 }
 
 abstract class NameReference {}
@@ -335,8 +340,6 @@ class PackageReference extends JavaProgramElement {
 
     ProgramElementName name;
 }
-
-abstract class PackageReferenceContainer {}
 
 abstract class ReferencePrefix {}
 
@@ -349,7 +352,8 @@ class SchematicFieldReference extends FieldReference {
     SchemaVariable schemaVariable;
 }
 
-abstract class SpecialConstructorReference extends JavaProgramElement {
+abstract class SpecialConstructorReference extends JavaProgramElement
+        implements ConstructorReference {
 
     List<Expression> arguments;
 }
@@ -367,11 +371,11 @@ class ThisReference extends JavaProgramElement {}
 
 class TypeRef extends TypeReferenceImp {}
 
-abstract class TypeReference {}
+abstract class TypeReference implements TypeReferenceInfix, TypeReferenceContainer {}
 
 abstract class TypeReferenceContainer {}
 
-abstract class TypeReferenceImp extends JavaProgramElement {
+abstract class TypeReferenceImp extends JavaProgramElement implements TypeReference {
 
     ReferencePrefix prefix;
 
@@ -380,9 +384,10 @@ abstract class TypeReferenceImp extends JavaProgramElement {
     ProgramElementName name;
 }
 
-abstract class TypeReferenceInfix {}
+abstract class TypeReferenceInfix implements ReferencePrefix, ReferenceSuffix {}
 
-class VariableReference extends JavaProgramElement {
+abstract class VariableReference extends JavaProgramElement
+        implements NameReference, ReferencePrefix {
 
     ProgramVariable variable;
 }
@@ -396,13 +401,20 @@ abstract class BranchStatement extends JavaStatement {}
 
 class Break extends LabelJumpStatement {}
 
-class Case {
+abstract class Branch {}
+
+class Case extends Branch {
     Expression expression;
     List<Statement> body;
 }
 
-class Default {
+class Default extends Branch {
     List<Statement> body;
+}
+
+class Catch extends JavaStatement {
+    ParameterDeclaration parameter;
+    StatementBlock body;
 }
 
 abstract class CatchClause {}
@@ -451,7 +463,7 @@ class If extends BranchStatement {
     Statement elseBranch;
 }
 
-abstract class JavaStatement extends JavaProgramElement {}
+abstract class JavaStatement extends JavaProgramElement implements Statement {}
 
 class JmlAssert extends JavaStatement {}
 
@@ -524,7 +536,9 @@ class While extends LoopStatement {}
 
 abstract class ProgramConstruct {}
 
-class ProgramElementName extends Name {}
+abstract class Name {}
+
+abstract class ProgramElementName extends Name implements MethodName, Label {}
 
 abstract class ProgramPrefix {}
 
@@ -537,17 +551,23 @@ class TempIndProgramElementName extends IndProgramElementName {}
 abstract class IProgramMethod {}
 abstract class IProgramVariable {}
 
+abstract class ObserverFunction {}
+
 class LocationVariable extends ProgramVariable {}
 class ProgramConstant extends ProgramVariable {}
 class ProgramMethod extends ObserverFunction {}
 
+abstract class JOperatorSV extends JAbstractSortedOperator implements ProgramConstruct {}
+
 class ProgramSV extends JOperatorSV {}
+
+abstract class JAbstractSortedOperator implements IProgramVariable {}
 
 abstract class ProgramVariable extends JAbstractSortedOperator {}
 
 abstract class AbstractProgramElement {}
 
-abstract class ProgramTransformer extends JavaProgramElement {
+abstract class ProgramTransformer extends JavaProgramElement implements AbstractProgramElement {
     /** the name of the meta construct */
     String name;
     /** the encapsulated program element */
@@ -556,7 +576,7 @@ abstract class ProgramTransformer extends JavaProgramElement {
 
 class ReattachLoopInvariant extends ProgramTransformer {
     String name = "#reattachLoopInvariant";
-    LoopStatment body;
+    ProgramElement body;
 }
 
 class SpecialConstructorCall extends ProgramTransformer {

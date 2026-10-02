@@ -12,11 +12,9 @@ public interface ArgVisitor<R, A> {
 
     R visit(Import n, A arg);
 
-    R visit(StatementBlock n, A arg);
+    R visit(CcatchNonstandardParameterDeclaration n, A arg);
 
     R visit(ArrayDeclaration n, A arg);
-
-    R visit(ClassDeclaration n, A arg);
 
     R visit(ClassInitializer n, A arg);
 
@@ -36,15 +34,15 @@ public interface ArgVisitor<R, A> {
 
     R visit(LocalVariableDeclaration n, A arg);
 
-    R visit(MethodDeclaration n, A arg);
+    R visit(JMLModifiers n, A arg);
+
+    R visit(Comment n, A arg);
 
     R visit(ParameterDeclaration n, A arg);
 
     R visit(SuperArrayDeclaration n, A arg);
 
     R visit(Throws n, A arg);
-
-    R visit(VariableSpecification n, A arg);
 
     R visit(AnnotationUseSpecification n, A arg);
 
@@ -98,8 +96,6 @@ public interface ArgVisitor<R, A> {
 
     R visit(ExecutionContext n, A arg);
 
-    R visit(FieldReference n, A arg);
-
     R visit(MetaClassReference n, A arg);
 
     R visit(MethodReference n, A arg);
@@ -120,8 +116,6 @@ public interface ArgVisitor<R, A> {
 
     R visit(TypeRef n, A arg);
 
-    R visit(VariableReference n, A arg);
-
     R visit(Assert n, A arg);
 
     R visit(Break n, A arg);
@@ -129,6 +123,8 @@ public interface ArgVisitor<R, A> {
     R visit(Case n, A arg);
 
     R visit(Default n, A arg);
+
+    R visit(Catch n, A arg);
 
     R visit(SingleCatch n, A arg);
 
@@ -183,8 +179,6 @@ public interface ArgVisitor<R, A> {
     R visit(Try n, A arg);
 
     R visit(While n, A arg);
-
-    R visit(ProgramElementName n, A arg);
 
     R visit(PermIndProgramElementName n, A arg);
 
