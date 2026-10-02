@@ -11,9 +11,11 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
@@ -307,10 +309,12 @@ public final class KeYFileChooser extends JFileChooser {
      *
      * @return the key file chooser
      */
-    public static KeYFileChooser getFileChooser(String title) {
+    public static KeYFileChooser getFileChooser(String title, @Nullable File startFolder) {
         if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir().toFile();
-            INSTANCE = new KeYFileChooser(initDir);
+            INSTANCE = new KeYFileChooser(startFolder == null
+                    ? ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                            .getLastUsedPath()
+                    : startFolder);
 
             // not the best design probably: this constructor has the side effect of connecting
             // the new bookmark panel to the file chooser.
@@ -320,5 +324,17 @@ public final class KeYFileChooser extends JFileChooser {
         INSTANCE.setDialogTitle(title);
         INSTANCE.prepare();
         return INSTANCE;
+    }
+
+    /**
+     * Convenience overload of {@link #getFileChooser(String, File)} that starts from the last used
+     * path remembered in the settings instead of an explicit start folder.
+     *
+     * @param title the title of the key file chooser
+     * @return the key file chooser, as described in {@link #getFileChooser(String, File)}
+     * @see #getFileChooser(String, File)
+     */
+    public static KeYFileChooser getFileChooser(String title) {
+        return getFileChooser(title, null);
     }
 }

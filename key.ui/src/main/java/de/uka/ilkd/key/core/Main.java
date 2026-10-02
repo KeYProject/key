@@ -534,24 +534,6 @@ public final class Main implements Callable<Integer> {
     }
 
     /**
-     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially others)
-     * to determine
-     * working directory. In case there is at least one location (i.e. a file or
-     * directory)
-     * specified as command line argument, working directory is determined based on
-     * first location
-     * that occurred in the list of arguments. Otherwise, value of
-     * System.getProperty("user.home")
-     * is used to determine working directory.
-     *
-     * @return {@link File} object representing working directory.
-     */
-    public static Path getWorkingDir() {
-        return workingDir;
-    }
-
-
-    /**
      * Perform necessary actions before loading any problem files. Currently only
      * performs RIFL to JML transformation.
      */
