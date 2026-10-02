@@ -502,6 +502,6 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         // Could also make SequentFormula a SyntaxElement; no special reason for current decision.
-        return getFormulaByNr(n - 1).formula();
+        return getFormulaByNr(n + 1).formula();
     }
 }
