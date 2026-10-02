@@ -20,9 +20,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -34,6 +32,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
@@ -147,10 +146,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
-            if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result);
-            }
+        if (info.getSource() instanceof ProverCore
+                || info.getSource() instanceof KeyAst.ProofScript) {
+            printResults(openGoals, info, result);
         } else if (info.getSource() instanceof ProblemLoader) {
             if (result != null) {
                 if (result instanceof Throwable thrown) {
@@ -178,7 +176,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                         pse.execute(this, script);
                         // The start and end messages are fake to persuade the system ...
                         // All this here should refactored anyway ...
-                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                        this.taskFinished(
+                            new DefaultTaskFinishedInfo(script, null, proof, 0, 0, 0));
                     }
                 } catch (Exception e) {
                     LOGGER.debug("", e);
