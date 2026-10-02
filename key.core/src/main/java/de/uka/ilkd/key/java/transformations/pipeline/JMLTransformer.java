@@ -20,10 +20,17 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.*;
-import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.DataKey;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.key.*;
+import com.github.javaparser.ast.jml.doc.*;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
+import com.github.javaparser.ast.key.KeyMergePointStmt;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
@@ -59,7 +66,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// {@link MethodDeclaration}, or {@link BlockStmt}, {@link FieldDeclaration} and
 /// {@link MethodDeclaration} were introduced for ghost and model declarations,
 /// JML statements (assume, assert, ...) are inserted into the bodies using
-/// {@link KeYMarkerStatement}.
+/// {@link JmlExpressionStmt}.
 ///
 /// You can access attached JML information using the {@link DataKey} in
 /// [JMLTransformer#KEY_SPEC_CASE],
@@ -230,11 +237,12 @@ public final class JMLTransformer extends JavaTransformerAbstract {
     private Statement transformAssertStatement(TextualJMLAssertStatement stat) {
         KeyAst.Expression ctx = stat.getContext();
         org.key_project.util.parsing.Position pos = ctx.getStartLocation().getPosition();
-        int kind = switch (stat.getKind()) {
-            case ASSERT -> KIND_ASSERT;
-            case ASSUME -> KIND_ASSUME;
+        var kind = switch (stat.getKind()) {
+            case ASSERT -> JmlStmtKind.ASSERT;
+            case ASSUME -> JmlStmtKind.ASSUME;
         };
-        KeYMarkerStatement stmt = new KeYMarkerStatement(kind);
+        JmlExpressionStmt stmt =
+            new JmlExpressionStmt(new NodeList<>(), kind, new BooleanLiteralExpr(true));
         stmt.setData(KEY_ASSERT, stat);
         return stmt;
     }
@@ -242,14 +250,15 @@ public final class JMLTransformer extends JavaTransformerAbstract {
     private Statement transformSetStatement(TextualJMLSetStatement stat) {
         KeyAst.SetStatementContext ctx = new KeyAst.SetStatementContext(stat.getAssignment());
         // org.key_project.util.parsing.Position pos = ctx.getStartLocation().getPosition();
-        KeYMarkerStatement stmt = new KeYMarkerStatement(KIND_SET);
+        JmlExpressionStmt stmt =
+            new JmlExpressionStmt(new NodeList<>(), JmlStmtKind.SET, new BooleanLiteralExpr(true));
         // TODO simulate/ copy token range.
         stmt.setData(KEY_ASSIGN, ctx);
         return stmt;
     }
 
-    private KeYMarkerStatement transformMergePointDecl(TextualJMLMergePointDecl stat) {
-        KeYMarkerStatement mps = new KeYMarkerStatement(KIND_MERGE_POINT);
+    private KeyMergePointStmt transformMergePointDecl(TextualJMLMergePointDecl stat) {
+        KeyMergePointStmt mps = new KeyMergePointStmt(new BooleanLiteralExpr(true));
         mps.setData(KEY_MERGE_POINT, stat);
         return mps;
     }
@@ -274,8 +283,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
 
         for (BodyDeclaration<?> member : members) {
             // JMLDocsBodyDeclaration: JML comments inside a class/interface/... body
-            if (member instanceof JmlDocsBodyDeclaration bd) {
-                String concatenatedComment = sanitizer.asString(bd.jmlDocs());
+            if (member instanceof JmlDocDeclaration bd) {
+                String concatenatedComment = sanitizer.asString(bd.getJmlComments());
 
                 // The preparser split along the grammar rules in KeYParser.g4, and gives you a list
                 // of JML entities.
@@ -402,7 +411,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             while (stmt instanceof LabeledStmt labeledStmt) {
                 var inner = labeledStmt.getStatement();
 
-                if (inner instanceof JmlDocsStatements) {
+                if (inner instanceof JmlDocStmt) {
                     throw new SLTranslationException(
                         ("Here is something wrong. Your label '%s' is glued to a " +
                             "JML annotation instead of a Java statement. Please consider the use of braces")
@@ -429,8 +438,8 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 }
             } else if (stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
                 transformMethodLevelCommentsAt(b.getBody().asBlockStmt(), fileName);
-            } else if (stmt instanceof JmlDocsStatements doc) {
-                String concat = sanitizer.asString(doc.getJmlDocs());
+            } else if (stmt instanceof JmlDocStmt doc) {
+                String concat = sanitizer.asString(doc.getJmlComments());
                 ImmutableList<TextualJMLConstruct> constructs =
                     io.parseMethodLevel(concat, fileName, pos);
                 services.addWarnings(io.getWarnings());
@@ -513,10 +522,10 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             final var types = new ArrayList<>(cu.getTypes());
             ImmutableList<JMLModifier> modifiers = null;
             for (TypeDeclaration<?> td : types) {
-                if (td instanceof JmlDocsTypeDeclaration jdtd) {
+                if (td instanceof JmlDocType jdtd) {
                     // Currently, we only support modifier at type declaration level.
                     // Other things would be ghost classes or model imports.
-                    var input = sanitizer.asString(jdtd.jmlDocs());
+                    var input = sanitizer.asString(jdtd.getJmlComments());
                     PreParser pp = TransformationPipelineServices.getPreParser();
                     modifiers = pp.parseModifiers(input);
                 } else {
@@ -555,7 +564,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         for (Modifier mod : hasMods.getModifiers()) {
             var kw = mod.getKeyword();
             if (kw instanceof JmlDocModifier jdm) {
-                var modifiers = sanitizer.asString(jdm.getJmlDocs());
+                var modifiers = sanitizer.asString(jdm.getJmlComments());
                 var jmlMods = pp.parseModifiers(modifiers);
                 for (var jmlMod : jmlMods) {
                     hasMods.addModifier(jmlMod.getParserKeyword());
@@ -607,7 +616,10 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
     }
 
     public String asString(NodeList<JmlDoc> jmlDocs, boolean emulateGlobalPosition) {
-        return asStringJT(jmlDocs.stream().map(JmlDoc::getContent).toList(), emulateGlobalPosition);
+        final var tokenList = jmlDocs.stream().map(JmlDoc::getTokenRange)
+                .map(it -> it.get().getBegin())
+                .toList();
+        return asStringJT(tokenList, emulateGlobalPosition);
     }
 
     public String toSanitizedString(StringBuilder s) {

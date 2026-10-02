@@ -52,7 +52,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
-import com.github.javaparser.ast.key.KeyTransactionStatement;
+import com.github.javaparser.ast.key.KeyTransactionStmt;
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -1586,7 +1586,7 @@ public final class AuxiliaryContractBuilders {
                 final Statement statement) {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(statement,
-                    new TransactionStatement(KeyTransactionStatement.TransactionType.FINISH));
+                    new TransactionStatement(KeyTransactionStmt.TransactionType.FINISH));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;
