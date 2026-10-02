@@ -14,17 +14,19 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
+import static de.uka.ilkd.key.nparser.varexp.TacletBuilderCommandInfo.createVarcondInfo;
 import static de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode.*;
 
 /**
@@ -36,6 +38,7 @@ import static de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode.*;
  */
 public class TacletBuilderManipulators {
     // region Factories
+
     // Short cut for argument types
     private static final ArgumentType TR = TYPE_RESOLVER;
     private static final ArgumentType KJT = ArgumentType.JAVA_TYPE;
@@ -50,20 +53,14 @@ public class TacletBuilderManipulators {
     private static final ArgumentType T = ArgumentType.TERM;
 
 
-    /**
-     *
-     */
     public static final AbstractConditionBuilder ABSTRACT_OR_INTERFACE =
         new ConstructorBasedBuilder("isAbstractOrInterface", AbstractOrInterfaceType.class, TR);
 
     public static final AbstractConditionBuilder FINAL_TYPE =
         new ConstructorBasedBuilder("isFinal", FinalTypeVarCond.class, TR);
 
-    /**
-     *
-     */
     public static final AbstractConditionBuilder SAME =
-        new AbstractConditionBuilder("same", TR, TR) {
+        new AbstractConditionBuilder("same", TypeComparisonCondition.class, true, TR, TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -73,11 +70,8 @@ public class TacletBuilderManipulators {
             }
         };
 
-    /**
-     *
-     */
     public static final AbstractConditionBuilder IS_SUBTYPE =
-        new AbstractConditionBuilder("sub", TR, TR) {
+        new AbstractConditionBuilder("sub", TypeComparisonCondition.class, true, TR, TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -91,9 +85,9 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder STRICT =
-        new AbstractConditionBuilder("scrictSub", TR, TR) {
+        new AbstractConditionBuilder("scrictSub", TypeComparisonCondition.class, false, TR, TR) {
             @Override
-            public boolean isSuitableFor(@NonNull String name) {
+            public boolean isSuitableFor(String name) {
                 if (super.isSuitableFor(name)) {
                     return true;
                 }
@@ -116,7 +110,8 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder DISJOINT_MODULO_NULL =
-        new AbstractConditionBuilder("disjointModuloNull", TR, TR) {
+        new AbstractConditionBuilder("disjointModuloNull", TypeComparisonCondition.class, false, TR,
+            TR) {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -138,7 +133,8 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractTacletBuilderCommand NEW_JAVATYPE =
-        new AbstractTacletBuilderCommand("new", SV, KJT) {
+        new AbstractTacletBuilderCommand(
+            createVarcondInfo("new", NewVarcond.class, false, SV, KJT)) {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
@@ -151,7 +147,8 @@ public class TacletBuilderManipulators {
         };
 
     public static final AbstractTacletBuilderCommand NEW_VAR =
-        new AbstractTacletBuilderCommand("new", SV, SORT) {
+        new AbstractTacletBuilderCommand(
+            createVarcondInfo("new", NewVarcond.class, false, SV, SORT)) {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
@@ -168,8 +165,8 @@ public class TacletBuilderManipulators {
         "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
-            super("notFreeIn", argumentsTypes);
+        public NotFreeInTacletBuilderCommand(ArgumentType... argumentsTypes) {
+            super(createVarcondInfo("notFreeIn", NotFreeIn.class, true, argumentsTypes));
         }
 
         @Override
@@ -195,7 +192,8 @@ public class TacletBuilderManipulators {
 
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(32);
     public static final AbstractTacletBuilderCommand NEW_TYPE_OF =
-        new AbstractTacletBuilderCommand("newTypeOf", SV, SV) {
+        new AbstractTacletBuilderCommand(
+            createVarcondInfo("newTypeOf", NewVarcond.class, false, SV, SV)) {
 
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
@@ -209,7 +207,8 @@ public class TacletBuilderManipulators {
             }
         };
     public static final AbstractTacletBuilderCommand NEW_DEPENDING_ON =
-        new AbstractTacletBuilderCommand("newDependingOn", SV, SV) {
+        new AbstractTacletBuilderCommand(
+            createVarcondInfo("newDependingOn", NewDependingOn.class, false, SV, SV)) {
             @Override
             public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -236,7 +235,8 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder ARRAY =
         new ConstructorBasedBuilder("isArray", ArrayTypeCondition.class, SV);
     public static final AbstractConditionBuilder REFERENCE_ARRAY =
-        new AbstractConditionBuilder("isReferenceArray", SV) {
+        new AbstractConditionBuilder("isReferenceArray", ArrayComponentTypeCondition.class, true,
+            SV) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -252,7 +252,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder THIS_REFERENCE =
         new ConstructorBasedBuilder("isThisReference", IsThisReference.class, SV);
     public static final AbstractConditionBuilder REFERENCE =
-        new AbstractConditionBuilder("isReference", TR) {
+        new AbstractConditionBuilder("isReference", TypeCondition.class, true, TR) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -302,8 +302,8 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
-            super(triggerName, SV, SORT);
+        public JavaTypeToSortConditionBuilder(String triggerName, boolean forceElmentary) {
+            super(triggerName, JavaTypeToSortCondition.class, false, SV, SORT);
             this.elmen = forceElmentary;
         }
 
@@ -332,7 +332,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
     // endregion
     public static final AbstractConditionBuilder STORE_TERM_IN =
-        new AbstractConditionBuilder("storeTermIn", SV, T) {
+        new AbstractConditionBuilder("storeTermIn", StoreTermInCondition.class, false, SV, T) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -350,7 +350,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder GET_FREE_INVARIANT = new ConstructorBasedBuilder(
         "\\getFreeInvariant", LoopFreeInvariantCondition.class, PV, SV, SV);
     public static final AbstractConditionBuilder GET_VARIANT =
-        new AbstractConditionBuilder("\\getVariant", PV, SV) {
+        new AbstractConditionBuilder("\\getVariant", LoopVariantCondition.class, false, PV, SV) {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
@@ -359,7 +359,7 @@ public class TacletBuilderManipulators {
             }
         };
     public static final AbstractConditionBuilder IS_LABELED =
-        new AbstractConditionBuilder("isLabeled", PV) {
+        new AbstractConditionBuilder("isLabeled", IsLabeledCondition.class, true, PV) {
             @Override
             public IsLabeledCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {

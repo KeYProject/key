@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * Simple default implementation for {@link TacletBuilderCommand}.
@@ -12,36 +11,26 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (12/9/19)
  */
 public abstract class AbstractTacletBuilderCommand implements TacletBuilderCommand {
-    private final @NonNull String triggerName;
-    private final @NonNull ArgumentType[] argumentsTypes;
+    protected final TacletBuilderCommandInfo info;
 
-    /**
-     * Construct this class with the parameters for {@link #isSuitableFor(String)} and
-     * {@link #getArgumentTypes()}.
-     *
-     * @param triggerName the name of this command.
-     * @param argumentsTypes the argument type of this command.
-     */
-    protected AbstractTacletBuilderCommand(@NonNull String triggerName,
-            @NonNull ArgumentType... argumentsTypes) {
-        this.triggerName = triggerName;
-        this.argumentsTypes = argumentsTypes;
+    protected AbstractTacletBuilderCommand(TacletBuilderCommandInfo info) {
+        this.info = info;
     }
 
     @Override
-    public boolean isSuitableFor(@NonNull String name) {
-        if (triggerName.equalsIgnoreCase(name)) {
+    public boolean isSuitableFor(String name) {
+        if (info.name().equalsIgnoreCase(name)) {
             return true;
         }
-        if (name.startsWith("\\")) // handling leading backslashes
-        {
+        // handling leading backslashes
+        if (name.startsWith("\\")) {
             return isSuitableFor(name.substring(1));
         }
         return false;
     }
 
     @Override
-    public ArgumentType[] getArgumentTypes() {
-        return argumentsTypes;
+    public TacletBuilderCommandInfo getInformation() {
+        return info;
     }
 }
