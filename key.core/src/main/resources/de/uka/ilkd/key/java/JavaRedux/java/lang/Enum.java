@@ -5,9 +5,13 @@ package java.lang;
 
 public abstract class Enum extends java.lang.Object implements java.lang.Comparable, java.io.Serializable
 {
-
    public final java.lang.String name();
-   public final int ordinal();
+
+   /*@ public normal_behavior
+     @   ensures \result == \dl_enumOrdinal(this);
+     @   assignable \strictly_nothing;
+     @*/
+   public /*@ helper */ final int ordinal();
    protected Enum(java.lang.String arg0, int arg1);
    public final java.lang.Class getDeclaringClass();
    public static java.lang.Enum valueOf(java.lang.Class arg0, java.lang.String arg1);

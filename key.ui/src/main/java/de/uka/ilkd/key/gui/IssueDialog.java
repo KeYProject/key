@@ -26,11 +26,11 @@ import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
-import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.ErrorMarkPainter;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -703,7 +703,8 @@ public final class IssueDialog extends JDialog {
                 if (isJava(uri.getPath())) {
                     showSourceCode(source, new JavaJMLEditorLexer());
                 } else if (isKeY(uri.getPath())) {
-                    showSourceCode(source, new KeYEditorLexer());
+                    showSourceCode(source,
+                        new LexerHighlighter.KeYLexerHighlighter().getEditorLexer());
                 } else {
                     txtSource.setText(source);
                 }

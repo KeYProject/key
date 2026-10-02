@@ -1,6 +1,8 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.java.transformations.pipeline;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +16,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SpecialJavaPrinter;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformerAbstract;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
@@ -100,6 +99,11 @@ class KeyJavaPipelineTest {
     @TestFactory
     Stream<DynamicTest> innerclass() throws IOException {
         return generatePipelineTests(Paths.get("pipelineTests/innerclass").toAbsolutePath());
+    }
+
+    @TestFactory
+    Stream<DynamicTest> enums() throws IOException {
+        return generatePipelineTests(Paths.get("pipelineTests/enums").toAbsolutePath());
     }
 
 

@@ -22,10 +22,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
-import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.CurrentLineHighlighter;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.key_project.util.java.IOUtil;
@@ -179,7 +179,7 @@ public class EditSourceFileAction extends KeyAction {
         if (file.toString().endsWith(".java")) {
             lexer = new JavaJMLEditorLexer();
         } else if (file.toString().endsWith(".key") || file.toString().endsWith(".proof")) {
-            lexer = new KeYEditorLexer();
+            lexer = new LexerHighlighter.KeYLexerHighlighter().getEditorLexer();
         } else {
             lexer = SourceHighlightDocument.TRIVIAL_LEXER;
         }
