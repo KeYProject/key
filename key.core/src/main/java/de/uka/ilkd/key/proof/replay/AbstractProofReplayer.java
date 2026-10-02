@@ -203,6 +203,18 @@ public abstract class AbstractProofReplayer {
         return ourApp;
     }
 
+    private NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
+        for (Node n = goal.node(); n != null; n = n.parent()) {
+            for (NoPosTacletApp introduced : n.getLocalIntroducedRules()) {
+                if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(introduced,
+                    app)) {
+                    return introduced;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Construct a new taclet application based on a step in the original proof
      *
@@ -228,16 +240,21 @@ public abstract class AbstractProofReplayer {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
-                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
                     break;
                 }
             }
+
+            if (ourApp == null) {
+                ourApp = lookupIntroducedTaclet(originalTacletApp, currGoal);
+            }
+
             if (ourApp == null) {
                 ourApp = currGoal.indexOfTaclets().lookup(tacletName);
             }
+
             if (ourApp == null) {
                 throw new IllegalStateException(
                     "proof replayer failed to find dynamically added taclet at original node "

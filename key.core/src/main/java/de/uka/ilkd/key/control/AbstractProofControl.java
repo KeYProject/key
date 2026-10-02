@@ -195,7 +195,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public boolean selectedTaclet(Taclet taclet, Goal goal,
             PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
-        if (applics.size() == 0) {
+        if (applics.isEmpty()) {
             return false;
         }
         return selectedTaclet(applics, goal);
@@ -207,7 +207,7 @@ public abstract class AbstractProofControl implements ProofControl {
         if (applics.size() == 1) {
             TacletApp firstApp = it.next();
             boolean ifSeqInteraction = !firstApp.taclet().assumesSequent().isEmpty();
-            if (isMinimizeInteraction() && !firstApp.complete()) {
+            if (isMinimizeInteraction() && !firstApp.completeExceptSkolemConstants()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(), services);
 
@@ -229,7 +229,8 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
 
             }
-            if (ifSeqInteraction || !firstApp.complete()) {
+            if (ifSeqInteraction || !firstApp.completeExceptSkolemConstants() ||
+                    (!isMinimizeInteraction() && !firstApp.complete())) {
                 LinkedList<TacletApp> l = new LinkedList<>();
                 l.add(firstApp);
                 TacletInstantiationModel[] models = completeAndApplyApp(l, goal);
