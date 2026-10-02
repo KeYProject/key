@@ -553,7 +553,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 }
             }
 
-            throw new AssertionError();
+            return null;
         }
     }
 
@@ -589,10 +589,43 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
     }
 
+    private static void replaceVariableDefault(ProgramVariable var, Expression init,
+                                        Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
+                                        LoopContractImpl r, Services services) {
+        // Do nothing.
+        // A variable whose initializer isn't another variable nor a literal cannot be replaced by that initializer in
+        // a logical expression.
+        // In realistic programs, this mainly occurs with variables like {@code \index} and {@code \values}.
+        // Since these aren't allowed to occur in a precondition or {@code \old} expression anyway, we don't need to
+        // do anything with them.
+    }
+
+    /**
+     * Helper function for {@link #toBlockContract()} to replaces variables defined in a for-loop's head statement
+     * by their initializer expressions where necessary, i.e., in the block contract's precondition and in the
+     * postcondition if part of an {@code \old} expression.
+     *
+     * @param var the variable to replace
+     * @param init the variable's initializer
+     * @param preReplacementMap a map mapping variables to their replacements for the block contract's precondition
+     * @param postReplacementMap a map mapping {@code \old} variable to their replacements for the block contract's
+     *                           postcondirion
+     * @param r the loop contract that is being converted to a block contract (see {@link #toBlockContract()})
+     * @param services services
+     */
     private static void replaceVariable(ProgramVariable var, Expression init,
             Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
             LoopContractImpl r, Services services) {
-        switch (ReplaceTypes.fromClass(init.getClass())) {
+        ReplaceTypes replaceTypes = ReplaceTypes.fromClass(init.getClass());
+
+        if (replaceTypes == null) {
+            // A variable whose initializer isn't another variable nor a literal cannot be replaced
+            // and isn't allowed to occur in a precondition or {@code \old} expression.
+            // We simply leave it as is here, which will cause an error later during name resolution.
+            return;
+        }
+
+        switch (replaceTypes) {
             case PROGRAM_VARIABLE -> replaceVariable(var, (ProgramVariable) init, preReplacementMap,
                 postReplacementMap, r, services);
             case ABSTRACT_INTEGER_LITERAL -> replaceVariable(var, (AbstractIntegerLiteral) init,
@@ -600,7 +633,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             case EMPTY_SEQ_LITERAL ->
                 replaceVariable(var, (EmptySeqLiteral) init, preReplacementMap,
                     postReplacementMap, r, services);
-            default -> throw new AssertionError();
+            default -> replaceVariableDefault(var, init, preReplacementMap, postReplacementMap, r, services);
         }
     }
 
