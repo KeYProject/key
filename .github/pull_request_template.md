@@ -77,4 +77,4 @@ This pull request resolves #.
      Please use the draft mode unless you think that your proposal
      should be brought onto master in the current form. -->
 
-The contributions within this pull request are licensed under GPLv2 (only) for inclusion in KeY.
+The contributions within this pull request are licensed under GPLv2, or (at your option) any later version, for inclusion in KeY.

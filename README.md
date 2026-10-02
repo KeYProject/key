@@ -18,7 +18,7 @@ For more information, refer to
   * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
   * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
-The current version of KeY is 3.1.0-dev, licensed under GPL v2.
+The current version of KeY is 3.1.0-dev, licensed under GPL v2 or later.
 
 
 Feel free to use the project templates to get started using KeY:
@@ -121,6 +121,6 @@ Copyright (C) 2011-2026 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 
-The KeY system is protected by the GNU General Public License.
+The KeY system is protected by the GNU General Public License, Version 2 or (at your option) any later version.
 See LICENSE.TXT for details.
 ```
